@@ -53,9 +53,13 @@ export const Home: React.FC = () => {
     };
   }, []);
 
-  const handleCreateClick = () => {
+  const handleCreateClick = (prompt?: string) => {
     if (isAuthenticated) {
-      navigate(RoutePath.CREATE_NOTE);
+      if (prompt) {
+        navigate(RoutePath.CREATE_NOTE, { state: { initialPrompt: prompt } });
+      } else {
+        navigate(RoutePath.CREATE_NOTE);
+      }
     } else {
       navigate(RoutePath.LOGIN);
     }
@@ -181,7 +185,7 @@ export const Home: React.FC = () => {
                 variant="secondary" 
                 size="sm" 
                 className="mt-6 w-full sm:w-auto bg-white text-blue font-extrabold uppercase shadow-3d-gray"
-                onClick={handleCreateClick}
+                onClick={() => handleCreateClick("What is one thing that made you feel peaceful today, even if just for a second?")}
               >
                 WRITE ABOUT IT
               </Button>

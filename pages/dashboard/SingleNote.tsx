@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Edit3, Trash2, ArrowLeft, Calendar, Clock, AlertCircle, Paperclip, FileText, Download, Smile, Sun, Cloud, Frown, Zap, Moon } from 'lucide-react';
+import { Edit3, Trash2, ArrowLeft, Calendar, Clock, AlertCircle, Paperclip, FileText, Download, Smile, Sun, Cloud, Frown, Zap, Moon, Tag } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { noteService } from '../../services/noteService';
 import { storageService } from '../../services/storageService';
@@ -156,6 +156,21 @@ export const SingleNote: React.FC = () => {
           
           <div className="p-8 md:p-12">
             <h1 className="mb-6 text-4xl font-display text-gray-text lowercase">{note.title}</h1>
+            
+            {note.tags && note.tags.length > 0 && (
+              <div className="mb-6 flex flex-wrap gap-2">
+                {note.tags.map(tag => (
+                  <button 
+                    key={tag} 
+                    onClick={() => navigate(`${RoutePath.NOTES}?tag=${tag}`)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue/5 border-2 border-blue/10 text-blue text-[12px] font-bold hover:bg-blue/10 transition-colors"
+                  >
+                    <Tag size={12} />
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            )}
             
             <div className="mb-8 flex flex-wrap items-center gap-4 text-[11px] font-extrabold uppercase tracking-wider text-gray-nav border-b-2 border-border pb-6">
               <span className="flex items-center"><Calendar size={14} className="mr-1.5 opacity-70" /> {new Date(note.createdAt).toLocaleDateString()}</span>

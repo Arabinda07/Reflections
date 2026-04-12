@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Loader2, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Meh, Frown, Sun, Cloud, Moon, Heart, Brain, Coffee, MessageSquare, Tag as TagIcon } from 'lucide-react';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Loader2, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Meh, Frown, Sun, Cloud, Moon, Heart, Brain, Coffee, MessageSquare, Tag as TagIcon, CheckCircle2 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Editor } from '../../components/ui/Editor';
 import { noteService } from '../../services/noteService';
@@ -16,14 +16,16 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 export const CreateNote: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>(); 
+  const location = useLocation();
+  const initialPrompt = location.state?.initialPrompt;
   
   const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState(initialPrompt ? `<p><strong>Prompt:</strong> ${initialPrompt}</p><p><br></p>` : '');
   const [mood, setMood] = useState<string | undefined>(undefined);
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
   const [saving, setSaving] = useState(false);
-  const [autoSaving, setAutoSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [loading, setLoading] = useState(true);
   const [isLimitReached, setIsLimitReached] = useState(false);
   const [isReflecting, setIsReflecting] = useState(false);
@@ -88,14 +90,15 @@ export const CreateNote: React.FC = () => {
         return;
       }
 
-      setAutoSaving(true);
+      setSaveStatus('saving');
       try {
         await noteService.update(currentId, data);
         lastSavedRef.current = { ...data };
+        setSaveStatus('saved');
+        setTimeout(() => setSaveStatus('idle'), 2000);
       } catch (error) {
         console.error("Auto-save failed:", error);
-      } finally {
-        setAutoSaving(false);
+        setSaveStatus('idle');
       }
     }, 2000),
     []
@@ -426,13 +429,20 @@ export const CreateNote: React.FC = () => {
              <span className="text-[12px] font-extrabold text-gray-nav uppercase tracking-wider">
                 {id ? 'edit note' : 'new journal entry'}
              </span>
-             {autoSaving && (
-               <span className="text-[10px] font-bold text-blue animate-pulse">Auto-saving...</span>
-             )}
            </div>
         </div>
         
         <div className="flex items-center gap-2">
+          {saveStatus === 'saving' && (
+            <span className="text-[11px] font-bold text-blue animate-pulse flex items-center gap-1 mr-2">
+              <Loader2 size={12} className="animate-spin" /> Saving...
+            </span>
+          )}
+          {saveStatus === 'saved' && (
+            <span className="text-[11px] font-bold text-green flex items-center gap-1 mr-2">
+              <CheckCircle2 size={12} /> Saved
+            </span>
+          )}
             <Button 
               variant="secondary" 
               size="sm" 

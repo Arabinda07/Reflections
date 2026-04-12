@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { Menu, Search, Sparkles, User, Settings, LogOut, Loader2, FileText, X, LogIn } from 'lucide-react';
+import { Menu, Search, Sparkles, User, Settings, LogOut, Loader2, FileText, X, LogIn, Moon, Sun } from 'lucide-react';
 import { RoutePath, Note } from '../types';
 import { noteService } from '../services/noteService';
 import { useAuth } from '../context/AuthContext';
@@ -11,6 +11,22 @@ export const DashboardLayout: React.FC = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return document.documentElement.classList.contains('dark');
+  });
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDarkMode]);
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
   
   const handleNavigation = (path: string) => {
     navigate(path);
@@ -45,6 +61,13 @@ export const DashboardLayout: React.FC = () => {
 
           {/* Right Side - Desktop Nav */}
           <div className="hidden md:flex items-center gap-2">
+            <button 
+              onClick={toggleDarkMode}
+              className="p-2 rounded-xl text-gray-nav hover:text-green hover:bg-green/5 transition-colors"
+              title="Toggle Dark Mode"
+            >
+              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
             {navItems.map((item) => (
               <button
                 key={item.label}
@@ -85,7 +108,14 @@ export const DashboardLayout: React.FC = () => {
           </div>
 
           {/* Mobile Menu Icon */}
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center gap-2">
+            <button 
+              onClick={toggleDarkMode}
+              className="p-2 rounded-xl text-gray-nav hover:text-green hover:bg-green/5 transition-colors"
+              title="Toggle Dark Mode"
+            >
+              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="p-2 rounded-xl hover:bg-gray-100 transition-colors z-[110]"
@@ -95,60 +125,60 @@ export const DashboardLayout: React.FC = () => {
             </button>
           </div>
         </div>
+      </nav>
 
-        {/* Mobile Menu Overlay */}
-        {isMobileMenuOpen && (
-          <div className="fixed inset-0 z-[105] md:hidden animate-in fade-in duration-300">
-            <div className="absolute inset-0 bg-white/98 backdrop-blur-2xl" onClick={() => setIsMobileMenuOpen(false)} />
-            <div className="relative flex flex-col p-6 pt-24 gap-4 h-full overflow-y-auto">
-              {navItems.map((item) => (
-                <button
-                  key={item.label}
-                  onClick={() => handleNavigation(item.path)}
-                  className="w-full p-5 text-left text-[20px] font-black uppercase tracking-widest text-gray-text border-b-2 border-border/50 hover:text-green transition-colors active:bg-green/5 rounded-xl"
+      {/* Mobile Menu Overlay - Moved OUTSIDE of nav to avoid overflow:hidden from liquid-glass */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-[105] md:hidden animate-in fade-in duration-300">
+          <div className="absolute inset-0 bg-white/98 backdrop-blur-2xl" onClick={() => setIsMobileMenuOpen(false)} />
+          <div className="relative flex flex-col p-6 pt-24 gap-4 h-full overflow-y-auto">
+            {navItems.map((item) => (
+              <button
+                key={item.label}
+                onClick={() => handleNavigation(item.path)}
+                className="w-full p-5 text-left text-[20px] font-black uppercase tracking-widest text-gray-text border-b-2 border-border/50 hover:text-green transition-colors active:bg-green/5 rounded-xl"
+              >
+                {item.label}
+              </button>
+            ))}
+            
+            <div className="mt-8 flex flex-col gap-4">
+              {isAuthenticated ? (
+                <Button 
+                  variant="ghost" 
+                  size="lg" 
+                  onClick={() => {
+                    logout();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full text-red hover:bg-red/5 h-16 font-black uppercase tracking-widest border-2 border-red/10"
                 >
-                  {item.label}
-                </button>
-              ))}
-              
-              <div className="mt-8 flex flex-col gap-4">
-                {isAuthenticated ? (
+                  LOGOUT
+                </Button>
+              ) : (
+                <>
                   <Button 
-                    variant="ghost" 
+                    variant="secondary" 
                     size="lg" 
-                    onClick={() => {
-                      logout();
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="w-full text-red hover:bg-red/5 h-16 font-black uppercase tracking-widest border-2 border-red/10"
+                    onClick={() => handleNavigation(RoutePath.LOGIN)}
+                    className="w-full h-16 font-black uppercase tracking-widest border-2 border-border shadow-3d-gray"
                   >
-                    LOGOUT
+                    SIGN IN
                   </Button>
-                ) : (
-                  <>
-                    <Button 
-                      variant="secondary" 
-                      size="lg" 
-                      onClick={() => handleNavigation(RoutePath.LOGIN)}
-                      className="w-full h-16 font-black uppercase tracking-widest border-2 border-border shadow-3d-gray"
-                    >
-                      SIGN IN
-                    </Button>
-                    <Button 
-                      variant="primary" 
-                      size="lg" 
-                      onClick={() => handleNavigation(RoutePath.SIGNUP)}
-                      className="w-full h-16 font-black uppercase tracking-widest shadow-3d-green"
-                    >
-                      SIGN UP
-                    </Button>
-                  </>
-                )}
-              </div>
+                  <Button 
+                    variant="primary" 
+                    size="lg" 
+                    onClick={() => handleNavigation(RoutePath.SIGNUP)}
+                    className="w-full h-16 font-black uppercase tracking-widest shadow-3d-green"
+                  >
+                    SIGN UP
+                  </Button>
+                </>
+              )}
             </div>
           </div>
-        )}
-      </nav>
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="pt-[64px] w-full max-w-[1440px] mx-auto">

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Plus, FileText, ArrowUpRight, Calendar as CalendarIcon, Search, Smile, Meh, Frown, Sun, Cloud, Moon, Zap, Trash2, Loader2, LayoutGrid, Calendar, Tag } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Plus, FileText, ArrowUpRight, Calendar as CalendarIcon, Search, Smile, Meh, Frown, Sun, Cloud, Moon, Zap, Trash2, Loader2, LayoutGrid, Calendar, Tag, X } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Note, RoutePath } from '../../types';
 import { noteService } from '../../services/noteService';
@@ -13,12 +13,16 @@ import { format, isSameDay } from 'date-fns';
 
 export const MyNotes: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'calendar'>('grid');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
+  const queryParams = new URLSearchParams(location.search);
+  const tagFilter = queryParams.get('tag');
 
   const fetchNotes = async () => {
     try {
@@ -34,6 +38,14 @@ export const MyNotes: React.FC = () => {
   useEffect(() => {
     fetchNotes();
   }, []);
+
+  const filteredNotes = tagFilter 
+    ? notes.filter(note => note.tags?.includes(tagFilter))
+    : notes;
+
+  const notesOnSelectedDate = filteredNotes.filter(note => 
+    isSameDay(new Date(note.updatedAt), selectedDate)
+  );
 
   const handleDelete = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
@@ -69,21 +81,23 @@ export const MyNotes: React.FC = () => {
     }
   };
 
-  const notesOnSelectedDate = notes.filter(note => 
-    isSameDay(new Date(note.updatedAt), selectedDate)
-  );
-
   const tileContent = ({ date, view }: { date: Date, view: string }) => {
     if (view === 'month') {
-      const dayNotes = notes.filter(note => isSameDay(new Date(note.updatedAt), date));
+      const dayNotes = filteredNotes.filter(note => isSameDay(new Date(note.updatedAt), date));
       if (dayNotes.length > 0) {
         return (
           <div className="flex justify-center mt-1">
             <div className="flex -space-x-1">
               {dayNotes.slice(0, 3).map((note, idx) => (
-                <div key={note.id} className={`h-1.5 w-1.5 rounded-full ${idx === 0 ? 'bg-blue' : idx === 1 ? 'bg-green' : 'bg-purple-500'}`} />
+                <div key={note.id} className="flex items-center justify-center">
+                  {note.mood ? (
+                    <div className="scale-75 origin-center">{getMoodIcon(note.mood)}</div>
+                  ) : (
+                    <div className={`h-1.5 w-1.5 rounded-full ${idx === 0 ? 'bg-blue' : idx === 1 ? 'bg-green' : 'bg-purple-500'}`} />
+                  )}
+                </div>
               ))}
-              {dayNotes.length > 3 && <div className="h-1.5 w-1.5 rounded-full bg-gray-300" />}
+              {dayNotes.length > 3 && <div className="h-1.5 w-1.5 rounded-full bg-gray-300 ml-1" />}
             </div>
           </div>
         );
@@ -100,6 +114,21 @@ export const MyNotes: React.FC = () => {
           <p className="text-gray-light mt-2 text-[17px] font-medium">
             Manage your personal knowledge base.
           </p>
+          {tagFilter && (
+            <div className="mt-4 flex items-center gap-2">
+              <span className="text-[13px] font-bold text-gray-nav">Filtering by tag:</span>
+              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue/5 border-2 border-blue/10 text-blue text-[12px] font-bold">
+                <Tag size={12} />
+                {tagFilter}
+                <button 
+                  onClick={() => navigate(RoutePath.NOTES)}
+                  className="ml-1 hover:text-red transition-colors"
+                >
+                  <X size={12} />
+                </button>
+              </span>
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-3">
           <div className="flex bg-white border-2 border-border rounded-xl p-1 shadow-[0_2px_0_0_#E5E5E5]">
@@ -204,7 +233,7 @@ export const MyNotes: React.FC = () => {
         </div>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-8">
-          {notes.map((note) => (
+          {filteredNotes.map((note) => (
             <div 
               key={note.id} 
               onClick={() => navigate(RoutePath.NOTE_DETAIL.replace(':id', note.id))}
@@ -295,20 +324,32 @@ export const MyNotes: React.FC = () => {
         </div>
       )}
       
-      {!loading && notes.length === 0 && (
+      {!loading && filteredNotes.length === 0 && (
           <div className="flex h-80 flex-col items-center justify-center rounded-[32px] border-2 border-dashed border-border bg-white text-center px-4">
              <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-3d-gray border-2 border-border mb-6">
                  <FileText size={28} className="text-gray-nav" />
              </div>
-             <h3 className="font-display text-[24px] text-gray-text lowercase">no notes yet</h3>
-             <p className="text-gray-light mb-8 max-w-sm font-medium">Create your first note to get started on your mental health journey.</p>
-             <Button 
-                onClick={() => navigate(RoutePath.CREATE_NOTE)} 
-                variant="primary" 
-                className="h-[48px] px-8 text-[15px] font-bold uppercase rounded-xl shadow-3d-green active:shadow-none active:translate-y-[4px] transition-all"
-              >
-                CREATE YOUR FIRST NOTE
-              </Button>
+             <h3 className="font-display text-[24px] text-gray-text lowercase">no notes found</h3>
+             <p className="text-gray-light mb-8 max-w-sm font-medium">
+               {tagFilter ? `No notes found with the tag "${tagFilter}".` : "Create your first note to get started on your mental health journey."}
+             </p>
+             {tagFilter ? (
+               <Button 
+                  onClick={() => navigate(RoutePath.NOTES)} 
+                  variant="secondary" 
+                  className="h-[48px] px-8 text-[15px] font-bold uppercase rounded-xl border-2 border-border text-gray-text shadow-3d-gray active:shadow-none active:translate-y-[4px] transition-all"
+                >
+                  CLEAR FILTER
+                </Button>
+             ) : (
+               <Button 
+                  onClick={() => navigate(RoutePath.CREATE_NOTE)} 
+                  variant="primary" 
+                  className="h-[48px] px-8 text-[15px] font-bold uppercase rounded-xl shadow-3d-green active:shadow-none active:translate-y-[4px] transition-all"
+                >
+                  CREATE YOUR FIRST NOTE
+                </Button>
+             )}
           </div>
       )}
     </div>
