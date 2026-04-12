@@ -111,6 +111,30 @@ export const CreateNote: React.FC = () => {
     }
   };
 
+  const handleMoodSelect = async (mId: string) => {
+    const isSelected = mood === mId;
+    const newMood = isSelected ? undefined : mId;
+    setMood(newMood);
+    generateDynamicPrompts(newMood);
+
+    // If editing, auto-save the mood
+    if (id) {
+      try {
+        await noteService.update(id, { mood: newMood });
+      } catch (error) {
+        console.error("Failed to auto-save mood:", error);
+      }
+    }
+  };
+
+  const getFileIcon = (type: string) => {
+    if (type.startsWith('image/')) return <ImageIcon size={20} />;
+    if (type.includes('pdf')) return <FileText size={20} className="text-red" />;
+    if (type.includes('word') || type.includes('officedocument')) return <FileText size={20} className="text-blue" />;
+    if (type.includes('zip') || type.includes('compressed')) return <Zap size={20} className="text-yellow-600" />;
+    return <FileIcon size={20} />;
+  };
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -416,28 +440,39 @@ export const CreateNote: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="mb-8">
-                  <p className="text-[11px] font-extrabold text-gray-nav uppercase tracking-widest mb-4">How are you feeling?</p>
-                  <div className="flex flex-wrap gap-2">
+                <div className="mb-10">
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-[11px] font-extrabold text-gray-nav uppercase tracking-widest">How are you feeling?</p>
+                    {mood && (
+                      <button 
+                        onClick={() => handleMoodSelect(mood)}
+                        className="text-[10px] font-extrabold text-gray-nav hover:text-red transition-colors uppercase tracking-tight"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-3">
                     {moods.map((m) => {
                       const Icon = m.icon;
                       const isSelected = mood === m.id;
                       return (
                         <button
                           key={m.id}
-                          onClick={() => {
-                            const newMood = isSelected ? undefined : m.id;
-                            setMood(newMood);
-                            generateDynamicPrompts(newMood);
-                          }}
-                          className={`flex items-center gap-2 px-4 py-2 rounded-xl border-2 transition-all duration-200 ${
+                          onClick={() => handleMoodSelect(m.id)}
+                          className={`group relative flex flex-col items-center justify-center w-20 h-20 rounded-2xl border-2 transition-all duration-300 ${
                             isSelected 
-                              ? `${m.color} border-current shadow-[0_2px_0_0_currentColor] scale-105` 
-                              : 'border-border bg-white text-gray-nav hover:border-blue/30 hover:bg-blue/5 hover:text-blue'
+                              ? `${m.color} border-current shadow-[0_4px_0_0_currentColor] -translate-y-1` 
+                              : 'border-border bg-white text-gray-nav hover:border-blue/30 hover:bg-blue/5 hover:text-blue hover:-translate-y-0.5'
                           }`}
                         >
-                          <Icon size={16} />
-                          <span className="text-[13px] font-bold uppercase">{m.label}</span>
+                          <Icon size={24} className={`transition-transform duration-300 ${isSelected ? 'scale-110' : 'group-hover:scale-110'}`} />
+                          <span className="mt-2 text-[10px] font-black uppercase tracking-tighter">{m.label}</span>
+                          {isSelected && (
+                            <div className="absolute -top-1 -right-1 h-4 w-4 bg-current rounded-full flex items-center justify-center text-white ring-2 ring-white">
+                              <Sparkles size={8} fill="currentColor" />
+                            </div>
+                          )}
                         </button>
                       );
                     })}
@@ -478,10 +513,10 @@ export const CreateNote: React.FC = () => {
                       <Paperclip size={16} className="text-gray-nav" />
                       Attachments ({newAttachments.length + existingAttachments.length})
                     </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {existingAttachments.map((att) => (
-                        <div key={att.path} className="group relative flex items-center gap-3 p-3 rounded-xl border-2 border-border bg-white hover:bg-blue/5 hover:border-blue/30 transition-all duration-200">
-                          <div className="h-10 w-10 shrink-0 rounded-lg bg-white border-2 border-border flex items-center justify-center text-gray-nav shadow-sm overflow-hidden">
+                        <div key={att.path} className="group relative flex items-center gap-3 p-4 rounded-2xl border-2 border-border bg-white hover:bg-blue/5 hover:border-blue/30 transition-all duration-300 shadow-sm">
+                          <div className="h-12 w-12 shrink-0 rounded-xl bg-white border-2 border-border flex items-center justify-center text-gray-nav shadow-inner overflow-hidden">
                              {att.type.startsWith('image/') ? (
                                <StorageImage 
                                  path={att.path} 
@@ -489,48 +524,59 @@ export const CreateNote: React.FC = () => {
                                  className="h-full w-full object-cover" 
                                />
                              ) : (
-                               <FileText size={20} />
+                               getFileIcon(att.type)
                              )}
                           </div>
                           <div className="min-w-0 flex-1">
                             <p className="text-[13px] font-bold text-gray-text truncate">{att.name}</p>
-                            <p className="text-[11px] text-gray-nav font-bold">{formatFileSize(att.size)}</p>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] text-gray-nav font-bold uppercase">{formatFileSize(att.size)}</span>
+                              <span className="h-1 w-1 rounded-full bg-border"></span>
+                              <span className="text-[10px] text-emerald-500 font-black uppercase">Saved</span>
+                            </div>
                           </div>
                           <button 
                             onClick={() => removeExistingAttachment(att)}
-                            className="h-8 w-8 rounded-xl bg-white text-gray-nav border-2 border-border shadow-[0_2px_0_0_#E5E5E5] flex items-center justify-center hover:text-red hover:border-red/30 active:shadow-none active:translate-y-[2px] transition-all duration-200"
+                            className="h-9 w-9 rounded-xl bg-white text-gray-nav border-2 border-border shadow-[0_2px_0_0_#E5E5E5] flex items-center justify-center hover:text-red hover:border-red/30 active:shadow-none active:translate-y-[2px] transition-all duration-200"
                             title="Remove attachment"
                           >
-                            <X size={14} strokeWidth={2.5} />
+                            <X size={16} strokeWidth={2.5} />
                           </button>
                         </div>
                       ))}
                       {newAttachments.map((file, index) => {
                         const isImage = file.type.startsWith('image/');
+                        const previewUrl = isImage ? URL.createObjectURL(file) : null;
                         return (
-                          <div key={`new-${index}`} className="group relative flex items-center gap-3 p-3 rounded-xl border-2 border-blue/20 bg-blue/5 hover:bg-white hover:border-blue/30 transition-all duration-200">
-                            <div className="h-10 w-10 shrink-0 rounded-lg bg-white border-2 border-blue/20 flex items-center justify-center text-blue shadow-sm overflow-hidden">
-                              {isImage ? (
+                          <div key={`new-${index}`} className="group relative flex items-center gap-3 p-4 rounded-2xl border-2 border-blue/20 bg-blue/5 hover:bg-white hover:border-blue/40 transition-all duration-300 shadow-sm animate-in zoom-in-95 duration-200">
+                            <div className="h-12 w-12 shrink-0 rounded-xl bg-white border-2 border-blue/20 flex items-center justify-center text-blue shadow-inner overflow-hidden">
+                              {isImage && previewUrl ? (
                                 <img 
-                                  src={URL.createObjectURL(file)} 
+                                  src={previewUrl} 
                                   alt="preview" 
                                   className="h-full w-full object-cover"
-                                  onLoad={(e) => URL.revokeObjectURL((e.target as HTMLImageElement).src)}
+                                  onLoad={() => {
+                                    if (previewUrl) URL.revokeObjectURL(previewUrl);
+                                  }}
                                 />
                               ) : (
-                                <FileIcon size={20} />
+                                getFileIcon(file.type)
                               )}
                             </div>
                             <div className="min-w-0 flex-1">
                               <p className="text-[13px] font-bold text-gray-text truncate">{file.name}</p>
-                              <p className="text-[11px] text-blue font-extrabold uppercase">READY TO UPLOAD</p>
+                              <div className="flex items-center gap-2">
+                                <span className="text-[10px] text-gray-nav font-bold uppercase">{formatFileSize(file.size)}</span>
+                                <span className="h-1 w-1 rounded-full bg-blue/20"></span>
+                                <span className="text-[10px] text-blue font-black uppercase tracking-tight">Ready to Upload</span>
+                              </div>
                             </div>
                             <button 
                               onClick={() => removeNewAttachment(index)}
-                              className="h-8 w-8 rounded-xl bg-white text-gray-nav border-2 border-border shadow-[0_2px_0_0_#E5E5E5] flex items-center justify-center hover:text-red hover:border-red/30 active:shadow-none active:translate-y-[2px] transition-all duration-200"
+                              className="h-9 w-9 rounded-xl bg-white text-gray-nav border-2 border-border shadow-[0_2px_0_0_#E5E5E5] flex items-center justify-center hover:text-red hover:border-red/30 active:shadow-none active:translate-y-[2px] transition-all duration-200"
                               title="Remove attachment"
                             >
-                              <X size={14} strokeWidth={2.5} />
+                              <X size={16} strokeWidth={2.5} />
                             </button>
                           </div>
                         );
