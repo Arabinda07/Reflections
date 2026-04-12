@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, FileText, ArrowUpRight, Calendar, Search, Smile, Meh, Frown, Sun, Cloud, Moon, Zap, Trash2, Loader2 } from 'lucide-react';
+import { Plus, FileText, ArrowUpRight, Calendar as CalendarIcon, Search, Smile, Meh, Frown, Sun, Cloud, Moon, Zap, Trash2, Loader2, LayoutGrid, Calendar, Tag } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Note, RoutePath } from '../../types';
 import { noteService } from '../../services/noteService';
 import { StorageImage } from '../../components/ui/StorageImage';
 import { useAuth } from '../../context/AuthContext';
+import ReactCalendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
+import './Calendar.css';
+import { format, isSameDay } from 'date-fns';
 
 export const MyNotes: React.FC = () => {
   const navigate = useNavigate();
@@ -13,6 +17,8 @@ export const MyNotes: React.FC = () => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'calendar'>('grid');
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   const fetchNotes = async () => {
     try {
@@ -63,6 +69,29 @@ export const MyNotes: React.FC = () => {
     }
   };
 
+  const notesOnSelectedDate = notes.filter(note => 
+    isSameDay(new Date(note.updatedAt), selectedDate)
+  );
+
+  const tileContent = ({ date, view }: { date: Date, view: string }) => {
+    if (view === 'month') {
+      const dayNotes = notes.filter(note => isSameDay(new Date(note.updatedAt), date));
+      if (dayNotes.length > 0) {
+        return (
+          <div className="flex justify-center mt-1">
+            <div className="flex -space-x-1">
+              {dayNotes.slice(0, 3).map((note, idx) => (
+                <div key={note.id} className={`h-1.5 w-1.5 rounded-full ${idx === 0 ? 'bg-blue' : idx === 1 ? 'bg-green' : 'bg-purple-500'}`} />
+              ))}
+              {dayNotes.length > 3 && <div className="h-1.5 w-1.5 rounded-full bg-gray-300" />}
+            </div>
+          </div>
+        );
+      }
+    }
+    return null;
+  };
+
   return (
     <div className="space-y-10 animate-in fade-in duration-500 pb-12 px-4 md:px-10">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-border pb-8 gap-4">
@@ -72,14 +101,32 @@ export const MyNotes: React.FC = () => {
             Manage your personal knowledge base.
           </p>
         </div>
-        <Button 
-          onClick={() => navigate(RoutePath.CREATE_NOTE)} 
-          variant="primary"
-          className="h-[48px] px-8 text-[15px] font-bold uppercase rounded-xl shadow-3d-green active:shadow-none active:translate-y-[4px] transition-all"
-        >
-          <Plus className="mr-2 h-5 w-5" />
-          CREATE NOTE
-        </Button>
+        <div className="flex items-center gap-3">
+          <div className="flex bg-white border-2 border-border rounded-xl p-1 shadow-[0_2px_0_0_#E5E5E5]">
+            <button 
+              onClick={() => setViewMode('grid')}
+              className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-blue/10 text-blue' : 'text-gray-nav hover:bg-gray-50'}`}
+              title="Grid View"
+            >
+              <LayoutGrid size={20} />
+            </button>
+            <button 
+              onClick={() => setViewMode('calendar')}
+              className={`p-2 rounded-lg transition-all ${viewMode === 'calendar' ? 'bg-blue/10 text-blue' : 'text-gray-nav hover:bg-gray-50'}`}
+              title="Calendar View"
+            >
+              <CalendarIcon size={20} />
+            </button>
+          </div>
+          <Button 
+            onClick={() => navigate(RoutePath.CREATE_NOTE)} 
+            variant="primary"
+            className="h-[48px] px-8 text-[15px] font-bold uppercase rounded-xl shadow-3d-green active:shadow-none active:translate-y-[4px] transition-all"
+          >
+            <Plus className="mr-2 h-5 w-5" />
+            CREATE NOTE
+          </Button>
+        </div>
       </div>
 
       {loading ? (
@@ -87,6 +134,73 @@ export const MyNotes: React.FC = () => {
           {[1, 2, 3].map((n) => (
              <div key={n} className="h-72 animate-pulse rounded-2xl bg-white border-2 border-border"></div>
           ))}
+        </div>
+      ) : viewMode === 'calendar' ? (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in slide-in-from-bottom-4 duration-500">
+          <div className="lg:col-span-7 xl:col-span-8">
+            <div className="bg-white border-2 border-border rounded-[32px] p-6 sm:p-8 shadow-[0_8px_0_0_#E5E5E5] liquid-glass">
+              <ReactCalendar 
+                onChange={(val) => setSelectedDate(val as Date)} 
+                value={selectedDate}
+                tileContent={tileContent}
+                className="w-full border-none font-sans"
+              />
+            </div>
+          </div>
+          <div className="lg:col-span-5 xl:col-span-4 space-y-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-[14px] font-black uppercase tracking-widest text-gray-text flex items-center gap-2">
+                <CalendarIcon size={18} className="text-blue" />
+                {format(selectedDate, 'MMMM do, yyyy')}
+              </h3>
+              <span className="text-[11px] font-bold text-gray-nav bg-gray-100 px-2 py-1 rounded-lg">
+                {notesOnSelectedDate.length} {notesOnSelectedDate.length === 1 ? 'Note' : 'Notes'}
+              </span>
+            </div>
+            
+            <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+              {notesOnSelectedDate.length > 0 ? (
+                notesOnSelectedDate.map(note => (
+                  <div 
+                    key={note.id}
+                    onClick={() => navigate(RoutePath.NOTE_DETAIL.replace(':id', note.id))}
+                    className="group cursor-pointer p-5 rounded-2xl bg-white border-2 border-border shadow-[0_4px_0_0_#E5E5E5] hover:shadow-none hover:translate-y-[2px] transition-all duration-200"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-bold text-gray-text group-hover:text-blue transition-colors truncate pr-4">{note.title}</h4>
+                      {getMoodIcon(note.mood)}
+                    </div>
+                    <p className="text-[13px] text-gray-light line-clamp-2 font-medium mb-3">
+                      {getPreviewText(note.content)}
+                    </p>
+                    {note.tags && note.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {note.tags.slice(0, 2).map(tag => (
+                          <span key={tag} className="text-[10px] font-bold text-blue bg-blue/5 px-2 py-0.5 rounded-lg border border-blue/10">#{tag}</span>
+                        ))}
+                        {note.tags.length > 2 && <span className="text-[10px] font-bold text-gray-nav">+{note.tags.length - 2}</span>}
+                      </div>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12 text-center bg-gray-50/50 rounded-[32px] border-2 border-dashed border-border">
+                  <div className="h-12 w-12 rounded-xl bg-white border-2 border-border flex items-center justify-center text-gray-nav/30 mb-4">
+                    <FileText size={24} />
+                  </div>
+                  <p className="text-[14px] font-bold text-gray-nav">No entries for this day</p>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="mt-2 text-blue text-[11px]"
+                    onClick={() => navigate(RoutePath.CREATE_NOTE)}
+                  >
+                    Create one now
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-8">
@@ -130,7 +244,7 @@ export const MyNotes: React.FC = () => {
                 <div className="absolute top-4 right-4 z-20 flex flex-col items-end gap-2">
                      <div className="flex items-center gap-2 rounded-xl bg-white border-2 border-border px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-gray-nav shadow-[0_2px_0_0_#E5E5E5]">
                         <div className="flex items-center gap-1.5 border-r-2 border-border pr-2 mr-0.5">
-                          <Calendar size={12} className="text-gray-nav" />
+                          <CalendarIcon size={12} className="text-gray-nav" />
                           <span>{new Date(note.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
                         </div>
                         {note.mood ? (
@@ -146,6 +260,15 @@ export const MyNotes: React.FC = () => {
               </div>
               
               <div className="flex flex-1 flex-col p-6">
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {note.tags?.map(tag => (
+                    <span key={tag} className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-blue/5 border border-blue/10 text-blue text-[10px] font-black uppercase tracking-tight">
+                      <Tag size={8} />
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+
                 <h3 className="mb-2 text-[18px] font-bold tracking-tight text-gray-text leading-snug group-hover:text-blue transition-colors">
                   {note.title}
                 </h3>
@@ -159,7 +282,7 @@ export const MyNotes: React.FC = () => {
                       <div className="h-6 w-6 rounded-full bg-blue flex items-center justify-center text-[10px] font-extrabold text-white shadow-3d-blue">
                         {user?.name?.charAt(0) || 'U'}
                       </div>
-                      <span className="text-[12px] font-bold text-gray-nav">Edited just now</span>
+                      <span className="text-[12px] font-bold text-gray-nav">Edited {format(new Date(note.updatedAt), 'MMM d')}</span>
                    </div>
                    <div className="flex items-center text-[12px] font-extrabold uppercase tracking-wider text-blue group-hover:opacity-70 transition-all">
                       <span>OPEN</span>

@@ -17,21 +17,27 @@ export const DashboardLayout: React.FC = () => {
     setIsMobileMenuOpen(false);
   };
 
+  const navItems = [
+    { label: 'My Notes', path: RoutePath.NOTES },
+    { label: 'Create Note', path: RoutePath.CREATE_NOTE },
+    { label: 'Account', path: RoutePath.ACCOUNT },
+  ];
+
   return (
     <div className="min-h-screen bg-white font-sans selection:bg-green/30 selection:text-green-hover">
       {/* Fixed Navbar */}
-      <nav className="fixed top-0 left-0 right-0 h-[64px] bg-white/80 border-b-2 border-border z-50 flex justify-center liquid-glass">
+      <nav className="fixed top-0 left-0 right-0 h-[64px] bg-white/80 border-b-2 border-border z-[100] flex justify-center liquid-glass">
         <div className="w-full max-w-[1440px] px-4 md:px-10 flex items-center justify-between">
           {/* Left Side */}
           <div className="flex items-center gap-4">
             <div 
               className="flex items-center gap-2 cursor-pointer group"
-              onClick={() => navigate(RoutePath.HOME)}
+              onClick={() => handleNavigation(RoutePath.HOME)}
             >
               <div className="h-10 w-10 rounded-xl bg-green flex items-center justify-center text-white shadow-3d-green group-hover:scale-110 transition-transform">
                 <Sparkles size={24} fill="currentColor" />
               </div>
-              <span className="font-display text-[24px] text-green lowercase tracking-tight">
+              <span className="font-display text-[20px] sm:text-[24px] text-green lowercase tracking-tight truncate max-w-[150px] sm:max-w-none">
                 mindful notes
               </span>
             </div>
@@ -39,11 +45,7 @@ export const DashboardLayout: React.FC = () => {
 
           {/* Right Side - Desktop Nav */}
           <div className="hidden md:flex items-center gap-2">
-            {[
-              { label: 'My Notes', path: RoutePath.NOTES },
-              { label: 'Create Note', path: RoutePath.CREATE_NOTE },
-              { label: 'Account', path: RoutePath.ACCOUNT },
-            ].map((item) => (
+            {navItems.map((item) => (
               <button
                 key={item.label}
                 onClick={() => navigate(item.path)}
@@ -83,10 +85,11 @@ export const DashboardLayout: React.FC = () => {
           </div>
 
           {/* Mobile Menu Icon */}
-          <div className="md:hidden">
+          <div className="md:hidden flex items-center">
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-xl hover:bg-gray-100 transition-colors z-[110]"
+              aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? <X className="text-gray-nav" size={24} /> : <Menu className="text-gray-nav" size={24} />}
             </button>
@@ -95,24 +98,20 @@ export const DashboardLayout: React.FC = () => {
 
         {/* Mobile Menu Overlay */}
         {isMobileMenuOpen && (
-          <div className="fixed inset-0 top-[64px] z-[100] md:hidden animate-in fade-in duration-300">
-            <div className="absolute inset-0 bg-white/95 backdrop-blur-xl" />
-            <div className="relative flex flex-col p-6 gap-4">
-              {[
-                { label: 'My Notes', path: RoutePath.NOTES },
-                { label: 'Create Note', path: RoutePath.CREATE_NOTE },
-                { label: 'Account', path: RoutePath.ACCOUNT },
-              ].map((item) => (
+          <div className="fixed inset-0 z-[105] md:hidden animate-in fade-in duration-300">
+            <div className="absolute inset-0 bg-white/98 backdrop-blur-2xl" onClick={() => setIsMobileMenuOpen(false)} />
+            <div className="relative flex flex-col p-6 pt-24 gap-4 h-full overflow-y-auto">
+              {navItems.map((item) => (
                 <button
                   key={item.label}
                   onClick={() => handleNavigation(item.path)}
-                  className="w-full p-4 text-left text-[18px] font-black uppercase tracking-widest text-gray-text border-b-2 border-border/50 hover:text-green transition-colors"
+                  className="w-full p-5 text-left text-[20px] font-black uppercase tracking-widest text-gray-text border-b-2 border-border/50 hover:text-green transition-colors active:bg-green/5 rounded-xl"
                 >
                   {item.label}
                 </button>
               ))}
               
-              <div className="mt-4 flex flex-col gap-3">
+              <div className="mt-8 flex flex-col gap-4">
                 {isAuthenticated ? (
                   <Button 
                     variant="ghost" 
@@ -121,7 +120,7 @@ export const DashboardLayout: React.FC = () => {
                       logout();
                       setIsMobileMenuOpen(false);
                     }}
-                    className="w-full text-red hover:bg-red/5 h-14 font-black uppercase tracking-widest"
+                    className="w-full text-red hover:bg-red/5 h-16 font-black uppercase tracking-widest border-2 border-red/10"
                   >
                     LOGOUT
                   </Button>
@@ -131,7 +130,7 @@ export const DashboardLayout: React.FC = () => {
                       variant="secondary" 
                       size="lg" 
                       onClick={() => handleNavigation(RoutePath.LOGIN)}
-                      className="w-full h-14 font-black uppercase tracking-widest"
+                      className="w-full h-16 font-black uppercase tracking-widest border-2 border-border shadow-3d-gray"
                     >
                       SIGN IN
                     </Button>
@@ -139,7 +138,7 @@ export const DashboardLayout: React.FC = () => {
                       variant="primary" 
                       size="lg" 
                       onClick={() => handleNavigation(RoutePath.SIGNUP)}
-                      className="w-full h-14 font-black uppercase tracking-widest"
+                      className="w-full h-16 font-black uppercase tracking-widest shadow-3d-green"
                     >
                       SIGN UP
                     </Button>

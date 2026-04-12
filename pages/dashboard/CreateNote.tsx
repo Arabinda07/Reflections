@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Loader2, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Meh, Frown, Sun, Cloud, Moon, Heart, Brain, Coffee, MessageSquare } from 'lucide-react';
+import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Loader2, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Meh, Frown, Sun, Cloud, Moon, Heart, Brain, Coffee, MessageSquare, Tag as TagIcon } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Editor } from '../../components/ui/Editor';
 import { noteService } from '../../services/noteService';
@@ -9,6 +9,7 @@ import { RoutePath, NoteAttachment } from '../../types';
 import { supabase } from '../../src/supabaseClient';
 import { StorageImage } from '../../components/ui/StorageImage';
 import { GoogleGenAI, Type } from "@google/genai";
+import debounce from 'lodash.debounce';
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
@@ -19,7 +20,10 @@ export const CreateNote: React.FC = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [mood, setMood] = useState<string | undefined>(undefined);
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState('');
   const [saving, setSaving] = useState(false);
+  const [autoSaving, setAutoSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isLimitReached, setIsLimitReached] = useState(false);
   const [isReflecting, setIsReflecting] = useState(false);
@@ -27,12 +31,7 @@ export const CreateNote: React.FC = () => {
   const [dynamicPrompts, setDynamicPrompts] = useState<string[]>([]);
   const [isGeneratingPrompts, setIsGeneratingPrompts] = useState(false);
   
-  // Image preview can be a Blob URL (new) or Storage Path (existing)
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  
-  // Attachments: Mixed list of new Files and existing NoteAttachments
-  const [newAttachments, setNewAttachments] = useState<File[]>([]);
-  const [existingAttachments, setExistingAttachments] = useState<NoteAttachment[]>([]);
+  const lastSavedRef = useRef({ title: '', content: '', mood: undefined as string | undefined, tags: [] as string[] });
 
   useEffect(() => {
     const checkLimitAndFetch = async () => {
@@ -55,8 +54,10 @@ export const CreateNote: React.FC = () => {
             setTitle(note.title);
             setContent(note.content);
             setMood(note.mood);
+            setTags(note.tags || []);
             setImagePreview(note.thumbnailUrl || null);
             setExistingAttachments(note.attachments || []);
+            lastSavedRef.current = { title: note.title, content: note.content, mood: note.mood, tags: note.tags || [] };
             // Generate prompts based on existing mood
             generateDynamicPrompts(note.mood);
           } else {
@@ -72,6 +73,53 @@ export const CreateNote: React.FC = () => {
 
     checkLimitAndFetch();
   }, [id, navigate]);
+
+  const debouncedAutoSave = useCallback(
+    debounce(async (currentId: string, data: { title: string, content: string, mood?: string, tags: string[] }) => {
+      if (!currentId) return;
+      
+      // Only save if something actually changed
+      if (
+        data.title === lastSavedRef.current.title &&
+        data.content === lastSavedRef.current.content &&
+        data.mood === lastSavedRef.current.mood &&
+        JSON.stringify(data.tags) === JSON.stringify(lastSavedRef.current.tags)
+      ) {
+        return;
+      }
+
+      setAutoSaving(true);
+      try {
+        await noteService.update(currentId, data);
+        lastSavedRef.current = { ...data };
+      } catch (error) {
+        console.error("Auto-save failed:", error);
+      } finally {
+        setAutoSaving(false);
+      }
+    }, 2000),
+    []
+  );
+
+  useEffect(() => {
+    if (id && !loading) {
+      debouncedAutoSave(id, { title, content, mood, tags });
+    }
+  }, [id, title, content, mood, tags, loading, debouncedAutoSave]);
+
+  const handleAddTag = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && tagInput.trim()) {
+      e.preventDefault();
+      if (!tags.includes(tagInput.trim())) {
+        setTags([...tags, tagInput.trim()]);
+      }
+      setTagInput('');
+    }
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    setTags(tags.filter(t => t !== tagToRemove));
+  };
 
   const generateDynamicPrompts = async (currentMood?: string) => {
     setIsGeneratingPrompts(true);
@@ -218,7 +266,7 @@ export const CreateNote: React.FC = () => {
       if (!user) throw new Error("Not authenticated");
 
       let noteId = id;
-      let noteData: any = { title, content, tags: [], mood };
+      let noteData: any = { title, content, tags, mood };
       
       if (!noteId) {
         const newNote = await noteService.create(noteData);
@@ -266,6 +314,7 @@ export const CreateNote: React.FC = () => {
         title,
         content,
         mood,
+        tags,
         thumbnailUrl: finalThumbnailUrl || undefined,
         attachments: finalAttachments
       });
@@ -373,9 +422,14 @@ export const CreateNote: React.FC = () => {
              BACK
            </Button>
            <div className="h-4 w-[2px] bg-border"></div>
-           <span className="text-[12px] font-extrabold text-gray-nav uppercase tracking-wider">
-              {id ? 'edit note' : 'new journal entry'}
-           </span>
+           <div className="flex flex-col">
+             <span className="text-[12px] font-extrabold text-gray-nav uppercase tracking-wider">
+                {id ? 'edit note' : 'new journal entry'}
+             </span>
+             {autoSaving && (
+               <span className="text-[10px] font-bold text-blue animate-pulse">Auto-saving...</span>
+             )}
+           </div>
         </div>
         
         <div className="flex items-center gap-2">
@@ -488,6 +542,33 @@ export const CreateNote: React.FC = () => {
                         </button>
                       );
                     })}
+                  </div>
+                </div>
+
+                <div className="mb-10">
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-[11px] font-extrabold text-gray-nav uppercase tracking-widest">Tags</p>
+                  </div>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {tags.map(tag => (
+                      <span key={tag} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue/5 border-2 border-blue/10 text-blue text-[12px] font-bold">
+                        #{tag}
+                        <button onClick={() => removeTag(tag)} className="hover:text-red transition-colors">
+                          <X size={12} />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                  <div className="relative max-w-xs">
+                    <TagIcon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-nav" />
+                    <input 
+                      type="text"
+                      placeholder="Add tag and press Enter..."
+                      value={tagInput}
+                      onChange={(e) => setTagInput(e.target.value)}
+                      onKeyDown={handleAddTag}
+                      className="w-full pl-9 pr-4 py-2 rounded-xl border-2 border-border bg-white text-[13px] font-bold focus:border-blue focus:outline-none transition-all"
+                    />
                   </div>
                 </div>
 
