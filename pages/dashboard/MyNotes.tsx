@@ -64,9 +64,14 @@ export const MyNotes: React.FC = () => {
   };
 
   const getPreviewText = (html: string) => {
+    if (!html || html === '<p><br></p>') return "No content available";
     const tmp = document.createElement("DIV");
     tmp.innerHTML = html;
-    return tmp.textContent || tmp.innerText || "";
+    const text = tmp.textContent || tmp.innerText || "";
+    if (text.length > 100) {
+      return text.substring(0, 100) + "...";
+    }
+    return text || "No content available";
   };
 
   const getMoodIcon = (mood?: string) => {

@@ -115,7 +115,7 @@ export const SingleNote: React.FC = () => {
               size="sm" 
               onClick={handleEdit}
               disabled={isDeleting}
-              className="border-2 border-border text-blue shadow-3d-gray active:shadow-none active:translate-y-[2px] transition-all"
+              className="border-2 border-border text-blue shadow-3d-gray active:shadow-none active:translate-y-[2px] transition-all liquid-glass"
             >
               <Edit3 className="mr-2 h-3.5 w-3.5" />
               EDIT
@@ -126,7 +126,7 @@ export const SingleNote: React.FC = () => {
               onClick={initiateDelete} 
               isLoading={isDeleting}
               disabled={isDeleting}
-              className="border-2 border-border text-red shadow-3d-gray active:shadow-none active:translate-y-[2px] transition-all hover:bg-red/5 hover:border-red/30"
+              className="border-2 border-border text-red shadow-3d-gray active:shadow-none active:translate-y-[2px] transition-all hover:bg-red/5 hover:border-red/30 liquid-glass"
             >
               <Trash2 className="mr-2 h-3.5 w-3.5" />
               DELETE
@@ -163,7 +163,7 @@ export const SingleNote: React.FC = () => {
                   <button 
                     key={tag} 
                     onClick={() => navigate(`${RoutePath.NOTES}?tag=${tag}`)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue/5 border-2 border-blue/10 text-blue text-[12px] font-bold hover:bg-blue/10 transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue/5 border-2 border-blue/10 text-blue text-[12px] font-bold hover:bg-blue/10 transition-colors liquid-glass"
                   >
                     <Tag size={12} />
                     {tag}
@@ -184,7 +184,7 @@ export const SingleNote: React.FC = () => {
             </div>
 
             <div 
-              className="prose prose-zinc prose-lg max-w-none text-gray-text leading-8 font-medium"
+              className="prose prose-zinc prose-lg max-w-prose mx-auto text-gray-text leading-loose font-serif"
               dangerouslySetInnerHTML={{ __html: note.content }}
             />
 

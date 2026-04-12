@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Loader2, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Meh, Frown, Sun, Cloud, Moon, Heart, Brain, Coffee, MessageSquare, Tag as TagIcon, CheckCircle2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Loader2, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Meh, Frown, Sun, Cloud, Moon, Heart, Brain, Coffee, MessageSquare, Tag as TagIcon, CheckCircle2, Check } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Editor } from '../../components/ui/Editor';
 import { noteService } from '../../services/noteService';
@@ -40,7 +41,7 @@ export const CreateNote: React.FC = () => {
   const initialPrompt = location.state?.initialPrompt;
   
   const [title, setTitle] = useState('');
-  const [content, setContent] = useState(initialPrompt ? `<p><strong>Prompt:</strong> ${initialPrompt}</p><p><br></p>` : '');
+  const [content, setContent] = useState('');
   const [mood, setMood] = useState<string | undefined>(undefined);
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
@@ -48,7 +49,7 @@ export const CreateNote: React.FC = () => {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [loading, setLoading] = useState(true);
   const [isLimitReached, setIsLimitReached] = useState(false);
-  const [activePlaceholder, setActivePlaceholder] = useState<string | null>(null);
+  const [activePlaceholder, setActivePlaceholder] = useState<string | null>(initialPrompt || null);
   const [isReflecting, setIsReflecting] = useState(false);
   const [aiReflection, setAiReflection] = useState<string | null>(null);
   const [dynamicPrompts, setDynamicPrompts] = useState<string[]>([]);
@@ -459,16 +460,32 @@ export const CreateNote: React.FC = () => {
         </div>
         
         <div className="flex items-center gap-2">
-          {saveStatus === 'saving' && (
-            <span className="text-[11px] font-bold text-blue animate-pulse flex items-center gap-1 mr-2">
-              <Loader2 size={12} className="animate-spin" /> Saving...
-            </span>
-          )}
-          {saveStatus === 'saved' && (
-            <span className="text-[11px] font-bold text-green flex items-center gap-1 mr-2">
-              <CheckCircle2 size={12} /> Saved
-            </span>
-          )}
+          <AnimatePresence mode="wait">
+            {saveStatus === 'saving' && (
+              <motion.div 
+                key="saving"
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                className="text-[11px] font-bold text-blue flex items-center gap-1.5 mr-2 px-3 py-1 rounded-full bg-blue/5 border border-blue/10"
+              >
+                <Loader2 size={12} className="animate-spin" />
+                <span>Saving...</span>
+              </motion.div>
+            )}
+            {saveStatus === 'saved' && (
+              <motion.div 
+                key="saved"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="text-[11px] font-bold text-green flex items-center gap-1.5 mr-2 px-3 py-1 rounded-full bg-green/5 border border-green/10"
+              >
+                <Check size={12} className="text-green" />
+                <span>Saved</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
             <Button 
               variant="secondary" 
               size="sm" 
