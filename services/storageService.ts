@@ -1,4 +1,4 @@
-import { supabase } from '../supabaseClient';
+import { supabase } from '../src/supabaseClient';
 
 export const storageService = {
   // Since bucket is private, we must use signed URLs
@@ -17,10 +17,10 @@ export const storageService = {
     return data.signedUrl;
   },
 
-  async uploadFile(file: File, userId: string, folder: string, customName?: string): Promise<string> {
-    // Sanitize filename and ensure uniqueness
-    const fileName = customName || `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-    const path = `${userId}/${folder}/${fileName}`;
+  async uploadFile(file: File, userId: string, featureName: string, itemId: string): Promise<string> {
+    const extension = file.name.split('.').pop();
+    const uuid = crypto.randomUUID();
+    const path = `${userId}/${featureName}/${itemId}/${uuid}.${extension}`;
     
     const { error } = await supabase.storage
       .from('app-files')

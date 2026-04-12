@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { User, Mail, Shield, AlertTriangle, Save, Camera, Lock, ChevronRight, Globe, Key, Trash2, Smartphone } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { supabase } from '../../supabaseClient';
+import { supabase } from '../../src/supabaseClient';
 import { RoutePath } from '../../types';
 import { storageService } from '../../services/storageService';
 import { StorageImage } from '../../components/ui/StorageImage';
@@ -64,7 +64,7 @@ export const Account: React.FC = () => {
         setLoading(true);
         // Upload to {userId}/avatar/profile.ext
         const extension = file.name.split('.').pop();
-        const path = await storageService.uploadFile(file, userId, 'avatar', `profile.${extension}`);
+        const path = await storageService.uploadFile(file, userId, 'avatar', 'profile');
         
         // Update local state to show preview immediately (using blob for speed, but real path for save)
         setAvatarPath(path);

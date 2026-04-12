@@ -5,6 +5,7 @@ import { Button } from '../../components/ui/Button';
 import { RoutePath } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { noteService } from '../../services/noteService';
+import { supabase } from '../../src/supabaseClient';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -14,7 +15,8 @@ export const Home: React.FC = () => {
 
   useEffect(() => {
     const fetchCount = async () => {
-      if (isAuthenticated) {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (authUser) {
         setIsCountLoading(true);
         try {
           const count = await noteService.getCount();
@@ -29,7 +31,27 @@ export const Home: React.FC = () => {
     };
 
     fetchCount();
-  }, [isAuthenticated]);
+
+    // Real-time subscription to update count automatically
+    const channel = supabase
+      .channel('note-count-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'notes',
+        },
+        () => {
+          fetchCount();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   const handleCreateClick = () => {
     if (isAuthenticated) {

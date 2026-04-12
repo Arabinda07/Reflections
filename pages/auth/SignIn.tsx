@@ -4,12 +4,13 @@ import { Mail, Lock, CheckCircle } from 'lucide-react';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { RoutePath } from '../../types';
-import { supabase } from '../../supabaseClient';
+import { supabase } from '../../src/supabaseClient';
 
 export const SignIn: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const successMessage = location.state?.successMessage;
   const prefilledEmail = location.state?.email || '';
@@ -17,25 +18,26 @@ export const SignIn: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
 
     const formData = new FormData(e.currentTarget as HTMLFormElement);
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
     
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password
       });
 
-      if (error) {
-        alert(error.message);
+      if (signInError) {
+        setError(signInError.message);
       } else {
         navigate(RoutePath.HOME);
       }
     } catch (err) {
       console.error('Login error:', err);
-      alert('An unexpected error occurred');
+      setError('An unexpected error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -52,12 +54,12 @@ export const SignIn: React.FC = () => {
       });
 
       if (error) {
-        alert(error.message);
+        setError(error.message);
         setLoading(false);
       }
     } catch (err) {
       console.error("Google login error:", err);
-      alert("An unexpected error occurred");
+      setError("An unexpected error occurred during Google login.");
       setLoading(false);
     }
   };
@@ -119,6 +121,12 @@ export const SignIn: React.FC = () => {
             >
               SIGN IN
             </Button>
+
+            {error && (
+              <p className="text-[13px] font-bold text-red text-center mt-2 animate-in fade-in slide-in-from-top-1">
+                {error}
+              </p>
+            )}
           </form>
 
           <div className="my-8 flex w-full items-center gap-4">

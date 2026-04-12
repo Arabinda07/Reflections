@@ -6,7 +6,7 @@ import { Editor } from '../../components/ui/Editor';
 import { noteService } from '../../services/noteService';
 import { storageService } from '../../services/storageService';
 import { RoutePath, NoteAttachment } from '../../types';
-import { supabase } from '../../supabaseClient';
+import { supabase } from '../../src/supabaseClient';
 import { StorageImage } from '../../components/ui/StorageImage';
 import { GoogleGenAI } from "@google/genai";
 
@@ -155,7 +155,8 @@ export const CreateNote: React.FC = () => {
         finalThumbnailUrl = await storageService.uploadFile(
           file, 
           user.id, 
-          `notes/${noteId}/cover`
+          'notes',
+          noteId
         );
       } 
       else if (!imagePreview) {
@@ -167,8 +168,8 @@ export const CreateNote: React.FC = () => {
         const path = await storageService.uploadFile(
           file, 
           user.id, 
-          `notes/${noteId}/attachments`,
-          `${Date.now()}-${file.name}`
+          'notes',
+          noteId
         );
         uploadedAttachments.push({
           name: file.name,

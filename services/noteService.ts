@@ -1,4 +1,4 @@
-import { supabase } from '../supabaseClient';
+import { supabase } from '../src/supabaseClient';
 import { Note, NoteAttachment } from '../types';
 import { storageService } from './storageService';
 
@@ -53,7 +53,6 @@ export const noteService = {
 
   // Search notes by title or content
   search: async (query: string): Promise<Note[]> => {
-    await delay(300); // Small delay for UX
     const { data, error } = await supabase
       .from('notes')
       .select('*')
@@ -150,6 +149,3 @@ export const noteService = {
     if (error) throw error;
   }
 };
-
-// Internal delay helper for responsiveness sim
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));

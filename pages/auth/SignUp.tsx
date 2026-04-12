@@ -4,15 +4,17 @@ import { Mail, Lock, User, UserPlus } from 'lucide-react';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { RoutePath } from '../../types';
-import { supabase } from '../../supabaseClient';
+import { supabase } from '../../src/supabaseClient';
 
 export const SignUp: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
 
     const formData = new FormData(e.currentTarget as HTMLFormElement);
     const email = formData.get('email') as string;
@@ -20,29 +22,33 @@ export const SignUp: React.FC = () => {
     const name = formData.get('name') as string;
     
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            name: name,
+            full_name: name,
           }
         }
       });
 
-      if (error) {
-        alert(error.message);
-      } else {
+      if (signUpError) {
+        setError(signUpError.message);
+      } else if (data.user && !data.session) {
+        // Email confirmation is likely enabled
         navigate(RoutePath.LOGIN, { 
           state: { 
-            successMessage: 'Account created successfully! Please check your email for verification.',
+            successMessage: 'Account created successfully! Please check your email and verify your address before logging in.',
             email: email
           } 
         });
+      } else if (data.session) {
+        // Auto-login happened (email confirmation disabled)
+        navigate(RoutePath.HOME);
       }
     } catch (err) {
       console.error('Signup error:', err);
-      alert('An unexpected error occurred');
+      setError('An unexpected error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -59,12 +65,12 @@ export const SignUp: React.FC = () => {
       });
 
       if (error) {
-        alert(error.message);
+        setError(error.message);
         setLoading(false);
       }
     } catch (err) {
       console.error("Google login error:", err);
-      alert("An unexpected error occurred");
+      setError("An unexpected error occurred during Google login.");
       setLoading(false);
     }
   };
@@ -123,6 +129,12 @@ export const SignUp: React.FC = () => {
             >
               CREATE ACCOUNT
             </Button>
+
+            {error && (
+              <p className="text-[13px] font-bold text-red text-center mt-2 animate-in fade-in slide-in-from-top-1">
+                {error}
+              </p>
+            )}
           </form>
 
           <div className="my-8 flex w-full items-center gap-4">
