@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
-import { Menu, Search, Sparkles, User, Settings, LogOut, Loader2, FileText, X, LogIn, Moon, Sun } from 'lucide-react';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { Menu, Search, Sparkles, User, Settings, LogOut, Loader2, FileText, X, LogIn, Moon, Sun, ArrowRight } from 'lucide-react';
 import { RoutePath, Note } from '../types';
 import { noteService } from '../services/noteService';
 import { useAuth } from '../context/AuthContext';
@@ -9,11 +9,14 @@ import { StorageImage } from '../components/ui/StorageImage';
 
 export const DashboardLayout: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return document.documentElement.classList.contains('dark');
   });
+
+  const isLandingPage = location.pathname === RoutePath.HOME && !isAuthenticated;
 
   useEffect(() => {
     if (isDarkMode) {
@@ -27,13 +30,12 @@ export const DashboardLayout: React.FC = () => {
     setIsDarkMode(!isDarkMode);
   };
 
-  
   const handleNavigation = (path: string) => {
     navigate(path);
     setIsMobileMenuOpen(false);
   };
 
-  const navItems = [
+  const navItems = isLandingPage ? [] : [
     { label: 'My Notes', path: RoutePath.NOTES },
     { label: 'Create Note', path: RoutePath.CREATE_NOTE },
     { label: 'Account', path: RoutePath.ACCOUNT },
@@ -129,30 +131,44 @@ export const DashboardLayout: React.FC = () => {
 
       {/* Mobile Menu Overlay - Moved OUTSIDE of nav to avoid overflow:hidden from liquid-glass */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-[105] md:hidden animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-[105] md:hidden animate-in fade-in duration-500">
           <div className="absolute inset-0 bg-white/98 backdrop-blur-2xl" onClick={() => setIsMobileMenuOpen(false)} />
           
+          {/* Ambient Background for Mobile Menu */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-[-10%] right-[-10%] w-[300px] h-[300px] bg-green/10 blur-[100px] rounded-full animate-pulse" />
+            <div className="absolute bottom-[-10%] left-[-10%] w-[300px] h-[300px] bg-blue/10 blur-[100px] rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
+          </div>
+
           {/* Close Button */}
           <button 
             onClick={() => setIsMobileMenuOpen(false)}
-            className="absolute top-4 right-4 p-2 rounded-xl text-gray-nav hover:text-green hover:bg-green/5 transition-colors z-[110]"
+            className="absolute top-4 right-4 p-3 rounded-2xl text-gray-nav hover:text-green hover:bg-green/5 transition-all z-[110] border-2 border-border bg-white shadow-3d-gray active:shadow-none active:translate-y-[2px]"
             aria-label="Close menu"
           >
-            <X size={28} />
+            <X size={24} />
           </button>
 
-          <div className="relative flex flex-col p-6 pt-24 gap-4 h-full overflow-y-auto">
+          <div className="relative flex flex-col p-8 pt-24 gap-6 h-full overflow-y-auto">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="h-12 w-12 rounded-2xl bg-green flex items-center justify-center text-white shadow-3d-green">
+                <Sparkles size={28} fill="currentColor" />
+              </div>
+              <span className="font-display text-[28px] text-green lowercase">mindful notes</span>
+            </div>
+
             {navItems.map((item) => (
               <button
                 key={item.label}
                 onClick={() => handleNavigation(item.path)}
-                className="w-full p-5 text-left text-[20px] font-black uppercase tracking-widest text-gray-text border-b-2 border-border/50 hover:text-green transition-colors active:bg-green/5 rounded-xl"
+                className="w-full p-6 text-left text-[24px] font-black uppercase tracking-widest text-gray-text border-b-2 border-border/50 hover:text-green transition-all active:bg-green/5 rounded-2xl flex items-center justify-between group"
               >
-                {item.label}
+                <span>{item.label}</span>
+                <ArrowRight className="opacity-0 group-hover:opacity-100 transition-opacity" />
               </button>
             ))}
             
-            <div className="mt-8 flex flex-col gap-4">
+            <div className="mt-auto flex flex-col gap-4 pb-10">
               {isAuthenticated ? (
                 <Button 
                   variant="ghost" 
@@ -161,17 +177,17 @@ export const DashboardLayout: React.FC = () => {
                     logout();
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full text-red hover:bg-red/5 h-16 font-black uppercase tracking-widest border-2 border-red/10"
+                  className="w-full text-red hover:bg-red/5 h-16 font-black uppercase tracking-widest border-2 border-red/10 rounded-2xl"
                 >
                   LOGOUT
                 </Button>
               ) : (
-                <>
+                <div className="grid grid-cols-1 gap-4">
                   <Button 
                     variant="secondary" 
                     size="lg" 
                     onClick={() => handleNavigation(RoutePath.LOGIN)}
-                    className="w-full h-16 font-black uppercase tracking-widest border-2 border-border shadow-3d-gray"
+                    className="w-full h-16 font-black uppercase tracking-widest border-2 border-border shadow-3d-gray rounded-2xl liquid-glass"
                   >
                     SIGN IN
                   </Button>
@@ -179,11 +195,11 @@ export const DashboardLayout: React.FC = () => {
                     variant="primary" 
                     size="lg" 
                     onClick={() => handleNavigation(RoutePath.SIGNUP)}
-                    className="w-full h-16 font-black uppercase tracking-widest shadow-3d-green"
+                    className="w-full h-16 font-black uppercase tracking-widest shadow-3d-green rounded-2xl liquid-glass"
                   >
                     SIGN UP
                   </Button>
-                </>
+                </div>
               )}
             </div>
           </div>

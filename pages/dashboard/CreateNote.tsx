@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Loader2, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Meh, Frown, Sun, Cloud, Moon, Heart, Brain, Coffee, MessageSquare, Tag as TagIcon, CheckCircle2, Check } from 'lucide-react';
+import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Loader2, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Meh, Frown, Sun, Cloud, Moon, Heart, Brain, Coffee, MessageSquare, Tag as TagIcon, CheckCircle2, Check, RefreshCw } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Editor } from '../../components/ui/Editor';
 import { noteService } from '../../services/noteService';
@@ -58,7 +58,24 @@ export const CreateNote: React.FC = () => {
   const [newAttachments, setNewAttachments] = useState<File[]>([]);
   const [existingAttachments, setExistingAttachments] = useState<NoteAttachment[]>([]);
   
+  // New UI states
+  const [isMoodOpen, setIsMoodOpen] = useState(false);
+  const [isTagsOpen, setIsTagsOpen] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
+  
   const lastSavedRef = useRef({ title: '', content: '', mood: undefined as string | undefined, tags: [] as string[] });
+  const editorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleFocus = () => setIsFocused(true);
+    const handleBlur = () => setIsFocused(false);
+    
+    // We'll attach these to the editor container or listen for typing
+    return () => {
+      // Cleanup
+    };
+  }, []);
 
   useEffect(() => {
     const checkLimitAndFetch = async () => {
@@ -261,15 +278,30 @@ export const CreateNote: React.FC = () => {
       const moodText = mood ? `The user is feeling ${mood}.` : 'The user has not specified a specific mood.';
       const titleText = title ? `The entry is titled "${title}".` : 'The entry has no title.';
       
+      const pastNotes = await noteService.getAll();
+      const pastContext = pastNotes
+        .filter(n => n.id !== id)
+        .slice(0, 5)
+        .map(n => n.title)
+        .filter(Boolean)
+        .join(', ');
+
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: `You are a compassionate mental health journaling assistant. 
-        Based on the following journal entry, provide a brief (2-3 sentences), empathetic reflection or a thoughtful follow-up question to help the user process their thoughts. 
-        Be supportive, non-judgmental, and deeply contextual.
+        Based on the following journal entry and the user's past context, provide a brief (2-3 sentences), empathetic reflection.
         
-        Context:
-        - ${titleText}
-        - ${moodText}
+        CRITICAL RULES:
+        1. If the current entry is too short (less than 50 words) and there are fewer than 3 past entries, DO NOT hallucinate deep insights. Instead, warmly encourage the user to write more so you can get to know them better.
+        2. If you have enough data, reference specific themes or emotions mentioned.
+        3. Be supportive, non-judgmental, and deeply contextual.
+        
+        Past Context (titles of recent entries):
+        ${pastContext || 'No past entries yet.'}
+        
+        Current Entry Context:
+        - Title: ${title || 'Untitled'}
+        - Mood: ${mood || 'Not specified'}
         
         Entry Content:
         ${plainText}
@@ -285,6 +317,37 @@ export const CreateNote: React.FC = () => {
       setIsReflecting(false);
     }
   };
+
+  const generateSuggestedTags = async () => {
+    if (!content || content === '<p><br></p>') return;
+    try {
+      const plainText = content.replace(/<[^>]*>/g, '');
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: `Based on this journal entry, suggest 3 relevant tags for organization. Return only a JSON array of strings.
+        
+        Entry:
+        ${plainText}`,
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.ARRAY,
+            items: { type: Type.STRING }
+          }
+        }
+      });
+      const result = JSON.parse(response.text || "[]");
+      setSuggestedTags(result);
+    } catch (error) {
+      console.error("Failed to suggest tags:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (isTagsOpen && suggestedTags.length === 0) {
+      generateSuggestedTags();
+    }
+  }, [isTagsOpen]);
 
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes';
@@ -445,7 +508,7 @@ export const CreateNote: React.FC = () => {
 
   return (
     <div className="mx-auto max-w-5xl animate-in fade-in duration-500 pb-20 px-4 md:px-10">
-      <nav className="sticky top-4 z-50 mb-8 flex items-center justify-between rounded-2xl border-2 border-border bg-white/90 px-4 py-3 shadow-[0_4px_0_0_#E5E5E5] backdrop-blur-2xl transition-all">
+      <nav className={`sticky top-4 z-50 mb-8 flex items-center justify-between rounded-2xl border-2 border-border bg-white/90 px-4 py-3 shadow-[0_4px_0_0_#E5E5E5] backdrop-blur-2xl transition-all duration-500 ${isFocused ? 'opacity-40 hover:opacity-100' : 'opacity-100'}`}>
         <div className="flex items-center gap-3">
            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-bold uppercase text-[12px]">
              <ArrowLeft className="mr-2 h-4 w-4" />
@@ -537,21 +600,146 @@ export const CreateNote: React.FC = () => {
             )}
 
             <div className="flex-1 px-8 py-10 md:px-12 md:py-10">
-                <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+                <div className={`mb-12 flex flex-wrap items-center justify-between gap-4 transition-all duration-500 ${isFocused ? 'opacity-30 hover:opacity-100' : 'opacity-100'}`}>
                     <div className="flex items-center gap-2 text-[11px] font-extrabold text-gray-nav uppercase tracking-wider">
                         <Calendar size={13} />
                         <span>{new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                     </div>
 
                     <div className="flex items-center gap-3">
-                       <label className="group flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-border bg-white px-3 py-1.5 text-[11px] font-extrabold text-gray-nav uppercase transition-all hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]">
-                          <Paperclip size={14} className="text-gray-nav group-hover:text-blue" />
+                       {/* Progressive Disclosure: Mood Button */}
+                       <div className="relative">
+                          <button 
+                            onClick={() => setIsMoodOpen(!isMoodOpen)}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-xl border-2 transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] ${mood ? 'bg-blue/5 border-blue text-blue' : 'bg-white border-border text-gray-nav hover:border-blue/30'}`}
+                          >
+                            {mood ? (
+                              <>
+                                {React.createElement(moods.find(m => m.id === mood)?.icon || Smile, { size: 16 })}
+                                <span className="text-[11px] font-black uppercase">{mood}</span>
+                              </>
+                            ) : (
+                              <>
+                                <Smile size={16} />
+                                <span className="text-[11px] font-black uppercase">Mood</span>
+                              </>
+                            )}
+                          </button>
+                          
+                          <AnimatePresence>
+                            {isMoodOpen && (
+                              <motion.div 
+                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+                                className="absolute top-full mt-3 right-0 z-[100] p-4 bg-white border-2 border-border rounded-3xl shadow-xl w-[280px] liquid-glass"
+                              >
+                                <div className="flex items-center justify-between mb-4 px-1">
+                                  <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav">How are you?</span>
+                                  {mood && <button onClick={() => handleMoodSelect(mood)} className="text-[10px] font-bold text-red uppercase">Clear</button>}
+                                </div>
+                                <div className="grid grid-cols-3 gap-2">
+                                  {moods.map((m) => {
+                                    const Icon = m.icon;
+                                    const isSelected = mood === m.id;
+                                    return (
+                                      <button
+                                        key={m.id}
+                                        onClick={() => {
+                                          handleMoodSelect(m.id);
+                                          setIsMoodOpen(false);
+                                        }}
+                                        className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all ${isSelected ? `${m.color} border-current` : 'border-transparent hover:bg-gray-50 text-gray-nav'}`}
+                                      >
+                                        <Icon size={20} />
+                                        <span className="mt-1 text-[9px] font-bold uppercase">{m.label}</span>
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                       </div>
+
+                       {/* Progressive Disclosure: Tags Button */}
+                       <div className="relative">
+                          <button 
+                            onClick={() => setIsTagsOpen(!isTagsOpen)}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-xl border-2 transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] ${tags.length > 0 ? 'bg-green/5 border-green text-green' : 'bg-white border-border text-gray-nav hover:border-green/30'}`}
+                          >
+                            <TagIcon size={16} />
+                            <span className="text-[11px] font-black uppercase">{tags.length > 0 ? `${tags.length} Tags` : 'Tags'}</span>
+                          </button>
+
+                          <AnimatePresence>
+                            {isTagsOpen && (
+                              <motion.div 
+                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+                                className="absolute top-full mt-3 right-0 z-[100] p-6 bg-white border-2 border-border rounded-3xl shadow-xl w-[320px] liquid-glass"
+                              >
+                                <div className="mb-4">
+                                  <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav block mb-3">Add Tags</span>
+                                  <div className="relative">
+                                    <TagIcon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-nav" />
+                                    <input 
+                                      type="text"
+                                      placeholder="Type and press Enter..."
+                                      value={tagInput}
+                                      onChange={(e) => setTagInput(e.target.value)}
+                                      onKeyDown={handleAddTag}
+                                      className="w-full pl-9 pr-4 py-2 rounded-xl border-2 border-border bg-white text-[13px] font-bold focus:border-blue focus:outline-none transition-all"
+                                    />
+                                  </div>
+                                </div>
+
+                                {suggestedTags.length > 0 && (
+                                  <div className="mb-4">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-blue block mb-2">AI Suggestions</span>
+                                    <div className="flex flex-wrap gap-2">
+                                      {suggestedTags.map(tag => (
+                                        <button 
+                                          key={tag}
+                                          onClick={() => {
+                                            if (!tags.includes(tag)) setTags([...tags, tag]);
+                                            setSuggestedTags(prev => prev.filter(t => t !== tag));
+                                          }}
+                                          className="px-2 py-1 rounded-lg bg-blue/5 border border-blue/10 text-blue text-[10px] font-bold hover:bg-blue/10 transition-all"
+                                        >
+                                          +{tag}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+
+                                <div className="flex flex-wrap gap-2 max-h-[120px] overflow-y-auto pr-1 custom-scrollbar">
+                                  {tags.map(tag => (
+                                    <span key={tag} className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-gray-100 border border-border text-gray-text text-[11px] font-bold">
+                                      #{tag}
+                                      <button onClick={() => removeTag(tag)} className="hover:text-red transition-colors">
+                                        <X size={10} />
+                                      </button>
+                                    </span>
+                                  ))}
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                       </div>
+
+                       <label className="group flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-border bg-white px-4 py-2 text-[11px] font-black uppercase text-gray-nav transition-all hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]">
+                          <Paperclip size={16} className="text-gray-nav group-hover:text-blue" />
                           <span>ATTACH</span>
                           <input type="file" multiple className="hidden" onChange={handleAttachmentUpload} />
                        </label>
                        {!imagePreview && (
-                          <label className="group flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-border bg-white px-3 py-1.5 text-[11px] font-extrabold text-gray-nav uppercase transition-all hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]">
-                             <ImageIcon size={14} className="text-gray-nav group-hover:text-blue" />
+                          <label className="group flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-border bg-white px-4 py-2 text-[11px] font-black uppercase text-gray-nav transition-all hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]">
+                             <ImageIcon size={16} className="text-gray-nav group-hover:text-blue" />
                              <span>COVER</span>
                              <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
                           </label>
@@ -559,83 +747,22 @@ export const CreateNote: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="mb-12">
-                  <div className="flex items-center justify-between mb-4">
-                    <p className="text-[11px] font-extrabold text-gray-nav uppercase tracking-widest">How are you feeling?</p>
-                    {mood && (
-                      <button 
-                        onClick={() => handleMoodSelect(mood)}
-                        className="text-[10px] font-extrabold text-gray-nav hover:text-red transition-colors uppercase tracking-tight"
-                      >
-                        Clear
-                      </button>
-                    )}
-                  </div>
-                  <div className="flex flex-wrap gap-3">
-                    {moods.map((m) => {
-                      const Icon = m.icon;
-                      const isSelected = mood === m.id;
-                      const isAnySelected = mood !== undefined;
-                      return (
-                        <button
-                          key={m.id}
-                          onClick={() => handleMoodSelect(m.id)}
-                          className={`group relative flex flex-col items-center justify-center w-20 h-20 rounded-2xl border-2 transition-all duration-300 ${
-                            isSelected 
-                              ? `${m.color} border-current shadow-[0_4px_0_0_currentColor] -translate-y-1` 
-                              : `border-border bg-white text-gray-nav hover:border-blue/30 hover:bg-blue/5 hover:text-blue hover:-translate-y-0.5 ${isAnySelected ? 'opacity-40 grayscale' : ''}`
-                          }`}
-                        >
-                          <Icon size={24} className={`transition-transform duration-300 ${isSelected ? 'scale-110' : 'group-hover:scale-110'}`} />
-                          <span className="mt-2 text-[10px] font-black uppercase tracking-tighter">{m.label}</span>
-                          {isSelected && (
-                            <div className="absolute -top-1 -right-1 h-4 w-4 bg-current rounded-full flex items-center justify-center text-white ring-2 ring-white">
-                              <Sparkles size={8} fill="currentColor" />
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div className="mb-12">
-                  <div className="flex items-center justify-between mb-4">
-                    <p className="text-[11px] font-extrabold text-gray-nav uppercase tracking-widest">Tags</p>
-                  </div>
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {tags.map(tag => (
-                      <span key={tag} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue/5 border-2 border-blue/10 text-blue text-[12px] font-bold liquid-glass">
-                        #{tag}
-                        <button onClick={() => removeTag(tag)} className="hover:text-red transition-colors">
-                          <X size={12} />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                  <div className="relative max-w-xs">
-                    <TagIcon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-nav" />
-                    <input 
-                      type="text"
-                      placeholder="Add tag and press Enter..."
-                      value={tagInput}
-                      onChange={(e) => setTagInput(e.target.value)}
-                      onKeyDown={handleAddTag}
-                      className="w-full pl-9 pr-4 py-2 rounded-xl border-2 border-border bg-white text-[13px] font-bold focus:border-blue focus:outline-none transition-all"
-                    />
-                  </div>
-                </div>
-
                 <input
                     type="text"
                     placeholder="Title your entry..."
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
                     className="w-full border-none bg-transparent text-3xl sm:text-4xl font-display text-gray-text placeholder:text-border focus:outline-none focus:ring-0 p-0 mb-12 tracking-tight leading-tight lowercase"
                     autoFocus
                 />
                 
-                <div className="relative min-h-[400px]">
+                <div 
+                  className="relative min-h-[400px]"
+                  onFocusCapture={() => setIsFocused(true)}
+                  onBlurCapture={() => setIsFocused(false)}
+                >
                     <div className="max-w-prose mx-auto font-serif leading-loose">
                       <Editor 
                           value={content} 
@@ -681,39 +808,44 @@ export const CreateNote: React.FC = () => {
                 )}
 
                 {(newAttachments.length > 0 || existingAttachments.length > 0) && (
-                  <div className="mt-12 border-t-2 border-border pt-8 animate-in fade-in duration-300">
-                    <h3 className="text-[12px] font-extrabold text-gray-text uppercase tracking-wider mb-4 flex items-center gap-2">
+                  <div className={`mt-12 border-t-2 border-border pt-8 transition-all duration-500 ${isFocused ? 'opacity-30 hover:opacity-100' : 'opacity-100'}`}>
+                    <h3 className="text-[12px] font-extrabold text-gray-text uppercase tracking-wider mb-6 flex items-center gap-2">
                       <Paperclip size={16} className="text-gray-nav" />
                       Attachments ({newAttachments.length + existingAttachments.length})
                     </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       {existingAttachments.map((att) => (
-                        <div key={att.path} className="group relative flex items-center gap-3 p-4 rounded-2xl border-2 border-border bg-white hover:bg-blue/5 hover:border-blue/30 transition-all duration-300 shadow-sm">
-                          <div className="h-12 w-12 shrink-0 rounded-xl bg-white border-2 border-border flex items-center justify-center text-gray-nav shadow-inner overflow-hidden">
+                        <div key={att.path} className="group relative flex items-center gap-4 p-5 rounded-[24px] border-2 border-border bg-white hover:bg-blue/5 hover:border-blue/30 transition-all duration-500 shadow-3d-gray hover:shadow-none hover:translate-y-[2px] liquid-glass">
+                          <div className="h-16 w-16 shrink-0 rounded-2xl bg-white border-2 border-border flex items-center justify-center text-gray-nav shadow-inner overflow-hidden">
                              {att.type?.startsWith('image/') ? (
                                <StorageImage 
                                  path={att.path} 
                                  alt={att.name} 
-                                 className="h-full w-full object-cover" 
+                                 className="h-full w-full object-cover transition-transform group-hover:scale-110" 
                                />
                              ) : (
-                               getFileIcon(att.type || '')
+                               <div className="text-blue/40 group-hover:text-blue transition-colors">
+                                 {getFileIcon(att.type || '')}
+                               </div>
                              )}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="text-[13px] font-bold text-gray-text truncate">{att.name}</p>
+                            <p className="text-[14px] font-bold text-gray-text truncate mb-1">{att.name}</p>
                             <div className="flex items-center gap-2">
-                              <span className="text-[10px] text-gray-nav font-bold uppercase">{formatFileSize(att.size)}</span>
+                              <span className="text-[10px] text-gray-nav font-black uppercase tracking-widest">{formatFileSize(att.size)}</span>
                               <span className="h-1 w-1 rounded-full bg-border"></span>
-                              <span className="text-[10px] text-emerald-500 font-black uppercase">Saved</span>
+                              <div className="flex items-center gap-1">
+                                <CheckCircle2 size={10} className="text-emerald-500" />
+                                <span className="text-[10px] text-emerald-500 font-black uppercase tracking-widest">Cloud</span>
+                              </div>
                             </div>
                           </div>
                           <button 
                             onClick={() => removeExistingAttachment(att)}
-                            className="h-9 w-9 rounded-xl bg-white text-gray-nav border-2 border-border shadow-[0_2px_0_0_#E5E5E5] flex items-center justify-center hover:text-red hover:border-red/30 active:shadow-none active:translate-y-[2px] transition-all duration-200"
+                            className="h-10 w-10 rounded-xl bg-white text-gray-nav border-2 border-border shadow-[0_2px_0_0_#E5E5E5] flex items-center justify-center hover:text-red hover:border-red/30 active:shadow-none active:translate-y-[2px] transition-all duration-200"
                             title="Remove attachment"
                           >
-                            <X size={16} strokeWidth={2.5} />
+                            <X size={18} strokeWidth={2.5} />
                           </button>
                         </div>
                       ))}
@@ -721,35 +853,40 @@ export const CreateNote: React.FC = () => {
                         const isImage = file.type?.startsWith('image/');
                         const previewUrl = isImage ? URL.createObjectURL(file) : null;
                         return (
-                          <div key={`new-${index}`} className="group relative flex items-center gap-3 p-4 rounded-2xl border-2 border-blue/20 bg-blue/5 hover:bg-white hover:border-blue/40 transition-all duration-300 shadow-sm animate-in zoom-in-95 duration-200">
-                            <div className="h-12 w-12 shrink-0 rounded-xl bg-white border-2 border-blue/20 flex items-center justify-center text-blue shadow-inner overflow-hidden">
+                          <div key={`new-${index}`} className="group relative flex items-center gap-4 p-5 rounded-[24px] border-2 border-blue/20 bg-blue/5 hover:bg-white hover:border-blue/40 transition-all duration-500 shadow-3d-blue hover:shadow-none hover:translate-y-[2px] liquid-glass animate-in zoom-in-95 duration-300">
+                            <div className="h-16 w-16 shrink-0 rounded-2xl bg-white border-2 border-blue/20 flex items-center justify-center text-blue shadow-inner overflow-hidden">
                               {isImage && previewUrl ? (
                                 <img 
                                   src={previewUrl} 
                                   alt="preview" 
-                                  className="h-full w-full object-cover"
+                                  className="h-full w-full object-cover transition-transform group-hover:scale-110"
                                   onLoad={() => {
                                     if (previewUrl) URL.revokeObjectURL(previewUrl);
                                   }}
                                 />
                               ) : (
-                                getFileIcon(file.type)
+                                <div className="text-blue/60 group-hover:text-blue transition-colors">
+                                  {getFileIcon(file.type)}
+                                </div>
                               )}
                             </div>
                             <div className="min-w-0 flex-1">
-                              <p className="text-[13px] font-bold text-gray-text truncate">{file.name}</p>
+                              <p className="text-[14px] font-bold text-gray-text truncate mb-1">{file.name}</p>
                               <div className="flex items-center gap-2">
-                                <span className="text-[10px] text-gray-nav font-bold uppercase">{formatFileSize(file.size)}</span>
+                                <span className="text-[10px] text-gray-nav font-black uppercase tracking-widest">{formatFileSize(file.size)}</span>
                                 <span className="h-1 w-1 rounded-full bg-blue/20"></span>
-                                <span className="text-[10px] text-blue font-black uppercase tracking-tight">Ready to Upload</span>
+                                <div className="flex items-center gap-1">
+                                  <Loader2 size={10} className="text-blue animate-spin" />
+                                  <span className="text-[10px] text-blue font-black uppercase tracking-tighter">Pending</span>
+                                </div>
                               </div>
                             </div>
                             <button 
                               onClick={() => removeNewAttachment(index)}
-                              className="h-9 w-9 rounded-xl bg-white text-gray-nav border-2 border-border shadow-[0_2px_0_0_#E5E5E5] flex items-center justify-center hover:text-red hover:border-red/30 active:shadow-none active:translate-y-[2px] transition-all duration-200"
+                              className="h-10 w-10 rounded-xl bg-white text-gray-nav border-2 border-border shadow-[0_2px_0_0_#E5E5E5] flex items-center justify-center hover:text-red hover:border-red/30 active:shadow-none active:translate-y-[2px] transition-all duration-200"
                               title="Remove attachment"
                             >
-                              <X size={16} strokeWidth={2.5} />
+                              <X size={18} strokeWidth={2.5} />
                             </button>
                           </div>
                         );
@@ -759,7 +896,7 @@ export const CreateNote: React.FC = () => {
                 )}
             </div>
 
-            <div className="border-t-2 border-border bg-white/50 px-8 py-4 text-center">
+            <div className={`border-t-2 border-border bg-white/50 px-8 py-4 text-center transition-all duration-500 ${isFocused ? 'opacity-20' : 'opacity-100'}`}>
                 <p className="text-[11px] font-extrabold text-gray-nav uppercase tracking-widest">
                    Your journal is a safe space for your thoughts.
                 </p>
@@ -767,14 +904,21 @@ export const CreateNote: React.FC = () => {
           </div>
         </div>
 
-        <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-24 lg:self-start">
-          <div className="rounded-[32px] border-2 border-border bg-white p-6 shadow-[0_4px_0_0_#E5E5E5]">
+        <div className={`lg:col-span-4 space-y-6 lg:sticky lg:top-24 lg:self-start transition-all duration-500 ${isFocused ? 'opacity-30 hover:opacity-100' : 'opacity-100'}`}>
+          <div className="rounded-[32px] border-2 border-border bg-white p-6 shadow-[0_4px_0_0_#E5E5E5] liquid-glass">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-[12px] font-extrabold text-gray-text uppercase tracking-widest flex items-center gap-2">
                 <Brain size={16} className="text-blue" />
                 Journaling Prompts
               </h3>
-              {isGeneratingPrompts && <Loader2 size={14} className="animate-spin text-blue" />}
+              <button 
+                onClick={() => generateDynamicPrompts(mood)}
+                disabled={isGeneratingPrompts}
+                className="p-2 rounded-xl hover:bg-blue/5 text-gray-nav hover:text-blue transition-colors disabled:opacity-50"
+                title="Refresh Prompts"
+              >
+                <RefreshCw size={14} className={isGeneratingPrompts ? 'animate-spin' : ''} />
+              </button>
             </div>
             <div className="space-y-3 relative">
               {isGeneratingPrompts && (
