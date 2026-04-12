@@ -9,7 +9,18 @@ import { RoutePath, NoteAttachment } from '../../types';
 import { supabase } from '../../src/supabaseClient';
 import { StorageImage } from '../../components/ui/StorageImage';
 import { GoogleGenAI, Type } from "@google/genai";
-import debounce from 'lodash.debounce';
+
+// Custom debounce function to avoid CommonJS import issues
+function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout;
+  return function(this: any, ...args: Parameters<T>) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
@@ -32,6 +43,9 @@ export const CreateNote: React.FC = () => {
   const [aiReflection, setAiReflection] = useState<string | null>(null);
   const [dynamicPrompts, setDynamicPrompts] = useState<string[]>([]);
   const [isGeneratingPrompts, setIsGeneratingPrompts] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [newAttachments, setNewAttachments] = useState<File[]>([]);
+  const [existingAttachments, setExistingAttachments] = useState<NoteAttachment[]>([]);
   
   const lastSavedRef = useRef({ title: '', content: '', mood: undefined as string | undefined, tags: [] as string[] });
 
@@ -178,7 +192,8 @@ export const CreateNote: React.FC = () => {
     }
   };
 
-  const getFileIcon = (type: string) => {
+  const getFileIcon = (type?: string) => {
+    if (!type) return <FileIcon size={20} />;
     if (type.startsWith('image/')) return <ImageIcon size={20} />;
     if (type.includes('pdf')) return <FileText size={20} className="text-red" />;
     if (type.includes('word') || type.includes('officedocument')) return <FileText size={20} className="text-blue" />;
@@ -644,14 +659,14 @@ export const CreateNote: React.FC = () => {
                       {existingAttachments.map((att) => (
                         <div key={att.path} className="group relative flex items-center gap-3 p-4 rounded-2xl border-2 border-border bg-white hover:bg-blue/5 hover:border-blue/30 transition-all duration-300 shadow-sm">
                           <div className="h-12 w-12 shrink-0 rounded-xl bg-white border-2 border-border flex items-center justify-center text-gray-nav shadow-inner overflow-hidden">
-                             {att.type.startsWith('image/') ? (
+                             {att.type?.startsWith('image/') ? (
                                <StorageImage 
                                  path={att.path} 
                                  alt={att.name} 
                                  className="h-full w-full object-cover" 
                                />
                              ) : (
-                               getFileIcon(att.type)
+                               getFileIcon(att.type || '')
                              )}
                           </div>
                           <div className="min-w-0 flex-1">
@@ -672,7 +687,7 @@ export const CreateNote: React.FC = () => {
                         </div>
                       ))}
                       {newAttachments.map((file, index) => {
-                        const isImage = file.type.startsWith('image/');
+                        const isImage = file.type?.startsWith('image/');
                         const previewUrl = isImage ? URL.createObjectURL(file) : null;
                         return (
                           <div key={`new-${index}`} className="group relative flex items-center gap-3 p-4 rounded-2xl border-2 border-blue/20 bg-blue/5 hover:bg-white hover:border-blue/40 transition-all duration-300 shadow-sm animate-in zoom-in-95 duration-200">

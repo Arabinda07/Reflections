@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PlusCircle, Sparkles, FolderOpen, FileText, UserPlus } from 'lucide-react';
+import { PlusCircle, Sparkles, FolderOpen, FileText, UserPlus, Smile, Tag } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { RoutePath } from '../../types';
 import { useAuth } from '../../context/AuthContext';
@@ -12,6 +12,19 @@ export const Home: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
   const [noteCount, setNoteCount] = useState<number | null>(null);
   const [isCountLoading, setIsCountLoading] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  useEffect(() => {
+    const hasSeen = localStorage.getItem('hasSeenOnboarding');
+    if (!hasSeen) {
+      setShowOnboarding(true);
+    }
+  }, []);
+
+  const handleCloseOnboarding = () => {
+    localStorage.setItem('hasSeenOnboarding', 'true');
+    setShowOnboarding(false);
+  };
 
   useEffect(() => {
     const fetchCount = async () => {
@@ -53,10 +66,10 @@ export const Home: React.FC = () => {
     };
   }, []);
 
-  const handleCreateClick = (prompt?: string) => {
+  const handleCreateClick = (promptOrEvent?: string | React.MouseEvent) => {
     if (isAuthenticated) {
-      if (prompt) {
-        navigate(RoutePath.CREATE_NOTE, { state: { initialPrompt: prompt } });
+      if (typeof promptOrEvent === 'string') {
+        navigate(RoutePath.CREATE_NOTE, { state: { initialPrompt: promptOrEvent } });
       } else {
         navigate(RoutePath.CREATE_NOTE);
       }
@@ -193,6 +206,69 @@ export const Home: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Onboarding Modal */}
+      {showOnboarding && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-dark-blue/40 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+          <div className="relative w-full max-w-lg space-y-6 rounded-[32px] border-2 border-border bg-white p-8 shadow-[0_12px_0_0_#E5E5E5] overflow-hidden liquid-glass">
+            <div className="absolute top-[-20%] right-[-10%] w-[200px] h-[200px] bg-green/10 blur-[60px] rounded-full pointer-events-none" />
+            <div className="absolute bottom-[-10%] left-[-10%] w-[200px] h-[200px] bg-blue/10 blur-[60px] rounded-full pointer-events-none" />
+            
+            <div className="relative z-10">
+              <h2 className="text-[32px] font-display text-gray-text lowercase mb-2">welcome to ai notes</h2>
+              <p className="text-[15px] text-gray-light font-medium leading-relaxed mb-8">
+                Your intelligent companion for mental wellness and journaling. Here's what you can do:
+              </p>
+
+              <div className="space-y-6 mb-8">
+                <div className="flex gap-4">
+                  <div className="h-12 w-12 shrink-0 rounded-2xl bg-green/10 flex items-center justify-center text-green shadow-3d-gray border-2 border-border">
+                    <Sparkles size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-[16px] font-bold text-gray-text mb-1">AI Reflection</h3>
+                    <p className="text-[14px] text-gray-light font-medium leading-relaxed">
+                      Get personalized insights, compassionate feedback, and dynamic prompts based on your entries.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="h-12 w-12 shrink-0 rounded-2xl bg-blue/10 flex items-center justify-center text-blue shadow-3d-gray border-2 border-border">
+                    <Smile size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-[16px] font-bold text-gray-text mb-1">Mood Tracking</h3>
+                    <p className="text-[14px] text-gray-light font-medium leading-relaxed">
+                      Log your emotions with each entry and visualize your mood trends over time on your calendar.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="h-12 w-12 shrink-0 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-500 shadow-3d-gray border-2 border-border">
+                    <Tag size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-[16px] font-bold text-gray-text mb-1">Smart Organization</h3>
+                    <p className="text-[14px] text-gray-light font-medium leading-relaxed">
+                      Add custom tags to your notes to easily filter and find your thoughts later.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <Button 
+                variant="primary" 
+                className="w-full h-[56px] text-[16px] font-bold uppercase rounded-xl shadow-3d-green active:shadow-none active:translate-y-[4px] transition-all"
+                onClick={handleCloseOnboarding}
+              >
+                Let's Get Started
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

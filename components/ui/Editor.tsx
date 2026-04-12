@@ -16,6 +16,10 @@ export const Editor: React.FC<EditorProps> = ({ value, onChange, placeholder, cl
 
   useEffect(() => {
     if (editorRef.current && !quillInstance.current) {
+      if (typeof Quill === 'undefined') {
+        console.error("Quill is not loaded. Please check your internet connection or CDN.");
+        return;
+      }
       // Initialize Quill
       quillInstance.current = new Quill(editorRef.current, {
         theme: 'snow',
