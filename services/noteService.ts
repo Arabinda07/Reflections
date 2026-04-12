@@ -25,7 +25,10 @@ export const noteService = {
       .select('*')
       .order('updated_at', { ascending: false });
     
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase DB Error (getAll notes):', error.message, error);
+      throw error;
+    }
     return (data || []).map(mapToNote);
   },
 
@@ -35,7 +38,10 @@ export const noteService = {
       .from('notes')
       .select('*', { count: 'exact', head: true });
     
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase DB Error (getCount notes):', error.message, error);
+      throw error;
+    }
     return count || 0;
   },
 
@@ -88,7 +94,10 @@ export const noteService = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase DB Error (create note):', error.message, error);
+      throw error;
+    }
     return mapToNote(data);
   },
 
@@ -112,7 +121,10 @@ export const noteService = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase DB Error (update note):', error.message, error);
+      throw error;
+    }
     return mapToNote(data);
   },
 

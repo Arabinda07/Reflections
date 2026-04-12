@@ -8,7 +8,7 @@ import { storageService } from '../../services/storageService';
 import { RoutePath, NoteAttachment } from '../../types';
 import { supabase } from '../../src/supabaseClient';
 import { StorageImage } from '../../components/ui/StorageImage';
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
@@ -24,6 +24,8 @@ export const CreateNote: React.FC = () => {
   const [isLimitReached, setIsLimitReached] = useState(false);
   const [isReflecting, setIsReflecting] = useState(false);
   const [aiReflection, setAiReflection] = useState<string | null>(null);
+  const [dynamicPrompts, setDynamicPrompts] = useState<string[]>([]);
+  const [isGeneratingPrompts, setIsGeneratingPrompts] = useState(false);
   
   // Image preview can be a Blob URL (new) or Storage Path (existing)
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -44,6 +46,8 @@ export const CreateNote: React.FC = () => {
             setLoading(false);
             return;
           }
+          // Generate initial prompts for new note
+          generateDynamicPrompts();
         } else {
           // If editing an EXISTING note
           const note = await noteService.getById(id);
@@ -53,6 +57,8 @@ export const CreateNote: React.FC = () => {
             setMood(note.mood);
             setImagePreview(note.thumbnailUrl || null);
             setExistingAttachments(note.attachments || []);
+            // Generate prompts based on existing mood
+            generateDynamicPrompts(note.mood);
           } else {
              navigate(RoutePath.NOTES);
           }
@@ -66,6 +72,44 @@ export const CreateNote: React.FC = () => {
 
     checkLimitAndFetch();
   }, [id, navigate]);
+
+  const generateDynamicPrompts = async (currentMood?: string) => {
+    setIsGeneratingPrompts(true);
+    try {
+      const pastNotes = await noteService.getAll();
+      // Use titles of last 3 notes for context
+      const pastContext = pastNotes
+        .filter(n => n.id !== id)
+        .slice(0, 3)
+        .map(n => n.title)
+        .filter(Boolean)
+        .join(', ');
+      
+      const moodContext = currentMood ? `The user is currently feeling ${currentMood}.` : 'The user hasn\'t specified their mood yet.';
+      const context = pastContext ? `Their recent entries were about: ${pastContext}.` : '';
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: `You are a helpful journaling assistant. Generate 4 unique, personalized journaling prompts for the user. ${moodContext} ${context} The prompts should be short, encouraging, and relevant to their current state or past topics. Return only a JSON array of strings.`,
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.ARRAY,
+            items: { type: Type.STRING }
+          }
+        }
+      });
+
+      const result = JSON.parse(response.text || "[]");
+      if (Array.isArray(result) && result.length > 0) {
+        setDynamicPrompts(result);
+      }
+    } catch (error) {
+      console.error("Failed to generate prompts:", error);
+    } finally {
+      setIsGeneratingPrompts(false);
+    }
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -108,8 +152,8 @@ export const CreateNote: React.FC = () => {
       const moodText = mood ? `The user is feeling ${mood}.` : '';
       
       const response = await ai.models.generateContent({
-        model: "gemini-3-flash-latest",
-        contents: `You are a compassionate mental health journaling assistant. Based on the following journal entry, provide a brief (2-3 sentences), empathetic reflection or a thoughtful follow-up question to help the user process their thoughts. ${moodText}\n\nEntry: ${plainText}`,
+        model: "gemini-3-flash-preview",
+        contents: `You are a compassionate mental health journaling assistant. Based on the following journal entry, provide a brief (2-3 sentences), empathetic reflection or a thoughtful follow-up question to help the user process their thoughts. Be supportive and non-judgmental. ${moodText}\n\nEntry: ${plainText}`,
       });
       
       setAiReflection(response.text || "I'm here to listen. Your thoughts are valid.");
@@ -381,7 +425,11 @@ export const CreateNote: React.FC = () => {
                       return (
                         <button
                           key={m.id}
-                          onClick={() => setMood(isSelected ? undefined : m.id)}
+                          onClick={() => {
+                            const newMood = isSelected ? undefined : m.id;
+                            setMood(newMood);
+                            generateDynamicPrompts(newMood);
+                          }}
                           className={`flex items-center gap-2 px-4 py-2 rounded-xl border-2 transition-all duration-200 ${
                             isSelected 
                               ? `${m.color} border-current shadow-[0_2px_0_0_currentColor] scale-105` 
@@ -502,21 +550,34 @@ export const CreateNote: React.FC = () => {
 
         <div className="lg:col-span-4 space-y-6">
           <div className="rounded-[32px] border-2 border-border bg-white p-6 shadow-[0_4px_0_0_#E5E5E5]">
-            <h3 className="text-[12px] font-extrabold text-gray-text uppercase tracking-widest mb-6 flex items-center gap-2">
-              <Brain size={16} className="text-blue" />
-              Journaling Prompts
-            </h3>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-[12px] font-extrabold text-gray-text uppercase tracking-widest flex items-center gap-2">
+                <Brain size={16} className="text-blue" />
+                Journaling Prompts
+              </h3>
+              {isGeneratingPrompts && <Loader2 size={14} className="animate-spin text-blue" />}
+            </div>
             <div className="space-y-3">
-              {prompts.map((prompt, i) => (
+              {(dynamicPrompts.length > 0 ? dynamicPrompts : prompts).map((prompt, i) => (
                 <button
                   key={i}
                   onClick={() => setContent(prev => prev + `<p><i>${prompt}</i></p><p><br></p>`)}
-                  className="w-full text-left p-4 rounded-2xl border-2 border-border bg-white text-[13px] text-gray-light font-bold hover:border-blue/30 hover:bg-blue/5 hover:text-blue transition-all duration-200 leading-relaxed shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]"
+                  className="w-full text-left p-4 rounded-2xl border-2 border-border bg-white text-[13px] text-gray-light font-bold hover:border-blue/30 hover:bg-blue/5 hover:text-blue transition-all duration-200 leading-relaxed shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] animate-in fade-in slide-in-from-right-2 duration-300"
+                  style={{ animationDelay: `${i * 50}ms` }}
                 >
                   {prompt}
                 </button>
               ))}
             </div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="w-full mt-4 text-[10px] font-extrabold text-blue hover:bg-blue/5"
+              onClick={() => generateDynamicPrompts(mood)}
+              disabled={isGeneratingPrompts}
+            >
+              REFRESH PROMPTS
+            </Button>
           </div>
 
           <div className="rounded-[32px] border-2 border-blue/20 bg-gradient-to-br from-blue to-blue/80 p-8 text-white shadow-3d-blue">

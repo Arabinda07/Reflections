@@ -11,7 +11,7 @@ export const storageService = {
       .createSignedUrl(path, 3600); // 1 hour validity
       
     if (error) {
-      console.error('Error getting signed URL:', error);
+      console.error('Supabase Storage Error (getSignedUrl):', error.message, error);
       return '';
     }
     return data.signedUrl;
@@ -29,7 +29,10 @@ export const storageService = {
         cacheControl: '3600'
       });
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase Storage Error (uploadFile):', error.message, error);
+      throw error;
+    }
     return path;
   },
 
