@@ -504,7 +504,7 @@ export const CreateNote: React.FC = () => {
                     <Editor 
                         value={content} 
                         onChange={setContent} 
-                        placeholder="Start writing your thoughts..."
+                        placeholder={id ? "Continue writing..." : "Start writing your thoughts here... let your mind flow freely."}
                         className="text-[17px] text-gray-text leading-relaxed min-h-[400px] font-medium"
                     />
                 </div>
@@ -639,7 +639,15 @@ export const CreateNote: React.FC = () => {
               </h3>
               {isGeneratingPrompts && <Loader2 size={14} className="animate-spin text-blue" />}
             </div>
-            <div className="space-y-3">
+            <div className="space-y-3 relative">
+              {isGeneratingPrompts && (
+                <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-[2px] flex items-center justify-center rounded-2xl animate-in fade-in duration-300">
+                  <div className="flex flex-col items-center gap-2">
+                    <Loader2 size={24} className="animate-spin text-blue" />
+                    <span className="text-[10px] font-black text-blue uppercase tracking-widest">Generating...</span>
+                  </div>
+                </div>
+              )}
               {(dynamicPrompts.length > 0 ? dynamicPrompts : prompts).map((prompt, i) => (
                 <button
                   key={i}

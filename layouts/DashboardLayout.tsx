@@ -10,9 +10,11 @@ import { StorageImage } from '../components/ui/StorageImage';
 export const DashboardLayout: React.FC = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   const handleNavigation = (path: string) => {
     navigate(path);
+    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -80,11 +82,73 @@ export const DashboardLayout: React.FC = () => {
             )}
           </div>
 
-          {/* Mobile Menu Icon (Simplified) */}
+          {/* Mobile Menu Icon */}
           <div className="md:hidden">
-            <Menu className="text-gray-nav" size={24} />
+            <button 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
+            >
+              {isMobileMenuOpen ? <X className="text-gray-nav" size={24} /> : <Menu className="text-gray-nav" size={24} />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Menu Overlay */}
+        {isMobileMenuOpen && (
+          <div className="fixed inset-0 top-[64px] z-[100] md:hidden animate-in fade-in duration-300">
+            <div className="absolute inset-0 bg-white/95 backdrop-blur-xl" />
+            <div className="relative flex flex-col p-6 gap-4">
+              {[
+                { label: 'My Notes', path: RoutePath.NOTES },
+                { label: 'Create Note', path: RoutePath.CREATE_NOTE },
+                { label: 'Account', path: RoutePath.ACCOUNT },
+              ].map((item) => (
+                <button
+                  key={item.label}
+                  onClick={() => handleNavigation(item.path)}
+                  className="w-full p-4 text-left text-[18px] font-black uppercase tracking-widest text-gray-text border-b-2 border-border/50 hover:text-green transition-colors"
+                >
+                  {item.label}
+                </button>
+              ))}
+              
+              <div className="mt-4 flex flex-col gap-3">
+                {isAuthenticated ? (
+                  <Button 
+                    variant="ghost" 
+                    size="lg" 
+                    onClick={() => {
+                      logout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full text-red hover:bg-red/5 h-14 font-black uppercase tracking-widest"
+                  >
+                    LOGOUT
+                  </Button>
+                ) : (
+                  <>
+                    <Button 
+                      variant="secondary" 
+                      size="lg" 
+                      onClick={() => handleNavigation(RoutePath.LOGIN)}
+                      className="w-full h-14 font-black uppercase tracking-widest"
+                    >
+                      SIGN IN
+                    </Button>
+                    <Button 
+                      variant="primary" 
+                      size="lg" 
+                      onClick={() => handleNavigation(RoutePath.SIGNUP)}
+                      className="w-full h-14 font-black uppercase tracking-widest"
+                    >
+                      SIGN UP
+                    </Button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Main Content */}
