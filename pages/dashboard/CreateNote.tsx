@@ -173,11 +173,23 @@ export const CreateNote: React.FC = () => {
     setAiReflection(null);
     try {
       const plainText = content.replace(/<[^>]*>/g, '');
-      const moodText = mood ? `The user is feeling ${mood}.` : '';
+      const moodText = mood ? `The user is feeling ${mood}.` : 'The user has not specified a specific mood.';
+      const titleText = title ? `The entry is titled "${title}".` : 'The entry has no title.';
       
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
-        contents: `You are a compassionate mental health journaling assistant. Based on the following journal entry, provide a brief (2-3 sentences), empathetic reflection or a thoughtful follow-up question to help the user process their thoughts. Be supportive and non-judgmental. ${moodText}\n\nEntry: ${plainText}`,
+        contents: `You are a compassionate mental health journaling assistant. 
+        Based on the following journal entry, provide a brief (2-3 sentences), empathetic reflection or a thoughtful follow-up question to help the user process their thoughts. 
+        Be supportive, non-judgmental, and deeply contextual.
+        
+        Context:
+        - ${titleText}
+        - ${moodText}
+        
+        Entry Content:
+        ${plainText}
+        
+        Your response should be warm, insightful, and encourage further self-reflection.`,
       });
       
       setAiReflection(response.text || "I'm here to listen. Your thoughts are valid.");
@@ -498,12 +510,36 @@ export const CreateNote: React.FC = () => {
                 </div>
 
                 {aiReflection && (
-                  <div className="mt-8 p-6 rounded-2xl bg-blue/5 border-2 border-blue/10 text-blue animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Sparkles size={16} className="text-blue" />
-                      <span className="text-[11px] font-extrabold uppercase tracking-widest text-blue/60">AI Reflection</span>
+                  <div className="mt-12 relative group animate-in fade-in slide-in-from-bottom-6 duration-700">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-blue/20 via-indigo-500/10 to-purple-500/20 rounded-[32px] blur-xl opacity-70 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
+                    <div className="relative p-8 rounded-[30px] bg-white border-2 border-blue/10 shadow-[0_10px_40px_-15px_rgba(59,130,246,0.1)] overflow-hidden">
+                      <div className="absolute top-0 right-0 p-4 opacity-10">
+                        <Sparkles size={80} className="text-blue" />
+                      </div>
+                      
+                      <div className="relative z-10">
+                        <div className="flex items-center gap-3 mb-5">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue/10 text-blue shadow-inner">
+                            <Brain size={20} />
+                          </div>
+                          <div>
+                            <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-blue/40 leading-none mb-1">AI Insights</h4>
+                            <p className="text-[13px] font-bold text-gray-text leading-none">A moment of reflection</p>
+                          </div>
+                        </div>
+                        
+                        <div className="pl-4 border-l-4 border-blue/20">
+                          <p className="text-[17px] leading-relaxed text-gray-text font-medium italic">
+                            "{aiReflection}"
+                          </p>
+                        </div>
+                        
+                        <div className="mt-6 flex items-center gap-4">
+                          <div className="h-[1px] flex-1 bg-gradient-to-r from-blue/20 to-transparent"></div>
+                          <span className="text-[10px] font-extrabold text-gray-nav uppercase tracking-widest">Thoughtfully generated for you</span>
+                        </div>
+                      </div>
                     </div>
-                    <p className="text-[15px] leading-relaxed italic font-medium">"{aiReflection}"</p>
                   </div>
                 )}
 
