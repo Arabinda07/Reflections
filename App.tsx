@@ -10,6 +10,7 @@ import { MyNotes } from './pages/dashboard/MyNotes';
 import { CreateNote } from './pages/dashboard/CreateNote';
 import { SingleNote } from './pages/dashboard/SingleNote';
 import { Account } from './pages/dashboard/Account';
+import { Insights } from './pages/dashboard/Insights';
 import { RoutePath } from './types';
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
             <Route path={RoutePath.EDIT_NOTE} element={<ProtectedRoute><CreateNote /></ProtectedRoute>} />
             <Route path={RoutePath.NOTE_DETAIL} element={<ProtectedRoute><SingleNote /></ProtectedRoute>} />
             <Route path={RoutePath.ACCOUNT} element={<ProtectedRoute><Account /></ProtectedRoute>} />
+            <Route path={RoutePath.INSIGHTS} element={<ProtectedRoute><Insights /></ProtectedRoute>} />
           </Route>
 
           {/* Fallback */}
