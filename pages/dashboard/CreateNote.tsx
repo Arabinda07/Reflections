@@ -24,6 +24,15 @@ function debounce<T extends (...args: any[]) => any>(
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
+const DEFAULT_PROMPTS = [
+  "What are three things you're grateful for today?",
+  "How did you feel when you woke up this morning?",
+  "What's one small win you had today?",
+  "What's something you're looking forward to?",
+  "Describe a moment today that made you smile.",
+  "What's one thing you want to let go of today?",
+];
+
 export const CreateNote: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>(); 
@@ -39,6 +48,7 @@ export const CreateNote: React.FC = () => {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [loading, setLoading] = useState(true);
   const [isLimitReached, setIsLimitReached] = useState(false);
+  const [activePlaceholder, setActivePlaceholder] = useState<string | null>(null);
   const [isReflecting, setIsReflecting] = useState(false);
   const [aiReflection, setAiReflection] = useState<string | null>(null);
   const [dynamicPrompts, setDynamicPrompts] = useState<string[]>([]);
@@ -165,12 +175,20 @@ export const CreateNote: React.FC = () => {
         }
       });
 
-      const result = JSON.parse(response.text || "[]");
+      const text = response.text || "[]";
+      const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+      const result = JSON.parse(cleanText);
+      
       if (Array.isArray(result) && result.length > 0) {
         setDynamicPrompts(result);
+      } else {
+        throw new Error("Invalid response format");
       }
     } catch (error) {
       console.error("Failed to generate prompts:", error);
+      // Fallback: shuffle default prompts
+      const shuffled = [...DEFAULT_PROMPTS].sort(() => 0.5 - Math.random()).slice(0, 4);
+      setDynamicPrompts(shuffled);
     } finally {
       setIsGeneratingPrompts(false);
     }
@@ -422,14 +440,7 @@ export const CreateNote: React.FC = () => {
     { id: 'tired', icon: Moon, label: 'Tired', color: 'text-slate-500 bg-slate-50 border-slate-100' },
   ];
 
-  const prompts = [
-    "What are three things you're grateful for today?",
-    "How did you feel when you woke up this morning?",
-    "What's one small win you had today?",
-    "What's something you're looking forward to?",
-    "Describe a moment today that made you smile.",
-    "What's one thing you want to let go of today?",
-  ];
+
 
   return (
     <div className="mx-auto max-w-5xl animate-in fade-in duration-500 pb-20 px-4 md:px-10">
@@ -442,7 +453,7 @@ export const CreateNote: React.FC = () => {
            <div className="h-4 w-[2px] bg-border"></div>
            <div className="flex flex-col">
              <span className="text-[12px] font-extrabold text-gray-nav uppercase tracking-wider">
-                {id ? 'edit note' : 'new journal entry'}
+                {id ? 'edit note' : 'new entry'}
              </span>
            </div>
         </div>
@@ -478,7 +489,7 @@ export const CreateNote: React.FC = () => {
               disabled={!canSave}
             >
               <Save className="mr-2 h-3.5 w-3.5" />
-              SAVE ENTRY
+              SAVE
             </Button>
         </div>
       </nav>
@@ -531,7 +542,7 @@ export const CreateNote: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="mb-10">
+                <div className="mb-12">
                   <div className="flex items-center justify-between mb-4">
                     <p className="text-[11px] font-extrabold text-gray-nav uppercase tracking-widest">How are you feeling?</p>
                     {mood && (
@@ -547,6 +558,7 @@ export const CreateNote: React.FC = () => {
                     {moods.map((m) => {
                       const Icon = m.icon;
                       const isSelected = mood === m.id;
+                      const isAnySelected = mood !== undefined;
                       return (
                         <button
                           key={m.id}
@@ -554,7 +566,7 @@ export const CreateNote: React.FC = () => {
                           className={`group relative flex flex-col items-center justify-center w-20 h-20 rounded-2xl border-2 transition-all duration-300 ${
                             isSelected 
                               ? `${m.color} border-current shadow-[0_4px_0_0_currentColor] -translate-y-1` 
-                              : 'border-border bg-white text-gray-nav hover:border-blue/30 hover:bg-blue/5 hover:text-blue hover:-translate-y-0.5'
+                              : `border-border bg-white text-gray-nav hover:border-blue/30 hover:bg-blue/5 hover:text-blue hover:-translate-y-0.5 ${isAnySelected ? 'opacity-40 grayscale' : ''}`
                           }`}
                         >
                           <Icon size={24} className={`transition-transform duration-300 ${isSelected ? 'scale-110' : 'group-hover:scale-110'}`} />
@@ -570,7 +582,7 @@ export const CreateNote: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="mb-10">
+                <div className="mb-12">
                   <div className="flex items-center justify-between mb-4">
                     <p className="text-[11px] font-extrabold text-gray-nav uppercase tracking-widest">Tags</p>
                   </div>
@@ -602,17 +614,19 @@ export const CreateNote: React.FC = () => {
                     placeholder="Title your entry..."
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full border-none bg-transparent text-3xl sm:text-4xl font-display text-gray-text placeholder:text-border focus:outline-none focus:ring-0 p-0 mb-6 tracking-tight leading-tight lowercase"
+                    className="w-full border-none bg-transparent text-3xl sm:text-4xl font-display text-gray-text placeholder:text-border focus:outline-none focus:ring-0 p-0 mb-12 tracking-tight leading-tight lowercase"
                     autoFocus
                 />
                 
                 <div className="relative min-h-[400px]">
-                    <Editor 
-                        value={content} 
-                        onChange={setContent} 
-                        placeholder={id ? "Continue writing..." : "Start writing your thoughts here... let your mind flow freely."}
-                        className="text-[17px] text-gray-text leading-relaxed min-h-[400px] font-medium"
-                    />
+                    <div className="max-w-prose mx-auto font-serif leading-loose">
+                      <Editor 
+                          value={content} 
+                          onChange={setContent} 
+                          placeholder={activePlaceholder || (id ? "Continue writing..." : "Start writing your thoughts here... let your mind flow freely.")}
+                          className="text-[17px] text-gray-text min-h-[400px]"
+                      />
+                    </div>
                 </div>
 
                 {aiReflection && (
@@ -736,7 +750,7 @@ export const CreateNote: React.FC = () => {
           </div>
         </div>
 
-        <div className="lg:col-span-4 space-y-6">
+        <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-24 lg:self-start">
           <div className="rounded-[32px] border-2 border-border bg-white p-6 shadow-[0_4px_0_0_#E5E5E5]">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-[12px] font-extrabold text-gray-text uppercase tracking-widest flex items-center gap-2">
@@ -754,10 +768,17 @@ export const CreateNote: React.FC = () => {
                   </div>
                 </div>
               )}
-              {(dynamicPrompts.length > 0 ? dynamicPrompts : prompts).map((prompt, i) => (
+              {(dynamicPrompts.length > 0 ? dynamicPrompts : DEFAULT_PROMPTS.slice(0, 4)).map((prompt, i) => (
                 <button
                   key={i}
-                  onClick={() => setContent(prev => prev + `<p><i>${prompt}</i></p><p><br></p>`)}
+                  onClick={() => {
+                    setActivePlaceholder(prompt);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    setTimeout(() => {
+                      const editorEl = document.querySelector('.ql-editor') as HTMLElement;
+                      if (editorEl) editorEl.focus();
+                    }, 100);
+                  }}
                   className="w-full text-left p-4 rounded-2xl border-2 border-border bg-white text-[13px] text-gray-light font-bold hover:border-blue/30 hover:bg-blue/5 hover:text-blue transition-all duration-200 leading-relaxed shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] animate-in fade-in slide-in-from-right-2 duration-300"
                   style={{ animationDelay: `${i * 50}ms` }}
                 >

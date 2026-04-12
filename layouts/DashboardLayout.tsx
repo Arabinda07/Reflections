@@ -131,6 +131,16 @@ export const DashboardLayout: React.FC = () => {
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-[105] md:hidden animate-in fade-in duration-300">
           <div className="absolute inset-0 bg-white/98 backdrop-blur-2xl" onClick={() => setIsMobileMenuOpen(false)} />
+          
+          {/* Close Button */}
+          <button 
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="absolute top-4 right-4 p-2 rounded-xl text-gray-nav hover:text-green hover:bg-green/5 transition-colors z-[110]"
+            aria-label="Close menu"
+          >
+            <X size={28} />
+          </button>
+
           <div className="relative flex flex-col p-6 pt-24 gap-4 h-full overflow-y-auto">
             {navItems.map((item) => (
               <button

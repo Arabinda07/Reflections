@@ -50,6 +50,28 @@ export const Editor: React.FC<EditorProps> = ({ value, onChange, placeholder, cl
     }
   }, []);
 
+  useEffect(() => {
+    if (quillInstance.current) {
+      const currentHtml = quillInstance.current.root.innerHTML;
+      const normalizedValue = value || '<p><br></p>';
+      if (currentHtml !== normalizedValue && currentHtml !== value) {
+        quillInstance.current.root.innerHTML = value;
+        // Move cursor to the end so user can start typing
+        setTimeout(() => {
+          if (quillInstance.current) {
+            quillInstance.current.setSelection(quillInstance.current.getLength(), 0);
+          }
+        }, 0);
+      }
+    }
+  }, [value]);
+
+  useEffect(() => {
+    if (quillInstance.current && placeholder) {
+      quillInstance.current.root.dataset.placeholder = placeholder;
+    }
+  }, [placeholder]);
+
   return (
     <div className={`prose prose-zinc max-w-none ${className} duolingo-editor`}>
       <div ref={editorRef} className="border-none" />

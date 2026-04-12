@@ -214,6 +214,21 @@ export const Home: React.FC = () => {
             <div className="absolute top-[-20%] right-[-10%] w-[200px] h-[200px] bg-green/10 blur-[60px] rounded-full pointer-events-none" />
             <div className="absolute bottom-[-10%] left-[-10%] w-[200px] h-[200px] bg-blue/10 blur-[60px] rounded-full pointer-events-none" />
             
+            {/* Dark Mode Toggle for Onboarding */}
+            <button 
+              onClick={() => {
+                if (document.documentElement.classList.contains('dark')) {
+                  document.documentElement.classList.remove('dark');
+                } else {
+                  document.documentElement.classList.add('dark');
+                }
+              }}
+              className="absolute top-6 right-6 p-2 rounded-xl text-gray-nav hover:text-green hover:bg-green/5 transition-colors z-20 border-2 border-border bg-white/50 backdrop-blur-md"
+              title="Toggle Dark Mode"
+            >
+              <Sparkles size={18} />
+            </button>
+
             <div className="relative z-10">
               <h2 className="text-[32px] font-display text-gray-text lowercase mb-2">welcome to ai notes</h2>
               <p className="text-[15px] text-gray-light font-medium leading-relaxed mb-8">

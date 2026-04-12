@@ -233,11 +233,12 @@ export const MyNotes: React.FC = () => {
         </div>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-8">
-          {filteredNotes.map((note) => (
+          {filteredNotes.map((note, index) => (
             <div 
               key={note.id} 
               onClick={() => navigate(RoutePath.NOTE_DETAIL.replace(':id', note.id))}
-              className="group cursor-pointer flex flex-col overflow-hidden rounded-2xl bg-white border-2 border-border shadow-[0_4px_0_0_#E5E5E5] transition-all duration-200 hover:shadow-none hover:translate-y-[2px] liquid-glass"
+              className="group cursor-pointer flex flex-col overflow-hidden rounded-2xl bg-white border-2 border-border shadow-[0_4px_0_0_#E5E5E5] transition-all duration-200 hover:shadow-none hover:translate-y-[2px] liquid-glass animate-in fade-in slide-in-from-bottom-4"
+              style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
             >
               {/* Image / Header */}
               <div className="relative h-44 w-full overflow-hidden bg-white border-b-2 border-border">
