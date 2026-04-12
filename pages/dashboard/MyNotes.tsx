@@ -205,9 +205,9 @@ export const MyNotes: React.FC = () => {
                     {note.tags && note.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1.5">
                         {note.tags.slice(0, 2).map(tag => (
-                          <span key={tag} className="text-[10px] font-bold text-blue bg-blue/5 px-2 py-0.5 rounded-lg border border-blue/10">#{tag}</span>
+                          <span key={tag} className="text-[10px] font-bold text-blue bg-blue/5 px-2 py-0.5 rounded-lg border border-blue/10 liquid-glass">#{tag}</span>
                         ))}
-                        {note.tags.length > 2 && <span className="text-[10px] font-bold text-gray-nav">+{note.tags.length - 2}</span>}
+                        {note.tags.length > 2 && <span className="text-[10px] font-bold text-gray-nav liquid-glass px-2 py-0.5 rounded-lg border border-border">+{note.tags.length - 2}</span>}
                       </div>
                     )}
                   </div>

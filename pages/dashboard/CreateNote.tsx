@@ -588,7 +588,7 @@ export const CreateNote: React.FC = () => {
                   </div>
                   <div className="flex flex-wrap gap-2 mb-3">
                     {tags.map(tag => (
-                      <span key={tag} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue/5 border-2 border-blue/10 text-blue text-[12px] font-bold">
+                      <span key={tag} className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue/5 border-2 border-blue/10 text-blue text-[12px] font-bold liquid-glass">
                         #{tag}
                         <button onClick={() => removeTag(tag)} className="hover:text-red transition-colors">
                           <X size={12} />

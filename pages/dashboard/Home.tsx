@@ -102,7 +102,7 @@ export const Home: React.FC = () => {
         <div className="flex flex-col sm:flex-row gap-4">
           <Button 
             variant="primary" 
-            className="h-[48px] px-8 text-[15px] font-bold uppercase rounded-xl shadow-3d-green active:shadow-none active:translate-y-[4px] transition-all"
+            className="h-[48px] px-8 text-[15px] font-bold uppercase rounded-xl shadow-3d-green active:shadow-none active:translate-y-[4px] transition-all liquid-glass"
             onClick={handleCreateClick}
           >
             CREATE NEW NOTE
@@ -110,7 +110,7 @@ export const Home: React.FC = () => {
           {!isAuthenticated && (
             <Button 
               variant="secondary" 
-              className="h-[48px] px-8 text-[15px] font-bold uppercase rounded-xl border-2 border-border text-blue shadow-3d-gray active:shadow-none active:translate-y-[4px] transition-all"
+              className="h-[48px] px-8 text-[15px] font-bold uppercase rounded-xl border-2 border-border text-blue shadow-3d-gray active:shadow-none active:translate-y-[4px] transition-all liquid-glass"
               onClick={() => navigate(RoutePath.LOGIN)}
             >
               GET STARTED
@@ -197,7 +197,7 @@ export const Home: React.FC = () => {
               <Button 
                 variant="secondary" 
                 size="sm" 
-                className="mt-6 w-full sm:w-auto bg-white text-blue font-extrabold uppercase shadow-3d-gray"
+                className="mt-6 w-full sm:w-auto bg-white text-blue font-extrabold uppercase shadow-3d-gray liquid-glass"
                 onClick={() => handleCreateClick("What is one thing that made you feel peaceful today, even if just for a second?")}
               >
                 WRITE ABOUT IT
@@ -275,7 +275,7 @@ export const Home: React.FC = () => {
 
               <Button 
                 variant="primary" 
-                className="w-full h-[56px] text-[16px] font-bold uppercase rounded-xl shadow-3d-green active:shadow-none active:translate-y-[4px] transition-all"
+                className="w-full h-[56px] text-[16px] font-bold uppercase rounded-xl shadow-3d-green active:shadow-none active:translate-y-[4px] transition-all liquid-glass"
                 onClick={handleCloseOnboarding}
               >
                 Let's Get Started
