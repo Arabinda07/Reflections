@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, Shield, AlertTriangle, Save, Camera, Lock, ChevronRight, Globe, Key, Trash2, Smartphone } from 'lucide-react';
+import { User, Mail, Shield, AlertTriangle, Save, Camera, Lock, ChevronRight, Globe, Key, Trash2, Smartphone, LogOut, X } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { supabase } from '../../src/supabaseClient';
@@ -281,8 +281,8 @@ export const Account: React.FC = () => {
                                         <Smartphone size={20} />
                                     </div>
                                     <div>
-                                        <p className="text-[15px] font-bold text-gray-text">2-Factor Authentication</p>
-                                        <p className="text-[12px] font-bold text-gray-nav uppercase">Enhanced security for your sanctuary</p>
+                                        <p className="text-[15px] font-bold text-gray-text">2-Factor Auth</p>
+                                        <p className="text-[12px] font-bold text-gray-nav uppercase">Enhanced security</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 border border-border">
@@ -320,31 +320,35 @@ export const Account: React.FC = () => {
                 </div>
 
                 {/* Footer Action Bar */}
-                <div className="sticky bottom-0 z-10 flex flex-col sm:flex-row items-center justify-between border-t-2 border-border bg-white/95 px-8 py-6 backdrop-blur-xl gap-6 sm:gap-0">
+                <div className="sticky bottom-0 z-10 flex items-center justify-between border-t-2 border-border bg-white/95 px-6 sm:px-8 py-6 backdrop-blur-xl gap-4">
                     <button 
                         type="button" 
                         onClick={handleSignOut}
-                        className="flex items-center gap-2 text-[13px] font-black text-gray-nav hover:text-red transition-all uppercase tracking-widest group"
+                        className="flex items-center justify-center h-12 w-12 sm:w-auto sm:px-4 rounded-xl border-2 border-border bg-white text-gray-nav hover:text-red hover:border-red/30 transition-all shadow-3d-gray active:shadow-none active:translate-y-[2px] group"
+                        title="Sign Out"
                     >
-                        <Trash2 size={16} className="group-hover:scale-110 transition-transform" />
-                        SIGN OUT
+                        <LogOut size={20} className="group-hover:scale-110 transition-transform" />
+                        <span className="hidden sm:inline ml-2 text-[13px] font-black uppercase tracking-widest">SIGN OUT</span>
                     </button>
-                    <div className="flex items-center gap-4 w-full sm:w-auto">
+                    <div className="flex items-center gap-3 sm:gap-4">
                          <Button 
                             type="button" 
-                            variant="ghost" 
+                            variant="secondary" 
                             onClick={() => navigate(RoutePath.HOME)} 
-                            className="flex-1 sm:flex-none text-gray-nav font-extrabold uppercase hover:bg-gray-100"
+                            className="flex items-center justify-center h-12 w-12 sm:w-auto sm:px-6 p-0 sm:p-auto border-2 border-border text-gray-nav font-extrabold shadow-3d-gray active:shadow-none active:translate-y-[2px]"
+                            title="Cancel"
                          >
-                             CANCEL
+                             <X size={20} className="sm:hidden" />
+                             <span className="hidden sm:inline uppercase">CANCEL</span>
                          </Button>
                          <Button 
                             type="submit" 
                             isLoading={loading} 
-                            className="flex-1 sm:flex-none shadow-3d-green active:shadow-none active:translate-y-[2px] font-extrabold px-8"
+                            className="flex items-center justify-center h-12 w-12 sm:w-auto sm:px-8 p-0 sm:p-auto shadow-3d-green active:shadow-none active:translate-y-[2px] font-extrabold"
+                            title="Save Changes"
                          >
-                             <Save className="mr-2 h-4 w-4" />
-                             SAVE CHANGES
+                             {loading ? null : <Save size={20} className="sm:mr-2" />}
+                             <span className="hidden sm:inline uppercase">SAVE CHANGES</span>
                          </Button>
                     </div>
                 </div>
