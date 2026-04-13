@@ -215,15 +215,27 @@ export const SingleNote: React.FC = () => {
                  </h3>
                  <div className="space-y-3">
                     {note.tasks.map((task) => (
-                      <div key={task.id} className="flex items-center gap-4 p-4 rounded-[24px] border-2 border-border bg-white shadow-sm liquid-glass group transition-all hover:border-blue/30">
+                      <div 
+                        key={task.id} 
+                        className={`flex items-center gap-4 p-4 rounded-[24px] border-2 transition-all ${
+                          task.completed 
+                            ? 'border-border bg-gray-50/30 opacity-60' 
+                            : 'border-border bg-white shadow-sm hover:border-blue/30'
+                        }`}
+                      >
                         <button 
-                          onClick={() => toggleTask(task.id)}
-                          className={`h-6 w-6 rounded-lg border-2 flex items-center justify-center transition-all ${task.completed ? 'bg-blue border-blue text-white' : 'border-border text-transparent hover:border-blue/50'}`}
+                          onClick={() => !task.completed && toggleTask(task.id)}
+                          disabled={task.completed}
+                          className={`h-6 w-6 rounded-lg border-2 flex items-center justify-center transition-all ${
+                            task.completed 
+                              ? 'bg-blue border-blue text-white cursor-default' 
+                              : 'border-border text-transparent hover:border-blue/50'
+                          }`}
                         >
                           <Check size={14} strokeWidth={3} />
                         </button>
                         <div className="flex-1">
-                          <p className={`text-[14px] font-bold text-gray-text transition-all ${task.completed ? 'line-through opacity-50' : ''}`}>
+                          <p className={`text-[14px] font-bold text-gray-text transition-all ${task.completed ? 'line-through' : ''}`}>
                             {task.text}
                           </p>
                           {task.dueDate && (
