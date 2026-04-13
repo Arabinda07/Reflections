@@ -1,12 +1,21 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { Sparkles, Play, Shield, Zap, Heart, Brain, Moon, Sun, ArrowRight, CheckCircle2, Cloud } from 'lucide-react';
+import { Sparkles, Play, Shield, Zap, Heart, Brain, Moon, Sun, ArrowRight, CheckCircle2, Cloud, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { RoutePath } from '../../types';
 
 export const Landing: React.FC = () => {
   const navigate = useNavigate();
+  const [isMuted, setIsMuted] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
+    }
+  };
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-white selection:bg-green/30 selection:text-green-hover">
@@ -45,14 +54,23 @@ export const Landing: React.FC = () => {
             <div className="relative aspect-video rounded-[24px] sm:rounded-[40px] border-2 border-border bg-white/50 backdrop-blur-xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] overflow-hidden liquid-glass p-2 sm:p-4">
               <div className="w-full h-full rounded-[16px] sm:rounded-[32px] overflow-hidden border-2 border-white/20 relative">
                 <video 
+                  ref={videoRef}
                   src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260324_151826_c7218672-6e92-402c-9e45-f1e0f454bdc4.mp4"
                   className="w-full h-full object-cover bg-black/5"
                   autoPlay
                   loop
-                  muted
+                  muted={isMuted}
                   playsInline
-                  controls
                 />
+                
+                {/* Custom Mute Button */}
+                <button
+                  onClick={toggleMute}
+                  className="absolute bottom-4 right-4 p-3 bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full text-white transition-all z-10"
+                  aria-label={isMuted ? "Unmute video" : "Mute video"}
+                >
+                  {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                </button>
               </div>
             </div>
           </div>
