@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PlusCircle, Sparkles, FolderOpen, FileText, UserPlus, Smile, Tag, RefreshCw, ArrowRight } from 'lucide-react';
+import { PlusCircle, Sparkles, FolderOpen, FileText, UserPlus, Smile, Tag, RefreshCw, ArrowRight, Brain, Target } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { Button } from '../../components/ui/Button';
 import { RoutePath } from '../../types';
 import { useAuth } from '../../context/AuthContext';
@@ -25,6 +26,7 @@ export const Home: React.FC = () => {
   const [isCountLoading, setIsCountLoading] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [dailyPrompt, setDailyPrompt] = useState(DAILY_PROMPTS[0]);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     // Randomize initial prompt
@@ -33,11 +35,19 @@ export const Home: React.FC = () => {
 
   const refreshPrompt = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (isRefreshing) return;
+    
+    setIsRefreshing(true);
     let next;
     do {
       next = DAILY_PROMPTS[Math.floor(Math.random() * DAILY_PROMPTS.length)];
     } while (next === dailyPrompt);
-    setDailyPrompt(next);
+    
+    // Artificial delay to make it feel like it's "refreshing"
+    setTimeout(() => {
+      setDailyPrompt(next);
+      setIsRefreshing(false);
+    }, 600);
   };
 
   useEffect(() => {
@@ -54,8 +64,7 @@ export const Home: React.FC = () => {
 
   useEffect(() => {
     const fetchCount = async () => {
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      if (authUser) {
+      if (user) {
         setIsCountLoading(true);
         try {
           const count = await noteService.getCount();
@@ -118,23 +127,50 @@ export const Home: React.FC = () => {
 
   return (
     <div className="animate-in fade-in duration-700">
-      {/* Hero Section - Simplified for Auth Users */}
-      <section className="flex flex-col items-center text-center py-[80px] px-10 bg-gradient-to-b from-green/5 to-white">
-        <h1 className="font-display text-[64px] text-green lowercase mb-4 tracking-tighter">
-          welcome back, {user?.name?.split(' ')[0] || 'learner'}
-        </h1>
-        <p className="text-[18px] text-gray-light max-w-[520px] leading-[1.5] mb-10 font-medium">
-          Ready to capture your thoughts? Your sanctuary is waiting.
-        </p>
-        <Button 
-          variant="primary" 
-          size="lg"
-          className="h-[64px] px-12 text-[18px] font-bold uppercase rounded-2xl shadow-3d-green active:shadow-none active:translate-y-[4px] transition-all liquid-glass group"
-          onClick={() => handleCreateClick()}
+      {/* Hero Section - Cinematic Background */}
+      <section className="relative flex flex-col items-center justify-center text-center py-[100px] px-6 sm:px-10 overflow-hidden border-b-2 border-border min-h-[500px]">
+        {/* Background Video */}
+        <video 
+          autoPlay 
+          loop 
+          muted 
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover z-0 opacity-90"
         >
-          <PlusCircle className="mr-3 group-hover:rotate-90 transition-transform duration-300" />
-          New Entry
-        </Button>
+          <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260307_083826_e938b29f-a43a-41ec-a153-3d4730578ab8.mp4" type="video/mp4" />
+        </video>
+
+        {/* Overlay to ensure text legibility without a solid card */}
+        <div className="absolute inset-0 bg-black/40 z-0"></div>
+
+        {/* Floating Text Container */}
+        <motion.div 
+          animate={{ y: [-5, 5, -5] }}
+          transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+          className="relative z-10 flex flex-col items-center max-w-2xl w-full"
+        >
+          <h1 
+            className="font-display text-[48px] sm:text-[64px] lowercase mb-4 tracking-tighter leading-none"
+            style={{ color: '#ffffff', textShadow: '0 4px 12px rgba(0,0,0,0.8)' }}
+          >
+            welcome back, {user?.name?.split(' ')[0] || 'learner'}
+          </h1>
+          <p 
+            className="text-[16px] sm:text-[18px] max-w-[520px] leading-[1.5] mb-10 font-bold"
+            style={{ color: '#ffffff', textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}
+          >
+            Ready to capture your thoughts? Your sanctuary is waiting.
+          </p>
+          <Button 
+            variant="primary" 
+            size="lg"
+            className="h-[64px] px-12 text-[18px] font-bold uppercase rounded-2xl shadow-3d-green active:shadow-none active:translate-y-[4px] transition-all liquid-glass group"
+            onClick={() => handleCreateClick()}
+          >
+            <PlusCircle className="mr-3 group-hover:rotate-90 transition-transform duration-300" />
+            New Entry
+          </Button>
+        </motion.div>
       </section>
 
       {/* Main Grid */}
@@ -171,7 +207,7 @@ export const Home: React.FC = () => {
             >
               <div className="flex items-center justify-between mb-6">
                 <div className="h-14 w-14 rounded-2xl bg-green/10 flex items-center justify-center text-green shadow-3d-gray group-hover:scale-110 transition-transform">
-                  <Sparkles size={28} />
+                  <Brain size={28} />
                 </div>
                 <div className="flex items-center gap-2 text-[11px] font-black uppercase text-green tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
                   Get Insights <ArrowRight size={12} />
@@ -188,23 +224,24 @@ export const Home: React.FC = () => {
           <div className="panel-label">Daily Mindfulness</div>
           <div className="bg-gradient-to-br from-blue to-blue/80 rounded-[32px] p-10 text-white shadow-3d-blue liquid-glass-strong relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:rotate-12 transition-transform duration-700">
-              <Sparkles size={120} />
+              <Target size={120} />
             </div>
             
             <div className="relative z-10">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-4">
                   <div className="h-12 w-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center">
-                    <Sparkles size={24} />
+                    <Target size={24} />
                   </div>
                   <h4 className="text-[20px] font-display lowercase">today's focus</h4>
                 </div>
                 <button 
                   onClick={refreshPrompt}
-                  className="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-colors"
+                  className={`p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-all ${isRefreshing ? 'opacity-50' : 'opacity-100'}`}
                   title="Refresh Prompt"
+                  disabled={isRefreshing}
                 >
-                  <RefreshCw size={18} />
+                  <RefreshCw size={18} className={isRefreshing ? 'animate-spin' : ''} />
                 </button>
               </div>
               
