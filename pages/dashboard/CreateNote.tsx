@@ -660,7 +660,7 @@ export const CreateNote: React.FC = () => {
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                 transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                                className="absolute top-full mt-3 left-0 z-[100] p-4 bg-white border-2 border-border rounded-3xl shadow-xl w-[calc(100vw-2rem)] sm:w-[280px] liquid-glass"
+                                className="absolute top-full mt-3 left-0 z-[100] p-4 bg-white border-2 border-border rounded-3xl shadow-xl w-[260px] sm:w-[280px] liquid-glass max-w-[calc(100vw-40px)]"
                               >
                                 <div className="flex items-center justify-between mb-4 px-1">
                                   <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav">How are you?</span>
@@ -710,7 +710,7 @@ export const CreateNote: React.FC = () => {
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                 transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                                className="absolute top-full mt-3 right-0 sm:left-0 sm:right-auto z-[100] p-6 bg-white border-2 border-border rounded-3xl shadow-xl w-[calc(100vw-2rem)] sm:w-[320px] liquid-glass"
+                                className="absolute top-full mt-3 right-0 sm:left-0 sm:right-auto z-[100] p-5 sm:p-6 bg-white border-2 border-border rounded-3xl shadow-xl w-[280px] sm:w-[320px] liquid-glass max-w-[calc(100vw-40px)]"
                               >
                                 <div className="mb-4">
                                   <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav block mb-3">Add Tags</span>
@@ -828,7 +828,7 @@ export const CreateNote: React.FC = () => {
                       tasks.map((task) => (
                         <div 
                           key={task.id} 
-                          className={`group flex items-center gap-4 p-4 rounded-[24px] border-2 transition-all duration-500 ease-out ${
+                          className={`group flex items-center gap-2 sm:gap-4 p-3 sm:p-4 rounded-[24px] border-2 transition-all duration-500 ease-out ${
                             task.completed 
                               ? 'border-border bg-gray-50/30 opacity-50 scale-[0.98]' 
                               : 'border-border bg-white shadow-sm hover:border-blue/30 scale-100'
@@ -850,13 +850,13 @@ export const CreateNote: React.FC = () => {
                             value={task.text}
                             onChange={(e) => updateTask(task.id, { text: e.target.value })}
                             readOnly={task.completed}
-                            placeholder="What needs to be done?"
-                            className={`flex-1 bg-transparent border-none focus:ring-0 text-[14px] font-bold text-gray-text placeholder:text-border transition-all duration-500 ${
+                            placeholder="Your Task"
+                            className={`flex-1 min-w-0 bg-transparent border-none focus:ring-0 text-[14px] px-1 font-bold text-gray-text placeholder:text-border transition-all duration-500 ${
                               task.completed ? 'line-through text-gray-nav cursor-default' : ''
                             }`}
                           />
 
-                          <div className={`flex items-center gap-2 transition-all duration-300 ${task.completed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+                          <div className={`flex shrink-0 items-center gap-1 sm:gap-2 transition-all duration-300 ${task.completed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
                             <input 
                               type="date"
                               value={task.dueDate || ''}

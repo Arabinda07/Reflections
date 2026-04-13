@@ -92,7 +92,7 @@ export const Insights: React.FC = () => {
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white border-2 border-border rounded-[32px] p-8 shadow-[0_8px_0_0_#E5E5E5] liquid-glass">
+          <div className="bg-white border-2 border-border rounded-[32px] p-6 sm:p-8 shadow-[0_8px_0_0_#E5E5E5] liquid-glass">
             <div className="flex items-center gap-3 mb-6">
               <div className="h-10 w-10 rounded-xl bg-green/10 text-green flex items-center justify-center">
                 <TrendingUp size={20} />
@@ -110,7 +110,7 @@ export const Insights: React.FC = () => {
             </p>
           </div>
 
-          <div className="bg-white border-2 border-border rounded-[32px] p-8 shadow-[0_8px_0_0_#E5E5E5] liquid-glass">
+          <div className="bg-white border-2 border-border rounded-[32px] p-6 sm:p-8 shadow-[0_8px_0_0_#E5E5E5] liquid-glass">
             <div className="flex items-center gap-3 mb-6">
               <div className="h-10 w-10 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center">
                 <Heart size={20} />
@@ -136,7 +136,7 @@ export const Insights: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-blue to-blue/80 rounded-[32px] p-10 text-white shadow-3d-blue liquid-glass-strong relative overflow-hidden">
+        <div className="bg-gradient-to-br from-blue to-blue/80 rounded-[32px] p-6 sm:p-10 text-white shadow-3d-blue liquid-glass-strong relative overflow-hidden">
           {/* Decorative elements */}
           <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
           

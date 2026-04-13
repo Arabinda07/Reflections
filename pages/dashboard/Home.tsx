@@ -177,7 +177,7 @@ export const Home: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 border-t-2 border-border">
         
         {/* Panel 1: Stats & Overview - Now Clickable */}
-        <div className="p-[36px_40px] border-b-2 border-border lg:border-r-2 border-border">
+        <div className="p-6 sm:p-10 border-b-2 border-border lg:border-r-2 border-border">
           <div className="panel-label">Emotional Overview</div>
           <div className="flex flex-col gap-6">
             <div 
@@ -220,7 +220,7 @@ export const Home: React.FC = () => {
         </div>
 
         {/* Panel 2: Daily Mindfulness */}
-        <div className="p-[36px_40px] border-b-2 border-border flex flex-col justify-center">
+        <div className="p-6 sm:p-10 border-b-2 border-border flex flex-col justify-center">
           <div className="panel-label">Daily Mindfulness</div>
           <div className="bg-gradient-to-br from-blue to-blue/80 rounded-[32px] p-10 text-white shadow-3d-blue liquid-glass-strong relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:rotate-12 transition-transform duration-700">
