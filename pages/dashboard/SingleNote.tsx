@@ -120,10 +120,10 @@ export const SingleNote: React.FC = () => {
 
   return (
     <>
-      <div className="mx-auto max-w-3xl space-y-6 animate-in fade-in duration-300 pb-20 relative px-4 md:px-0">
+      <div className="mx-auto max-w-3xl space-y-6 animate-in fade-in duration-300 pb-20 relative px-4 md:px-0 pt-4">
         {/* Sticky Header */}
-        <div className="flex items-center justify-between sticky top-0 bg-[#FAFAFA]/90 backdrop-blur-sm py-4 z-10">
-          <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.NOTES)} className="-ml-3 text-gray-nav hover:text-gray-text font-bold uppercase text-[12px]">
+        <div className="flex items-center justify-between sticky top-4 bg-white/80 backdrop-blur-xl py-3 px-4 sm:px-6 rounded-[24px] border-2 border-border shadow-sm z-10 mb-8 liquid-glass">
+          <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.NOTES)} className="-ml-2 text-gray-nav hover:text-gray-text font-bold uppercase text-[12px]">
             <ArrowLeft className="mr-2 h-4 w-4" />
             BACK
           </Button>
