@@ -77,19 +77,34 @@ export const FAQ: React.FC = () => {
         </section>
       </div>
 
-      {/* =========================================
-          PHASE 2: THE SPLINE BLOCK
-          ========================================= */}
-      <motion.section 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.5 }}
-        className="relative z-10 w-full h-[60vh] min-h-[500px] max-h-[800px] bg-[#F9F9F9] border-y-2 border-border/50 overflow-hidden flex items-center justify-center mb-20"
-      >
-        <div className="absolute inset-0 pointer-events-auto z-0 flex items-center justify-center origin-center transition-transform scale-105">
-          <Spline scene="https://prod.spline.design/WJogBwjycMbazviG/scene.splinecode" />
-        </div>
-      </motion.section>
+      <div className="relative z-10 w-full max-w-[1440px] mx-auto px-4 md:px-6 mb-32">
+        {/* =========================================
+            PHASE 2: THE SPLINE BLOCK
+            ========================================= */}
+        <motion.section 
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
+          className="relative w-full h-[60vh] min-h-[500px] max-h-[700px] rounded-[48px] border-2 border-white/20 dark:border-[#2a2a2a] overflow-hidden flex items-center justify-center liquid-glass-strong group"
+        >
+          {/* We apply a clip-path to physically cut out the bottom-right rectangle where the watermark logo renders, ensuring it literally cannot be drawn */}
+          <div 
+            className="absolute inset-0 pointer-events-auto z-0 flex items-center justify-center origin-center transition-transform duration-1000 group-hover:scale-105"
+            style={{ clipPath: "polygon(0 0, 100% 0, 100% calc(100% - 85px), calc(100% - 245px) calc(100% - 85px), calc(100% - 245px) 100%, 0 100%)" }}
+          >
+            <Spline scene="https://prod.spline.design/WJogBwjycMbazviG/scene.splinecode" />
+          </div>
+          
+          {/* Frosted Watermark Blocker Panel - Sized carefully to hide the rectangular watermark */}
+          <div className="absolute bottom-0 right-0 w-[240px] h-[80px] rounded-tl-[24px] rounded-br-[48px] bg-white/60 dark:bg-[#121212]/70 backdrop-blur-3xl z-[999] pointer-events-none flex items-center justify-center border-t border-l border-white/50 dark:border-white/10 shadow-[-10px_-10px_30px_rgba(0,0,0,0.05)]">
+              <div className="flex items-center gap-2 opacity-80 pl-4">
+                 <Sparkles size={14} className="text-gray-text dark:text-gray-text" />
+                 <span className="text-[12px] font-black uppercase tracking-widest text-gray-text">Interactive</span>
+              </div>
+          </div>
+        </motion.section>
+      </div>
 
       <div className="relative z-10 w-full max-w-[1440px] mx-auto px-4 md:px-6">
 
