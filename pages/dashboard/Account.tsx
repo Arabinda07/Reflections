@@ -337,41 +337,41 @@ export const Account: React.FC = () => {
                 </div>
 
                 {/* Footer Action Bar */}
-                <div className="sticky bottom-0 z-10 flex flex-wrap sm:flex-nowrap items-center justify-between border-t-2 border-border bg-white/95 px-4 sm:px-8 py-4 sm:py-6 backdrop-blur-xl gap-3 sm:gap-4">
+                <div className="sticky bottom-0 z-10 flex items-center justify-between border-t-2 border-border bg-white/95 px-4 sm:px-8 py-4 sm:py-6 backdrop-blur-xl gap-3 sm:gap-4">
                     <button 
                         type="button" 
                         onClick={handleSignOut}
-                        className="flex items-center justify-center h-12 px-4 rounded-xl border-2 border-border bg-white text-gray-nav hover:text-red hover:border-red/30 transition-all shadow-3d-gray active:shadow-none active:translate-y-[2px] group"
+                        className="flex items-center justify-center h-12 w-12 sm:w-auto sm:px-4 rounded-xl border-2 border-border bg-white text-gray-nav hover:text-red hover:border-red/30 transition-all shadow-3d-gray active:shadow-none active:translate-y-[2px] group"
                         title="Sign Out"
                     >
                         <LogOut size={20} className="group-hover:scale-110 transition-transform" />
-                        <span className="ml-2 text-[12px] sm:text-[13px] font-black uppercase tracking-widest">SIGN OUT</span>
+                        <span className="hidden sm:inline ml-2 text-[13px] font-black uppercase tracking-widest">SIGN OUT</span>
                     </button>
-                    <div className="flex items-center gap-2 sm:gap-4 ml-auto">
+                    <div className="flex items-center gap-2 sm:gap-4">
                          <Button 
                             type="button" 
                             variant="secondary" 
                             onClick={() => navigate(RoutePath.HOME)} 
-                            className="flex items-center justify-center h-12 px-3 sm:px-6 border-2 border-border text-gray-nav font-extrabold shadow-3d-gray active:shadow-none active:translate-y-[2px]"
+                            className="flex items-center justify-center h-12 w-12 sm:w-auto !px-0 sm:!px-6 border-2 border-border text-gray-nav font-extrabold shadow-3d-gray active:shadow-none active:translate-y-[2px]"
                             title="Cancel"
                          >
-                             <X size={18} className="mr-1 sm:mr-2" />
-                             <span className="text-[12px] sm:text-[14px] uppercase">CANCEL</span>
+                             <X size={20} className="sm:mr-2" />
+                             <span className="hidden sm:inline text-[14px] uppercase">CANCEL</span>
                          </Button>
                          <Button 
                             type="submit" 
                             disabled={loading || isSaved}
-                            className={`flex items-center justify-center h-12 px-3 sm:px-8 font-extrabold transition-all duration-300 ${isSaved ? 'bg-green text-white border-green shadow-3d-green' : 'shadow-3d-green active:shadow-none active:translate-y-[2px]'}`}
+                            className={`flex items-center justify-center h-12 w-12 sm:w-auto !px-0 sm:!px-8 font-extrabold transition-all duration-300 ${isSaved ? 'bg-green text-white border-green shadow-3d-green' : 'shadow-3d-green active:shadow-none active:translate-y-[2px]'}`}
                             title="Save Changes"
                          >
                              {loading ? (
-                               <div className="h-4 w-4 sm:h-5 sm:w-5 animate-spin rounded-full border-2 border-white border-t-transparent mr-1 sm:mr-2"></div>
+                               <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent sm:mr-2"></div>
                              ) : isSaved ? (
-                               <Check size={18} className="mr-1 sm:mr-2" />
+                               <Check size={20} className="sm:mr-2" />
                              ) : (
-                               <Save size={18} className="mr-1 sm:mr-2" />
+                               <Save size={20} className="sm:mr-2" />
                              )}
-                             <span className="text-[12px] sm:text-[14px] uppercase">
+                             <span className="hidden sm:inline text-[14px] uppercase">
                                 {loading ? 'SAVING...' : isSaved ? 'SAVED!' : 'SAVE'}
                              </span>
                          </Button>
