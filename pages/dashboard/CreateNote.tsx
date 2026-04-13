@@ -66,6 +66,9 @@ export const CreateNote: React.FC = () => {
   const [isFocusModeManual, setIsFocusModeManual] = useState(false);
   const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
   
+  const moodRef = useRef<HTMLDivElement>(null);
+  const tagsRef = useRef<HTMLDivElement>(null);
+  
   const lastSavedRef = useRef({ title: '', content: '', mood: undefined as string | undefined, tags: [] as string[], tasks: [] as Task[] });
   const editorRef = useRef<HTMLDivElement>(null);
 
@@ -76,6 +79,22 @@ export const CreateNote: React.FC = () => {
     // We'll attach these to the editor container or listen for typing
     return () => {
       // Cleanup
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (moodRef.current && !moodRef.current.contains(event.target as Node)) {
+        setIsMoodOpen(false);
+      }
+      if (tagsRef.current && !tagsRef.current.contains(event.target as Node)) {
+        setIsTagsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
@@ -619,9 +638,9 @@ export const CreateNote: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-8">
-          <div className="relative min-h-[70vh] rounded-[32px] border-2 border-border bg-white shadow-[0_8px_0_0_#E5E5E5] overflow-hidden flex flex-col liquid-glass">
+          <div className="relative min-h-[70vh] rounded-[32px] border-2 border-border bg-white shadow-[0_8px_0_0_#E5E5E5] flex flex-col liquid-glass !overflow-visible">
             {imagePreview && (
-              <div className="relative aspect-[21/9] w-full group bg-white border-b-2 border-border">
+              <div className="relative aspect-[21/9] w-full group bg-white border-b-2 border-border rounded-t-[30px] overflow-hidden">
                   <StorageImage 
                     path={imagePreview} 
                     alt="Cover" 
@@ -651,9 +670,12 @@ export const CreateNote: React.FC = () => {
 
                     <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
                        {/* Progressive Disclosure: Mood Button */}
-                       <div className="relative">
+                       <div className="relative" ref={moodRef}>
                           <button 
-                            onClick={() => setIsMoodOpen(!isMoodOpen)}
+                            onClick={() => {
+                              setIsMoodOpen(!isMoodOpen);
+                              setIsTagsOpen(false);
+                            }}
                             className={`w-full flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] ${mood ? 'bg-blue/5 border-blue text-blue' : 'bg-white border-border text-gray-nav hover:border-blue/30'}`}
                           >
                             {mood ? (
@@ -676,7 +698,7 @@ export const CreateNote: React.FC = () => {
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                 transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                                className="fixed inset-x-4 bottom-4 sm:absolute sm:inset-auto sm:top-full sm:mt-3 sm:right-0 z-[100] p-4 bg-white border-2 border-border rounded-3xl shadow-xl sm:w-[280px] liquid-glass"
+                                className="fixed inset-x-4 bottom-4 sm:absolute sm:inset-auto sm:top-full sm:mt-3 sm:left-0 z-[100] p-4 bg-white border-2 border-border rounded-3xl shadow-xl sm:w-[280px] liquid-glass"
                               >
                                 <div className="flex items-center justify-between mb-4 px-1">
                                   <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav">How are you?</span>
@@ -707,9 +729,12 @@ export const CreateNote: React.FC = () => {
                        </div>
 
                        {/* Progressive Disclosure: Tags Button */}
-                       <div className="relative">
+                       <div className="relative" ref={tagsRef}>
                           <button 
-                            onClick={() => setIsTagsOpen(!isTagsOpen)}
+                            onClick={() => {
+                              setIsTagsOpen(!isTagsOpen);
+                              setIsMoodOpen(false);
+                            }}
                             className={`w-full flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] ${tags.length > 0 ? 'bg-green/5 border-green text-green' : 'bg-white border-border text-gray-nav hover:border-green/30'}`}
                           >
                             <TagIcon size={16} />
@@ -723,7 +748,7 @@ export const CreateNote: React.FC = () => {
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                 transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                                className="fixed inset-x-4 bottom-4 sm:absolute sm:inset-auto sm:top-full sm:mt-3 sm:right-0 z-[100] p-6 bg-white border-2 border-border rounded-3xl shadow-xl sm:w-[320px] liquid-glass"
+                                className="fixed inset-x-4 bottom-4 sm:absolute sm:inset-auto sm:top-full sm:mt-3 sm:left-0 sm:right-auto z-[100] p-6 bg-white border-2 border-border rounded-3xl shadow-xl sm:w-[320px] liquid-glass"
                               >
                                 <div className="mb-4">
                                   <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav block mb-3">Add Tags</span>
