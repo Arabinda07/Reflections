@@ -11,6 +11,7 @@ import { CreateNote } from './pages/dashboard/CreateNote';
 import { SingleNote } from './pages/dashboard/SingleNote';
 import { Account } from './pages/dashboard/Account';
 import { Insights } from './pages/dashboard/Insights';
+import { FAQ } from './pages/dashboard/FAQ';
 import { RoutePath } from './types';
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
           <Route element={<DashboardLayout />}>
             {/* Public Home Page (Handles both Guest and Auth states internally) */}
             <Route path={RoutePath.HOME} element={<Home />} />
+            <Route path={RoutePath.FAQ} element={<FAQ />} />
             
             {/* Protected Routes - Redirect to Login if Guest */}
             <Route path={RoutePath.NOTES} element={<ProtectedRoute><MyNotes /></ProtectedRoute>} />

@@ -35,10 +35,13 @@ export const DashboardLayout: React.FC = () => {
     setIsMobileMenuOpen(false);
   };
 
-  const navItems = isLandingPage ? [] : [
+  const navItems = isLandingPage ? [
+    { label: 'FAQ', path: RoutePath.FAQ },
+  ] : [
     { label: 'My Notes', path: RoutePath.NOTES },
     { label: 'Create Note', path: RoutePath.CREATE_NOTE },
     { label: 'Account', path: RoutePath.ACCOUNT },
+    { label: 'FAQ', path: RoutePath.FAQ },
   ];
 
   return (

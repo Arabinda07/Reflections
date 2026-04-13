@@ -43,4 +43,5 @@ export enum RoutePath {
   LOGIN = '/login',
   SIGNUP = '/signup',
   INSIGHTS = '/insights',
+  FAQ = '/faq',
 }

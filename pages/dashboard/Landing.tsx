@@ -107,88 +107,21 @@ export const Landing: React.FC = () => {
               Sign In
             </Button>
           </div>
+          
+          <div className="mt-8 flex justify-center">
+             <Button 
+               variant="ghost" 
+               size="sm" 
+               className="text-[14px] font-bold uppercase tracking-widest text-gray-nav hover:text-blue hover:bg-blue/5 border-2 border-transparent hover:border-blue/10 rounded-full px-6 py-3 transition-all flex items-center gap-2"
+               onClick={() => navigate(RoutePath.FAQ)}
+             >
+               <Sparkles size={16} />
+               <span>Explore How It Works (FAQ)</span>
+             </Button>
+          </div>
         </motion.div>
 
-        {/* Bento Grid Features */}
-        <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-12 gap-6">
-          {/* Large Card: AI Insights */}
-          <div className="md:col-span-8 p-10 rounded-[40px] border-2 border-border bg-white shadow-3d-gray liquid-glass relative overflow-hidden group hover:translate-y-[-4px] transition-all duration-500">
-            <div className="absolute top-0 right-0 p-12 opacity-5 group-hover:scale-110 group-hover:rotate-12 transition-transform duration-700">
-              <Brain size={200} />
-            </div>
-            <div className="relative z-10 max-w-md">
-              <div className="h-14 w-14 rounded-2xl bg-blue/10 text-blue flex items-center justify-center mb-8 shadow-3d-gray">
-                <Sparkles size={28} />
-              </div>
-              <h3 className="text-[32px] font-display text-gray-text lowercase mb-4">AI-Powered Reflections</h3>
-              <p className="text-[18px] text-gray-light font-medium leading-relaxed mb-8">
-                Gain deep understanding of your emotional patterns with compassionate AI analysis that evolves with your journey.
-              </p>
-              <ul className="space-y-3">
-                {['Pattern Recognition', 'Compassionate Feedback', 'Dynamic Prompts'].map(item => (
-                  <li key={item} className="flex items-center gap-3 text-[14px] font-bold text-gray-nav">
-                    <CheckCircle2 size={18} className="text-green" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
 
-          {/* Tall Card: Privacy */}
-          <div className="md:col-span-4 p-10 rounded-[40px] border-2 border-border bg-green/5 shadow-3d-green liquid-glass relative overflow-hidden group hover:translate-y-[-4px] transition-all duration-500">
-            <div className="h-14 w-14 rounded-2xl bg-green text-white flex items-center justify-center mb-8 shadow-3d-green">
-              <Shield size={28} />
-            </div>
-            <h3 className="text-[28px] font-display text-gray-text lowercase mb-4">Your Private Sanctuary</h3>
-            <p className="text-[16px] text-gray-light font-medium leading-relaxed">
-              Your thoughts are yours alone. We prioritize end-to-end encryption and complete data ownership.
-            </p>
-            <div className="mt-12 p-6 rounded-3xl bg-white/50 border-2 border-border backdrop-blur-sm">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="h-3 w-3 rounded-full bg-green animate-pulse" />
-                <span className="text-[12px] font-black uppercase tracking-widest text-green">Encrypted</span>
-              </div>
-              <div className="space-y-2">
-                <div className="h-2 w-full bg-gray-100 rounded-full" />
-                <div className="h-2 w-2/3 bg-gray-100 rounded-full" />
-              </div>
-            </div>
-          </div>
-
-          {/* Wide Card: Mood Tracking */}
-          <div className="md:col-span-12 p-10 rounded-[40px] border-2 border-border bg-white shadow-3d-gray liquid-glass flex flex-col md:flex-row items-center gap-12 group hover:translate-y-[-4px] transition-all duration-500">
-            <div className="flex-1">
-              <div className="h-14 w-14 rounded-2xl bg-purple-500/10 text-purple-500 flex items-center justify-center mb-8 shadow-3d-gray">
-                <Heart size={28} />
-              </div>
-              <h3 className="text-[32px] font-display text-gray-text lowercase mb-4">Visualize Your Emotions</h3>
-              <p className="text-[18px] text-gray-light font-medium leading-relaxed">
-                Track your mood over time and see how your environment and activities impact your mental well-being.
-              </p>
-            </div>
-            <div className="flex-1 w-full grid grid-cols-4 gap-4">
-              {[Sun, Cloud, Moon, Zap].map((Icon, i) => (
-                <div key={i} className="aspect-square rounded-3xl border-2 border-border flex items-center justify-center text-gray-nav hover:bg-purple-500/5 hover:border-purple-500/20 hover:text-purple-500 transition-all cursor-pointer group/icon">
-                  <Icon size={32} className="group-hover/icon:scale-110 transition-transform" />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Final CTA */}
-        <div className="mt-32 text-center">
-          <h2 className="text-[40px] md:text-[64px] font-display text-gray-text lowercase mb-8 tracking-tight">ready to start your journey?</h2>
-          <Button 
-            variant="primary" 
-            size="lg" 
-            className="h-20 px-16 text-[20px] font-bold uppercase rounded-[24px] shadow-3d-green liquid-glass"
-            onClick={() => navigate(RoutePath.SIGNUP)}
-          >
-            Create Your Sanctuary
-          </Button>
-        </div>
       </div>
     </div>
   );
