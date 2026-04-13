@@ -86,10 +86,16 @@ export const FAQ: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 1.2, ease: "easeOut" }}
-          className="relative w-full h-[60vh] min-h-[500px] max-h-[700px] flex items-center justify-center group"
+          className="relative w-full max-w-6xl mx-auto flex flex-col items-center"
         >
-          <div className="absolute inset-0 pointer-events-auto z-0 flex items-center justify-center origin-center transition-transform duration-1000 group-hover:scale-105">
-            <Spline scene="https://prod.spline.design/Dpx2TF6lL963qEnt/scene.splinecode" />
+          <div className="relative w-full group">
+            {/* Persistent breathing glow that intensifies on hover */}
+            <div className="absolute -inset-4 bg-gradient-to-r from-green/30 via-blue/30 to-green/30 rounded-[48px] blur-2xl opacity-50 animate-pulse group-hover:opacity-100 transition-opacity duration-1000" />
+            <div className="relative h-[60vh] min-h-[500px] max-h-[700px] rounded-[24px] sm:rounded-[40px] border-2 border-border bg-white/50 backdrop-blur-xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] overflow-hidden liquid-glass p-2 sm:p-4">
+              <div className="w-full h-full rounded-[16px] sm:rounded-[32px] overflow-hidden border-2 border-white/20 relative transition-transform duration-1000 group-hover:scale-[1.02]">
+                <Spline scene="https://prod.spline.design/Dpx2TF6lL963qEnt/scene.splinecode" />
+              </div>
+            </div>
           </div>
         </motion.section>
       </div>

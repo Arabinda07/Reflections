@@ -160,51 +160,53 @@ export const DashboardLayout: React.FC = () => {
               <span className="font-display text-[28px] text-green lowercase">mindful notes</span>
             </div>
 
-            {navItems.map((item) => (
-              <button
-                key={item.label}
-                onClick={() => handleNavigation(item.path)}
-                className="w-full p-6 text-left text-[24px] font-black uppercase tracking-widest text-gray-text border-b-2 border-border/50 hover:text-green transition-all active:bg-green/5 rounded-2xl flex items-center justify-between group"
-              >
-                <span>{item.label}</span>
-                <ArrowRight className="opacity-0 group-hover:opacity-100 transition-opacity" />
-              </button>
-            ))}
-            
-            <div className="mt-auto flex flex-col gap-4 pb-10">
-              {isAuthenticated ? (
-                <Button 
-                  variant="ghost" 
-                  size="lg" 
-                  onClick={() => {
-                    logout();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="w-full text-red hover:bg-red/5 h-16 font-black uppercase tracking-widest border-2 border-red/10 rounded-2xl"
-                >
-                  LOGOUT
-                </Button>
-              ) : (
-                <div className="grid grid-cols-1 gap-4">
+            {isAuthenticated ? (
+              <>
+                <div className="flex flex-col gap-2">
+                  {navItems.map((item) => (
+                    <button
+                      key={item.label}
+                      onClick={() => handleNavigation(item.path)}
+                      className="w-full p-6 text-left text-[24px] font-black uppercase tracking-widest text-gray-text border-b-2 border-border/50 hover:text-green transition-all active:bg-green/5 rounded-2xl flex items-center justify-between group"
+                    >
+                      <span>{item.label}</span>
+                      <ArrowRight className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-8 flex flex-col gap-4 pb-10">
                   <Button 
-                    variant="secondary" 
+                    variant="ghost" 
                     size="lg" 
-                    onClick={() => handleNavigation(RoutePath.LOGIN)}
-                    className="w-full h-16 font-black uppercase tracking-widest border-2 border-border shadow-3d-gray rounded-2xl liquid-glass"
+                    onClick={() => {
+                      logout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full text-red hover:bg-red/5 h-16 font-black uppercase tracking-widest border-2 border-red/10 rounded-2xl"
                   >
-                    SIGN IN
-                  </Button>
-                  <Button 
-                    variant="primary" 
-                    size="lg" 
-                    onClick={() => handleNavigation(RoutePath.SIGNUP)}
-                    className="w-full h-16 font-black uppercase tracking-widest shadow-3d-green rounded-2xl liquid-glass"
-                  >
-                    SIGN UP
+                    LOGOUT
                   </Button>
                 </div>
-              )}
-            </div>
+              </>
+            ) : (
+              <div className="flex flex-col gap-2 pb-10">
+                {[
+                  { label: 'Homepage', path: RoutePath.HOME },
+                  { label: 'FAQ', path: RoutePath.FAQ },
+                  { label: 'Sign In', path: RoutePath.LOGIN },
+                  { label: 'Sign Up', path: RoutePath.SIGNUP },
+                ].map((item) => (
+                  <button
+                    key={item.label}
+                    onClick={() => handleNavigation(item.path)}
+                    className="w-full p-6 text-left text-[24px] font-black uppercase tracking-widest text-gray-text border-b-2 border-border/50 hover:text-green transition-all active:bg-green/5 rounded-2xl flex items-center justify-between group"
+                  >
+                    <span>{item.label}</span>
+                    <ArrowRight className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
