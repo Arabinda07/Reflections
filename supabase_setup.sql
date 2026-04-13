@@ -1,81 +1,118 @@
--- ==========================================
--- 1. DATABASE TABLES & POLICIES
--- ==========================================
-
--- Create the notes table
-CREATE TABLE IF NOT EXISTS public.notes (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-    title TEXT,
-    content TEXT,
-    mood TEXT,
-    thumbnail_url TEXT,
-    tags TEXT[] DEFAULT '{}',
-    attachments JSONB DEFAULT '[]',
-    tasks JSONB DEFAULT '[]',
-    created_at TIMESTAMPTZ DEFAULT now(),
-    updated_at TIMESTAMPTZ DEFAULT now()
+create policy "Users can view own files"
+on storage.objects for select
+to authenticated
+using (
+  bucket_id = 'app-files'
+  and name like (auth.uid()::text || '/%')
 );
 
--- Enable RLS
-ALTER TABLE public.notes ENABLE ROW LEVEL SECURITY;
-
--- Create policies
-CREATE POLICY "Users can create their own notes" 
-ON public.notes FOR INSERT 
-WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can view their own notes" 
-ON public.notes FOR SELECT 
-USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can update their own notes" 
-ON public.notes FOR UPDATE 
-USING (auth.uid() = user_id)
-WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can delete their own notes" 
-ON public.notes FOR DELETE 
-USING (auth.uid() = user_id);
-
--- ==========================================
--- 2. STORAGE BUCKET & POLICIES
--- ==========================================
-
--- Ensure the bucket exists
--- Note: This might fail if run multiple times, but Supabase usually handles it or you can do it via UI
--- INSERT INTO storage.buckets (id, name, public) VALUES ('app-files', 'app-files', false) ON CONFLICT (id) DO NOTHING;
-
--- Storage Policies for 'app-files' bucket
-
--- 1. Allow users to upload files to their own folder
-CREATE POLICY "Users can upload files to their own folder"
-ON storage.objects FOR INSERT
-WITH CHECK (
-    bucket_id = 'app-files' AND 
-    (storage.foldername(name))[1] = auth.uid()::text
+create policy "Users can upload to own folder"
+on storage.objects for insert
+to authenticated
+with check (
+  bucket_id = 'app-files'
+  and name like (auth.uid()::text || '/%')
 );
 
--- 2. Allow users to view their own files
-CREATE POLICY "Users can view their own files"
-ON storage.objects FOR SELECT
-USING (
-    bucket_id = 'app-files' AND 
-    (storage.foldername(name))[1] = auth.uid()::text
+create policy "Users can update own files"
+on storage.objects for update
+to authenticated
+using (
+  bucket_id = 'app-files'
+  and name like (auth.uid()::text || '/%')
 );
 
--- 3. Allow users to update their own files
-CREATE POLICY "Users can update their own files"
-ON storage.objects FOR UPDATE
-USING (
-    bucket_id = 'app-files' AND 
-    (storage.foldername(name))[1] = auth.uid()::text
+create policy "Users can delete own files"
+on storage.objects for delete
+to authenticated
+using (
+  bucket_id = 'app-files'
+  and name like (auth.uid()::text || '/%')
 );
 
--- 4. Allow users to delete their own files
-CREATE POLICY "Users can delete their own files"
-ON storage.objects FOR DELETE
-USING (
-    bucket_id = 'app-files' AND 
-    (storage.foldername(name))[1] = auth.uid()::text
+-- 1. Create Profiles table (for user metadata and plan tracking)
+create table if not exists profiles (
+  id uuid references auth.users on delete cascade primary key,
+  full_name text,
+  avatar_url text,
+  plan text default 'free', -- 'free' or 'pro'
+  updated_at timestamp with time zone default timezone('utc'::text, now())
 );
+
+-- 2. Create Notes table
+create table if not exists notes (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) on delete cascade not null,
+  title text default '',
+  content text default '',
+  mood text,
+  thumbnail_url text,
+  tags text[] default '{}',
+  attachments jsonb default '[]',
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- 3. Enable Row Level Security (RLS)
+alter table profiles enable row level security;
+alter table notes enable row level security;
+
+-- 4. Profiles Policies
+create policy "Public profiles are viewable by everyone." on profiles for select using ( true );
+create policy "Users can insert their own profile." on profiles for insert with check ( auth.uid() = id );
+create policy "Users can update own profile." on profiles for update using ( auth.uid() = id );
+
+-- 5. Notes Policies (Strictly scoped to the authenticated user)
+create policy "Users can view their own notes" on notes for select using (auth.uid() = user_id);
+create policy "Users can insert their own notes" on notes for insert with check (auth.uid() = user_id);
+create policy "Users can update their own notes" on notes for update using (auth.uid() = user_id);
+create policy "Users can delete their own notes" on notes for delete using (auth.uid() = user_id);
+
+-- 6. SaaS Limit Enforcement (Server-side Trigger)
+-- This ensures free users cannot bypass the 30-note monthly limit via API calls
+create or replace function enforce_note_limit()
+returns trigger as $$
+declare
+  note_count int;
+begin
+  select count(*) into note_count 
+  from notes 
+  where user_id = new.user_id 
+    and created_at >= date_trunc('month', now());
+    
+  if note_count >= 30 then
+    raise exception 'FREE_LIMIT_REACHED';
+  end if;
+  return new;
+end;
+$$ language plpgsql;
+
+-- Drop trigger if it exists before creating to prevent errors
+drop trigger if exists tr_enforce_note_limit on notes;
+create trigger tr_enforce_note_limit
+before insert on notes
+for each row execute function enforce_note_limit();
+
+-- 7. Trigger for profile creation on signup
+create or replace function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.profiles (id, full_name, avatar_url)
+  values (new.id, new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'avatar_url');
+  return new;
+end;
+$$ language plpgsql security definer;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+
+-- Helper to safely add column if needed
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name='notes' AND column_name='tasks') THEN
+        ALTER TABLE public.notes ADD COLUMN tasks JSONB DEFAULT '[]'::jsonb;
+    END IF;
+END $$;
