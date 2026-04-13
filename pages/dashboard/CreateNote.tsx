@@ -866,21 +866,21 @@ export const CreateNote: React.FC = () => {
                       tasks.map((task) => (
                         <div 
                           key={task.id} 
-                          className={`group flex items-center gap-4 p-4 rounded-[24px] border-2 transition-all ${
+                          className={`group flex items-center gap-4 p-4 rounded-[24px] border-2 transition-all duration-500 ease-out ${
                             task.completed 
-                              ? 'border-border bg-gray-50/30 opacity-60' 
-                              : 'border-border bg-white shadow-sm hover:border-blue/30'
+                              ? 'border-border bg-gray-50/30 opacity-50 scale-[0.98]' 
+                              : 'border-border bg-white shadow-sm hover:border-blue/30 scale-100'
                           }`}
                         >
                           <button 
                             onClick={() => toggleTask(task.id)}
-                            className={`h-6 w-6 rounded-lg border-2 flex items-center justify-center transition-all ${
+                            className={`h-6 w-6 shrink-0 rounded-lg border-2 flex items-center justify-center transition-all duration-300 ${
                               task.completed 
-                                ? 'bg-blue border-blue text-white' 
+                                ? 'bg-blue border-blue text-white shadow-[0_0_10px_rgba(28,176,246,0.5)]' 
                                 : 'border-border text-transparent hover:border-blue/50'
                             }`}
                           >
-                            <Check size={14} strokeWidth={3} />
+                            <Check size={14} strokeWidth={3} className={`transition-transform duration-300 ${task.completed ? 'scale-100' : 'scale-0'}`} />
                           </button>
                           
                           <input 
@@ -889,12 +889,12 @@ export const CreateNote: React.FC = () => {
                             onChange={(e) => updateTask(task.id, { text: e.target.value })}
                             readOnly={task.completed}
                             placeholder="What needs to be done?"
-                            className={`flex-1 bg-transparent border-none focus:ring-0 text-[14px] font-bold text-gray-text placeholder:text-border transition-all ${
-                              task.completed ? 'line-through cursor-default' : ''
+                            className={`flex-1 bg-transparent border-none focus:ring-0 text-[14px] font-bold text-gray-text placeholder:text-border transition-all duration-500 ${
+                              task.completed ? 'line-through text-gray-nav cursor-default' : ''
                             }`}
                           />
 
-                          <div className={`flex items-center gap-2 transition-all ${task.completed ? 'opacity-0 pointer-events-none' : 'opacity-0 group-hover:opacity-100'}`}>
+                          <div className={`flex items-center gap-2 transition-all duration-300 ${task.completed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
                             <input 
                               type="date"
                               value={task.dueDate || ''}
