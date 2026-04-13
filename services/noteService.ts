@@ -21,9 +21,13 @@ const NOTE_LIMIT = 30;
 export const noteService = {
   // Fetch all notes for the authenticated user
   getAll: async (): Promise<Note[]> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
     const { data, error } = await supabase
       .from('notes')
       .select('*')
+      .eq('user_id', user.id)
       .order('updated_at', { ascending: false });
     
     if (error) {
@@ -35,9 +39,13 @@ export const noteService = {
 
   // Get the total count of notes for the current user
   getCount: async (): Promise<number> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
     const { count, error } = await supabase
       .from('notes')
-      .select('*', { count: 'exact', head: true });
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id);
     
     if (error) {
       console.error('Supabase DB Error (getCount notes):', error.message, error);
@@ -48,6 +56,9 @@ export const noteService = {
 
   // Get the monthly count of notes for the current user
   getMonthlyCount: async (): Promise<number> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
     const startOfMonth = new Date();
     startOfMonth.setDate(1);
     startOfMonth.setHours(0, 0, 0, 0);
@@ -55,6 +66,7 @@ export const noteService = {
     const { count, error } = await supabase
       .from('notes')
       .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
       .gte('created_at', startOfMonth.toISOString());
     
     if (error) {
@@ -66,10 +78,14 @@ export const noteService = {
 
   // Get a single note by ID
   getById: async (id: string): Promise<Note | undefined> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return undefined;
+
     const { data, error } = await supabase
       .from('notes')
       .select('*')
       .eq('id', id)
+      .eq('user_id', user.id)
       .single();
     
     if (error) return undefined;
@@ -78,9 +94,13 @@ export const noteService = {
 
   // Search notes by title or content
   search: async (query: string): Promise<Note[]> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
     const { data, error } = await supabase
       .from('notes')
       .select('*')
+      .eq('user_id', user.id)
       .or(`title.ilike.%${query}%,content.ilike.%${query}%`)
       .order('updated_at', { ascending: false });
 
@@ -123,6 +143,9 @@ export const noteService = {
 
   // Update an existing note
   update: async (id: string, updates: Partial<Note>): Promise<Note> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
     // Map app fields to DB fields
     const dbUpdates: any = {
       updated_at: new Date().toISOString(),
@@ -139,6 +162,7 @@ export const noteService = {
       .from('notes')
       .update(dbUpdates)
       .eq('id', id)
+      .eq('user_id', user.id)
       .select()
       .single();
 
@@ -174,10 +198,14 @@ export const noteService = {
     }
 
     // 2. Delete from DB
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
     const { error } = await supabase
       .from('notes')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .eq('user_id', user.id);
     
     if (error) throw error;
   }
