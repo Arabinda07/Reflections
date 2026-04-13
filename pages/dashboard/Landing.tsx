@@ -29,7 +29,7 @@ export const Landing: React.FC = () => {
       <div className="relative z-10 flex flex-col items-center px-4 sm:px-6 py-16 sm:py-20 md:py-32">
         {/* Hero Text At Top */}
         <div className="text-center max-w-4xl mb-16">
-          <h1 className="text-4xl sm:text-6xl md:text-9xl font-display text-gray-text lowercase leading-tight md:leading-none mb-8 tracking-tighter animate-in slide-in-from-bottom-6 duration-700 drop-shadow-sm hover:-translate-y-1 transition-transform">
+          <h1 className="text-4xl sm:text-6xl md:text-9xl font-display text-gray-text lowercase leading-tight md:leading-[1.1] mb-8 tracking-tighter animate-in slide-in-from-bottom-6 duration-700 drop-shadow-sm hover:-translate-y-1 transition-transform">
             your mind, <br />
             <span className="bg-gradient-to-r from-green via-blue to-green bg-clip-text text-transparent animate-gradient-x drop-shadow-md">beautifully</span> organized.
           </h1>

@@ -97,20 +97,21 @@ export const CreateNote: React.FC = () => {
 
   useEffect(() => {
     const checkLimitAndFetch = async () => {
-      setLoading(true);
       try {
         if (!id) {
-          // If creating a NEW note, check count for current month
+          // If creating a NEW note, unblock UI immediately
+          setLoading(false);
+          
+          // Generate initial prompts for new note without awaiting
+          generateDynamicPrompts();
+          
+          // Check count for current month asynchronously
           const count = await noteService.getMonthlyCount();
           if (count >= 30) {
             setIsLimitReached(true);
-            setLoading(false);
-            return;
           }
-          // Generate initial prompts for new note
-          generateDynamicPrompts();
         } else {
-          // If editing an EXISTING note
+          // If editing an EXISTING note, we must block to fetch data
           const note = await noteService.getById(id);
           if (note) {
             setTitle(note.title);
@@ -132,10 +133,10 @@ export const CreateNote: React.FC = () => {
           } else {
              navigate(RoutePath.NOTES);
           }
+          setLoading(false);
         }
       } catch (error) {
         console.error("Failed to initialize note view", error);
-      } finally {
         setLoading(false);
       }
     };
@@ -451,26 +452,26 @@ export const CreateNote: React.FC = () => {
   }
 
   // LIMIT REACHED UI
-  if (isLimitReached) {
-    return (
-      <div className="mx-auto max-w-2xl animate-in fade-in zoom-in-95 duration-500 py-12 md:py-20">
-        <div className="relative overflow-hidden rounded-[40px] border border-white/80 bg-white/40 backdrop-blur-3xl shadow-[0_40px_100px_-15px_rgba(0,0,0,0.05)] p-10 md:p-14 text-center ring-1 ring-white/50">
+  const limitReachedOverlay = isLimitReached ? (
+    <div className="fixed inset-0 z-[200] bg-white/80 backdrop-blur-md flex items-center justify-center p-4">
+      <div className="w-full max-w-2xl animate-in fade-in zoom-in-95 duration-500 py-12 md:py-20">
+        <div className="relative overflow-hidden rounded-[40px] border border-white/80 bg-white/90 shadow-[0_40px_100px_-15px_rgba(0,0,0,0.05)] p-10 md:p-14 text-center ring-1 ring-white/50">
           
           {/* Ambient Glows */}
-          <div className="absolute top-[-20%] left-[-10%] w-[300px] h-[300px] bg-indigo-500/10 blur-[80px] rounded-full pointer-events-none" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[300px] h-[300px] bg-purple-500/10 blur-[80px] rounded-full pointer-events-none" />
+          <div className="absolute top-[-20%] left-[-10%] w-[300px] h-[300px] bg-blue/10 blur-[80px] rounded-full pointer-events-none" />
+          <div className="absolute bottom-[-10%] right-[-10%] w-[300px] h-[300px] bg-green/10 blur-[80px] rounded-full pointer-events-none" />
 
           <div className="relative z-10 flex flex-col items-center gap-8">
-            <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-indigo-50 text-indigo-600 shadow-inner ring-1 ring-indigo-100/50">
+            <div className="flex h-20 w-20 items-center justify-center rounded-[24px] bg-blue/10 text-blue shadow-3d-gray border-2 border-border border-blue/20">
               <Zap size={36} fill="currentColor" className="opacity-80" />
             </div>
 
             <div className="space-y-4">
-              <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 leading-tight">
+              <h2 className="text-[32px] font-display lowercase tracking-tight text-gray-text leading-tight">
                 Plan Limit Reached
               </h2>
-              <p className="text-slate-600 text-lg font-medium leading-relaxed max-w-sm mx-auto">
-                Free users can create a maximum of <span className="text-indigo-600 font-bold">30 notes per month</span>. Upgrade to Pro for unlimited creative space.
+              <p className="text-gray-light text-[18px] font-medium leading-relaxed max-w-sm mx-auto">
+                Free users can create a maximum of <span className="text-blue font-bold">30 notes per month</span>. Upgrade for unlimited creative space.
               </p>
             </div>
 
@@ -478,7 +479,7 @@ export const CreateNote: React.FC = () => {
               <Button 
                 variant="primary" 
                 size="lg" 
-                className="rounded-full shadow-lg shadow-indigo-500/20 group h-14"
+                className="rounded-[20px] shadow-3d-green group h-14"
                 onClick={() => {}} // Placeholder for upgrade
               >
                 <Sparkles size={18} className="mr-2 group-hover:rotate-12 transition-transform" />
@@ -488,21 +489,24 @@ export const CreateNote: React.FC = () => {
               <Button 
                 variant="secondary" 
                 size="lg" 
-                className="rounded-full h-14"
-                onClick={() => navigate(RoutePath.NOTES)}
+                className="rounded-[20px] h-14 shadow-3d-gray text-gray-nav"
+                onClick={() => {
+                  setIsLimitReached(false);
+                  navigate(RoutePath.NOTES);
+                }}
               >
                 Back to My Notes
               </Button>
             </div>
             
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+            <p className="text-[11px] font-black text-gray-nav/60 uppercase tracking-widest">
               Join 2,000+ users on Pro
             </p>
           </div>
         </div>
       </div>
-    );
-  }
+    </div>
+  ) : null;
 
   const hasContent = content && content !== '<p><br></p>';
   const canSave = title.trim().length > 0 || hasContent;
@@ -517,10 +521,11 @@ export const CreateNote: React.FC = () => {
     { id: 'tired', icon: Moon, label: 'Tired', color: 'text-slate-500 bg-slate-50 border-slate-100' },
   ];
 
-  const isDimmed = isFocusModeManual && isFocused;
+  const isDimmed = isFocusModeManual;
 
   return (
     <div className="mx-auto max-w-5xl animate-in fade-in duration-500 pb-20 px-4 md:px-10">
+      {limitReachedOverlay}
       <nav className={`sticky top-4 z-50 mb-8 flex items-center justify-between rounded-2xl border-2 border-border bg-white/90 px-4 py-3 shadow-[0_4px_0_0_#E5E5E5] backdrop-blur-2xl transition-all duration-500 ${isDimmed ? 'opacity-40 hover:opacity-100' : 'opacity-100'}`}>
         <div className="flex items-center gap-3">
            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-bold uppercase text-[12px]">
