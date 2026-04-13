@@ -61,7 +61,7 @@ export const FAQ: React.FC = () => {
                 <span>Your Mental Health Sanctuary</span>
               </div>
               
-              <h1 className="text-5xl sm:text-6xl md:text-8xl font-display text-gray-text lowercase leading-[1.1] md:leading-[0.9] mb-8 tracking-tighter drop-shadow-sm">
+              <h1 className="text-5xl sm:text-6xl md:text-8xl font-display text-gray-text lowercase leading-tight md:leading-[0.9] mb-8 tracking-tighter drop-shadow-sm">
                 untangle <br />
                 <span className="bg-gradient-to-r from-green via-blue to-green bg-clip-text text-transparent animate-gradient-x drop-shadow-md">your thoughts.</span>
               </h1>
@@ -81,25 +81,17 @@ export const FAQ: React.FC = () => {
         {/* =========================================
             PHASE 2: THE SPLINE BLOCK
             ========================================= */}
-        <motion.div 
+        <motion.section 
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 1.2, ease: "easeOut" }}
-          className="w-full max-w-6xl mx-auto flex flex-col items-center group relative z-10"
+          className="relative w-full h-[60vh] min-h-[500px] max-h-[700px] flex items-center justify-center group"
         >
-          <div className="relative w-full h-[60vh] min-h-[500px] max-h-[700px] group">
-            {/* Persistent breathing glow that intensifies on hover */}
-            <div className="absolute -inset-4 bg-gradient-to-r from-green/30 via-blue/30 to-purple-500/30 rounded-[48px] blur-2xl opacity-40 animate-pulse group-hover:opacity-100 transition-opacity duration-1000" />
-            <div className="relative w-full h-full rounded-[24px] sm:rounded-[40px] border-2 border-border bg-white/40 dark:bg-black/20 backdrop-blur-xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] overflow-hidden liquid-glass p-2 sm:p-4 transition-transform duration-1000 group-hover:scale-[1.01]">
-              <div className="w-full h-full rounded-[16px] sm:rounded-[32px] overflow-hidden border-2 border-white/20 dark:border-white/5 relative flex items-center justify-center bg-transparent">
-                <div className="absolute inset-0 pointer-events-auto z-0 flex items-center justify-center origin-center transition-transform duration-1000 scale-[1.05] group-hover:scale-[1.1]">
-                  <Spline scene="https://prod.spline.design/Dpx2TF6lL963qEnt/scene.splinecode" />
-                </div>
-              </div>
-            </div>
+          <div className="absolute inset-0 pointer-events-auto z-0 flex items-center justify-center origin-center transition-transform duration-1000 group-hover:scale-105">
+            <Spline scene="https://prod.spline.design/Dpx2TF6lL963qEnt/scene.splinecode" />
           </div>
-        </motion.div>
+        </motion.section>
       </div>
 
       <div className="relative z-10 w-full max-w-[1440px] mx-auto px-4 md:px-6">

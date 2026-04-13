@@ -19,15 +19,18 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
-          {/* Public Auth Routes */}
-          <Route path={RoutePath.LOGIN} element={<SignIn />} />
-          <Route path={RoutePath.SIGNUP} element={<SignUp />} />
+          {/* Public Auth Routes (Moved inside DashboardLayout for universal nav) */}
+
 
           {/* Dashboard Layout (Shared by Guest and Auth users) */}
           <Route element={<DashboardLayout />}>
             {/* Public Home Page (Handles both Guest and Auth states internally) */}
             <Route path={RoutePath.HOME} element={<Home />} />
             <Route path={RoutePath.FAQ} element={<FAQ />} />
+            
+            {/* Public Auth Routes - Guest only effectively via navigation logic */}
+            <Route path={RoutePath.LOGIN} element={<SignIn />} />
+            <Route path={RoutePath.SIGNUP} element={<SignUp />} />
             
             {/* Protected Routes - Redirect to Login if Guest */}
             <Route path={RoutePath.NOTES} element={<ProtectedRoute><MyNotes /></ProtectedRoute>} />
