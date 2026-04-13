@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, Shield, AlertTriangle, Save, Camera, Lock, ChevronRight, Globe, Key, Trash2, Smartphone, LogOut, X } from 'lucide-react';
+import { User, Mail, Shield, AlertTriangle, Save, Camera, Lock, ChevronRight, Globe, Key, Trash2, Smartphone, LogOut, X, Check } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { supabase } from '../../src/supabaseClient';
@@ -11,6 +11,7 @@ import { StorageImage } from '../../components/ui/StorageImage';
 export const Account: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const [fetching, setFetching] = useState(true);
   
   // User specific state
@@ -104,7 +105,11 @@ export const Account: React.FC = () => {
       if (error) throw error;
       
       // Simulate save delay
-      setTimeout(() => setLoading(false), 500);
+      setTimeout(() => {
+        setLoading(false);
+        setIsSaved(true);
+        setTimeout(() => setIsSaved(false), 2000);
+      }, 500);
 
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -338,17 +343,25 @@ export const Account: React.FC = () => {
                             className="flex items-center justify-center h-12 w-12 sm:w-auto sm:px-6 p-0 sm:p-auto border-2 border-border text-gray-nav font-extrabold shadow-3d-gray active:shadow-none active:translate-y-[2px]"
                             title="Cancel"
                          >
-                             <X size={20} className="sm:hidden" />
+                             <X size={18} className="sm:mr-2" />
                              <span className="hidden sm:inline uppercase">CANCEL</span>
                          </Button>
                          <Button 
                             type="submit" 
-                            isLoading={loading} 
-                            className="flex items-center justify-center h-12 w-12 sm:w-auto sm:px-8 p-0 sm:p-auto shadow-3d-green active:shadow-none active:translate-y-[2px] font-extrabold"
+                            disabled={loading || isSaved}
+                            className={`flex items-center justify-center h-12 w-12 sm:w-auto sm:px-8 p-0 sm:p-auto font-extrabold transition-all duration-300 ${isSaved ? 'bg-green text-white border-green shadow-3d-green' : 'shadow-3d-green active:shadow-none active:translate-y-[2px]'}`}
                             title="Save Changes"
                          >
-                             {loading ? null : <Save size={20} className="sm:mr-2" />}
-                             <span className="hidden sm:inline uppercase">SAVE CHANGES</span>
+                             {loading ? (
+                               <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent sm:mr-2"></div>
+                             ) : isSaved ? (
+                               <Check size={20} className="sm:mr-2" />
+                             ) : (
+                               <Save size={20} className="sm:mr-2" />
+                             )}
+                             <span className="hidden sm:inline uppercase">
+                               {loading ? 'SAVING...' : isSaved ? 'SAVED!' : 'SAVE CHANGES'}
+                             </span>
                          </Button>
                     </div>
                 </div>
