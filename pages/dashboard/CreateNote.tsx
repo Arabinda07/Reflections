@@ -100,9 +100,9 @@ export const CreateNote: React.FC = () => {
       setLoading(true);
       try {
         if (!id) {
-          // If creating a NEW note, check count
-          const count = await noteService.getCount();
-          if (count >= 3) {
+          // If creating a NEW note, check count for current month
+          const count = await noteService.getMonthlyCount();
+          if (count >= 30) {
             setIsLimitReached(true);
             setLoading(false);
             return;
@@ -470,7 +470,7 @@ export const CreateNote: React.FC = () => {
                 Plan Limit Reached
               </h2>
               <p className="text-slate-600 text-lg font-medium leading-relaxed max-w-sm mx-auto">
-                Free users can create a maximum of <span className="text-indigo-600 font-bold">3 notes</span>. Upgrade to Pro for unlimited creative space.
+                Free users can create a maximum of <span className="text-indigo-600 font-bold">30 notes per month</span>. Upgrade to Pro for unlimited creative space.
               </p>
             </div>
 

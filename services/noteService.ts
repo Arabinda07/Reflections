@@ -16,7 +16,7 @@ const mapToNote = (data: any): Note => ({
   tasks: data.tasks || [],
 });
 
-const NOTE_LIMIT = 3;
+const NOTE_LIMIT = 30;
 
 export const noteService = {
   // Fetch all notes for the authenticated user
@@ -41,6 +41,24 @@ export const noteService = {
     
     if (error) {
       console.error('Supabase DB Error (getCount notes):', error.message, error);
+      throw error;
+    }
+    return count || 0;
+  },
+
+  // Get the monthly count of notes for the current user
+  getMonthlyCount: async (): Promise<number> => {
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+
+    const { count, error } = await supabase
+      .from('notes')
+      .select('*', { count: 'exact', head: true })
+      .gte('created_at', startOfMonth.toISOString());
+    
+    if (error) {
+      console.error('Supabase DB Error (getMonthlyCount notes):', error.message, error);
       throw error;
     }
     return count || 0;
@@ -76,7 +94,7 @@ export const noteService = {
     if (!user) throw new Error('User not authenticated');
 
     // SaaS Limit Check
-    const currentCount = await noteService.getCount();
+    const currentCount = await noteService.getMonthlyCount();
     if (currentCount >= NOTE_LIMIT) {
       throw new Error('FREE_LIMIT_REACHED');
     }
