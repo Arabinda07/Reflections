@@ -276,24 +276,7 @@ export const FAQ: React.FC = () => {
           </div>
         </section>
 
-        {/* Final CTA */}
-        <motion.div 
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mt-20 mb-32 text-center"
-        >
-          <h2 className="text-[32px] md:text-[48px] font-display text-gray-text lowercase mb-8 tracking-tight">ready to clear your mind?</h2>
-          <Button 
-            variant="primary"
-            size="lg"
-            onClick={() => navigate(RoutePath.SIGNUP)}
-            className="w-full sm:w-auto h-16 sm:h-20 px-8 sm:px-12 text-[16px] sm:text-[20px] font-bold uppercase rounded-[20px] sm:rounded-[24px] shadow-3d-green liquid-glass group mx-auto"
-          >
-            <span>Create Your Sanctuary</span>
-            <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-          </Button>
-        </motion.div>
+
 
       </div>
 
