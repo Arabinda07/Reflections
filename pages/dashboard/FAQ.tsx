@@ -86,22 +86,10 @@ export const FAQ: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 1.2, ease: "easeOut" }}
-          className="relative w-full h-[60vh] min-h-[500px] max-h-[700px] rounded-[48px] border-2 border-white/20 dark:border-[#2a2a2a] overflow-hidden flex items-center justify-center liquid-glass-strong group"
+          className="relative w-full h-[60vh] min-h-[500px] max-h-[700px] flex items-center justify-center group"
         >
-          {/* We apply a clip-path to physically cut out the bottom-right rectangle where the watermark logo renders, ensuring it literally cannot be drawn */}
-          <div 
-            className="absolute inset-0 pointer-events-auto z-0 flex items-center justify-center origin-center transition-transform duration-1000 group-hover:scale-105"
-            style={{ clipPath: "polygon(0 0, 100% 0, 100% calc(100% - 85px), calc(100% - 245px) calc(100% - 85px), calc(100% - 245px) 100%, 0 100%)" }}
-          >
-            <Spline scene="https://prod.spline.design/WJogBwjycMbazviG/scene.splinecode" />
-          </div>
-          
-          {/* Frosted Watermark Blocker Panel - Sized carefully to hide the rectangular watermark */}
-          <div className="absolute bottom-0 right-0 w-[240px] h-[80px] rounded-tl-[24px] rounded-br-[48px] bg-white/60 dark:bg-[#121212]/70 backdrop-blur-3xl z-[999] pointer-events-none flex items-center justify-center border-t border-l border-white/50 dark:border-white/10 shadow-[-10px_-10px_30px_rgba(0,0,0,0.05)]">
-              <div className="flex items-center gap-2 opacity-80 pl-4">
-                 <Sparkles size={14} className="text-gray-text dark:text-gray-text" />
-                 <span className="text-[12px] font-black uppercase tracking-widest text-gray-text">Interactive</span>
-              </div>
+          <div className="absolute inset-0 pointer-events-auto z-0 flex items-center justify-center origin-center transition-transform duration-1000 group-hover:scale-105">
+            <Spline scene="https://prod.spline.design/Dpx2TF6lL963qEnt/scene.splinecode" />
           </div>
         </motion.section>
       </div>
@@ -242,23 +230,24 @@ export const FAQ: React.FC = () => {
               </div>
             </div>
 
-            {/* Premium / Horizon - Adaptive Kinetic Glassmorphism */}
-            <div className="md:col-span-2 lg:col-span-3 mt-6 relative rounded-[40px] p-0 group">
-              {/* Animated Aurora Breathing Background */}
-              <div className="absolute -inset-1 rounded-[40px] bg-gradient-to-r from-blue via-green to-purple-500 opacity-20 blur-xl animate-gradient-x pointer-events-none transition-opacity duration-1000 group-hover:opacity-40"></div>
-              <div className="absolute -inset-1 rounded-[40px] bg-gradient-to-r from-blue via-green to-purple-500 opacity-20 blur-sm animate-gradient-x pointer-events-none transition-opacity duration-1000 group-hover:opacity-40"></div>
+            {/* Premium / Horizon - Soft Light Leak Aura */}
+            <div className="md:col-span-2 lg:col-span-3 mt-6 relative rounded-[40px] p-0 group overflow-hidden border-2 border-white/20 dark:border-[#2a2a2a] bg-white/40 dark:bg-[#121212]/40 backdrop-blur-3xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.05)] transition-all">
               
-              {/* Actual Content Wrapper (Adaptive Glass) */}
-              <div className="relative h-full w-full p-10 rounded-[40px] border-2 border-white/20 dark:border-white/10 bg-white/60 dark:bg-black/40 backdrop-blur-3xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] overflow-hidden transition-all">
+              {/* Soft Light Leak */}
+              <div className="absolute -top-32 -right-32 w-96 h-96 bg-blue/10 dark:bg-blue/5 rounded-full blur-[80px] pointer-events-none transition-opacity duration-1000 group-hover:opacity-80"></div>
+              <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-green/10 dark:bg-green/5 rounded-full blur-[80px] pointer-events-none transition-opacity duration-1000 group-hover:opacity-80"></div>
+              
+              {/* Content Wrapper */}
+              <div className="relative h-full w-full p-10 rounded-[40px] z-10">
                 
                 <div className="flex items-center gap-4 mb-8 relative z-10">
-                  <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-green to-blue text-white flex items-center justify-center shadow-lg border-b-4 border-blue/50">
-                    <Sparkles size={28} />
+                  <div className="h-14 w-14 rounded-2xl bg-blue/5 dark:bg-blue/10 text-blue flex items-center justify-center shadow-sm border border-blue/10 dark:border-blue/20">
+                    <Sparkles size={26} opacity={0.9} />
                   </div>
                   <div>
                     <h3 className="text-[28px] font-display text-gray-text lowercase">the premium horizon</h3>
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/50 dark:bg-black/50 border border-border text-gray-text text-[10px] font-black uppercase tracking-widest mt-1 shadow-sm backdrop-blur-sm">
-                      <Lock size={12} className="text-blue" /> Coming Soon
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/70 dark:bg-white/5 border border-white/50 dark:border-white/10 text-gray-text text-[10px] font-black uppercase tracking-widest mt-1 shadow-sm backdrop-blur-sm">
+                      <Lock size={12} className="text-blue opacity-80" /> Coming Soon
                     </div>
                   </div>
                 </div>
