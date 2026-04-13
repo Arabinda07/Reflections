@@ -38,6 +38,7 @@
   --golden: #FFC800;
   --bg-color: #ffffff;
   --panel-bg: #ffffff;
+  --panel-bg-rgb: 255, 255, 255;
 }
 
 .dark {
@@ -53,6 +54,7 @@
   --nav-text: rgb(140, 140, 140);
   --bg-color: #121212;
   --panel-bg: #1e1e1e;
+  --panel-bg-rgb: 30, 30, 30;
 }
 
 body {
