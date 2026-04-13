@@ -16,7 +16,7 @@ export const DashboardLayout: React.FC = () => {
     return document.documentElement.classList.contains('dark');
   });
 
-  const isLandingPage = location.pathname === RoutePath.HOME && !isAuthenticated;
+
 
   useEffect(() => {
     if (isDarkMode) {
@@ -35,14 +35,19 @@ export const DashboardLayout: React.FC = () => {
     setIsMobileMenuOpen(false);
   };
 
-  const navItems = isLandingPage ? [
+  const guestNavItems = [
+    { label: 'Homepage', path: RoutePath.HOME },
     { label: 'FAQ', path: RoutePath.FAQ },
-  ] : [
+  ];
+
+  const authNavItems = [
     { label: 'My Notes', path: RoutePath.NOTES },
     { label: 'Create Note', path: RoutePath.CREATE_NOTE },
     { label: 'Account', path: RoutePath.ACCOUNT },
     { label: 'FAQ', path: RoutePath.FAQ },
   ];
+
+  const navItems = isAuthenticated ? authNavItems : guestNavItems;
 
   return (
     <div className="min-h-screen bg-white font-sans selection:bg-green/30 selection:text-green-hover">
