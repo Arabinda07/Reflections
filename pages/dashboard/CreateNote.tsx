@@ -549,7 +549,7 @@ export const CreateNote: React.FC = () => {
            <div className="h-4 w-[2px] bg-border"></div>
            <div className="flex flex-col">
              <span className="text-[12px] font-extrabold text-gray-nav uppercase tracking-wider">
-                {id ? 'edit note' : 'new entry'}
+                {id ? 'edit note' : ''}
              </span>
            </div>
         </div>
@@ -559,11 +559,11 @@ export const CreateNote: React.FC = () => {
             variant="ghost"
             size="sm"
             onClick={() => setIsFocusModeManual(!isFocusModeManual)}
-            className={`hidden sm:flex items-center gap-2 font-bold uppercase text-[11px] transition-all ${isFocusModeManual ? 'text-blue bg-blue/5' : 'text-gray-nav'}`}
+            className={`flex items-center gap-2 font-bold uppercase text-[11px] transition-all ${isFocusModeManual ? 'text-blue bg-blue/5' : 'text-gray-nav'}`}
             title={isFocusModeManual ? "Disable Focus Mode" : "Enable Focus Mode"}
           >
             {isFocusModeManual ? <Eye size={16} /> : <EyeOff size={16} />}
-            <span className="hidden md:inline">Focus</span>
+            <span className="hidden sm:inline">Focus</span>
           </Button>
 
           <AnimatePresence mode="wait">
@@ -649,12 +649,12 @@ export const CreateNote: React.FC = () => {
                         <span>{new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
                        {/* Progressive Disclosure: Mood Button */}
                        <div className="relative">
                           <button 
                             onClick={() => setIsMoodOpen(!isMoodOpen)}
-                            className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] ${mood ? 'bg-blue/5 border-blue text-blue' : 'bg-white border-border text-gray-nav hover:border-blue/30'}`}
+                            className={`w-full flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] ${mood ? 'bg-blue/5 border-blue text-blue' : 'bg-white border-border text-gray-nav hover:border-blue/30'}`}
                           >
                             {mood ? (
                               <>
@@ -710,7 +710,7 @@ export const CreateNote: React.FC = () => {
                        <div className="relative">
                           <button 
                             onClick={() => setIsTagsOpen(!isTagsOpen)}
-                            className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] ${tags.length > 0 ? 'bg-green/5 border-green text-green' : 'bg-white border-border text-gray-nav hover:border-green/30'}`}
+                            className={`w-full flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] ${tags.length > 0 ? 'bg-green/5 border-green text-green' : 'bg-white border-border text-gray-nav hover:border-green/30'}`}
                           >
                             <TagIcon size={16} />
                             <span className="text-[10px] sm:text-[11px] font-black uppercase">{tags.length > 0 ? `${tags.length} Tags` : 'Tags'}</span>
@@ -775,15 +775,15 @@ export const CreateNote: React.FC = () => {
                           </AnimatePresence>
                        </div>
 
-                       <label className="group flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-border bg-white px-3 sm:px-4 py-2 text-[10px] sm:text-[11px] font-black uppercase text-gray-nav transition-all hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]">
+                       <label className="group flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border-2 border-border bg-white px-3 sm:px-4 py-2 text-[10px] sm:text-[11px] font-black uppercase text-gray-nav transition-all hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]">
                           <Paperclip size={16} className="text-gray-nav group-hover:text-blue" />
-                          <span className="hidden xs:inline">ATTACH</span>
+                          <span>ATTACH</span>
                           <input type="file" multiple className="hidden" onChange={handleAttachmentUpload} />
                        </label>
                        {!imagePreview && (
-                          <label className="group flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-border bg-white px-3 sm:px-4 py-2 text-[10px] sm:text-[11px] font-black uppercase text-gray-nav transition-all hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]">
+                          <label className="group flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border-2 border-border bg-white px-3 sm:px-4 py-2 text-[10px] sm:text-[11px] font-black uppercase text-gray-nav transition-all hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]">
                              <ImageIcon size={16} className="text-gray-nav group-hover:text-blue" />
-                             <span className="hidden xs:inline">COVER</span>
+                             <span>COVER</span>
                              <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
                           </label>
                        )}
@@ -839,10 +839,21 @@ export const CreateNote: React.FC = () => {
                       </div>
                     ) : (
                       tasks.map((task) => (
-                        <div key={task.id} className="group flex items-center gap-4 p-4 rounded-[24px] border-2 border-border bg-white hover:border-blue/30 transition-all shadow-sm liquid-glass">
+                        <div 
+                          key={task.id} 
+                          className={`group flex items-center gap-4 p-4 rounded-[24px] border-2 transition-all ${
+                            task.completed 
+                              ? 'border-border bg-gray-50/30 opacity-60' 
+                              : 'border-border bg-white shadow-sm hover:border-blue/30'
+                          }`}
+                        >
                           <button 
                             onClick={() => toggleTask(task.id)}
-                            className={`h-6 w-6 rounded-lg border-2 flex items-center justify-center transition-all ${task.completed ? 'bg-blue border-blue text-white' : 'border-border text-transparent hover:border-blue/50'}`}
+                            className={`h-6 w-6 rounded-lg border-2 flex items-center justify-center transition-all ${
+                              task.completed 
+                                ? 'bg-blue border-blue text-white' 
+                                : 'border-border text-transparent hover:border-blue/50'
+                            }`}
                           >
                             <Check size={14} strokeWidth={3} />
                           </button>
@@ -851,11 +862,14 @@ export const CreateNote: React.FC = () => {
                             type="text"
                             value={task.text}
                             onChange={(e) => updateTask(task.id, { text: e.target.value })}
+                            readOnly={task.completed}
                             placeholder="What needs to be done?"
-                            className={`flex-1 bg-transparent border-none focus:ring-0 text-[14px] font-bold text-gray-text placeholder:text-border transition-all ${task.completed ? 'line-through opacity-50' : ''}`}
+                            className={`flex-1 bg-transparent border-none focus:ring-0 text-[14px] font-bold text-gray-text placeholder:text-border transition-all ${
+                              task.completed ? 'line-through cursor-default' : ''
+                            }`}
                           />
 
-                          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                          <div className={`flex items-center gap-2 transition-all ${task.completed ? 'opacity-0 pointer-events-none' : 'opacity-0 group-hover:opacity-100'}`}>
                             <input 
                               type="date"
                               value={task.dueDate || ''}
