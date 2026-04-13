@@ -698,7 +698,7 @@ export const CreateNote: React.FC = () => {
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                 transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                                className="absolute top-full mt-3 left-0 z-[100] p-4 bg-white border-2 border-border rounded-3xl shadow-xl w-[calc(100vw-3rem)] sm:w-[280px] liquid-glass"
+                                className="absolute top-full mt-3 left-0 z-[100] p-4 bg-white border-2 border-border rounded-3xl shadow-xl w-[calc(100vw-2rem)] sm:w-[280px] liquid-glass"
                               >
                                 <div className="flex items-center justify-between mb-4 px-1">
                                   <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav">How are you?</span>
@@ -748,7 +748,7 @@ export const CreateNote: React.FC = () => {
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                 transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                                className="absolute top-full mt-3 left-0 sm:right-auto z-[100] p-6 bg-white border-2 border-border rounded-3xl shadow-xl w-[calc(100vw-3rem)] sm:w-[320px] liquid-glass"
+                                className="absolute top-full mt-3 right-0 sm:left-0 sm:right-auto z-[100] p-6 bg-white border-2 border-border rounded-3xl shadow-xl w-[calc(100vw-2rem)] sm:w-[320px] liquid-glass"
                               >
                                 <div className="mb-4">
                                   <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav block mb-3">Add Tags</span>
