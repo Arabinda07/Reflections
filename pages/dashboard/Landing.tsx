@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'motion/react';
 import { Sparkles, Play, Shield, Zap, Heart, Brain, Moon, Sun, ArrowRight, CheckCircle2, Cloud } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { RoutePath } from '../../types';
@@ -17,46 +18,63 @@ export const Landing: React.FC = () => {
       </div>
 
       <div className="relative z-10 flex flex-col items-center px-6 py-20 md:py-32">
-        {/* Video Section */}
-        <div className="w-full max-w-6xl mb-16 flex flex-col items-center">
-          <p className="text-[14px] font-black uppercase tracking-[0.4em] text-gray-nav mb-6 animate-in fade-in duration-1000">Experience the Sanctuary</p>
-          <div className="relative w-full group">
-            <div className="absolute -inset-4 bg-gradient-to-r from-green/20 via-blue/20 to-purple-500/20 rounded-[48px] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-            <div className="relative aspect-video rounded-[40px] border-2 border-border bg-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] overflow-hidden liquid-glass animate-in zoom-in-95 duration-1000">
-              <video 
-                src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260324_151826_c7218672-6e92-402c-9e45-f1e0f454bdc4.mp4"
-                className="w-full h-full object-contain bg-black/5"
-                autoPlay
-                loop
-                muted
-                playsInline
-                controls
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Hero Text Below Video */}
-        <div className="text-center max-w-4xl mb-32">
-          <h1 className="text-6xl md:text-9xl font-display text-gray-text lowercase leading-[0.85] mb-10 tracking-tighter animate-in slide-in-from-bottom-6 duration-700">
+        {/* Hero Text At Top */}
+        <div className="text-center max-w-4xl mb-16">
+          <h1 className="text-6xl md:text-9xl font-display text-gray-text lowercase leading-[0.85] mb-8 tracking-tighter animate-in slide-in-from-bottom-6 duration-700 drop-shadow-sm hover:-translate-y-1 transition-transform">
             your mind, <br />
-            <span className="bg-gradient-to-r from-green via-blue to-purple-500 bg-clip-text text-transparent animate-gradient-x">beautifully</span> organized.
+            <span className="bg-gradient-to-r from-green via-blue to-green bg-clip-text text-transparent animate-gradient-x drop-shadow-md">beautifully</span> organized.
           </h1>
 
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green/10 border-2 border-green/20 text-green text-[12px] font-black uppercase tracking-[0.2em] mb-8 animate-in slide-in-from-bottom-4 duration-500">
             <Sparkles size={14} />
             <span>The Future of Journaling</span>
           </div>
-          
-          <p className="text-[18px] md:text-[24px] text-gray-light font-medium leading-relaxed max-w-2xl mx-auto mb-14 animate-in slide-in-from-bottom-8 duration-900">
+        </div>
+
+        {/* Video Section */}
+        <motion.div 
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.2 }}
+          className="w-full max-w-6xl mb-16 flex flex-col items-center"
+        >
+          <p className="text-[12px] sm:text-[14px] font-black uppercase tracking-[0.4em] text-gray-nav mb-6">Experience the Sanctuary</p>
+          <div className="relative w-full group">
+            {/* Persistent breathing glow that intensifies on hover */}
+            <div className="absolute -inset-4 bg-gradient-to-r from-green/30 via-blue/30 to-green/30 rounded-[48px] blur-2xl opacity-50 animate-pulse group-hover:opacity-100 transition-opacity duration-1000" />
+            <div className="relative aspect-video rounded-[24px] sm:rounded-[40px] border-2 border-border bg-white/50 backdrop-blur-xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] overflow-hidden liquid-glass p-2 sm:p-4">
+              <div className="w-full h-full rounded-[16px] sm:rounded-[32px] overflow-hidden border-2 border-white/20 relative">
+                <video 
+                  src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260324_151826_c7218672-6e92-402c-9e45-f1e0f454bdc4.mp4"
+                  className="w-full h-full object-cover bg-black/5"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  controls
+                />
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Call to Action Below Video */}
+        <motion.div 
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-center max-w-4xl mb-32 px-4"
+        >
+          <p className="text-[16px] sm:text-[18px] md:text-[24px] text-gray-light font-medium leading-relaxed max-w-2xl mx-auto mb-8 sm:mb-10">
             A sanctuary for your thoughts. AI-powered reflections, mood tracking, and a clean space to breathe.
           </p>
           
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 animate-in slide-in-from-bottom-10 duration-1000">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
             <Button 
               variant="primary" 
               size="lg" 
-              className="h-20 px-12 text-[20px] font-bold uppercase rounded-[24px] shadow-3d-green liquid-glass group"
+              className="w-full sm:w-auto h-16 sm:h-20 px-8 sm:px-12 text-[16px] sm:text-[20px] font-bold uppercase rounded-[20px] sm:rounded-[24px] shadow-3d-green liquid-glass group"
               onClick={() => navigate(RoutePath.SIGNUP)}
             >
               <span>Enter Sanctuary</span>
@@ -65,13 +83,13 @@ export const Landing: React.FC = () => {
             <Button 
               variant="secondary" 
               size="lg" 
-              className="h-20 px-12 text-[20px] font-bold uppercase rounded-[24px] border-2 border-border text-blue shadow-3d-gray liquid-glass"
+              className="w-full sm:w-auto h-16 sm:h-20 px-8 sm:px-12 text-[16px] sm:text-[20px] font-bold uppercase rounded-[20px] sm:rounded-[24px] border-2 border-border text-blue shadow-3d-gray liquid-glass"
               onClick={() => navigate(RoutePath.LOGIN)}
             >
               Sign In
             </Button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Bento Grid Features */}
         <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-12 gap-6">
