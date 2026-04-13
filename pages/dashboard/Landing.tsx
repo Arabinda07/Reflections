@@ -17,17 +17,36 @@ export const Landing: React.FC = () => {
       </div>
 
       <div className="relative z-10 flex flex-col items-center px-6 py-20 md:py-32">
-        {/* Hero Section */}
-        <div className="text-center max-w-4xl mb-24">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green/10 border-2 border-green/20 text-green text-[12px] font-black uppercase tracking-[0.2em] mb-8 animate-in slide-in-from-bottom-4 duration-500">
-            <Sparkles size={14} />
-            <span>The Future of Journaling</span>
+        {/* Video Section */}
+        <div className="w-full max-w-6xl mb-16 flex flex-col items-center">
+          <p className="text-[14px] font-black uppercase tracking-[0.4em] text-gray-nav mb-6 animate-in fade-in duration-1000">Experience the Sanctuary</p>
+          <div className="relative w-full group">
+            <div className="absolute -inset-4 bg-gradient-to-r from-green/20 via-blue/20 to-purple-500/20 rounded-[48px] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+            <div className="relative aspect-video rounded-[40px] border-2 border-border bg-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] overflow-hidden liquid-glass animate-in zoom-in-95 duration-1000">
+              <video 
+                src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260324_151826_c7218672-6e92-402c-9e45-f1e0f454bdc4.mp4"
+                className="w-full h-full object-contain bg-black/5"
+                autoPlay
+                loop
+                muted
+                playsInline
+                controls
+              />
+            </div>
           </div>
-          
+        </div>
+
+        {/* Hero Text Below Video */}
+        <div className="text-center max-w-4xl mb-32">
           <h1 className="text-6xl md:text-9xl font-display text-gray-text lowercase leading-[0.85] mb-10 tracking-tighter animate-in slide-in-from-bottom-6 duration-700">
             your mind, <br />
             <span className="bg-gradient-to-r from-green via-blue to-purple-500 bg-clip-text text-transparent animate-gradient-x">beautifully</span> organized.
           </h1>
+
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green/10 border-2 border-green/20 text-green text-[12px] font-black uppercase tracking-[0.2em] mb-8 animate-in slide-in-from-bottom-4 duration-500">
+            <Sparkles size={14} />
+            <span>The Future of Journaling</span>
+          </div>
           
           <p className="text-[18px] md:text-[24px] text-gray-light font-medium leading-relaxed max-w-2xl mx-auto mb-14 animate-in slide-in-from-bottom-8 duration-900">
             A sanctuary for your thoughts. AI-powered reflections, mood tracking, and a clean space to breathe.
@@ -51,57 +70,6 @@ export const Landing: React.FC = () => {
             >
               Sign In
             </Button>
-          </div>
-        </div>
-
-        {/* Video Placeholder Section */}
-        <div className="relative w-full max-w-6xl mb-32 group">
-          <div className="absolute -inset-4 bg-gradient-to-r from-green/20 via-blue/20 to-purple-500/20 rounded-[48px] blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-          <div className="relative aspect-video rounded-[40px] border-2 border-border bg-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] overflow-hidden liquid-glass animate-in zoom-in-95 duration-1000">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue/5 via-transparent to-green/5" />
-            
-            {/* Mock Video Content */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="relative">
-                <div className="absolute -inset-8 bg-blue/20 rounded-full blur-3xl animate-pulse" />
-                <div className="relative h-24 w-24 rounded-full bg-white border-2 border-border flex items-center justify-center text-blue shadow-3d-gray group-hover:scale-110 transition-transform duration-500 cursor-pointer">
-                  <Play size={40} fill="currentColor" className="ml-1" />
-                </div>
-              </div>
-            </div>
-
-            {/* Floating UI Elements */}
-            <div className="absolute top-10 left-10 p-5 rounded-2xl bg-white/80 backdrop-blur-md border-2 border-border shadow-xl animate-bounce duration-[3000ms] liquid-glass">
-              <div className="flex items-center gap-4">
-                <div className="h-10 w-10 rounded-xl bg-green/10 text-green flex items-center justify-center">
-                  <Heart size={20} />
-                </div>
-                <div className="space-y-2">
-                  <div className="h-2 w-24 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full w-2/3 bg-green animate-progress" />
-                  </div>
-                  <div className="h-2 w-16 bg-gray-100 rounded-full" />
-                </div>
-              </div>
-            </div>
-
-            <div className="absolute bottom-10 right-10 p-5 rounded-2xl bg-white/80 backdrop-blur-md border-2 border-border shadow-xl animate-bounce duration-[4000ms] liquid-glass">
-              <div className="flex items-center gap-4">
-                <div className="h-10 w-10 rounded-xl bg-blue/10 text-blue flex items-center justify-center">
-                  <Zap size={20} />
-                </div>
-                <div className="space-y-2">
-                  <div className="h-2 w-32 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full w-1/2 bg-blue animate-progress" style={{ animationDelay: '1s' }} />
-                  </div>
-                  <div className="h-2 w-20 bg-gray-100 rounded-full" />
-                </div>
-              </div>
-            </div>
-
-            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white/90 to-transparent backdrop-blur-sm flex items-center justify-center">
-              <p className="text-[14px] font-black uppercase tracking-[0.4em] text-gray-nav">Experience the Sanctuary</p>
-            </div>
           </div>
         </div>
 
