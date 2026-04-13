@@ -19,9 +19,10 @@ export const Account: React.FC = () => {
   const [formData, setFormData] = useState({
     fullName: '',
     displayName: '',
-    timezone: 'UTC-8 (Pacific Time)'
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
   });
   const [avatarPath, setAvatarPath] = useState<string | null>(null);
+  const [lastSignIn, setLastSignIn] = useState<string | null>(null);
 
   // Fetch Supabase User on Mount
   useEffect(() => {
@@ -37,11 +38,12 @@ export const Account: React.FC = () => {
         setUserId(user.id);
         setEmail(user.email || '');
         setAvatarPath(user.user_metadata?.avatar_url || null);
+        setLastSignIn(user.last_sign_in_at || null);
         
         setFormData({
           fullName: user.user_metadata?.full_name || '',
           displayName: user.user_metadata?.display_name || '',
-          timezone: user.user_metadata?.timezone || 'UTC-8 (Pacific Time)'
+          timezone: user.user_metadata?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone
         });
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -225,11 +227,19 @@ export const Account: React.FC = () => {
                                     onChange={handleChange}
                                     className="w-full appearance-none rounded-2xl border-2 border-border bg-white pl-12 pr-5 py-4 text-[15px] font-bold text-gray-text transition-all duration-300 hover:border-blue/30 focus:border-blue focus:outline-none shadow-3d-gray active:shadow-none active:translate-y-[2px]"
                                 >
-                                    <option>UTC-8 (Pacific Time)</option>
-                                    <option>UTC-5 (Eastern Time)</option>
-                                    <option>UTC+0 (London)</option>
-                                    <option>UTC+1 (Paris)</option>
-                                    <option>UTC+9 (Tokyo)</option>
+                                    <option value="UTC">UTC (Coordinated Universal Time)</option>
+                                    <option value="America/New_York">Eastern Time (ET)</option>
+                                    <option value="America/Chicago">Central Time (CT)</option>
+                                    <option value="America/Denver">Mountain Time (MT)</option>
+                                    <option value="America/Los_Angeles">Pacific Time (PT)</option>
+                                    <option value="Europe/London">London (GMT/BST)</option>
+                                    <option value="Europe/Paris">Paris (CET/CEST)</option>
+                                    <option value="Asia/Dubai">Dubai (GST)</option>
+                                    <option value="Asia/Kolkata">India (IST)</option>
+                                    <option value="Asia/Singapore">Singapore (SGT)</option>
+                                    <option value="Asia/Tokyo">Tokyo (JST)</option>
+                                    <option value="Australia/Sydney">Sydney (AEST/AEDT)</option>
+                                    <option value="Pacific/Auckland">Auckland (NZST/NZDT)</option>
                                 </select>
                                 <ChevronRight className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-nav rotate-90 pointer-events-none" size={16} />
                             </div>
@@ -253,28 +263,31 @@ export const Account: React.FC = () => {
                                     </div>
                                     <div>
                                         <p className="text-[15px] font-bold text-gray-text">Password</p>
-                                        <p className="text-[12px] font-bold text-gray-nav uppercase">Last changed 3 months ago</p>
+                                        <p className="text-[12px] font-bold text-gray-nav uppercase">
+                                            {lastSignIn ? `Last active: ${new Date(lastSignIn).toLocaleDateString()}` : 'Secure your account'}
+                                        </p>
                                     </div>
                                 </div>
-                                <Button type="button" variant="secondary" size="sm" onClick={handlePasswordReset} className="border-2 border-border shadow-3d-gray active:shadow-none active:translate-y-[2px] text-blue font-extrabold">
+                                <Button type="button" variant="secondary" size="sm" onClick={handlePasswordReset} className="border-2 border-border shadow-3d-gray active:shadow-none active:translate-y-[2px] text-blue font-extrabold px-6">
                                     RESET
                                 </Button>
                             </div>
                             
                             <div className="my-6 h-[2px] w-full bg-border" />
                             
-                            <div className="flex items-center justify-between opacity-50">
+                            <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-4">
                                     <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white border-2 border-border text-gray-nav">
                                         <Smartphone size={20} />
                                     </div>
                                     <div>
                                         <p className="text-[15px] font-bold text-gray-text">2-Factor Authentication</p>
-                                        <p className="text-[12px] font-bold text-gray-nav uppercase">Add an extra layer of security</p>
+                                        <p className="text-[12px] font-bold text-gray-nav uppercase">Enhanced security for your sanctuary</p>
                                     </div>
                                 </div>
-                                <div className="relative inline-flex h-7 w-12 items-center rounded-full bg-border">
-                                    <span className="h-5 w-5 translate-x-1 transform rounded-full bg-white transition" />
+                                <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 border border-border">
+                                    <span className="h-2 w-2 rounded-full bg-gray-400" />
+                                    <span className="text-[10px] font-black text-gray-nav uppercase">Coming Soon</span>
                                 </div>
                             </div>
                         </div>
@@ -307,19 +320,29 @@ export const Account: React.FC = () => {
                 </div>
 
                 {/* Footer Action Bar */}
-                <div className="sticky bottom-0 z-10 flex items-center justify-between border-t-2 border-border bg-white/90 px-8 py-6 backdrop-blur-xl">
+                <div className="sticky bottom-0 z-10 flex flex-col sm:flex-row items-center justify-between border-t-2 border-border bg-white/95 px-8 py-6 backdrop-blur-xl gap-6 sm:gap-0">
                     <button 
                         type="button" 
                         onClick={handleSignOut}
-                        className="text-[13px] font-extrabold text-gray-nav hover:text-red transition-colors uppercase tracking-widest"
+                        className="flex items-center gap-2 text-[13px] font-black text-gray-nav hover:text-red transition-all uppercase tracking-widest group"
                     >
+                        <Trash2 size={16} className="group-hover:scale-110 transition-transform" />
                         SIGN OUT
                     </button>
-                    <div className="flex gap-4">
-                         <Button type="button" variant="ghost" onClick={() => navigate(RoutePath.HOME)} className="text-gray-nav font-extrabold uppercase">
+                    <div className="flex items-center gap-4 w-full sm:w-auto">
+                         <Button 
+                            type="button" 
+                            variant="ghost" 
+                            onClick={() => navigate(RoutePath.HOME)} 
+                            className="flex-1 sm:flex-none text-gray-nav font-extrabold uppercase hover:bg-gray-100"
+                         >
                              CANCEL
                          </Button>
-                         <Button type="submit" isLoading={loading} className="shadow-3d-green active:shadow-none active:translate-y-[2px] font-extrabold">
+                         <Button 
+                            type="submit" 
+                            isLoading={loading} 
+                            className="flex-1 sm:flex-none shadow-3d-green active:shadow-none active:translate-y-[2px] font-extrabold px-8"
+                         >
                              <Save className="mr-2 h-4 w-4" />
                              SAVE CHANGES
                          </Button>
