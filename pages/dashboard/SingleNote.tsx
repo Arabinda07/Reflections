@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Edit3, Trash2, ArrowLeft, Calendar, Clock, AlertCircle, Paperclip, FileText, Download, Smile, Sun, Cloud, Frown, Zap, Moon, Tag } from 'lucide-react';
+import { Edit3, Trash2, ArrowLeft, Calendar, Clock, AlertCircle, Paperclip, FileText, Download, Smile, Sun, Cloud, Frown, Zap, Moon, Tag, ListTodo, Check } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { noteService } from '../../services/noteService';
 import { storageService } from '../../services/storageService';
-import { Note, RoutePath } from '../../types';
+import { Note, RoutePath, Task } from '../../types';
 import { StorageImage } from '../../components/ui/StorageImage';
 
 export const SingleNote: React.FC = () => {
@@ -75,6 +75,24 @@ export const SingleNote: React.FC = () => {
   const handleEdit = () => {
     if (id) {
       navigate(RoutePath.EDIT_NOTE.replace(':id', id));
+    }
+  };
+
+  const toggleTask = async (taskId: string) => {
+    if (!note || !id) return;
+    
+    const updatedTasks = note.tasks?.map(t => 
+      t.id === taskId ? { ...t, completed: !t.completed } : t
+    ) || [];
+    
+    setNote({ ...note, tasks: updatedTasks });
+    
+    try {
+      await noteService.update(id, { tasks: updatedTasks });
+    } catch (err) {
+      console.error("Failed to update task status:", err);
+      // Revert on error
+      setNote(note);
     }
   };
 
@@ -187,6 +205,38 @@ export const SingleNote: React.FC = () => {
               className="prose prose-zinc prose-lg max-w-prose mx-auto text-gray-text leading-loose font-serif"
               dangerouslySetInnerHTML={{ __html: note.content }}
             />
+
+            {/* Tasks Section */}
+            {note.tasks && note.tasks.length > 0 && (
+              <div className="mt-12 border-t-2 border-border pt-8">
+                 <h3 className="text-[12px] font-extrabold text-gray-text uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <ListTodo size={16} className="text-blue" />
+                    Actionable Tasks
+                 </h3>
+                 <div className="space-y-3">
+                    {note.tasks.map((task) => (
+                      <div key={task.id} className="flex items-center gap-4 p-4 rounded-[24px] border-2 border-border bg-white shadow-sm liquid-glass group transition-all hover:border-blue/30">
+                        <button 
+                          onClick={() => toggleTask(task.id)}
+                          className={`h-6 w-6 rounded-lg border-2 flex items-center justify-center transition-all ${task.completed ? 'bg-blue border-blue text-white' : 'border-border text-transparent hover:border-blue/50'}`}
+                        >
+                          <Check size={14} strokeWidth={3} />
+                        </button>
+                        <div className="flex-1">
+                          <p className={`text-[14px] font-bold text-gray-text transition-all ${task.completed ? 'line-through opacity-50' : ''}`}>
+                            {task.text}
+                          </p>
+                          {task.dueDate && (
+                            <p className="text-[11px] font-bold text-gray-nav mt-0.5">
+                              Due: {new Date(task.dueDate).toLocaleDateString()}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                 </div>
+              </div>
+            )}
 
             {/* Attachments Section */}
             {note.attachments && note.attachments.length > 0 && (

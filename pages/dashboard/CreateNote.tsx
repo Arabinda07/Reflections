@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Loader2, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Meh, Frown, Sun, Cloud, Moon, Heart, Brain, Coffee, MessageSquare, Tag as TagIcon, CheckCircle2, Check, RefreshCw } from 'lucide-react';
+import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Loader2, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Meh, Frown, Sun, Cloud, Moon, Heart, Brain, Coffee, MessageSquare, Tag as TagIcon, CheckCircle2, Check, RefreshCw, CheckSquare, Square, Plus, Trash2, Eye, EyeOff, ListTodo } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Editor } from '../../components/ui/Editor';
 import { noteService } from '../../services/noteService';
 import { storageService } from '../../services/storageService';
-import { RoutePath, NoteAttachment } from '../../types';
+import { RoutePath, NoteAttachment, Task } from '../../types';
 import { supabase } from '../../src/supabaseClient';
 import { StorageImage } from '../../components/ui/StorageImage';
 import { GoogleGenAI, Type } from "@google/genai";
@@ -57,14 +57,16 @@ export const CreateNote: React.FC = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [newAttachments, setNewAttachments] = useState<File[]>([]);
   const [existingAttachments, setExistingAttachments] = useState<NoteAttachment[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   
   // New UI states
   const [isMoodOpen, setIsMoodOpen] = useState(false);
   const [isTagsOpen, setIsTagsOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [isFocusModeManual, setIsFocusModeManual] = useState(false);
   const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
   
-  const lastSavedRef = useRef({ title: '', content: '', mood: undefined as string | undefined, tags: [] as string[] });
+  const lastSavedRef = useRef({ title: '', content: '', mood: undefined as string | undefined, tags: [] as string[], tasks: [] as Task[] });
   const editorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -99,9 +101,16 @@ export const CreateNote: React.FC = () => {
             setContent(note.content);
             setMood(note.mood);
             setTags(note.tags || []);
+            setTasks(note.tasks || []);
             setImagePreview(note.thumbnailUrl || null);
             setExistingAttachments(note.attachments || []);
-            lastSavedRef.current = { title: note.title, content: note.content, mood: note.mood, tags: note.tags || [] };
+            lastSavedRef.current = { 
+              title: note.title, 
+              content: note.content, 
+              mood: note.mood, 
+              tags: note.tags || [],
+              tasks: note.tasks || []
+            };
             // Generate prompts based on existing mood
             generateDynamicPrompts(note.mood);
           } else {
@@ -119,7 +128,7 @@ export const CreateNote: React.FC = () => {
   }, [id, navigate]);
 
   const debouncedAutoSave = useCallback(
-    debounce(async (currentId: string, data: { title: string, content: string, mood?: string, tags: string[] }) => {
+    debounce(async (currentId: string, data: { title: string, content: string, mood?: string, tags: string[], tasks: Task[] }) => {
       if (!currentId) return;
       
       // Only save if something actually changed
@@ -127,7 +136,8 @@ export const CreateNote: React.FC = () => {
         data.title === lastSavedRef.current.title &&
         data.content === lastSavedRef.current.content &&
         data.mood === lastSavedRef.current.mood &&
-        JSON.stringify(data.tags) === JSON.stringify(lastSavedRef.current.tags)
+        JSON.stringify(data.tags) === JSON.stringify(lastSavedRef.current.tags) &&
+        JSON.stringify(data.tasks) === JSON.stringify(lastSavedRef.current.tasks)
       ) {
         return;
       }
@@ -148,9 +158,9 @@ export const CreateNote: React.FC = () => {
 
   useEffect(() => {
     if (id && !loading) {
-      debouncedAutoSave(id, { title, content, mood, tags });
+      debouncedAutoSave(id, { title, content, mood, tags, tasks });
     }
-  }, [id, title, content, mood, tags, loading, debouncedAutoSave]);
+  }, [id, title, content, mood, tags, tasks, loading, debouncedAutoSave]);
 
   const handleAddTag = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && tagInput.trim()) {
@@ -366,7 +376,7 @@ export const CreateNote: React.FC = () => {
       if (!user) throw new Error("Not authenticated");
 
       let noteId = id;
-      let noteData: any = { title, content, tags, mood };
+      let noteData: any = { title, content, tags, mood, tasks };
       
       if (!noteId) {
         const newNote = await noteService.create(noteData);
@@ -415,6 +425,7 @@ export const CreateNote: React.FC = () => {
         content,
         mood,
         tags,
+        tasks,
         thumbnailUrl: finalThumbnailUrl || undefined,
         attachments: finalAttachments
       });
@@ -431,6 +442,27 @@ export const CreateNote: React.FC = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  const addTask = () => {
+    const newTask: Task = {
+      id: Math.random().toString(36).substr(2, 9),
+      text: '',
+      completed: false
+    };
+    setTasks([...tasks, newTask]);
+  };
+
+  const updateTask = (taskId: string, updates: Partial<Task>) => {
+    setTasks(tasks.map(t => t.id === taskId ? { ...t, ...updates } : t));
+  };
+
+  const removeTask = (taskId: string) => {
+    setTasks(tasks.filter(t => t.id !== taskId));
+  };
+
+  const toggleTask = (taskId: string) => {
+    setTasks(tasks.map(t => t.id === taskId ? { ...t, completed: !t.completed } : t));
   };
 
   if (loading) {
@@ -504,11 +536,11 @@ export const CreateNote: React.FC = () => {
     { id: 'tired', icon: Moon, label: 'Tired', color: 'text-slate-500 bg-slate-50 border-slate-100' },
   ];
 
-
+  const isDimmed = isFocusModeManual && isFocused;
 
   return (
     <div className="mx-auto max-w-5xl animate-in fade-in duration-500 pb-20 px-4 md:px-10">
-      <nav className={`sticky top-4 z-50 mb-8 flex items-center justify-between rounded-2xl border-2 border-border bg-white/90 px-4 py-3 shadow-[0_4px_0_0_#E5E5E5] backdrop-blur-2xl transition-all duration-500 ${isFocused ? 'opacity-40 hover:opacity-100' : 'opacity-100'}`}>
+      <nav className={`sticky top-4 z-50 mb-8 flex items-center justify-between rounded-2xl border-2 border-border bg-white/90 px-4 py-3 shadow-[0_4px_0_0_#E5E5E5] backdrop-blur-2xl transition-all duration-500 ${isDimmed ? 'opacity-40 hover:opacity-100' : 'opacity-100'}`}>
         <div className="flex items-center gap-3">
            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-bold uppercase text-[12px]">
              <ArrowLeft className="mr-2 h-4 w-4" />
@@ -523,6 +555,17 @@ export const CreateNote: React.FC = () => {
         </div>
         
         <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsFocusModeManual(!isFocusModeManual)}
+            className={`hidden sm:flex items-center gap-2 font-bold uppercase text-[11px] transition-all ${isFocusModeManual ? 'text-blue bg-blue/5' : 'text-gray-nav'}`}
+            title={isFocusModeManual ? "Disable Focus Mode" : "Enable Focus Mode"}
+          >
+            {isFocusModeManual ? <Eye size={16} /> : <EyeOff size={16} />}
+            <span className="hidden md:inline">Focus</span>
+          </Button>
+
           <AnimatePresence mode="wait">
             {saveStatus === 'saving' && (
               <motion.div 
@@ -599,29 +642,29 @@ export const CreateNote: React.FC = () => {
               </div>
             )}
 
-            <div className="flex-1 px-8 py-10 md:px-12 md:py-10">
-                <div className={`mb-12 flex flex-wrap items-center justify-between gap-4 transition-all duration-500 ${isFocused ? 'opacity-30 hover:opacity-100' : 'opacity-100'}`}>
+            <div className="flex-1 px-6 py-8 md:px-12 md:py-10">
+                <div className={`mb-12 flex flex-wrap items-center justify-between gap-4 transition-all duration-500 ${isDimmed ? 'opacity-30 hover:opacity-100' : 'opacity-100'}`}>
                     <div className="flex items-center gap-2 text-[11px] font-extrabold text-gray-nav uppercase tracking-wider">
                         <Calendar size={13} />
                         <span>{new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                        {/* Progressive Disclosure: Mood Button */}
                        <div className="relative">
                           <button 
                             onClick={() => setIsMoodOpen(!isMoodOpen)}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-xl border-2 transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] ${mood ? 'bg-blue/5 border-blue text-blue' : 'bg-white border-border text-gray-nav hover:border-blue/30'}`}
+                            className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] ${mood ? 'bg-blue/5 border-blue text-blue' : 'bg-white border-border text-gray-nav hover:border-blue/30'}`}
                           >
                             {mood ? (
                               <>
                                 {React.createElement(moods.find(m => m.id === mood)?.icon || Smile, { size: 16 })}
-                                <span className="text-[11px] font-black uppercase">{mood}</span>
+                                <span className="text-[10px] sm:text-[11px] font-black uppercase">{mood}</span>
                               </>
                             ) : (
                               <>
                                 <Smile size={16} />
-                                <span className="text-[11px] font-black uppercase">Mood</span>
+                                <span className="text-[10px] sm:text-[11px] font-black uppercase">Mood</span>
                               </>
                             )}
                           </button>
@@ -633,7 +676,7 @@ export const CreateNote: React.FC = () => {
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                 transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                                className="absolute top-full mt-3 right-0 z-[100] p-4 bg-white border-2 border-border rounded-3xl shadow-xl w-[280px] liquid-glass"
+                                className="fixed inset-x-4 bottom-4 sm:absolute sm:inset-auto sm:top-full sm:mt-3 sm:right-0 z-[100] p-4 bg-white border-2 border-border rounded-3xl shadow-xl sm:w-[280px] liquid-glass"
                               >
                                 <div className="flex items-center justify-between mb-4 px-1">
                                   <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav">How are you?</span>
@@ -667,10 +710,10 @@ export const CreateNote: React.FC = () => {
                        <div className="relative">
                           <button 
                             onClick={() => setIsTagsOpen(!isTagsOpen)}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-xl border-2 transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] ${tags.length > 0 ? 'bg-green/5 border-green text-green' : 'bg-white border-border text-gray-nav hover:border-green/30'}`}
+                            className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] ${tags.length > 0 ? 'bg-green/5 border-green text-green' : 'bg-white border-border text-gray-nav hover:border-green/30'}`}
                           >
                             <TagIcon size={16} />
-                            <span className="text-[11px] font-black uppercase">{tags.length > 0 ? `${tags.length} Tags` : 'Tags'}</span>
+                            <span className="text-[10px] sm:text-[11px] font-black uppercase">{tags.length > 0 ? `${tags.length} Tags` : 'Tags'}</span>
                           </button>
 
                           <AnimatePresence>
@@ -680,7 +723,7 @@ export const CreateNote: React.FC = () => {
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                 transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                                className="absolute top-full mt-3 right-0 z-[100] p-6 bg-white border-2 border-border rounded-3xl shadow-xl w-[320px] liquid-glass"
+                                className="fixed inset-x-4 bottom-4 sm:absolute sm:inset-auto sm:top-full sm:mt-3 sm:right-0 z-[100] p-6 bg-white border-2 border-border rounded-3xl shadow-xl sm:w-[320px] liquid-glass"
                               >
                                 <div className="mb-4">
                                   <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav block mb-3">Add Tags</span>
@@ -732,15 +775,15 @@ export const CreateNote: React.FC = () => {
                           </AnimatePresence>
                        </div>
 
-                       <label className="group flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-border bg-white px-4 py-2 text-[11px] font-black uppercase text-gray-nav transition-all hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]">
+                       <label className="group flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-border bg-white px-3 sm:px-4 py-2 text-[10px] sm:text-[11px] font-black uppercase text-gray-nav transition-all hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]">
                           <Paperclip size={16} className="text-gray-nav group-hover:text-blue" />
-                          <span>ATTACH</span>
+                          <span className="hidden xs:inline">ATTACH</span>
                           <input type="file" multiple className="hidden" onChange={handleAttachmentUpload} />
                        </label>
                        {!imagePreview && (
-                          <label className="group flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-border bg-white px-4 py-2 text-[11px] font-black uppercase text-gray-nav transition-all hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]">
+                          <label className="group flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-border bg-white px-3 sm:px-4 py-2 text-[10px] sm:text-[11px] font-black uppercase text-gray-nav transition-all hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]">
                              <ImageIcon size={16} className="text-gray-nav group-hover:text-blue" />
-                             <span>COVER</span>
+                             <span className="hidden xs:inline">COVER</span>
                              <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
                           </label>
                        )}
@@ -771,6 +814,65 @@ export const CreateNote: React.FC = () => {
                           className="text-[17px] text-gray-text min-h-[400px]"
                       />
                     </div>
+                </div>
+
+                {/* Tasks Section */}
+                <div className={`mt-12 border-t-2 border-border pt-8 transition-all duration-500 ${isDimmed ? 'opacity-30 hover:opacity-100' : 'opacity-100'}`}>
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-[12px] font-extrabold text-gray-text uppercase tracking-widest flex items-center gap-2">
+                      <ListTodo size={16} className="text-blue" />
+                      Actionable Tasks
+                    </h3>
+                    <button 
+                      onClick={addTask}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 border-blue/20 bg-blue/5 text-blue text-[10px] font-black uppercase tracking-widest hover:bg-blue/10 transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]"
+                    >
+                      <Plus size={14} />
+                      Add Task
+                    </button>
+                  </div>
+
+                  <div className="space-y-3">
+                    {tasks.length === 0 ? (
+                      <div className="p-8 rounded-3xl border-2 border-dashed border-border bg-gray-50/50 text-center">
+                        <p className="text-[13px] font-bold text-gray-nav uppercase tracking-widest opacity-40">No tasks added yet</p>
+                      </div>
+                    ) : (
+                      tasks.map((task) => (
+                        <div key={task.id} className="group flex items-center gap-4 p-4 rounded-[24px] border-2 border-border bg-white hover:border-blue/30 transition-all shadow-sm liquid-glass">
+                          <button 
+                            onClick={() => toggleTask(task.id)}
+                            className={`h-6 w-6 rounded-lg border-2 flex items-center justify-center transition-all ${task.completed ? 'bg-blue border-blue text-white' : 'border-border text-transparent hover:border-blue/50'}`}
+                          >
+                            <Check size={14} strokeWidth={3} />
+                          </button>
+                          
+                          <input 
+                            type="text"
+                            value={task.text}
+                            onChange={(e) => updateTask(task.id, { text: e.target.value })}
+                            placeholder="What needs to be done?"
+                            className={`flex-1 bg-transparent border-none focus:ring-0 text-[14px] font-bold text-gray-text placeholder:text-border transition-all ${task.completed ? 'line-through opacity-50' : ''}`}
+                          />
+
+                          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                            <input 
+                              type="date"
+                              value={task.dueDate || ''}
+                              onChange={(e) => updateTask(task.id, { dueDate: e.target.value })}
+                              className="text-[11px] font-bold text-gray-nav bg-gray-50 border-none rounded-lg p-1 focus:ring-0"
+                            />
+                            <button 
+                              onClick={() => removeTask(task.id)}
+                              className="p-2 rounded-xl text-gray-nav hover:text-red hover:bg-red/5 transition-all"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
 
                 {aiReflection && (

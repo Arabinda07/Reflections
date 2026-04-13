@@ -6,6 +6,13 @@ export interface NoteAttachment {
   id: string;
 }
 
+export interface Task {
+  id: string;
+  text: string;
+  completed: boolean;
+  dueDate?: string;
+}
+
 export interface Note {
   id: string;
   title: string;
@@ -16,6 +23,7 @@ export interface Note {
   tags?: string[];
   attachments?: NoteAttachment[];
   mood?: string;
+  tasks?: Task[];
 }
 
 export interface User {

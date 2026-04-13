@@ -13,6 +13,7 @@ const mapToNote = (data: any): Note => ({
   tags: data.tags || [],
   attachments: data.attachments || [],
   mood: data.mood || undefined,
+  tasks: data.tasks || [],
 });
 
 const NOTE_LIMIT = 3;
@@ -89,6 +90,7 @@ export const noteService = {
         thumbnail_url: note.thumbnailUrl,
         tags: note.tags || [],
         attachments: note.attachments || [], // Expecting JSONB in DB
+        tasks: note.tasks || [],
         mood: note.mood
       })
       .select()
@@ -113,6 +115,7 @@ export const noteService = {
     if (updates.tags !== undefined) dbUpdates.tags = updates.tags;
     if (updates.attachments !== undefined) dbUpdates.attachments = updates.attachments;
     if (updates.mood !== undefined) dbUpdates.mood = updates.mood;
+    if (updates.tasks !== undefined) dbUpdates.tasks = updates.tasks;
 
     const { data, error } = await supabase
       .from('notes')

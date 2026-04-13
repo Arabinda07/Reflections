@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS public.notes (
     thumbnail_url TEXT,
     tags TEXT[] DEFAULT '{}',
     attachments JSONB DEFAULT '[]',
+    tasks JSONB DEFAULT '[]',
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT now()
 );
