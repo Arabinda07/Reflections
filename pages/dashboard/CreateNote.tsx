@@ -71,14 +71,11 @@ export const CreateNote: React.FC = () => {
   
   const lastSavedRef = useRef({ title: '', content: '', mood: undefined as string | undefined, tags: [] as string[], tasks: [] as Task[] });
   const editorRef = useRef<HTMLDivElement>(null);
+  const isUnmounted = useRef(false);
 
   useEffect(() => {
-    const handleFocus = () => setIsFocused(true);
-    const handleBlur = () => setIsFocused(false);
-    
-    // We'll attach these to the editor container or listen for typing
     return () => {
-      // Cleanup
+      isUnmounted.current = true;
     };
   }, []);
 
@@ -145,41 +142,6 @@ export const CreateNote: React.FC = () => {
 
     checkLimitAndFetch();
   }, [id, navigate]);
-
-  const debouncedAutoSave = useCallback(
-    debounce(async (currentId: string, data: { title: string, content: string, mood?: string, tags: string[], tasks: Task[] }) => {
-      if (!currentId) return;
-      
-      // Only save if something actually changed
-      if (
-        data.title === lastSavedRef.current.title &&
-        data.content === lastSavedRef.current.content &&
-        data.mood === lastSavedRef.current.mood &&
-        JSON.stringify(data.tags) === JSON.stringify(lastSavedRef.current.tags) &&
-        JSON.stringify(data.tasks) === JSON.stringify(lastSavedRef.current.tasks)
-      ) {
-        return;
-      }
-
-      setSaveStatus('saving');
-      try {
-        await noteService.update(currentId, data);
-        lastSavedRef.current = { ...data };
-        setSaveStatus('saved');
-        setTimeout(() => setSaveStatus('idle'), 2000);
-      } catch (error) {
-        console.error("Auto-save failed:", error);
-        setSaveStatus('idle');
-      }
-    }, 2000),
-    []
-  );
-
-  useEffect(() => {
-    if (id && !loading) {
-      debouncedAutoSave(id, { title, content, mood, tags, tasks });
-    }
-  }, [id, title, content, mood, tags, tasks, loading, debouncedAutoSave]);
 
   const handleAddTag = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && tagInput.trim()) {
