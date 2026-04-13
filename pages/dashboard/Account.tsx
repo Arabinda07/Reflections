@@ -7,9 +7,11 @@ import { supabase } from '../../src/supabaseClient';
 import { RoutePath } from '../../types';
 import { storageService } from '../../services/storageService';
 import { StorageImage } from '../../components/ui/StorageImage';
+import { useAuth } from '../../context/AuthContext';
 
 export const Account: React.FC = () => {
   const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuth();
   const [loading, setLoading] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [fetching, setFetching] = useState(true);
@@ -29,22 +31,32 @@ export const Account: React.FC = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (!user) {
+        if (!isAuthenticated || !user) {
           navigate(RoutePath.LOGIN);
           return;
         }
 
-        setUserId(user.id);
-        setEmail(user.email || '');
-        setAvatarPath(user.user_metadata?.avatar_url || null);
-        setLastSignIn(user.last_sign_in_at || null);
+        // We still need to get the full user object from Supabase to get metadata
+        // like last_sign_in_at, but we can use getSession which is faster and doesn't
+        // trigger the lock stealing as often, or just use the context user if we don't need it.
+        // Actually, let's just use getSession.
+        const { data: { session } } = await supabase.auth.getSession();
+        const fullUser = session?.user;
+        
+        if (!fullUser) {
+          navigate(RoutePath.LOGIN);
+          return;
+        }
+
+        setUserId(fullUser.id);
+        setEmail(fullUser.email || '');
+        setAvatarPath(fullUser.user_metadata?.avatar_url || null);
+        setLastSignIn(fullUser.last_sign_in_at || null);
         
         setFormData({
-          fullName: user.user_metadata?.full_name || '',
-          displayName: user.user_metadata?.display_name || '',
-          timezone: user.user_metadata?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone
+          fullName: fullUser.user_metadata?.full_name || '',
+          displayName: fullUser.user_metadata?.display_name || '',
+          timezone: fullUser.user_metadata?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone
         });
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -54,7 +66,7 @@ export const Account: React.FC = () => {
     };
 
     fetchUser();
-  }, [navigate]);
+  }, [navigate, isAuthenticated, user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -325,42 +337,42 @@ export const Account: React.FC = () => {
                 </div>
 
                 {/* Footer Action Bar */}
-                <div className="sticky bottom-0 z-10 flex items-center justify-between border-t-2 border-border bg-white/95 px-6 sm:px-8 py-6 backdrop-blur-xl gap-4">
+                <div className="sticky bottom-0 z-10 flex flex-wrap sm:flex-nowrap items-center justify-between border-t-2 border-border bg-white/95 px-4 sm:px-8 py-4 sm:py-6 backdrop-blur-xl gap-3 sm:gap-4">
                     <button 
                         type="button" 
                         onClick={handleSignOut}
-                        className="flex items-center justify-center h-12 w-12 sm:w-auto sm:px-4 rounded-xl border-2 border-border bg-white text-gray-nav hover:text-red hover:border-red/30 transition-all shadow-3d-gray active:shadow-none active:translate-y-[2px] group"
+                        className="flex items-center justify-center h-12 px-4 rounded-xl border-2 border-border bg-white text-gray-nav hover:text-red hover:border-red/30 transition-all shadow-3d-gray active:shadow-none active:translate-y-[2px] group"
                         title="Sign Out"
                     >
                         <LogOut size={20} className="group-hover:scale-110 transition-transform" />
-                        <span className="hidden sm:inline ml-2 text-[13px] font-black uppercase tracking-widest">SIGN OUT</span>
+                        <span className="ml-2 text-[12px] sm:text-[13px] font-black uppercase tracking-widest">SIGN OUT</span>
                     </button>
-                    <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="flex items-center gap-2 sm:gap-4 ml-auto">
                          <Button 
                             type="button" 
                             variant="secondary" 
                             onClick={() => navigate(RoutePath.HOME)} 
-                            className="flex items-center justify-center h-12 w-12 sm:w-auto sm:px-6 p-0 sm:p-auto border-2 border-border text-gray-nav font-extrabold shadow-3d-gray active:shadow-none active:translate-y-[2px]"
+                            className="flex items-center justify-center h-12 px-3 sm:px-6 border-2 border-border text-gray-nav font-extrabold shadow-3d-gray active:shadow-none active:translate-y-[2px]"
                             title="Cancel"
                          >
-                             <X size={18} className="sm:mr-2" />
-                             <span className="hidden sm:inline uppercase">CANCEL</span>
+                             <X size={18} className="mr-1 sm:mr-2" />
+                             <span className="text-[12px] sm:text-[14px] uppercase">CANCEL</span>
                          </Button>
                          <Button 
                             type="submit" 
                             disabled={loading || isSaved}
-                            className={`flex items-center justify-center h-12 w-12 sm:w-auto sm:px-8 p-0 sm:p-auto font-extrabold transition-all duration-300 ${isSaved ? 'bg-green text-white border-green shadow-3d-green' : 'shadow-3d-green active:shadow-none active:translate-y-[2px]'}`}
+                            className={`flex items-center justify-center h-12 px-3 sm:px-8 font-extrabold transition-all duration-300 ${isSaved ? 'bg-green text-white border-green shadow-3d-green' : 'shadow-3d-green active:shadow-none active:translate-y-[2px]'}`}
                             title="Save Changes"
                          >
                              {loading ? (
-                               <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent sm:mr-2"></div>
+                               <div className="h-4 w-4 sm:h-5 sm:w-5 animate-spin rounded-full border-2 border-white border-t-transparent mr-1 sm:mr-2"></div>
                              ) : isSaved ? (
-                               <Check size={20} className="sm:mr-2" />
+                               <Check size={18} className="mr-1 sm:mr-2" />
                              ) : (
-                               <Save size={20} className="sm:mr-2" />
+                               <Save size={18} className="mr-1 sm:mr-2" />
                              )}
-                             <span className="hidden sm:inline uppercase">
-                               {loading ? 'SAVING...' : isSaved ? 'SAVED!' : 'SAVE CHANGES'}
+                             <span className="text-[12px] sm:text-[14px] uppercase">
+                                {loading ? 'SAVING...' : isSaved ? 'SAVED!' : 'SAVE'}
                              </span>
                          </Button>
                     </div>
