@@ -200,3 +200,12 @@ body {
     font-weight: 700 !important;
   }
 }
+
+/* Hide Spline Watermark */
+#logo,
+canvas + div,
+canvas ~ div {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}

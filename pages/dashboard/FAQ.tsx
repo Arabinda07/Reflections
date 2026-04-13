@@ -45,26 +45,11 @@ export const FAQ: React.FC = () => {
         <div className="absolute bottom-[-10%] right-[10%] w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full animate-pulse" style={{ animationDuration: '12s' }} />
       </div>
 
-      {/* =========================================
-          PHASE 1: THE SPLINE HERO BLOCK
-          ========================================= */}
-      <motion.section 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.5 }}
-        className="relative z-10 w-full h-[60vh] min-h-[500px] max-h-[800px] bg-[#F9F9F9] rounded-b-[48px] md:rounded-b-[80px] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.05)] border-b-2 border-border/50 overflow-hidden flex items-center justify-center mb-16"
-      >
-        <div className="absolute inset-0 pointer-events-auto z-0 flex items-center justify-center origin-center transition-transform">
-          <Spline scene="https://prod.spline.design/WJogBwjycMbazviG/scene.splinecode" />
-        </div>
-      </motion.section>
-
-      <div className="relative z-10 w-full max-w-[1440px] mx-auto px-4 md:px-6">
-        
+      <div className="relative z-10 w-full max-w-[1440px] mx-auto px-4 md:px-6 pt-24 pb-16">
         {/* =========================================
-            PHASE 1: THE WHY TEXT (Under Spline)
+            PHASE 1: THE HERO TEXT
             ========================================= */}
-        <section className="flex flex-col mb-32">
+        <section className="flex flex-col">
           <div className="w-full text-center max-w-4xl mx-auto">
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
@@ -90,6 +75,23 @@ export const FAQ: React.FC = () => {
             </motion.div>
           </div>
         </section>
+      </div>
+
+      {/* =========================================
+          PHASE 2: THE SPLINE BLOCK
+          ========================================= */}
+      <motion.section 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.5 }}
+        className="relative z-10 w-full h-[60vh] min-h-[500px] max-h-[800px] bg-[#F9F9F9] border-y-2 border-border/50 overflow-hidden flex items-center justify-center mb-20"
+      >
+        <div className="absolute inset-0 pointer-events-auto z-0 flex items-center justify-center origin-center transition-transform scale-105">
+          <Spline scene="https://prod.spline.design/WJogBwjycMbazviG/scene.splinecode" />
+        </div>
+      </motion.section>
+
+      <div className="relative z-10 w-full max-w-[1440px] mx-auto px-4 md:px-6">
 
 
         {/* =========================================
