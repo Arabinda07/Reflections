@@ -116,7 +116,7 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
         onChange={(e) => updateTask(task.id, { text: e.target.value })}
         readOnly={task.completed}
         placeholder="Your Task"
-        className={`relative z-10 flex-1 min-w-0 bg-transparent border-none focus:ring-0 text-[14px] px-1 font-bold text-gray-text placeholder:text-border transition-all duration-500 ${
+        className={`relative z-10 flex-1 min-w-0 bg-transparent border-none outline-none ring-0 focus:ring-0 focus:outline-none text-[14px] px-1 font-bold text-gray-text placeholder:text-border transition-all duration-500 ${
           showCompletedText ? 'line-through text-gray-nav cursor-default decoration-sky-400 decoration-2' : ''
         }`}
       />

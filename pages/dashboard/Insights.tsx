@@ -8,14 +8,23 @@ import { noteService } from '../../services/noteService';
 import { GoogleGenAI } from "@google/genai";
 import { supabase } from '../../src/supabaseClient';
 
-// Soft pastel dictionary for Aura
+// Flat soft colors — no gradients
 const MOOD_COLORS: Record<string, string> = {
-  happy: 'var(--golden, #eab308)',
-  calm: 'var(--green, #10b981)',
-  anxious: 'var(--blue, #3b82f6)',
-  sad: 'var(--dark-blue, #6366f1)',
-  angry: 'var(--red, #f43f5e)',
-  tired: 'var(--gray-light, #64748b)',
+  happy:   '#f59e0b',
+  calm:    '#10b981',
+  anxious: '#60a5fa',
+  sad:     '#818cf8',
+  angry:   '#fb7185',
+  tired:   '#94a3b8',
+};
+
+const MOOD_BG: Record<string, string> = {
+  happy:   '#fef3c7',
+  calm:    '#d1fae5',
+  anxious: '#dbeafe',
+  sad:     '#e0e7ff',
+  angry:   '#ffe4e6',
+  tired:   '#f1f5f9',
 };
 
 export const Insights: React.FC = () => {
@@ -225,40 +234,43 @@ export const Insights: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
-        {/* The Aura Visualization */}
-        <div className="bg-white border-2 border-border rounded-[40px] p-8 shadow-[0_8px_0_0_#E5E5E5] liquid-glass flex flex-col items-center justify-center min-h-[300px] relative overflow-hidden">
-          <h3 className="absolute top-8 left-8 text-[14px] font-extrabold text-gray-text uppercase tracking-wider z-20">The Mood Landscape</h3>
+        {/* Stacked Soft Mood Bars */}
+        <div className="bg-white dark:bg-[#1E1E1E] border-2 border-border rounded-[40px] p-8 shadow-[0_8px_0_0_#E5E5E5] dark:shadow-[0_8px_0_0_rgba(15,23,42,0.55)] liquid-glass flex flex-col min-h-[300px]">
+          <h3 className="text-[14px] font-extrabold text-gray-text uppercase tracking-wider mb-6">Mood Frequency</h3>
           {stats.moodData.length === 0 ? (
-            <p className="text-[13px] text-gray-nav font-medium italic z-20">Label some moods to see your landscape.</p>
+            <div className="flex-1 flex items-center justify-center">
+              <p className="text-[13px] text-gray-nav font-medium italic">Label some moods to see your pattern.</p>
+            </div>
           ) : (
-            <div className="relative w-full h-[220px] mt-10 flex items-center justify-center">
-              <motion.div
-                animate={{ 
-                  scale: [1, 1.05, 1],
-                  rotate: [0, 5, -5, 0],
-                  opacity: [0.8, 1, 0.8]
-                }}
-                transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
-                className="w-[200px] h-[200px] sm:w-[220px] sm:h-[220px] rounded-full relative overflow-hidden" 
-                style={{
-                  background: stats.moodData.slice(0, 3).map((entry, index) => {
-                    const color = MOOD_COLORS[entry.name] || 'var(--gray-light)';
-                    const x = index === 0 ? '50%' : index === 1 ? '30%' : '70%';
-                    const y = index === 0 ? '50%' : index === 1 ? '70%' : '30%';
-                    const size = index === 0 ? '70%' : '50%';
-                    return `radial-gradient(circle at ${x} ${y}, ${color} 0%, transparent ${size})`;
-                  }).join(', ') + ', var(--panel-bg)',
-                  filter: 'blur(30px)'
-                }}
-              />
-              {stats.topMood !== 'undefined' && (
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-                  <div className="text-center bg-white/40 dark:bg-[#1e1e1e]/40 px-6 py-4 rounded-3xl backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-white/20 dark:border-white/10">
-                    <span className="text-[32px] font-display text-gray-text block lowercase leading-none mb-1 capitalize">{stats.topMood}</span>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-text/70">{stats.moodData[0].value} Entries</span>
+            <div className="flex flex-col gap-4 flex-1 justify-center">
+              {stats.moodData.map((entry) => {
+                const maxVal = stats.moodData[0].value;
+                const pct = Math.round((entry.value / maxVal) * 100);
+                const color = MOOD_COLORS[entry.name] || '#94a3b8';
+                const bg = MOOD_BG[entry.name] || '#f1f5f9';
+                return (
+                  <div key={entry.name} className="flex items-center gap-4">
+                    <span
+                      className="text-[11px] font-black uppercase tracking-widest w-14 shrink-0 capitalize"
+                      style={{ color }}
+                    >
+                      {entry.name}
+                    </span>
+                    <div className="relative flex-1 h-8 rounded-full overflow-hidden" style={{ background: bg }}>
+                      <motion.div
+                        className="absolute inset-y-0 left-0 rounded-full"
+                        style={{ backgroundColor: color }}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${pct}%` }}
+                        transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1], delay: 0.1 }}
+                      />
+                    </div>
+                    <span className="text-[12px] font-extrabold text-gray-nav w-6 text-right shrink-0">
+                      {entry.value}
+                    </span>
                   </div>
-                </div>
-              )}
+                );
+              })}
             </div>
           )}
         </div>

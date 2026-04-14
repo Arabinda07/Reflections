@@ -190,7 +190,8 @@ body {
     border: none !important;
     border-bottom: 2px solid var(--border-color) !important;
     padding: 12px !important;
-    background: var(--panel-bg);
+    background: transparent;
+    border-radius: 0 !important;
   }
 
   .ql-container.ql-snow {
@@ -198,6 +199,13 @@ body {
     font-family: inherit !important;
     font-size: 16px !important;
     height: auto !important;
+  }
+
+  /* Soft rounded wrapper — wraps the whole editor */
+  .duolingo-editor {
+    border-radius: 20px !important;
+    overflow: visible !important;
+    border: none !important;
   }
 
   .ql-editor {
