@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { Headphones, Pause, Play } from 'lucide-react';
+import { Headphones, Pause, Play, X } from 'lucide-react';
 import { Button } from '../ui/Button';
 
 interface AmbientPlayerProps {
@@ -23,7 +23,7 @@ const AMBIENT_PRESETS: AmbientPreset[] = [
     id: 'morning-air',
     name: 'Morning Air',
     description: 'Light, slow, and barely there',
-    colorClass: 'bg-emerald-50 text-emerald-600 border-emerald-100',
+    colorClass: 'border-emerald-200 bg-emerald-50/95 text-emerald-700 dark:border-emerald-400/25 dark:bg-emerald-400/12 dark:text-emerald-100',
     baseFrequency: 174,
     modulationFrequency: 0.07,
     filterFrequency: 520,
@@ -33,7 +33,7 @@ const AMBIENT_PRESETS: AmbientPreset[] = [
     id: 'soft-hum',
     name: 'Soft Hum',
     description: 'Warm focus without rhythm',
-    colorClass: 'bg-sky-50 text-sky-600 border-sky-100',
+    colorClass: 'border-sky-200 bg-sky-50/95 text-sky-700 dark:border-sky-400/25 dark:bg-sky-400/12 dark:text-sky-100',
     baseFrequency: 220,
     modulationFrequency: 0.05,
     filterFrequency: 430,
@@ -43,7 +43,7 @@ const AMBIENT_PRESETS: AmbientPreset[] = [
     id: 'quiet-tide',
     name: 'Quiet Tide',
     description: 'A slow breathing wash',
-    colorClass: 'bg-teal-50 text-teal-600 border-teal-100',
+    colorClass: 'border-teal-200 bg-teal-50/95 text-teal-700 dark:border-teal-400/25 dark:bg-teal-400/12 dark:text-teal-100',
     baseFrequency: 196,
     modulationFrequency: 0.04,
     filterFrequency: 360,
@@ -54,6 +54,7 @@ const AMBIENT_PRESETS: AmbientPreset[] = [
 export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activePresetId, setActivePresetId] = useState<string | null>(null);
+  const [isMobileLayout, setIsMobileLayout] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
   const nodesRef = useRef<{
     carrier: OscillatorNode;
@@ -151,6 +152,15 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
   }, [isEditorFocused]);
 
   useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 639px)');
+    const syncLayout = () => setIsMobileLayout(mediaQuery.matches);
+
+    syncLayout();
+    mediaQuery.addEventListener('change', syncLayout);
+    return () => mediaQuery.removeEventListener('change', syncLayout);
+  }, []);
+
+  useEffect(() => {
     return () => {
       stopPreset();
       audioContextRef.current?.close();
@@ -177,10 +187,10 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
         onClick={handleTriggerClick}
         aria-expanded={isOpen}
         aria-haspopup="menu"
-        className={`border ${
+        className={`border shadow-[0_2px_0_0_rgba(226,232,240,0.6)] dark:shadow-[0_2px_0_0_rgba(15,23,42,0.42)] ${
           isPlaying
-            ? 'border-sky-200 bg-sky-50 text-sky-600 hover:bg-sky-100'
-            : 'border-transparent text-gray-nav hover:bg-emerald-50 hover:text-emerald-600'
+            ? 'border-sky-200/90 bg-sky-50/90 text-sky-700 hover:bg-sky-100 dark:border-sky-400/20 dark:bg-sky-400/12 dark:text-sky-100 dark:hover:bg-sky-400/16'
+            : 'border-border/70 bg-white/75 text-gray-nav hover:bg-emerald-50 hover:text-emerald-700 dark:border-white/10 dark:bg-white/5 dark:text-gray-light dark:hover:bg-emerald-400/12 dark:hover:text-emerald-100'
         }`}
         title={isPlaying ? 'Turn ambient sound off' : 'Choose ambient sound'}
       >
@@ -188,16 +198,16 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
       </Button>
 
       <AnimatePresence>
-        {isOpen && (
+        {isOpen && !isMobileLayout && (
           <motion.div
             initial={{ opacity: 0, y: 10, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.97 }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
-            className="absolute right-0 top-full z-[100] mt-2 w-[250px] rounded-2xl border border-sky-100 bg-white/95 p-4 shadow-[0_20px_60px_-35px_rgba(14,165,233,0.7)] backdrop-blur-2xl"
+            className="absolute right-0 top-full z-[100] mt-2 w-[280px] rounded-[28px] border border-sky-100/90 bg-white/95 p-4 shadow-[0_24px_60px_-35px_rgba(14,165,233,0.7)] backdrop-blur-2xl dark:border-white/10 dark:bg-[#16181d]/95 dark:shadow-[0_30px_70px_-40px_rgba(8,145,178,0.55)]"
           >
-            <h4 className="mb-1 text-[10px] font-black uppercase tracking-widest text-gray-nav">Ambient Focus</h4>
-            <p className="mb-4 text-[11px] font-bold leading-relaxed text-gray-light">Quiet tones for a softer writing room.</p>
+            <h4 className="mb-1 text-[10px] font-black uppercase tracking-widest text-gray-nav dark:text-slate-300">Ambient Focus</h4>
+            <p className="mb-4 text-[11px] font-bold leading-relaxed text-gray-light dark:text-slate-400">Quiet tones for a softer writing room.</p>
 
             <div className="space-y-2">
               {AMBIENT_PRESETS.map((preset) => {
@@ -212,7 +222,7 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
                     className={`w-full rounded-xl border p-3 text-left transition-all ${
                       isPresetPlaying
                         ? preset.colorClass
-                        : 'border-transparent bg-gray-50/80 text-gray-text hover:border-sky-100 hover:bg-sky-50/60'
+                        : 'border-transparent bg-slate-50/85 text-gray-text hover:border-sky-100 hover:bg-sky-50/60 dark:bg-white/5 dark:text-slate-100 dark:hover:border-sky-400/20 dark:hover:bg-sky-400/10'
                     }`}
                   >
                     <span className="flex items-center justify-between gap-3">
@@ -224,6 +234,68 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
                 );
               })}
             </div>
+          </motion.div>
+        )}
+
+        {isOpen && isMobileLayout && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[140] flex items-end bg-slate-950/35 p-3 backdrop-blur-sm sm:hidden"
+            onClick={() => setIsOpen(false)}
+          >
+            <motion.div
+              initial={{ y: 30, opacity: 0.85 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 30, opacity: 0.85 }}
+              transition={{ duration: 0.22, ease: 'easeOut' }}
+              className="w-full rounded-[28px] border border-sky-100/90 bg-white/96 p-4 shadow-[0_24px_60px_-32px_rgba(15,23,42,0.5)] dark:border-white/10 dark:bg-[#16181d]/96"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div className="mb-4 flex items-start justify-between gap-4">
+                <div>
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.24em] text-gray-nav dark:text-slate-300">Ambient Focus</h4>
+                  <p className="mt-1 text-[12px] font-bold leading-relaxed text-gray-light dark:text-slate-400">
+                    Choose a soft sound for writing without the menu leaving the screen.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsOpen(false)}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border border-border/80 bg-white/75 text-gray-nav dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
+                  aria-label="Close ambient sound choices"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              <div className="space-y-2">
+                {AMBIENT_PRESETS.map((preset) => {
+                  const isPresetPlaying = activePresetId === preset.id;
+                  return (
+                    <button
+                      key={preset.id}
+                      onClick={() => {
+                        playPreset(preset);
+                        setIsOpen(false);
+                      }}
+                      className={`w-full rounded-[22px] border p-4 text-left transition-all ${
+                        isPresetPlaying
+                          ? preset.colorClass
+                          : 'border-transparent bg-slate-50/90 text-gray-text dark:bg-white/5 dark:text-slate-100'
+                      }`}
+                    >
+                      <span className="flex items-center justify-between gap-3">
+                        <span className="text-[13px] font-black">{preset.name}</span>
+                        {isPresetPlaying ? <Pause size={16} /> : <Play size={16} />}
+                      </span>
+                      <span className="mt-1 block text-[11px] font-bold opacity-75">{preset.description}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
