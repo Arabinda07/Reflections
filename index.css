@@ -179,6 +179,9 @@ body {
     min-height: 400px;
     height: auto !important;
     overflow-y: visible !important;
+    line-height: 1.95 !important;
+    max-width: 70ch;
+    margin: 0 auto;
   }
 
   .ql-editor.ql-blank::before {

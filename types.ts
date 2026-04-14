@@ -33,6 +33,40 @@ export interface User {
   avatarUrl?: string;
 }
 
+export type PlanTier = 'free' | 'pro';
+
+export interface WellnessAccess {
+  userId: string;
+  planTier: PlanTier;
+  freeAiReflectionsUsed: number;
+}
+
+export interface NoteUsage {
+  usedThisMonth: number;
+  monthlyLimit: number;
+  remainingThisMonth: number;
+  canCreateNote: boolean;
+}
+
+export interface AiReflectionGate {
+  canReflect: boolean;
+  reason?: 'needs_more_notes' | 'sample_used' | 'missing_content';
+  remainingFreeSamples: number;
+  requiresUpgrade: boolean;
+}
+
+export interface MonthlyWellnessJourney {
+  monthLabel: string;
+  noteCount: number;
+  writingDays: number;
+  topMood?: string;
+  moodCounts: Record<string, number>;
+  topTags: Array<{ tag: string; count: number }>;
+  recurringThemes: string[];
+  summary: string;
+  nextStep: string;
+}
+
 export enum RoutePath {
   HOME = '/',
   NOTES = '/notes',

@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Loader2, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Meh, Frown, Sun, Cloud, Moon, Heart, Brain, Coffee, MessageSquare, Tag as TagIcon, CheckCircle2, Check, RefreshCw, CheckSquare, Square, Plus, Trash2, Eye, EyeOff, ListTodo, Headphones, Wind, Play, Pause, Volume2 } from 'lucide-react';
-import confetti from 'canvas-confetti';
+import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Loader2, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Meh, Frown, Sun, Cloud, Moon, Heart, Brain, Coffee, MessageSquare, Tag as TagIcon, CheckCircle2, Check, RefreshCw, CheckSquare, Square, Plus, Trash2, Eye, EyeOff, ListTodo, Wind, Target } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Editor } from '../../components/ui/Editor';
 import { noteService } from '../../services/noteService';
@@ -11,6 +10,8 @@ import { RoutePath, NoteAttachment, Task } from '../../types';
 import { supabase } from '../../src/supabaseClient';
 import { StorageImage } from '../../components/ui/StorageImage';
 import { GoogleGenAI, Type } from "@google/genai";
+import { AmbientPlayer } from '../../components/wellness/AmbientPlayer';
+import { BreathingGate } from '../../components/wellness/BreathingGate';
 
 // Custom debounce function to avoid CommonJS import issues
 function debounce<T extends (...args: any[]) => any>(
@@ -34,6 +35,161 @@ const DEFAULT_PROMPTS = [
   "Describe a moment today that made you smile.",
   "What's one thing you want to let go of today?",
 ];
+
+interface MindfulnessSparkPromptProps {
+  prompt: string;
+  isLoading: boolean;
+  isSoftened: boolean;
+  onRefresh: () => void;
+}
+
+const MindfulnessSparkPrompt: React.FC<MindfulnessSparkPromptProps> = ({ prompt, isLoading, isSoftened, onRefresh }) => (
+  <motion.div
+    layout
+    className={`mb-10 overflow-hidden rounded-[28px] bg-gradient-to-br from-blue to-blue/80 p-5 text-white shadow-3d-blue liquid-glass-strong transition-opacity duration-500 sm:p-6 ${
+      isSoftened ? 'opacity-40 hover:opacity-100' : 'opacity-100'
+    }`}
+  >
+    <div className="relative z-10">
+      <div className="mb-4 flex items-center justify-between gap-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/20 text-white backdrop-blur-md">
+            <Target size={22} />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[10px] font-black uppercase tracking-[0.22em] text-white/70">Daily Mindfulness</p>
+            <h3 className="truncate font-display text-[20px] lowercase leading-none">today's spark</h3>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={onRefresh}
+          disabled={isLoading}
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 text-white transition-all hover:bg-white/20 disabled:opacity-50"
+          title="New spark"
+          aria-label="Show another writing spark"
+        >
+          <RefreshCw size={17} className={isLoading ? 'animate-spin' : ''} />
+        </button>
+      </div>
+
+      <p className="text-[16px] font-bold leading-relaxed text-white sm:text-[18px]">
+        "{prompt}"
+      </p>
+    </div>
+  </motion.div>
+);
+
+interface TaskRowProps {
+  task: Task;
+  updateTask: (taskId: string, updates: Partial<Task>) => void;
+  toggleTask: (taskId: string) => void;
+  removeTask: (taskId: string) => void;
+}
+
+const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeTask }) => {
+  const [showCompletedText, setShowCompletedText] = useState(task.completed);
+  const [rippleKey, setRippleKey] = useState(0);
+  const wasCompleted = useRef(task.completed);
+
+  useEffect(() => {
+    if (task.completed) {
+      if (!wasCompleted.current) {
+        setRippleKey((key) => key + 1);
+      }
+
+      const timer = window.setTimeout(() => setShowCompletedText(true), 180);
+      wasCompleted.current = true;
+      return () => window.clearTimeout(timer);
+    }
+
+    setShowCompletedText(false);
+    wasCompleted.current = false;
+  }, [task.completed]);
+
+  return (
+    <motion.div
+      layout
+      animate={
+        task.completed
+          ? {
+              scale: 0.99,
+              backgroundColor: 'rgba(236, 253, 245, 0.58)',
+              borderColor: 'rgba(125, 211, 252, 0.55)',
+              boxShadow: '0 0 0 1px rgba(186, 230, 253, 0.55), 0 18px 45px -35px rgba(14, 165, 233, 0.7)',
+            }
+          : {
+              scale: 1,
+              backgroundColor: 'rgba(255, 255, 255, 1)',
+              borderColor: 'rgb(229, 229, 229)',
+              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
+            }
+      }
+      transition={{ duration: 0.45, ease: 'easeOut' }}
+      className="group relative flex items-center gap-2 overflow-hidden rounded-[24px] border-2 p-3 sm:gap-4 sm:p-4"
+    >
+      <AnimatePresence>
+        {rippleKey > 0 && task.completed && (
+          <motion.span
+            key={rippleKey}
+            initial={{ scale: 0.2, opacity: 0.38 }}
+            animate={{ scale: 4.6, opacity: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.9, ease: 'easeOut' }}
+            className="pointer-events-none absolute left-5 top-1/2 h-12 w-12 -translate-y-1/2 rounded-full bg-sky-200/60"
+          />
+        )}
+      </AnimatePresence>
+
+      <button
+        type="button"
+        onClick={() => toggleTask(task.id)}
+        className={`relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border-2 transition-all duration-300 ${
+          task.completed
+            ? 'border-sky-400 bg-sky-400 text-white shadow-[0_0_18px_rgba(14,165,233,0.38)]'
+            : 'border-border text-transparent hover:border-sky-300'
+        }`}
+        aria-label={task.completed ? 'Mark task incomplete' : 'Mark task complete'}
+      >
+        <motion.span
+          animate={{ scale: task.completed ? 1 : 0, rotate: task.completed ? 0 : -20 }}
+          transition={{ duration: 0.22, ease: 'easeOut' }}
+        >
+          <Check size={14} strokeWidth={3} />
+        </motion.span>
+      </button>
+
+      <input
+        type="text"
+        value={task.text}
+        onChange={(e) => updateTask(task.id, { text: e.target.value })}
+        readOnly={task.completed}
+        placeholder="Your Task"
+        className={`relative z-10 flex-1 min-w-0 bg-transparent border-none focus:ring-0 text-[14px] px-1 font-bold text-gray-text placeholder:text-border transition-all duration-500 ${
+          showCompletedText ? 'line-through text-gray-nav cursor-default decoration-sky-400 decoration-2' : ''
+        }`}
+      />
+
+      <div className={`relative z-10 flex shrink-0 items-center gap-1 transition-all duration-300 sm:gap-2 ${task.completed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+        <input
+          type="date"
+          value={task.dueDate || ''}
+          onChange={(e) => updateTask(task.id, { dueDate: e.target.value })}
+          className="text-[11px] font-bold text-gray-nav bg-gray-50 border-none rounded-lg p-1 focus:ring-0"
+        />
+        <button
+          type="button"
+          onClick={() => removeTask(task.id)}
+          className="p-2 rounded-xl text-gray-nav hover:text-red hover:bg-red/5 transition-all"
+          aria-label="Remove task"
+        >
+          <Trash2 size={16} />
+        </button>
+      </div>
+    </motion.div>
+  );
+};
 
 export const CreateNote: React.FC = () => {
   const navigate = useNavigate();
@@ -64,10 +220,6 @@ export const CreateNote: React.FC = () => {
   const [isBreathing, setIsBreathing] = useState(!id);
   const [isReleasing, setIsReleasing] = useState(false);
   const [promptIndex, setPromptIndex] = useState(0);
-  const [isAudioOpen, setIsAudioOpen] = useState(false);
-  const [activeTrack, setActiveTrack] = useState<{name: string, url: string} | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const [isMoodOpen, setIsMoodOpen] = useState(false);
   const [isTagsOpen, setIsTagsOpen] = useState(false);
@@ -88,14 +240,9 @@ export const CreateNote: React.FC = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (isBreathing) {
-      const timer = setTimeout(() => {
-        setIsBreathing(false);
-      }, 3500);
-      return () => clearTimeout(timer);
-    }
-  }, [isBreathing]);
+  const handleBreathingComplete = useCallback(() => {
+    setIsBreathing(false);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -465,18 +612,17 @@ export const CreateNote: React.FC = () => {
     setTasks(tasks.map(t => {
       if (t.id === taskId) {
         const newCompleted = !t.completed;
-        if (newCompleted) {
-          confetti({
-            particleCount: 80,
-            spread: 60,
-            origin: { y: 0.8 },
-            colors: ['#1CB0F6', '#58CC02', '#FF9600']
-          });
-        }
         return { ...t, completed: newCompleted };
       }
       return t;
     }));
+  };
+
+  const cycleSparkPrompt = () => {
+    const promptsList = dynamicPrompts.length > 0 ? dynamicPrompts : DEFAULT_PROMPTS;
+    const nextIdx = (promptIndex + 1) % promptsList.length;
+    setPromptIndex(nextIdx);
+    setActivePlaceholder(promptsList[nextIdx]);
   };
 
   const handleRelease = () => {
@@ -548,9 +694,11 @@ export const CreateNote: React.FC = () => {
     </div>
   ) : null;
 
-  const hasContent = content && content !== '<p><br></p>';
+  const hasContent = Boolean(content && content !== '<p><br></p>');
   const canSave = title.trim().length > 0 || hasContent;
   const canEnhance = hasContent;
+  const promptOptions = dynamicPrompts.length > 0 ? dynamicPrompts : DEFAULT_PROMPTS;
+  const sparkPrompt = activePlaceholder || promptOptions[promptIndex % promptOptions.length] || DEFAULT_PROMPTS[0];
 
   const moods = [
     { id: 'happy', icon: Smile, label: 'Happy', color: 'text-yellow-500 bg-yellow-50 border-yellow-100' },
@@ -563,36 +711,17 @@ export const CreateNote: React.FC = () => {
 
   const isDimmed = isFocusModeManual;
 
+  if (isBreathing) {
+    return (
+      <>
+        <BreathingGate active={isBreathing} durationMs={3600} onComplete={handleBreathingComplete} />
+        {limitReachedOverlay}
+      </>
+    );
+  }
+
   return (
-    <div className="mx-auto max-w-5xl animate-in fade-in duration-500 pb-20 px-4 md:px-10">
-      <AnimatePresence>
-        {isBreathing && (
-           <motion.div 
-             initial={{ opacity: 0 }}
-             animate={{ opacity: 1 }}
-             exit={{ opacity: 0 }}
-             transition={{ duration: 0.8 }}
-             className="fixed inset-0 z-[300] bg-white flex flex-col items-center justify-center p-4"
-           >
-              <motion.div 
-                 initial={{ scale: 0.8 }}
-                 animate={{ scale: [0.8, 1.2, 0.8] }}
-                 transition={{ duration: 3.5, ease: "easeInOut" }}
-                 className="w-48 h-48 rounded-full bg-blue/10 border-4 border-blue/20 flex items-center justify-center mb-8"
-              >
-                  <Wind size={40} className="text-blue/50" />
-              </motion.div>
-              <motion.p 
-                 initial={{ opacity: 0 }}
-                 animate={{ opacity: [0, 1, 0] }}
-                 transition={{ duration: 3.5, ease: "easeInOut" }}
-                 className="text-[18px] font-display text-gray-nav lowercase tracking-wide"
-              >
-                 take a deep breath...
-              </motion.p>
-           </motion.div>
-        )}
-      </AnimatePresence>
+    <div className="mx-auto max-w-4xl animate-in fade-in duration-500 pb-20 px-4 md:px-8">
       {limitReachedOverlay}
       <nav className={`sticky top-4 z-50 mb-8 flex items-center justify-between rounded-2xl border-2 border-border bg-white/90 px-4 py-3 shadow-[0_4px_0_0_#E5E5E5] backdrop-blur-2xl transition-all duration-500 ${isDimmed ? 'opacity-40 hover:opacity-100' : 'opacity-100'}`}>
         <div className="flex items-center gap-3">
@@ -620,63 +749,13 @@ export const CreateNote: React.FC = () => {
             <span className="hidden sm:inline">Focus</span>
           </Button>
 
-          {/* Audio Player Popover */}
-          <div className="relative">
-             <Button variant="ghost" size="sm" onClick={() => setIsAudioOpen(!isAudioOpen)} className={`mr-2 hidden sm:flex text-gray-nav transition-all ${isPlaying ? 'text-blue bg-blue/5' : ''}`}>
-                 <Headphones size={16} />
-             </Button>
-             <AnimatePresence>
-                {isAudioOpen && (
-                   <motion.div 
-                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                     className="absolute top-full right-0 mt-2 z-[100] p-4 bg-white border-2 border-border rounded-2xl shadow-xl w-[200px] liquid-glass"
-                   >
-                      <h4 className="text-[10px] uppercase font-black tracking-widest text-gray-nav mb-3">Ambient Focus</h4>
-                      <div className="space-y-2">
-                         {[
-                           { name: 'Soft Rain', url: 'https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3?filename=rain-and-thunder-16705.mp3' },
-                           { name: 'Deep Focus', url: 'https://cdn.pixabay.com/download/audio/2022/02/07/audio_67eb2ea238.mp3?filename=lofi-study-112191.mp3' },
-                           { name: 'Lo-Fi Wind', url: 'https://cdn.pixabay.com/download/audio/2022/08/31/audio_14115f5cff.mp3?filename=calm-winds-118836.mp3' }
-                         ].map(track => {
-                            const isThisPlaying = activeTrack?.name === track.name && isPlaying;
-                            return (
-                               <button 
-                                 key={track.name}
-                                 onClick={() => {
-                                    if (activeTrack?.name === track.name) {
-                                       if (isPlaying) { audioRef.current?.pause(); setIsPlaying(false); }
-                                       else { audioRef.current?.play(); setIsPlaying(true); }
-                                    } else {
-                                       setActiveTrack(track);
-                                       setIsPlaying(true);
-                                       if (audioRef.current) {
-                                          audioRef.current.src = track.url;
-                                          audioRef.current.play();
-                                       }
-                                    }
-                                 }}
-                                 className={`w-full flex items-center justify-between p-2 rounded-xl text-[12px] font-bold transition-all ${isThisPlaying ? 'bg-blue/10 text-blue' : 'hover:bg-gray-50 text-gray-text'}`}
-                               >
-                                  <span>{track.name}</span>
-                                  {isThisPlaying ? <Pause size={14} /> : <Play size={14} />}
-                               </button>
-                            );
-                         })}
-                      </div>
-                   </motion.div>
-                )}
-             </AnimatePresence>
-          </div>
-
-          <audio ref={audioRef} loop />
+          <AmbientPlayer isEditorFocused={isFocused} />
 
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={handleRelease} 
-            className="hidden sm:flex border-2 border-transparent text-gray-nav hover:bg-gray-50 hover:text-gray-text transition-all mr-2" 
+            className="hidden sm:flex border border-sky-100 bg-sky-50/70 text-sky-600 hover:bg-emerald-50 hover:text-emerald-600 transition-all mr-2" 
             disabled={isReleasing}
           >
               <Wind className="mr-2 h-3.5 w-3.5" />
@@ -734,8 +813,19 @@ export const CreateNote: React.FC = () => {
         </div>
       </nav>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <motion.div className="lg:col-span-8">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key="editor-shell"
+          initial={{ opacity: 0, y: 20, filter: 'blur(10px)' }}
+          animate={
+            isReleasing
+              ? { opacity: 0, y: -34, scale: 0.98, filter: 'blur(18px)' }
+              : { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }
+          }
+          exit={{ opacity: 0, y: -20, filter: 'blur(14px)' }}
+          transition={{ duration: isReleasing ? 1.35 : 0.65, ease: 'easeInOut' }}
+          className="mx-auto w-full max-w-4xl"
+        >
           <div className="relative min-h-[70vh] rounded-[32px] border-2 border-border bg-white shadow-[0_8px_0_0_#E5E5E5] flex flex-col liquid-glass !overflow-visible">
             {imagePreview && (
               <div className="relative aspect-[21/9] w-full group bg-white border-b-2 border-border rounded-t-[30px] overflow-hidden">
@@ -913,6 +1003,15 @@ export const CreateNote: React.FC = () => {
                     </div>
                 </div>
 
+                {!id && (
+                  <MindfulnessSparkPrompt
+                    prompt={sparkPrompt}
+                    isLoading={isGeneratingPrompts}
+                    isSoftened={hasContent}
+                    onRefresh={cycleSparkPrompt}
+                  />
+                )}
+
                 <input
                     type="text"
                     placeholder="Title your entry..."
@@ -929,28 +1028,13 @@ export const CreateNote: React.FC = () => {
                   onFocusCapture={() => setIsFocused(true)}
                   onBlurCapture={() => setIsFocused(false)}
                 >
-                    <div className="max-w-prose mx-auto font-serif leading-loose relative">
+                    <div className="mx-auto max-w-[70ch] font-serif leading-loose relative">
                       <Editor 
                           value={content} 
                           onChange={setContent} 
                           placeholder={activePlaceholder || (id ? "Continue writing..." : "Start typing... or click ✨ for a spark.")}
-                          className="text-[17px] text-gray-text min-h-[400px]"
+                          className="text-[18px] text-gray-text min-h-[400px]"
                       />
-                      {(!content || content === '<p><br></p>') && !id && (
-                         <Button
-                            variant="ghost"
-                            size="sm"
-                            className="absolute -left-12 top-0 opacity-40 hover:opacity-100 transition-opacity"
-                            onClick={() => {
-                               const promptsList = dynamicPrompts.length > 0 ? dynamicPrompts : DEFAULT_PROMPTS;
-                               const nextIdx = (promptIndex + 1) % promptsList.length;
-                               setPromptIndex(nextIdx);
-                               setActivePlaceholder(promptsList[nextIdx]);
-                            }}
-                         >
-                            <Sparkles size={18} className="text-blue" />
-                         </Button>
-                      )}
                     </div>
                 </div>
 
@@ -977,51 +1061,13 @@ export const CreateNote: React.FC = () => {
                       </div>
                     ) : (
                       tasks.map((task) => (
-                        <div 
+                        <TaskRow
                           key={task.id} 
-                          className={`group flex items-center gap-2 sm:gap-4 p-3 sm:p-4 rounded-[24px] border-2 transition-all duration-500 ease-out ${
-                            task.completed 
-                              ? 'border-border bg-gray-50/30 opacity-50 scale-[0.98]' 
-                              : 'border-border bg-white shadow-sm hover:border-blue/30 scale-100'
-                          }`}
-                        >
-                          <button 
-                            onClick={() => toggleTask(task.id)}
-                            className={`h-6 w-6 shrink-0 rounded-lg border-2 flex items-center justify-center transition-all duration-300 ${
-                              task.completed 
-                                ? 'bg-blue border-blue text-white shadow-[0_0_10px_rgba(28,176,246,0.5)]' 
-                                : 'border-border text-transparent hover:border-blue/50'
-                            }`}
-                          >
-                            <Check size={14} strokeWidth={3} className={`transition-transform duration-300 ${task.completed ? 'scale-100' : 'scale-0'}`} />
-                          </button>
-                          
-                          <input 
-                            type="text"
-                            value={task.text}
-                            onChange={(e) => updateTask(task.id, { text: e.target.value })}
-                            readOnly={task.completed}
-                            placeholder="Your Task"
-                            className={`flex-1 min-w-0 bg-transparent border-none focus:ring-0 text-[14px] px-1 font-bold text-gray-text placeholder:text-border transition-all duration-500 ${
-                              task.completed ? 'line-through text-gray-nav cursor-default' : ''
-                            }`}
-                          />
-
-                          <div className={`flex shrink-0 items-center gap-1 sm:gap-2 transition-all duration-300 ${task.completed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-                            <input 
-                              type="date"
-                              value={task.dueDate || ''}
-                              onChange={(e) => updateTask(task.id, { dueDate: e.target.value })}
-                              className="text-[11px] font-bold text-gray-nav bg-gray-50 border-none rounded-lg p-1 focus:ring-0"
-                            />
-                            <button 
-                              onClick={() => removeTask(task.id)}
-                              className="p-2 rounded-xl text-gray-nav hover:text-red hover:bg-red/5 transition-all"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          </div>
-                        </div>
+                          task={task}
+                          updateTask={updateTask}
+                          toggleTask={toggleTask}
+                          removeTask={removeTask}
+                        />
                       ))
                     )}
                   </div>
@@ -1157,7 +1203,7 @@ export const CreateNote: React.FC = () => {
             </div>
           </div>
         </motion.div>
-      </div>
+      </AnimatePresence>
     </div>
   );
 };
