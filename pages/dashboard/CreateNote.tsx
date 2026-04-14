@@ -822,7 +822,7 @@ export const CreateNote: React.FC = () => {
                         <span>{new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                     </div>
 
-                    <div className="grid w-full grid-cols-4 items-center gap-1.5 sm:gap-3 md:flex md:w-auto md:flex-wrap">
+                    <div className="flex w-full items-center gap-2 overflow-x-auto no-scrollbar pb-2 sm:pb-0 sm:gap-3 md:w-auto md:flex-wrap">
                        <button
                         type="button"
                         onClick={cycleSparkPrompt}
@@ -848,12 +848,12 @@ export const CreateNote: React.FC = () => {
                             {mood ? (
                               <>
                                 {React.createElement(moods.find(m => m.id === mood)?.icon || Smile, { size: 16 })}
-                                <span className="hidden sm:inline">{mood}</span>
+                                <span className="inline">{mood}</span>
                               </>
                             ) : (
                               <>
                                 <Smile size={16} />
-                                <span className="hidden sm:inline">Mood</span>
+                                <span className="inline">Mood</span>
                               </>
                             )}
                           </button>
@@ -905,7 +905,7 @@ export const CreateNote: React.FC = () => {
                             className={`w-full chooser-chip ${tags.length > 0 ? 'active' : ''}`}
                           >
                             <TagIcon size={16} />
-                            <span className="hidden sm:inline">{tags.length > 0 ? `${tags.length} Tags` : 'Tags'}</span>
+                            <span className="inline">{tags.length > 0 ? `${tags.length} Tags` : 'Tags'}</span>
                           </button>
 
                           <AnimatePresence>
@@ -969,13 +969,13 @@ export const CreateNote: React.FC = () => {
 
                        <label className="chooser-chip cursor-pointer w-full md:w-auto">
                           <Paperclip size={16} />
-                          <span className="hidden sm:inline">ATTACH</span>
+                          <span className="inline">ATTACH</span>
                           <input type="file" multiple className="hidden" onChange={handleAttachmentUpload} />
                        </label>
                        {!imagePreview && (
                           <label className="chooser-chip cursor-pointer w-full md:w-auto">
                              <ImageIcon size={16} />
-                             <span className="hidden sm:inline">COVER</span>
+                             <span className="inline">COVER</span>
                              <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
                           </label>
                        )}
