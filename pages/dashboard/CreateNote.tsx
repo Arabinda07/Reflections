@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Loader2, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Meh, Frown, Sun, Cloud, Moon, Heart, Brain, Coffee, MessageSquare, Tag as TagIcon, CheckCircle2, Check, RefreshCw, CheckSquare, Square, Plus, Trash2, Eye, EyeOff, ListTodo } from 'lucide-react';
+import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Loader2, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Meh, Frown, Sun, Cloud, Moon, Heart, Brain, Coffee, MessageSquare, Tag as TagIcon, CheckCircle2, Check, RefreshCw, CheckSquare, Square, Plus, Trash2, Eye, EyeOff, ListTodo, Headphones, Wind, Play, Pause, Volume2 } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { Button } from '../../components/ui/Button';
 import { Editor } from '../../components/ui/Editor';
 import { noteService } from '../../services/noteService';
@@ -60,6 +61,14 @@ export const CreateNote: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   
   // New UI states
+  const [isBreathing, setIsBreathing] = useState(!id);
+  const [isReleasing, setIsReleasing] = useState(false);
+  const [promptIndex, setPromptIndex] = useState(0);
+  const [isAudioOpen, setIsAudioOpen] = useState(false);
+  const [activeTrack, setActiveTrack] = useState<{name: string, url: string} | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
   const [isMoodOpen, setIsMoodOpen] = useState(false);
   const [isTagsOpen, setIsTagsOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -78,6 +87,15 @@ export const CreateNote: React.FC = () => {
       isUnmounted.current = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (isBreathing) {
+      const timer = setTimeout(() => {
+        setIsBreathing(false);
+      }, 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [isBreathing]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -444,7 +462,29 @@ export const CreateNote: React.FC = () => {
   };
 
   const toggleTask = (taskId: string) => {
-    setTasks(tasks.map(t => t.id === taskId ? { ...t, completed: !t.completed } : t));
+    setTasks(tasks.map(t => {
+      if (t.id === taskId) {
+        const newCompleted = !t.completed;
+        if (newCompleted) {
+          confetti({
+            particleCount: 80,
+            spread: 60,
+            origin: { y: 0.8 },
+            colors: ['#1CB0F6', '#58CC02', '#FF9600']
+          });
+        }
+        return { ...t, completed: newCompleted };
+      }
+      return t;
+    }));
+  };
+
+  const handleRelease = () => {
+    if (isReleasing) return;
+    setIsReleasing(true);
+    setTimeout(() => {
+      navigate(RoutePath.NOTES);
+    }, 1500);
   };
 
   if (loading) {
@@ -525,6 +565,34 @@ export const CreateNote: React.FC = () => {
 
   return (
     <div className="mx-auto max-w-5xl animate-in fade-in duration-500 pb-20 px-4 md:px-10">
+      <AnimatePresence>
+        {isBreathing && (
+           <motion.div 
+             initial={{ opacity: 0 }}
+             animate={{ opacity: 1 }}
+             exit={{ opacity: 0 }}
+             transition={{ duration: 0.8 }}
+             className="fixed inset-0 z-[300] bg-white flex flex-col items-center justify-center p-4"
+           >
+              <motion.div 
+                 initial={{ scale: 0.8 }}
+                 animate={{ scale: [0.8, 1.2, 0.8] }}
+                 transition={{ duration: 3.5, ease: "easeInOut" }}
+                 className="w-48 h-48 rounded-full bg-blue/10 border-4 border-blue/20 flex items-center justify-center mb-8"
+              >
+                  <Wind size={40} className="text-blue/50" />
+              </motion.div>
+              <motion.p 
+                 initial={{ opacity: 0 }}
+                 animate={{ opacity: [0, 1, 0] }}
+                 transition={{ duration: 3.5, ease: "easeInOut" }}
+                 className="text-[18px] font-display text-gray-nav lowercase tracking-wide"
+              >
+                 take a deep breath...
+              </motion.p>
+           </motion.div>
+        )}
+      </AnimatePresence>
       {limitReachedOverlay}
       <nav className={`sticky top-4 z-50 mb-8 flex items-center justify-between rounded-2xl border-2 border-border bg-white/90 px-4 py-3 shadow-[0_4px_0_0_#E5E5E5] backdrop-blur-2xl transition-all duration-500 ${isDimmed ? 'opacity-40 hover:opacity-100' : 'opacity-100'}`}>
         <div className="flex items-center gap-3">
@@ -550,6 +618,69 @@ export const CreateNote: React.FC = () => {
           >
             {isFocusModeManual ? <Eye size={16} /> : <EyeOff size={16} />}
             <span className="hidden sm:inline">Focus</span>
+          </Button>
+
+          {/* Audio Player Popover */}
+          <div className="relative">
+             <Button variant="ghost" size="sm" onClick={() => setIsAudioOpen(!isAudioOpen)} className={`mr-2 hidden sm:flex text-gray-nav transition-all ${isPlaying ? 'text-blue bg-blue/5' : ''}`}>
+                 <Headphones size={16} />
+             </Button>
+             <AnimatePresence>
+                {isAudioOpen && (
+                   <motion.div 
+                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                     animate={{ opacity: 1, y: 0, scale: 1 }}
+                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                     className="absolute top-full right-0 mt-2 z-[100] p-4 bg-white border-2 border-border rounded-2xl shadow-xl w-[200px] liquid-glass"
+                   >
+                      <h4 className="text-[10px] uppercase font-black tracking-widest text-gray-nav mb-3">Ambient Focus</h4>
+                      <div className="space-y-2">
+                         {[
+                           { name: 'Soft Rain', url: 'https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3?filename=rain-and-thunder-16705.mp3' },
+                           { name: 'Deep Focus', url: 'https://cdn.pixabay.com/download/audio/2022/02/07/audio_67eb2ea238.mp3?filename=lofi-study-112191.mp3' },
+                           { name: 'Lo-Fi Wind', url: 'https://cdn.pixabay.com/download/audio/2022/08/31/audio_14115f5cff.mp3?filename=calm-winds-118836.mp3' }
+                         ].map(track => {
+                            const isThisPlaying = activeTrack?.name === track.name && isPlaying;
+                            return (
+                               <button 
+                                 key={track.name}
+                                 onClick={() => {
+                                    if (activeTrack?.name === track.name) {
+                                       if (isPlaying) { audioRef.current?.pause(); setIsPlaying(false); }
+                                       else { audioRef.current?.play(); setIsPlaying(true); }
+                                    } else {
+                                       setActiveTrack(track);
+                                       setIsPlaying(true);
+                                       if (audioRef.current) {
+                                          audioRef.current.src = track.url;
+                                          audioRef.current.play();
+                                       }
+                                    }
+                                 }}
+                                 className={`w-full flex items-center justify-between p-2 rounded-xl text-[12px] font-bold transition-all ${isThisPlaying ? 'bg-blue/10 text-blue' : 'hover:bg-gray-50 text-gray-text'}`}
+                               >
+                                  <span>{track.name}</span>
+                                  {isThisPlaying ? <Pause size={14} /> : <Play size={14} />}
+                               </button>
+                            );
+                         })}
+                      </div>
+                   </motion.div>
+                )}
+             </AnimatePresence>
+          </div>
+
+          <audio ref={audioRef} loop />
+
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleRelease} 
+            className="hidden sm:flex border-2 border-transparent text-gray-nav hover:bg-gray-50 hover:text-gray-text transition-all mr-2" 
+            disabled={isReleasing}
+          >
+              <Wind className="mr-2 h-3.5 w-3.5" />
+              <span>RELEASE</span>
           </Button>
 
           <AnimatePresence mode="wait">
@@ -798,13 +929,28 @@ export const CreateNote: React.FC = () => {
                   onFocusCapture={() => setIsFocused(true)}
                   onBlurCapture={() => setIsFocused(false)}
                 >
-                    <div className="max-w-prose mx-auto font-serif leading-loose">
+                    <div className="max-w-prose mx-auto font-serif leading-loose relative">
                       <Editor 
                           value={content} 
                           onChange={setContent} 
-                          placeholder={activePlaceholder || (id ? "Continue writing..." : "Start writing your thoughts here... let your mind flow freely.")}
+                          placeholder={activePlaceholder || (id ? "Continue writing..." : "Start typing... or click ✨ for a spark.")}
                           className="text-[17px] text-gray-text min-h-[400px]"
                       />
+                      {(!content || content === '<p><br></p>') && !id && (
+                         <Button
+                            variant="ghost"
+                            size="sm"
+                            className="absolute -left-12 top-0 opacity-40 hover:opacity-100 transition-opacity"
+                            onClick={() => {
+                               const promptsList = dynamicPrompts.length > 0 ? dynamicPrompts : DEFAULT_PROMPTS;
+                               const nextIdx = (promptIndex + 1) % promptsList.length;
+                               setPromptIndex(nextIdx);
+                               setActivePlaceholder(promptsList[nextIdx]);
+                            }}
+                         >
+                            <Sparkles size={18} className="text-blue" />
+                         </Button>
+                      )}
                     </div>
                 </div>
 
@@ -1010,74 +1156,7 @@ export const CreateNote: React.FC = () => {
                 </p>
             </div>
           </div>
-        </div>
-
-        <div className={`lg:col-span-4 space-y-6 lg:sticky lg:top-24 lg:self-start transition-all duration-500 ${isFocused ? 'opacity-30 hover:opacity-100' : 'opacity-100'}`}>
-          <div className="rounded-[32px] border-2 border-border bg-white p-6 shadow-[0_4px_0_0_#E5E5E5] liquid-glass">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-[12px] font-extrabold text-gray-text uppercase tracking-widest flex items-center gap-2">
-                <Brain size={16} className="text-blue" />
-                Journaling Prompts
-              </h3>
-              <button 
-                onClick={() => generateDynamicPrompts(mood)}
-                disabled={isGeneratingPrompts}
-                className="p-2 rounded-xl hover:bg-blue/5 text-gray-nav hover:text-blue transition-colors disabled:opacity-50"
-                title="Refresh Prompts"
-              >
-                <RefreshCw size={14} className={isGeneratingPrompts ? 'animate-spin' : ''} />
-              </button>
-            </div>
-            <div className="space-y-3 relative">
-              {isGeneratingPrompts && (
-                <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-[2px] flex items-center justify-center rounded-2xl animate-in fade-in duration-300">
-                  <div className="flex flex-col items-center gap-2">
-                    <Loader2 size={24} className="animate-spin text-blue" />
-                    <span className="text-[10px] font-black text-blue uppercase tracking-widest">Generating...</span>
-                  </div>
-                </div>
-              )}
-              {(dynamicPrompts.length > 0 ? dynamicPrompts : DEFAULT_PROMPTS.slice(0, 4)).map((prompt, i) => (
-                <button
-                  key={i}
-                  onClick={() => {
-                    setActivePlaceholder(prompt);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                    setTimeout(() => {
-                      const editorEl = document.querySelector('.ql-editor') as HTMLElement;
-                      if (editorEl) editorEl.focus();
-                    }, 100);
-                  }}
-                  className="w-full text-left p-4 rounded-2xl border-2 border-border bg-white text-[13px] text-gray-light font-bold hover:border-blue/30 hover:bg-blue/5 hover:text-blue transition-all duration-200 leading-relaxed shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] animate-in fade-in slide-in-from-right-2 duration-300"
-                  style={{ animationDelay: `${i * 50}ms` }}
-                >
-                  {prompt}
-                </button>
-              ))}
-            </div>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="w-full mt-4 text-[10px] font-extrabold text-blue hover:bg-blue/5"
-              onClick={() => generateDynamicPrompts(mood)}
-              disabled={isGeneratingPrompts}
-            >
-              REFRESH PROMPTS
-            </Button>
-          </div>
-
-          <div className="rounded-[32px] border-2 border-blue/20 bg-gradient-to-br from-blue to-blue/80 p-8 text-white shadow-3d-blue">
-            <Heart size={24} className="mb-4 opacity-80" />
-            <h3 className="font-display text-[20px] mb-2 lowercase">self-care tip</h3>
-            <p className="text-[15px] text-white/90 leading-relaxed font-medium">
-              Take 5 deep breaths before you start writing. It helps clear your mind and focus on your feelings.
-            </p>
-            <div className="mt-6 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest opacity-60">
-              <Coffee size={14} />
-              <span>Mindfulness</span>
-            </div>
-          </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
