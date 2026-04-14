@@ -298,7 +298,7 @@ export const Insights: React.FC = () => {
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-3">
-                <h2 className="text-3xl font-display text-gray-text lowercase tracking-tight dark:text-slate-50">AI Deep Reflection</h2>
+                <h2 className="text-3xl font-display text-gray-text lowercase tracking-tight dark:text-slate-50">Deep Reflection</h2>
                 {isPro ? (
                   <div className="inline-flex items-center gap-1.5 rounded-full border-2 border-amber-200 bg-amber-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-amber-600 dark:border-amber-400/20 dark:bg-amber-400/10 dark:text-amber-100">
                     <Crown size={12} /> PRO
@@ -309,7 +309,7 @@ export const Insights: React.FC = () => {
                   </div>
                 )}
               </div>
-              <p className="mt-2 max-w-2xl text-[14px] font-medium leading-relaxed text-gray-light dark:text-slate-400">
+              <p className="mt-2 text-right text-[14px] font-medium leading-relaxed text-gray-light dark:text-slate-400">
                 A calm, grounded reading of the patterns your notes are holding right now.
               </p>
             </div>
@@ -365,11 +365,11 @@ export const Insights: React.FC = () => {
               {!hasEnoughNotes ? (
                 <><MessageSquare size={18} className="mr-2" /> WRITE 3 NOTES TO UNLOCK</>
               ) : reflectionText && isPro ? (
-                <><Sparkles size={18} className="mr-2" /> GENERATE NEW REFLECTION</>
+                <><Sparkles size={18} className="mr-2" /> GENERATE REFLECTION</>
               ) : isFreeAvailable ? (
-                <><Sparkles size={18} className="mr-2" /> GENERATE REFLECTION (1 FREE)</>
+                <><Sparkles size={18} className="mr-2" /> GENERATE REFLECTION</>
               ) : (
-                <><Sparkles size={18} className="mr-2" /> GENERATE NEW REFLECTION</>
+                <><Sparkles size={18} className="mr-2" /> GENERATE REFLECTION</>
               )}
             </Button>
           )}
