@@ -33,16 +33,12 @@ export const FAQ: React.FC = () => {
   }, []);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-body selection:bg-green/30 selection:text-green-hover pb-32">
+    <div className="relative min-h-screen overflow-hidden bg-white dark:bg-[#121212] selection:bg-green/30 selection:text-green-hover pb-32 transition-colors duration-300">
       
-      {/* Ambient Emotional Atmosphere Background */}
+      {/* Ambient Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <motion.div 
-          style={{ y: yBase }}
-          className="absolute top-[0%] right-[-10%] w-[600px] h-[600px] bg-green/5 blur-[120px] rounded-full" 
-        />
-        <div className="absolute top-[40%] left-[-15%] w-[800px] h-[800px] bg-blue/5 blur-[150px] rounded-full animate-pulse" style={{ animationDuration: '8s' }} />
-        <div className="absolute bottom-[-10%] right-[10%] w-[500px] h-[500px] bg-purple-500/5 blur-[120px] rounded-full animate-pulse" style={{ animationDuration: '12s' }} />
+        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-green/5 blur-[120px] rounded-full animate-pulse" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-blue/5 blur-[120px] rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
       </div>
 
       <div className="relative z-10 w-full max-w-[1440px] mx-auto px-4 md:px-6 pt-24 pb-16">

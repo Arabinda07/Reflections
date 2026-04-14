@@ -61,7 +61,7 @@ export const DashboardLayout: React.FC = () => {
   const navItems = isAuthenticated ? authNavItems : guestNavItems;
 
   return (
-    <div className="min-h-screen bg-white font-sans selection:bg-green/30 selection:text-green-hover">
+    <div className="min-h-screen bg-white dark:bg-[#121212] font-sans selection:bg-green/30 selection:text-green-hover transition-colors duration-300">
       {/* Fixed Navbar */}
       <nav className="fixed top-0 left-0 right-0 h-[64px] border-b-2 border-border z-[100] flex justify-center liquid-glass">
         <div className="w-full max-w-[1440px] px-4 md:px-10 flex items-center justify-between">

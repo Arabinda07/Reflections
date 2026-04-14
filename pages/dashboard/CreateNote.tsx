@@ -4,7 +4,7 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Loader2, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Meh, Frown, Sun, Cloud, Moon, Heart, Brain, Coffee, MessageSquare, Tag as TagIcon, CheckCircle2, Check, CheckSquare, Square, Plus, Trash2, Eye, EyeOff, ListTodo, Wind, Target, Mic, MicOff, Music, Play, Pause, Volume2 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
-import { Editor } from '../../components/ui/Editor';
+import { Editor, EditorRef } from '../../components/ui/Editor';
 import { noteService } from '../../services/noteService';
 import { storageService } from '../../services/storageService';
 import { RoutePath, NoteAttachment, Task } from '../../types';
@@ -200,7 +200,7 @@ export const CreateNote: React.FC = () => {
   const musicRef = useRef<HTMLDivElement>(null);
   
   const lastSavedRef = useRef({ title: '', content: '', mood: undefined as string | undefined, tags: [] as string[], tasks: [] as Task[] });
-  const editorRef = useRef<HTMLDivElement>(null);
+  const editorInstanceRef = useRef<EditorRef>(null);
   const isUnmounted = useRef(false);
   const shouldReduceMotion = useReducedMotion();
   const releaseEase = [0.4, 0, 0.2, 1];
@@ -304,17 +304,22 @@ export const CreateNote: React.FC = () => {
 
   const handleBreathingComplete = useCallback(() => {
     setIsBreathing(false);
+    // Focus the editor once breathing is complete
+    setTimeout(() => {
+      editorInstanceRef.current?.focus();
+    }, 100);
   }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (moodRef.current && !moodRef.current.contains(event.target as Node)) {
+      const target = event.target as Element;
+      if (moodRef.current && !moodRef.current.contains(target) && !target.closest('.mood-popup-container')) {
         setIsMoodOpen(false);
       }
-      if (tagsRef.current && !tagsRef.current.contains(event.target as Node)) {
+      if (tagsRef.current && !tagsRef.current.contains(target) && !target.closest('.tags-popup-container')) {
         setIsTagsOpen(false);
       }
-      if (musicRef.current && !musicRef.current.contains(event.target as Node)) {
+      if (musicRef.current && !musicRef.current.contains(target) && !target.closest('.music-popup-container')) {
         setIsMusicOpen(false);
       }
     };
@@ -363,6 +368,11 @@ export const CreateNote: React.FC = () => {
             };
             // Generate prompts based on existing mood
             generateDynamicPrompts(note.mood);
+            
+            // Focus editor for existing note
+            setTimeout(() => {
+              editorInstanceRef.current?.focus();
+            }, 500);
           } else {
              navigate(RoutePath.NOTES);
           }
@@ -856,7 +866,7 @@ export const CreateNote: React.FC = () => {
                       initial={{ opacity: 0, y: 15, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 15, scale: 0.95 }}
-                      className="pointer-events-auto p-5 bg-white border-2 border-border rounded-[32px] shadow-2xl w-[calc(100%-32px)] sm:w-[260px] liquid-glass-strong sm:fixed relative mt-20 sm:mt-0"
+                      className="music-popup-container pointer-events-auto p-5 bg-white border-2 border-border rounded-[32px] shadow-2xl w-[calc(100%-32px)] sm:w-[260px] liquid-glass-strong sm:fixed relative mb-4 sm:mb-0"
                       style={window.innerWidth >= 640 ? {
                         top: musicRef.current ? musicRef.current.getBoundingClientRect().bottom + window.scrollY + 12 : 0,
                         left: musicRef.current ? musicRef.current.getBoundingClientRect().left - 100 + window.scrollX : 0
@@ -1022,19 +1032,17 @@ export const CreateNote: React.FC = () => {
                           {createPortal(
                             <AnimatePresence>
                               {isMoodOpen && (
-                                <div className="fixed inset-0 z-[10000] pointer-events-none flex flex-col items-center sm:items-start pt-32 sm:pt-0">
+                                <div className="fixed inset-0 z-[10000] pointer-events-none flex items-end justify-center sm:items-start sm:justify-start">
                                   <motion.div 
                                     initial={{ opacity: 0, y: 15, scale: 0.95 }}
                                     animate={{ opacity: 1, y: 0, scale: 1 }}
                                     exit={{ opacity: 0, y: 15, scale: 0.95 }}
                                     transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-                                    className="pointer-events-auto liquid-glass-strong border-2 border-border rounded-[32px] p-6 shadow-[0_6px_0_0_#E5E5E5] w-[calc(100%-32px)] sm:w-[280px] sm:fixed relative"
+                                    className="mood-popup-container pointer-events-auto liquid-glass-strong border-2 border-border rounded-[32px] p-6 shadow-2xl w-[calc(100%-32px)] sm:w-[280px] sm:fixed relative mb-4 sm:mb-0"
                                     style={window.innerWidth >= 640 ? {
                                       top: moodRef.current ? moodRef.current.getBoundingClientRect().bottom + window.scrollY + 12 : 0,
                                       left: moodRef.current ? moodRef.current.getBoundingClientRect().left + window.scrollX : 0
-                                    } : {
-                                      top: moodRef.current ? moodRef.current.getBoundingClientRect().bottom + window.scrollY + 12 : 120
-                                    }}
+                                    } : {}}
                                   >
                                     <div className="flex items-center justify-between mb-4 px-1">
                                       <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav">How are you?</span>
@@ -1080,19 +1088,17 @@ export const CreateNote: React.FC = () => {
                           {createPortal(
                             <AnimatePresence>
                               {isTagsOpen && (
-                                <div className="fixed inset-0 z-[10000] pointer-events-none flex flex-col items-center sm:items-start pt-32 sm:pt-0">
+                                <div className="fixed inset-0 z-[10000] pointer-events-none flex items-end justify-center sm:items-start sm:justify-start">
                                   <motion.div 
                                     initial={{ opacity: 0, y: 15, scale: 0.95 }}
                                     animate={{ opacity: 1, y: 0, scale: 1 }}
                                     exit={{ opacity: 0, y: 15, scale: 0.95 }}
                                     transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-                                    className="pointer-events-auto liquid-glass-strong border-2 border-border rounded-[32px] p-6 shadow-[0_6px_0_0_#E5E5E5] w-[calc(100%-32px)] sm:w-[320px] sm:fixed relative"
+                                    className="tags-popup-container pointer-events-auto liquid-glass-strong border-2 border-border rounded-[32px] p-6 shadow-2xl w-[calc(100%-32px)] sm:w-[320px] sm:fixed relative mb-4 sm:mb-0"
                                     style={window.innerWidth >= 640 ? {
                                       top: tagsRef.current ? tagsRef.current.getBoundingClientRect().bottom + window.scrollY + 12 : 0,
                                       left: tagsRef.current ? tagsRef.current.getBoundingClientRect().left - 40 + window.scrollX : 0
-                                    } : {
-                                      top: tagsRef.current ? tagsRef.current.getBoundingClientRect().bottom + window.scrollY + 12 : 120
-                                    }}
+                                    } : {}}
                                   >
                                     <div className="mb-4">
                                       <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav block mb-3">Add Tags</span>
@@ -1170,7 +1176,6 @@ export const CreateNote: React.FC = () => {
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
                     className="w-full border-none bg-transparent text-3xl sm:text-4xl font-display text-gray-text placeholder:text-border focus:outline-none focus:ring-0 p-0 mb-12 tracking-tight leading-tight lowercase"
-                    autoFocus
                 />
                 
                 <div 
@@ -1180,6 +1185,7 @@ export const CreateNote: React.FC = () => {
                 >
                     <div className="mx-auto max-w-[82ch] font-sans leading-[1.8] relative">
                       <Editor 
+                          ref={editorInstanceRef}
                           value={content} 
                           onChange={setContent} 
                           placeholder={activePlaceholder || (id ? "Continue writing..." : "Start typing... or click ✨ below for a spark.")}

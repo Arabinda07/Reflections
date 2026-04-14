@@ -18,12 +18,11 @@ export const Landing: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-white selection:bg-green/30 selection:text-green-hover">
+    <div className="relative min-h-screen overflow-hidden bg-white dark:bg-[#121212] selection:bg-green/30 selection:text-green-hover transition-colors duration-300">
       {/* Ambient Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-green/5 blur-[120px] rounded-full animate-pulse" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-blue/5 blur-[120px] rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
-        <div className="absolute top-[40%] left-[20%] w-[300px] h-[300px] bg-purple-500/5 blur-[100px] rounded-full animate-pulse" style={{ animationDelay: '4s' }} />
       </div>
 
       <div className="relative z-10 flex flex-col items-center px-4 sm:px-6 py-16 sm:py-20 md:py-32">

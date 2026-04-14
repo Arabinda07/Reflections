@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 
 interface EditorProps {
   value: string;
@@ -7,12 +7,24 @@ interface EditorProps {
   className?: string;
 }
 
+export interface EditorRef {
+  focus: () => void;
+}
+
 // Access the global Quill object from CDN
 declare const Quill: any;
 
-export const Editor: React.FC<EditorProps> = ({ value, onChange, placeholder, className = '' }) => {
+export const Editor = forwardRef<EditorRef, EditorProps>(({ value, onChange, placeholder, className = '' }, ref) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const quillInstance = useRef<any>(null);
+
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      if (quillInstance.current) {
+        quillInstance.current.focus();
+      }
+    }
+  }));
 
   useEffect(() => {
     if (editorRef.current && !quillInstance.current) {
@@ -77,4 +89,4 @@ export const Editor: React.FC<EditorProps> = ({ value, onChange, placeholder, cl
       <div ref={editorRef} className="border-none" />
     </div>
   );
-};
+});
