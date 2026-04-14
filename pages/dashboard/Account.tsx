@@ -302,9 +302,9 @@ export const Account: React.FC = () => {
                                         <p className="text-[12px] font-bold text-gray-nav uppercase">Enhanced security</p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 border border-border">
-                                    <span className="h-2 w-2 rounded-full bg-gray-400" />
-                                    <span className="text-[10px] font-black text-gray-nav uppercase">Coming Soon</span>
+                                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/50 backdrop-blur-md border-2 border-border shadow-sm">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-gray-nav/40" />
+                                    <span className="text-[9px] font-black text-gray-nav uppercase tracking-widest">Coming Soon</span>
                                 </div>
                             </div>
                         </div>

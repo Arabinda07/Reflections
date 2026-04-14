@@ -1051,31 +1051,34 @@ export const CreateNote: React.FC = () => {
                                     }}
                                   >
                                     <div className="flex items-center justify-between mb-4 px-1">
-                                  <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav">How are you?</span>
-                                  {mood && <button onClick={() => handleMoodSelect(mood)} className="text-[10px] font-bold text-red uppercase">Clear</button>}
+                                      <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav">How are you?</span>
+                                      {mood && <button onClick={() => handleMoodSelect(mood)} className="text-[10px] font-bold text-red uppercase">Clear</button>}
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-2">
+                                      {moods.map((m) => {
+                                        const Icon = m.icon;
+                                        const isSelected = mood === m.id;
+                                        return (
+                                          <button
+                                            key={m.id}
+                                            onClick={() => {
+                                              handleMoodSelect(m.id);
+                                              setIsMoodOpen(false);
+                                            }}
+                                            className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all ${isSelected ? `${m.color} border-current` : 'border-transparent hover:bg-gray-50 text-gray-nav'}`}
+                                          >
+                                            <Icon size={20} />
+                                            <span className="mt-1 text-[9px] font-bold uppercase">{m.label}</span>
+                                          </button>
+                                        );
+                                      })}
+                                    </div>
+                                  </motion.div>
                                 </div>
-                                <div className="grid grid-cols-3 gap-2">
-                                  {moods.map((m) => {
-                                    const Icon = m.icon;
-                                    const isSelected = mood === m.id;
-                                    return (
-                                      <button
-                                        key={m.id}
-                                        onClick={() => {
-                                          handleMoodSelect(m.id);
-                                          setIsMoodOpen(false);
-                                        }}
-                                        className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all ${isSelected ? `${m.color} border-current` : 'border-transparent hover:bg-gray-50 text-gray-nav'}`}
-                                      >
-                                        <Icon size={20} />
-                                        <span className="mt-1 text-[9px] font-bold uppercase">{m.label}</span>
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
+                              )}
+                            </AnimatePresence>,
+                            document.body
+                          )}
                        </div>
 
                        {/* Progressive Disclosure: Tags Button */}
@@ -1106,53 +1109,56 @@ export const CreateNote: React.FC = () => {
                                     }}
                                   >
                                     <div className="mb-4">
-                                  <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav block mb-3">Add Tags</span>
-                                  <div className="relative">
-                                    <TagIcon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-nav" />
-                                    <input 
-                                      type="text"
-                                      placeholder="Type and press Enter..."
-                                      value={tagInput}
-                                      onChange={(e) => setTagInput(e.target.value)}
-                                      onKeyDown={handleAddTag}
-                                      className="w-full pl-9 pr-4 py-2 rounded-xl border-2 border-border bg-white text-[13px] font-bold focus:border-blue focus:outline-none transition-all"
-                                    />
-                                  </div>
-                                </div>
+                                      <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav block mb-3">Add Tags</span>
+                                      <div className="relative">
+                                        <TagIcon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-nav" />
+                                        <input 
+                                          type="text"
+                                          placeholder="Type and press Enter..."
+                                          value={tagInput}
+                                          onChange={(e) => setTagInput(e.target.value)}
+                                          onKeyDown={handleAddTag}
+                                          className="w-full pl-9 pr-4 py-2 rounded-xl border-2 border-border bg-white text-[13px] font-bold focus:border-blue focus:outline-none transition-all"
+                                        />
+                                      </div>
+                                    </div>
 
-                                {suggestedTags.length > 0 && (
-                                  <div className="mb-4">
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-blue block mb-2">AI Suggestions</span>
-                                    <div className="flex flex-wrap gap-2">
-                                      {suggestedTags.map(tag => (
-                                        <button 
-                                          key={tag}
-                                          onClick={() => {
-                                            if (!tags.includes(tag)) setTags([...tags, tag]);
-                                            setSuggestedTags(prev => prev.filter(t => t !== tag));
-                                          }}
-                                          className="px-2 py-1 rounded-lg bg-blue/5 border border-blue/10 text-blue text-[10px] font-bold hover:bg-blue/10 transition-all"
-                                        >
-                                          +{tag}
-                                        </button>
+                                    {suggestedTags.length > 0 && (
+                                      <div className="mb-4">
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-blue block mb-2">AI Suggestions</span>
+                                        <div className="flex flex-wrap gap-2">
+                                          {suggestedTags.map(tag => (
+                                            <button 
+                                              key={tag}
+                                              onClick={() => {
+                                                if (!tags.includes(tag)) setTags([...tags, tag]);
+                                                setSuggestedTags(prev => prev.filter(t => t !== tag));
+                                              }}
+                                              className="px-2 py-1 rounded-lg bg-blue/5 border border-blue/10 text-blue text-[10px] font-bold hover:bg-blue/10 transition-all"
+                                            >
+                                              +{tag}
+                                            </button>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    <div className="flex flex-wrap gap-2 max-h-[120px] overflow-y-auto pr-1 custom-scrollbar">
+                                      {tags.map(tag => (
+                                        <span key={tag} className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-gray-100 border border-border text-gray-text text-[11px] font-bold">
+                                          #{tag}
+                                          <button onClick={() => removeTag(tag)} className="hover:text-red transition-colors">
+                                            <X size={10} />
+                                          </button>
+                                        </span>
                                       ))}
                                     </div>
-                                  </div>
-                                )}
-
-                                <div className="flex flex-wrap gap-2 max-h-[120px] overflow-y-auto pr-1 custom-scrollbar">
-                                  {tags.map(tag => (
-                                    <span key={tag} className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-gray-100 border border-border text-gray-text text-[11px] font-bold">
-                                      #{tag}
-                                      <button onClick={() => removeTag(tag)} className="hover:text-red transition-colors">
-                                        <X size={10} />
-                                      </button>
-                                    </span>
-                                  ))}
+                                  </motion.div>
                                 </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
+                              )}
+                            </AnimatePresence>,
+                            document.body
+                          )}
                        </div>
 
                        <label className="group flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-border bg-white px-3 sm:px-4 py-2 text-[10px] sm:text-[11px] font-black uppercase text-gray-nav transition-all hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]">
