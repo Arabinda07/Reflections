@@ -52,7 +52,7 @@ export const DashboardLayout: React.FC = () => {
   return (
     <div className="min-h-screen bg-white font-sans selection:bg-green/30 selection:text-green-hover">
       {/* Fixed Navbar */}
-      <nav className="fixed top-0 left-0 right-0 h-[64px] bg-white/80 border-b-2 border-border z-[100] flex justify-center liquid-glass">
+      <nav className="fixed top-0 left-0 right-0 h-[64px] border-b-2 border-border z-[100] flex justify-center liquid-glass">
         <div className="w-full max-w-[1440px] px-4 md:px-10 flex items-center justify-between">
           {/* Left Side */}
           <div className="flex items-center gap-4">
@@ -82,7 +82,7 @@ export const DashboardLayout: React.FC = () => {
               <button
                 key={item.label}
                 onClick={() => navigate(item.path)}
-                className="px-4 py-2 text-[13px] font-extrabold uppercase tracking-[0.5px] text-gray-nav hover:text-green hover:bg-green/5 rounded-xl transition-all duration-200"
+                className="px-4 py-2 text-[13px] font-extrabold uppercase tracking-[0.5px] text-gray-nav hover:text-green hover:bg-green/5 rounded-xl transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-1"
               >
                 {item.label}
               </button>
@@ -93,7 +93,7 @@ export const DashboardLayout: React.FC = () => {
                 variant="ghost" 
                 size="sm" 
                 onClick={() => logout()}
-                className="text-red hover:bg-red/5"
+                className="text-red hover:bg-red/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red"
               >
                 LOGOUT
               </Button>
@@ -103,6 +103,7 @@ export const DashboardLayout: React.FC = () => {
                   variant="ghost" 
                   size="sm" 
                   onClick={() => navigate(RoutePath.LOGIN)}
+                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
                 >
                   SIGN IN
                 </Button>
@@ -110,6 +111,7 @@ export const DashboardLayout: React.FC = () => {
                   variant="primary" 
                   size="sm" 
                   onClick={() => navigate(RoutePath.SIGNUP)}
+                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green"
                 >
                   SIGN UP
                 </Button>
@@ -121,14 +123,14 @@ export const DashboardLayout: React.FC = () => {
           <div className="md:hidden flex items-center gap-2">
             <button 
               onClick={toggleDarkMode}
-              className="p-2 rounded-xl text-gray-nav hover:text-green hover:bg-green/5 transition-colors"
+              className="p-2 rounded-xl text-gray-nav hover:text-green hover:bg-green/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
               title="Toggle Dark Mode"
             >
               {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
             </button>
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 rounded-xl hover:bg-gray-100 transition-colors z-[110]"
+              className="p-2 rounded-xl text-gray-nav hover:text-green hover:bg-green/5 transition-colors z-[110] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? <X className="text-gray-nav" size={24} /> : <Menu className="text-gray-nav" size={24} />}
@@ -151,7 +153,7 @@ export const DashboardLayout: React.FC = () => {
           {/* Close Button */}
           <button 
             onClick={() => setIsMobileMenuOpen(false)}
-            className="absolute top-4 right-4 p-3 rounded-2xl text-gray-nav hover:text-green hover:bg-green/5 transition-all z-[110] border-2 border-border bg-white shadow-3d-gray active:shadow-none active:translate-y-[2px]"
+            className="absolute top-4 right-4 p-3 rounded-2xl text-gray-nav hover:text-green hover:bg-green/5 transition-all z-[110] border-2 border-border bg-white shadow-3d-gray active:shadow-none active:translate-y-[2px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
             aria-label="Close menu"
           >
             <X size={24} />
@@ -172,7 +174,7 @@ export const DashboardLayout: React.FC = () => {
                     <button
                       key={item.label}
                       onClick={() => handleNavigation(item.path)}
-                      className="w-full p-6 text-left text-[24px] font-black uppercase tracking-widest text-gray-text border-b-2 border-border/50 hover:text-green transition-all active:bg-green/5 rounded-2xl flex items-center justify-between group"
+                      className="w-full p-6 text-left text-[24px] font-black uppercase tracking-widest text-gray-text border-b-2 border-border/50 hover:text-green transition-all active:bg-green/5 rounded-2xl flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset"
                     >
                       <span>{item.label}</span>
                       <ArrowRight className="opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -187,7 +189,7 @@ export const DashboardLayout: React.FC = () => {
                       logout();
                       setIsMobileMenuOpen(false);
                     }}
-                    className="w-full text-red hover:bg-red/5 h-16 font-black uppercase tracking-widest border-2 border-red/10 rounded-2xl"
+                    className="w-full text-red hover:bg-red/5 h-16 font-black uppercase tracking-widest border-2 border-red/10 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-1"
                   >
                     LOGOUT
                   </Button>
@@ -204,7 +206,7 @@ export const DashboardLayout: React.FC = () => {
                   <button
                     key={item.label}
                     onClick={() => handleNavigation(item.path)}
-                    className="w-full p-6 text-left text-[24px] font-black uppercase tracking-widest text-gray-text border-b-2 border-border/50 hover:text-green transition-all active:bg-green/5 rounded-2xl flex items-center justify-between group"
+                    className="w-full p-6 text-left text-[24px] font-black uppercase tracking-widest text-gray-text border-b-2 border-border/50 hover:text-green transition-all active:bg-green/5 rounded-2xl flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset"
                   >
                     <span>{item.label}</span>
                     <ArrowRight className="opacity-0 group-hover:opacity-100 transition-opacity" />

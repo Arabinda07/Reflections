@@ -190,19 +190,25 @@ export const SingleNote: React.FC = () => {
               </div>
             )}
             
-            <div className="mb-8 flex flex-wrap items-center gap-4 text-[11px] font-extrabold uppercase tracking-wider text-gray-nav border-b-2 border-border pb-6">
-              <span className="flex items-center"><Calendar size={14} className="mr-1.5 opacity-70" /> {new Date(note.createdAt).toLocaleDateString()}</span>
-              <span className="flex items-center"><Clock size={14} className="mr-1.5 opacity-70" /> {new Date(note.updatedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+            <div className="mb-8 flex flex-wrap items-center gap-3 border-b-2 border-border pb-6">
+              <span className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue/5 border-2 border-blue/10 text-blue text-[11px] font-extrabold shadow-sm uppercase tracking-wider">
+                <Calendar size={14} /> 
+                {new Date(note.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+              </span>
+              <span className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-green/5 border-2 border-green/10 text-green text-[11px] font-extrabold shadow-sm uppercase tracking-wider">
+                <Clock size={14} /> 
+                {new Date(note.updatedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+              </span>
               {note.mood && (
-                <span className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border-2 border-border text-gray-text shadow-sm">
+                <span className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-purple-500/5 border-2 border-purple-500/10 text-purple-600 text-[11px] font-extrabold shadow-sm uppercase tracking-wider">
                   {getMoodIcon(note.mood)}
-                  <span className="capitalize">{note.mood}</span>
+                  <span>{note.mood}</span>
                 </span>
               )}
             </div>
 
             <div 
-              className="prose prose-zinc prose-lg max-w-prose mx-auto text-gray-text leading-loose font-serif"
+              className="prose prose-zinc prose-lg max-w-prose mx-auto text-gray-text leading-loose font-sans"
               dangerouslySetInnerHTML={{ __html: note.content }}
             />
 
