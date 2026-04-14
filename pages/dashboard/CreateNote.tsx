@@ -823,7 +823,7 @@ export const CreateNote: React.FC = () => {
                        <button
                         type="button"
                         onClick={cycleSparkPrompt}
-                        className="col-span-1 ml-auto flex h-11 w-11 items-center justify-center rounded-2xl border border-sky-100 bg-[linear-gradient(135deg,rgba(239,248,255,0.96),rgba(247,253,255,0.98))] text-blue shadow-[0_4px_0_0_rgba(226,232,240,0.9)] transition-all hover:-translate-y-[1px] hover:border-sky-200 hover:shadow-[0_6px_0_0_rgba(226,232,240,0.9)] active:translate-y-[2px] active:shadow-none dark:border-sky-400/20 dark:bg-[linear-gradient(135deg,rgba(56,189,248,0.16),rgba(15,23,42,0.75))] dark:text-sky-100 dark:shadow-[0_4px_0_0_rgba(15,23,42,0.5)]"
+                        className={`col-span-1 ml-auto chooser-chip !p-2 !w-11 !h-11 ${isGeneratingPrompts ? 'active animate-pulse' : ''}`}
                         title={sparkPrompt}
                         aria-label="Show another daily wellness spark"
                       >
@@ -840,17 +840,17 @@ export const CreateNote: React.FC = () => {
                               setIsMoodOpen(!isMoodOpen);
                               setIsTagsOpen(false);
                             }}
-                            className={`w-full flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] ${mood ? 'bg-blue/5 border-blue text-blue' : 'bg-white border-border text-gray-nav hover:border-blue/30'}`}
+                            className={`w-full chooser-chip ${mood ? 'active' : ''}`}
                           >
                             {mood ? (
                               <>
                                 {React.createElement(moods.find(m => m.id === mood)?.icon || Smile, { size: 16 })}
-                                <span className="text-[10px] sm:text-[11px] font-black uppercase">{mood}</span>
+                                <span>{mood}</span>
                               </>
                             ) : (
                               <>
                                 <Smile size={16} />
-                                <span className="text-[10px] sm:text-[11px] font-black uppercase">Mood</span>
+                                <span>Mood</span>
                               </>
                             )}
                           </button>
@@ -862,7 +862,7 @@ export const CreateNote: React.FC = () => {
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                 transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                                className="absolute top-full mt-3 left-0 z-[100] p-4 bg-white border-2 border-border rounded-3xl shadow-xl w-[260px] sm:w-[280px] liquid-glass max-w-[calc(100vw-40px)]"
+                                className="absolute top-full mt-3 left-0 z-[100] chooser-popover w-[260px] sm:w-[280px] max-w-[calc(100vw-40px)]"
                               >
                                 <div className="flex items-center justify-between mb-4 px-1">
                                   <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav">How are you?</span>
@@ -899,10 +899,10 @@ export const CreateNote: React.FC = () => {
                               setIsTagsOpen(!isTagsOpen);
                               setIsMoodOpen(false);
                             }}
-                            className={`w-full flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] ${tags.length > 0 ? 'bg-green/5 border-green text-green' : 'bg-white border-border text-gray-nav hover:border-green/30'}`}
+                            className={`w-full chooser-chip ${tags.length > 0 ? 'active' : ''}`}
                           >
                             <TagIcon size={16} />
-                            <span className="text-[10px] sm:text-[11px] font-black uppercase">{tags.length > 0 ? `${tags.length} Tags` : 'Tags'}</span>
+                            <span>{tags.length > 0 ? `${tags.length} Tags` : 'Tags'}</span>
                           </button>
 
                           <AnimatePresence>
@@ -912,7 +912,7 @@ export const CreateNote: React.FC = () => {
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                 transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                                className="absolute top-full mt-3 right-0 sm:left-0 sm:right-auto z-[100] p-5 sm:p-6 bg-white border-2 border-border rounded-3xl shadow-xl w-[280px] sm:w-[320px] liquid-glass max-w-[calc(100vw-40px)]"
+                                className="absolute top-full mt-3 right-0 sm:left-0 sm:right-auto z-[100] chooser-popover w-[280px] sm:w-[320px] max-w-[calc(100vw-40px)]"
                               >
                                 <div className="mb-4">
                                   <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav block mb-3">Add Tags</span>
@@ -964,14 +964,14 @@ export const CreateNote: React.FC = () => {
                           </AnimatePresence>
                        </div>
 
-                       <label className="group flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border-2 border-border bg-white px-3 sm:px-4 py-2 text-[10px] sm:text-[11px] font-black uppercase text-gray-nav transition-all hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]">
-                          <Paperclip size={16} className="text-gray-nav group-hover:text-blue" />
+                       <label className="chooser-chip cursor-pointer !w-full lg:!w-auto">
+                          <Paperclip size={16} />
                           <span>ATTACH</span>
                           <input type="file" multiple className="hidden" onChange={handleAttachmentUpload} />
                        </label>
                        {!imagePreview && (
-                          <label className="group flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border-2 border-border bg-white px-3 sm:px-4 py-2 text-[10px] sm:text-[11px] font-black uppercase text-gray-nav transition-all hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]">
-                             <ImageIcon size={16} className="text-gray-nav group-hover:text-blue" />
+                          <label className="chooser-chip cursor-pointer !w-full lg:!w-auto">
+                             <ImageIcon size={16} />
                              <span>COVER</span>
                              <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
                           </label>

@@ -228,6 +228,20 @@ body {
     color: var(--gray-light) !important;
     font-weight: 700 !important;
   }
+
+  .chooser-chip {
+    @apply flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 bg-white border-border text-gray-nav transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] hover:border-blue/30 hover:bg-blue/5 dark:bg-white/5 dark:border-white/10 dark:text-slate-300 dark:shadow-[0_2px_0_0_rgba(15,23,42,0.3)] dark:hover:bg-white/10 dark:hover:border-white/20;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .chooser-chip.active {
+    @apply bg-blue/5 border-blue/30 text-blue shadow-[0_2px_0_0_#E5E5E5] dark:bg-sky-400/10 dark:border-sky-400/30 dark:text-sky-100 dark:shadow-[0_2px_0_0_rgba(15,23,42,0.3)];
+  }
+
+  .chooser-popover {
+    @apply p-5 bg-white/95 border-2 border-border rounded-3xl shadow-sm liquid-glass dark:bg-[#16181d]/95 dark:border-white/10 dark:shadow-[0_4px_12px_-4px_rgba(0,0,0,0.5)];
+  }
 }
 
 @media (max-width: 640px) {

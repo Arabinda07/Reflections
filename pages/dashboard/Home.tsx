@@ -211,34 +211,23 @@ export const Home: React.FC = () => {
         </div>
 
         {/* Panel 2: Daily Mindfulness */}
-        <div className="p-6 sm:p-10 border-b-2 border-border flex flex-col justify-center">
+        <div className="p-6 sm:p-10 lg:border-l-2 border-border flex flex-col justify-center">
           <div className="panel-label">Daily Mindfulness</div>
-          <motion.div
-            whileHover={{ y: -5, scale: 1.008 }}
-            transition={{ type: 'spring', stiffness: 240, damping: 18 }}
-            className="group relative overflow-hidden rounded-[34px] border-2 border-sky-100/80 bg-[linear-gradient(180deg,rgba(239,248,255,0.96),rgba(255,255,255,0.98))] p-6 shadow-[0_10px_0_0_rgba(226,232,240,0.95)] transition-all sm:p-8 lg:p-10 dark:border-sky-400/15 dark:bg-[linear-gradient(180deg,rgba(17,24,39,0.96),rgba(12,18,28,0.98))] dark:shadow-[0_10px_0_0_rgba(15,23,42,0.55)]"
-          >
-            <div className="absolute inset-x-0 top-0 h-24 bg-[radial-gradient(circle_at_top_right,rgba(125,211,252,0.22),transparent_55%)] pointer-events-none dark:bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.18),transparent_60%)]" />
-            <div className="absolute -bottom-10 left-0 h-32 w-32 rounded-full bg-emerald-100/60 blur-3xl pointer-events-none dark:bg-emerald-300/10" />
-            <div className="absolute -right-6 top-0 h-28 w-28 rounded-full bg-sky-100/70 blur-3xl pointer-events-none dark:bg-sky-300/10" />
-            <div className="absolute top-4 right-4 opacity-20 transition-transform duration-700 group-hover:rotate-[10deg] group-hover:scale-110 dark:opacity-15">
-              <Target size={90} className="text-sky-200 dark:text-sky-300/40" />
-            </div>
-            
+          <div className="group relative overflow-hidden bg-white border-2 border-border rounded-[32px] p-8 shadow-[0_8px_0_0_#E5E5E5] liquid-glass flex flex-col">
             <div className="relative z-10">
               <div className="mb-6 flex items-start justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[22px] border border-sky-100 bg-white text-blue shadow-[0_3px_0_0_rgba(226,232,240,0.9)] transition-transform duration-500 group-hover:-translate-y-1 group-hover:scale-105 dark:border-sky-400/20 dark:bg-white/8 dark:text-sky-100 dark:shadow-[0_3px_0_0_rgba(15,23,42,0.45)]">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[22px] bg-blue/10 text-blue shadow-3d-gray border-2 border-border/50">
                     <Target size={22} />
                   </div>
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.24em] text-blue/70 dark:text-sky-200/75">Daily Wellness</p>
-                    <h4 className="text-[21px] font-display lowercase text-gray-text dark:text-slate-50">today's focus</h4>
+                    <h4 className="text-[16px] font-bold text-gray-nav uppercase tracking-wider mb-1">Today's Focus</h4>
+                    <p className="text-[14px] text-gray-light font-medium">A small nudge for today</p>
                   </div>
                 </div>
                 <button 
                   onClick={refreshPrompt}
-                  className={`flex h-10 w-10 items-center justify-center rounded-2xl border border-sky-100 bg-white/92 text-blue shadow-[0_3px_0_0_rgba(226,232,240,0.9)] transition-all hover:-translate-y-[1px] hover:bg-sky-50 dark:border-sky-400/20 dark:bg-white/8 dark:text-sky-100 dark:shadow-[0_3px_0_0_rgba(15,23,42,0.45)] dark:hover:bg-sky-400/12 ${isRefreshing ? 'opacity-50' : 'opacity-100'}`}
+                  className={`flex h-10 w-10 items-center justify-center rounded-2xl bg-white border-2 border-border text-gray-nav shadow-sm hover:text-blue hover:border-blue/30 transition-all ${isRefreshing ? 'opacity-50' : 'opacity-100'}`}
                   title="Refresh Prompt"
                   disabled={isRefreshing}
                 >
@@ -246,27 +235,24 @@ export const Home: React.FC = () => {
                 </button>
               </div>
 
-              <div className="mb-8 rounded-[28px] border border-white/80 bg-white/70 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-xl dark:border-white/10 dark:bg-white/5 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-                <p className="text-[18px] font-medium leading-relaxed text-gray-text sm:text-[20px] dark:text-slate-100">
+              <div className="mb-8 rounded-[24px] border-2 border-border bg-gray-50/50 p-6">
+                <p className="text-[18px] font-medium leading-relaxed text-gray-text sm:text-[20px]">
                   "{dailyPrompt}"
                 </p>
               </div>
               
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <p className="max-w-md text-[13px] font-medium leading-relaxed text-gray-light dark:text-slate-400">
-                  A small nudge for today, kept simple so you can move straight into writing.
-                </p>
                 <Button 
                   variant="secondary" 
                   size="lg" 
-                  className="w-full border border-sky-100 bg-white text-blue font-extrabold uppercase shadow-[0_4px_0_0_rgba(226,232,240,0.95)] dark:border-sky-400/20 dark:bg-white/8 dark:text-sky-100 dark:shadow-[0_4px_0_0_rgba(15,23,42,0.45)] sm:w-auto"
+                  className="w-full border-2 border-border bg-white text-blue font-extrabold uppercase shadow-3d-gray sm:w-auto"
                   onClick={() => handleCreateClick(dailyPrompt)}
                 >
-                  WRITE ABOUT IT
+                  Start Writing
                 </Button>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
 

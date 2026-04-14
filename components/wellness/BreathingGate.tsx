@@ -27,36 +27,15 @@ export const BreathingGate: React.FC<BreathingGateProps> = ({ active, durationMs
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.75, ease: 'easeOut' }}
-          className="fixed inset-0 z-[300] flex items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_center,#F5FFF8_0%,#ECFEFF_42%,#FFFFFF_100%)] px-6 dark:bg-[radial-gradient(circle_at_center,#071018_0%,#0d1620_38%,#121212_100%)]"
+          className="fixed inset-0 z-[300] flex items-center justify-center overflow-hidden bg-white/95 backdrop-blur-md px-6 dark:bg-[#121212]/95"
         >
-          <motion.div
-            className="absolute h-[28rem] w-[28rem] rounded-full bg-emerald-200/20 blur-3xl dark:bg-emerald-300/10"
-            animate={{ scale: shouldReduceMotion ? 1 : [0.85, 1.12, 0.85], opacity: [0.35, 0.65, 0.35] }}
-            transition={{ duration: durationMs / 1000, ease: breathEase }}
-          />
-          <motion.div
-            className="absolute h-[20rem] w-[20rem] rounded-full bg-sky-200/20 blur-2xl dark:bg-sky-300/10"
-            animate={{ scale: shouldReduceMotion ? 1 : [1.08, 0.92, 1.08], opacity: [0.45, 0.25, 0.45] }}
-            transition={{ duration: durationMs / 1000, ease: breathEase }}
-          />
-
           <div className="relative flex flex-col items-center text-center">
             <motion.div
-              className="relative mb-8 flex h-52 w-52 items-center justify-center rounded-full border border-sky-200/70 bg-white/50 shadow-[0_30px_80px_-40px_rgba(14,165,233,0.55)] backdrop-blur-2xl dark:border-sky-300/20 dark:bg-white/6 dark:shadow-[0_26px_90px_-48px_rgba(56,189,248,0.6)]"
-              animate={{ scale: shouldReduceMotion ? 1 : [0.82, 1.08, 0.82] }}
+              className="relative mb-8 flex h-48 w-48 items-center justify-center rounded-full border border-border bg-gray-50 shadow-sm dark:border-white/10 dark:bg-white/5"
+              animate={{ scale: shouldReduceMotion ? 1 : [0.95, 1.05, 0.95], opacity: shouldReduceMotion ? 1 : [0.7, 1, 0.7] }}
               transition={{ duration: durationMs / 1000, ease: breathEase }}
             >
-              <motion.div
-                className="absolute inset-5 rounded-full border border-emerald-200/80 bg-emerald-100/20 dark:border-emerald-300/20 dark:bg-emerald-300/6"
-                animate={{ scale: shouldReduceMotion ? 1 : [0.9, 1.18, 0.9], opacity: [0.35, 0.75, 0.35] }}
-                transition={{ duration: durationMs / 1000, ease: breathEase }}
-              />
-              <motion.div
-                className="absolute inset-12 rounded-full bg-sky-100/60 dark:bg-sky-300/10"
-                animate={{ scale: shouldReduceMotion ? 1 : [1, 0.82, 1], opacity: [0.55, 0.85, 0.55] }}
-                transition={{ duration: durationMs / 1000, ease: breathEase }}
-              />
-              <Wind size={42} className="relative text-sky-500/70 dark:text-sky-200/90" />
+              <Wind size={36} className="relative text-gray-nav opacity-50 dark:text-slate-400" />
             </motion.div>
 
             <motion.p

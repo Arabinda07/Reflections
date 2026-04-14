@@ -123,7 +123,7 @@ export const Insights: React.FC = () => {
         .map(n => `Title: ${n.title}\nContent: ${n.content.replace(/<[^>]*>/g, '')}\nMood: ${n.mood || 'None'}`)
         .join('\n\n---\n\n');
 
-      const prompt = `You are a deeply empathetic and intuitive journaling assistant. Provide a beautifully written, profound 2-3 paragraph reflection for this user based on their recent entries. Connect their themes, validate their emotions, and point out subtle areas of growth. Tone: Gentle, empowering, sanctuary-like. Do not summarize linearly; synthesize meaning.
+      const prompt = `You are a grounding journaling assistant. Review the user's recent entries and provide 1-2 short paragraphs with concrete observations from their notes. Offer one gentle takeaway or question. Do not use process narration, meta-framing, or attempt to be profound. Just reflect what you see directly.
 
       Recent Notes:
       ${notesContext}`;
@@ -289,184 +289,99 @@ export const Insights: React.FC = () => {
       </div>
 
       {/* PREMIUM AI REFLECTION CONTAINER */}
-      <div className={`relative w-full overflow-hidden rounded-[40px] border transition-all duration-700 ${
-        isPro
-          ? 'border-sky-200 bg-[linear-gradient(180deg,rgba(242,249,255,0.98),rgba(255,255,255,0.98))] shadow-[0_12px_40px_-28px_rgba(14,165,233,0.45)] dark:border-sky-400/20 dark:bg-[linear-gradient(180deg,rgba(15,23,42,0.98),rgba(8,12,20,0.98))] dark:shadow-[0_16px_48px_-30px_rgba(2,132,199,0.28)]'
-          : 'border-sky-100 bg-[linear-gradient(180deg,rgba(247,251,255,0.98),rgba(255,255,255,0.98))] shadow-[0_12px_40px_-30px_rgba(14,165,233,0.35)] dark:border-sky-400/15 dark:bg-[linear-gradient(180deg,rgba(15,23,42,0.98),rgba(10,14,24,0.98))] dark:shadow-[0_16px_48px_-30px_rgba(2,132,199,0.22)]'
-      }`}>
-        <div className="absolute inset-x-0 top-0 h-28 bg-[radial-gradient(circle_at_top_right,rgba(125,211,252,0.2),transparent_55%)] pointer-events-none dark:bg-[radial-gradient(circle_at_top_right,rgba(56,189,248,0.2),transparent_60%)]" />
-        <div className="absolute -bottom-12 left-0 h-32 w-32 rounded-full bg-emerald-100/40 blur-3xl pointer-events-none dark:bg-emerald-300/10" />
-
-        <div className="relative z-10 p-6 sm:p-8 md:p-10 lg:p-12">
-          <div className="mb-8 flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
-            <div className="flex items-start gap-5">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[24px] border border-sky-100 bg-white text-blue shadow-[0_3px_0_0_rgba(226,232,240,0.9)] dark:border-sky-400/20 dark:bg-white/8 dark:text-sky-100 dark:shadow-[0_3px_0_0_rgba(15,23,42,0.45)]">
-                <Sparkles size={28} />
-              </div>
-              <div>
-                <div className="flex flex-wrap items-center gap-3">
-                  <h2 className="text-3xl font-display text-gray-text lowercase tracking-tight dark:text-slate-50">AI Deep Reflection</h2>
-                  {isPro ? (
-                    <div className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-amber-600 shadow-sm dark:border-amber-300/20 dark:bg-amber-300/10 dark:text-amber-100">
-                      <Crown size={12} /> PRO
-                    </div>
-                  ) : (
-                    <div className="inline-flex items-center gap-1.5 rounded-full border border-sky-100 bg-white/80 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-blue shadow-sm dark:border-sky-400/20 dark:bg-white/6 dark:text-sky-100">
-                      <Sparkles size={12} /> 1 Free Reflection
-                    </div>
-                  )}
-                </div>
-                <p className="mt-2 max-w-2xl text-[14px] font-medium leading-relaxed text-gray-light dark:text-slate-400">
-                  A calm, compassionate reading of the patterns your notes are holding right now, designed to feel readable instead of overwhelming.
-                </p>
-              </div>
+      <div className="relative w-full overflow-hidden bg-white border-2 border-border rounded-[40px] shadow-[0_8px_0_0_#E5E5E5] liquid-glass p-8 md:p-12 mb-16 dark:bg-[#16181d] dark:border-white/10 dark:shadow-[0_8px_0_0_rgba(15,23,42,0.5)]">
+        <div className="mb-8 flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+          <div className="flex items-start gap-5">
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[24px] bg-blue/10 text-blue border-2 border-border/50 dark:bg-sky-400/10 dark:border-white/10 dark:text-sky-100">
+              <Sparkles size={28} />
             </div>
-
-            <div className="flex flex-wrap gap-2">
-              <div className="rounded-full border border-border bg-white/75 px-3 py-2 text-[11px] font-black uppercase tracking-widest text-gray-nav dark:border-white/10 dark:bg-white/6 dark:text-slate-300">
-                {notes.length} notes in context
-              </div>
-              <div className="rounded-full border border-border bg-white/75 px-3 py-2 text-[11px] font-black uppercase tracking-widest text-gray-nav dark:border-white/10 dark:bg-white/6 dark:text-slate-300">
-                {reflectionText ? 'Latest reflection ready' : isPremiumLocked ? 'Upgrade for more' : 'Ready when you are'}
-              </div>
-            </div>
-          </div>
-
-          <div className="grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_320px]">
-            <div className="rounded-[30px] border border-white/70 bg-white/78 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-xl dark:border-white/10 dark:bg-white/6 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] sm:p-7">
-              <div className="mb-4 flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.24em] text-gray-nav dark:text-slate-300">Reading Panel</p>
-                  <h3 className="mt-1 text-[18px] font-display lowercase text-gray-text dark:text-slate-50">
-                    {reflectionText ? 'what your recent notes are saying' : isPremiumLocked ? 'your next reflection is waiting' : 'what this reflection will help you notice'}
-                  </h3>
-                </div>
-                {reflectionText && (
-                  <span className="rounded-full border border-sky-100 bg-sky-50/90 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-sky-700 dark:border-sky-400/20 dark:bg-sky-400/12 dark:text-sky-100">
-                    Calm Scroll
-                  </span>
+            <div>
+              <div className="flex flex-wrap items-center gap-3">
+                <h2 className="text-3xl font-display text-gray-text lowercase tracking-tight dark:text-slate-50">AI Deep Reflection</h2>
+                {isPro ? (
+                  <div className="inline-flex items-center gap-1.5 rounded-full border-2 border-amber-200 bg-amber-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-amber-600 dark:border-amber-400/20 dark:bg-amber-400/10 dark:text-amber-100">
+                    <Crown size={12} /> PRO
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center gap-1.5 rounded-full border-2 border-border bg-gray-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-blue dark:border-white/10 dark:bg-white/5 dark:text-sky-100">
+                    <Sparkles size={12} /> 1 Free Reflection
+                  </div>
                 )}
               </div>
-
-              {reflectionText ? (
-                <div
-                  className="wellness-scroll max-h-[360px] overflow-y-auto pr-2 prose prose-lg max-w-none text-gray-text leading-loose font-sans font-medium dark:prose-invert dark:text-slate-100"
-                  dangerouslySetInnerHTML={{ __html: reflectionText.replace(/\n\n/g, '<br/><br/>') }}
-                />
-              ) : isPremiumLocked ? (
-                <div className="flex min-h-[260px] flex-col justify-between rounded-[24px] border border-white/70 bg-white/65 p-5 dark:border-white/10 dark:bg-white/5">
-                  <div>
-                    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-border bg-white text-gray-nav shadow-sm dark:border-white/10 dark:bg-white/6 dark:text-slate-300">
-                      <Lock size={18} />
-                    </div>
-                    <p className="text-[17px] font-display lowercase text-gray-text dark:text-slate-50">
-                      your first deep reflection has been used
-                    </p>
-                    <p className="mt-3 max-w-xl text-[14px] font-medium leading-relaxed text-gray-light dark:text-slate-400">
-                      Pro keeps this space open for ongoing pattern reads, emotional themes, and gentler synthesis as your journal grows.
-                    </p>
-                  </div>
-                  <div className="grid gap-3 pt-5 sm:grid-cols-2">
-                    <div className="rounded-[20px] border border-sky-100 bg-sky-50/70 p-4 dark:border-sky-400/15 dark:bg-sky-400/10">
-                      <p className="text-[11px] font-black uppercase tracking-widest text-sky-700 dark:text-sky-100">Continued synthesis</p>
-                      <p className="mt-2 text-[13px] font-medium leading-relaxed text-gray-text dark:text-slate-200">Notice recurring moods and life themes without reading through every note again.</p>
-                    </div>
-                    <div className="rounded-[20px] border border-emerald-100 bg-emerald-50/70 p-4 dark:border-emerald-400/15 dark:bg-emerald-400/10">
-                      <p className="text-[11px] font-black uppercase tracking-widest text-emerald-700 dark:text-emerald-100">Quieter guidance</p>
-                      <p className="mt-2 text-[13px] font-medium leading-relaxed text-gray-text dark:text-slate-200">Keep the reflection space available whenever you want a calmer read on what is shifting.</p>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex min-h-[260px] flex-col justify-between rounded-[24px] border border-white/70 bg-white/65 p-5 dark:border-white/10 dark:bg-white/5">
-                  <div>
-                    <p className="text-[17px] font-display lowercase text-gray-text dark:text-slate-50">
-                      a gentler read, not a wall of text
-                    </p>
-                    <p className="mt-3 max-w-xl text-[14px] font-medium leading-relaxed text-gray-light dark:text-slate-400">
-                      This reflection looks across your recent entries and surfaces the emotional patterns, themes, and tensions that deserve a calmer second look.
-                    </p>
-                  </div>
-                  <div className="grid gap-3 pt-5">
-                    <div className="rounded-[20px] border border-white/80 bg-white/82 p-4 dark:border-white/10 dark:bg-white/6">
-                      <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav dark:text-slate-300">It can highlight</p>
-                      <p className="mt-2 text-[13px] font-medium leading-relaxed text-gray-text dark:text-slate-200">Repeated emotions, recurring situations, and the places where your writing is asking for more attention.</p>
-                    </div>
-                    <div className="rounded-[20px] border border-white/80 bg-white/82 p-4 dark:border-white/10 dark:bg-white/6">
-                      <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav dark:text-slate-300">It stays useful</p>
-                      <p className="mt-2 text-[13px] font-medium leading-relaxed text-gray-text dark:text-slate-200">The layout keeps the reading area separate from actions, so the reflection stays readable even when it gets longer.</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="flex flex-col gap-4">
-              <div className="rounded-[30px] border border-white/70 bg-white/78 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-xl dark:border-white/10 dark:bg-white/6 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-gray-nav dark:text-slate-300">Action Area</p>
-                <h3 className="mt-2 text-[20px] font-display lowercase text-gray-text dark:text-slate-50">
-                  {isPremiumLocked ? 'keep this space open' : reflectionText ? 'refresh the perspective when you need it' : 'generate a deeper read'}
-                </h3>
-                <p className="mt-3 text-[14px] font-medium leading-relaxed text-gray-light dark:text-slate-400">
-                  {isPremiumLocked
-                    ? 'You can still use the monthly insights above, or unlock continuous deep reflections with Pro.'
-                    : reflectionText
-                      ? isPro
-                        ? 'Generate another reflection anytime. The current one stays readable in the panel beside it.'
-                        : 'Your free reflection is ready. You can keep reading it here, and Pro unlocks ongoing reflections later.'
-                      : hasEnoughNotes
-                        ? 'You have enough entries for a thoughtful reflection now.'
-                        : 'Write at least three notes so the reflection has enough material to say something useful.'}
-                </p>
-
-                <div className="mt-5">
-                  {isPremiumLocked || (reflectionText && !isPro) ? (
-                    <Button
-                      variant={reflectionText && !isPro ? 'secondary' : 'primary'}
-                      size="lg"
-                      className={`w-full rounded-2xl border px-6 text-[14px] ${
-                        reflectionText && !isPro
-                          ? 'border-sky-100 bg-white text-blue shadow-[0_4px_0_0_rgba(226,232,240,0.95)] dark:border-sky-400/20 dark:bg-white/8 dark:text-sky-100 dark:shadow-[0_4px_0_0_rgba(15,23,42,0.45)]'
-                          : 'border-sky-100 shadow-[0_4px_0_0_rgba(226,232,240,0.95)] dark:border-sky-400/20 dark:shadow-[0_4px_0_0_rgba(15,23,42,0.45)]'
-                      }`}
-                      onClick={() => {/* Trigger Paywall */}}
-                    >
-                      <Crown size={18} className="mr-2" />
-                      {reflectionText && !isPro ? 'UNLOCK MORE REFLECTIONS' : 'UPGRADE TO PRO'}
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="primary"
-                      size="lg"
-                      className="w-full rounded-2xl border border-sky-100 px-6 text-[14px] shadow-[0_4px_0_0_rgba(226,232,240,0.95)] dark:border-sky-400/20 dark:shadow-[0_4px_0_0_rgba(15,23,42,0.45)]"
-                      onClick={handleGenerateReflection}
-                      isLoading={generating}
-                      disabled={!hasEnoughNotes}
-                    >
-                      {!hasEnoughNotes ? (
-                        <><MessageSquare size={18} className="mr-2" /> WRITE 3 NOTES TO UNLOCK</>
-                      ) : reflectionText && isPro ? (
-                        <><Sparkles size={18} className="mr-2" /> GENERATE NEW REFLECTION</>
-                      ) : isFreeAvailable ? (
-                        <><Sparkles size={18} className="mr-2" /> GENERATE REFLECTION (1 FREE)</>
-                      ) : (
-                        <><Sparkles size={18} className="mr-2" /> GENERATE NEW REFLECTION</>
-                      )}
-                    </Button>
-                  )}
-                </div>
-              </div>
-
-              <div className="rounded-[28px] border border-white/70 bg-white/70 p-5 dark:border-white/10 dark:bg-white/5">
-                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-gray-nav dark:text-slate-300">What Changes</p>
-                <div className="mt-3 space-y-3 text-[13px] font-medium leading-relaxed text-gray-text dark:text-slate-200">
-                  <p>The reading panel stays separate from the CTA so the text never gets obstructed.</p>
-                  <p>Long reflections scroll inside the card instead of stretching the whole page.</p>
-                  <p>Dark mode keeps contrast on the card shell, inner panel, and action area.</p>
-                </div>
-              </div>
+              <p className="mt-2 max-w-2xl text-[14px] font-medium leading-relaxed text-gray-light dark:text-slate-400">
+                A calm, grounded reading of the patterns your notes are holding right now.
+              </p>
             </div>
           </div>
+
+          <div className="flex flex-wrap gap-2">
+            <div className="rounded-xl border-2 border-border bg-gray-50 px-3 py-2 text-[11px] font-black uppercase tracking-widest text-gray-nav dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
+              {notes.length} notes in context
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-8 p-6 rounded-[24px] border-2 border-border bg-gray-50/50 dark:border-white/10 dark:bg-white/5">
+          {reflectionText ? (
+            <div
+              className="prose prose-lg max-w-none text-gray-text leading-loose font-sans font-medium dark:prose-invert dark:text-slate-100"
+              dangerouslySetInnerHTML={{ __html: reflectionText.replace(/\n\n/g, '<br/><br/>') }}
+            />
+          ) : isPremiumLocked ? (
+            <div className="text-center py-10">
+              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-border bg-white text-gray-nav shadow-sm dark:border-white/10 dark:bg-white/6 dark:text-slate-300">
+                <Lock size={18} />
+              </div>
+              <p className="text-[17px] font-display lowercase text-gray-text dark:text-slate-50">
+                your first deep reflection has been used
+              </p>
+              <p className="mt-3 max-w-xl mx-auto text-[14px] font-medium leading-relaxed text-gray-light dark:text-slate-400">
+                Upgrade to Pro to continuously map your emotional themes and patterns.
+              </p>
+            </div>
+          ) : (
+            <div className="text-center py-10">
+              <p className="text-[17px] font-display lowercase text-gray-text dark:text-slate-50">
+                a gentler read, not a wall of text
+              </p>
+              <p className="mt-3 max-w-xl mx-auto text-[14px] font-medium leading-relaxed text-gray-light dark:text-slate-400">
+                This reflection surfaces the emotional patterns, themes, and tensions from your recent entries in a simple, brief summary.
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div className="flex justify-center">
+          {isPremiumLocked || (reflectionText && !isPro) ? (
+            <Button
+              variant={reflectionText && !isPro ? 'secondary' : 'primary'}
+              size="lg"
+              className="w-full sm:w-auto rounded-2xl border-2 border-border px-8 text-[14px] uppercase font-black"
+              onClick={() => {/* Trigger Paywall */}}
+            >
+              <Crown size={18} className="mr-2" />
+              {reflectionText && !isPro ? 'UNLOCK MORE REFLECTIONS' : 'UPGRADE TO PRO'}
+            </Button>
+          ) : (
+            <Button
+              variant="primary"
+              size="lg"
+              className="w-full sm:w-auto rounded-2xl border-2 border-border shadow-3d-gray px-8 text-[14px] uppercase font-black"
+              onClick={handleGenerateReflection}
+              isLoading={generating}
+              disabled={!hasEnoughNotes}
+            >
+              {!hasEnoughNotes ? (
+                <><MessageSquare size={18} className="mr-2" /> WRITE 3 NOTES TO UNLOCK</>
+              ) : reflectionText && isPro ? (
+                <><Sparkles size={18} className="mr-2" /> GENERATE NEW REFLECTION</>
+              ) : isFreeAvailable ? (
+                <><Sparkles size={18} className="mr-2" /> GENERATE REFLECTION (1 FREE)</>
+              ) : (
+                <><Sparkles size={18} className="mr-2" /> GENERATE NEW REFLECTION</>
+              )}
+            </Button>
+          )}
         </div>
       </div>
 
