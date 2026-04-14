@@ -683,7 +683,7 @@ export const CreateNote: React.FC = () => {
       {limitReachedOverlay}
       <nav className={`sticky top-4 z-50 mb-8 flex items-center justify-between gap-2 rounded-2xl border-2 border-border bg-white/90 px-3 py-2 sm:px-4 sm:py-3 shadow-[0_4px_0_0_#E5E5E5] backdrop-blur-2xl transition-all duration-500 dark:bg-[#17171b]/90 dark:shadow-[0_4px_0_0_rgba(15,23,42,0.55)] ${isDimmed ? 'opacity-40 hover:opacity-100' : 'opacity-100'}`}>
         <div className="flex items-center gap-2 sm:gap-3">
-           <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-black tracking-widest uppercase text-[11px] px-2 sm:px-3 active:scale-[0.98] transition-all">
+           <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-bold uppercase text-[12px] px-2 sm:px-3">
              <ArrowLeft className="h-4 w-4 sm:mr-2" />
              <span className="hidden sm:inline">BACK</span>
            </Button>
@@ -700,10 +700,8 @@ export const CreateNote: React.FC = () => {
             variant="ghost"
             size="sm"
             onClick={() => setIsFocusModeManual(!isFocusModeManual)}
-            className={`flex items-center gap-2 rounded-xl border font-black tracking-widest uppercase text-[11px] transition-all active:scale-[0.98] ${
-              isFocusModeManual
-                ? 'border-sky-200/90 bg-sky-50/90 text-sky-700 shadow-[0_2px_0_0_rgba(226,232,240,0.8)] dark:border-sky-400/20 dark:bg-sky-400/12 dark:text-sky-100 dark:shadow-[0_2px_0_0_rgba(15,23,42,0.42)]'
-                : 'border-border/70 bg-white/75 text-gray-nav dark:border-white/10 dark:bg-white/5 dark:text-slate-300'
+            className={`flex items-center gap-2 font-bold uppercase text-[11px] transition-all ${
+              isFocusModeManual ? 'text-blue bg-blue/5' : 'text-gray-nav'
             }`}
             title={isFocusModeManual ? "Disable Focus Mode" : "Enable Focus Mode"}
           >
@@ -717,7 +715,7 @@ export const CreateNote: React.FC = () => {
             variant="ghost" 
             size="sm" 
             onClick={handleRelease} 
-            className="border border-sky-100 bg-sky-50/70 text-sky-700 shadow-[0_2px_0_0_rgba(226,232,240,0.75)] hover:bg-emerald-50 hover:text-emerald-700 transition-all dark:border-emerald-400/15 dark:bg-emerald-400/10 dark:text-emerald-100 dark:shadow-[0_2px_0_0_rgba(15,23,42,0.42)] font-black tracking-widest uppercase text-[11px] px-2 sm:px-3 active:scale-[0.98] dark:hover:bg-emerald-400/16 dark:hover:text-emerald-50" 
+            className="text-gray-nav hover:text-red hover:bg-red/5 font-bold uppercase text-[11px] transition-all px-2 sm:px-3" 
             disabled={isReleasing}
           >
               <Wind className="h-3.5 w-3.5 sm:mr-2" />
@@ -753,7 +751,7 @@ export const CreateNote: React.FC = () => {
             <Button 
               variant="secondary" 
               size="sm" 
-              className="border-2 border-border text-blue font-black tracking-widest uppercase text-[11px] shadow-3d-gray active:shadow-none active:translate-y-[2px] transition-all dark:bg-white/6 px-2 sm:px-3 dark:text-sky-100 dark:shadow-[0_3px_0_0_rgba(15,23,42,0.55)]" 
+              className="border-2 border-border text-blue shadow-3d-gray active:shadow-none active:translate-y-[2px] transition-all dark:bg-white/6 px-2 sm:px-3 dark:text-sky-100 dark:shadow-[0_3px_0_0_rgba(15,23,42,0.55)]"
               disabled={!canEnhance || isReflecting}
               onClick={handleAiReflect}
               isLoading={isReflecting}
@@ -765,7 +763,7 @@ export const CreateNote: React.FC = () => {
               onClick={handleSave} 
               size="sm" 
               variant="primary"
-              className="shadow-3d-green font-black tracking-widest uppercase text-[11px] px-2 sm:px-3 active:shadow-none active:translate-y-[2px] transition-all"
+              className="shadow-3d-green px-2 sm:px-3 active:shadow-none active:translate-y-[2px] transition-all"
               isLoading={saving} 
               disabled={!canSave}
             >
@@ -828,21 +826,18 @@ export const CreateNote: React.FC = () => {
                        {/* Progressive Disclosure: Mood Button */}
                        <div className="relative" ref={moodRef}>
                           <button 
-                            onClick={() => {
-                              setIsMoodOpen(!isMoodOpen);
-                              setIsTagsOpen(false);
-                            }}
-                            className={`w-full chooser-chip ${mood ? 'active' : ''}`}
+                            onClick={() => setIsMoodOpen(!isMoodOpen)}
+                            className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] ${mood ? 'bg-blue/5 border-blue text-blue' : 'bg-white border-border text-gray-nav hover:border-blue/30'}`}
                           >
                             {mood ? (
                               <>
                                 {React.createElement(moods.find(m => m.id === mood)?.icon || Smile, { size: 16 })}
-                                <span className="inline">{mood}</span>
+                                <span className="text-[10px] sm:text-[11px] font-black uppercase">{mood}</span>
                               </>
                             ) : (
                               <>
                                 <Smile size={16} />
-                                <span className="inline">Mood</span>
+                                <span className="text-[10px] sm:text-[11px] font-black uppercase">Mood</span>
                               </>
                             )}
                           </button>
@@ -887,14 +882,11 @@ export const CreateNote: React.FC = () => {
                        {/* Progressive Disclosure: Tags Button */}
                        <div className="relative" ref={tagsRef}>
                           <button 
-                            onClick={() => {
-                              setIsTagsOpen(!isTagsOpen);
-                              setIsMoodOpen(false);
-                            }}
-                            className={`w-full chooser-chip ${tags.length > 0 ? 'active' : ''}`}
+                            onClick={() => setIsTagsOpen(!isTagsOpen)}
+                            className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] ${tags.length > 0 ? 'bg-green/5 border-green text-green' : 'bg-white border-border text-gray-nav hover:border-green/30'}`}
                           >
                             <TagIcon size={16} />
-                            <span className="inline">{tags.length > 0 ? `${tags.length} Tags` : 'Tags'}</span>
+                            <span className="text-[10px] sm:text-[11px] font-black uppercase">{tags.length > 0 ? `${tags.length} Tags` : 'Tags'}</span>
                           </button>
 
                           <AnimatePresence>
@@ -956,15 +948,15 @@ export const CreateNote: React.FC = () => {
                           </AnimatePresence>
                        </div>
 
-                       <label className="chooser-chip cursor-pointer w-full md:w-auto">
-                          <Paperclip size={16} />
-                          <span className="inline">ATTACH</span>
+                       <label className="group flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-border bg-white px-3 sm:px-4 py-2 text-[10px] sm:text-[11px] font-black uppercase text-gray-nav transition-all hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]">
+                          <Paperclip size={16} className="text-gray-nav group-hover:text-blue" />
+                          <span className="hidden xs:inline">ATTACH</span>
                           <input type="file" multiple className="hidden" onChange={handleAttachmentUpload} />
                        </label>
                        {!imagePreview && (
-                          <label className="chooser-chip cursor-pointer w-full md:w-auto">
-                             <ImageIcon size={16} />
-                             <span className="inline">COVER</span>
+                          <label className="group flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-border bg-white px-3 sm:px-4 py-2 text-[10px] sm:text-[11px] font-black uppercase text-gray-nav transition-all hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]">
+                             <ImageIcon size={16} className="text-gray-nav group-hover:text-blue" />
+                             <span className="hidden xs:inline">COVER</span>
                              <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
                           </label>
                        )}
