@@ -1032,7 +1032,7 @@ export const CreateNote: React.FC = () => {
                       <Editor 
                           value={content} 
                           onChange={setContent} 
-                          placeholder={activePlaceholder || (id ? "Continue writing..." : "Start typing... or click ✨ for a spark.")}
+                          placeholder={activePlaceholder || (id ? "Continue writing..." : "Start typing...")}
                           className="text-[18px] text-gray-text min-h-[400px]"
                       />
                     </div>
