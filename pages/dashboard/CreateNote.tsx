@@ -683,7 +683,7 @@ export const CreateNote: React.FC = () => {
       {limitReachedOverlay}
       <nav className={`sticky top-4 z-50 mb-8 flex items-center justify-between gap-2 rounded-2xl border-2 border-border bg-white/90 px-3 py-2 sm:px-4 sm:py-3 shadow-[0_4px_0_0_#E5E5E5] backdrop-blur-2xl transition-all duration-500 dark:bg-[#17171b]/90 dark:shadow-[0_4px_0_0_rgba(15,23,42,0.55)] ${isDimmed ? 'opacity-40 hover:opacity-100' : 'opacity-100'}`}>
         <div className="flex items-center gap-2 sm:gap-3">
-           <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-bold uppercase text-[12px] px-2 sm:px-3">
+           <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-black tracking-widest uppercase text-[11px] px-2 sm:px-3 active:scale-[0.98] transition-all">
              <ArrowLeft className="h-4 w-4 sm:mr-2" />
              <span className="hidden sm:inline">BACK</span>
            </Button>
@@ -700,7 +700,7 @@ export const CreateNote: React.FC = () => {
             variant="ghost"
             size="sm"
             onClick={() => setIsFocusModeManual(!isFocusModeManual)}
-            className={`flex items-center gap-2 rounded-xl border font-bold uppercase text-[11px] transition-all ${
+            className={`flex items-center gap-2 rounded-xl border font-black tracking-widest uppercase text-[11px] transition-all active:scale-[0.98] ${
               isFocusModeManual
                 ? 'border-sky-200/90 bg-sky-50/90 text-sky-700 shadow-[0_2px_0_0_rgba(226,232,240,0.8)] dark:border-sky-400/20 dark:bg-sky-400/12 dark:text-sky-100 dark:shadow-[0_2px_0_0_rgba(15,23,42,0.42)]'
                 : 'border-border/70 bg-white/75 text-gray-nav dark:border-white/10 dark:bg-white/5 dark:text-slate-300'
@@ -717,7 +717,7 @@ export const CreateNote: React.FC = () => {
             variant="ghost" 
             size="sm" 
             onClick={handleRelease} 
-            className="border border-sky-100 bg-sky-50/70 text-sky-700 shadow-[0_2px_0_0_rgba(226,232,240,0.75)] hover:bg-emerald-50 hover:text-emerald-700 transition-all dark:border-emerald-400/15 dark:bg-emerald-400/10 dark:text-emerald-100 dark:shadow-[0_2px_0_0_rgba(15,23,42,0.42)] px-2 sm:px-3 dark:hover:bg-emerald-400/16 dark:hover:text-emerald-50" 
+            className="border border-sky-100 bg-sky-50/70 text-sky-700 shadow-[0_2px_0_0_rgba(226,232,240,0.75)] hover:bg-emerald-50 hover:text-emerald-700 transition-all dark:border-emerald-400/15 dark:bg-emerald-400/10 dark:text-emerald-100 dark:shadow-[0_2px_0_0_rgba(15,23,42,0.42)] font-black tracking-widest uppercase text-[11px] px-2 sm:px-3 active:scale-[0.98] dark:hover:bg-emerald-400/16 dark:hover:text-emerald-50" 
             disabled={isReleasing}
           >
               <Wind className="h-3.5 w-3.5 sm:mr-2" />
@@ -753,7 +753,7 @@ export const CreateNote: React.FC = () => {
             <Button 
               variant="secondary" 
               size="sm" 
-              className="border-2 border-border text-blue shadow-3d-gray active:shadow-none active:translate-y-[2px] transition-all dark:bg-white/6 px-2 sm:px-3 dark:text-sky-100 dark:shadow-[0_3px_0_0_rgba(15,23,42,0.55)]" 
+              className="border-2 border-border text-blue font-black tracking-widest uppercase text-[11px] shadow-3d-gray active:shadow-none active:translate-y-[2px] transition-all dark:bg-white/6 px-2 sm:px-3 dark:text-sky-100 dark:shadow-[0_3px_0_0_rgba(15,23,42,0.55)]" 
               disabled={!canEnhance || isReflecting}
               onClick={handleAiReflect}
               isLoading={isReflecting}
@@ -765,7 +765,7 @@ export const CreateNote: React.FC = () => {
               onClick={handleSave} 
               size="sm" 
               variant="primary"
-              className="shadow-3d-green px-2 sm:px-3 active:shadow-none active:translate-y-[2px] transition-all"
+              className="shadow-3d-green font-black tracking-widest uppercase text-[11px] px-2 sm:px-3 active:shadow-none active:translate-y-[2px] transition-all"
               isLoading={saving} 
               disabled={!canSave}
             >
@@ -823,18 +823,7 @@ export const CreateNote: React.FC = () => {
                     </div>
 
                     <div className="flex w-full items-center gap-2 overflow-x-auto no-scrollbar pb-2 sm:pb-0 sm:gap-3 md:w-auto md:flex-wrap">
-                       <button
-                        type="button"
-                        onClick={cycleSparkPrompt}
-                        className={`hidden md:flex col-span-1 ml-auto chooser-chip !p-2 !w-11 !h-11 ${isGeneratingPrompts ? 'active animate-pulse' : ''}`}
-                        title={sparkPrompt}
-                        aria-label="Show another daily wellness spark"
-                      >
-                        <Target size={18} className={isGeneratingPrompts ? 'animate-pulse' : ''} />
-                        <span className="sr-only">
-                          {isGeneratingPrompts ? 'Finding a gentle spark for you...' : sparkPrompt}
-                        </span>
-                      </button>
+
 
                        {/* Progressive Disclosure: Mood Button */}
                        <div className="relative" ref={moodRef}>
@@ -998,26 +987,31 @@ export const CreateNote: React.FC = () => {
                   onFocusCapture={() => setIsFocused(true)}
                   onBlurCapture={() => setIsFocused(false)}
                 >
-                    <div className="mx-auto max-w-[82ch] font-serif leading-loose relative">
+                    <div className="mx-auto max-w-[82ch] font-sans leading-[1.8] relative">
                       <Editor 
                           value={content} 
                           onChange={setContent} 
-                          placeholder={activePlaceholder || (id ? "Continue writing..." : "Start typing...")}
-                          className="text-[18px] text-gray-text min-h-[400px]"
+                          placeholder={activePlaceholder || (id ? "Continue writing..." : "Start typing... or click ✨ below for a spark.")}
+                          className="text-[17px] text-gray-text/90 min-h-[400px]"
                       />
                     </div>
-                    {/* Floating Mobile Spark Prompt Button */}
-                    <div className="absolute bottom-4 right-4 z-10 md:hidden">
-                       <button
-                        type="button"
-                        onClick={cycleSparkPrompt}
-                        className={`flex items-center justify-center h-12 w-12 rounded-2xl border-2 border-border bg-white shadow-lg liquid-glass text-blue focus:outline-none focus:ring-2 focus:ring-blue ${isGeneratingPrompts ? 'animate-pulse' : ''}`}
-                        title={sparkPrompt}
-                        aria-label="Show another daily wellness spark"
-                      >
-                        <Target size={20} className={isGeneratingPrompts ? 'animate-pulse' : ''} />
-                      </button>
-                    </div>
+                    {/* Persistent Spark Prompt FAB in Body */}
+                    {(!content || content === '<p><br></p>') && (
+                      <div className="absolute bottom-6 right-6 z-20">
+                          <motion.button
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.92 }}
+                            onClick={cycleSparkPrompt}
+                            className={`relative flex h-14 w-14 items-center justify-center rounded-full border border-white/40 bg-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-xl transition-all text-yellow-500 hover:text-yellow-600 hover:shadow-[0_8px_30px_rgba(234,179,8,0.2)] hover:border-yellow-200/50 ${isGeneratingPrompts ? 'animate-pulse' : ''}`}
+                            title={sparkPrompt}
+                          >
+                              {/* Breathing Glow */}
+                              <div className="absolute inset-0 rounded-full bg-yellow-400/20 animate-ping opacity-30" style={{ animationDuration: '3s' }} />
+                              <Sparkles size={22} className="relative z-10 drop-shadow-sm" />
+                          </motion.button>
+                      </div>
+                    )}
+
                 </div>
 
                 {/* Tasks Section */}
