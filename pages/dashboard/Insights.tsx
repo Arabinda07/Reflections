@@ -323,9 +323,7 @@ export const Insights: React.FC = () => {
                   </div>
                 )}
               </div>
-              <p className="mt-2 text-right text-[14px] font-medium leading-relaxed text-gray-light">
-                A calm, grounded reading of the patterns your notes are holding right now.
-              </p>
+
             </div>
           </div>
 
