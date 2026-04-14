@@ -1011,7 +1011,7 @@ export const CreateNote: React.FC = () => {
                         <span>{new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                     </div>
 
-                    <div className="flex w-full items-center gap-2 overflow-x-auto no-scrollbar pb-2 sm:pb-0 sm:gap-3 md:w-auto md:flex-wrap">
+                    <div className="flex w-full items-center gap-2 overflow-x-auto no-scrollbar pb-2 sm:overflow-visible sm:pb-0 sm:flex-wrap sm:gap-3 sm:w-auto">
 
 
                        {/* Progressive Disclosure: Mood Button */}
