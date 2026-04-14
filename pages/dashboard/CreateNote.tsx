@@ -196,6 +196,7 @@ export const CreateNote: React.FC = () => {
   
   const moodRef = useRef<HTMLDivElement>(null);
   const tagsRef = useRef<HTMLDivElement>(null);
+  const musicRef = useRef<HTMLDivElement>(null);
   
   const lastSavedRef = useRef({ title: '', content: '', mood: undefined as string | undefined, tags: [] as string[], tasks: [] as Task[] });
   const editorRef = useRef<HTMLDivElement>(null);
@@ -311,6 +312,9 @@ export const CreateNote: React.FC = () => {
       }
       if (tagsRef.current && !tagsRef.current.contains(event.target as Node)) {
         setIsTagsOpen(false);
+      }
+      if (musicRef.current && !musicRef.current.contains(event.target as Node)) {
+        setIsMusicOpen(false);
       }
     };
 
@@ -829,11 +833,20 @@ export const CreateNote: React.FC = () => {
           </Button>
 
           {/* Music Player Button */}
-          <div className="relative">
+          <div className="relative" ref={musicRef}>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setIsMusicOpen(!isMusicOpen)}
+              onClick={() => {
+                if (!isMusicOpen) {
+                  setIsMusicOpen(true);
+                } else if (isPlaying) {
+                  audioRef.current?.pause();
+                  setIsPlaying(false);
+                } else {
+                  setIsMusicOpen(false);
+                }
+              }}
               className={`flex items-center gap-2 font-bold uppercase text-[11px] transition-all ${isPlaying ? 'text-purple-500 bg-purple-500/5' : 'text-gray-nav'}`}
               title="Ambient Sounds"
             >
@@ -847,7 +860,7 @@ export const CreateNote: React.FC = () => {
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute top-full mt-3 right-0 z-[100] p-4 bg-white border-2 border-border rounded-3xl shadow-xl w-[240px] liquid-glass"
+                  className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-auto sm:bottom-auto sm:absolute sm:top-full mt-3 sm:right-0 z-[100] p-4 bg-white border-2 border-border rounded-3xl shadow-xl w-auto sm:w-[240px] liquid-glass"
                 >
                   <div className="flex items-center justify-between mb-4 px-1">
                     <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav flex items-center gap-2">
@@ -1017,7 +1030,7 @@ export const CreateNote: React.FC = () => {
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                 transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                                className="absolute top-full mt-3 left-0 z-[100] p-4 bg-white border-2 border-border rounded-3xl shadow-xl w-[260px] sm:w-[280px] max-w-[calc(100vw-40px)] liquid-glass"
+                                className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-auto sm:bottom-auto sm:absolute sm:top-full mt-3 sm:-ml-2 z-[100] p-4 bg-white border-2 border-border rounded-3xl shadow-xl w-auto sm:w-[280px] liquid-glass"
                               >
                                 <div className="flex items-center justify-between mb-4 px-1">
                                   <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav">How are you?</span>
@@ -1064,7 +1077,7 @@ export const CreateNote: React.FC = () => {
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                 transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                                className="absolute top-full mt-3 right-0 sm:left-0 sm:right-auto z-[100] p-4 bg-white border-2 border-border rounded-3xl shadow-xl w-[280px] sm:w-[320px] max-w-[calc(100vw-40px)] liquid-glass"
+                                className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-auto sm:bottom-auto sm:absolute sm:top-full mt-3 sm:left-0 z-[100] p-4 bg-white border-2 border-border rounded-3xl shadow-xl w-auto sm:w-[320px] liquid-glass"
                               >
                                 <div className="mb-4">
                                   <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav block mb-3">Add Tags</span>
@@ -1162,11 +1175,11 @@ export const CreateNote: React.FC = () => {
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.92 }}
                             onClick={cycleSparkPrompt}
-                            className={`relative flex h-14 w-14 items-center justify-center rounded-full border border-white/40 bg-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-xl transition-all text-yellow-500 hover:text-yellow-600 hover:shadow-[0_8px_30px_rgba(234,179,8,0.2)] hover:border-yellow-200/50 ${isGeneratingPrompts ? 'animate-pulse' : ''}`}
+                            className={`relative flex h-14 w-14 items-center justify-center rounded-full border border-white/40 bg-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-xl transition-all text-emerald-500 hover:text-emerald-600 hover:shadow-[0_8px_30px_rgba(16,185,129,0.2)] hover:border-emerald-200/50 ${isGeneratingPrompts ? 'animate-pulse' : ''}`}
                             title={sparkPrompt}
                           >
                               {/* Breathing Glow */}
-                              <div className="absolute inset-0 rounded-full bg-yellow-400/20 animate-ping opacity-30" style={{ animationDuration: '3s' }} />
+                              <div className="absolute inset-0 rounded-full bg-emerald-400/20 animate-ping opacity-30" style={{ animationDuration: '3s' }} />
                               <Sparkles size={22} className="relative z-10 drop-shadow-sm" />
                           </motion.button>
                       </div>
