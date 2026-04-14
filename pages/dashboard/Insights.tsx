@@ -149,8 +149,9 @@ export const Insights: React.FC = () => {
           }
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("AI deep reflection failed:", error);
+      alert(`Error generating reflection: ${error?.message || "Please check your GEMINI_API_KEY or connection."}`);
     } finally {
       setGenerating(false);
     }
@@ -315,20 +316,19 @@ export const Insights: React.FC = () => {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <div className="rounded-xl border-2 border-border bg-gray-50 px-3 py-2 text-[11px] font-black uppercase tracking-widest text-gray-nav dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
-              {notes.length} notes in context
-            </div>
           </div>
         </div>
 
-        <div className="mb-8 p-6 rounded-[24px] border-2 border-border bg-gray-50/50 dark:border-white/10 dark:bg-white/5">
+        <div className="mb-0 p-0 rounded-[24px]">
           {reflectionText ? (
-            <div
-              className="prose prose-lg max-w-none text-gray-text leading-loose font-sans font-medium dark:prose-invert dark:text-slate-100"
-              dangerouslySetInnerHTML={{ __html: reflectionText.replace(/\n\n/g, '<br/><br/>') }}
-            />
+            <div className="mb-8 p-6 border-2 border-border bg-gray-50/50 dark:border-white/10 dark:bg-white/5 rounded-[24px]">
+              <div
+                className="prose prose-lg max-w-none text-gray-text leading-loose font-sans font-medium dark:prose-invert dark:text-slate-100"
+                dangerouslySetInnerHTML={{ __html: reflectionText.replace(/\n\n/g, '<br/><br/>') }}
+              />
+            </div>
           ) : isPremiumLocked ? (
-            <div className="text-center py-10">
+            <div className="mb-8 p-6 text-center py-10 border-2 border-border bg-gray-50/50 dark:border-white/10 dark:bg-white/5 rounded-[24px]">
               <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-border bg-white text-gray-nav shadow-sm dark:border-white/10 dark:bg-white/6 dark:text-slate-300">
                 <Lock size={18} />
               </div>
@@ -339,16 +339,7 @@ export const Insights: React.FC = () => {
                 Upgrade to Pro to continuously map your emotional themes and patterns.
               </p>
             </div>
-          ) : (
-            <div className="text-center py-10">
-              <p className="text-[17px] font-display lowercase text-gray-text dark:text-slate-50">
-                a gentler read, not a wall of text
-              </p>
-              <p className="mt-3 max-w-xl mx-auto text-[14px] font-medium leading-relaxed text-gray-light dark:text-slate-400">
-                This reflection surfaces the emotional patterns, themes, and tensions from your recent entries in a simple, brief summary.
-              </p>
-            </div>
-          )}
+          ) : null}
         </div>
 
         <div className="flex justify-center">

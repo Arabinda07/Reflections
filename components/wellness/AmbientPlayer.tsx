@@ -272,7 +272,7 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 30, opacity: 0.85 }}
               transition={{ duration: 0.22, ease: 'easeOut' }}
-              className="w-full chooser-popover"
+              className="w-full chooser-popover max-h-[85vh] overflow-y-auto"
               onClick={(event) => event.stopPropagation()}
             >
               <div className="mb-4 flex items-start justify-end">

@@ -823,7 +823,7 @@ export const CreateNote: React.FC = () => {
                        <button
                         type="button"
                         onClick={cycleSparkPrompt}
-                        className={`col-span-1 ml-auto chooser-chip !p-2 !w-11 !h-11 ${isGeneratingPrompts ? 'active animate-pulse' : ''}`}
+                        className={`hidden md:flex col-span-1 ml-auto chooser-chip !p-2 !w-11 !h-11 ${isGeneratingPrompts ? 'active animate-pulse' : ''}`}
                         title={sparkPrompt}
                         aria-label="Show another daily wellness spark"
                       >
@@ -845,12 +845,12 @@ export const CreateNote: React.FC = () => {
                             {mood ? (
                               <>
                                 {React.createElement(moods.find(m => m.id === mood)?.icon || Smile, { size: 16 })}
-                                <span>{mood}</span>
+                                <span className="hidden sm:inline">{mood}</span>
                               </>
                             ) : (
                               <>
                                 <Smile size={16} />
-                                <span>Mood</span>
+                                <span className="hidden sm:inline">Mood</span>
                               </>
                             )}
                           </button>
@@ -902,7 +902,7 @@ export const CreateNote: React.FC = () => {
                             className={`w-full chooser-chip ${tags.length > 0 ? 'active' : ''}`}
                           >
                             <TagIcon size={16} />
-                            <span>{tags.length > 0 ? `${tags.length} Tags` : 'Tags'}</span>
+                            <span className="hidden sm:inline">{tags.length > 0 ? `${tags.length} Tags` : 'Tags'}</span>
                           </button>
 
                           <AnimatePresence>
@@ -964,15 +964,15 @@ export const CreateNote: React.FC = () => {
                           </AnimatePresence>
                        </div>
 
-                       <label className="chooser-chip cursor-pointer !w-full lg:!w-auto">
+                       <label className="chooser-chip cursor-pointer w-full md:w-auto">
                           <Paperclip size={16} />
-                          <span>ATTACH</span>
+                          <span className="hidden sm:inline">ATTACH</span>
                           <input type="file" multiple className="hidden" onChange={handleAttachmentUpload} />
                        </label>
                        {!imagePreview && (
-                          <label className="chooser-chip cursor-pointer !w-full lg:!w-auto">
+                          <label className="chooser-chip cursor-pointer w-full md:w-auto">
                              <ImageIcon size={16} />
-                             <span>COVER</span>
+                             <span className="hidden sm:inline">COVER</span>
                              <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
                           </label>
                        )}
@@ -1002,6 +1002,18 @@ export const CreateNote: React.FC = () => {
                           placeholder={activePlaceholder || (id ? "Continue writing..." : "Start typing...")}
                           className="text-[18px] text-gray-text min-h-[400px]"
                       />
+                    </div>
+                    {/* Floating Mobile Spark Prompt Button */}
+                    <div className="absolute bottom-4 right-4 z-10 md:hidden">
+                       <button
+                        type="button"
+                        onClick={cycleSparkPrompt}
+                        className={`flex items-center justify-center h-12 w-12 rounded-2xl border-2 border-border bg-white shadow-lg liquid-glass text-blue focus:outline-none focus:ring-2 focus:ring-blue ${isGeneratingPrompts ? 'animate-pulse' : ''}`}
+                        title={sparkPrompt}
+                        aria-label="Show another daily wellness spark"
+                      >
+                        <Target size={20} className={isGeneratingPrompts ? 'animate-pulse' : ''} />
+                      </button>
                     </div>
                 </div>
 
