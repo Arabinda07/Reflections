@@ -26,6 +26,17 @@ export const DashboardLayout: React.FC = () => {
     }
   }, [isDarkMode]);
 
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileMenuOpen]);
+
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };

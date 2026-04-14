@@ -781,19 +781,12 @@ export const CreateNote: React.FC = () => {
 
   const isDimmed = isFocusModeManual;
 
-  if (isBreathing) {
-    return (
-      <>
-        <BreathingGate active={isBreathing} durationMs={3600} onComplete={handleBreathingComplete} />
-        {limitReachedOverlay}
-      </>
-    );
-  }
-
   return (
-    <div className="mx-auto max-w-[1180px] animate-in fade-in duration-500 pb-20 px-3 sm:px-4 md:px-6">
+    <>
+      <BreathingGate active={isBreathing} durationMs={3600} onComplete={handleBreathingComplete} />
       {limitReachedOverlay}
-      <nav className={`sticky top-4 z-50 mb-8 flex items-center justify-between gap-2 rounded-2xl border-2 border-border bg-white/90 px-3 py-2 sm:px-4 sm:py-3 shadow-[0_4px_0_0_#E5E5E5] backdrop-blur-2xl transition-all duration-500 dark:bg-[#17171b]/90 dark:shadow-[0_4px_0_0_rgba(15,23,42,0.55)] ${isDimmed ? 'opacity-40 hover:opacity-100' : 'opacity-100'}`}>
+      <div className={`mx-auto max-w-[1180px] transition-opacity duration-1000 ${isBreathing ? 'opacity-0 pointer-events-none' : 'opacity-100 animate-in fade-in duration-500'} pb-20 px-3 sm:px-4 md:px-6`}>
+        <nav className={`sticky top-4 z-50 mb-8 flex items-center justify-between gap-2 rounded-2xl border-2 border-border bg-white/90 px-3 py-2 sm:px-4 sm:py-3 shadow-[0_4px_0_0_#E5E5E5] backdrop-blur-2xl transition-all duration-500 dark:bg-[#17171b]/90 dark:shadow-[0_4px_0_0_rgba(15,23,42,0.55)] ${isDimmed ? 'opacity-40 hover:opacity-100' : 'opacity-100'}`}>
         <div className="flex items-center gap-2 sm:gap-3">
            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-bold uppercase text-[12px] px-2 sm:px-3">
              <ArrowLeft className="h-4 w-4 sm:mr-2" />
@@ -965,22 +958,15 @@ export const CreateNote: React.FC = () => {
       </nav>
 
       <AnimatePresence mode="wait">
-        <motion.div
-          key="editor-shell"
-          initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 20, filter: 'blur(10px)' }}
-          animate={
-            isReleasing
-              ? shouldReduceMotion
-                ? { opacity: 0 }
-                : { opacity: 0, y: -34, scale: 0.98, filter: 'blur(18px)' }
-              : shouldReduceMotion
-                ? { opacity: 1 }
-                : { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }
-          }
-          exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -20, filter: 'blur(14px)' }}
-          transition={{ duration: shouldReduceMotion ? 0.3 : (isReleasing ? 1.35 : 0.65), ease: releaseEase }}
-          className="mx-auto w-full max-w-[1100px]"
-        >
+        {!isReleasing && (
+          <motion.div
+            key="editor-shell"
+            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 20, filter: 'blur(10px)' }}
+            animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+            exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -50, scale: 0.98, filter: 'blur(12px)' }}
+            transition={{ duration: 1.2, ease: releaseEase }}
+            className="mx-auto w-full max-w-[1100px]"
+          >
           <div className="relative min-h-[70vh] rounded-[32px] border-2 border-border bg-white shadow-[0_8px_0_0_#E5E5E5] flex flex-col liquid-glass !overflow-visible dark:bg-[#17171b] dark:shadow-[0_8px_0_0_rgba(15,23,42,0.58)]">
             {imagePreview && (
               <div className="relative aspect-[21/9] w-full group bg-white border-b-2 border-border rounded-t-[30px] overflow-hidden">
@@ -1380,8 +1366,10 @@ export const CreateNote: React.FC = () => {
             </div>
           </div>
         </motion.div>
+        )}
       </AnimatePresence>
       <audio ref={audioRef} loop className="hidden" />
-    </div>
+      </div>
+    </>
   );
 };

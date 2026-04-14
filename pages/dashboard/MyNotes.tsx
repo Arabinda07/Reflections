@@ -43,6 +43,8 @@ export const MyNotes: React.FC = () => {
     ? notes.filter(note => note.tags?.includes(tagFilter))
     : notes;
 
+  const allTags = Array.from(new Set(notes.flatMap(n => n.tags || [])));
+
   const notesOnSelectedDate = filteredNotes.filter(note => 
     isSameDay(new Date(note.updatedAt), selectedDate)
   );
@@ -132,6 +134,19 @@ export const MyNotes: React.FC = () => {
                   <X size={12} />
                 </button>
               </span>
+            </div>
+          )}
+          {!tagFilter && allTags.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {allTags.map(tag => (
+                <button 
+                  key={tag}
+                  onClick={() => navigate(`${RoutePath.NOTES}?tag=${encodeURIComponent(tag)}`)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-50 border border-border text-[12px] font-bold text-gray-nav hover:text-blue hover:border-blue/30 transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]"
+                >
+                  <Tag size={12} /> {tag}
+                </button>
+              ))}
             </div>
           )}
         </div>
@@ -335,9 +350,9 @@ export const MyNotes: React.FC = () => {
              <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-3d-gray border-2 border-border mb-6">
                  <FileText size={28} className="text-gray-nav" />
              </div>
-             <h3 className="font-display text-[24px] text-gray-text lowercase">no notes found</h3>
+             <h3 className="font-display text-[24px] text-gray-text lowercase">The space is quiet</h3>
              <p className="text-gray-light mb-8 max-w-sm font-medium">
-               {tagFilter ? `No notes found with the tag "${tagFilter}".` : "Create your first note to get started on your mental health journey."}
+               {tagFilter ? `No notes found with the tag "${tagFilter}".` : "Take a breath, and when you are ready, leave a thought here."}
              </p>
              {tagFilter ? (
                <Button 

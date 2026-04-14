@@ -1,21 +1,21 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Sparkles, Brain, Calendar, CheckSquare, Heart, Lock, TrendingUp, Loader2, MessageSquare, Crown } from 'lucide-react';
+import { motion } from 'motion/react';
 import { Button } from '../../components/ui/Button';
 import { RoutePath, Note } from '../../types';
 import { noteService } from '../../services/noteService';
 import { GoogleGenAI } from "@google/genai";
 import { supabase } from '../../src/supabaseClient';
-import { PieChart, Pie, Cell, ResponsiveContainer, Sector } from 'recharts';
 
-// Soft pastel dictionary for recharts
+// Soft pastel dictionary for Aura
 const MOOD_COLORS: Record<string, string> = {
-  happy: '#eab308',
-  calm: '#10b981',
-  anxious: '#3b82f6',
-  sad: '#6366f1',
-  angry: '#f43f5e',
-  tired: '#64748b',
+  happy: 'var(--golden, #eab308)',
+  calm: 'var(--green, #10b981)',
+  anxious: 'var(--blue, #3b82f6)',
+  sad: 'var(--dark-blue, #6366f1)',
+  angry: 'var(--red, #f43f5e)',
+  tired: 'var(--gray-light, #64748b)',
 };
 
 export const Insights: React.FC = () => {
@@ -225,35 +225,37 @@ export const Insights: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
-        {/* Soft Recharts Donut */}
-        <div className="bg-white border-2 border-border rounded-[40px] p-8 shadow-[0_8px_0_0_#E5E5E5] liquid-glass flex flex-col items-center justify-center min-h-[300px] relative">
-          <h3 className="absolute top-8 left-8 text-[14px] font-extrabold text-gray-text uppercase tracking-wider">The Mood Landscape</h3>
+        {/* The Aura Visualization */}
+        <div className="bg-white border-2 border-border rounded-[40px] p-8 shadow-[0_8px_0_0_#E5E5E5] liquid-glass flex flex-col items-center justify-center min-h-[300px] relative overflow-hidden">
+          <h3 className="absolute top-8 left-8 text-[14px] font-extrabold text-gray-text uppercase tracking-wider z-20">The Mood Landscape</h3>
           {stats.moodData.length === 0 ? (
-            <p className="text-[13px] text-gray-nav font-medium italic">Label some moods to see your landscape.</p>
+            <p className="text-[13px] text-gray-nav font-medium italic z-20">Label some moods to see your landscape.</p>
           ) : (
-            <div className="w-full h-[220px] mt-10">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={stats.moodData}
-                    innerRadius={70}
-                    outerRadius={90}
-                    paddingAngle={5}
-                    dataKey="value"
-                    stroke="none"
-                    cornerRadius={10}
-                  >
-                    {stats.moodData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={MOOD_COLORS[entry.name] || '#94a3b8'} className="drop-shadow-sm" />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
+            <div className="relative w-full h-[220px] mt-10 flex items-center justify-center">
+              <motion.div
+                animate={{ 
+                  scale: [1, 1.05, 1],
+                  rotate: [0, 5, -5, 0],
+                  opacity: [0.8, 1, 0.8]
+                }}
+                transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
+                className="w-[200px] h-[200px] sm:w-[220px] sm:h-[220px] rounded-full relative overflow-hidden" 
+                style={{
+                  background: stats.moodData.slice(0, 3).map((entry, index) => {
+                    const color = MOOD_COLORS[entry.name] || 'var(--gray-light)';
+                    const x = index === 0 ? '50%' : index === 1 ? '30%' : '70%';
+                    const y = index === 0 ? '50%' : index === 1 ? '70%' : '30%';
+                    const size = index === 0 ? '70%' : '50%';
+                    return `radial-gradient(circle at ${x} ${y}, ${color} 0%, transparent ${size})`;
+                  }).join(', ') + ', var(--panel-bg)',
+                  filter: 'blur(30px)'
+                }}
+              />
               {stats.topMood !== 'undefined' && (
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none mt-10">
-                  <div className="text-center">
-                    <span className="text-[28px] font-display text-gray-text block lowercase leading-none">{stats.topMood}</span>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav">{stats.moodData[0].value} Entries</span>
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                  <div className="text-center bg-white/40 dark:bg-[#1e1e1e]/40 px-6 py-4 rounded-3xl backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-white/20 dark:border-white/10">
+                    <span className="text-[32px] font-display text-gray-text block lowercase leading-none mb-1 capitalize">{stats.topMood}</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-text/70">{stats.moodData[0].value} Entries</span>
                   </div>
                 </div>
               )}
