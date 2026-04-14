@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import { Headphones, Pause, Play, X, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '../ui/Button';
@@ -195,15 +196,15 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
 
   return (
     <div className="relative" ref={containerRef}>
-      <div className={`chooser-chip !p-0 overflow-hidden ${isPlaying ? 'active' : ''}`}>
+      <div className={`chooser-chip !p-0 overflow-hidden flex flex-row items-center flex-nowrap ${isPlaying ? 'active' : ''}`}>
         <button
           onClick={() => setIsOpen((current) => !current)}
           aria-expanded={isOpen}
           aria-haspopup="menu"
-          className="flex h-full items-center gap-2 px-3 sm:px-4 py-2"
+          className="flex h-full items-center gap-2 px-3 sm:px-4 py-2 flex-nowrap whitespace-nowrap"
           title="Choose ambient sound"
         >
-          <Headphones size={16} />
+          <Headphones size={16} className="shrink-0" />
           <span className="hidden sm:inline">{isPlaying ? AMBIENT_PRESETS.find(p => p.id === activePresetId)?.name || 'Ambient' : 'Ambient'}</span>
         </button>
         {isPlaying && (
@@ -259,12 +260,12 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
           </motion.div>
         )}
 
-        {isOpen && isMobileLayout && (
+        {isOpen && isMobileLayout && createPortal(
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[140] flex items-end bg-slate-950/35 p-3 backdrop-blur-sm sm:hidden"
+            className="fixed inset-0 z-[9999] flex items-end bg-slate-950/35 p-3 backdrop-blur-sm sm:hidden"
             onClick={() => setIsOpen(false)}
           >
             <motion.div
@@ -272,7 +273,7 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 30, opacity: 0.85 }}
               transition={{ duration: 0.22, ease: 'easeOut' }}
-              className="w-full chooser-popover max-h-[85vh] overflow-y-auto"
+              className="w-full chooser-popover max-h-[85vh] overflow-y-auto mb-4"
               onClick={(event) => event.stopPropagation()}
             >
               <div className="mb-4 flex items-start justify-end">
@@ -311,7 +312,8 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
                 })}
               </div>
             </motion.div>
-          </motion.div>
+          </motion.div>,
+          document.body
         )}
       </AnimatePresence>
     </div>

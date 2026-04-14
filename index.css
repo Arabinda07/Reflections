@@ -240,7 +240,7 @@ body {
   }
 
   .chooser-popover {
-    @apply p-5 bg-white/95 border-2 border-border rounded-3xl shadow-sm liquid-glass dark:bg-[#16181d]/95 dark:border-white/10 dark:shadow-[0_4px_12px_-4px_rgba(0,0,0,0.5)];
+    @apply p-5 bg-white/70 backdrop-blur-2xl border-2 border-border rounded-3xl shadow-md liquid-glass dark:bg-[#16181d]/80 dark:border-white/10 dark:shadow-[0_4px_12px_-4px_rgba(0,0,0,0.5)];
   }
 }
 
@@ -252,6 +252,30 @@ body {
   .ql-editor {
     max-width: 100%;
     min-height: 320px;
+  }
+
+  /* Make quill pickers appear as a bottom sheet on mobile to not overflow */
+  .ql-snow .ql-picker.ql-expanded .ql-picker-options {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: auto !important;
+    width: 100% !important;
+    max-height: 50vh;
+    overflow-y: auto;
+    z-index: 9999;
+    padding: 20px !important;
+    border-radius: 20px 20px 0 0;
+    background: var(--panel-bg);
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.15) !important;
+  }
+
+  .ql-snow .ql-color-picker .ql-picker-options {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
   }
 }
 

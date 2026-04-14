@@ -26,7 +26,10 @@ function debounce<T extends (...args: any[]) => any>(
   };
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+const apiKey = typeof process !== 'undefined' && process.env.GEMINI_API_KEY 
+  ? process.env.GEMINI_API_KEY 
+  : (import.meta as any).env?.VITE_GEMINI_API_KEY || "";
+const ai = new GoogleGenAI({ apiKey });
 
 interface TaskRowProps {
   task: Task;
@@ -678,21 +681,21 @@ export const CreateNote: React.FC = () => {
   return (
     <div className="mx-auto max-w-[1180px] animate-in fade-in duration-500 pb-20 px-3 sm:px-4 md:px-6">
       {limitReachedOverlay}
-      <nav className={`sticky top-4 z-50 mb-8 flex flex-col gap-3 rounded-2xl border-2 border-border bg-white/90 px-4 py-3 shadow-[0_4px_0_0_#E5E5E5] backdrop-blur-2xl transition-all duration-500 dark:bg-[#17171b]/90 dark:shadow-[0_4px_0_0_rgba(15,23,42,0.55)] sm:flex-row sm:items-center sm:justify-between ${isDimmed ? 'opacity-40 hover:opacity-100' : 'opacity-100'}`}>
-        <div className="flex items-center gap-3">
-           <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-bold uppercase text-[12px]">
-             <ArrowLeft className="mr-2 h-4 w-4" />
-             BACK
+      <nav className={`sticky top-4 z-50 mb-8 flex items-center justify-between gap-2 rounded-2xl border-2 border-border bg-white/90 px-3 py-2 sm:px-4 sm:py-3 shadow-[0_4px_0_0_#E5E5E5] backdrop-blur-2xl transition-all duration-500 dark:bg-[#17171b]/90 dark:shadow-[0_4px_0_0_rgba(15,23,42,0.55)] ${isDimmed ? 'opacity-40 hover:opacity-100' : 'opacity-100'}`}>
+        <div className="flex items-center gap-2 sm:gap-3">
+           <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-bold uppercase text-[12px] px-2 sm:px-3">
+             <ArrowLeft className="h-4 w-4 sm:mr-2" />
+             <span className="hidden sm:inline">BACK</span>
            </Button>
            <div className="h-4 w-[2px] bg-border"></div>
            <div className="flex flex-col">
              <span className="text-[12px] font-extrabold text-gray-nav uppercase tracking-wider">
-                {id ? 'edit note' : ''}
+                {id ? 'EDIT' : ''}
              </span>
            </div>
         </div>
         
-        <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <Button
             variant="ghost"
             size="sm"
@@ -714,10 +717,10 @@ export const CreateNote: React.FC = () => {
             variant="ghost" 
             size="sm" 
             onClick={handleRelease} 
-            className="border border-sky-100 bg-sky-50/70 text-sky-700 shadow-[0_2px_0_0_rgba(226,232,240,0.75)] hover:bg-emerald-50 hover:text-emerald-700 transition-all dark:border-emerald-400/15 dark:bg-emerald-400/10 dark:text-emerald-100 dark:shadow-[0_2px_0_0_rgba(15,23,42,0.42)] dark:hover:bg-emerald-400/16 dark:hover:text-emerald-50" 
+            className="border border-sky-100 bg-sky-50/70 text-sky-700 shadow-[0_2px_0_0_rgba(226,232,240,0.75)] hover:bg-emerald-50 hover:text-emerald-700 transition-all dark:border-emerald-400/15 dark:bg-emerald-400/10 dark:text-emerald-100 dark:shadow-[0_2px_0_0_rgba(15,23,42,0.42)] px-2 sm:px-3 dark:hover:bg-emerald-400/16 dark:hover:text-emerald-50" 
             disabled={isReleasing}
           >
-              <Wind className="mr-2 h-3.5 w-3.5" />
+              <Wind className="h-3.5 w-3.5 sm:mr-2" />
               <span className="hidden sm:inline">RELEASE</span>
           </Button>
 
@@ -750,24 +753,24 @@ export const CreateNote: React.FC = () => {
             <Button 
               variant="secondary" 
               size="sm" 
-              className="border-2 border-border text-blue shadow-3d-gray active:shadow-none active:translate-y-[2px] transition-all dark:bg-white/6 dark:text-sky-100 dark:shadow-[0_3px_0_0_rgba(15,23,42,0.55)]" 
+              className="border-2 border-border text-blue shadow-3d-gray active:shadow-none active:translate-y-[2px] transition-all dark:bg-white/6 px-2 sm:px-3 dark:text-sky-100 dark:shadow-[0_3px_0_0_rgba(15,23,42,0.55)]" 
               disabled={!canEnhance || isReflecting}
               onClick={handleAiReflect}
               isLoading={isReflecting}
             >
-                <Wand2 className="mr-2 h-3.5 w-3.5" />
+                <Wand2 className="h-3.5 w-3.5 sm:mr-2" />
                 <span className="hidden sm:inline">AI REFLECT</span>
             </Button>
             <Button 
               onClick={handleSave} 
               size="sm" 
               variant="primary"
-              className="shadow-3d-green active:shadow-none active:translate-y-[2px] transition-all"
+              className="shadow-3d-green px-2 sm:px-3 active:shadow-none active:translate-y-[2px] transition-all"
               isLoading={saving} 
               disabled={!canSave}
             >
-              <Save className="mr-2 h-3.5 w-3.5" />
-              SAVE
+              <Save className="h-3.5 w-3.5 sm:mr-2" />
+              <span className="hidden sm:inline">SAVE</span>
             </Button>
         </div>
       </nav>
@@ -819,7 +822,7 @@ export const CreateNote: React.FC = () => {
                         <span>{new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                     </div>
 
-                    <div className="grid w-full grid-cols-2 items-center gap-2 sm:gap-3 md:w-full md:grid-cols-[repeat(auto-fit,minmax(0,1fr))] lg:flex lg:w-auto lg:flex-wrap">
+                    <div className="grid w-full grid-cols-4 items-center gap-1.5 sm:gap-3 md:flex md:w-auto md:flex-wrap">
                        <button
                         type="button"
                         onClick={cycleSparkPrompt}
@@ -1063,9 +1066,9 @@ export const CreateNote: React.FC = () => {
                           <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-sky-100 bg-white text-blue shadow-[0_2px_0_0_rgba(226,232,240,0.9)]">
                             <Brain size={20} />
                           </div>
-                          <div>
-                            <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-blue/55 leading-none mb-1">AI Reflection</h4>
-                            <p className="text-[13px] font-bold text-gray-text leading-none">A softer mirror for what you wrote</p>
+                          <div className="flex-1 flex flex-col items-end">
+                            <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-blue/55 leading-none mb-1 w-full text-left">Reflection</h4>
+                            <p className="text-[13px] font-bold text-gray-text leading-none w-full text-right">A softer mirror for what you wrote</p>
                           </div>
                         </div>
 
