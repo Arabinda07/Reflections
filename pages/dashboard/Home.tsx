@@ -7,17 +7,8 @@ import { RoutePath } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { noteService } from '../../services/noteService';
 import { supabase } from '../../src/supabaseClient';
+import { DEFAULT_WELLNESS_PROMPTS } from '../../services/wellnessPrompts';
 import { Landing } from './Landing';
-
-const DAILY_PROMPTS = [
-  "What is one thing that made you feel peaceful today, even if just for a second?",
-  "How did you handle a challenge today with kindness toward yourself?",
-  "What's a small victory you want to celebrate right now?",
-  "If you could send a message to your future self, what would it say?",
-  "What's one thing you're letting go of to make room for growth?",
-  "Describe a moment today where you felt truly present.",
-  "What's a quality you admire in yourself that you used today?"
-];
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -25,12 +16,12 @@ export const Home: React.FC = () => {
   const [noteCount, setNoteCount] = useState<number | null>(null);
   const [isCountLoading, setIsCountLoading] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [dailyPrompt, setDailyPrompt] = useState(DAILY_PROMPTS[0]);
+  const [dailyPrompt, setDailyPrompt] = useState(DEFAULT_WELLNESS_PROMPTS[0]);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     // Randomize initial prompt
-    setDailyPrompt(DAILY_PROMPTS[Math.floor(Math.random() * DAILY_PROMPTS.length)]);
+    setDailyPrompt(DEFAULT_WELLNESS_PROMPTS[Math.floor(Math.random() * DEFAULT_WELLNESS_PROMPTS.length)]);
   }, []);
 
   const refreshPrompt = (e: React.MouseEvent) => {
@@ -40,7 +31,7 @@ export const Home: React.FC = () => {
     setIsRefreshing(true);
     let next;
     do {
-      next = DAILY_PROMPTS[Math.floor(Math.random() * DAILY_PROMPTS.length)];
+      next = DEFAULT_WELLNESS_PROMPTS[Math.floor(Math.random() * DEFAULT_WELLNESS_PROMPTS.length)];
     } while (next === dailyPrompt);
     
     // Artificial delay to make it feel like it's "refreshing"
@@ -222,22 +213,27 @@ export const Home: React.FC = () => {
         {/* Panel 2: Daily Mindfulness */}
         <div className="p-6 sm:p-10 border-b-2 border-border flex flex-col justify-center">
           <div className="panel-label">Daily Mindfulness</div>
-          <div className="bg-gradient-to-br from-blue to-blue/80 rounded-[32px] p-10 text-white shadow-3d-blue liquid-glass-strong relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:rotate-12 transition-transform duration-700">
-              <Target size={120} />
+          <div className="group relative overflow-hidden rounded-[32px] border border-sky-100 bg-[linear-gradient(180deg,rgba(239,248,255,0.94),rgba(255,255,255,0.98))] p-6 shadow-[0_8px_0_0_rgba(226,232,240,0.95)] transition-all sm:p-8 lg:p-10">
+            <div className="absolute inset-x-0 top-0 h-24 bg-[radial-gradient(circle_at_top_right,rgba(125,211,252,0.22),transparent_55%)] pointer-events-none" />
+            <div className="absolute -bottom-8 left-0 h-28 w-28 rounded-full bg-emerald-100/50 blur-3xl pointer-events-none" />
+            <div className="absolute top-0 right-0 p-5 opacity-40 transition-transform duration-700 group-hover:rotate-12">
+              <Target size={96} className="text-sky-100" />
             </div>
             
             <div className="relative z-10">
-              <div className="flex items-center justify-between mb-6">
+              <div className="mb-5 flex items-start justify-between gap-4 sm:mb-6">
                 <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center">
-                    <Target size={24} />
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-sky-100 bg-white text-blue shadow-[0_2px_0_0_rgba(226,232,240,0.9)]">
+                    <Target size={22} />
                   </div>
-                  <h4 className="text-[20px] font-display lowercase">today's focus</h4>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.22em] text-blue/70">Daily Wellness</p>
+                    <h4 className="text-[20px] font-display lowercase text-gray-text">today's focus</h4>
+                  </div>
                 </div>
                 <button 
                   onClick={refreshPrompt}
-                  className={`p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-all ${isRefreshing ? 'opacity-50' : 'opacity-100'}`}
+                  className={`rounded-xl border border-sky-100 bg-white p-2 text-blue shadow-[0_2px_0_0_rgba(226,232,240,0.9)] transition-all hover:bg-sky-50 ${isRefreshing ? 'opacity-50' : 'opacity-100'}`}
                   title="Refresh Prompt"
                   disabled={isRefreshing}
                 >
@@ -245,14 +241,14 @@ export const Home: React.FC = () => {
                 </button>
               </div>
               
-              <p className="text-[20px] font-medium leading-relaxed mb-10">
+              <p className="mb-8 text-[18px] font-medium leading-relaxed text-gray-text sm:text-[20px]">
                 "{dailyPrompt}"
               </p>
               
               <Button 
                 variant="secondary" 
                 size="lg" 
-                className="w-full sm:w-auto bg-white text-blue font-extrabold uppercase shadow-3d-gray liquid-glass"
+                className="w-full sm:w-auto border border-sky-100 bg-white text-blue font-extrabold uppercase shadow-[0_4px_0_0_rgba(226,232,240,0.95)]"
                 onClick={() => handleCreateClick(dailyPrompt)}
               >
                 WRITE ABOUT IT

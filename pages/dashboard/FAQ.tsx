@@ -4,7 +4,7 @@ import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
 import { 
   Heart, Sparkles, Brain, Shield, Cloud, Sun, Moon, Zap, 
   PenTool, Tags, Calendar as CalendarIcon, CheckSquare,
-  Lock, ArrowRight, BookOpen, Compass, CheckCircle2
+  Lock, ArrowRight, BookOpen, Compass, CheckCircle2, Paperclip, Image as ImageIcon, Headphones, Target
 } from 'lucide-react';
 
 import Spline from '@splinetool/react-spline';
@@ -273,6 +273,91 @@ export const FAQ: React.FC = () => {
               </div>
             </div>
 
+          </div>
+        </section>
+
+        <section className="mb-24 max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-6xl font-display text-gray-text lowercase mb-6 tracking-tight">using the sanctuary</h2>
+            <p className="text-[18px] text-gray-light font-medium max-w-3xl mx-auto leading-relaxed">
+              The best rituals are gentle and repeatable. These small tools are here to make your notes easier to return to, easier to understand later, and softer to live inside while you write.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {[
+              {
+                icon: ImageIcon,
+                title: 'cover images',
+                tone: 'text-blue bg-blue/10',
+                body: 'Use a cover when a note carries a strong atmosphere. A simple landscape, texture, or memory cue helps your future self recognize the emotional season of that entry before reading a single line.'
+              },
+              {
+                icon: Paperclip,
+                title: 'attachments',
+                tone: 'text-green bg-green/10',
+                body: 'Attach screenshots, PDFs, voice references, or supportive documents when they belong to the story you are processing. This works best for context, not clutter. If a file helps explain why the note matters, it belongs there.'
+              },
+              {
+                icon: Tags,
+                title: 'tags',
+                tone: 'text-purple-500 bg-purple-500/10',
+                body: 'Keep tags short and human. Think themes like work, family, grief, recovery, rest, or hope. A small set of recurring tags builds better patterns than inventing brand-new labels every day.'
+              },
+              {
+                icon: CheckSquare,
+                title: 'tasks inside notes',
+                tone: 'text-orange bg-orange/10',
+                body: 'Tasks are for gentle follow-through, not pressure. Use them to capture the next caring action hidden inside a reflection: send the message, drink water, make the appointment, take the walk.'
+              },
+              {
+                icon: Headphones,
+                title: 'ambient music',
+                tone: 'text-blue bg-blue/10',
+                body: 'Turn on ambient sound when you want to slow your nervous system before writing. The headphone control now works in two states: tap to choose a sound, tap again while it is active to turn it off instantly.'
+              },
+              {
+                icon: Target,
+                title: 'daily wellness spark',
+                tone: 'text-green bg-green/10',
+                body: 'The spark button in the editor is there for blank-page moments. Tap it when you need a nudge. It keeps the writing surface clear while still giving you one focused prompt connected to the Daily Mindfulness section on the homepage.'
+              },
+              {
+                icon: Brain,
+                title: 'AI reflection',
+                tone: 'text-blue bg-blue/10',
+                body: 'Use AI reflection after you have written enough for the note to hold emotional shape. It is designed to mirror patterns back softly, not diagnose you or rush you toward conclusions.'
+              },
+              {
+                icon: BookOpen,
+                title: 'insights page',
+                tone: 'text-green bg-green/10',
+                body: 'Visit Insights when you want the wider picture. That page helps you notice moods, rhythms, and recurring themes across time, while the note editor stays focused on one honest moment.'
+              },
+              {
+                icon: Compass,
+                title: 'release and reset',
+                tone: 'text-purple-500 bg-purple-500/10',
+                body: 'Some entries are meant to be witnessed and let go. The release action exists for those heavier moments when writing is about unloading the feeling, not preserving a polished artifact.'
+              }
+            ].map((item, index) => (
+              <motion.div
+                key={item.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.45, delay: index * 0.05 }}
+                className="rounded-[32px] border-2 border-border bg-white p-8 shadow-3d-gray liquid-glass"
+              >
+                <div className={`mb-6 flex h-12 w-12 items-center justify-center rounded-2xl ${item.tone}`}>
+                  <item.icon size={22} />
+                </div>
+                <h3 className="mb-3 text-[22px] font-display lowercase text-gray-text">{item.title}</h3>
+                <p className="text-[15px] font-medium leading-relaxed text-gray-light">
+                  {item.body}
+                </p>
+              </motion.div>
+            ))}
           </div>
         </section>
 

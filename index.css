@@ -180,7 +180,7 @@ body {
     height: auto !important;
     overflow-y: visible !important;
     line-height: 1.95 !important;
-    max-width: 70ch;
+    max-width: 82ch;
     margin: 0 auto;
   }
 
@@ -201,6 +201,17 @@ body {
   .ql-snow .ql-picker {
     color: var(--gray-light) !important;
     font-weight: 700 !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .ql-toolbar.ql-snow {
+    padding: 10px 8px !important;
+  }
+
+  .ql-editor {
+    max-width: 100%;
+    min-height: 320px;
   }
 }
 

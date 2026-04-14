@@ -288,20 +288,18 @@ export const Insights: React.FC = () => {
       </div>
 
       {/* PREMIUM AI REFLECTION CONTAINER */}
-      <div className={`relative w-full rounded-[48px] border-2 transition-all duration-700 overflow-hidden ${
-        isPro 
-          ? 'bg-gradient-to-br from-white to-blue/5 border-blue/20 shadow-3d-blue' 
-          : 'bg-white border-white/50 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.05)] bg-gradient-to-b from-white to-gray-50'
+      <div className={`relative w-full overflow-hidden rounded-[40px] border transition-all duration-700 ${
+        isPro
+          ? 'border-sky-200 bg-[linear-gradient(180deg,rgba(242,249,255,0.98),rgba(255,255,255,0.98))] shadow-[0_12px_40px_-28px_rgba(14,165,233,0.45)]'
+          : 'border-sky-100 bg-[linear-gradient(180deg,rgba(247,251,255,0.98),rgba(255,255,255,0.98))] shadow-[0_12px_40px_-30px_rgba(14,165,233,0.35)]'
       }`}>
-        
-        {/* Soft Decorative Glows */}
-        <div className="absolute top-[-30%] right-[-10%] w-[400px] h-[400px] bg-blue/10 blur-[100px] rounded-full pointer-events-none" />
-        <div className="absolute bottom-[-20%] left-[-10%] w-[300px] h-[300px] bg-green/10 blur-[90px] rounded-full pointer-events-none" />
+        <div className="absolute inset-x-0 top-0 h-28 bg-[radial-gradient(circle_at_top_right,rgba(125,211,252,0.2),transparent_55%)] pointer-events-none" />
+        <div className="absolute -bottom-12 left-0 h-32 w-32 rounded-full bg-emerald-100/40 blur-3xl pointer-events-none" />
 
         <div className="relative z-10 p-10 md:p-14">
           <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-6 mb-10">
             <div className="flex items-center gap-5">
-              <div className="h-16 w-16 rounded-[24px] bg-blue/10 text-blue flex items-center justify-center border-2 border-white shadow-sm shrink-0">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[24px] border border-sky-100 bg-white text-blue shadow-[0_2px_0_0_rgba(226,232,240,0.9)]">
                 <Sparkles size={28} />
               </div>
               <div>
@@ -309,17 +307,17 @@ export const Insights: React.FC = () => {
                   <h2 className="text-3xl font-display text-gray-text lowercase tracking-tight">AI Deep Reflection</h2>
                   
                   {isPro && (
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-yellow-100 to-yellow-50 border border-yellow-200 text-yellow-600 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm">
+                    <div className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-amber-600 shadow-sm">
                       <Crown size={12} /> PRO
                     </div>
                   )}
                 </div>
-                <p className="text-[14px] text-gray-light font-medium mt-1">A synthesized, compassionate reading of your cognitive landscape.</p>
+                <p className="mt-1 text-[14px] font-medium text-gray-light">A calm, compassionate reading of the patterns your notes are holding right now.</p>
               </div>
             </div>
           </div>
 
-          <div className="relative min-h-[200px]">
+          <div className="relative min-h-[220px] rounded-[28px] border border-white/70 bg-white/80 p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] sm:p-8">
              {/* THE CONTENT */}
              {reflectionText ? (
                 <div 
@@ -327,7 +325,7 @@ export const Insights: React.FC = () => {
                   dangerouslySetInnerHTML={{ __html: reflectionText.replace(/\n\n/g, '<br/><br/>') }}
                 />
              ) : (
-                <div className="prose prose-lg max-w-none text-gray-text/40 leading-loose font-sans opacity-60">
+                <div className="prose prose-lg max-w-none text-gray-text/45 leading-loose font-sans opacity-70">
                    {isPremiumLocked 
                      ? "Your mind has been actively weaving complex themes over the last several entries. I observe a distinct tension between your desire for structure and an underlying need for emotional release. Specifically, your mentions of 'work' often overlap with feelings of mild anxiety, whereas your tags relating to 'home' introduce a profound sense of calm..."
                      : "Your deep reflection awaits. It will synthesize your recent entries into a compassionate overview, identifying themes you might be missing..."
@@ -337,8 +335,8 @@ export const Insights: React.FC = () => {
 
              {/* THE FREEMIUM LOGIC LAYERS */}
              {isPremiumLocked && (
-               <div className="absolute inset-0 z-20 flex flex-col items-center justify-center backdrop-blur-md bg-white/40 rounded-3xl border border-white/50 animate-in fade-in duration-1000 p-6 text-center">
-                 <div className="h-16 w-16 bg-white rounded-full flex items-center justify-center border border-border shadow-lg mb-6">
+               <div className="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-[28px] border border-white/60 bg-white/55 p-6 text-center backdrop-blur-md animate-in fade-in duration-1000">
+                 <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-border bg-white shadow-lg">
                    <Lock size={24} className="text-gray-nav" />
                  </div>
                  <h3 className="text-2xl font-display text-gray-text lowercase mb-3">Unlimited Insights Locked</h3>
@@ -348,7 +346,7 @@ export const Insights: React.FC = () => {
                  <Button 
                    variant="primary" 
                    size="lg"
-                   className="shadow-3d-green h-14 px-10 text-[14px] rounded-2xl group"
+                   className="h-14 rounded-2xl border border-sky-100 px-10 text-[14px] shadow-[0_4px_0_0_rgba(226,232,240,0.95)] group"
                    onClick={() => {/* Trigger Paywall */}}
                  >
                    <Crown size={18} className="mr-2 opacity-80 group-hover:rotate-12 transition-transform" />
@@ -362,7 +360,7 @@ export const Insights: React.FC = () => {
                  <Button 
                    variant="primary" 
                    size="lg"
-                   className="shadow-3d-blue bg-blue hover:bg-blue/90 border-blue border h-14 px-8 text-[14px] rounded-2xl group"
+                   className="h-14 rounded-2xl border border-sky-100 bg-white px-8 text-[14px] text-blue shadow-[0_4px_0_0_rgba(226,232,240,0.95)] group hover:bg-sky-50"
                    onClick={handleGenerateReflection}
                    isLoading={generating}
                    disabled={notes.length < 3}
@@ -381,7 +379,7 @@ export const Insights: React.FC = () => {
                  <Button 
                    variant="primary" 
                    size="lg"
-                   className="shadow-3d-blue bg-blue hover:bg-blue/90 border-blue border h-14 px-8 text-[14px] rounded-2xl group"
+                   className="h-14 rounded-2xl border border-sky-100 bg-white px-8 text-[14px] text-blue shadow-[0_4px_0_0_rgba(226,232,240,0.95)] group hover:bg-sky-50"
                    onClick={handleGenerateReflection}
                    isLoading={generating}
                    disabled={notes.length < 3}
@@ -398,4 +396,3 @@ export const Insights: React.FC = () => {
     </div>
   );
 };
-

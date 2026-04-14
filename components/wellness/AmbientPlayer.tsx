@@ -159,19 +159,30 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
   }, [stopPreset]);
 
   const isPlaying = activePresetId !== null;
+  const handleTriggerClick = () => {
+    if (isPlaying) {
+      stopPreset();
+      setIsOpen(false);
+      return;
+    }
+
+    setIsOpen((current) => !current);
+  };
 
   return (
     <div className="relative">
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => setIsOpen((current) => !current)}
+        onClick={handleTriggerClick}
         aria-expanded={isOpen}
         aria-haspopup="menu"
-        className={`mr-2 hidden border border-transparent sm:flex ${
-          isPlaying ? 'bg-sky-50 text-sky-600' : 'text-gray-nav hover:bg-emerald-50 hover:text-emerald-600'
+        className={`border ${
+          isPlaying
+            ? 'border-sky-200 bg-sky-50 text-sky-600 hover:bg-sky-100'
+            : 'border-transparent text-gray-nav hover:bg-emerald-50 hover:text-emerald-600'
         }`}
-        title="Ambient sound"
+        title={isPlaying ? 'Turn ambient sound off' : 'Choose ambient sound'}
       >
         <Headphones size={16} />
       </Button>
@@ -194,7 +205,10 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
                 return (
                   <button
                     key={preset.id}
-                    onClick={() => playPreset(preset)}
+                    onClick={() => {
+                      playPreset(preset);
+                      setIsOpen(false);
+                    }}
                     className={`w-full rounded-xl border p-3 text-left transition-all ${
                       isPresetPlaying
                         ? preset.colorClass

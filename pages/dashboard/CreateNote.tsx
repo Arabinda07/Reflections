@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Loader2, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Meh, Frown, Sun, Cloud, Moon, Heart, Brain, Coffee, MessageSquare, Tag as TagIcon, CheckCircle2, Check, RefreshCw, CheckSquare, Square, Plus, Trash2, Eye, EyeOff, ListTodo, Wind, Target } from 'lucide-react';
+import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Loader2, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Meh, Frown, Sun, Cloud, Moon, Heart, Brain, Coffee, MessageSquare, Tag as TagIcon, CheckCircle2, Check, CheckSquare, Square, Plus, Trash2, Eye, EyeOff, ListTodo, Wind, Target } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Editor } from '../../components/ui/Editor';
 import { noteService } from '../../services/noteService';
@@ -12,6 +12,7 @@ import { StorageImage } from '../../components/ui/StorageImage';
 import { GoogleGenAI, Type } from "@google/genai";
 import { AmbientPlayer } from '../../components/wellness/AmbientPlayer';
 import { BreathingGate } from '../../components/wellness/BreathingGate';
+import { DEFAULT_WELLNESS_PROMPTS, getCurrentWellnessPrompt, getNextWellnessPromptState } from '../../services/wellnessPrompts';
 
 // Custom debounce function to avoid CommonJS import issues
 function debounce<T extends (...args: any[]) => any>(
@@ -26,60 +27,6 @@ function debounce<T extends (...args: any[]) => any>(
 }
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
-
-const DEFAULT_PROMPTS = [
-  "What are three things you're grateful for today?",
-  "How did you feel when you woke up this morning?",
-  "What's one small win you had today?",
-  "What's something you're looking forward to?",
-  "Describe a moment today that made you smile.",
-  "What's one thing you want to let go of today?",
-];
-
-interface MindfulnessSparkPromptProps {
-  prompt: string;
-  isLoading: boolean;
-  isSoftened: boolean;
-  onRefresh: () => void;
-}
-
-const MindfulnessSparkPrompt: React.FC<MindfulnessSparkPromptProps> = ({ prompt, isLoading, isSoftened, onRefresh }) => (
-  <motion.div
-    layout
-    className={`mb-10 overflow-hidden rounded-[28px] bg-gradient-to-br from-blue to-blue/80 p-5 text-white shadow-3d-blue liquid-glass-strong transition-opacity duration-500 sm:p-6 ${
-      isSoftened ? 'opacity-40 hover:opacity-100' : 'opacity-100'
-    }`}
-  >
-    <div className="relative z-10">
-      <div className="mb-4 flex items-center justify-between gap-4">
-        <div className="flex min-w-0 items-center gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/20 text-white backdrop-blur-md">
-            <Target size={22} />
-          </div>
-          <div className="min-w-0">
-            <p className="text-[10px] font-black uppercase tracking-[0.22em] text-white/70">Daily Mindfulness</p>
-            <h3 className="truncate font-display text-[20px] lowercase leading-none">today's spark</h3>
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={onRefresh}
-          disabled={isLoading}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 text-white transition-all hover:bg-white/20 disabled:opacity-50"
-          title="New spark"
-          aria-label="Show another writing spark"
-        >
-          <RefreshCw size={17} className={isLoading ? 'animate-spin' : ''} />
-        </button>
-      </div>
-
-      <p className="text-[16px] font-bold leading-relaxed text-white sm:text-[18px]">
-        "{prompt}"
-      </p>
-    </div>
-  </motion.div>
-);
 
 interface TaskRowProps {
   task: Task;
@@ -362,7 +309,7 @@ export const CreateNote: React.FC = () => {
     } catch (error) {
       console.error("Failed to generate prompts:", error);
       // Fallback: shuffle default prompts
-      const shuffled = [...DEFAULT_PROMPTS].sort(() => 0.5 - Math.random()).slice(0, 4);
+      const shuffled = [...DEFAULT_WELLNESS_PROMPTS].sort(() => 0.5 - Math.random()).slice(0, 4);
       setDynamicPrompts(shuffled);
     } finally {
       setIsGeneratingPrompts(false);
@@ -619,10 +566,9 @@ export const CreateNote: React.FC = () => {
   };
 
   const cycleSparkPrompt = () => {
-    const promptsList = dynamicPrompts.length > 0 ? dynamicPrompts : DEFAULT_PROMPTS;
-    const nextIdx = (promptIndex + 1) % promptsList.length;
-    setPromptIndex(nextIdx);
-    setActivePlaceholder(promptsList[nextIdx]);
+    const nextState = getNextWellnessPromptState(promptIndex, dynamicPrompts);
+    setPromptIndex(nextState.nextIndex);
+    setActivePlaceholder(nextState.prompt);
   };
 
   const handleRelease = () => {
@@ -697,8 +643,7 @@ export const CreateNote: React.FC = () => {
   const hasContent = Boolean(content && content !== '<p><br></p>');
   const canSave = title.trim().length > 0 || hasContent;
   const canEnhance = hasContent;
-  const promptOptions = dynamicPrompts.length > 0 ? dynamicPrompts : DEFAULT_PROMPTS;
-  const sparkPrompt = activePlaceholder || promptOptions[promptIndex % promptOptions.length] || DEFAULT_PROMPTS[0];
+  const sparkPrompt = activePlaceholder || getCurrentWellnessPrompt(promptIndex, dynamicPrompts);
 
   const moods = [
     { id: 'happy', icon: Smile, label: 'Happy', color: 'text-yellow-500 bg-yellow-50 border-yellow-100' },
@@ -721,9 +666,9 @@ export const CreateNote: React.FC = () => {
   }
 
   return (
-    <div className="mx-auto max-w-4xl animate-in fade-in duration-500 pb-20 px-4 md:px-8">
+    <div className="mx-auto max-w-[1180px] animate-in fade-in duration-500 pb-20 px-3 sm:px-4 md:px-6">
       {limitReachedOverlay}
-      <nav className={`sticky top-4 z-50 mb-8 flex items-center justify-between rounded-2xl border-2 border-border bg-white/90 px-4 py-3 shadow-[0_4px_0_0_#E5E5E5] backdrop-blur-2xl transition-all duration-500 ${isDimmed ? 'opacity-40 hover:opacity-100' : 'opacity-100'}`}>
+      <nav className={`sticky top-4 z-50 mb-8 flex flex-col gap-3 rounded-2xl border-2 border-border bg-white/90 px-4 py-3 shadow-[0_4px_0_0_#E5E5E5] backdrop-blur-2xl transition-all duration-500 sm:flex-row sm:items-center sm:justify-between ${isDimmed ? 'opacity-40 hover:opacity-100' : 'opacity-100'}`}>
         <div className="flex items-center gap-3">
            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-bold uppercase text-[12px]">
              <ArrowLeft className="mr-2 h-4 w-4" />
@@ -737,7 +682,7 @@ export const CreateNote: React.FC = () => {
            </div>
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto">
           <Button
             variant="ghost"
             size="sm"
@@ -755,11 +700,11 @@ export const CreateNote: React.FC = () => {
             variant="ghost" 
             size="sm" 
             onClick={handleRelease} 
-            className="hidden sm:flex border border-sky-100 bg-sky-50/70 text-sky-600 hover:bg-emerald-50 hover:text-emerald-600 transition-all mr-2" 
+            className="border border-sky-100 bg-sky-50/70 text-sky-600 hover:bg-emerald-50 hover:text-emerald-600 transition-all" 
             disabled={isReleasing}
           >
               <Wind className="mr-2 h-3.5 w-3.5" />
-              <span>RELEASE</span>
+              <span className="hidden sm:inline">RELEASE</span>
           </Button>
 
           <AnimatePresence mode="wait">
@@ -769,7 +714,7 @@ export const CreateNote: React.FC = () => {
                 initial={{ opacity: 0, x: 10 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -10 }}
-                className="text-[11px] font-bold text-blue flex items-center gap-1.5 mr-2 px-3 py-1 rounded-full bg-blue/5 border border-blue/10"
+                className="text-[11px] font-bold text-blue flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue/5 border border-blue/10"
               >
                 <Loader2 size={12} className="animate-spin" />
                 <span>Saving...</span>
@@ -781,7 +726,7 @@ export const CreateNote: React.FC = () => {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
-                className="text-[11px] font-bold text-green flex items-center gap-1.5 mr-2 px-3 py-1 rounded-full bg-green/5 border border-green/10"
+                className="text-[11px] font-bold text-green flex items-center gap-1.5 px-3 py-1 rounded-full bg-green/5 border border-green/10"
               >
                 <Check size={12} className="text-green" />
                 <span>Saved</span>
@@ -791,13 +736,13 @@ export const CreateNote: React.FC = () => {
             <Button 
               variant="secondary" 
               size="sm" 
-              className="hidden sm:flex border-2 border-border text-blue shadow-3d-gray active:shadow-none active:translate-y-[2px] transition-all" 
+              className="border-2 border-border text-blue shadow-3d-gray active:shadow-none active:translate-y-[2px] transition-all" 
               disabled={!canEnhance || isReflecting}
               onClick={handleAiReflect}
               isLoading={isReflecting}
             >
                 <Wand2 className="mr-2 h-3.5 w-3.5" />
-                <span>AI REFLECT</span>
+                <span className="hidden sm:inline">AI REFLECT</span>
             </Button>
             <Button 
               onClick={handleSave} 
@@ -824,7 +769,7 @@ export const CreateNote: React.FC = () => {
           }
           exit={{ opacity: 0, y: -20, filter: 'blur(14px)' }}
           transition={{ duration: isReleasing ? 1.35 : 0.65, ease: 'easeInOut' }}
-          className="mx-auto w-full max-w-4xl"
+          className="mx-auto w-full max-w-[1100px]"
         >
           <div className="relative min-h-[70vh] rounded-[32px] border-2 border-border bg-white shadow-[0_8px_0_0_#E5E5E5] flex flex-col liquid-glass !overflow-visible">
             {imagePreview && (
@@ -849,14 +794,37 @@ export const CreateNote: React.FC = () => {
               </div>
             )}
 
-            <div className="flex-1 px-6 py-8 md:px-12 md:py-10">
+            <div className="flex-1 px-4 py-6 sm:px-6 md:px-10 md:py-8 lg:px-12 lg:py-10">
                 <div className={`mb-12 flex flex-wrap items-center justify-between gap-4 transition-all duration-500 ${isDimmed ? 'opacity-30 hover:opacity-100' : 'opacity-100'}`}>
                     <div className="flex items-center gap-2 text-[11px] font-extrabold text-gray-nav uppercase tracking-wider">
                         <Calendar size={13} />
                         <span>{new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                     </div>
 
-                    <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                    <div className="grid w-full grid-cols-2 items-center gap-2 sm:gap-3 md:w-full md:grid-cols-[repeat(auto-fit,minmax(0,1fr))] lg:flex lg:w-auto lg:flex-wrap">
+                       <button
+                        type="button"
+                        onClick={cycleSparkPrompt}
+                        className="col-span-2 flex min-w-0 items-center gap-3 rounded-2xl border border-sky-100 bg-[linear-gradient(135deg,rgba(239,248,255,0.96),rgba(247,253,255,0.98))] px-3 py-2 text-left shadow-[0_4px_0_0_rgba(226,232,240,0.9)] transition-all hover:-translate-y-[1px] hover:border-sky-200 hover:shadow-[0_6px_0_0_rgba(226,232,240,0.9)] active:translate-y-[2px] active:shadow-none sm:px-4 lg:col-span-1 lg:min-w-[260px]"
+                        title={sparkPrompt}
+                        aria-label="Show another daily wellness spark"
+                      >
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-sky-100 bg-white text-blue shadow-[0_2px_0_0_rgba(226,232,240,0.9)]">
+                          <Target size={18} />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <span className="block text-[9px] font-black uppercase tracking-[0.22em] text-blue/70 sm:text-[10px]">
+                            Daily Wellness
+                          </span>
+                          <span className="block truncate text-[12px] font-bold leading-relaxed text-gray-text sm:text-[13px]">
+                            {isGeneratingPrompts ? 'Finding a gentle spark for you...' : sparkPrompt}
+                          </span>
+                        </div>
+                        <div className="shrink-0 rounded-full bg-white px-2 py-1 text-[9px] font-black uppercase tracking-[0.18em] text-blue shadow-[0_2px_0_0_rgba(226,232,240,0.9)]">
+                          Spark
+                        </div>
+                      </button>
+
                        {/* Progressive Disclosure: Mood Button */}
                        <div className="relative" ref={moodRef}>
                           <button 
@@ -1003,15 +971,6 @@ export const CreateNote: React.FC = () => {
                     </div>
                 </div>
 
-                {!id && (
-                  <MindfulnessSparkPrompt
-                    prompt={sparkPrompt}
-                    isLoading={isGeneratingPrompts}
-                    isSoftened={hasContent}
-                    onRefresh={cycleSparkPrompt}
-                  />
-                )}
-
                 <input
                     type="text"
                     placeholder="Title your entry..."
@@ -1028,7 +987,7 @@ export const CreateNote: React.FC = () => {
                   onFocusCapture={() => setIsFocused(true)}
                   onBlurCapture={() => setIsFocused(false)}
                 >
-                    <div className="mx-auto max-w-[70ch] font-serif leading-loose relative">
+                    <div className="mx-auto max-w-[82ch] font-serif leading-loose relative">
                       <Editor 
                           value={content} 
                           onChange={setContent} 
@@ -1074,33 +1033,31 @@ export const CreateNote: React.FC = () => {
                 </div>
 
                 {aiReflection && (
-                  <div className="mt-12 relative group animate-in fade-in slide-in-from-bottom-6 duration-700">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-blue/20 via-indigo-500/10 to-purple-500/20 rounded-[32px] blur-xl opacity-70 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
-                    <div className="relative p-8 rounded-[30px] bg-white border-2 border-blue/10 shadow-[0_10px_40px_-15px_rgba(59,130,246,0.1)] overflow-hidden">
-                      <div className="absolute top-0 right-0 p-4 opacity-10">
-                        <Sparkles size={80} className="text-blue" />
-                      </div>
-                      
+                  <div className="mt-12 animate-in fade-in slide-in-from-bottom-6 duration-700">
+                    <div className="relative overflow-hidden rounded-[32px] border border-sky-100 bg-[linear-gradient(180deg,rgba(247,251,255,0.98),rgba(255,255,255,0.98))] p-6 shadow-[0_10px_30px_-22px_rgba(14,165,233,0.45)] sm:p-8">
+                      <div className="absolute inset-x-0 top-0 h-24 bg-[radial-gradient(circle_at_top_right,rgba(125,211,252,0.18),transparent_55%)] pointer-events-none" />
+                      <div className="absolute bottom-0 left-0 h-20 w-20 rounded-full bg-emerald-100/40 blur-3xl pointer-events-none" />
+
                       <div className="relative z-10">
                         <div className="flex items-center gap-3 mb-5">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue/10 text-blue shadow-inner">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-sky-100 bg-white text-blue shadow-[0_2px_0_0_rgba(226,232,240,0.9)]">
                             <Brain size={20} />
                           </div>
                           <div>
-                            <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-blue/40 leading-none mb-1">AI Insights</h4>
-                            <p className="text-[13px] font-bold text-gray-text leading-none">A moment of reflection</p>
+                            <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-blue/55 leading-none mb-1">AI Reflection</h4>
+                            <p className="text-[13px] font-bold text-gray-text leading-none">A softer mirror for what you wrote</p>
                           </div>
                         </div>
-                        
-                        <div className="pl-4 border-l-4 border-blue/20">
-                          <p className="text-[17px] leading-relaxed text-gray-text font-medium italic">
+
+                        <div className="rounded-[24px] border border-white/70 bg-white/80 px-4 py-5 sm:px-5">
+                          <p className="text-[16px] leading-relaxed text-gray-text font-medium italic sm:text-[17px]">
                             "{aiReflection}"
                           </p>
                         </div>
-                        
-                        <div className="mt-6 flex items-center gap-4">
-                          <div className="h-[1px] flex-1 bg-gradient-to-r from-blue/20 to-transparent"></div>
-                          <span className="text-[10px] font-extrabold text-gray-nav uppercase tracking-widest">Thoughtfully generated for you</span>
+
+                        <div className="mt-5 flex items-center gap-4">
+                          <div className="h-[1px] flex-1 bg-gradient-to-r from-sky-100 to-transparent"></div>
+                          <span className="text-[10px] font-extrabold text-gray-nav uppercase tracking-widest">For reflection, not medical advice</span>
                         </div>
                       </div>
                     </div>
