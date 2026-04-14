@@ -290,26 +290,26 @@ export const Insights: React.FC = () => {
       </div>
 
       {/* PREMIUM AI REFLECTION CONTAINER */}
-      <div className="relative w-full overflow-hidden bg-white border-2 border-border rounded-[40px] shadow-[0_8px_0_0_#E5E5E5] liquid-glass p-8 md:p-12 mb-16 dark:bg-[#16181d] dark:border-white/10 dark:shadow-[0_8px_0_0_rgba(15,23,42,0.5)]">
+      <div className="relative w-full overflow-hidden bg-white border-2 border-border rounded-[32px] p-6 shadow-[0_6px_0_0_#E5E5E5] liquid-glass mb-16">
         <div className="mb-8 flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
           <div className="flex items-start gap-5">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[24px] bg-blue/10 text-blue border-2 border-border/50 dark:bg-sky-400/10 dark:border-white/10 dark:text-sky-100">
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[24px] bg-blue/5 text-blue border-2 border-border/50 shadow-3d-gray">
               <Sparkles size={28} />
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-3">
-                <h2 className="text-3xl font-display text-gray-text lowercase tracking-tight dark:text-slate-50">Deep Reflection</h2>
+                <h2 className="text-3xl font-display text-gray-text lowercase tracking-tight">Deep Reflection</h2>
                 {isPro ? (
-                  <div className="inline-flex items-center gap-1.5 rounded-full border-2 border-amber-200 bg-amber-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-amber-600 dark:border-amber-400/20 dark:bg-amber-400/10 dark:text-amber-100">
+                  <div className="inline-flex items-center gap-1.5 rounded-full border-2 border-amber-200 bg-amber-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-amber-600">
                     <Crown size={12} /> PRO
                   </div>
                 ) : (
-                  <div className="inline-flex items-center gap-1.5 rounded-full border-2 border-border bg-gray-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-blue dark:border-white/10 dark:bg-white/5 dark:text-sky-100">
+                  <div className="inline-flex items-center gap-1.5 rounded-full border-2 border-border bg-gray-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-blue">
                     <Sparkles size={12} /> 1 Free Reflection
                   </div>
                 )}
               </div>
-              <p className="mt-2 text-right text-[14px] font-medium leading-relaxed text-gray-light dark:text-slate-400">
+              <p className="mt-2 text-right text-[14px] font-medium leading-relaxed text-gray-light">
                 A calm, grounded reading of the patterns your notes are holding right now.
               </p>
             </div>

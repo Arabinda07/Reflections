@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Loader2, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Meh, Frown, Sun, Cloud, Moon, Heart, Brain, Coffee, MessageSquare, Tag as TagIcon, CheckCircle2, Check, CheckSquare, Square, Plus, Trash2, Eye, EyeOff, ListTodo, Wind, Target, Mic, MicOff, Music, Play, Pause, Volume2 } from 'lucide-react';
@@ -854,42 +855,51 @@ export const CreateNote: React.FC = () => {
               <span className="hidden md:inline">Sounds</span>
             </Button>
             
-            <AnimatePresence>
-              {isMusicOpen && (
-                <motion.div 
-                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-auto sm:bottom-auto sm:absolute sm:top-full mt-3 sm:right-0 z-[100] p-4 bg-white border-2 border-border rounded-3xl shadow-xl w-auto sm:w-[240px] liquid-glass"
-                >
-                  <div className="flex items-center justify-between mb-4 px-1">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav flex items-center gap-2">
-                      <Volume2 size={12} /> Ambient Focus
-                    </span>
+            {createPortal(
+              <AnimatePresence>
+                {isMusicOpen && (
+                  <div className="fixed inset-0 z-[10000] pointer-events-none flex items-end justify-center sm:items-start sm:justify-start">
+                    <motion.div 
+                      initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 15, scale: 0.95 }}
+                      className="pointer-events-auto p-5 bg-white border-2 border-border rounded-[32px] shadow-2xl w-[calc(100%-32px)] sm:w-[260px] liquid-glass-strong sm:fixed relative mt-20 sm:mt-0"
+                      style={window.innerWidth >= 640 ? {
+                        top: musicRef.current ? musicRef.current.getBoundingClientRect().bottom + window.scrollY + 12 : 0,
+                        left: musicRef.current ? musicRef.current.getBoundingClientRect().left - 100 + window.scrollX : 0
+                      } : {}}
+                    >
+                      <div className="flex items-center justify-between mb-4 px-1">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav flex items-center gap-2">
+                          <Volume2 size={12} /> Ambient Focus
+                        </span>
+                      </div>
+                      <div className="space-y-2">
+                        {AMBIENT_TRACKS.map(track => (
+                          <button
+                            key={track.id}
+                            onClick={() => toggleMusic(track.url)}
+                            className={`w-full flex items-center justify-between p-3 rounded-2xl border-2 transition-all ${
+                              currentTrack === track.url 
+                                ? 'border-purple-500/30 bg-purple-500/5 text-purple-600' 
+                                : 'border-border bg-white text-gray-text hover:border-purple-500/30'
+                            }`}
+                          >
+                            <span className="text-[12px] font-bold">{track.name}</span>
+                            {currentTrack === track.url && isPlaying ? (
+                              <Pause size={14} className="text-purple-500" />
+                            ) : (
+                              <Play size={14} className={currentTrack === track.url ? "text-purple-500" : "text-gray-nav"} />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </motion.div>
                   </div>
-                  <div className="space-y-2">
-                    {AMBIENT_TRACKS.map(track => (
-                      <button
-                        key={track.id}
-                        onClick={() => toggleMusic(track.url)}
-                        className={`w-full flex items-center justify-between p-3 rounded-2xl border-2 transition-all ${
-                          currentTrack === track.url 
-                            ? 'border-purple-500/30 bg-purple-500/5 text-purple-600' 
-                            : 'border-border bg-white text-gray-text hover:border-purple-500/30'
-                        }`}
-                      >
-                        <span className="text-[12px] font-bold">{track.name}</span>
-                        {currentTrack === track.url && isPlaying ? (
-                          <Pause size={14} className="text-purple-500" />
-                        ) : (
-                          <Play size={14} className={currentTrack === track.url ? "text-purple-500" : "text-gray-nav"} />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                )}
+              </AnimatePresence>,
+              document.body
+            )}
           </div>
 
           <Button 
@@ -1023,16 +1033,24 @@ export const CreateNote: React.FC = () => {
                             )}
                           </button>
                           
-                          <AnimatePresence>
-                            {isMoodOpen && (
-                              <motion.div 
-                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                                className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-auto sm:bottom-auto sm:absolute sm:top-full mt-3 sm:-ml-2 z-[100] p-4 bg-white border-2 border-border rounded-3xl shadow-xl w-auto sm:w-[280px] liquid-glass"
-                              >
-                                <div className="flex items-center justify-between mb-4 px-1">
+                          {createPortal(
+                            <AnimatePresence>
+                              {isMoodOpen && (
+                                <div className="fixed inset-0 z-[10000] pointer-events-none flex flex-col items-center sm:items-start pt-32 sm:pt-0">
+                                  <motion.div 
+                                    initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: 15, scale: 0.95 }}
+                                    transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+                                    className="pointer-events-auto liquid-glass-strong border-2 border-border rounded-[32px] p-6 shadow-[0_6px_0_0_#E5E5E5] w-[calc(100%-32px)] sm:w-[280px] sm:fixed relative"
+                                    style={window.innerWidth >= 640 ? {
+                                      top: moodRef.current ? moodRef.current.getBoundingClientRect().bottom + window.scrollY + 12 : 0,
+                                      left: moodRef.current ? moodRef.current.getBoundingClientRect().left + window.scrollX : 0
+                                    } : {
+                                      top: moodRef.current ? moodRef.current.getBoundingClientRect().bottom + window.scrollY + 12 : 120
+                                    }}
+                                  >
+                                    <div className="flex items-center justify-between mb-4 px-1">
                                   <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav">How are you?</span>
                                   {mood && <button onClick={() => handleMoodSelect(mood)} className="text-[10px] font-bold text-red uppercase">Clear</button>}
                                 </div>
@@ -1070,16 +1088,24 @@ export const CreateNote: React.FC = () => {
                             <span className="text-[10px] sm:text-[11px] font-black uppercase">{tags.length > 0 ? `${tags.length} Tags` : 'Tags'}</span>
                           </button>
 
-                          <AnimatePresence>
-                            {isTagsOpen && (
-                              <motion.div 
-                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                                className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-auto sm:bottom-auto sm:absolute sm:top-full mt-3 sm:left-0 z-[100] p-4 bg-white border-2 border-border rounded-3xl shadow-xl w-auto sm:w-[320px] liquid-glass"
-                              >
-                                <div className="mb-4">
+                          {createPortal(
+                            <AnimatePresence>
+                              {isTagsOpen && (
+                                <div className="fixed inset-0 z-[10000] pointer-events-none flex flex-col items-center sm:items-start pt-32 sm:pt-0">
+                                  <motion.div 
+                                    initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: 15, scale: 0.95 }}
+                                    transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+                                    className="pointer-events-auto liquid-glass-strong border-2 border-border rounded-[32px] p-6 shadow-[0_6px_0_0_#E5E5E5] w-[calc(100%-32px)] sm:w-[320px] sm:fixed relative"
+                                    style={window.innerWidth >= 640 ? {
+                                      top: tagsRef.current ? tagsRef.current.getBoundingClientRect().bottom + window.scrollY + 12 : 0,
+                                      left: tagsRef.current ? tagsRef.current.getBoundingClientRect().left - 40 + window.scrollX : 0
+                                    } : {
+                                      top: tagsRef.current ? tagsRef.current.getBoundingClientRect().bottom + window.scrollY + 12 : 120
+                                    }}
+                                  >
+                                    <div className="mb-4">
                                   <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav block mb-3">Add Tags</span>
                                   <div className="relative">
                                     <TagIcon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-nav" />
@@ -1172,15 +1198,13 @@ export const CreateNote: React.FC = () => {
                     {(!content || content === '<p><br></p>') && (
                       <div className="absolute bottom-6 right-6 z-20">
                           <motion.button
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.92 }}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                             onClick={cycleSparkPrompt}
-                            className={`relative flex h-14 w-14 items-center justify-center rounded-full border border-white/40 bg-white/60 shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-xl transition-all text-emerald-500 hover:text-emerald-600 hover:shadow-[0_8px_30px_rgba(16,185,129,0.2)] hover:border-emerald-200/50 ${isGeneratingPrompts ? 'animate-pulse' : ''}`}
+                            className={`flex h-14 w-14 items-center justify-center rounded-full border-2 border-border bg-white shadow-3d-gray backdrop-blur-xl transition-all text-blue hover:text-blue/80 hover:shadow-none hover:translate-y-[2px] ${isGeneratingPrompts ? 'animate-pulse' : ''}`}
                             title={sparkPrompt}
                           >
-                              {/* Breathing Glow */}
-                              <div className="absolute inset-0 rounded-full bg-emerald-400/20 animate-ping opacity-30" style={{ animationDuration: '3s' }} />
-                              <Sparkles size={22} className="relative z-10 drop-shadow-sm" />
+                              <Sparkles size={22} className="relative z-10" />
                           </motion.button>
                       </div>
                     )}
