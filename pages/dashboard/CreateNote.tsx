@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
-import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Loader2, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Meh, Frown, Sun, Cloud, Moon, Heart, Brain, Coffee, MessageSquare, Tag as TagIcon, CheckCircle2, Check, CheckSquare, Square, Plus, Trash2, Eye, EyeOff, ListTodo, Wind, Target } from 'lucide-react';
+import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Loader2, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Meh, Frown, Sun, Cloud, Moon, Heart, Brain, Coffee, MessageSquare, Tag as TagIcon, CheckCircle2, Check, CheckSquare, Square, Plus, Trash2, Eye, EyeOff, ListTodo, Wind, Target, Mic, MicOff, Music, Play, Pause, Volume2 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Editor } from '../../components/ui/Editor';
 import { noteService } from '../../services/noteService';
@@ -10,7 +10,6 @@ import { RoutePath, NoteAttachment, Task } from '../../types';
 import { supabase } from '../../src/supabaseClient';
 import { StorageImage } from '../../components/ui/StorageImage';
 import { GoogleGenAI, Type } from "@google/genai";
-import { AmbientPlayer } from '../../components/wellness/AmbientPlayer';
 import { BreathingGate } from '../../components/wellness/BreathingGate';
 import { DEFAULT_WELLNESS_PROMPTS, getCurrentWellnessPrompt, getNextWellnessPromptState } from '../../services/wellnessPrompts';
 
@@ -177,6 +176,24 @@ export const CreateNote: React.FC = () => {
   const [isFocusModeManual, setIsFocusModeManual] = useState(false);
   const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
   
+  // Mindful Features States
+  const [isMusicOpen, setIsMusicOpen] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTrack, setCurrentTrack] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  
+  // Whisper Mode States
+  const [isWhispering, setIsWhispering] = useState(false);
+  const [interimTranscript, setInterimTranscript] = useState('');
+  const recognitionRef = useRef<any>(null);
+  const isWhisperingRef = useRef(false);
+
+  const AMBIENT_TRACKS = [
+    { id: 'rain', name: 'Soft Rain', url: 'https://actions.google.com/sounds/v1/weather/rain_heavy_loud.ogg' },
+    { id: 'waves', name: 'Deep Focus', url: 'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg' },
+    { id: 'coffee', name: 'Calm Vibe', url: 'https://actions.google.com/sounds/v1/ambiences/coffee_shop.ogg' }
+  ];
+  
   const moodRef = useRef<HTMLDivElement>(null);
   const tagsRef = useRef<HTMLDivElement>(null);
   
@@ -185,6 +202,96 @@ export const CreateNote: React.FC = () => {
   const isUnmounted = useRef(false);
   const shouldReduceMotion = useReducedMotion();
   const releaseEase = [0.4, 0, 0.2, 1];
+
+  const toggleMusic = (trackUrl: string) => {
+    if (currentTrack === trackUrl) {
+      if (isPlaying) {
+        audioRef.current?.pause();
+        setIsPlaying(false);
+      } else {
+        audioRef.current?.play();
+        setIsPlaying(true);
+      }
+    } else {
+      setCurrentTrack(trackUrl);
+      setIsPlaying(true);
+      if (audioRef.current) {
+        audioRef.current.src = trackUrl;
+        audioRef.current.play();
+      }
+    }
+  };
+
+  const toggleWhisper = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Your browser does not support voice journaling. Please try Chrome or Safari.");
+      return;
+    }
+
+    if (isWhispering) {
+      setIsWhispering(false);
+      isWhisperingRef.current = false;
+      recognitionRef.current?.stop();
+      setInterimTranscript('');
+    } else {
+      setIsWhispering(true);
+      isWhisperingRef.current = true;
+      setInterimTranscript('');
+      
+      if (!recognitionRef.current) {
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.continuous = true;
+        recognitionRef.current.interimResults = true;
+        
+        recognitionRef.current.onresult = (event: any) => {
+          let finalTranscript = '';
+          let currentInterim = '';
+          
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+              finalTranscript += event.results[i][0].transcript;
+            } else {
+              currentInterim += event.results[i][0].transcript;
+            }
+          }
+          
+          if (finalTranscript) {
+            setContent((prev: string) => {
+              const cleanPrev = prev === '<p><br></p>' ? '' : prev;
+              if (!cleanPrev) return `<p>${finalTranscript}</p>`;
+              if (cleanPrev.endsWith('</p>')) {
+                return cleanPrev.slice(0, -4) + ' ' + finalTranscript + '</p>';
+              }
+              return cleanPrev + ' ' + finalTranscript;
+            });
+          }
+          setInterimTranscript(currentInterim);
+        };
+        
+        recognitionRef.current.onerror = (event: any) => {
+          console.error("Speech recognition error", event.error);
+          if (event.error === 'not-allowed') {
+            setIsWhispering(false);
+            isWhisperingRef.current = false;
+            alert("Microphone access is required for Whisper Mode.");
+          }
+        };
+        
+        recognitionRef.current.onend = () => {
+          if (isWhisperingRef.current) {
+            try { recognitionRef.current.start(); } catch(e) {}
+          }
+        };
+      }
+      
+      try {
+        recognitionRef.current.start();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
 
   useEffect(() => {
     isUnmounted.current = false;
@@ -709,7 +816,68 @@ export const CreateNote: React.FC = () => {
             <span className="hidden sm:inline">Focus</span>
           </Button>
 
-          <AmbientPlayer isEditorFocused={isFocused} />
+          {/* Whisper Mode Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleWhisper}
+            className={`flex items-center gap-2 font-bold uppercase text-[11px] transition-all ${isWhispering ? 'text-blue bg-blue/5' : 'text-gray-nav'}`}
+            title="Whisper Mode"
+          >
+            {isWhispering ? <Mic size={16} className="animate-pulse" /> : <MicOff size={16} />}
+            <span className="hidden md:inline">Whisper</span>
+          </Button>
+
+          {/* Music Player Button */}
+          <div className="relative">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsMusicOpen(!isMusicOpen)}
+              className={`flex items-center gap-2 font-bold uppercase text-[11px] transition-all ${isPlaying ? 'text-purple-500 bg-purple-500/5' : 'text-gray-nav'}`}
+              title="Ambient Sounds"
+            >
+              <Music size={16} />
+              <span className="hidden md:inline">Sounds</span>
+            </Button>
+            
+            <AnimatePresence>
+              {isMusicOpen && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  className="absolute top-full mt-3 right-0 z-[100] p-4 bg-white border-2 border-border rounded-3xl shadow-xl w-[240px] liquid-glass"
+                >
+                  <div className="flex items-center justify-between mb-4 px-1">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav flex items-center gap-2">
+                      <Volume2 size={12} /> Ambient Focus
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    {AMBIENT_TRACKS.map(track => (
+                      <button
+                        key={track.id}
+                        onClick={() => toggleMusic(track.url)}
+                        className={`w-full flex items-center justify-between p-3 rounded-2xl border-2 transition-all ${
+                          currentTrack === track.url 
+                            ? 'border-purple-500/30 bg-purple-500/5 text-purple-600' 
+                            : 'border-border bg-white text-gray-text hover:border-purple-500/30'
+                        }`}
+                      >
+                        <span className="text-[12px] font-bold">{track.name}</span>
+                        {currentTrack === track.url && isPlaying ? (
+                          <Pause size={14} className="text-purple-500" />
+                        ) : (
+                          <Play size={14} className={currentTrack === track.url ? "text-purple-500" : "text-gray-nav"} />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           <Button 
             variant="ghost" 
@@ -849,7 +1017,7 @@ export const CreateNote: React.FC = () => {
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                 transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                                className="absolute top-full mt-3 left-0 z-[100] chooser-popover w-[260px] sm:w-[280px] max-w-[calc(100vw-40px)]"
+                                className="absolute top-full mt-3 left-0 z-[100] p-4 bg-white border-2 border-border rounded-3xl shadow-xl w-[260px] sm:w-[280px] max-w-[calc(100vw-40px)] liquid-glass"
                               >
                                 <div className="flex items-center justify-between mb-4 px-1">
                                   <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav">How are you?</span>
@@ -896,7 +1064,7 @@ export const CreateNote: React.FC = () => {
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                 transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                                className="absolute top-full mt-3 right-0 sm:left-0 sm:right-auto z-[100] chooser-popover w-[280px] sm:w-[320px] max-w-[calc(100vw-40px)]"
+                                className="absolute top-full mt-3 right-0 sm:left-0 sm:right-auto z-[100] p-4 bg-white border-2 border-border rounded-3xl shadow-xl w-[280px] sm:w-[320px] max-w-[calc(100vw-40px)] liquid-glass"
                               >
                                 <div className="mb-4">
                                   <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav block mb-3">Add Tags</span>
@@ -1170,6 +1338,7 @@ export const CreateNote: React.FC = () => {
           </div>
         </motion.div>
       </AnimatePresence>
+      <audio ref={audioRef} loop className="hidden" />
     </div>
   );
 };
