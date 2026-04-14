@@ -65,19 +65,17 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
         task.completed
           ? {
               scale: 0.99,
-              backgroundColor: 'rgba(236, 253, 245, 0.58)',
-              borderColor: 'rgba(125, 211, 252, 0.55)',
-              boxShadow: '0 0 0 1px rgba(186, 230, 253, 0.55), 0 18px 45px -35px rgba(14, 165, 233, 0.7)',
+              borderColor: 'rgba(125, 211, 252, 0.45)',
+              boxShadow: '0 0 0 1px rgba(186, 230, 253, 0.35), 0 18px 45px -35px rgba(14, 165, 233, 0.55)',
             }
           : {
               scale: 1,
-              backgroundColor: 'rgba(255, 255, 255, 1)',
-              borderColor: 'rgb(229, 229, 229)',
+              borderColor: 'var(--border-color)',
               boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
             }
       }
       transition={{ duration: 0.45, ease: 'easeOut' }}
-      className="group relative flex items-center gap-2 overflow-hidden rounded-[24px] border-2 p-3 sm:gap-4 sm:p-4"
+      className={`group relative flex items-center gap-2 overflow-hidden rounded-[24px] border-2 p-3 sm:gap-4 sm:p-4 bg-white dark:bg-[#1e1e1e] transition-colors duration-300 ${task.completed ? 'bg-emerald-50/60 dark:bg-emerald-900/10' : ''}`}
     >
       <AnimatePresence>
         {rippleKey > 0 && task.completed && (
@@ -126,7 +124,7 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
           type="date"
           value={task.dueDate || ''}
           onChange={(e) => updateTask(task.id, { dueDate: e.target.value })}
-          className="text-[11px] font-bold text-gray-nav bg-gray-50 border-none rounded-lg p-1 focus:ring-0"
+          className="text-[11px] font-bold text-gray-nav bg-gray-50 dark:bg-white/5 border-none rounded-lg p-1 focus:ring-0 dark:text-slate-300"
         />
         <button
           type="button"
@@ -1227,7 +1225,7 @@ export const CreateNote: React.FC = () => {
 
                   <div className="space-y-3">
                     {tasks.length === 0 ? (
-                      <div className="p-8 rounded-3xl border-2 border-dashed border-border bg-gray-50/50 text-center">
+                      <div className="p-8 rounded-3xl border-2 border-dashed border-border dark:border-white/10 bg-gray-50/50 dark:bg-white/5 text-center">
                         <p className="text-[13px] font-bold text-gray-nav uppercase tracking-widest opacity-40">No tasks added yet</p>
                       </div>
                     ) : (

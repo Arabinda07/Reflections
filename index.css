@@ -185,27 +185,44 @@ body {
     background-color: var(--border-color);
   }
 
-  /* Quill Editor Overrides */
+  /* Quill Editor Overrides — strip all default snow-theme borders */
   .ql-toolbar.ql-snow {
     border: none !important;
-    border-bottom: 2px solid var(--border-color) !important;
+    border-bottom: 1px solid var(--border-color) !important;
     padding: 12px !important;
     background: transparent;
     border-radius: 0 !important;
+    box-shadow: none !important;
+    outline: none !important;
   }
 
+  /* The snow theme renders a 1px solid #ccc border on this element by default.
+     Remove every expression of it so the editor merges invisibly into its parent. */
   .ql-container.ql-snow {
     border: none !important;
+    border-top: none !important;
+    outline: none !important;
+    box-shadow: none !important;
     font-family: inherit !important;
     font-size: 16px !important;
     height: auto !important;
   }
 
-  /* Soft rounded wrapper — wraps the whole editor */
+  /* Wrapper div rendered by our Editor component */
   .duolingo-editor {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
     border-radius: 20px !important;
     overflow: visible !important;
+  }
+
+  /* Focus state — kill the browser default blue focus ring too */
+  .duolingo-editor:focus-within,
+  .ql-container:focus-within {
     border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
   }
 
   .ql-editor {
@@ -216,6 +233,8 @@ body {
     line-height: 1.95 !important;
     max-width: 82ch;
     margin: 0 auto;
+    border: none !important;
+    outline: none !important;
   }
 
   .ql-editor.ql-blank::before {
@@ -273,7 +292,7 @@ body {
     min-height: 320px;
   }
 
-  /* Make quill pickers appear as a floating bottom sheet on mobile */
+  /* ── Generic pickers (header, align, etc.) as a fixed bottom sheet ── */
   .ql-snow .ql-picker.ql-expanded .ql-picker-options {
     position: fixed !important;
     bottom: 16px !important;
@@ -281,25 +300,55 @@ body {
     right: 16px !important;
     top: auto !important;
     width: calc(100% - 32px) !important;
-    max-height: 50vh;
+    max-height: 60vh;
     overflow-y: auto;
-    z-index: 9999;
+    z-index: 10002;
     padding: 24px !important;
     border-radius: 32px;
     background: var(--panel-bg);
-    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25) !important;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35) !important;
     border: 2px solid var(--border-color);
     display: block !important;
   }
 
-  .ql-snow .ql-expanded.ql-color-picker .ql-picker-options,
-  .ql-snow .ql-expanded.ql-background-picker .ql-picker-options {
+  /* ── Colour & Highlight pickers — fixed bottom sheet + flex swatch grid ──
+     Quill's real class names are .ql-color and .ql-background (not -picker).
+     We must repeat ALL position properties here because Quill's JS injects
+     an inline `top` value that would win over the rule above alone. */
+  .ql-snow .ql-color.ql-expanded .ql-picker-options,
+  .ql-snow .ql-background.ql-expanded .ql-picker-options,
+  .ql-snow .ql-color-picker.ql-expanded .ql-picker-options {
+    position: fixed !important;
+    bottom: 16px !important;
+    left: 16px !important;
+    right: 16px !important;
+    top: auto !important;
+    width: calc(100% - 32px) !important;
+    max-height: 60vh;
+    overflow-y: auto;
+    z-index: 10002;
+    padding: 20px !important;
+    border-radius: 32px;
+    background: var(--panel-bg);
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35) !important;
+    border: 2px solid var(--border-color);
     display: flex !important;
     flex-wrap: wrap;
     gap: 8px;
     justify-content: center;
+    align-items: center;
+  }
+
+  /* Make individual colour swatches a reasonable tap size on mobile */
+  .ql-snow .ql-color.ql-expanded .ql-picker-options .ql-picker-item,
+  .ql-snow .ql-background.ql-expanded .ql-picker-options .ql-picker-item,
+  .ql-snow .ql-color-picker.ql-expanded .ql-picker-options .ql-picker-item {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 50% !important;
   }
 }
+
 
 /* Hide Spline Watermark */
 #logo,
