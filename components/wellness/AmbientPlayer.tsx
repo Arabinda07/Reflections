@@ -1,11 +1,21 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { Headphones, Pause, Play, X } from 'lucide-react';
+import { Headphones, Pause, Play, X, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '../ui/Button';
 
 interface AmbientPlayerProps {
   isEditorFocused: boolean;
 }
+
+type ActiveNodes = {
+  carrier: OscillatorNode;
+  companion: OscillatorNode;
+  modulator: OscillatorNode;
+  modulationGain: GainNode;
+  filter: BiquadFilterNode;
+  gain: GainNode;
+  stopTimeout?: number;
+};
 
 type AmbientPreset = {
   id: string;
@@ -56,14 +66,8 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
   const [activePresetId, setActivePresetId] = useState<string | null>(null);
   const [isMobileLayout, setIsMobileLayout] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
-  const nodesRef = useRef<{
-    carrier: OscillatorNode;
-    companion: OscillatorNode;
-    modulator: OscillatorNode;
-    modulationGain: GainNode;
-    filter: BiquadFilterNode;
-    gain: GainNode;
-  } | null>(null);
+  const activeNodesRef = useRef<Set<ActiveNodes>>(new Set());
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const getAudioContext = useCallback(() => {
     if (!audioContextRef.current) {
@@ -74,27 +78,28 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
 
   const stopPreset = useCallback(() => {
     const context = audioContextRef.current;
-    const nodes = nodesRef.current;
 
-    if (context && nodes) {
-      const fadeEnd = context.currentTime + 0.35;
-      nodes.gain.gain.cancelScheduledValues(context.currentTime);
-      nodes.gain.gain.setValueAtTime(nodes.gain.gain.value, context.currentTime);
-      nodes.gain.gain.linearRampToValueAtTime(0.0001, fadeEnd);
-
-      window.setTimeout(() => {
+    activeNodesRef.current.forEach((nodes) => {
+      if (context) {
         try {
-          nodes.carrier.stop();
-          nodes.companion.stop();
-          nodes.modulator.stop();
-        } catch {
-          // The Web Audio nodes may already be stopped if the user switches quickly.
-        }
-        if (nodesRef.current === nodes) {
-          nodesRef.current = null;
-        }
-      }, 400);
-    }
+          const fadeEnd = context.currentTime + 0.35;
+          nodes.gain.gain.cancelScheduledValues(context.currentTime);
+          nodes.gain.gain.setValueAtTime(nodes.gain.gain.value, context.currentTime);
+          nodes.gain.gain.linearRampToValueAtTime(0.0001, fadeEnd);
+
+          nodes.stopTimeout = window.setTimeout(() => {
+            try {
+              nodes.carrier.stop();
+              nodes.companion.stop();
+              nodes.modulator.stop();
+            } catch {
+              // The Web Audio nodes may already be stopped if the user switches quickly.
+            }
+            activeNodesRef.current.delete(nodes);
+          }, 400);
+        } catch {}
+      }
+    });
 
     setActivePresetId(null);
   }, []);
@@ -123,7 +128,7 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
     carrier.frequency.value = preset.baseFrequency;
     companion.frequency.value = preset.baseFrequency * 1.5;
     modulator.frequency.value = preset.modulationFrequency;
-    modulationGain.gain.value = 18;
+    modulationGain.gain.value = 14;
     filter.type = 'lowpass';
     filter.frequency.value = preset.filterFrequency;
     filter.Q.value = 0.4;
@@ -139,9 +144,9 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
     carrier.start();
     companion.start();
     modulator.start();
-    gain.gain.linearRampToValueAtTime(0.026, context.currentTime + 0.8);
+    gain.gain.linearRampToValueAtTime(0.015, context.currentTime + 0.8);
 
-    nodesRef.current = { carrier, companion, modulator, modulationGain, filter, gain };
+    activeNodesRef.current.add({ carrier, companion, modulator, modulationGain, filter, gain });
     setActivePresetId(preset.id);
   }, [activePresetId, getAudioContext, stopPreset]);
 
@@ -150,6 +155,16 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
       setIsOpen(false);
     }
   }, [isEditorFocused]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(max-width: 639px)');
@@ -162,40 +177,56 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
 
   useEffect(() => {
     return () => {
-      stopPreset();
+      activeNodesRef.current.forEach((nodes) => {
+        if (nodes.stopTimeout) window.clearTimeout(nodes.stopTimeout);
+        try {
+          nodes.carrier.stop();
+          nodes.companion.stop();
+          nodes.modulator.stop();
+        } catch {}
+      });
+      activeNodesRef.current.clear();
       audioContextRef.current?.close();
       audioContextRef.current = null;
     };
   }, [stopPreset]);
 
   const isPlaying = activePresetId !== null;
-  const handleTriggerClick = () => {
-    if (isPlaying) {
-      stopPreset();
-      setIsOpen(false);
-      return;
-    }
-
-    setIsOpen((current) => !current);
-  };
 
   return (
-    <div className="relative">
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={handleTriggerClick}
-        aria-expanded={isOpen}
-        aria-haspopup="menu"
-        className={`border shadow-[0_2px_0_0_rgba(226,232,240,0.6)] dark:shadow-[0_2px_0_0_rgba(15,23,42,0.42)] ${
-          isPlaying
-            ? 'border-sky-200/90 bg-sky-50/90 text-sky-700 hover:bg-sky-100 dark:border-sky-400/20 dark:bg-sky-400/12 dark:text-sky-100 dark:hover:bg-sky-400/16'
-            : 'border-border/70 bg-white/75 text-gray-nav hover:bg-emerald-50 hover:text-emerald-700 dark:border-white/10 dark:bg-white/5 dark:text-gray-light dark:hover:bg-emerald-400/12 dark:hover:text-emerald-100'
+    <div className="relative" ref={containerRef}>
+      <div className={`flex items-center rounded-xl border-2 transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] ${
+          isPlaying 
+            ? 'bg-blue/5 border-blue text-blue dark:bg-sky-400/12 dark:border-sky-400/20 dark:text-sky-100' 
+            : 'bg-white border-border text-gray-nav hover:border-blue/30 dark:bg-white/5 dark:border-white/10 dark:text-slate-300 dark:hover:border-sky-400/20'
         }`}
-        title={isPlaying ? 'Turn ambient sound off' : 'Choose ambient sound'}
       >
-        <Headphones size={16} />
-      </Button>
+        <button
+          onClick={() => setIsOpen((current) => !current)}
+          aria-expanded={isOpen}
+          aria-haspopup="menu"
+          className="flex items-center gap-2 px-3 sm:px-4 py-2 font-black uppercase text-[10px] sm:text-[11px]"
+          title="Choose ambient sound"
+        >
+          <Headphones size={16} />
+          <span className="hidden sm:inline">{isPlaying ? AMBIENT_PRESETS.find(p => p.id === activePresetId)?.name || 'Ambient' : 'Ambient'}</span>
+        </button>
+        {isPlaying && (
+          <div className="flex items-center">
+            <div className="w-[2px] h-4 bg-blue/20 dark:bg-sky-400/20"></div>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                stopPreset();
+              }}
+              className="px-3 py-2 text-blue hover:text-red hover:bg-red/5 rounded-r-xl transition-all"
+              title="Turn ambient sound off"
+            >
+              <VolumeX size={16} />
+            </button>
+          </div>
+        )}
+      </div>
 
       <AnimatePresence>
         {isOpen && !isMobileLayout && (

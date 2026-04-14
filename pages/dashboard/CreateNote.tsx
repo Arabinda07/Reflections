@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Loader2, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Meh, Frown, Sun, Cloud, Moon, Heart, Brain, Coffee, MessageSquare, Tag as TagIcon, CheckCircle2, Check, CheckSquare, Square, Plus, Trash2, Eye, EyeOff, ListTodo, Wind, Target } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Editor } from '../../components/ui/Editor';
@@ -180,8 +180,11 @@ export const CreateNote: React.FC = () => {
   const lastSavedRef = useRef({ title: '', content: '', mood: undefined as string | undefined, tags: [] as string[], tasks: [] as Task[] });
   const editorRef = useRef<HTMLDivElement>(null);
   const isUnmounted = useRef(false);
+  const shouldReduceMotion = useReducedMotion();
+  const releaseEase = [0.4, 0, 0.2, 1];
 
   useEffect(() => {
+    isUnmounted.current = false;
     return () => {
       isUnmounted.current = true;
     };
@@ -212,6 +215,7 @@ export const CreateNote: React.FC = () => {
       try {
         if (!id) {
           // If creating a NEW note, unblock UI immediately
+          if (isUnmounted.current) return;
           setLoading(false);
           
           // Generate initial prompts for new note without awaiting
@@ -219,12 +223,14 @@ export const CreateNote: React.FC = () => {
           
           // Check count for current month asynchronously
           const count = await noteService.getMonthlyCount();
+          if (isUnmounted.current) return;
           if (count >= 30) {
             setIsLimitReached(true);
           }
         } else {
           // If editing an EXISTING note, we must block to fetch data
           const note = await noteService.getById(id);
+          if (isUnmounted.current) return;
           if (note) {
             setTitle(note.title);
             setContent(note.content);
@@ -413,12 +419,14 @@ export const CreateNote: React.FC = () => {
         Your response should be warm, insightful, and encourage further self-reflection.`,
       });
       
+      if (isUnmounted.current) return;
       setAiReflection(response.text || "I'm here to listen. Your thoughts are valid.");
     } catch (error) {
+      if (isUnmounted.current) return;
       console.error("AI Reflection failed:", error);
       setAiReflection("I'm having trouble reflecting right now, but I'm still here for you.");
     } finally {
-      setIsReflecting(false);
+      if (!isUnmounted.current) setIsReflecting(false);
     }
   };
 
@@ -524,9 +532,11 @@ export const CreateNote: React.FC = () => {
         attachments: finalAttachments
       });
 
+      if (isUnmounted.current) return;
       navigate(RoutePath.NOTE_DETAIL.replace(':id', noteId));
       
     } catch (error: any) {
+      if (isUnmounted.current) return;
       if (error.message === 'FREE_LIMIT_REACHED') {
         setIsLimitReached(true);
       } else {
@@ -534,7 +544,7 @@ export const CreateNote: React.FC = () => {
         alert("Failed to save note.");
       }
     } finally {
-      setSaving(false);
+      if (!isUnmounted.current) setSaving(false);
     }
   };
 
@@ -765,14 +775,18 @@ export const CreateNote: React.FC = () => {
       <AnimatePresence mode="wait">
         <motion.div
           key="editor-shell"
-          initial={{ opacity: 0, y: 20, filter: 'blur(10px)' }}
+          initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 20, filter: 'blur(10px)' }}
           animate={
             isReleasing
-              ? { opacity: 0, y: -34, scale: 0.98, filter: 'blur(18px)' }
-              : { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }
+              ? shouldReduceMotion
+                ? { opacity: 0 }
+                : { opacity: 0, y: -34, scale: 0.98, filter: 'blur(18px)' }
+              : shouldReduceMotion
+                ? { opacity: 1 }
+                : { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }
           }
-          exit={{ opacity: 0, y: -20, filter: 'blur(14px)' }}
-          transition={{ duration: isReleasing ? 1.35 : 0.65, ease: 'easeInOut' }}
+          exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -20, filter: 'blur(14px)' }}
+          transition={{ duration: shouldReduceMotion ? 0.3 : (isReleasing ? 1.35 : 0.65), ease: releaseEase }}
           className="mx-auto w-full max-w-[1100px]"
         >
           <div className="relative min-h-[70vh] rounded-[32px] border-2 border-border bg-white shadow-[0_8px_0_0_#E5E5E5] flex flex-col liquid-glass !overflow-visible dark:bg-[#17171b] dark:shadow-[0_8px_0_0_rgba(15,23,42,0.58)]">

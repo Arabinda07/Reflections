@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { Wind } from 'lucide-react';
 
 interface BreathingGateProps {
@@ -9,6 +9,9 @@ interface BreathingGateProps {
 }
 
 export const BreathingGate: React.FC<BreathingGateProps> = ({ active, durationMs, onComplete }) => {
+  const shouldReduceMotion = useReducedMotion();
+  const breathEase = [0.4, 0, 0.2, 1];
+
   useEffect(() => {
     if (!active) return;
 
@@ -28,38 +31,38 @@ export const BreathingGate: React.FC<BreathingGateProps> = ({ active, durationMs
         >
           <motion.div
             className="absolute h-[28rem] w-[28rem] rounded-full bg-emerald-200/20 blur-3xl dark:bg-emerald-300/10"
-            animate={{ scale: [0.85, 1.12, 0.85], opacity: [0.35, 0.65, 0.35] }}
-            transition={{ duration: durationMs / 1000, ease: 'easeInOut' }}
+            animate={{ scale: shouldReduceMotion ? 1 : [0.85, 1.12, 0.85], opacity: [0.35, 0.65, 0.35] }}
+            transition={{ duration: durationMs / 1000, ease: breathEase }}
           />
           <motion.div
             className="absolute h-[20rem] w-[20rem] rounded-full bg-sky-200/20 blur-2xl dark:bg-sky-300/10"
-            animate={{ scale: [1.08, 0.92, 1.08], opacity: [0.45, 0.25, 0.45] }}
-            transition={{ duration: durationMs / 1000, ease: 'easeInOut' }}
+            animate={{ scale: shouldReduceMotion ? 1 : [1.08, 0.92, 1.08], opacity: [0.45, 0.25, 0.45] }}
+            transition={{ duration: durationMs / 1000, ease: breathEase }}
           />
 
           <div className="relative flex flex-col items-center text-center">
             <motion.div
               className="relative mb-8 flex h-52 w-52 items-center justify-center rounded-full border border-sky-200/70 bg-white/50 shadow-[0_30px_80px_-40px_rgba(14,165,233,0.55)] backdrop-blur-2xl dark:border-sky-300/20 dark:bg-white/6 dark:shadow-[0_26px_90px_-48px_rgba(56,189,248,0.6)]"
-              animate={{ scale: [0.82, 1.08, 0.82] }}
-              transition={{ duration: durationMs / 1000, ease: 'easeInOut' }}
+              animate={{ scale: shouldReduceMotion ? 1 : [0.82, 1.08, 0.82] }}
+              transition={{ duration: durationMs / 1000, ease: breathEase }}
             >
               <motion.div
                 className="absolute inset-5 rounded-full border border-emerald-200/80 bg-emerald-100/20 dark:border-emerald-300/20 dark:bg-emerald-300/6"
-                animate={{ scale: [0.9, 1.18, 0.9], opacity: [0.35, 0.75, 0.35] }}
-                transition={{ duration: durationMs / 1000, ease: 'easeInOut' }}
+                animate={{ scale: shouldReduceMotion ? 1 : [0.9, 1.18, 0.9], opacity: [0.35, 0.75, 0.35] }}
+                transition={{ duration: durationMs / 1000, ease: breathEase }}
               />
               <motion.div
                 className="absolute inset-12 rounded-full bg-sky-100/60 dark:bg-sky-300/10"
-                animate={{ scale: [1, 0.82, 1], opacity: [0.55, 0.85, 0.55] }}
-                transition={{ duration: durationMs / 1000, ease: 'easeInOut' }}
+                animate={{ scale: shouldReduceMotion ? 1 : [1, 0.82, 1], opacity: [0.55, 0.85, 0.55] }}
+                transition={{ duration: durationMs / 1000, ease: breathEase }}
               />
               <Wind size={42} className="relative text-sky-500/70 dark:text-sky-200/90" />
             </motion.div>
 
             <motion.p
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: [0, 1, 1, 0], y: [8, 0, 0, -4] }}
-              transition={{ duration: durationMs / 1000, ease: 'easeInOut' }}
+              initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
+              animate={shouldReduceMotion ? { opacity: [0, 1, 1, 0] } : { opacity: [0, 1, 1, 0], y: [8, 0, 0, -4] }}
+              transition={{ duration: durationMs / 1000, ease: breathEase }}
               className="font-display text-[20px] lowercase tracking-wide text-gray-text dark:text-slate-100"
             >
               take a soft breath
