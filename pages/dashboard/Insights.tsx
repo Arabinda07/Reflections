@@ -42,10 +42,14 @@ export const Insights: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      // Minimum display time for the initial sanctuary entry (4 seconds)
+      const minTimePromise = new Promise(resolve => setTimeout(resolve, 4000));
+      
       try {
         const [allNotes, userResponse] = await Promise.all([
           noteService.getAll(),
-          supabase.auth.getUser()
+          supabase.auth.getUser(),
+          minTimePromise
         ]);
         
         setNotes(allNotes);
@@ -180,7 +184,7 @@ export const Insights: React.FC = () => {
   const hasEnoughNotes = notes.length >= 3;
 
   if (loading) {
-    return <LoadingState message="analyzing your patterns..." />;
+    return <AIThinkingState isVisible={true} />;
   }
 
   return (
