@@ -1,10 +1,9 @@
-import { ArrowRight, Brain, Download, FolderOpen, PlusCircle, RefreshCw, Smile, Sparkles, Tag, Target, UserPlus } from 'lucide-react';
+import { ArrowRight, Brain, FolderOpen, PlusCircle, RefreshCw, Smile, Sparkles, Tag, Target, UserPlus } from 'lucide-react';
 import { motion } from 'motion/react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { useAuth } from '../../context/AuthContext';
-import { usePWAInstall } from '../../context/PWAInstallContext';
 import { noteService } from '../../services/noteService';
 import { DEFAULT_WELLNESS_PROMPTS } from '../../services/wellnessPrompts';
 import { supabase } from '../../src/supabaseClient';
@@ -14,7 +13,6 @@ import { Landing } from './Landing';
 export const Home: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
-  const { canInstall, isInstalled, triggerInstall } = usePWAInstall();
   const [noteCount, setNoteCount] = useState<number | null>(null);
   const [isCountLoading, setIsCountLoading] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -148,38 +146,15 @@ export const Home: React.FC = () => {
           >
             welcome back, {user?.name?.split(' ')[0] || 'learner'}
           </h1>
-          <div className="flex flex-col sm:flex-row items-center gap-3">
-            <Button
-              variant="primary"
-              size="lg"
-              className="h-[56px] sm:h-[64px] px-8 sm:px-12 text-[16px] sm:text-[18px] font-bold uppercase rounded-2xl shadow-3d-green active:shadow-none active:translate-y-[4px] transition-all liquid-glass group"
-              onClick={() => handleCreateClick()}
-            >
-              <PlusCircle className="mr-3 group-hover:rotate-90 transition-transform duration-300" />
-              New Entry
-            </Button>
-
-            {canInstall && !isInstalled && (
-              <motion.div
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.2 }}
-              >
-                <button
-                  onClick={triggerInstall}
-                  className="flex items-center gap-2 h-[48px] px-6 rounded-xl text-white font-black text-[13px] uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98]"
-                  style={{
-                    backgroundColor: 'rgba(255,255,255,0.15)',
-                    backdropFilter: 'blur(12px)',
-                    border: '1.5px solid rgba(255,255,255,0.25)',
-                  }}
-                >
-                  <Download size={16} />
-                  Install Free
-                </button>
-              </motion.div>
-            )}
-          </div>
+          <Button
+            variant="primary"
+            size="lg"
+            className="h-[56px] sm:h-[64px] px-8 sm:px-12 text-[16px] sm:text-[18px] font-bold uppercase rounded-2xl shadow-3d-green active:shadow-none active:translate-y-[4px] transition-all liquid-glass group"
+            onClick={() => handleCreateClick()}
+          >
+            <PlusCircle className="mr-3 group-hover:rotate-90 transition-transform duration-300" />
+            New Entry
+          </Button>
         </motion.div>
       </section>
 
