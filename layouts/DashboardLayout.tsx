@@ -63,7 +63,7 @@ export const DashboardLayout: React.FC = () => {
   const navItems = isAuthenticated ? authNavItems : guestNavItems;
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#121212] font-sans selection:bg-green/30 selection:text-green-hover transition-colors duration-300">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-[#121212] font-sans selection:bg-green/30 selection:text-green-hover transition-colors duration-300">
       {/* Fixed Navbar */}
       <nav className="fixed top-0 left-0 right-0 h-[64px] border-b-2 border-border z-[100] flex justify-center liquid-glass">
         <div className="w-full max-w-[1440px] px-4 md:px-10 flex items-center justify-between">
@@ -238,12 +238,7 @@ export const DashboardLayout: React.FC = () => {
                     <ArrowRight className="opacity-0 group-hover:opacity-100 transition-opacity" />
                   </button>
                 ))}
-                <button
-                  onClick={() => handleNavigation(RoutePath.PRIVACY)}
-                  className="mt-4 text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-colors text-center w-full py-3"
-                >
-                  Privacy Policy
-                </button>
+
               </div>
             )}
           </div>
@@ -251,9 +246,59 @@ export const DashboardLayout: React.FC = () => {
       )}
 
       {/* Main Content */}
-      <main className="pt-[64px] w-full max-w-[1440px] mx-auto">
+      <main className="pt-[64px] w-full max-w-[1440px] mx-auto flex-grow">
         <Outlet />
       </main>
+
+      {/* Global Footer */}
+      <footer className="w-full border-t-2 border-border py-12 mt-20 liquid-glass">
+        <div className="max-w-[1440px] mx-auto px-4 md:px-10 flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="flex flex-col items-center md:items-start gap-4">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-lg bg-green flex items-center justify-center text-white">
+                <Sparkles size={18} fill="currentColor" />
+              </div>
+              <span className="font-display text-[18px] text-green lowercase tracking-tight">
+                reflections
+              </span>
+            </div>
+            <p className="text-[12px] font-bold text-gray-nav uppercase tracking-widest">
+              Built with care by Arabinda
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
+            <button 
+              onClick={() => navigate(RoutePath.HOME)}
+              className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-colors"
+            >
+              Home
+            </button>
+            <button 
+              onClick={() => navigate(RoutePath.FAQ)}
+              className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-colors"
+            >
+              FAQ
+            </button>
+            <button 
+              onClick={() => navigate(RoutePath.PRIVACY)}
+              className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-colors"
+            >
+              Privacy Policy
+            </button>
+            <a 
+              href="mailto:robinsaha@gmail.com"
+              className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-colors"
+            >
+              Contact
+            </a>
+          </div>
+
+          <div className="text-[11px] font-black uppercase tracking-widest text-gray-nav opacity-50">
+            © 2026 Arabinda
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
