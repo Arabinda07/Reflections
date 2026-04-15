@@ -54,19 +54,19 @@ export const FAQ: React.FC = () => {
             >
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green/10 border-2 border-green/20 text-green text-[12px] font-black uppercase tracking-[0.2em] mb-8 shadow-sm">
                 <Heart size={14} className="animate-pulse" />
-                <span>reflections: focus on your thoughts.</span>
+                <span>Your Mental Health Sanctuary</span>
               </div>
               
               <h1 className="text-5xl sm:text-6xl md:text-8xl font-display text-gray-text lowercase leading-tight md:leading-[0.9] mb-8 tracking-tighter drop-shadow-sm">
-                clear your <br />
-                <span className="bg-gradient-to-r from-green via-blue to-green bg-clip-text text-transparent animate-gradient-x drop-shadow-md">head.</span>
+                untangle your <br />
+                <span className="bg-gradient-to-r from-green via-blue to-green bg-clip-text text-transparent animate-gradient-x drop-shadow-md">thoughts.</span>
               </h1>
               
               <p className="text-[18px] sm:text-[22px] text-gray-light font-medium leading-relaxed max-w-3xl mx-auto mb-6">
-                Get what's in your head out on the page. No clutter, no noise. Just a private space to think.
+                We live in an overwhelming, fast-paced world. Racing thoughts, anxiety, stress accumulate until our minds feel loud and cluttered. 
               </p>
               <p className="text-[18px] sm:text-[20px] text-gray-text font-semibold leading-relaxed max-w-2xl mx-auto">
-                Journaling is about giving yourself room to breathe. Use this app to clear the mental clutter.
+                Get what's in your head out on the page. Journaling is about giving yourself room to breathe. Use this app to clear the mental clutter.
               </p>
             </motion.div>
           </div>
