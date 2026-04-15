@@ -8,10 +8,19 @@ import { StartupScreen } from '../components/ui/StartupScreen';
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
+  isInitialCheckDone: boolean;
   logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Helper to map Supabase session to our app User type
+const mapSessionToUser = (session: Session): User => ({
+  id: session.user.id,
+  email: session.user.email || '',
+  name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
+  avatarUrl: session.user.user_metadata?.avatar_url,
+});
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -19,7 +28,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [showStartup, setShowStartup] = useState(true);
   const [minTimeReached, setMinTimeReached] = useState(false);
 
-  // Minimum duration for the startup animation (2 seconds)
+  // Minimum duration for the startup animation (3.5 seconds)
   useEffect(() => {
     const timer = setTimeout(() => {
       setMinTimeReached(true);
@@ -29,6 +38,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     let mounted = true;
+
+    // Initial session check
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (mounted) {
+        if (session) {
+          setUser(mapSessionToUser(session));
+        } else {
+          setUser(null);
+        }
+        setLoading(false);
+      }
+    };
+
+    checkSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!mounted) return;
@@ -67,9 +91,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isInitialCheckDone: !loading, logout }}>
+      {/* StartupScreen is a fixed overlay, so it doesn't interrupt the app mounting */}
       <StartupScreen isVisible={showStartup} />
-      {!loading && children}
+      
+      {/* 
+        CRITICAL FIX: We always render children to keep the Router and its state alive.
+        The StartupScreen covers it visually until we're ready.
+      */}
+      {children}
     </AuthContext.Provider>
   );
 };
