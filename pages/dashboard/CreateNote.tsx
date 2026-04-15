@@ -1372,7 +1372,7 @@ export const CreateNote: React.FC = () => {
         </motion.div>
         )}
       </AnimatePresence>
-      <audio ref={audioRef} loop className="hidden" />
+      <audio ref={audioRef} src="" preload="none" loop className="hidden" />
       </div>
     </>
   );
