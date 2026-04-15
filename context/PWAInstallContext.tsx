@@ -59,12 +59,18 @@ export const PWAInstallProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   const triggerInstall = useCallback(async () => {
     if (!installPrompt) return;
+    // Show the native install prompt
     await installPrompt.prompt();
     const { outcome } = await installPrompt.userChoice;
     if (outcome === 'accepted') {
+      // Only clear the prompt on acceptance — 
+      // dismissal should keep the button visible so they can try again later.
       setInstallPrompt(null);
       setIsInstalled(true);
     }
+    // Note: on 'dismissed', we intentionally do NOT clear installPrompt.
+    // The browser typically fires beforeinstallprompt again on next page load,
+    // but for this session we keep canInstall = true so the button stays visible.
   }, [installPrompt]);
 
   return (

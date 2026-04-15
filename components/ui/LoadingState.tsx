@@ -1,6 +1,4 @@
 import React from 'react';
-import { createPortal } from 'react-dom';
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface LoadingStateProps {
@@ -9,8 +7,9 @@ interface LoadingStateProps {
 }
 
 /**
- * LoadingState - The "Ultimate" Cinematic Loader
- * Hardened with Portals to guarantee a full-screen white sanctuary.
+ * LoadingState — Brand Cinematic Loader
+ * Uses the startup video. All colors hardcoded to be fully dark-mode immune.
+ * Text elements are explicitly z-layered above the video.
  */
 export const LoadingState: React.FC<LoadingStateProps> = ({ 
   message = "gathering your thoughts...",
@@ -20,58 +19,66 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
     <AnimatePresence>
       {isVisible && (
         <motion.div 
+          key="loading-sanctuary"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.8 }}
-          className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-white"
+          className="fixed inset-0 z-[10000] flex flex-col items-center justify-center"
+          style={{ backgroundColor: '#ffffff' }}
         >
-          {/* Main Cinematic Video Container */}
-          <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
-            {/* Subtle backlight glow */}
-            <div className="absolute inset-0 bg-green/5 blur-3xl rounded-full scale-75 animate-pulse z-10" />
-            
-            <video 
-              src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_074327_a4d6275d-82d9-4c83-bfbe-f1fb2213c17c.mp4"
-              autoPlay 
-              loop 
-              muted 
-              playsInline
-              className="absolute inset-0 w-full h-full object-cover z-0"
-            />
-          </div>
+          {/* Video fills the whole overlay */}
+          <video 
+            src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_074327_a4d6275d-82d9-4c83-bfbe-f1fb2213c17c.mp4"
+            autoPlay 
+            loop 
+            muted 
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover z-0"
+          />
 
-          {/* Qualitative Message */}
+          {/* Dark overlay for legibility — subtle, not heavy */}
+          <div className="absolute inset-0 z-[1]" style={{ backgroundColor: 'rgba(255,255,255,0.25)' }} />
+
+          {/* Qualitative Message — above video */}
           <motion.p 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.8 }}
-            className="text-[14px] font-bold text-gray-light uppercase tracking-[0.2em] font-display mt-4"
+            transition={{ delay: 0.6, duration: 0.8 }}
+            className="relative z-[2] text-[13px] font-black uppercase tracking-[0.25em]"
+            style={{ color: '#4b4b4b' }}
           >
             {message}
           </motion.p>
-          
-          {/* Brand Footer to match Splash Screen */}
+
+          {/* Brand wordmark — absolute bottom */}
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1, duration: 1 }}
-            className="absolute bottom-16 flex flex-col items-center gap-2"
+            className="absolute bottom-14 z-[2] flex flex-col items-center gap-2"
           >
-            <span className="text-[20px] font-display text-gray-text lowercase tracking-tight opacity-80">
+            <span
+              className="text-[20px] lowercase tracking-tight"
+              style={{ fontFamily: 'Nunito, sans-serif', color: '#4b4b4b', opacity: 0.75 }}
+            >
               reflections
             </span>
-            <div className="h-[2px] w-8 bg-green/20 rounded-full" />
+            <div className="h-[2px] w-8 rounded-full" style={{ backgroundColor: 'rgba(88,204,2,0.3)' }} />
           </motion.div>
           
-          {/* Subtle progress bar */}
-          <div className="absolute bottom-12 w-48 h-1 bg-gray-50 rounded-full overflow-hidden border border-border/50">
-             <motion.div 
-               initial={{ x: "-100%" }}
-               animate={{ x: "0%" }}
-               transition={{ duration: 6, ease: "linear" }}
-               className="h-full w-full bg-green/20"
-             />
+          {/* Progress bar */}
+          <div
+            className="absolute bottom-10 z-[2] w-44 h-[3px] rounded-full overflow-hidden"
+            style={{ backgroundColor: 'rgba(0,0,0,0.06)' }}
+          >
+            <motion.div 
+              initial={{ scaleX: 0, originX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 6, ease: "linear" }}
+              className="h-full w-full rounded-full"
+              style={{ backgroundColor: 'rgba(88,204,2,0.4)' }}
+            />
           </div>
         </motion.div>
       )}

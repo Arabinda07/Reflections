@@ -146,11 +146,11 @@ export const Account: React.FC = () => {
 
   if (fetching) {
     return (
-      <div className="flex h-screen w-full items-center justify-center text-slate-500">
-         <div className="flex flex-col items-center gap-3">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent"></div>
-            <span className="text-sm font-medium">Loading account...</span>
-         </div>
+      <div className="flex h-screen w-full items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-8 w-8 animate-spin rounded-full border-[3px] border-blue border-t-transparent" />
+          <span className="text-[12px] font-black text-gray-nav uppercase tracking-widest">Loading account...</span>
+        </div>
       </div>
     );
   }

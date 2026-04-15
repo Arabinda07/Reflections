@@ -1,15 +1,14 @@
+import { ArrowRight, Brain, FileText, FolderOpen, PlusCircle, RefreshCw, Smile, Sparkles, Tag, Target, UserPlus } from 'lucide-react';
+import { motion } from 'motion/react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PlusCircle, Sparkles, FolderOpen, FileText, UserPlus, Smile, Tag, RefreshCw, ArrowRight, Brain, Target, Download } from 'lucide-react';
-import { motion } from 'motion/react';
 import { Button } from '../../components/ui/Button';
-import { RoutePath } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { noteService } from '../../services/noteService';
-import { supabase } from '../../src/supabaseClient';
 import { DEFAULT_WELLNESS_PROMPTS } from '../../services/wellnessPrompts';
+import { supabase } from '../../src/supabaseClient';
+import { RoutePath } from '../../types';
 import { Landing } from './Landing';
-import { usePWAInstall } from '../../context/PWAInstallContext';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -28,13 +27,13 @@ export const Home: React.FC = () => {
   const refreshPrompt = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (isRefreshing) return;
-    
+
     setIsRefreshing(true);
     let next;
     do {
       next = DEFAULT_WELLNESS_PROMPTS[Math.floor(Math.random() * DEFAULT_WELLNESS_PROMPTS.length)];
     } while (next === dailyPrompt);
-    
+
     // Artificial delay to make it feel like it's "refreshing"
     setTimeout(() => {
       setDailyPrompt(next);
@@ -123,11 +122,11 @@ export const Home: React.FC = () => {
       <section className="relative flex flex-col items-center justify-center text-center py-16 sm:py-24 px-6 sm:px-10 overflow-hidden border-b-2 border-border min-h-[400px] sm:min-h-[500px]">
         {/* Hero Video Background */}
         {/* Hero Video Background */}
-        <video 
+        <video
           src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_045634_e1c98c76-1265-4f5c-882a-4276f2080894.mp4"
-          autoPlay 
-          loop 
-          muted 
+          autoPlay
+          loop
+          muted
           playsInline
           crossOrigin="anonymous"
           className="absolute inset-0 w-full h-full object-cover object-bottom z-0"
@@ -137,19 +136,19 @@ export const Home: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/40 to-transparent z-0"></div>
 
         {/* Floating Text Container */}
-        <motion.div 
+        <motion.div
           animate={{ y: [-5, 5, -5] }}
           transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
           className="relative z-10 flex flex-col items-center max-w-2xl w-full"
         >
-          <h1 
+          <h1
             className="font-display text-[48px] sm:text-[64px] lowercase mb-4 tracking-tighter leading-none"
             style={{ color: '#ffffff', textShadow: '0 4px 12px rgba(0,0,0,0.8)' }}
           >
             welcome back, {user?.name?.split(' ')[0] || 'learner'}
           </h1>
-          <Button 
-            variant="primary" 
+          <Button
+            variant="primary"
             size="lg"
             className="h-[64px] px-12 text-[18px] font-bold uppercase rounded-2xl shadow-3d-green active:shadow-none active:translate-y-[4px] transition-all liquid-glass group"
             onClick={() => handleCreateClick()}
@@ -162,12 +161,12 @@ export const Home: React.FC = () => {
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 border-t-2 border-border">
-        
+
         {/* Panel 1: Stats & Overview - Now Clickable */}
         <div className="p-6 sm:p-10 border-b-2 border-border lg:border-r-2 border-border">
           <div className="panel-label">Emotional Overview</div>
           <div className="flex flex-col gap-6">
-            <div 
+            <div
               className="bg-white border-2 border-border rounded-[32px] p-8 shadow-[0_8px_0_0_#E5E5E5] hover:shadow-none hover:translate-y-[4px] transition-all liquid-glass cursor-pointer group"
               onClick={() => navigate(RoutePath.NOTES)}
             >
@@ -188,7 +187,7 @@ export const Home: React.FC = () => {
               </div>
             </div>
 
-            <div 
+            <div
               className="bg-white border-2 border-border rounded-[32px] p-8 shadow-[0_8px_0_0_#E5E5E5] hover:shadow-none hover:translate-y-[4px] transition-all liquid-glass cursor-pointer group"
               onClick={() => navigate(RoutePath.INSIGHTS)}
             >
@@ -221,7 +220,7 @@ export const Home: React.FC = () => {
                     <p className="text-[14px] text-gray-light font-medium">A small nudge for today</p>
                   </div>
                 </div>
-                <button 
+                <button
                   onClick={refreshPrompt}
                   className={`flex h-10 w-10 items-center justify-center rounded-2xl bg-white border-2 border-border text-gray-nav shadow-sm hover:text-blue hover:border-blue/30 transition-all ${isRefreshing ? 'opacity-50' : 'opacity-100'}`}
                   title="Refresh Prompt"
@@ -236,11 +235,11 @@ export const Home: React.FC = () => {
                   "{dailyPrompt}"
                 </p>
               </div>
-              
+
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <Button 
-                  variant="secondary" 
-                  size="lg" 
+                <Button
+                  variant="secondary"
+                  size="lg"
                   className="w-full border-2 border-border bg-white text-blue font-extrabold uppercase shadow-3d-gray sm:w-auto"
                   onClick={() => handleCreateClick(dailyPrompt)}
                 >
@@ -258,9 +257,9 @@ export const Home: React.FC = () => {
           <div className="relative w-full max-w-lg space-y-6 rounded-[32px] border-2 border-border bg-white p-8 shadow-[0_12px_0_0_#E5E5E5] overflow-hidden liquid-glass">
             <div className="absolute top-[-20%] right-[-10%] w-[200px] h-[200px] bg-green/10 blur-[60px] rounded-full pointer-events-none" />
             <div className="absolute bottom-[-10%] left-[-10%] w-[200px] h-[200px] bg-blue/10 blur-[60px] rounded-full pointer-events-none" />
-            
+
             {/* Dark Mode Toggle for Onboarding */}
-            <button 
+            <button
               onClick={() => {
                 if (document.documentElement.classList.contains('dark')) {
                   document.documentElement.classList.remove('dark');
@@ -318,8 +317,8 @@ export const Home: React.FC = () => {
                 </div>
               </div>
 
-              <Button 
-                variant="primary" 
+              <Button
+                variant="primary"
                 className="w-full h-[56px] text-[16px] font-bold uppercase rounded-xl shadow-3d-green active:shadow-none active:translate-y-[4px] transition-all liquid-glass"
                 onClick={handleCloseOnboarding}
               >
