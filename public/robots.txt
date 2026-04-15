@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /signup
+Disallow: /notes
+Disallow: /notes/
+Disallow: /account
+Disallow: /insights
+
+# Privacy and legal pages — allow
+Allow: /privacy
+Allow: /faq
+
+Sitemap: https://reflections-ebon.vercel.app/sitemap.xml

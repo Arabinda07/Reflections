@@ -1,14 +1,21 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { Sparkles, Play, Shield, Zap, Heart, Brain, Moon, Sun, ArrowRight, CheckCircle2, Cloud, Volume2, VolumeX } from 'lucide-react';
+import { Sparkles, ArrowRight, CheckCircle2, Cloud, Volume2, VolumeX, Download, Share } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { RoutePath } from '../../types';
+import { usePWAInstall } from '../../context/PWAInstallContext';
 
 export const Landing: React.FC = () => {
   const navigate = useNavigate();
   const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const { canInstall, isInstalled, triggerInstall } = usePWAInstall();
+
+  // iOS detection — Safari doesn't fire beforeinstallprompt but supports Add to Home Screen via share sheet
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches;
+  const showIOSHint = isIOS && !isInStandaloneMode;
 
   const toggleMute = () => {
     if (videoRef.current) {
@@ -108,6 +115,37 @@ export const Landing: React.FC = () => {
             </Button>
           </div>
           
+          {/* PWA Install Button — appears automatically when browser supports it */}
+          {(canInstall || showIOSHint) && !isInstalled && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+              className="mt-6 flex flex-col items-center gap-2"
+            >
+              {canInstall ? (
+                <button
+                  onClick={triggerInstall}
+                  className="flex items-center gap-3 px-6 py-3 rounded-full border-2 border-green/30 bg-green/5 text-green font-black uppercase tracking-widest text-[13px] transition-all hover:bg-green/10 hover:border-green/50 active:scale-[0.97]"
+                >
+                  <Download size={16} />
+                  Install App — Free
+                </button>
+              ) : showIOSHint ? (
+                <button
+                  onClick={() => alert('Tap the Share button (⬆) in Safari, then choose "Add to Home Screen"')}
+                  className="flex items-center gap-3 px-6 py-3 rounded-full border-2 border-blue/30 bg-blue/5 text-blue font-black uppercase tracking-widest text-[13px] transition-all hover:bg-blue/10 active:scale-[0.97]"
+                >
+                  <Share size={16} />
+                  Save to Home Screen
+                </button>
+              ) : null}
+              <p className="text-[11px] font-bold text-gray-nav uppercase tracking-widest">
+                No app store needed · Works offline
+              </p>
+            </motion.div>
+          )}
+
           <div className="mt-8 flex justify-center">
              <Button 
                variant="ghost" 
