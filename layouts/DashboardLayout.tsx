@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, Search, Sparkles, User, Settings, LogOut, Loader2, FileText, X, LogIn, Moon, Sun, ArrowRight } from 'lucide-react';
+import { Menu, Search, Sparkles, User, Settings, LogOut, Loader2, FileText, X, LogIn, Moon, Sun, ArrowRight, Download } from 'lucide-react';
 import { RoutePath, Note } from '../types';
 import { noteService } from '../services/noteService';
 import { useAuth } from '../context/AuthContext';
+import { usePWAInstall } from '../context/PWAInstallContext';
 import { Button } from '../components/ui/Button';
 import { StorageImage } from '../components/ui/StorageImage';
 
@@ -11,6 +12,7 @@ export const DashboardLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
+  const { canInstall, triggerInstall } = usePWAInstall();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return document.documentElement.classList.contains('dark');
@@ -193,6 +195,19 @@ export const DashboardLayout: React.FC = () => {
                   ))}
                 </div>
                 <div className="mt-8 flex flex-col gap-4 pb-10">
+                  {/* PWA Install Button — only visible when browser supports it */}
+                  {canInstall && (
+                    <button
+                      onClick={async () => {
+                        await triggerInstall();
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="w-full flex items-center justify-center gap-3 p-5 rounded-2xl border-2 border-green/30 bg-green/5 text-green font-black uppercase tracking-widest text-[14px] transition-all hover:bg-green/10 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+                    >
+                      <Download size={20} />
+                      Add to Home Screen
+                    </button>
+                  )}
                   <Button 
                     variant="ghost" 
                     size="lg" 

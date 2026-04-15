@@ -1,6 +1,7 @@
 import React from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { PWAInstallProvider } from './context/PWAInstallContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { DashboardLayout } from './layouts/DashboardLayout';
 import { SignIn } from './pages/auth/SignIn';
@@ -16,8 +17,9 @@ import { RoutePath } from './types';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <PWAInstallProvider>
+      <AuthProvider>
+        <Router>
         <Routes>
           {/* Public Auth Routes (Moved inside DashboardLayout for universal nav) */}
 
@@ -44,8 +46,9 @@ function App() {
           {/* Fallback */}
           <Route path="*" element={<Navigate to={RoutePath.HOME} replace />} />
         </Routes>
-      </Router>
-    </AuthProvider>
+        </Router>
+      </AuthProvider>
+    </PWAInstallProvider>
   );
 }
 
