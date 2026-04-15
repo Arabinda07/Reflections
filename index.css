@@ -166,6 +166,17 @@ body {
     background-clip: padding-box;
   }
 
+  /* Hides the scrollbar track while keeping swipe-to-scroll functional.
+     Used on the CreateNote toolbar so buttons don't visually overflow. */
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
   .panel-label {
     font-size: 11px;
     font-weight: 800;

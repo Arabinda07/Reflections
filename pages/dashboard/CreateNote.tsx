@@ -795,7 +795,7 @@ export const CreateNote: React.FC = () => {
       {limitReachedOverlay}
       <div className={`mx-auto max-w-[1180px] transition-opacity duration-1000 ${isBreathing ? 'opacity-0 pointer-events-none' : 'opacity-100 animate-in fade-in duration-500'} pb-20 px-3 sm:px-4 md:px-6`}>
         <nav className={`sticky top-4 z-50 mb-8 flex items-center justify-between gap-2 rounded-2xl border-2 border-border bg-white/90 px-3 py-2 sm:px-4 sm:py-3 shadow-[0_4px_0_0_#E5E5E5] backdrop-blur-2xl transition-all duration-500 dark:bg-[#17171b]/90 dark:shadow-[0_4px_0_0_rgba(15,23,42,0.55)] ${isDimmed ? 'opacity-40 hover:opacity-100' : 'opacity-100'}`}>
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-bold uppercase text-[12px] px-2 sm:px-3">
              <ArrowLeft className="h-4 w-4 sm:mr-2" />
              <span className="hidden sm:inline">BACK</span>
@@ -808,12 +808,12 @@ export const CreateNote: React.FC = () => {
            </div>
         </div>
         
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto no-scrollbar min-w-0">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setIsFocusModeManual(!isFocusModeManual)}
-            className={`flex items-center gap-2 font-bold uppercase text-[11px] transition-all ${
+            className={`hidden sm:flex items-center gap-2 font-bold uppercase text-[11px] transition-all shrink-0 ${
               isFocusModeManual ? 'text-blue bg-blue/5' : 'text-gray-nav'
             }`}
             title={isFocusModeManual ? "Disable Focus Mode" : "Enable Focus Mode"}
@@ -907,7 +907,7 @@ export const CreateNote: React.FC = () => {
             variant="ghost" 
             size="sm" 
             onClick={handleRelease} 
-            className="text-gray-nav hover:text-red hover:bg-red/5 font-bold uppercase text-[11px] transition-all px-2 sm:px-3" 
+            className="hidden sm:flex text-gray-nav hover:text-red hover:bg-red/5 font-bold uppercase text-[11px] transition-all shrink-0 px-2 sm:px-3" 
             disabled={isReleasing}
           >
               <Wind className="h-3.5 w-3.5 sm:mr-2" />
@@ -921,10 +921,10 @@ export const CreateNote: React.FC = () => {
                 initial={{ opacity: 0, x: 10 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -10 }}
-                className="flex items-center gap-1.5 rounded-full border border-blue/10 bg-blue/5 px-3 py-1 text-[11px] font-bold text-blue dark:border-sky-400/20 dark:bg-sky-400/12 dark:text-sky-100"
+                className="flex shrink-0 items-center gap-1.5 rounded-full border border-blue/10 bg-blue/5 px-2 py-1 text-[11px] font-bold text-blue dark:border-sky-400/20 dark:bg-sky-400/12 dark:text-sky-100"
               >
-                <Loader2 size={12} className="animate-spin" />
-                <span>Saving...</span>
+                <Loader2 size={12} className="animate-spin shrink-0" />
+                <span className="hidden sm:inline">Saving...</span>
               </motion.div>
             )}
             {saveStatus === 'saved' && (
@@ -933,17 +933,17 @@ export const CreateNote: React.FC = () => {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
-                className="flex items-center gap-1.5 rounded-full border border-green/10 bg-green/5 px-3 py-1 text-[11px] font-bold text-green dark:border-emerald-400/20 dark:bg-emerald-400/12 dark:text-emerald-100"
+                className="flex shrink-0 items-center gap-1.5 rounded-full border border-green/10 bg-green/5 px-2 py-1 text-[11px] font-bold text-green dark:border-emerald-400/20 dark:bg-emerald-400/12 dark:text-emerald-100"
               >
-                <Check size={12} className="text-green" />
-                <span>Saved</span>
+                <Check size={12} className="text-green shrink-0" />
+                <span className="hidden sm:inline">Saved</span>
               </motion.div>
             )}
           </AnimatePresence>
             <Button 
               variant="secondary" 
               size="sm" 
-              className="border-2 border-border text-blue shadow-3d-gray active:shadow-none active:translate-y-[2px] transition-all dark:bg-white/6 px-2 sm:px-3 dark:text-sky-100 dark:shadow-[0_3px_0_0_rgba(15,23,42,0.55)]"
+              className="shrink-0 border-2 border-border text-blue shadow-3d-gray active:shadow-none active:translate-y-[2px] transition-all dark:bg-white/6 px-2 sm:px-3 dark:text-sky-100 dark:shadow-[0_3px_0_0_rgba(15,23,42,0.55)]"
               disabled={!canEnhance || isReflecting}
               onClick={handleAiReflect}
               isLoading={isReflecting}
@@ -955,7 +955,7 @@ export const CreateNote: React.FC = () => {
               onClick={handleSave} 
               size="sm" 
               variant="primary"
-              className="shadow-3d-green px-2 sm:px-3 active:shadow-none active:translate-y-[2px] transition-all"
+              className="shrink-0 shadow-3d-green px-2 sm:px-3 active:shadow-none active:translate-y-[2px] transition-all"
               isLoading={saving} 
               disabled={!canSave}
             >

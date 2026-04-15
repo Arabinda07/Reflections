@@ -13,6 +13,7 @@ import { SingleNote } from './pages/dashboard/SingleNote';
 import { Account } from './pages/dashboard/Account';
 import { Insights } from './pages/dashboard/Insights';
 import { FAQ } from './pages/dashboard/FAQ';
+import { PrivacyPolicy } from './pages/dashboard/PrivacyPolicy';
 import { RoutePath } from './types';
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
             {/* Public Home Page (Handles both Guest and Auth states internally) */}
             <Route path={RoutePath.HOME} element={<Home />} />
             <Route path={RoutePath.FAQ} element={<FAQ />} />
+            <Route path={RoutePath.PRIVACY} element={<PrivacyPolicy />} />
             
             {/* Public Auth Routes - Guest only effectively via navigation logic */}
             <Route path={RoutePath.LOGIN} element={<SignIn />} />

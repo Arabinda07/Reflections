@@ -238,6 +238,12 @@ export const DashboardLayout: React.FC = () => {
                     <ArrowRight className="opacity-0 group-hover:opacity-100 transition-opacity" />
                   </button>
                 ))}
+                <button
+                  onClick={() => handleNavigation(RoutePath.PRIVACY)}
+                  className="mt-4 text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-colors text-center w-full py-3"
+                >
+                  Privacy Policy
+                </button>
               </div>
             )}
           </div>
