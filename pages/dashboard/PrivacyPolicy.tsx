@@ -29,7 +29,7 @@ export const PrivacyPolicy: React.FC = () => {
               privacy policy
             </h1>
             <p className="text-[13px] font-bold text-gray-nav uppercase tracking-widest mt-1">
-              Last updated: April 2026
+              Last updated: April 15, 2026
             </p>
           </div>
         </div>
@@ -99,7 +99,7 @@ export const PrivacyPolicy: React.FC = () => {
             </div>
             <div className="pl-14 space-y-3 text-[15px] font-medium leading-relaxed text-gray-text">
               <p><strong>Access:</strong> You can view all your data through the app at any time.</p>
-              <p><strong>Delete:</strong> You can delete any journal entry from the app. To delete your account and all associated data permanently, contact us at the email below.</p>
+              <p><strong>Delete:</strong> You can delete any journal entry from the app. You can also delete your account and all associated data permanently via the Settings menu in the app. If you have any trouble, contact us at the email below.</p>
               <p><strong>Export:</strong> We are working on a data export feature. Until then, contact us to request your data in a portable format.</p>
               <p>These rights apply to all users, including users in the EU (GDPR) and California (CCPA).</p>
             </div>
@@ -116,14 +116,14 @@ export const PrivacyPolicy: React.FC = () => {
             <div className="pl-14 space-y-3 text-[15px] font-medium leading-relaxed text-gray-text">
               <p>Questions, data deletion requests, or concerns about this policy:</p>
               <a
-                href="mailto:privacy@reflections.app"
+                href="mailto:robinsaha@gmail.com"
                 className="inline-flex items-center gap-2 text-green font-bold hover:underline"
               >
                 <Mail size={16} />
-                privacy@reflections.app
+                robinsaha@gmail.com
               </a>
               <p className="text-[13px] text-gray-nav">
-                Reflections is built and maintained by Profit Studio, India.
+                Reflections is built and maintained by Arabinda.
               </p>
             </div>
           </section>

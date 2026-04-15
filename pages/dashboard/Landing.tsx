@@ -115,7 +115,21 @@ export const Landing: React.FC = () => {
             </Button>
           </div>
           
-          {/* PWA Install Button — appears automatically when browser supports it */}
+
+
+          <div className="mt-8 flex justify-center">
+             <Button 
+               variant="ghost" 
+               size="sm" 
+               className="text-[14px] font-bold uppercase tracking-widest text-gray-nav hover:text-blue hover:bg-blue/5 border-2 border-transparent hover:border-blue/10 rounded-full px-6 py-3 transition-all flex items-center gap-2"
+               onClick={() => navigate(RoutePath.FAQ)}
+             >
+               <Sparkles size={16} />
+               <span>Explore How It Works (FAQ)</span>
+             </Button>
+          </div>
+
+          {/* PWA Install Button — moved below FAQ */}
           {(canInstall || showIOSHint) && !isInstalled && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -145,18 +159,6 @@ export const Landing: React.FC = () => {
               </p>
             </motion.div>
           )}
-
-          <div className="mt-8 flex justify-center">
-             <Button 
-               variant="ghost" 
-               size="sm" 
-               className="text-[14px] font-bold uppercase tracking-widest text-gray-nav hover:text-blue hover:bg-blue/5 border-2 border-transparent hover:border-blue/10 rounded-full px-6 py-3 transition-all flex items-center gap-2"
-               onClick={() => navigate(RoutePath.FAQ)}
-             >
-               <Sparkles size={16} />
-               <span>Explore How It Works (FAQ)</span>
-             </Button>
-          </div>
         </motion.div>
 
 

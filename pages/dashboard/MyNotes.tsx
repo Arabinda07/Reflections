@@ -141,7 +141,7 @@ export const MyNotes: React.FC = () => {
               {allTags.map(tag => (
                 <button 
                   key={tag}
-                  onClick={() => navigate(`${RoutePath.NOTES}?tag=${encodeURIComponent(tag)}`)}
+                  onClick={() => navigate(`${RoutePath.NOTES}?tag=${encodeURIComponent(tag as string)}`)}
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-50 border border-border text-[12px] font-bold text-gray-nav hover:text-blue hover:border-blue/30 transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]"
                 >
                   <Tag size={12} /> {tag}
