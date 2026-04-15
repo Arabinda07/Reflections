@@ -402,21 +402,37 @@ export const CreateNote: React.FC = () => {
   const generateDynamicPrompts = async (currentMood?: string) => {
     setIsGeneratingPrompts(true);
     try {
-      const pastNotes = await noteService.getAll();
-      // Use titles of last 3 notes for context
+      const pastNotes = await noteService.getRecent(3);
+      
+      // Build a richer context from the last 3 notes, stripping HTML
       const pastContext = pastNotes
         .filter(n => n.id !== id)
-        .slice(0, 3)
-        .map(n => n.title)
-        .filter(Boolean)
-        .join(', ');
+        .map(n => {
+          const cleanContent = n.content.replace(/<[^>]*>/g, '').slice(0, 300);
+          return `Title: ${n.title}\nMood: ${n.mood || 'Unspecified'}\nContent: ${cleanContent}`;
+        })
+        .join('\n\n');
       
-      const moodContext = currentMood ? `The user is currently feeling ${currentMood}.` : 'The user hasn\'t specified their mood yet.';
-      const context = pastContext ? `Their recent entries were about: ${pastContext}.` : '';
+      const moodContext = currentMood ? `The user is currently feeling ${currentMood}.` : 'The user hasn\'t specified their mood for this new entry yet.';
+      const context = pastContext 
+        ? `Here are their 3 most recent entries for context:\n${pastContext}` 
+        : 'The user is just starting their journey and has no past entries yet.';
 
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
-        contents: `You are a helpful journaling assistant. Generate 4 unique, personalized journaling prompts for the user. ${moodContext} ${context} The prompts should be short, encouraging, and relevant to their current state or past topics. Return only a JSON array of strings.`,
+        contents: `You are a thoughtful, grounded journaling partner. Your goal is to help the user connect their current mood with recurring themes in their life.
+
+Context:
+${moodContext}
+
+${context}
+
+Instructions:
+1. Identify a recurring theme, an unresolved tension, or a pattern from these recent entries.
+2. Generate 4 brief, personalized journaling prompts. 
+3. One prompt should be a "gentle nudge," one should be a "deep question," and two should relate to their specific recurring themes.
+4. Avoid "AI-poetry" or flowery language. Be direct, human, and helpful—like a friend who listens well.
+5. Return only a JSON array of strings.`,
         config: {
           responseMimeType: "application/json",
           responseSchema: {

@@ -37,6 +37,25 @@ export const noteService = {
     return (data || []).map(mapToNote);
   },
 
+  // Fetch the most recent N notes with content for context
+  getRecent: async (limit: number): Promise<Note[]> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    const { data, error } = await supabase
+      .from('notes')
+      .select('id, title, content, mood, updated_at, tags')
+      .eq('user_id', user.id)
+      .order('updated_at', { ascending: false })
+      .limit(limit);
+    
+    if (error) {
+      console.error('Supabase DB Error (getRecent notes):', error.message, error);
+      throw error;
+    }
+    return (data || []).map(mapToNote);
+  },
+
   // Get the total count of notes for the current user
   getCount: async (): Promise<number> => {
     const { data: { user } } = await supabase.auth.getUser();

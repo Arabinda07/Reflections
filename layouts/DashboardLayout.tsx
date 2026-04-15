@@ -155,7 +155,7 @@ export const DashboardLayout: React.FC = () => {
       {/* Mobile Menu Overlay - Moved OUTSIDE of nav to avoid overflow:hidden from liquid-glass */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-[105] md:hidden animate-in fade-in duration-500">
-          <div className="absolute inset-0 bg-white/98 backdrop-blur-2xl" onClick={() => setIsMobileMenuOpen(false)} />
+          <div className="absolute inset-0 bg-white/96 dark:bg-[#0a0a0b]/96 backdrop-blur-3xl" onClick={() => setIsMobileMenuOpen(false)} />
           
           {/* Ambient Background for Mobile Menu */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -166,7 +166,7 @@ export const DashboardLayout: React.FC = () => {
           {/* Close Button */}
           <button 
             onClick={() => setIsMobileMenuOpen(false)}
-            className="absolute top-4 right-4 p-3 rounded-2xl text-gray-nav hover:text-green hover:bg-green/5 transition-all z-[110] border-2 border-border bg-white shadow-3d-gray active:shadow-none active:translate-y-[2px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
+            className="absolute top-4 right-4 p-3 rounded-2xl text-gray-nav hover:text-green hover:bg-green/5 transition-all z-[110] border-2 border-border dark:border-white/10 bg-white dark:bg-[#1e1e1e] shadow-3d-gray active:shadow-none active:translate-y-[2px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
             aria-label="Close menu"
           >
             <X size={24} />
