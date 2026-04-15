@@ -4,10 +4,10 @@
   font-family: 'Feather Bold';
   src: url('https://db.onlinewebfonts.com/t/14936bb7a4b6575fd2eee80a3ab52cc2.eot');
   src: url('https://db.onlinewebfonts.com/t/14936bb7a4b6575fd2eee80a3ab52cc2.eot?#iefix') format('embedded-opentype'),
-       url('https://db.onlinewebfonts.com/t/14936bb7a4b6575fd2eee80a3ab52cc2.woff2') format('woff2'),
-       url('https://db.onlinewebfonts.com/t/14936bb7a4b6575fd2eee80a3ab52cc2.woff') format('woff'),
-       url('https://db.onlinewebfonts.com/t/14936bb7a4b6575fd2eee80a3ab52cc2.ttf') format('truetype'),
-       url('https://db.onlinewebfonts.com/t/14936bb7a4b6575fd2eee80a3ab52cc2.svg#Feather Bold') format('svg');
+    url('https://db.onlinewebfonts.com/t/14936bb7a4b6575fd2eee80a3ab52cc2.woff2') format('woff2'),
+    url('https://db.onlinewebfonts.com/t/14936bb7a4b6575fd2eee80a3ab52cc2.woff') format('woff'),
+    url('https://db.onlinewebfonts.com/t/14936bb7a4b6575fd2eee80a3ab52cc2.ttf') format('truetype'),
+    url('https://db.onlinewebfonts.com/t/14936bb7a4b6575fd2eee80a3ab52cc2.svg#Feather Bold') format('svg');
 }
 
 @tailwind base;
@@ -74,22 +74,20 @@ body {
     position: relative;
     overflow: hidden;
   }
-  
+
   .liquid-glass::before {
     content: '';
     position: absolute;
     inset: 0;
     border-radius: inherit;
     padding: 1.4px;
-    background: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.45) 0%,
-      rgba(255, 255, 255, 0.15) 20%,
-      rgba(255, 255, 255, 0) 40%,
-      rgba(255, 255, 255, 0) 60%,
-      rgba(255, 255, 255, 0.15) 80%,
-      rgba(255, 255, 255, 0.45) 100%
-    );
+    background: linear-gradient(180deg,
+        rgba(255, 255, 255, 0.45) 0%,
+        rgba(255, 255, 255, 0.15) 20%,
+        rgba(255, 255, 255, 0) 40%,
+        rgba(255, 255, 255, 0) 60%,
+        rgba(255, 255, 255, 0.15) 80%,
+        rgba(255, 255, 255, 0.45) 100%);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
@@ -106,7 +104,7 @@ body {
     border-radius: inherit;
     z-index: -1;
   }
-  
+
   .liquid-glass-strong {
     background: rgba(255, 255, 255, 0.01);
     background-blend-mode: luminosity;
@@ -118,22 +116,20 @@ body {
     position: relative;
     overflow: hidden;
   }
-  
+
   .liquid-glass-strong::before {
     content: '';
     position: absolute;
     inset: 0;
     border-radius: inherit;
     padding: 1.4px;
-    background: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.5) 0%,
-      rgba(255, 255, 255, 0.2) 20%,
-      rgba(255, 255, 255, 0) 40%,
-      rgba(255, 255, 255, 0) 60%,
-      rgba(255, 255, 255, 0.2) 80%,
-      rgba(255, 255, 255, 0.5) 100%
-    );
+    background: linear-gradient(180deg,
+        rgba(255, 255, 255, 0.5) 0%,
+        rgba(255, 255, 255, 0.2) 20%,
+        rgba(255, 255, 255, 0) 40%,
+        rgba(255, 255, 255, 0) 60%,
+        rgba(255, 255, 255, 0.2) 80%,
+        rgba(255, 255, 255, 0.5) 100%);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
@@ -268,7 +264,7 @@ body {
   }
 
   .chooser-chip {
-    @apply flex flex-row items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 bg-white border-border text-gray-nav transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] dark:bg-white/5 dark:border-white/10 dark:text-slate-300 dark:shadow-[0_2px_0_0_rgba(15,23,42,0.3)];
+    @apply flex flex-row items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 bg-white border-border text-gray-nav transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] dark:bg-white/5 dark:border-white/10 dark:text-slate-300 dark:shadow-[0_2px_0_0_rgba(15, 23, 42, 0.3)];
     font-weight: 900;
     text-transform: uppercase;
     white-space: nowrap;
@@ -286,13 +282,13 @@ body {
   }
 
   .chooser-chip.active {
-    @apply text-blue shadow-[0_2px_0_0_#E5E5E5] dark:bg-sky-400/10 dark:border-sky-400/30 dark:text-sky-100 dark:shadow-[0_2px_0_0_rgba(15,23,42,0.3)];
+    @apply text-blue shadow-[0_2px_0_0_#E5E5E5] dark:bg-sky-400/10 dark:border-sky-400/30 dark:text-sky-100 dark:shadow-[0_2px_0_0_rgba(15, 23, 42, 0.3)];
     background-color: rgba(28, 176, 246, 0.05);
     border-color: rgba(28, 176, 246, 0.3);
   }
 
   .chooser-popover {
-    @apply p-5 rounded-3xl z-[100] border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.12)] liquid-glass-strong dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)] dark:border-white/10;
+    @apply p-5 rounded-3xl z-[100] border border-white/40 shadow-[0_8px_30px_rgb(0, 0, 0, 0.12)] liquid-glass-strong dark:shadow-[0_8px_30px_rgba(0, 0, 0, 0.5)] dark:border-white/10;
   }
 }
 
@@ -329,7 +325,7 @@ body {
     padding: 24px !important;
     border-radius: 32px;
     background: var(--panel-bg);
-    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35) !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35) !important;
     border: 2px solid var(--border-color);
     display: block !important;
   }
@@ -353,7 +349,7 @@ body {
     padding: 20px !important;
     border-radius: 32px;
     background: var(--panel-bg);
-    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35) !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35) !important;
     border: 2px solid var(--border-color);
     display: flex !important;
     flex-wrap: wrap;
@@ -375,8 +371,8 @@ body {
 
 /* Hide Spline Watermark */
 #logo,
-canvas + div,
-canvas ~ div {
+canvas+div,
+canvas~div {
   display: none !important;
   opacity: 0 !important;
   pointer-events: none !important;
