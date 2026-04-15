@@ -1,9 +1,10 @@
-import { ArrowRight, Brain, FileText, FolderOpen, PlusCircle, RefreshCw, Smile, Sparkles, Tag, Target, UserPlus } from 'lucide-react';
+import { ArrowRight, Brain, Download, FolderOpen, PlusCircle, RefreshCw, Smile, Sparkles, Tag, Target, UserPlus } from 'lucide-react';
 import { motion } from 'motion/react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { useAuth } from '../../context/AuthContext';
+import { usePWAInstall } from '../../context/PWAInstallContext';
 import { noteService } from '../../services/noteService';
 import { DEFAULT_WELLNESS_PROMPTS } from '../../services/wellnessPrompts';
 import { supabase } from '../../src/supabaseClient';
@@ -13,6 +14,7 @@ import { Landing } from './Landing';
 export const Home: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
+  const { canInstall, isInstalled, triggerInstall } = usePWAInstall();
   const [noteCount, setNoteCount] = useState<number | null>(null);
   const [isCountLoading, setIsCountLoading] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
