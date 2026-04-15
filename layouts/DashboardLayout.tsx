@@ -76,8 +76,8 @@ export const DashboardLayout: React.FC = () => {
               <div className="h-10 w-10 rounded-xl bg-green flex items-center justify-center text-white shadow-3d-green group-hover:scale-110 transition-transform">
                 <Sparkles size={24} fill="currentColor" />
               </div>
-              <span className="font-display text-[20px] sm:text-[24px] text-green lowercase tracking-tight truncate max-w-[150px] sm:max-w-none">
-                mindful notes
+              <span className="font-display text-[20px] sm:text-[24px] bg-gradient-to-r from-green via-blue to-green bg-clip-text text-transparent animate-gradient-x lowercase tracking-tight truncate max-w-[150px] sm:max-w-none">
+                reflections
               </span>
             </div>
           </div>
@@ -177,7 +177,7 @@ export const DashboardLayout: React.FC = () => {
               <div className="h-12 w-12 rounded-2xl bg-green flex items-center justify-center text-white shadow-3d-green">
                 <Sparkles size={28} fill="currentColor" />
               </div>
-              <span className="font-display text-[28px] text-green lowercase">mindful notes</span>
+              <span className="font-display text-[28px] bg-gradient-to-r from-green via-blue to-green bg-clip-text text-transparent animate-gradient-x lowercase">reflections</span>
             </div>
 
             {isAuthenticated ? (
@@ -250,24 +250,10 @@ export const DashboardLayout: React.FC = () => {
         <Outlet />
       </main>
 
-      {/* Global Footer */}
-      <footer className="w-full border-t-2 border-border py-12 mt-20 liquid-glass">
-        <div className="max-w-[1440px] mx-auto px-4 md:px-10 flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="flex flex-col items-center md:items-start gap-4">
-            <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-green flex items-center justify-center text-white">
-                <Sparkles size={18} fill="currentColor" />
-              </div>
-              <span className="font-display text-[18px] text-green lowercase tracking-tight">
-                reflections
-              </span>
-            </div>
-            <p className="text-[12px] font-bold text-gray-nav uppercase tracking-widest">
-              Built with care by Arabinda
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
+      {/* Global Footer - Minimalist */}
+      <footer className="w-full border-t border-border py-8 mt-12 bg-white/50 dark:bg-black/20 backdrop-blur-sm">
+        <div className="max-w-[1440px] mx-auto px-4 md:px-10 flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-8">
             <button 
               onClick={() => navigate(RoutePath.HOME)}
               className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-colors"
@@ -286,15 +272,9 @@ export const DashboardLayout: React.FC = () => {
             >
               Privacy Policy
             </button>
-            <a 
-              href="mailto:robinsaha@gmail.com"
-              className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-colors"
-            >
-              Contact
-            </a>
           </div>
 
-          <div className="text-[11px] font-black uppercase tracking-widest text-gray-nav opacity-50">
+          <div className="text-[11px] font-black uppercase tracking-widest text-gray-nav/50">
             © 2026 Arabinda
           </div>
         </div>
