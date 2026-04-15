@@ -194,11 +194,9 @@ export const CreateNote: React.FC = () => {
   const [observationText, setObservationText] = useState<string | null>(null);
   const [showObservation, setShowObservation] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
-  // Paper plane save ritual
   const [showPlane, setShowPlane] = useState(false);
-  const [pendingNavigatePath, setPendingNavigatePath] = useState<string | null>(null);
-  const saveCompletedRef = useRef(false);
-  const planeCompletedRef = useRef(false);
+  // Use a ref for the navigation path — avoids stale closure bugs
+  const navigatePathRef = useRef<string | null>(null);
 
   const AMBIENT_TRACKS = [
     { id: 'rain', name: 'Soft Rain', url: 'https://actions.google.com/sounds/v1/weather/rain_heavy_loud.ogg' },
@@ -629,33 +627,23 @@ Instructions:
   };
 
   /**
-   * Paper plane ritual: called when BOTH save is done AND plane animation is done.
-   * Whichever finishes last triggers the navigation.
+   * Called by PaperPlaneToast after its 2-second animation completes.
+   * Reads the navigation path from a ref — always current, no stale closures.
    */
-  const maybeNavigate = useCallback(() => {
-    if (!saveCompletedRef.current || !planeCompletedRef.current) return;
-    const path = pendingNavigatePath;
-    if (!path || isUnmounted.current) return;
-    setShowPlane(false);
-    // Small breath before navigating — lets the plane fade out
-    setTimeout(() => {
-      if (!isUnmounted.current) navigate(path);
-    }, 350);
-  }, [navigate, pendingNavigatePath]);
-
   const handlePlaneAnimationComplete = useCallback(() => {
-    planeCompletedRef.current = true;
-    maybeNavigate();
-  }, [maybeNavigate]);
+    const path = navigatePathRef.current;
+    setShowPlane(false);
+    if (path && !isUnmounted.current) {
+      setTimeout(() => {
+        if (!isUnmounted.current) navigate(path);
+      }, 200); // brief breath for the fade-out
+    }
+  }, [navigate]);
 
   const handleSave = async () => {
     if (!title.trim() && !content.trim()) return;
     setSaving(true);
-
-    // Reset plane state for this save
-    saveCompletedRef.current = false;
-    planeCompletedRef.current = false;
-    setPendingNavigatePath(null);
+    navigatePathRef.current = null;
     setShowPlane(true);
     
     try {
@@ -747,7 +735,7 @@ Instructions:
     );
 
     if (observation) {
-      // Observation takes priority — hide plane and show observation
+      // Milestone: hide plane and show observation instead
       setShowPlane(false);
       setTimeout(() => {
         if (!isUnmounted.current) {
@@ -758,11 +746,8 @@ Instructions:
         }
       }, 600);
     } else {
-      // Normal path: wait for both save + plane animation to finish
-      const targetPath = RoutePath.NOTE_DETAIL.replace(':id', noteId);
-      setPendingNavigatePath(targetPath);
-      saveCompletedRef.current = true;
-      maybeNavigate();
+      // Normal: store target in ref — plane timer will navigate in ~2s
+      navigatePathRef.current = RoutePath.NOTE_DETAIL.replace(':id', noteId);
     }
   };
 

@@ -33,6 +33,7 @@ export const Insights: React.FC = () => {
   const navigate = useNavigate();
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
+  const skippedRef = React.useRef(false);
   
   // Freemium States
   const [isPro, setIsPro] = useState(false);
@@ -70,8 +71,17 @@ export const Insights: React.FC = () => {
 
   // Early return: show ONLY the animation while loading.
   // This prevents any flash of page content before the overlay paints.
+  // onSkip lets the user bypass the minimum wait time.
   if (loading) {
-    return <AIThinkingState isVisible={true} />;
+    return (
+      <AIThinkingState
+        isVisible={true}
+        onSkip={() => {
+          skippedRef.current = true;
+          setLoading(false);
+        }}
+      />
+    );
   }
 
   // Soft Aggregation Engine

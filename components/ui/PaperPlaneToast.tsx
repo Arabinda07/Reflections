@@ -1,90 +1,85 @@
 import React, { useEffect, useRef } from 'react';
-import { DotLottieReact, type DotLottie } from '@lottiefiles/dotlottie-react';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface PaperPlaneToastProps {
   /** Show the plane — triggers the animation */
   isVisible: boolean;
-  /** Called when the plane animation has fully completed its arc */
+  /**
+   * Called exactly 2 seconds after becoming visible.
+   * Deterministic — does not rely on Lottie's onComplete event.
+   */
   onAnimationComplete: () => void;
 }
 
 /**
  * PaperPlaneToast
  *
- * A small, non-blocking strip at the bottom of the screen.
- * A paper plane flies across once, fully completing its arc,
- * then fades out and calls onAnimationComplete.
- *
- * Design intent: accompanies the save operation without blocking the UI.
- * The save happens concurrently; this is a ritual, not a gate.
+ * Fixed bottom bar. Paper plane Lottie plays for exactly 2 seconds,
+ * then calls onAnimationComplete and fades out.
+ * Uses a plain setTimeout — immune to Lottie event bugs.
  */
 export const PaperPlaneToast: React.FC<PaperPlaneToastProps> = ({
   isVisible,
   onAnimationComplete,
 }) => {
-  const lottieRef = useRef<DotLottie | null>(null);
-  const hasCompleted = useRef(false);
+  const callbackRef = useRef(onAnimationComplete);
+  callbackRef.current = onAnimationComplete; // always up-to-date
 
   useEffect(() => {
-    if (!isVisible) {
-      hasCompleted.current = false;
-      return;
-    }
+    if (!isVisible) return;
 
-    // Attach the onComplete listener once the Lottie instance is ready
-    const instance = lottieRef.current;
-    if (!instance) return;
+    // Fixed 2-second window — matches the paper plane arc duration
+    const timer = setTimeout(() => {
+      callbackRef.current();
+    }, 2000);
 
-    const handleComplete = () => {
-      if (hasCompleted.current) return;
-      hasCompleted.current = true;
-      // Small breath before fading out — feels natural
-      setTimeout(() => {
-        onAnimationComplete();
-      }, 400);
-    };
-
-    instance.addEventListener('complete', handleComplete);
-    return () => {
-      instance.removeEventListener('complete', handleComplete);
-    };
-  }, [isVisible, onAnimationComplete]);
+    return () => clearTimeout(timer);
+  }, [isVisible]);
 
   return (
     <AnimatePresence>
       {isVisible && (
         <motion.div
           key="paper-plane-toast"
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 16, transition: { duration: 0.6, ease: 'easeInOut' } }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
-          // Fixed strip at the bottom — does not block content above
-          className="fixed bottom-6 inset-x-0 z-[9000] flex items-center justify-center pointer-events-none"
+          exit={{ opacity: 0, y: 12 }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
+          style={{
+            position: 'fixed',
+            bottom: '24px',
+            left: 0,
+            right: 0,
+            zIndex: 9000,
+            display: 'flex',
+            justifyContent: 'center',
+            pointerEvents: 'none',
+          }}
           aria-live="polite"
           aria-label="Saving your entry"
         >
           <div
-            className="flex items-center gap-3 px-5 py-3 rounded-2xl"
             style={{
-              backgroundColor: 'rgba(255,255,255,0.92)',
-              backdropFilter: 'blur(16px)',
-              WebkitBackdropFilter: 'blur(16px)',
-              border: '1.5px solid rgba(229,229,229,0.8)',
-              boxShadow: '0 8px 24px -4px rgba(0,0,0,0.08), 0 2px 0 0 #E5E5E5',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '10px 20px 10px 12px',
+              borderRadius: '20px',
+              backgroundColor: 'rgba(255,255,255,0.95)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1.5px solid rgba(229,229,229,0.9)',
+              boxShadow: '0 8px 28px -6px rgba(0,0,0,0.12), 0 2px 0 0 #E5E5E5',
             }}
           >
-            {/* Paper plane Lottie — plays once, no loop */}
-            <div className="w-[56px] h-[56px] shrink-0">
+            {/* Paper plane Lottie */}
+            <div style={{ width: '52px', height: '52px', flexShrink: 0 }}>
               <DotLottieReact
                 src="https://lottie.host/44bd266f-34f2-4b70-87df-fb47ff5962a5/4mw21xhUNV.lottie"
                 autoplay
                 loop={false}
-                dotLottieRefCallback={(ref) => {
-                  lottieRef.current = ref;
-                }}
-                className="w-full h-full"
+                style={{ width: '100%', height: '100%' }}
               />
             </div>
 
@@ -97,6 +92,7 @@ export const PaperPlaneToast: React.FC<PaperPlaneToastProps> = ({
                 letterSpacing: '0.15em',
                 textTransform: 'uppercase',
                 color: '#4b4b4b',
+                whiteSpace: 'nowrap',
               }}
             >
               sending to your sanctuary

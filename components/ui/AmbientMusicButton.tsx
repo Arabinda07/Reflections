@@ -2,6 +2,21 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 
+/** Reactively tracks the Tailwind 'dark' class on <html> */
+function useDarkMode(): boolean {
+  const [isDark, setIsDark] = useState(
+    () => document.documentElement.classList.contains('dark')
+  );
+  useEffect(() => {
+    const obs = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    });
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => obs.disconnect();
+  }, []);
+  return isDark;
+}
+
 const TRACKS = [
   { id: 'lofi',   label: 'Lo-Fi Calm',   emoji: '☕', url: 'https://actions.google.com/sounds/v1/ambiences/coffee_shop.ogg',                  color: '#1cb0f6' },
   { id: 'ocean',  label: 'Ocean Waves',  emoji: '🌊', url: 'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg',      color: '#58cc02' },
@@ -28,6 +43,7 @@ export const AmbientMusicButton: React.FC = () => {
   const [activeTrack, setActiveTrack] = useState<TrackId | null>(null);
   const [isHovered, setIsHovered]     = useState(false);
   const [showHint, setShowHint]       = useState(false);
+  const isDark      = useDarkMode();
   const audioRef    = useRef<HTMLAudioElement | null>(null);
   const buttonRef   = useRef<HTMLButtonElement | null>(null);
   const [popupRight, setPopupRight] = useState(20);
@@ -104,6 +120,19 @@ export const AmbientMusicButton: React.FC = () => {
     : isHovered ? '#1cb0f6'
     : '#ffffff';
 
+  // ─── Theme-aware color tokens ─────────────────────────────────────────
+  const pickerBg      = isDark ? 'rgba(30,30,30,0.98)'   : 'rgba(255,255,255,0.97)';
+  const pickerBorder  = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(229,229,229,0.9)';
+  const pickerShadow  = isDark ? '0 6px 24px -6px rgba(0,0,0,0.5)' : '0 6px 24px -6px rgba(0,0,0,0.14)';
+  const pickerText    = isDark ? '#e5e5e5'                : '#4b4b4b';
+  const sheetBg       = isDark ? '#1a1a1a'               : '#ffffff';
+  const sheetHandle   = isDark ? '#3a3a3a'               : '#E5E5E5';
+  const sheetTitle    = isDark ? '#666666'               : '#aaaaaa';
+  const trackBg       = isDark ? '#252525'               : '#FAFAFA';
+  const trackBorder   = isDark ? '#333333'               : '#F0F0F0';
+  const trackText     = isDark ? '#e5e5e5'               : '#333333';
+  const trackChevron  = isDark ? '#555555'               : '#CCCCCC';
+
   // ─── Desktop popup (portal) ──────────────────────────────────────────
   const desktopPopup = !isMobile() && isOpen && !isPlaying && createPortal(
     <AnimatePresence>
@@ -131,17 +160,17 @@ export const AmbientMusicButton: React.FC = () => {
             style={{
               display: 'flex', alignItems: 'center', gap: '10px',
               padding: '11px 16px', borderRadius: '16px', textAlign: 'left',
-              backgroundColor: 'rgba(255,255,255,0.97)',
+              backgroundColor: pickerBg,
               backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
-              border: '1.5px solid rgba(229,229,229,0.9)',
-              boxShadow: '0 6px 24px -6px rgba(0,0,0,0.14)',
+              border: `1.5px solid ${pickerBorder}`,
+              boxShadow: pickerShadow,
               cursor: 'pointer', transition: 'transform 0.14s',
             }}
             onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.02)')}
             onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
           >
             <span style={{ fontSize: '16px' }}>{track.emoji}</span>
-            <span style={{ fontFamily: 'Nunito, sans-serif', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#4b4b4b', whiteSpace: 'nowrap' }}>
+            <span style={{ fontFamily: 'Nunito, sans-serif', fontSize: '13px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em', color: pickerText, whiteSpace: 'nowrap' }}>
               {track.label}
             </span>
             <span style={{ marginLeft: 'auto', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: track.color, flexShrink: 0 }} />
@@ -182,15 +211,15 @@ export const AmbientMusicButton: React.FC = () => {
             style={{
               position: 'fixed', left: 0, right: 0, bottom: 0,
               zIndex: 99991,
-              backgroundColor: '#ffffff',
+              backgroundColor: sheetBg,
               borderRadius: '24px 24px 0 0',
               padding: '0 0 calc(env(safe-area-inset-bottom) + 20px)',
-              boxShadow: '0 -8px 40px -8px rgba(0,0,0,0.18)',
+              boxShadow: '0 -8px 40px -8px rgba(0,0,0,0.25)',
             }}
           >
             {/* Handle */}
             <div style={{ display: 'flex', justifyContent: 'center', padding: '14px 0 8px' }}>
-              <div style={{ width: '36px', height: '4px', borderRadius: '9999px', backgroundColor: '#E5E5E5' }} />
+              <div style={{ width: '36px', height: '4px', borderRadius: '9999px', backgroundColor: sheetHandle }} />
             </div>
 
             {/* Title */}
@@ -198,7 +227,7 @@ export const AmbientMusicButton: React.FC = () => {
               textAlign: 'center', fontFamily: 'Nunito, sans-serif',
               fontSize: '11px', fontWeight: 900,
               textTransform: 'uppercase', letterSpacing: '0.2em',
-              color: '#aaaaaa', padding: '0 24px 16px',
+              color: sheetTitle, padding: '0 24px 16px',
             }}>
               Ambient Sounds
             </p>
@@ -213,16 +242,16 @@ export const AmbientMusicButton: React.FC = () => {
                     display: 'flex', alignItems: 'center', gap: '16px',
                     padding: '18px 20px',
                     borderRadius: '20px',
-                    border: '2px solid #F0F0F0',
-                    backgroundColor: '#FAFAFA',
+                    border: `2px solid ${trackBorder}`,
+                    backgroundColor: trackBg,
                     cursor: 'pointer',
                     textAlign: 'left',
                     WebkitTapHighlightColor: 'transparent',
                     transition: 'background-color 0.15s',
                     minHeight: '72px',
                   }}
-                  onTouchStart={e => (e.currentTarget.style.backgroundColor = '#F5F5F5')}
-                  onTouchEnd={e => (e.currentTarget.style.backgroundColor = '#FAFAFA')}
+                  onTouchStart={e => (e.currentTarget.style.backgroundColor = isDark ? '#333333' : '#F0F0F0')}
+                  onTouchEnd={e => (e.currentTarget.style.backgroundColor = trackBg)}
                 >
                   {/* Colour dot */}
                   <span style={{
@@ -236,12 +265,12 @@ export const AmbientMusicButton: React.FC = () => {
                   </span>
                   <span style={{
                     fontFamily: 'Nunito, sans-serif', fontSize: '16px',
-                    fontWeight: 800, color: '#333333',
+                    fontWeight: 800, color: trackText,
                   }}>
                     {track.label}
                   </span>
                   {/* Chevron */}
-                  <span style={{ marginLeft: 'auto', color: '#CCCCCC', fontSize: '18px' }}>›</span>
+                  <span style={{ marginLeft: 'auto', color: trackChevron, fontSize: '18px' }}>›</span>
                 </button>
               ))}
             </div>

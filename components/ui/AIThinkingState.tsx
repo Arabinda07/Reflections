@@ -10,7 +10,7 @@ const MESSAGES = [
   "centering sanctuary"
 ];
 
-// Canonical brand footer style — shared across all sanctuary animations
+// Canonical brand footer style — light-mode locked, shared across all sanctuary animations
 const BRAND_WORDMARK_STYLE: React.CSSProperties = {
   fontFamily: 'Nunito, sans-serif',
   fontSize: '20px',
@@ -30,27 +30,45 @@ const BRAND_DIVIDER_STYLE: React.CSSProperties = {
 
 interface AIThinkingStateProps {
   isVisible: boolean;
+  /**
+   * Optional: provide a skip callback to show a "skip" button after 3 seconds.
+   * Used on the Insights page where loading can take up to 7s.
+   */
+  onSkip?: () => void;
 }
 
 /**
  * AIThinkingState — Cinematic AI Sanctuary Overlay
  * Trigger: Mental Health Insights page load + Deep Reflection generation.
  * Uses the Spark Lottie animation. Light-mode locked (hardcoded inline styles).
- * Clean, minimal — just the animation, a rotating message, and the wordmark.
+ * Optional skip button appears after 3s when onSkip is provided.
  */
-export const AIThinkingState: React.FC<AIThinkingStateProps> = ({ isVisible }) => {
+export const AIThinkingState: React.FC<AIThinkingStateProps> = ({ isVisible, onSkip }) => {
   const [messageIndex, setMessageIndex] = useState(0);
+  const [showSkip, setShowSkip] = useState(false);
 
   useEffect(() => {
     if (!isVisible) {
       setMessageIndex(0);
+      setShowSkip(false);
       return;
     }
-    const interval = setInterval(() => {
+
+    const msgInterval = setInterval(() => {
       setMessageIndex((prev) => (prev + 1) % MESSAGES.length);
     }, 2000);
-    return () => clearInterval(interval);
-  }, [isVisible]);
+
+    // Show skip option after 3 seconds if onSkip is provided
+    let skipTimer: ReturnType<typeof setTimeout> | null = null;
+    if (onSkip) {
+      skipTimer = setTimeout(() => setShowSkip(true), 3000);
+    }
+
+    return () => {
+      clearInterval(msgInterval);
+      if (skipTimer) clearTimeout(skipTimer);
+    };
+  }, [isVisible, onSkip]);
 
   return (
     <AnimatePresence>
@@ -95,6 +113,39 @@ export const AIThinkingState: React.FC<AIThinkingStateProps> = ({ isVisible }) =
               </motion.p>
             </AnimatePresence>
           </div>
+
+          {/* Skip button — appears after 3s, only when onSkip is provided */}
+          <AnimatePresence>
+            {showSkip && onSkip && (
+              <motion.button
+                key="skip-btn"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 6 }}
+                transition={{ duration: 0.4 }}
+                onClick={onSkip}
+                style={{
+                  marginTop: '28px',
+                  padding: '8px 24px',
+                  borderRadius: '9999px',
+                  border: '1.5px solid rgba(0,0,0,0.1)',
+                  backgroundColor: 'rgba(0,0,0,0.04)',
+                  fontFamily: 'Nunito, sans-serif',
+                  fontSize: '11px',
+                  fontWeight: 900,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.2em',
+                  color: '#999999',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.08)')}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.04)')}
+              >
+                skip →
+              </motion.button>
+            )}
+          </AnimatePresence>
 
           {/* Brand Wordmark — canonical style, dark-mode immune */}
           <motion.div
