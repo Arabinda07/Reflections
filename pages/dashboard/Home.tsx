@@ -118,33 +118,41 @@ export const Home: React.FC = () => {
 
   return (
     <div className="animate-in fade-in duration-700">
-      {/* Hero Section - Cinematic Background with Illustration */}
-      <section className="relative flex flex-col items-center justify-center text-center py-16 sm:py-24 px-6 sm:px-10 overflow-hidden border-b-2 border-border min-h-[380px] sm:min-h-[500px]">
-        {/* Hero Illustration */}
-        <img 
-          src="https://keordfflghzaicfqsqio.supabase.co/storage/v1/object/public/Assests/Person%20writing%20love%20letter%20flat%20vector%20illustration.jpg" 
+      {/* Hero Section - Cinematic Adaptive Background */}
+      <section className="relative flex flex-col items-center justify-center text-center py-16 sm:py-24 px-6 sm:px-10 overflow-hidden border-b-2 border-border min-h-[400px] sm:min-h-[520px] bg-[#fdf8f3] dark:bg-[#0f172a] transition-colors duration-700">
+        
+        {/* Subtle Ambient Glows for Transparent Illustration */}
+        <div className="absolute top-[10%] left-[20%] w-[300px] h-[300px] bg-blue/10 dark:bg-blue/5 blur-[100px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-[10%] right-[20%] w-[300px] h-[300px] bg-green/10 dark:bg-green/5 blur-[1000px] rounded-full pointer-events-none" />
+
+        {/* Hero Illustration (Transparent PNG) */}
+        <motion.img 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
+          src="https://keordfflghzaicfqsqio.supabase.co/storage/v1/object/public/Assests/e1cee3cd-2a9d-40c5-9893-4bf28378adbf.png" 
           alt="Reflections Hero" 
-          className="absolute inset-0 w-full h-full object-cover object-center z-0"
+          className="absolute inset-0 w-full h-full object-contain object-center sm:object-right-bottom z-0 p-8 sm:p-0 opacity-80 dark:opacity-60"
         />
 
-        {/* Premium Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/40 to-transparent z-0"></div>
+        {/* Premium Adaptive Overlay - Minimalist for PNG */}
+        <div className="absolute inset-0 z-[1] bg-white/10 dark:bg-black/10 backdrop-blur-[1px]"></div>
 
         {/* Floating Text Container */}
         <motion.div 
-          animate={{ y: [-5, 5, -5] }}
-          transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          style={{ willChange: 'transform' }}
           className="relative z-10 flex flex-col items-center max-w-2xl w-full"
         >
           <h1 
-            className="font-display text-[48px] sm:text-[64px] lowercase mb-4 tracking-tighter leading-none"
-            style={{ color: '#ffffff', textShadow: '0 4px 12px rgba(0,0,0,0.6)' }}
+            className="font-display text-[48px] sm:text-[64px] lowercase mb-4 tracking-tighter leading-none text-gray-text dark:text-white drop-shadow-md"
           >
             welcome back, {user?.name?.split(' ')[0] || 'learner'}
           </h1>
           <p 
-            className="text-[16px] sm:text-[18px] max-w-[520px] leading-[1.5] mb-10 font-bold"
-            style={{ color: '#ffffff', textShadow: '0 2px 8px rgba(0,0,0,0.7)' }}
+            className="text-[16px] sm:text-[18px] max-w-[520px] leading-[1.5] mb-10 font-bold text-gray-nav dark:text-slate-300 drop-shadow-sm"
           >
             Ready to capture your thoughts? Your sanctuary is waiting.
           </p>
