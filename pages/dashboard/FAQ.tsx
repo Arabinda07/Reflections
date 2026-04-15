@@ -54,19 +54,19 @@ export const FAQ: React.FC = () => {
             >
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green/10 border-2 border-green/20 text-green text-[12px] font-black uppercase tracking-[0.2em] mb-8 shadow-sm">
                 <Heart size={14} className="animate-pulse" />
-                <span>Your Mental Health Sanctuary</span>
+                <span>reflections: focus on your thoughts.</span>
               </div>
               
               <h1 className="text-5xl sm:text-6xl md:text-8xl font-display text-gray-text lowercase leading-tight md:leading-[0.9] mb-8 tracking-tighter drop-shadow-sm">
-                untangle <br />
-                <span className="bg-gradient-to-r from-green via-blue to-green bg-clip-text text-transparent animate-gradient-x drop-shadow-md">your thoughts.</span>
+                clear your <br />
+                <span className="bg-gradient-to-r from-green via-blue to-green bg-clip-text text-transparent animate-gradient-x drop-shadow-md">head.</span>
               </h1>
               
               <p className="text-[18px] sm:text-[22px] text-gray-light font-medium leading-relaxed max-w-3xl mx-auto mb-6">
-                We live in an overwhelming, fast-paced world. Racing thoughts, anxiety, and stress accumulate until our minds feel loud and cluttered. 
+                Get what's in your head out on the page. No clutter, no noise. Just a private space to think.
               </p>
               <p className="text-[18px] sm:text-[20px] text-gray-text font-semibold leading-relaxed max-w-2xl mx-auto">
-                Journaling isn't just about recording what happened today—it involves actively unloading your cognitive burden to create space to breathe.
+                Journaling is about giving yourself room to breathe. Use this app to clear the mental clutter.
               </p>
             </motion.div>
           </div>
@@ -119,29 +119,29 @@ export const FAQ: React.FC = () => {
                 step: "01",
                 icon: Cloud,
                 color: "green",
-                title: "The Routine",
-                desc: "Set morning intentions before the noise begins, or write at night to perform a 'brain dump'."
+                title: "Morning or Night",
+                desc: "Start your day with an intention or end it by clearing your head. Write whenever it fits your schedule."
               },
               {
                 step: "02",
                 icon: PenTool,
                 color: "blue",
-                title: "Overcome Blanks",
-                desc: "Don't force inspiration. If chaotic, rely on dynamic prompts like 'What is one small win today?'."
+                title: "Feeling Stuck?",
+                desc: "If the page is blank, tap the Daily Spark in the editor. It's there to give you a quick nudge."
               },
               {
                 step: "03",
                 icon: Tags,
                 color: "green",
-                title: "Categorize Chaos",
-                desc: "Attach tags as you write. Over time, organizing fragments connects dots in your journey."
+                title: "Group your notes",
+                desc: "Use tags to find recurring themes. It helps you see how different parts of your life connect over time."
               },
               {
                 step: "04",
                 icon: Heart,
                 color: "purple-500",
-                title: "Acknowledge Mood",
-                desc: "Validate emotions without judgment. Are you anxious? Calm? Just naming it reduces its power."
+                title: "Check your mood",
+                desc: "Name how you feel. It sounds simple, but it's the first step to understanding your own patterns."
               }
             ].map((item, i) => (
               <motion.div 
@@ -191,12 +191,12 @@ export const FAQ: React.FC = () => {
               <div className="h-12 w-12 rounded-xl bg-blue/10 text-blue flex items-center justify-center mb-6 group-hover:bg-blue group-hover:text-white transition-colors duration-300">
                 <Shield size={24} />
               </div>
-              <h4 className="text-[20px] font-display text-gray-text lowercase mb-3">Absolute Privacy</h4>
+              <h4 className="text-[20px] font-display text-gray-text lowercase mb-3">It's 100% private</h4>
               <p className="text-[14px] text-gray-light font-medium leading-relaxed mb-6 flex-1">
-                Your thoughts are yours. We utilize end-to-end encryption. Your data is isolated securely, so you can write freely and truthfully.
+                We can't read your notes. Your data is stored securely on Supabase and belongs only to you.
               </p>
               <div className="pt-4 border-t border-border flex items-center gap-2 text-[10px] font-black text-gray-nav uppercase">
-                <CheckCircle2 size={14} className="text-green" /> Free Forever
+                <CheckCircle2 size={14} className="text-green" /> Totally Secure
               </div>
             </div>
 
@@ -204,12 +204,12 @@ export const FAQ: React.FC = () => {
               <div className="h-12 w-12 rounded-xl bg-green/10 text-green flex items-center justify-center mb-6 group-hover:bg-green group-hover:text-white transition-colors duration-300">
                 <Heart size={24} />
               </div>
-              <h4 className="text-[20px] font-display text-gray-text lowercase mb-3">Mood Visualization</h4>
+              <h4 className="text-[20px] font-display text-gray-text lowercase mb-3">Visual patterns</h4>
               <p className="text-[14px] text-gray-light font-medium leading-relaxed mb-6 flex-1">
-                Track how often you feel calm, anxious, or happy. Recognizing emotional rhythms is the first step to regulating them.
+                See how your mood changes over the week or month. It's a simple way to spot rhythms you might miss.
               </p>
               <div className="pt-4 border-t border-border flex items-center gap-2 text-[10px] font-black text-gray-nav uppercase">
-                <CheckCircle2 size={14} className="text-green" /> Free Forever
+                <CheckCircle2 size={14} className="text-green" /> Built-in Tracking
               </div>
             </div>
 
@@ -217,12 +217,12 @@ export const FAQ: React.FC = () => {
               <div className="h-12 w-12 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center mb-6 group-hover:bg-purple-500 group-hover:text-white transition-colors duration-300">
                 <CalendarIcon size={24} />
               </div>
-              <h4 className="text-[20px] font-display text-gray-text lowercase mb-3">Rich Context Notes</h4>
+              <h4 className="text-[20px] font-display text-gray-text lowercase mb-3">Store what matters</h4>
               <p className="text-[14px] text-gray-light font-medium leading-relaxed mb-6 flex-1">
-                Ground your thoughts by adding cover images, attaching files, or embedding tasks directly inside calendar-linked notes.
+                Attach images, files, or tasks directly to your notes to keep your reflections complete.
               </p>
               <div className="pt-4 border-t border-border flex items-center gap-2 text-[10px] font-black text-gray-nav uppercase">
-                <CheckCircle2 size={14} className="text-green" /> Free Forever
+                <CheckCircle2 size={14} className="text-green" /> No storage limits
               </div>
             </div>
 
@@ -241,7 +241,7 @@ export const FAQ: React.FC = () => {
                     <Sparkles size={26} opacity={0.9} />
                   </div>
                   <div>
-                    <h3 className="text-[28px] font-display text-gray-text lowercase">the premium horizon</h3>
+                    <h3 className="text-[28px] font-display text-gray-text lowercase">the future: deeper paths</h3>
                     <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/70 dark:bg-white/5 border border-white/50 dark:border-white/10 text-gray-text text-[10px] font-black uppercase tracking-widest mt-1 shadow-sm backdrop-blur-sm">
                       <Lock size={12} className="text-blue opacity-80" /> Coming Soon
                     </div>
@@ -251,18 +251,18 @@ export const FAQ: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10 w-full">
                   <div className="bg-white/40 dark:bg-white/5 p-6 rounded-3xl border border-white/20 dark:border-white/10 backdrop-blur-md">
                     <h4 className="text-[18px] font-bold text-gray-text mb-3 flex items-center gap-2">
-                      <Brain size={20} className="text-blue" /> AI-Powered Reflections
+                      <Brain size={20} className="text-blue" /> Smart Reflections
                     </h4>
                     <p className="text-[15px] text-gray-light font-medium leading-relaxed">
-                      Gain deep understanding of your emotional patterns. Secure server-side AI analyzes your entries to provide compassionate, non-judgmental feedback that evolves with your journey.
+                      AI reflections that help you spot patterns in your writing. Secure, compassionate, and fully private.
                     </p>
                   </div>
                   <div className="bg-white/40 dark:bg-white/5 p-6 rounded-3xl border border-white/20 dark:border-white/10 backdrop-blur-md">
                     <h4 className="text-[18px] font-bold text-gray-text mb-3 flex items-center gap-2">
-                      <Shield size={20} className="text-green" /> 2FA & Advanced Security
+                      <Shield size={20} className="text-green" /> Advanced Security
                     </h4>
                     <p className="text-[15px] text-gray-light font-medium leading-relaxed">
-                      Protect your mental health sanctuary with robust Two-Factor Authentication, ensuring complete peace of mind for your most intimate thoughts.
+                      Two-factor authentication and extra layers of protection for your most intimate thoughts.
                     </p>
                   </div>
                 </div>
@@ -286,55 +286,55 @@ export const FAQ: React.FC = () => {
                 icon: ImageIcon,
                 title: 'cover images',
                 tone: 'text-blue bg-blue/10',
-                body: 'Use a cover when a note carries a strong atmosphere. A simple landscape, texture, or memory cue helps your future self recognize the emotional season of that entry before reading a single line.'
+                body: 'Covers make your journal easier to scan and recognize later. Match the atmospheric tension or the literal view of your day.'
               },
               {
                 icon: Paperclip,
                 title: 'attachments',
                 tone: 'text-green bg-green/10',
-                body: 'Attach screenshots, PDFs, voice references, or supportive documents when they belong to the story you are processing. This works best for context, not clutter. If a file helps explain why the note matters, it belongs there.'
+                body: 'Attach photos or documents that belong to the story you are processing. Keeps the context all in one place.'
               },
               {
                 icon: Tags,
                 title: 'tags',
                 tone: 'text-purple-500 bg-purple-500/10',
-                body: 'Keep tags short and human. Think themes like work, family, grief, recovery, rest, or hope. A small set of recurring tags builds better patterns than inventing brand-new labels every day.'
+                body: 'Use simple, recurring themes (Work, Home, Health) to see the bigger picture of your journey.'
               },
               {
                 icon: CheckSquare,
-                title: 'tasks inside notes',
+                title: 'tasks',
                 tone: 'text-orange bg-orange/10',
-                body: 'Tasks are for gentle follow-through, not pressure. Use them to capture the next caring action hidden inside a reflection: send the message, drink water, make the appointment, take the walk.'
+                body: 'Capture caring actions like \'Drink water\' or \'Call home\' directly inside your notes. Use them for follow-through, not pressure.'
               },
               {
                 icon: Headphones,
-                title: 'ambient music',
+                title: 'ambient sound',
                 tone: 'text-blue bg-blue/10',
-                body: 'Turn on ambient sound when you want to slow your nervous system before writing. The headphone control now works in two states: tap to choose a sound, tap again while it is active to turn it off instantly.'
+                body: 'Use the headphone icon in the editor to quiet the room. Tap once to choose a sound, and again to turn it off.'
               },
               {
                 icon: Target,
-                title: 'daily wellness spark',
+                title: 'daily spark',
                 tone: 'text-green bg-green/10',
-                body: 'The spark button in the editor is there for blank-page moments. Tap it when you need a nudge. It keeps the writing surface clear while still giving you one focused prompt connected to the Daily Mindfulness section on the homepage.'
+                body: 'Facing a blank page? Tap the spark button in the editor for a quick mindfulness prompt.'
               },
               {
                 icon: Brain,
-                title: 'AI reflection',
+                title: 'ai reflection',
                 tone: 'text-blue bg-blue/10',
-                body: 'Use AI reflection after you have written enough for the note to hold emotional shape. It is designed to mirror patterns back softly, not diagnose you or rush you toward conclusions.'
+                body: 'Get a mirror of your growth. Use it after you have written a few paragraphs to help spot patterns you might miss.'
               },
               {
                 icon: BookOpen,
-                title: 'insights page',
+                title: 'insights',
                 tone: 'text-green bg-green/10',
-                body: 'Visit Insights when you want the wider picture. That page helps you notice moods, rhythms, and recurring themes across time, while the note editor stays focused on one honest moment.'
+                body: 'Visit the Insights page to see your long-term moods, themes, and resilience over time.'
               },
               {
                 icon: Compass,
-                title: 'release and reset',
+                title: 'release',
                 tone: 'text-purple-500 bg-purple-500/10',
-                body: 'Some entries are meant to be witnessed and let go. The release action exists for those heavier moments when writing is about unloading the feeling, not preserving a polished artifact.'
+                body: 'For the heavy stuff. Write it all out, then use \'Release\' to let the feeling go and move on.'
               }
             ].map((item, index) => (
               <motion.div
