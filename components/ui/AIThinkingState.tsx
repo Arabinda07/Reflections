@@ -10,14 +10,33 @@ const MESSAGES = [
   "centering sanctuary"
 ];
 
+// Canonical brand footer style — shared across all sanctuary animations
+const BRAND_WORDMARK_STYLE: React.CSSProperties = {
+  fontFamily: 'Nunito, sans-serif',
+  fontSize: '20px',
+  color: '#4b4b4b',
+  opacity: 0.75,
+  letterSpacing: '-0.02em',
+  textTransform: 'lowercase',
+  fontWeight: 700,
+};
+
+const BRAND_DIVIDER_STYLE: React.CSSProperties = {
+  height: '2px',
+  width: '32px',
+  borderRadius: '9999px',
+  backgroundColor: 'rgba(88,204,2,0.3)',
+};
+
 interface AIThinkingStateProps {
   isVisible: boolean;
 }
 
 /**
- * AIThinkingState - Cinematic AI Sanctuary Overlay
- * Uses the Spark Lottie for Mental Health Insights & Deep Reflection.
- * Light-mode locked with rotating 2-3 word qualitative messages.
+ * AIThinkingState — Cinematic AI Sanctuary Overlay
+ * Trigger: Mental Health Insights page load + Deep Reflection generation.
+ * Uses the Spark Lottie animation. Light-mode locked (hardcoded inline styles).
+ * Clean, minimal — just the animation, a rotating message, and the wordmark.
  */
 export const AIThinkingState: React.FC<AIThinkingStateProps> = ({ isVisible }) => {
   const [messageIndex, setMessageIndex] = useState(0);
@@ -46,7 +65,7 @@ export const AIThinkingState: React.FC<AIThinkingStateProps> = ({ isVisible }) =
           style={{ backgroundColor: '#ffffff' }}
         >
           {/* Spark Lottie Animation */}
-          <div className="w-[280px] h-[280px] sm:w-[340px] sm:h-[340px] relative">
+          <div className="w-[280px] h-[280px] sm:w-[340px] sm:h-[340px]">
             <DotLottieReact
               src="https://lottie.host/5227f55d-a0bd-48b5-98a8-04751a6dffb7/4D3o2TMxWZ.lottie"
               loop
@@ -64,43 +83,29 @@ export const AIThinkingState: React.FC<AIThinkingStateProps> = ({ isVisible }) =
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.45 }}
-                className="text-[13px] font-black uppercase tracking-[0.25em]"
-                style={{ color: '#777777' }}
+                style={{
+                  fontSize: '13px',
+                  fontWeight: 900,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.25em',
+                  color: '#777777',
+                }}
               >
                 {MESSAGES[messageIndex]}
               </motion.p>
             </AnimatePresence>
           </div>
 
-          {/* Brand wordmark */}
+          {/* Brand Wordmark — canonical style, dark-mode immune */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 1 }}
             className="absolute bottom-14 flex flex-col items-center gap-2"
           >
-            <span
-              className="text-[22px] lowercase tracking-tight"
-              style={{ fontFamily: 'var(--font-display, Nunito, sans-serif)', color: '#4b4b4b', opacity: 0.7 }}
-            >
-              reflections
-            </span>
-            <div className="h-[2px] w-8 rounded-full" style={{ backgroundColor: 'rgba(88,204,2,0.25)' }} />
+            <span style={BRAND_WORDMARK_STYLE}>reflections</span>
+            <div style={BRAND_DIVIDER_STYLE} />
           </motion.div>
-
-          {/* 7-second progress bar */}
-          <div
-            className="absolute bottom-10 w-44 h-[3px] rounded-full overflow-hidden"
-            style={{ backgroundColor: '#f0f0f0' }}
-          >
-            <motion.div
-              initial={{ scaleX: 0, originX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ duration: 7, ease: "linear" }}
-              className="h-full w-full rounded-full"
-              style={{ backgroundColor: 'rgba(88,204,2,0.3)' }}
-            />
-          </div>
         </motion.div>
       )}
     </AnimatePresence>

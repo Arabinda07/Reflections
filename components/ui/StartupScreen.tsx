@@ -42,17 +42,27 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
             />
           </div>
 
-          {/* Minimalist Brand Footer */}
+          {/* Brand Wordmark — canonical style, dark-mode immune */}
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 1 }}
-            className="absolute bottom-16 flex flex-col items-center gap-2"
+            className="absolute bottom-14 flex flex-col items-center gap-2"
           >
-            <span className="text-[20px] font-display text-gray-text lowercase tracking-tight opacity-80">
+            <span
+              style={{
+                fontFamily: 'Nunito, sans-serif',
+                fontSize: '20px',
+                color: '#4b4b4b',
+                opacity: 0.75,
+                letterSpacing: '-0.02em',
+                textTransform: 'lowercase',
+                fontWeight: 700,
+              }}
+            >
               reflections
             </span>
-            <div className="h-[2px] w-8 bg-green/20 rounded-full" />
+            <div style={{ height: '2px', width: '32px', borderRadius: '9999px', backgroundColor: 'rgba(88,204,2,0.3)' }} />
           </motion.div>
         </motion.div>
       )}
