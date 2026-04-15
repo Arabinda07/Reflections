@@ -24,3 +24,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Capacitor native projects — contain signing credentials, never commit
+android/
+ios/
+
+# Keystores — never commit these
+*.jks
+*.keystore
