@@ -127,6 +127,10 @@ export const Insights: React.FC = () => {
 
   const handleGenerateReflection = async () => {
     setGenerating(true);
+    
+    // Create a promise that resolves after 7 seconds for the "Joy" factor
+    const minTimePromise = new Promise(resolve => setTimeout(resolve, 7000));
+    
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
       const notesContext = notes
@@ -139,10 +143,13 @@ export const Insights: React.FC = () => {
       Recent Notes:
       ${notesContext}`;
 
-      const response = await ai.models.generateContent({
+      const generatePromise = ai.models.generateContent({
         model: "gemini-2.5-flash",
         contents: prompt
       });
+
+      // Wait for BOTH the AI and the 7-second animation timer to complete
+      const [response] = await Promise.all([generatePromise, minTimePromise]);
       
       if (response.text) {
         setReflectionText(response.text);
@@ -332,14 +339,10 @@ export const Insights: React.FC = () => {
         <div className="mb-0 p-0 rounded-[24px]">
           {reflectionText ? (
             <div className="mb-8 p-6 border-2 border-border bg-gray-50/50 dark:border-white/10 dark:bg-white/5 rounded-[24px]">
-              {generating ? (
-                <AIThinkingState />
-              ) : (
-                <div
-                  className="prose prose-lg max-w-none text-gray-text leading-loose font-sans font-medium dark:prose-invert dark:text-slate-100"
-                  dangerouslySetInnerHTML={{ __html: reflectionText.replace(/\n\n/g, '<br/><br/>') }}
-                />
-              )}
+              <div
+                className="prose prose-lg max-w-none text-gray-text leading-loose font-sans font-medium dark:prose-invert dark:text-slate-100"
+                dangerouslySetInnerHTML={{ __html: reflectionText.replace(/\n\n/g, '<br/><br/>') }}
+              />
             </div>
           ) : isPremiumLocked ? (
             <div className="mb-8 p-6 text-center py-10 border-2 border-border bg-gray-50/50 dark:border-white/10 dark:bg-white/5 rounded-[24px]">
@@ -390,6 +393,7 @@ export const Insights: React.FC = () => {
         </div>
       </div>
 
+      <AIThinkingState isVisible={generating} />
     </div>
   );
 };

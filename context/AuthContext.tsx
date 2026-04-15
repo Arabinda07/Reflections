@@ -73,10 +73,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Hide startup screen only when both conditions are met
   useEffect(() => {
     if (!loading && minTimeReached) {
-      // Small delay before fading out to ensure state is stable
+      // Extended delay to ensure the StartupScreen's exit animation (800ms) has time to finish
       const fadeOutTimer = setTimeout(() => {
         setShowStartup(false);
-      }, 300);
+      }, 800);
       return () => clearTimeout(fadeOutTimer);
     }
   }, [loading, minTimeReached]);

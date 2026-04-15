@@ -24,7 +24,8 @@ export const CompanionObservation: React.FC<CompanionObservationProps> = ({ isVi
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          exit={{ opacity: 0, scale: 0.98 }}
+          transition={{ duration: 1, ease: "easeInOut" }}
           className="fixed inset-0 z-[300] bg-white/90 backdrop-blur-xl flex flex-col items-center justify-center p-8 text-center"
         >
           <div className="w-72 h-72 md:w-96 md:h-96 -mt-10">
