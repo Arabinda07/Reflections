@@ -122,7 +122,7 @@ export const Home: React.FC = () => {
       <section className="relative flex flex-col items-center justify-center text-center py-[100px] px-6 sm:px-10 overflow-hidden border-b-2 border-border min-h-[500px]">
         {/* Hero Illustration */}
         <img 
-          src="/assets/images/dashboard_hero.jpg" 
+          src="https://keordfflghzaicfqsqio.supabase.co/storage/v1/object/public/Assests/dashboard_hero.jpg" 
           alt="Reflections Hero" 
           className="absolute inset-0 w-full h-full object-cover z-0"
         />
