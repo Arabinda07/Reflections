@@ -10,6 +10,8 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "@capacitor/cli": "^8.3.0",
+    "@capacitor/core": "^8.3.0",
     "@google/genai": "^1.49.0",
     "@splinetool/react-spline": "^4.1.0",
     "@splinetool/runtime": "^1.12.81",
