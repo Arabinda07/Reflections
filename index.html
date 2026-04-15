@@ -5,16 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
     <!-- ── Primary SEO ─────────────────────────────────────────────── -->
-    <title>Reflections – Mindful AI Journal</title>
-    <meta name="description" content="Reflections is a private, AI-powered mindful journal. Track your mood, write freely, and find calm. Built for India — works offline." />
-    <meta name="keywords" content="journal, mindfulness, mental health India, mood tracker, safe space, diary app, AI journal, wellness app" />
-    <meta name="author" content="Reflections by Profit Studio" />
+    <title>Reflections – Mindful Private AI Journal</title>
+    <meta name="description" content="Reflections: A private, AI-powered mindful journal. Track your mood, write freely, and find calm. Secure, offline-first, and designed for your inner wellbeing." />
+    <meta name="keywords" content="mindful journal, AI journal, digital diary, mental health tracker, emotional wellness, private reflection, daily mood tracker, mindfulness app, secure journal" />
+    <meta name="author" content="Reflections" />
     <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://reflections-ebon.vercel.app/" />
     <meta name="google-site-verification" content="fveZCgknZzwBAwwK1uwqRI0HGyM6Qb35SYhO-SP9BxU" />
 
-    <!-- ── PWA: Manifest ───────────────────────────────────────────── -->
+    <!-- ── PWA: Manifest & Theme ───────────────────────────────────── -->
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#58CC02" />
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Reflections">
 
     <!-- ── PWA: Apple / iOS ────────────────────────────────────────── -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -29,20 +32,26 @@
     <!-- ── Open Graph (Social Sharing) ────────────────────────────── -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://reflections-ebon.vercel.app/" />
+    <meta property="og:site_name" content="Reflections" />
     <meta property="og:title" content="Reflections – Mindful AI Journal" />
-    <meta property="og:description" content="Your private sanctuary to reflect, feel, and grow. AI-powered journaling with mood tracking." />
+    <meta property="og:description" content="Your private sanctuary to reflect, feel, and grow. AI-powered journaling with mood tracking and complete privacy." />
     <meta property="og:image" content="https://reflections-ebon.vercel.app/icons/icon-512.png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
     <meta property="og:locale" content="en_IN" />
 
     <!-- ── Twitter Card ────────────────────────────────────────────── -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Reflections – Mindful AI Journal" />
-    <meta name="twitter:description" content="Your private sanctuary to reflect, feel, and grow." />
+    <meta name="twitter:description" content="Your private sanctuary to reflect, feel, and grow. Secure AI-powered mindfulness." />
     <meta name="twitter:image" content="https://reflections-ebon.vercel.app/icons/icon-512.png" />
 
-    <!-- ── Performance: Font Preconnect ───────────────────────────── -->
+    <!-- ── Resource Hints ──────────────────────────────────────────── -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://esm.sh" />
+    <link rel="dns-prefetch" href="https://esm.sh" />
+    <link rel="dns-prefetch" href="https://supabase.co" />
 
     <!-- ── Stylesheets ─────────────────────────────────────────────── -->
     <link rel="stylesheet" href="/index.css" />
@@ -69,28 +78,45 @@
       }
     </style>
 
-    <!-- ── Schema Markup: SoftwareApplication ─────────────────────── -->
+    <!-- ── Structured Data (JSON-LD) ──────────────────────────────── -->
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "Reflections – Mindful Notes",
-      "url": "https://reflections-ebon.vercel.app/",
-      "applicationCategory": "HealthApplication",
-      "operatingSystem": "Web, Android, iOS",
-      "inLanguage": ["en", "hi", "bn", "ta"],
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "INR"
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Reflections",
+        "url": "https://reflections-ebon.vercel.app/",
+        "applicationCategory": "HealthApplication",
+        "operatingSystem": "Web, Android, iOS",
+        "inLanguage": ["en", "hi", "bn", "ta"],
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "INR"
+        },
+        "description": "A private, AI-powered mindful journal. Track your mood, write freely, and find calm. Works offline.",
+        "screenshot": "https://reflections-ebon.vercel.app/icons/icon-512.png",
+        "featureList": "AI-powered reflections, Mood tracking, Offline support, Privacy-focused"
       },
-      "author": {
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Reflections",
+        "url": "https://reflections-ebon.vercel.app/",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://reflections-ebon.vercel.app/#/notes?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@context": "https://schema.org",
         "@type": "Organization",
-        "name": "Profit Studio"
-      },
-      "description": "A private, AI-powered mindful journal. Track your mood, write freely, and find calm. Works offline.",
-      "screenshot": "https://reflections-ebon.vercel.app/icons/icon-512.png"
-    }
+        "name": "Reflections",
+        "url": "https://reflections-ebon.vercel.app/",
+        "logo": "https://reflections-ebon.vercel.app/icons/icon-512.png"
+      }
+    ]
     </script>
 
     <!-- ── ESM Import Map (dev/CDN fallback) ───────────────────────── -->
