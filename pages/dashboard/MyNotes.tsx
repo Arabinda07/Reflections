@@ -26,14 +26,8 @@ export const MyNotes: React.FC = () => {
   const tagFilter = queryParams.get('tag');
 
   const fetchNotes = async () => {
-    // Minimum display time for the subtle sanctuary loader (6 seconds)
-    const minTimePromise = new Promise(resolve => setTimeout(resolve, 6000));
-    
     try {
-      const [data] = await Promise.all([
-        noteService.getAll(),
-        minTimePromise
-      ]);
+      const data = await noteService.getAll();
       setNotes(data);
     } catch (error) {
       console.error("Failed to fetch notes", error);
@@ -374,7 +368,11 @@ export const MyNotes: React.FC = () => {
              )}
           </div>
       )}
-      <LoadingState isVisible={loading} />
+      {loading && (
+        <div className="flex flex-1 items-center justify-center py-20">
+          <Loader2 className="h-10 w-10 text-blue animate-spin opacity-20" />
+        </div>
+      )}
     </div>
   );
 };
