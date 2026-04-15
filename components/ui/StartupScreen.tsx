@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -11,9 +12,10 @@ interface StartupScreenProps {
  * 
  * Provides a premium, liquid-glass transition for the PWA boot sequence.
  * This bridges the gap between the OS Splash and the React App Initialization.
+ * Hardened with Portals to ensure it occupies the entire viewport.
  */
 export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
-  return (
+  return createPortal(
     <AnimatePresence>
       {isVisible && (
         <motion.div
@@ -23,7 +25,7 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
             duration: 0.8, 
             ease: [0.43, 0.13, 0.23, 0.96] // Premium liquid ease
           }}
-          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white"
+          className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-white"
           style={{ touchAction: 'none' }}
         >
           {/* Main Animation Container */}
@@ -32,10 +34,10 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
             <div className="absolute inset-0 bg-green/5 blur-3xl rounded-full scale-75 animate-pulse" />
             
             <DotLottieReact
-              src="https://lottie.host/16016d7c-4339-4feb-bea8-af73664d180d/OE9KL3HbaN.lottie"
-              loop
-              autoplay
-              className="relative z-10 w-full h-full"
+               src="https://lottie.host/16016d7c-4339-4feb-bea8-af73664d180d/OE9KL3HbaN.lottie"
+               loop
+               autoplay
+               className="relative z-10 w-full h-full"
             />
           </div>
 
@@ -53,6 +55,7 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };

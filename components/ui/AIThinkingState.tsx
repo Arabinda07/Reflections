@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -16,8 +17,7 @@ interface AIThinkingStateProps {
 
 /**
  * AIThinkingState - The "Ultimate" Cinematic AI Overlay
- * Standardized with the finger-tapping brand animation.
- * Features rotating qualitative messages and a forced white sanctuary background.
+ * Hardened with Portals to guarantee a total white blanket across the entire viewport.
  */
 export const AIThinkingState: React.FC<AIThinkingStateProps> = ({ isVisible }) => {
   const [messageIndex, setMessageIndex] = useState(0);
@@ -32,7 +32,7 @@ export const AIThinkingState: React.FC<AIThinkingStateProps> = ({ isVisible }) =
     return () => clearInterval(interval);
   }, [isVisible]);
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isVisible && (
         <motion.div
@@ -40,7 +40,7 @@ export const AIThinkingState: React.FC<AIThinkingStateProps> = ({ isVisible }) =
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
-          className="fixed inset-0 z-[1000] flex flex-col items-center justify-center bg-white"
+          className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-white"
         >
           {/* Principal Brand Animation (Finger Tapping) */}
           <div className="w-[320px] h-[320px] relative">
@@ -94,6 +94,7 @@ export const AIThinkingState: React.FC<AIThinkingStateProps> = ({ isVisible }) =
           </div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };

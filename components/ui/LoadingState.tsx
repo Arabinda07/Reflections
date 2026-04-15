@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -9,14 +10,13 @@ interface LoadingStateProps {
 
 /**
  * LoadingState - The "Ultimate" Cinematic Loader
- * Based on the Startup Splash Screen branding.
- * Forced white sanctuary background.
+ * Hardened with Portals to guarantee a full-screen white sanctuary.
  */
 export const LoadingState: React.FC<LoadingStateProps> = ({ 
   message = "gathering your thoughts...",
   isVisible = true
 }) => {
-  return (
+  return createPortal(
     <AnimatePresence>
       {isVisible && (
         <motion.div 
@@ -24,7 +24,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.8 }}
-          className="fixed inset-0 z-[1000] flex flex-col items-center justify-center bg-white"
+          className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-white"
         >
           {/* Main Finger-Tapping / Logo Animation */}
           <div className="w-[320px] h-[320px] relative">
@@ -72,6 +72,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
           </div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };
