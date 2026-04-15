@@ -145,12 +145,6 @@ export const Home: React.FC = () => {
           >
             welcome back, {user?.name?.split(' ')[0] || 'learner'}
           </h1>
-          <p 
-            className="text-[16px] sm:text-[18px] max-w-[520px] leading-[1.5] mb-10 font-bold"
-            style={{ color: '#ffffff', textShadow: '0 4px 12px rgba(0,0,0,0.8)' }}
-          >
-            Ready to capture your thoughts? Your sanctuary is waiting.
-          </p>
           <Button 
             variant="primary" 
             size="lg"

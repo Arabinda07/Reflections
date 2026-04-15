@@ -42,8 +42,8 @@ export const Insights: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      // Minimum display time for the initial sanctuary entry (4 seconds)
-      const minTimePromise = new Promise(resolve => setTimeout(resolve, 4000));
+      // Minimum display time for the initial sanctuary entry (7 seconds)
+      const minTimePromise = new Promise(resolve => setTimeout(resolve, 7000));
       
       try {
         const [allNotes, userResponse] = await Promise.all([

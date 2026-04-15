@@ -354,7 +354,14 @@ export const CreateNote: React.FC = () => {
           }
         } else {
           // If editing an EXISTING note, we must block to fetch data
-          const note = await noteService.getById(id);
+          // Implement a 6-second "Joy" timer for the Sanctuary transition
+          const minTimePromise = new Promise(resolve => setTimeout(resolve, 6000));
+          
+          const [note] = await Promise.all([
+            noteService.getById(id),
+            minTimePromise
+          ]);
+
           if (isUnmounted.current) return;
           if (note) {
             setTitle(note.title);
