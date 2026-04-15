@@ -14,6 +14,7 @@ import { Account } from './pages/dashboard/Account';
 import { Insights } from './pages/dashboard/Insights';
 import { FAQ } from './pages/dashboard/FAQ';
 import { PrivacyPolicy } from './pages/dashboard/PrivacyPolicy';
+import { NotFound } from './pages/NotFound';
 import { RoutePath } from './types';
 
 function App() {
@@ -46,7 +47,7 @@ function App() {
           </Route>
 
           {/* Fallback */}
-          <Route path="*" element={<Navigate to={RoutePath.HOME} replace />} />
+          <Route path="*" element={<DashboardLayout><NotFound /></DashboardLayout>} />
         </Routes>
         </Router>
       </AuthProvider>

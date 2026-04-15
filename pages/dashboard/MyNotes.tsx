@@ -10,6 +10,7 @@ import ReactCalendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import './Calendar.css';
 import { format, isSameDay } from 'date-fns';
+import { LoadingState } from '../../components/ui/LoadingState';
 
 export const MyNotes: React.FC = () => {
   const navigate = useNavigate();
@@ -179,11 +180,7 @@ export const MyNotes: React.FC = () => {
       </div>
 
       {loading ? (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3].map((n) => (
-             <div key={n} className="h-72 animate-pulse rounded-2xl bg-white border-2 border-border"></div>
-          ))}
-        </div>
+        <LoadingState message="gathering your entries..." />
       ) : viewMode === 'calendar' ? (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in slide-in-from-bottom-4 duration-500">
           <div className="lg:col-span-7 xl:col-span-8">

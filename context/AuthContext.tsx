@@ -69,7 +69,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <AuthContext.Provider value={{ user, isAuthenticated: !!user, logout }}>
       <StartupScreen isVisible={showStartup} />
-      {(!loading || !showStartup) && children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 };

@@ -7,6 +7,8 @@ import { RoutePath, Note } from '../../types';
 import { noteService } from '../../services/noteService';
 import { GoogleGenAI } from "@google/genai";
 import { supabase } from '../../src/supabaseClient';
+import { LoadingState } from '../../components/ui/LoadingState';
+import { AIThinkingState } from '../../components/ui/AIThinkingState';
 
 // Flat soft colors — no gradients
 const MOOD_COLORS: Record<string, string> = {
@@ -171,11 +173,7 @@ export const Insights: React.FC = () => {
   const hasEnoughNotes = notes.length >= 3;
 
   if (loading) {
-    return (
-      <div className="flex h-[80vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-blue" />
-      </div>
-    );
+    return <LoadingState message="analyzing your patterns..." />;
   }
 
   return (
@@ -334,10 +332,14 @@ export const Insights: React.FC = () => {
         <div className="mb-0 p-0 rounded-[24px]">
           {reflectionText ? (
             <div className="mb-8 p-6 border-2 border-border bg-gray-50/50 dark:border-white/10 dark:bg-white/5 rounded-[24px]">
-              <div
-                className="prose prose-lg max-w-none text-gray-text leading-loose font-sans font-medium dark:prose-invert dark:text-slate-100"
-                dangerouslySetInnerHTML={{ __html: reflectionText.replace(/\n\n/g, '<br/><br/>') }}
-              />
+              {generating ? (
+                <AIThinkingState />
+              ) : (
+                <div
+                  className="prose prose-lg max-w-none text-gray-text leading-loose font-sans font-medium dark:prose-invert dark:text-slate-100"
+                  dangerouslySetInnerHTML={{ __html: reflectionText.replace(/\n\n/g, '<br/><br/>') }}
+                />
+              )}
             </div>
           ) : isPremiumLocked ? (
             <div className="mb-8 p-6 text-center py-10 border-2 border-border bg-gray-50/50 dark:border-white/10 dark:bg-white/5 rounded-[24px]">

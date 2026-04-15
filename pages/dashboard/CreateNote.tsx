@@ -12,6 +12,9 @@ import { supabase } from '../../src/supabaseClient';
 import { StorageImage } from '../../components/ui/StorageImage';
 import { GoogleGenAI, Type } from "@google/genai";
 import { BreathingGate } from '../../components/wellness/BreathingGate';
+import { LoadingState } from '../../components/ui/LoadingState';
+import { CompanionObservation } from '../../components/ui/CompanionObservation';
+import { observationService } from '../../services/observationService';
 import { DEFAULT_WELLNESS_PROMPTS, getCurrentWellnessPrompt, getNextWellnessPromptState } from '../../services/wellnessPrompts';
 
 // Custom debounce function to avoid CommonJS import issues
@@ -186,6 +189,10 @@ export const CreateNote: React.FC = () => {
   const [interimTranscript, setInterimTranscript] = useState('');
   const recognitionRef = useRef<any>(null);
   const isWhisperingRef = useRef(false);
+  // Observation states
+  const [observationText, setObservationText] = useState<string | null>(null);
+  const [showObservation, setShowObservation] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
 
   const AMBIENT_TRACKS = [
     { id: 'rain', name: 'Soft Rain', url: 'https://actions.google.com/sounds/v1/weather/rain_heavy_loud.ogg' },
@@ -672,7 +679,10 @@ Instructions:
       });
 
       if (isUnmounted.current) return;
-      navigate(RoutePath.NOTE_DETAIL.replace(':id', noteId));
+      // We store the noteId temporarily for the finally block
+      if (!id) {
+        (window as any)._lastCreatedNoteId = noteId;
+      }
       
     } catch (error: any) {
       if (isUnmounted.current) return;
@@ -684,6 +694,32 @@ Instructions:
       }
     } finally {
       if (!isUnmounted.current) setSaving(false);
+      
+      const noteId = id || (window as any)._lastCreatedNoteId;
+
+      // TRIGGER OBSERVATION LOGIC AFTER 2s COOLING
+      const totalCount = await noteService.getCount();
+      const recentNotes = await noteService.getRecent(10);
+      const observation = observationService.checkMilestones(
+        { title, content, createdAt: new Date().toISOString() } as any, 
+        totalCount, 
+        recentNotes
+      );
+
+      const targetPath = RoutePath.NOTE_DETAIL.replace(':id', noteId);
+
+      if (observation) {
+        setTimeout(() => {
+          if (!isUnmounted.current) {
+            setObservationText(observation.text);
+            setShowObservation(true);
+            setPendingNavigation(targetPath);
+            observationService.markObservationShown();
+          }
+        }, 2000); // 2-second cooling period
+      } else {
+        if (!isUnmounted.current) navigate(targetPath);
+      }
     }
   };
 
@@ -729,7 +765,7 @@ Instructions:
   };
 
   if (loading) {
-     return <div className="flex h-[80vh] items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-indigo-500" /></div>;
+     return <LoadingState message="preparing the space..." />;
   }
 
   // LIMIT REACHED UI
@@ -808,6 +844,16 @@ Instructions:
   return (
     <>
       <BreathingGate active={isBreathing} durationMs={3600} onComplete={handleBreathingComplete} />
+      <CompanionObservation 
+        isVisible={showObservation} 
+        text={observationText || ""} 
+        onComplete={() => {
+          setShowObservation(false);
+          if (pendingNavigation) {
+            navigate(pendingNavigation);
+          }
+        }} 
+      />
       {limitReachedOverlay}
       <div className={`mx-auto max-w-[1180px] transition-opacity duration-1000 ${isBreathing ? 'opacity-0 pointer-events-none' : 'opacity-100 animate-in fade-in duration-500'} pb-20 px-3 sm:px-4 md:px-6`}>
         <nav className={`sticky top-4 z-50 mb-8 flex items-center justify-between gap-2 rounded-2xl border-2 border-border bg-white/90 px-3 py-2 sm:px-4 sm:py-3 shadow-[0_4px_0_0_#E5E5E5] backdrop-blur-2xl transition-all duration-500 dark:bg-[#17171b]/90 dark:shadow-[0_4px_0_0_rgba(15,23,42,0.55)] ${isDimmed ? 'opacity-40 hover:opacity-100' : 'opacity-100'}`}>
