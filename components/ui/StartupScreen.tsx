@@ -28,16 +28,18 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
           className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-white"
           style={{ touchAction: 'none' }}
         >
-          {/* Main Animation Container */}
-          <div className="relative w-[320px] h-[320px] flex items-center justify-center">
+          {/* Main Cinematic Video Container */}
+          <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
             {/* Subtle backlight glow */}
-            <div className="absolute inset-0 bg-green/5 blur-3xl rounded-full scale-75 animate-pulse" />
+            <div className="absolute inset-0 bg-green/5 blur-3xl rounded-full scale-75 animate-pulse z-10" />
             
-            <DotLottieReact
-               src="https://lottie.host/16016d7c-4339-4feb-bea8-af73664d180d/OE9KL3HbaN.lottie"
-               loop
-               autoplay
-               className="relative z-10 w-full h-full"
+            <video 
+              src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_074327_a4d6275d-82d9-4c83-bfbe-f1fb2213c17c.mp4"
+              autoPlay 
+              loop 
+              muted 
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover z-0"
             />
           </div>
 

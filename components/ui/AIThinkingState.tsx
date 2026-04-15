@@ -42,16 +42,19 @@ export const AIThinkingState: React.FC<AIThinkingStateProps> = ({ isVisible }) =
           transition={{ duration: 0.8, ease: "easeInOut" }}
           className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-white"
         >
-          {/* Principal Brand Animation (Finger Tapping) */}
-          <div className="w-[320px] h-[320px] relative">
-             <div className="absolute inset-0 bg-green/5 blur-3xl rounded-full scale-75 animate-pulse" />
-             
-             <DotLottieReact
-               src="https://lottie.host/5227f55d-a0bd-48b5-98a8-04751a6dffb7/4D3o2TMxWZ.lottie"
-               loop
-               autoplay
-               className="relative z-10 w-full h-full"
-             />
+          {/* Main Cinematic Video Container */}
+          <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+            {/* Subtle backlight glow */}
+            <div className="absolute inset-0 bg-green/5 blur-3xl rounded-full scale-75 animate-pulse z-10" />
+            
+            <video 
+              src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_074327_a4d6275d-82d9-4c83-bfbe-f1fb2213c17c.mp4"
+              autoPlay 
+              loop 
+              muted 
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover z-0"
+            />
           </div>
 
           {/* Rotating AI Reflection Messages */}

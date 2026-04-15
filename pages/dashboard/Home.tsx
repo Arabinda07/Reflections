@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PlusCircle, Sparkles, FolderOpen, FileText, UserPlus, Smile, Tag, RefreshCw, ArrowRight, Brain, Target } from 'lucide-react';
+import { PlusCircle, Sparkles, FolderOpen, FileText, UserPlus, Smile, Tag, RefreshCw, ArrowRight, Brain, Target, Download } from 'lucide-react';
 import { motion } from 'motion/react';
 import { Button } from '../../components/ui/Button';
 import { RoutePath } from '../../types';
@@ -9,6 +9,7 @@ import { noteService } from '../../services/noteService';
 import { supabase } from '../../src/supabaseClient';
 import { DEFAULT_WELLNESS_PROMPTS } from '../../services/wellnessPrompts';
 import { Landing } from './Landing';
+import { usePWAInstall } from '../../context/PWAInstallContext';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -121,15 +122,16 @@ export const Home: React.FC = () => {
       {/* Hero Section - Cinematic Hero with 3D Float */}
       <section className="relative flex flex-col items-center justify-center text-center py-16 sm:py-24 px-6 sm:px-10 overflow-hidden border-b-2 border-border min-h-[400px] sm:min-h-[500px]">
         {/* Hero Video Background */}
+        {/* Hero Video Background */}
         <video 
+          src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_045634_e1c98c76-1265-4f5c-882a-4276f2080894.mp4"
           autoPlay 
           loop 
           muted 
           playsInline
-          className="absolute inset-0 w-full h-full object-cover object-center z-0"
-        >
-          <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_045634_e1c98c76-1265-4f5c-882a-4276f2080894.mp4" type="video/mp4" />
-        </video>
+          crossOrigin="anonymous"
+          className="absolute inset-0 w-full h-full object-cover object-bottom z-0"
+        />
 
         {/* Cinematic Overlay for Visibility */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/40 to-transparent z-0"></div>
