@@ -16,7 +16,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
   message = "gathering your thoughts...",
   isVisible = true
 }) => {
-  return createPortal(
+  return (
     <AnimatePresence>
       {isVisible && (
         <motion.div 
@@ -72,7 +72,6 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
           </div>
         </motion.div>
       )}
-    </AnimatePresence>,
-    document.body
+    </AnimatePresence>
   );
 };

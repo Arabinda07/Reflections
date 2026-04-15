@@ -185,9 +185,7 @@ export const MyNotes: React.FC = () => {
         </div>
       </div>
 
-      {loading ? (
-        <LoadingState message="gathering your entries..." />
-      ) : viewMode === 'calendar' ? (
+      {viewMode === 'calendar' ? (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in slide-in-from-bottom-4 duration-500">
           <div className="lg:col-span-7 xl:col-span-8">
             <div className="bg-white border-2 border-border rounded-[32px] p-6 sm:p-8 shadow-[0_8px_0_0_#E5E5E5] liquid-glass">
@@ -376,6 +374,7 @@ export const MyNotes: React.FC = () => {
              )}
           </div>
       )}
+      <LoadingState isVisible={loading} />
     </div>
   );
 };

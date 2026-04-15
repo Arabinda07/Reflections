@@ -32,7 +32,7 @@ export const AIThinkingState: React.FC<AIThinkingStateProps> = ({ isVisible }) =
     return () => clearInterval(interval);
   }, [isVisible]);
 
-  return createPortal(
+  return (
     <AnimatePresence>
       {isVisible && (
         <motion.div
@@ -47,7 +47,7 @@ export const AIThinkingState: React.FC<AIThinkingStateProps> = ({ isVisible }) =
              <div className="absolute inset-0 bg-green/5 blur-3xl rounded-full scale-75 animate-pulse" />
              
              <DotLottieReact
-               src="https://lottie.host/16016d7c-4339-4feb-bea8-af73664d180d/OE9KL3HbaN.lottie"
+               src="https://lottie.host/5227f55d-a0bd-48b5-98a8-04751a6dffb7/4D3o2TMxWZ.lottie"
                loop
                autoplay
                className="relative z-10 w-full h-full"
@@ -94,7 +94,6 @@ export const AIThinkingState: React.FC<AIThinkingStateProps> = ({ isVisible }) =
           </div>
         </motion.div>
       )}
-    </AnimatePresence>,
-    document.body
+    </AnimatePresence>
   );
 };

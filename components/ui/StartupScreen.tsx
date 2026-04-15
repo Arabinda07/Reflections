@@ -15,7 +15,7 @@ interface StartupScreenProps {
  * Hardened with Portals to ensure it occupies the entire viewport.
  */
 export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
-  return createPortal(
+  return (
     <AnimatePresence>
       {isVisible && (
         <motion.div
@@ -55,7 +55,6 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>,
-    document.body
+    </AnimatePresence>
   );
 };

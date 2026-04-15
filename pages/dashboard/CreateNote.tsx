@@ -771,9 +771,7 @@ Instructions:
     }, 1500);
   };
 
-  if (loading) {
-     return <LoadingState message="preparing the space..." />;
-  }
+
 
   // LIMIT REACHED UI
   const limitReachedOverlay = isLimitReached ? (
@@ -1441,7 +1439,7 @@ Instructions:
         </motion.div>
         )}
       </AnimatePresence>
-      <audio ref={audioRef} src="" preload="none" loop className="hidden" />
+      <LoadingState isVisible={loading} />
       </div>
     </>
   );

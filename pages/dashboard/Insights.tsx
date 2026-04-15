@@ -183,9 +183,7 @@ export const Insights: React.FC = () => {
   const isPremiumLocked = !isPro && reflectionsUsed > 0 && !reflectionText;
   const hasEnoughNotes = notes.length >= 3;
 
-  if (loading) {
-    return <AIThinkingState isVisible={true} />;
-  }
+
 
   return (
     <div className="mx-auto max-w-[1000px] animate-in fade-in duration-700 pb-32 px-4 md:px-10">
@@ -397,7 +395,7 @@ export const Insights: React.FC = () => {
         </div>
       </div>
 
-      <AIThinkingState isVisible={generating} />
+      <AIThinkingState isVisible={loading || generating} />
     </div>
   );
 };
