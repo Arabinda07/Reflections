@@ -120,15 +120,16 @@ export const Home: React.FC = () => {
     <div className="animate-in fade-in duration-700">
       {/* Hero Section - Cinematic Hero with 3D Float */}
       <section className="relative flex flex-col items-center justify-center text-center py-16 sm:py-24 px-6 sm:px-10 overflow-hidden border-b-2 border-border min-h-[400px] sm:min-h-[500px]">
-        {/* Hero Illustration (Transparent PNG) */}
-        <motion.img 
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, ease: "easeOut" }}
-          src="https://keordfflghzaicfqsqio.supabase.co/storage/v1/object/public/Assests/e1cee3cd-2a9d-40c5-9893-4bf28378adbf.png" 
-          alt="Reflections Hero" 
+        {/* Hero Video Background */}
+        <video 
+          autoPlay 
+          loop 
+          muted 
+          playsInline
           className="absolute inset-0 w-full h-full object-cover object-center z-0"
-        />
+        >
+          <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_045634_e1c98c76-1265-4f5c-882a-4276f2080894.mp4" type="video/mp4" />
+        </video>
 
         {/* Cinematic Overlay for Visibility */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/40 to-transparent z-0"></div>
