@@ -30,7 +30,7 @@ export const CompanionObservation: React.FC<CompanionObservationProps> = ({ isVi
         >
           <div className="w-72 h-72 md:w-96 md:h-96 -mt-10">
             <DotLottieReact
-              src="https://lottie.host/44bd266f-34f2-4b70-87df-fb47ff5962a5/4mw21xhUNV.lottie"
+              src="https://lottie.host/cb641a5d-d1e7-4be2-8e0d-0011f4c70b87/Ur1AVC0l3b.lottie"
               autoplay
               loop={false}
             />

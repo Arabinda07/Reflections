@@ -9,6 +9,7 @@ import { DEFAULT_WELLNESS_PROMPTS } from '../../services/wellnessPrompts';
 import { supabase } from '../../src/supabaseClient';
 import { RoutePath } from '../../types';
 import { Landing } from './Landing';
+import { AmbientMusicButton } from '../../components/ui/AmbientMusicButton';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -156,6 +157,10 @@ export const Home: React.FC = () => {
             New Entry
           </Button>
         </motion.div>
+        {/* Ambient Music Button — bottom-right corner of hero */}
+        <div className="absolute bottom-5 right-5 z-10">
+          <AmbientMusicButton />
+        </div>
       </section>
 
       {/* Main Grid */}

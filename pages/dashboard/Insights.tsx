@@ -68,6 +68,12 @@ export const Insights: React.FC = () => {
     fetchData();
   }, []);
 
+  // Early return: show ONLY the animation while loading.
+  // This prevents any flash of page content before the overlay paints.
+  if (loading) {
+    return <AIThinkingState isVisible={true} />;
+  }
+
   // Soft Aggregation Engine
   const stats = useMemo(() => {
     const now = new Date();
@@ -395,7 +401,7 @@ export const Insights: React.FC = () => {
         </div>
       </div>
 
-      <AIThinkingState isVisible={loading || generating} />
+      <AIThinkingState isVisible={generating} />
     </div>
   );
 };
