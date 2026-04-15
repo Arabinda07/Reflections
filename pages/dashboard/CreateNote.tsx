@@ -14,6 +14,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { BreathingGate } from '../../components/wellness/BreathingGate';
 import { LoadingState } from '../../components/ui/LoadingState';
 import { CompanionObservation } from '../../components/ui/CompanionObservation';
+import { PaperPlaneToast } from '../../components/ui/PaperPlaneToast';
 import { observationService } from '../../services/observationService';
 import { DEFAULT_WELLNESS_PROMPTS, getCurrentWellnessPrompt, getNextWellnessPromptState } from '../../services/wellnessPrompts';
 
@@ -193,6 +194,11 @@ export const CreateNote: React.FC = () => {
   const [observationText, setObservationText] = useState<string | null>(null);
   const [showObservation, setShowObservation] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
+  // Paper plane save ritual
+  const [showPlane, setShowPlane] = useState(false);
+  const [pendingNavigatePath, setPendingNavigatePath] = useState<string | null>(null);
+  const saveCompletedRef = useRef(false);
+  const planeCompletedRef = useRef(false);
 
   const AMBIENT_TRACKS = [
     { id: 'rain', name: 'Soft Rain', url: 'https://actions.google.com/sounds/v1/weather/rain_heavy_loud.ogg' },
@@ -622,9 +628,35 @@ Instructions:
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
+  /**
+   * Paper plane ritual: called when BOTH save is done AND plane animation is done.
+   * Whichever finishes last triggers the navigation.
+   */
+  const maybeNavigate = useCallback(() => {
+    if (!saveCompletedRef.current || !planeCompletedRef.current) return;
+    const path = pendingNavigatePath;
+    if (!path || isUnmounted.current) return;
+    setShowPlane(false);
+    // Small breath before navigating — lets the plane fade out
+    setTimeout(() => {
+      if (!isUnmounted.current) navigate(path);
+    }, 350);
+  }, [navigate, pendingNavigatePath]);
+
+  const handlePlaneAnimationComplete = useCallback(() => {
+    planeCompletedRef.current = true;
+    maybeNavigate();
+  }, [maybeNavigate]);
+
   const handleSave = async () => {
     if (!title.trim() && !content.trim()) return;
     setSaving(true);
+
+    // Reset plane state for this save
+    saveCompletedRef.current = false;
+    planeCompletedRef.current = false;
+    setPendingNavigatePath(null);
+    setShowPlane(true);
     
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -686,47 +718,51 @@ Instructions:
       });
 
       if (isUnmounted.current) return;
-      // We store the noteId temporarily for the finally block
       if (!id) {
         (window as any)._lastCreatedNoteId = noteId;
       }
       
     } catch (error: any) {
       if (isUnmounted.current) return;
+      setShowPlane(false);
       if (error.message === 'FREE_LIMIT_REACHED') {
         setIsLimitReached(true);
       } else {
         console.error("Error saving note:", error);
         alert("Failed to save note.");
       }
+      return;
     } finally {
       if (!isUnmounted.current) setSaving(false);
-      
-      const noteId = id || (window as any)._lastCreatedNoteId;
+    }
 
-      // TRIGGER OBSERVATION LOGIC AFTER 2s COOLING
-      const totalCount = await noteService.getCount();
-      const recentNotes = await noteService.getRecent(10);
-      const observation = observationService.checkMilestones(
-        { title, content, createdAt: new Date().toISOString() } as any, 
-        totalCount, 
-        recentNotes
-      );
+    // Reached here = save succeeded. Determine navigation target.
+    const noteId = id || (window as any)._lastCreatedNoteId;
+    const totalCount = await noteService.getCount();
+    const recentNotes = await noteService.getRecent(10);
+    const observation = observationService.checkMilestones(
+      { title, content, createdAt: new Date().toISOString() } as any, 
+      totalCount, 
+      recentNotes
+    );
 
+    if (observation) {
+      // Observation takes priority — hide plane and show observation
+      setShowPlane(false);
+      setTimeout(() => {
+        if (!isUnmounted.current) {
+          setObservationText(observation.text);
+          setShowObservation(true);
+          setPendingNavigation(RoutePath.NOTE_DETAIL.replace(':id', noteId));
+          observationService.markObservationShown();
+        }
+      }, 600);
+    } else {
+      // Normal path: wait for both save + plane animation to finish
       const targetPath = RoutePath.NOTE_DETAIL.replace(':id', noteId);
-
-      if (observation) {
-        setTimeout(() => {
-          if (!isUnmounted.current) {
-            setObservationText(observation.text);
-            setShowObservation(true);
-            setPendingNavigation(targetPath);
-            observationService.markObservationShown();
-          }
-        }, 2000); // 2-second cooling period
-      } else {
-        if (!isUnmounted.current) navigate(targetPath);
-      }
+      setPendingNavigatePath(targetPath);
+      saveCompletedRef.current = true;
+      maybeNavigate();
     }
   };
 
@@ -1440,6 +1476,10 @@ Instructions:
         )}
       </AnimatePresence>
       <LoadingState isVisible={loading} />
+      <PaperPlaneToast
+        isVisible={showPlane}
+        onAnimationComplete={handlePlaneAnimationComplete}
+      />
       </div>
     </>
   );

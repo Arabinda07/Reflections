@@ -121,7 +121,6 @@ export const Home: React.FC = () => {
       {/* Hero Section - Cinematic Hero with 3D Float */}
       <section className="relative flex flex-col items-center justify-center text-center py-16 sm:py-24 px-6 sm:px-10 overflow-hidden border-b-2 border-border min-h-[400px] sm:min-h-[500px]">
         {/* Hero Video Background */}
-        {/* Hero Video Background */}
         <video
           src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_045634_e1c98c76-1265-4f5c-882a-4276f2080894.mp4"
           autoPlay
@@ -142,20 +141,43 @@ export const Home: React.FC = () => {
           className="relative z-10 flex flex-col items-center max-w-2xl w-full"
         >
           <h1
-            className="font-display text-[48px] sm:text-[64px] lowercase mb-4 tracking-tighter leading-none"
+            className="font-display text-[36px] sm:text-[52px] lg:text-[64px] lowercase mb-6 tracking-tighter leading-none px-2"
             style={{ color: '#ffffff', textShadow: '0 4px 12px rgba(0,0,0,0.8)' }}
           >
             welcome back, {user?.name?.split(' ')[0] || 'learner'}
           </h1>
-          <Button
-            variant="primary"
-            size="lg"
-            className="h-[64px] px-12 text-[18px] font-bold uppercase rounded-2xl shadow-3d-green active:shadow-none active:translate-y-[4px] transition-all liquid-glass group"
-            onClick={() => handleCreateClick()}
-          >
-            <PlusCircle className="mr-3 group-hover:rotate-90 transition-transform duration-300" />
-            New Entry
-          </Button>
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <Button
+              variant="primary"
+              size="lg"
+              className="h-[56px] sm:h-[64px] px-8 sm:px-12 text-[16px] sm:text-[18px] font-bold uppercase rounded-2xl shadow-3d-green active:shadow-none active:translate-y-[4px] transition-all liquid-glass group"
+              onClick={() => handleCreateClick()}
+            >
+              <PlusCircle className="mr-3 group-hover:rotate-90 transition-transform duration-300" />
+              New Entry
+            </Button>
+
+            {canInstall && !isInstalled && (
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.2 }}
+              >
+                <button
+                  onClick={triggerInstall}
+                  className="flex items-center gap-2 h-[48px] px-6 rounded-xl text-white font-black text-[13px] uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  style={{
+                    backgroundColor: 'rgba(255,255,255,0.15)',
+                    backdropFilter: 'blur(12px)',
+                    border: '1.5px solid rgba(255,255,255,0.25)',
+                  }}
+                >
+                  <Download size={16} />
+                  Install Free
+                </button>
+              </motion.div>
+            )}
+          </div>
         </motion.div>
       </section>
 
