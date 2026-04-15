@@ -157,10 +157,6 @@ export const Home: React.FC = () => {
             New Entry
           </Button>
         </motion.div>
-        {/* Ambient Music Button — bottom-right corner of hero */}
-        <div className="absolute bottom-5 right-5 z-10">
-          <AmbientMusicButton />
-        </div>
       </section>
 
       {/* Main Grid */}
@@ -332,6 +328,10 @@ export const Home: React.FC = () => {
           </div>
         </div>
       )}
+      {/* Ambient Music — scroll-locked floating button */}
+      <div style={{ position: 'fixed', bottom: '24px', right: '20px', zIndex: 8000 }}>
+        <AmbientMusicButton />
+      </div>
     </div>
   );
 };
