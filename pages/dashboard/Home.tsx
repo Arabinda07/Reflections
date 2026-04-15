@@ -18,7 +18,6 @@ export const Home: React.FC = () => {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [dailyPrompt, setDailyPrompt] = useState(DEFAULT_WELLNESS_PROMPTS[0]);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [heroVideoError, setHeroVideoError] = useState(false);
 
   useEffect(() => {
     // Randomize initial prompt
@@ -119,27 +118,17 @@ export const Home: React.FC = () => {
 
   return (
     <div className="animate-in fade-in duration-700">
-      {/* Hero Section - Cinematic Background */}
+      {/* Hero Section - Cinematic Background with Illustration */}
       <section className="relative flex flex-col items-center justify-center text-center py-[100px] px-6 sm:px-10 overflow-hidden border-b-2 border-border min-h-[500px]">
-        {/* Background Video — falls back to a gradient if the CDN URL fails */}
-        {!heroVideoError && (
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            onError={() => setHeroVideoError(true)}
-            className="absolute inset-0 w-full h-full object-cover z-0 opacity-90"
-          >
-            <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260307_083826_e938b29f-a43a-41ec-a153-3d4730578ab8.mp4" type="video/mp4" />
-          </video>
-        )}
-        {heroVideoError && (
-          <div className="absolute inset-0 z-0 bg-gradient-to-br from-green/20 via-blue/10 to-dark-blue/30" />
-        )}
+        {/* Hero Illustration */}
+        <img 
+          src="/assets/images/dashboard_hero.jpg" 
+          alt="Reflections Hero" 
+          className="absolute inset-0 w-full h-full object-cover z-0"
+        />
 
-        {/* Overlay to ensure text legibility without a solid card */}
-        <div className="absolute inset-0 bg-black/40 z-0"></div>
+        {/* Premium Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/40 to-transparent z-0"></div>
 
         {/* Floating Text Container */}
         <motion.div 
@@ -149,13 +138,13 @@ export const Home: React.FC = () => {
         >
           <h1 
             className="font-display text-[48px] sm:text-[64px] lowercase mb-4 tracking-tighter leading-none"
-            style={{ color: '#ffffff', textShadow: '0 4px 12px rgba(0,0,0,0.8)' }}
+            style={{ color: '#ffffff', textShadow: '0 4px 12px rgba(0,0,0,0.6)' }}
           >
             welcome back, {user?.name?.split(' ')[0] || 'learner'}
           </h1>
           <p 
             className="text-[16px] sm:text-[18px] max-w-[520px] leading-[1.5] mb-10 font-bold"
-            style={{ color: '#ffffff', textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}
+            style={{ color: '#ffffff', textShadow: '0 2px 8px rgba(0,0,0,0.7)' }}
           >
             Ready to capture your thoughts? Your sanctuary is waiting.
           </p>
