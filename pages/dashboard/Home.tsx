@@ -119,12 +119,12 @@ export const Home: React.FC = () => {
   return (
     <div className="animate-in fade-in duration-700">
       {/* Hero Section - Cinematic Background with Illustration */}
-      <section className="relative flex flex-col items-center justify-center text-center py-[100px] px-6 sm:px-10 overflow-hidden border-b-2 border-border min-h-[500px]">
+      <section className="relative flex flex-col items-center justify-center text-center py-16 sm:py-24 px-6 sm:px-10 overflow-hidden border-b-2 border-border min-h-[380px] sm:min-h-[500px]">
         {/* Hero Illustration */}
         <img 
-          src="https://keordfflghzaicfqsqio.supabase.co/storage/v1/object/public/Assests/dashboard_hero.jpg" 
+          src="https://keordfflghzaicfqsqio.supabase.co/storage/v1/object/public/Assests/Person%20writing%20love%20letter%20flat%20vector%20illustration.jpg" 
           alt="Reflections Hero" 
-          className="absolute inset-0 w-full h-full object-cover z-0"
+          className="absolute inset-0 w-full h-full object-cover object-center z-0"
         />
 
         {/* Premium Gradient Overlay */}
