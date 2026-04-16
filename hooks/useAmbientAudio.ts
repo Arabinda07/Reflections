@@ -90,7 +90,10 @@ export function useAmbientAudio() {
     // Snap in-element to 0 before starting
     inEl.volume = 0;
     const steps  = 30;
-    const stepMs = FADE_DURATION_MS / steps;
+    let tick = 0;
+
+    fadeInterval.current = setInterval(() => {
+      tick++;
       // Calculate steps based on current volumeRef
       const currentTarget = volumeRef.current;
       const volStep = currentTarget / steps;
