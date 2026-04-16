@@ -120,7 +120,7 @@ export const Home: React.FC = () => {
   return (
     <div className="animate-in fade-in duration-700">
       {/* Hero Section - Cinematic Hero with 3D Float */}
-      <section className="relative flex flex-col items-center justify-center text-center py-16 sm:py-24 px-6 sm:px-10 overflow-hidden border-b-2 border-border min-h-[400px] sm:min-h-[500px]">
+      <section className="relative flex flex-col items-center justify-start pt-0 pb-16 sm:pb-24 px-6 sm:px-10 overflow-hidden border-b-2 border-border min-h-[400px] sm:min-h-[500px]">
         {/* Hero Video Background */}
         <video
           src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_045634_e1c98c76-1265-4f5c-882a-4276f2080894.mp4"
@@ -139,10 +139,10 @@ export const Home: React.FC = () => {
         <motion.div
           animate={{ y: [-5, 5, -5] }}
           transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-          className="relative z-10 flex flex-col items-center max-w-2xl w-full translate-y-12 sm:translate-y-16"
+          className="relative z-10 flex flex-col items-center text-center max-w-2xl w-full pt-[160px] sm:pt-[210px]"
         >
           <h1
-            className="font-display text-[36px] sm:text-[52px] lg:text-[64px] lowercase mb-20 sm:mb-24 tracking-tighter leading-none px-2"
+            className="font-display text-[36px] sm:text-[52px] lg:text-[64px] lowercase mb-32 sm:mb-40 tracking-tighter leading-none px-2"
             style={{ color: '#ffffff', textShadow: '0 4px 12px rgba(0,0,0,0.8)' }}
           >
             welcome back, {user?.name?.split(' ')[0] || 'learner'}
