@@ -42,10 +42,10 @@ export const PaperPlaneToast: React.FC<PaperPlaneToastProps> = ({
       {isVisible && (
         <motion.div
           key="paper-plane-toast"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 12 }}
-          transition={{ duration: 0.4, ease: 'easeOut' }}
+          initial={{ opacity: 0, y: 24, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -16, scale: 1.04 }}
+          transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
           style={{
             position: 'fixed',
             bottom: '24px',
@@ -78,7 +78,7 @@ export const PaperPlaneToast: React.FC<PaperPlaneToastProps> = ({
               <DotLottieReact
                 src="https://lottie.host/44bd266f-34f2-4b70-87df-fb47ff5962a5/4mw21xhUNV.lottie"
                 autoplay
-                loop={false}
+                loop={true}
                 style={{ width: '100%', height: '100%' }}
               />
             </div>

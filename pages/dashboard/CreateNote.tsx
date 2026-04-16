@@ -643,44 +643,42 @@ Instructions:
   const handleSave = async () => {
     if (!title.trim() && !content.trim()) return;
     setSaving(true);
-    navigatePathRef.current = null;
-    setShowPlane(true);
-    
+    // ⚠️  Do NOT show the plane yet — save first so the 2-second plane timer
+    //     starts only after the ref is populated. This eliminates any race condition.
+
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
       let noteId = id;
       let noteData: any = { title, content, tags, mood, tasks };
-      
+
       if (!noteId) {
         const newNote = await noteService.create(noteData);
         noteId = newNote.id;
       }
 
       let finalThumbnailUrl = imagePreview;
-      
+
       if (imagePreview && imagePreview.startsWith('blob:')) {
         const response = await fetch(imagePreview);
         const blob = await response.blob();
         const file = new File([blob], "cover.jpg", { type: blob.type });
-        
         finalThumbnailUrl = await storageService.uploadFile(
-          file, 
-          user.id, 
+          file,
+          user.id,
           'notes',
           noteId
         );
-      } 
-      else if (!imagePreview) {
+      } else if (!imagePreview) {
         finalThumbnailUrl = undefined;
       }
 
       const uploadedAttachments: NoteAttachment[] = [];
       for (const file of newAttachments) {
         const path = await storageService.uploadFile(
-          file, 
-          user.id, 
+          file,
+          user.id,
           'notes',
           noteId
         );
@@ -709,10 +707,9 @@ Instructions:
       if (!id) {
         (window as any)._lastCreatedNoteId = noteId;
       }
-      
+
     } catch (error: any) {
       if (isUnmounted.current) return;
-      setShowPlane(false);
       if (error.message === 'FREE_LIMIT_REACHED') {
         setIsLimitReached(true);
       } else {
@@ -724,31 +721,33 @@ Instructions:
       if (!isUnmounted.current) setSaving(false);
     }
 
-    // Reached here = save succeeded. Determine navigation target.
-    const noteId = id || (window as any)._lastCreatedNoteId;
+    // Reached here = save fully succeeded.
+    const finalNoteId = id || (window as any)._lastCreatedNoteId;
     const totalCount = await noteService.getCount();
     const recentNotes = await noteService.getRecent(10);
     const observation = observationService.checkMilestones(
-      { title, content, createdAt: new Date().toISOString() } as any, 
-      totalCount, 
+      { title, content, createdAt: new Date().toISOString() } as any,
+      totalCount,
       recentNotes
     );
 
     if (observation) {
-      // Milestone: hide plane and show observation instead
-      setShowPlane(false);
-      setTimeout(() => {
-        if (!isUnmounted.current) {
-          setObservationText(observation.text);
-          setShowObservation(true);
-          setPendingNavigation(RoutePath.NOTE_DETAIL.replace(':id', noteId));
-          observationService.markObservationShown();
-        }
-      }, 600);
+      // Milestone path: skip the plane, go straight to the observation overlay.
+      // After the user reads it, CompanionObservation navigates to HOME.
+      if (!isUnmounted.current) {
+        setObservationText(observation.text);
+        setShowObservation(true);
+        setPendingNavigation(RoutePath.HOME);
+        observationService.markObservationShown();
+      }
     } else {
-      // Normal: store target in ref — plane timer will navigate in ~2s
-      // Navigate to Home so the user lands back on their dashboard
+      // Normal success path:
+      // 1. Arm the ref with the destination — must happen BEFORE showing the plane
+      //    so PaperPlaneToast's internal 2-second timer always fires with a valid path.
+      // 2. Show the plane — its timer starts NOW and will call handlePlaneAnimationComplete
+      //    exactly 2 seconds later, which reads the ref and navigates to HOME.
       navigatePathRef.current = RoutePath.HOME;
+      setShowPlane(true);
     }
   };
 
