@@ -10,8 +10,6 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@capacitor/android": "^8.3.0",
-    "@capacitor/cli": "^8.3.0",
     "@capacitor/core": "^8.3.0",
     "@google/genai": "^1.49.0",
     "@lottiefiles/dotlottie-react": "^0.19.0",
@@ -19,14 +17,12 @@
     "@splinetool/runtime": "^1.12.81",
     "@supabase/supabase-js": "2.39.3",
     "date-fns": "^4.1.0",
-    "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.563.0",
     "motion": "^12.38.0",
     "react": "^19.2.4",
     "react-calendar": "^6.0.1",
     "react-dom": "^19.2.4",
-    "react-router-dom": "^7.13.0",
-    "recharts": "^3.8.1"
+    "react-router-dom": "^7.13.0"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
