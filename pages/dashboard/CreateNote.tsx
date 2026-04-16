@@ -195,8 +195,7 @@ export const CreateNote: React.FC = () => {
   const [showObservation, setShowObservation] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
   const [showPlane, setShowPlane] = useState(false);
-  // Use a ref for the navigation path — avoids stale closure bugs
-  const navigatePathRef = useRef<string | null>(null);
+  const navigatePathRef = useRef<string | null>(null); // kept for type-safety, no longer drives nav
 
   const AMBIENT_TRACKS = [
     { id: 'rain', name: 'Soft Rain', url: 'https://actions.google.com/sounds/v1/weather/rain_heavy_loud.ogg' },
@@ -627,34 +626,35 @@ Instructions:
   };
 
   /**
-   * Called by PaperPlaneToast after its 2-second animation completes.
-   * Reads the navigation path from a ref — always current, no stale closures.
+   * handlePlaneAnimationComplete — navigation is now fully owned by handleSave.
+   * This callback is kept for PaperPlaneToast compatibility but takes no action.
    */
   const handlePlaneAnimationComplete = useCallback(() => {
-    const path = navigatePathRef.current;
-    setShowPlane(false);
-    if (path && !isUnmounted.current) {
-      setTimeout(() => {
-        if (!isUnmounted.current) navigate(path);
-      }, 200); // brief breath for the fade-out
-    }
-  }, [navigate]);
+    // intentionally empty — handleSave drives all timing
+  }, []);
 
   const handleSave = async () => {
     if (!title.trim() && !content.trim()) return;
     setSaving(true);
-    // ⚠️  Do NOT show the plane yet — save first so the 2-second plane timer
-    //     starts only after the ref is populated. This eliminates any race condition.
+
+    // ─── Step 1: Show plane AND start the 2.2-second animation floor simultaneously.
+    //     The floor ensures the Lottie always plays for a full, satisfying duration
+    //     regardless of how fast or slow the network save completes.
+    setShowPlane(true);
+    const animFloor = new Promise<void>(resolve => setTimeout(resolve, 2200));
+
+    // ─── Step 2: Run the save.
+    let saveSucceeded = false;
+    let savedNoteId: string | null = null;
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
       let noteId = id;
-      let noteData: any = { title, content, tags, mood, tasks };
 
       if (!noteId) {
-        const newNote = await noteService.create(noteData);
+        const newNote = await noteService.create({ title, content, tags, mood, tasks });
         noteId = newNote.id;
       }
 
@@ -664,52 +664,33 @@ Instructions:
         const response = await fetch(imagePreview);
         const blob = await response.blob();
         const file = new File([blob], "cover.jpg", { type: blob.type });
-        finalThumbnailUrl = await storageService.uploadFile(
-          file,
-          user.id,
-          'notes',
-          noteId
-        );
+        finalThumbnailUrl = await storageService.uploadFile(file, user.id, 'notes', noteId);
       } else if (!imagePreview) {
         finalThumbnailUrl = undefined;
       }
 
       const uploadedAttachments: NoteAttachment[] = [];
       for (const file of newAttachments) {
-        const path = await storageService.uploadFile(
-          file,
-          user.id,
-          'notes',
-          noteId
-        );
-        uploadedAttachments.push({
-          name: file.name,
-          size: file.size,
-          type: file.type,
-          path: path,
-          id: path
-        });
+        const path = await storageService.uploadFile(file, user.id, 'notes', noteId);
+        uploadedAttachments.push({ name: file.name, size: file.size, type: file.type, path, id: path });
       }
 
-      const finalAttachments = [...existingAttachments, ...uploadedAttachments];
-
       await noteService.update(noteId, {
-        title,
-        content,
-        mood,
-        tags,
-        tasks,
+        title, content, mood, tags, tasks,
         thumbnailUrl: finalThumbnailUrl || undefined,
-        attachments: finalAttachments
+        attachments: [...existingAttachments, ...uploadedAttachments]
       });
 
-      if (isUnmounted.current) return;
-      if (!id) {
-        (window as any)._lastCreatedNoteId = noteId;
+      if (!isUnmounted.current) {
+        if (!id) (window as any)._lastCreatedNoteId = noteId;
+        savedNoteId = noteId;
+        saveSucceeded = true;
       }
 
     } catch (error: any) {
       if (isUnmounted.current) return;
+      // Save failed — kill the plane immediately and surface the error.
+      setShowPlane(false);
       if (error.message === 'FREE_LIMIT_REACHED') {
         setIsLimitReached(true);
       } else {
@@ -721,8 +702,18 @@ Instructions:
       if (!isUnmounted.current) setSaving(false);
     }
 
-    // Reached here = save fully succeeded.
-    const finalNoteId = id || (window as any)._lastCreatedNoteId;
+    if (!saveSucceeded || isUnmounted.current) return;
+
+    // ─── Step 3: Wait for the animation floor to complete.
+    //     If save finished early (common), we wait here for the remaining time
+    //     so the Lottie always plays for the full 2.2 seconds.
+    //     If save was slow (> 2.2s), animFloor is already resolved and this is instant.
+    await animFloor;
+
+    if (isUnmounted.current) return;
+
+    // ─── Step 4: Check milestones, then navigate.
+    const resolvedNoteId = savedNoteId || id || (window as any)._lastCreatedNoteId;
     const totalCount = await noteService.getCount();
     const recentNotes = await noteService.getRecent(10);
     const observation = observationService.checkMilestones(
@@ -732,8 +723,8 @@ Instructions:
     );
 
     if (observation) {
-      // Milestone path: skip the plane, go straight to the observation overlay.
-      // After the user reads it, CompanionObservation navigates to HOME.
+      // Milestone: dismiss the plane, show the observation card, navigate home after.
+      setShowPlane(false);
       if (!isUnmounted.current) {
         setObservationText(observation.text);
         setShowObservation(true);
@@ -741,13 +732,11 @@ Instructions:
         observationService.markObservationShown();
       }
     } else {
-      // Normal success path:
-      // 1. Arm the ref with the destination — must happen BEFORE showing the plane
-      //    so PaperPlaneToast's internal 2-second timer always fires with a valid path.
-      // 2. Show the plane — its timer starts NOW and will call handlePlaneAnimationComplete
-      //    exactly 2 seconds later, which reads the ref and navigates to HOME.
-      navigatePathRef.current = RoutePath.HOME;
-      setShowPlane(true);
+      // Normal: fade the plane out, then glide to the homepage.
+      setShowPlane(false);
+      setTimeout(() => {
+        if (!isUnmounted.current) navigate(RoutePath.HOME);
+      }, 450); // matches the AnimatePresence exit duration (0.5s)
     }
   };
 
