@@ -277,7 +277,14 @@ export const DashboardLayout: React.FC = () => {
           </div>
 
           <div className="text-[11px] font-black uppercase tracking-widest text-gray-nav/50">
-            © 2026 Arabinda
+            © 2026 <a 
+              href="https://arabinda07.github.io/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-green hover:underline transition-all duration-300"
+            >
+              Arabinda
+            </a>
           </div>
         </div>
       </footer>
