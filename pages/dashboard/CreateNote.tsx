@@ -925,7 +925,13 @@ Instructions:
             <Button
               variant="ghost"
               size="sm"
-                onClick={() => setIsMusicOpen(!isMusicOpen)}
+              onClick={() => {
+                if (musicPlaying) {
+                  stopMusic();
+                } else {
+                  setIsMusicOpen(!isMusicOpen);
+                }
+              }}
               className={`flex items-center gap-2 font-bold uppercase text-[11px] transition-all ${musicPlaying ? 'text-purple-500 bg-purple-500/5' : 'text-gray-nav'}`}
               title="Ambient Sounds"
             >
@@ -952,8 +958,8 @@ Instructions:
                         boxShadow: '0 8px 32px -8px rgba(0,0,0,0.16), 0 2px 0 0 #E5E5E5',
                         padding: '16px',
                         ...(window.innerWidth >= 640 ? {
-                          top: musicRef.current ? musicRef.current.getBoundingClientRect().bottom + window.scrollY + 12 : 0,
-                          left: musicRef.current ? musicRef.current.getBoundingClientRect().left - 80 + window.scrollX : 0,
+                          top: musicRef.current ? musicRef.current.getBoundingClientRect().bottom + 12 : 0,
+                          left: musicRef.current ? musicRef.current.getBoundingClientRect().left - 80 : 0,
                         } : {}),
                       }}
                     >
