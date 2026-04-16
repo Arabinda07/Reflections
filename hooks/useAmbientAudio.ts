@@ -41,6 +41,8 @@ export const AMBIENT_TRACKS: AmbientTrack[] = [
 
 const FADE_DURATION_MS = 1200; // crossfade window
 const TARGET_VOLUME    = 0.38; // master volume ceiling
+const FADE_STEPS       = 30;
+const STEP_MS          = Math.max(16, Math.floor(FADE_DURATION_MS / FADE_STEPS));
 
 /**
  * useAmbientAudio
@@ -89,8 +91,7 @@ export function useAmbientAudio() {
 
     // Snap in-element to 0 before starting
     inEl.volume = 0;
-    const steps  = 30;
-    const stepMs = FADE_DURATION_MS / steps;
+    const steps  = FADE_STEPS;
     let tick = 0;
 
     fadeInterval.current = setInterval(() => {
@@ -109,7 +110,7 @@ export function useAmbientAudio() {
         inEl.volume = volumeRef.current;
         onDone?.();
       }
-    }, stepMs);
+    }, STEP_MS);
   }, []);
 
   const playTrack = useCallback((track: AmbientTrack) => {
@@ -157,11 +158,12 @@ export function useAmbientAudio() {
   }, []);
 
   const setVolume = useCallback((vol: number) => {
-    setVolumeState(vol);
-    volumeRef.current = vol;
+    const safeVolume = Math.min(0.8, Math.max(0, vol));
+    setVolumeState(safeVolume);
+    volumeRef.current = safeVolume;
     // Apply to both slots to ensure whatever is currently audible updates
-    if (slotA.current) slotA.current.volume = vol;
-    if (slotB.current) slotB.current.volume = vol;
+    if (slotA.current) slotA.current.volume = safeVolume;
+    if (slotB.current) slotB.current.volume = safeVolume;
   }, []);
 
   const activeTrack = AMBIENT_TRACKS.find(t => t.id === activeId) ?? null;
