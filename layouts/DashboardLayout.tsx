@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { usePWAInstall } from '../context/PWAInstallContext';
 import { Button } from '../components/ui/Button';
 import { StorageImage } from '../components/ui/StorageImage';
+import { SyncBanner } from '../components/ui/SyncBanner';
 
 export const DashboardLayout: React.FC = () => {
   const navigate = useNavigate();
@@ -246,6 +247,7 @@ export const DashboardLayout: React.FC = () => {
       )}
 
       {/* Main Content */}
+      <SyncBanner />
       <main className="pt-[64px] w-full max-w-[1440px] mx-auto flex-grow">
         <Outlet />
       </main>

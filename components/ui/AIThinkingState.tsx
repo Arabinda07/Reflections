@@ -73,7 +73,7 @@ export const AIThinkingState: React.FC<AIThinkingStateProps> = ({ isVisible, onS
       {isVisible && (
         <motion.div
           key="ai-sanctuary"
-          initial={{ opacity: 0 }}
+          initial={{ opacity: 1 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0, scale: 1.03 }}
           transition={{ duration: 0.7, ease: "easeInOut" }}

@@ -26,8 +26,13 @@ export const MyNotes: React.FC = () => {
   const tagFilter = queryParams.get('tag');
 
   const fetchNotes = async () => {
+    // Minimum cinematic display time for the sanctuary loader
+    const minTimePromise = new Promise(resolve => setTimeout(resolve, 2500));
     try {
-      const data = await noteService.getAll();
+      const [data] = await Promise.all([
+        noteService.getAll(),
+        minTimePromise
+      ]);
       setNotes(data);
     } catch (error) {
       console.error("Failed to fetch notes", error);
