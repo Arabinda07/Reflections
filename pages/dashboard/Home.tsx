@@ -139,10 +139,10 @@ export const Home: React.FC = () => {
         <motion.div
           animate={{ y: [-5, 5, -5] }}
           transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-          className="relative z-10 flex flex-col items-center max-w-2xl w-full"
+          className="relative z-10 flex flex-col items-center max-w-2xl w-full translate-y-12 sm:translate-y-16"
         >
           <h1
-            className="font-display text-[36px] sm:text-[52px] lg:text-[64px] lowercase mb-6 tracking-tighter leading-none px-2"
+            className="font-display text-[36px] sm:text-[52px] lg:text-[64px] lowercase mb-20 sm:mb-24 tracking-tighter leading-none px-2"
             style={{ color: '#ffffff', textShadow: '0 4px 12px rgba(0,0,0,0.8)' }}
           >
             welcome back, {user?.name?.split(' ')[0] || 'learner'}
