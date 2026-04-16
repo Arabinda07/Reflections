@@ -108,11 +108,19 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
--- Helper to safely add column if needed
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
-                   WHERE table_name='notes' AND column_name='tasks') THEN
-        ALTER TABLE public.notes ADD COLUMN tasks JSONB DEFAULT '[]'::jsonb;
-    END IF;
 END $$;
+
+-- 8. Function to delete all data for the current user
+create or replace function delete_user_data()
+returns void as $$
+begin
+  -- Delete all notes belonging to the user
+  delete from public.notes where user_id = auth.uid();
+  
+  -- Delete the user's profile
+  delete from public.profiles where id = auth.uid();
+  
+  -- Note: We can't easily delete from auth.users via RPC as a non-admin 
+  -- without specialized setup. This wipes their data from the public schema.
+end;
+$$ language plpgsql security definer;

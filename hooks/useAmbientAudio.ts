@@ -58,6 +58,7 @@ export function useAmbientAudio() {
   const slotB = useRef<HTMLAudioElement | null>(null);
   const useSlotA = useRef(true); // which slot is currently "active"
 
+  const volumeRef = useRef(volume);
   const fadeInterval = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const clearFade = () => {
@@ -90,20 +91,18 @@ export function useAmbientAudio() {
     inEl.volume = 0;
     const steps  = 30;
     const stepMs = FADE_DURATION_MS / steps;
-    const volStep = targetVol / steps;
-    let tick = 0;
+      // Calculate steps based on current volumeRef
+      const currentTarget = volumeRef.current;
+      const volStep = currentTarget / steps;
 
-    fadeInterval.current = setInterval(() => {
-      tick++;
-      // Fade in
-      inEl.volume = Math.min(targetVol, inEl.volume + volStep);
+      inEl.volume = Math.min(currentTarget, inEl.volume + volStep);
       // Fade out
       if (outEl) outEl.volume = Math.max(0, outEl.volume - volStep);
 
       if (tick >= steps) {
         clearFade();
         if (outEl) { outEl.pause(); outEl.volume = 0; }
-        inEl.volume = targetVol;
+        inEl.volume = volumeRef.current;
         onDone?.();
       }
     }, stepMs);
@@ -155,9 +154,10 @@ export function useAmbientAudio() {
 
   const setVolume = useCallback((vol: number) => {
     setVolumeState(vol);
-    // Apply to whichever element is currently audible
-    const activeEl = useSlotA.current ? slotB.current : slotA.current;
-    if (activeEl) activeEl.volume = vol;
+    volumeRef.current = vol;
+    // Apply to both slots to ensure whatever is currently audible updates
+    if (slotA.current) slotA.current.volume = vol;
+    if (slotB.current) slotB.current.volume = vol;
   }, []);
 
   const activeTrack = AMBIENT_TRACKS.find(t => t.id === activeId) ?? null;

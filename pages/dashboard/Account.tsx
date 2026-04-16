@@ -26,6 +26,7 @@ export const Account: React.FC = () => {
   });
   const [avatarPath, setAvatarPath] = useState<string | null>(null);
   const [lastSignIn, setLastSignIn] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Fetch Supabase User on Mount
   useEffect(() => {
@@ -142,6 +143,29 @@ export const Account: React.FC = () => {
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate(RoutePath.LOGIN);
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      setLoading(true);
+      
+      // 1. Call the RPC function to wipe public data
+      const { error: rpcError } = await supabase.rpc('delete_user_data');
+      if (rpcError) throw rpcError;
+
+      // 2. Log out (this clears the session)
+      await supabase.auth.signOut();
+      
+      // 3. Redirect to home
+      navigate(RoutePath.HOME);
+
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      alert("Failed to delete account data. Please try again or contact support.");
+    } finally {
+      setLoading(false);
+      setShowDeleteConfirm(false);
+    }
   };
 
   if (fetching) {
@@ -327,7 +351,13 @@ export const Account: React.FC = () => {
                                         Permanently delete your account and all of your content. This action cannot be undone.
                                     </p>
                                 </div>
-                                <Button type="button" variant="danger" size="sm" className="shadow-3d-red active:shadow-none active:translate-y-[2px] font-extrabold">
+                                <Button 
+                                    type="button" 
+                                    variant="danger" 
+                                    size="sm" 
+                                    className="shadow-3d-red active:shadow-none active:translate-y-[2px] font-extrabold"
+                                    onClick={() => setShowDeleteConfirm(true)}
+                                >
                                     <Trash2 className="mr-2 h-4 w-4" />
                                     DELETE ACCOUNT
                                 </Button>
@@ -380,6 +410,42 @@ export const Account: React.FC = () => {
 
             </form>
         </div>
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteConfirm && (
+            <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-in fade-in duration-300">
+                <div className="relative w-full max-w-md space-y-6 rounded-[32px] border-2 border-border bg-white p-8 shadow-2xl animate-in zoom-in-95 duration-300">
+                    <div className="flex flex-col items-center text-center gap-4">
+                        <div className="h-16 w-16 rounded-2xl bg-red/10 flex items-center justify-center text-red border-2 border-red/20 shadow-3d-red mb-2">
+                             <AlertTriangle size={32} />
+                        </div>
+                        <h2 className="text-2xl font-display text-gray-text lowercase">delete everything?</h2>
+                        <p className="text-[15px] text-gray-light font-medium leading-relaxed">
+                            This will permanently wipe all your notes, reflections, and tags. This action <span className="text-red font-bold">cannot be undone</span>.
+                        </p>
+                    </div>
+
+                    <div className="flex flex-col gap-3 pt-4">
+                        <Button 
+                            variant="danger" 
+                            className="w-full h-14 font-extrabold shadow-3d-red active:shadow-none active:translate-y-[2px]"
+                            onClick={handleDeleteAccount}
+                            disabled={loading}
+                        >
+                            {loading ? 'WIPING DATA...' : 'YES, WIPE EVERYTHING'}
+                        </Button>
+                        <Button 
+                            variant="secondary" 
+                            className="w-full h-14 font-extrabold border-2 border-border shadow-3d-gray active:shadow-none active:translate-y-[2px]"
+                            onClick={() => setShowDeleteConfirm(false)}
+                            disabled={loading}
+                        >
+                            CANCEL
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        )}
     </div>
   );
 };

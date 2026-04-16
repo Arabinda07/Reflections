@@ -925,16 +925,7 @@ Instructions:
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => {
-                if (!isMusicOpen) {
-                  setIsMusicOpen(true);
-                } else if (isPlaying) {
-                  audioRef.current?.pause();
-                  setIsPlaying(false);
-                } else {
-                  setIsMusicOpen(false);
-                }
-              }}
+                onClick={() => setIsMusicOpen(!isMusicOpen)}
               className={`flex items-center gap-2 font-bold uppercase text-[11px] transition-all ${musicPlaying ? 'text-purple-500 bg-purple-500/5' : 'text-gray-nav'}`}
               title="Ambient Sounds"
             >
