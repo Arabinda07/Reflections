@@ -2,7 +2,7 @@
 // Strategy: Cache-First for app shell, Network-First for API/Supabase
 // ─────────────────────────────────────────────────────────────────────
 
-const CACHE_NAME = 'reflections-shell-v3';
+const CACHE_NAME = 'reflections-shell-v4';
 
 // Core app shell files to cache on install
 const SHELL_ASSETS = [
@@ -62,12 +62,19 @@ self.addEventListener('fetch', (event) => {
   const isAudio = url.pathname.endsWith('.mp3') || url.pathname.endsWith('.wav') || url.pathname.endsWith('.m4a') || url.pathname.endsWith('.ogg');
   const isAudioHost = url.hostname.includes('actions.google.com');
 
+  if (isAudio || isAudioHost) {
+    // CRITICAL FIX: Do not intercept <audio> media requests. 
+    // Modern browsers use 206 Partial Content Range requests for media decoding.
+    // Standard Service Worker caches return 200 OK, which crashes the Chrome Media Decoder 
+    // resulting in "Cannot play media" errors. Let the browser handle media caching natively.
+    return;
+  }
+
   const isSameOrigin = url.origin === self.location.origin;
   const isStaticMedia = 
       url.hostname.includes('fonts.googleapis.com') ||
       url.hostname.includes('fonts.gstatic.com') ||
       url.hostname.includes('cdn.quilljs.com') ||
-      (isAudioHost && isAudio) ||
       isSupabaseStorage;
 
   if (request.method !== 'GET') return;
