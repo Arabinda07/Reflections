@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
-import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Frown, Sun, Cloud, Moon, Brain, Tag as TagIcon, CheckCircle2, Check, Plus, Trash2, Eye, EyeOff, ListTodo, Wind, Mic, MicOff, Music, Play, Pause, Volume2 } from 'lucide-react';
+import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Frown, Sun, Cloud, Moon, Brain, Tag as TagIcon, CheckCircle2, Check, Plus, Trash2, Eye, EyeOff, ListTodo, Wind, Mic, MicOff, Music, Play, Pause, Volume2, Loader2 } from 'lucide-react';
 import { useAmbientAudio, AMBIENT_TRACKS } from '../../hooks/useAmbientAudio';
 import { Button } from '../../components/ui/Button';
 import { Editor, EditorRef } from '../../components/ui/Editor';
@@ -29,6 +29,27 @@ function debounce<T extends (...args: any[]) => any>(
     clearTimeout(timeout);
     timeout = setTimeout(() => func.apply(this, args), wait);
   };
+}
+
+// ── Soft audio & haptic feedback ─────────────────────────────────────────
+// Generates an 880 Hz sine tone (≈ 75ms) that mimics a soft wooden tap.
+// Called inside click handlers (user-gesture context) so AudioContext is allowed.
+function playSoftClick() {
+  try {
+    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.07, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.075);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.075);
+  } catch {}
 }
 
 const apiKey = typeof process !== 'undefined' && process.env.GEMINI_API_KEY 
@@ -176,7 +197,7 @@ export const CreateNote: React.FC = () => {
   const [isMoodOpen, setIsMoodOpen] = useState(false);
   const [isTagsOpen, setIsTagsOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-  const [isFocusModeManual, setIsFocusModeManual] = useState(false);
+  const [isZenMode, setIsZenMode] = useState(false);
   const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
   
   // Mindful Features States
@@ -614,6 +635,8 @@ Instructions:
 
   const handleSave = async () => {
     if (!title.trim() && !content.trim()) return;
+    playSoftClick();
+    navigator.vibrate?.(10);
     setSaving(true);
 
     // ─── Step 1: Show plane AND start the 2.2-second animation floor simultaneously.
@@ -833,7 +856,11 @@ Instructions:
     { id: 'tired', icon: Moon, label: 'Tired', color: 'text-slate-500 bg-slate-50 border-slate-100' },
   ];
 
-  const isDimmed = isFocusModeManual;
+  // Word count for progressive AI Reflect disclosure
+  const wordCount = content.replace(/<[^>]*>/g, '').trim().split(/\s+/).filter(Boolean).length;
+  const canReflect = wordCount >= 100;
+
+  const isDimmed = isZenMode;
 
   return (
     <>
@@ -869,16 +896,16 @@ Instructions:
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setIsFocusModeManual(!isFocusModeManual)}
+            onClick={() => { playSoftClick(); navigator.vibrate?.(8); setIsZenMode(!isZenMode); }}
             className={`${
               hasContent ? 'flex' : 'hidden sm:flex'
             } items-center gap-2 font-bold uppercase text-[11px] transition-all shrink-0 ${
-              isFocusModeManual ? 'text-blue bg-blue/5' : 'text-gray-nav'
+              isZenMode ? 'text-blue bg-blue/5' : 'text-gray-nav'
             }`}
-            title={isFocusModeManual ? "Disable Focus Mode" : "Enable Focus Mode"}
+            title={isZenMode ? "Exit Zen Mode" : "Enter Zen Mode"}
           >
-            {isFocusModeManual ? <Eye size={16} /> : <EyeOff size={16} />}
-            <span className="hidden sm:inline">Focus</span>
+            {isZenMode ? <Eye size={16} /> : <EyeOff size={16} />}
+            <span className="hidden sm:inline">Zen</span>
           </Button>
 
           {/* Whisper Mode Button */}
@@ -962,6 +989,8 @@ Instructions:
                             <button
                               key={track.id}
                               onClick={() => {
+                                playSoftClick();
+                                navigator.vibrate?.(6);
                                 if (isActive) { stopMusic(); }
                                 else { playMusicTrack(track); }
                               }}
@@ -1054,17 +1083,28 @@ Instructions:
               <span className="hidden sm:inline">RELEASE</span>
           </Button>
 
-          <Button 
-            variant="secondary" 
-            size="sm" 
-            className="shrink-0 border-2 border-border text-blue shadow-3d-gray active:shadow-none active:translate-y-[2px] transition-all dark:bg-white/6 px-2 sm:px-3 dark:text-sky-100 dark:shadow-[0_3px_0_0_rgba(15,23,42,0.55)]"
-            disabled={!canEnhance || isReflecting}
-            onClick={handleAiReflect}
-            isLoading={isReflecting}
-          >
-              <Wand2 className="h-3.5 w-3.5 sm:mr-2" />
-              <span className="hidden sm:inline">AI REFLECT</span>
-          </Button>
+          <AnimatePresence>
+            {canReflect && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.82, x: -8 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0.82, x: -8 }}
+                transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+              >
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="shrink-0 border-2 border-border text-blue shadow-3d-gray active:shadow-none active:translate-y-[2px] transition-all dark:bg-white/6 px-2 sm:px-3 dark:text-sky-100 dark:shadow-[0_3px_0_0_rgba(15,23,42,0.55)]"
+                  disabled={isReflecting}
+                  onClick={handleAiReflect}
+                  isLoading={isReflecting}
+                >
+                  <Wand2 className="h-3.5 w-3.5 sm:mr-2" />
+                  <span className="hidden sm:inline">AI REFLECT</span>
+                </Button>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Save button: always on desktop; hides on mobile when hasContent (it moves to bottom) */}
           <Button 
@@ -1290,7 +1330,7 @@ Instructions:
                     onChange={(e) => setTitle(e.target.value)}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
-                    className="w-full border-none bg-transparent text-3xl sm:text-4xl font-display text-gray-text placeholder:text-border focus:outline-none focus:ring-0 p-0 mb-12 tracking-tight leading-tight lowercase"
+                    className="editor-body w-full border-none bg-transparent text-3xl sm:text-4xl font-semibold text-gray-text placeholder:text-border focus:outline-none focus:ring-0 p-0 mb-12 tracking-[-0.01em] leading-tight lowercase"
                 />
                 
                 <div 
@@ -1298,7 +1338,7 @@ Instructions:
                   onFocusCapture={() => setIsFocused(true)}
                   onBlurCapture={() => setIsFocused(false)}
                 >
-                    <div className="mx-auto max-w-[82ch] font-sans leading-[1.8] relative">
+                    <div className="editor-body mx-auto max-w-[82ch] relative">
                       <Editor 
                           ref={editorInstanceRef}
                           value={content} 
@@ -1308,10 +1348,10 @@ Instructions:
                       />
                     </div>
 
-                    {/* Bottom contextual action: Spark FAB (no content) ↔ Mobile Save button (has content) */}
-                    <div className="absolute bottom-6 right-6 z-20 sm:right-6">
+                    {/* Bottom contextual action: Spark FAB (no content) ↔ Mobile Save FAB (has content) ↔ nothing (lottie playing) */}
+                    <div className="absolute bottom-6 right-6 z-20">
                       <AnimatePresence mode="wait">
-                        {!hasContent ? (
+                        {showPlane ? null : !hasContent ? (
                           /* ── Spark prompt FAB — shown when editor is blank ── */
                           <motion.button
                             key="spark-fab"
@@ -1325,22 +1365,53 @@ Instructions:
                             className={`flex h-14 w-14 items-center justify-center rounded-full border-2 border-border bg-white shadow-3d-gray backdrop-blur-xl transition-all text-blue hover:text-blue/80 hover:shadow-none hover:translate-y-[2px] ${isGeneratingPrompts ? 'animate-pulse' : ''}`}
                             title={sparkPrompt}
                           >
-                              <Sparkles size={22} className="relative z-10" />
+                            <Sparkles size={22} className="relative z-10" />
                           </motion.button>
                         ) : (
-                          /* ── Mobile Save button — visible on mobile only when content exists ── */
+                          /* ── Mobile Save FAB — icon-only, multi-state, fades to let Lottie take over ── */
                           <motion.button
                             key="mobile-save"
-                            initial={{ opacity: 0, scale: 0.85, y: 12 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.85, y: 12 }}
+                            initial={{ opacity: 0, scale: 0.75 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{
+                              opacity: 0,
+                              scale: 0.65,
+                              transition: { duration: 0.32, ease: [0.4, 0, 1, 1] },
+                            }}
                             transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+                            whileTap={{ scale: 0.82, transition: { duration: 0.08 } }}
                             onClick={handleSave}
-                            disabled={!canSave || saving || showPlane}
-                            className="sm:hidden flex items-center gap-3 px-6 py-3.5 rounded-2xl bg-green text-white font-black uppercase text-[13px] tracking-wider shadow-3d-green active:shadow-none active:translate-y-[2px] transition-all disabled:opacity-50 disabled:pointer-events-none"
+                            disabled={!canSave || saving}
+                            className="sm:hidden relative flex h-16 w-16 items-center justify-center rounded-2xl bg-green text-white disabled:opacity-40 disabled:pointer-events-none"
+                            style={{
+                              boxShadow: saving
+                                ? '0 2px 0 0 #61B800, 0 0 0 3px rgba(88,204,2,0.12)'
+                                : '0 4px 0 0 #61B800, 0 8px 20px -4px rgba(88,204,2,0.4)',
+                            }}
                           >
-                            <Save size={17} />
-                            Save Entry
+                            <AnimatePresence mode="wait">
+                              {saving ? (
+                                <motion.div
+                                  key="spinner"
+                                  initial={{ opacity: 0, rotate: -45, scale: 0.5 }}
+                                  animate={{ opacity: 1, rotate: 0, scale: 1 }}
+                                  exit={{ opacity: 0, scale: 0.5 }}
+                                  transition={{ duration: 0.15 }}
+                                >
+                                  <Loader2 size={22} className="animate-spin" />
+                                </motion.div>
+                              ) : (
+                                <motion.div
+                                  key="save-icon"
+                                  initial={{ opacity: 0, scale: 0.5 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  exit={{ opacity: 0, scale: 0.5 }}
+                                  transition={{ duration: 0.15 }}
+                                >
+                                  <Save size={22} />
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
                           </motion.button>
                         )}
                       </AnimatePresence>
