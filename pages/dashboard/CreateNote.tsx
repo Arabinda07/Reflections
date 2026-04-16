@@ -982,19 +982,13 @@ Instructions:
                                 {track.emoji}
                               </span>
 
-                              {/* Label + mood */}
+                              {/* Label only */}
                               <span className="flex flex-col gap-0.5 flex-1 min-w-0">
                                 <span
                                   className="text-[12px] font-black truncate"
                                   style={{ color: isActive ? track.color : '#27272a' }}
                                 >
                                   {track.label}
-                                </span>
-                                <span
-                                  className="text-[9px] font-black uppercase tracking-widest"
-                                  style={{ color: isActive ? track.color : '#a1a1aa' }}
-                                >
-                                  {track.mood}
                                 </span>
                               </span>
 

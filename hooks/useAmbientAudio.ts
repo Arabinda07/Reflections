@@ -3,7 +3,6 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 export interface AmbientTrack {
   id: string;
   label: string;
-  mood: string;       // one-word descriptor shown in UI
   emoji: string;
   url: string;
   color: string;
@@ -13,7 +12,6 @@ export const AMBIENT_TRACKS: AmbientTrack[] = [
   {
     id: 'rain',
     label: 'Soft Rain',
-    mood: 'Focus',
     emoji: '🌧️',
     url: 'https://actions.google.com/sounds/v1/weather/rain_heavy_loud.ogg',
     color: '#818cf8',
@@ -21,7 +19,6 @@ export const AMBIENT_TRACKS: AmbientTrack[] = [
   {
     id: 'ocean',
     label: 'Ocean Waves',
-    mood: 'Calm',
     emoji: '🌊',
     url: 'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg',
     color: '#34d399',
@@ -29,7 +26,6 @@ export const AMBIENT_TRACKS: AmbientTrack[] = [
   {
     id: 'lofi',
     label: 'Lo-Fi Café',
-    mood: 'Creative',
     emoji: '☕',
     url: 'https://actions.google.com/sounds/v1/ambiences/coffee_shop.ogg',
     color: '#fb923c',
@@ -37,7 +33,6 @@ export const AMBIENT_TRACKS: AmbientTrack[] = [
   {
     id: 'forest',
     label: 'Forest Dawn',
-    mood: 'Grounded',
     emoji: '🌿',
     url: 'https://actions.google.com/sounds/v1/ambiences/jungle_atmosphere.ogg',
     color: '#4ade80',

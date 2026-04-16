@@ -201,16 +201,6 @@ export const AmbientMusicButton: React.FC = () => {
           }}>
             {track.label}
           </span>
-          {!compact && (
-            <span style={{
-              fontFamily: 'Nunito, sans-serif',
-              fontSize: '10px', fontWeight: 900,
-              textTransform: 'uppercase', letterSpacing: '0.15em',
-              color: isActive ? track.color : labelColor,
-            }}>
-              {track.mood}
-            </span>
-          )}
         </span>
 
         {/* Waveform (playing) or colour dot */}
