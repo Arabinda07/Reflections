@@ -49,6 +49,7 @@
     <!-- ── Resource Hints ──────────────────────────────────────────── -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=DM+Sans:wght@400;500;700&family=Noto+Sans+Devanagari:wght@400;700&family=Noto+Sans+Bengali:wght@400;700&display=swap" rel="stylesheet" />
     <link rel="preconnect" href="https://esm.sh" />
     <link rel="dns-prefetch" href="https://esm.sh" />
     <link rel="dns-prefetch" href="https://supabase.co" />
@@ -61,19 +62,19 @@
     <!-- ── Inline critical styles ──────────────────────────────────── -->
     <style>
       body {
-        font-family: 'Nunito', sans-serif;
+        font-family: 'Nunito', 'Noto Sans Devanagari', 'Noto Sans Bengali', sans-serif;
         background-color: var(--bg-color);
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         color: var(--gray-text);
       }
-      /* Quill Editor — uses DM Sans for a warm editorial writing feel */
+      /* Quill Editor — adds Hindi & Bengali support to the writing surface */
       .ql-container.ql-snow {
         border: none !important;
-        font-family: 'DM Sans', 'Nunito', sans-serif !important;
+        font-family: 'DM Sans', 'Noto Sans Devanagari', 'Noto Sans Bengali', 'Nunito', sans-serif !important;
       }
       .ql-editor {
-        font-family: 'DM Sans', 'Nunito', sans-serif !important;
+        font-family: 'DM Sans', 'Noto Sans Devanagari', 'Noto Sans Bengali', 'Nunito', sans-serif !important;
         font-size: 17px !important;
         color: var(--gray-text) !important;
       }

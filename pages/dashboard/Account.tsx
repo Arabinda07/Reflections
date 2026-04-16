@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Mail, Shield, AlertTriangle, Save, Camera, Lock, ChevronRight, Globe, Key, Trash2, Smartphone, LogOut, X, Check } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
@@ -11,7 +11,7 @@ import { useAuth } from '../../context/AuthContext';
 
 export const Account: React.FC = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [fetching, setFetching] = useState(true);
@@ -37,10 +37,6 @@ export const Account: React.FC = () => {
           return;
         }
 
-        // We still need to get the full user object from Supabase to get metadata
-        // like last_sign_in_at, but we can use getSession which is faster and doesn't
-        // trigger the lock stealing as often, or just use the context user if we don't need it.
-        // Actually, let's just use getSession.
         const { data: { session } } = await supabase.auth.getSession();
         const fullUser = session?.user;
         
@@ -78,14 +74,9 @@ export const Account: React.FC = () => {
     if (file && userId) {
       try {
         setLoading(true);
-        // Upload to {userId}/avatar/profile.ext
-        const extension = file.name.split('.').pop();
         const path = await storageService.uploadFile(file, userId, 'avatar', 'profile');
-        
-        // Update local state to show preview immediately (using blob for speed, but real path for save)
         setAvatarPath(path);
         
-        // Auto-save the avatar change
         const { error } = await supabase.auth.updateUser({
           data: { avatar_url: path }
         });
@@ -111,13 +102,11 @@ export const Account: React.FC = () => {
           full_name: formData.fullName,
           display_name: formData.displayName,
           timezone: formData.timezone
-          // Avatar is updated immediately on file select
         }
       });
 
       if (error) throw error;
       
-      // Simulate save delay
       setTimeout(() => {
         setLoading(false);
         setIsSaved(true);
@@ -148,20 +137,13 @@ export const Account: React.FC = () => {
   const handleDeleteAccount = async () => {
     try {
       setLoading(true);
-      
-      // 1. Call the RPC function to wipe public data
       const { error: rpcError } = await supabase.rpc('delete_user_data');
       if (rpcError) throw rpcError;
-
-      // 2. Log out (this clears the session)
       await supabase.auth.signOut();
-      
-      // 3. Redirect to home
       navigate(RoutePath.HOME);
-
     } catch (error) {
       console.error("Error deleting account:", error);
-      alert("Failed to delete account data. Please try again or contact support.");
+      alert("Failed to delete account data. Please check if you have added the SQL function in Supabase.");
     } finally {
       setLoading(false);
       setShowDeleteConfirm(false);
@@ -182,16 +164,13 @@ export const Account: React.FC = () => {
   return (
     <div className="relative w-full max-w-4xl mx-auto pb-20 animate-in fade-in duration-700 px-4 md:px-0">
         
-        {/* Main Panel */}
-        <div className="relative rounded-[40px] border-2 border-border bg-white shadow-[0_12px_0_0_#E5E5E5] overflow-hidden transition-all duration-500 liquid-glass">
+        <div className="relative rounded-[40px] border-2 border-border bg-white shadow-[0_12px_0_0_#E5E5E5] overflow-hidden transition-all duration-500 liquid-glass dark:bg-zinc-900/50">
             
             <form onSubmit={handleSubmit} className="divide-y-2 divide-border">
                 
-                {/* Header Section */}
-                <div className="px-10 py-12 flex flex-col items-center justify-center text-center relative overflow-hidden bg-white">
-                    {/* Avatar Group */}
+                <div className="px-10 py-12 flex flex-col items-center justify-center text-center relative overflow-hidden">
                     <div className="group relative mb-6 cursor-pointer" onClick={() => document.getElementById('avatar-upload')?.click()}>
-                        <div className="h-32 w-32 rounded-full p-1 bg-white border-4 border-border shadow-3d-gray transition-transform duration-500 group-hover:scale-105 relative overflow-hidden">
+                        <div className="h-32 w-32 rounded-full p-1 bg-white border-4 border-border shadow-3d-gray transition-transform duration-500 group-hover:scale-105 relative overflow-hidden dark:bg-zinc-800">
                              {avatarPath ? (
                                 <StorageImage 
                                     path={avatarPath} 
@@ -199,12 +178,12 @@ export const Account: React.FC = () => {
                                     className="h-full w-full rounded-full object-cover" 
                                 />
                              ) : (
-                                <div className="h-full w-full rounded-full bg-white flex items-center justify-center text-gray-nav">
+                                <div className="h-full w-full rounded-full bg-white flex items-center justify-center text-gray-nav dark:bg-zinc-800">
                                     <User size={48} />
                                 </div>
                              )}
                         </div>
-                        <button type="button" className="absolute bottom-1 right-1 flex h-10 w-10 items-center justify-center rounded-full bg-white text-gray-text border-2 border-border shadow-3d-gray transition-all hover:scale-110 hover:text-blue">
+                        <button type="button" className="absolute bottom-1 right-1 flex h-10 w-10 items-center justify-center rounded-full bg-white text-gray-text border-2 border-border shadow-3d-gray transition-all hover:scale-110 hover:text-blue dark:bg-zinc-800 dark:text-white">
                             <Camera size={18} />
                         </button>
                         <input 
@@ -216,25 +195,23 @@ export const Account: React.FC = () => {
                         />
                     </div>
 
-                    <h1 className="text-3xl font-display text-gray-text mb-2 lowercase">
+                    <h1 className="text-3xl font-display text-gray-text mb-2 lowercase dark:text-white">
                         {formData.fullName || formData.displayName || email.split('@')[0] || 'user'}
                     </h1>
-                    <p className="text-gray-nav font-extrabold flex items-center gap-2 bg-white px-4 py-1.5 rounded-xl border-2 border-border uppercase text-[11px] tracking-wider">
+                    <p className="text-gray-nav font-extrabold flex items-center gap-2 bg-white px-4 py-1.5 rounded-xl border-2 border-border uppercase text-[11px] tracking-wider dark:bg-zinc-800 dark:text-gray-400">
                         <Mail size={14} />
                         {email}
                     </p>
                 </div>
 
-                {/* Main Settings Grid */}
-                <div className="px-6 sm:px-12 py-12 space-y-12 bg-white">
+                <div className="px-6 sm:px-12 py-12 space-y-12">
                     
-                    {/* Section: Profile Information */}
                     <div className="space-y-8">
                         <div className="flex items-center gap-3 mb-6">
-                             <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-blue border-2 border-border shadow-3d-gray">
+                             <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-blue border-2 border-border shadow-3d-gray dark:bg-zinc-800">
                                  <User size={20} strokeWidth={2.5} />
                              </div>
-                             <h3 className="text-[18px] font-display text-gray-text lowercase">personal information</h3>
+                             <h3 className="text-[18px] font-display text-gray-text lowercase dark:text-white">personal information</h3>
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -266,7 +243,7 @@ export const Account: React.FC = () => {
                                     name="timezone"
                                     value={formData.timezone}
                                     onChange={handleChange}
-                                    className="w-full appearance-none rounded-2xl border-2 border-border bg-white pl-12 pr-5 py-4 text-[15px] font-bold text-gray-text transition-all duration-300 hover:border-blue/30 focus:border-blue focus:outline-none shadow-3d-gray active:shadow-none active:translate-y-[2px]"
+                                    className="w-full appearance-none rounded-2xl border-2 border-border bg-white pl-12 pr-5 py-4 text-[15px] font-bold text-gray-text transition-all duration-300 hover:border-blue/30 focus:border-blue focus:outline-none shadow-3d-gray dark:bg-zinc-800 dark:text-white"
                                 >
                                     <option value="UTC">UTC (Coordinated Universal Time)</option>
                                     <option value="America/New_York">Eastern Time (ET)</option>
@@ -287,23 +264,22 @@ export const Account: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Section: Security */}
                     <div className="space-y-8 pt-12 border-t-2 border-border">
                         <div className="flex items-center gap-3 mb-2">
-                             <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-blue border-2 border-border shadow-3d-gray">
+                             <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-blue border-2 border-border shadow-3d-gray dark:bg-zinc-800">
                                  <Shield size={20} strokeWidth={2.5} />
                              </div>
-                             <h3 className="text-[18px] font-display text-gray-text lowercase">security & login</h3>
+                             <h3 className="text-[18px] font-display text-gray-text lowercase dark:text-white">security & login</h3>
                         </div>
 
-                        <div className="rounded-[32px] border-2 border-border bg-white p-8 shadow-3d-gray">
+                        <div className="rounded-[32px] border-2 border-border bg-white p-8 shadow-3d-gray dark:bg-zinc-900">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-4">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white border-2 border-border text-gray-nav">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white border-2 border-border text-gray-nav dark:bg-zinc-800">
                                         <Key size={20} />
                                     </div>
                                     <div>
-                                        <p className="text-[15px] font-bold text-gray-text">Password</p>
+                                        <p className="text-[15px] font-bold text-gray-text dark:text-white">Password</p>
                                         <p className="text-[12px] font-bold text-gray-nav uppercase">
                                             {lastSignIn ? `Last active: ${new Date(lastSignIn).toLocaleDateString()}` : 'Secure your account'}
                                         </p>
@@ -318,15 +294,15 @@ export const Account: React.FC = () => {
                             
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-4">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white border-2 border-border text-gray-nav">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white border-2 border-border text-gray-nav dark:bg-zinc-800">
                                         <Smartphone size={20} />
                                     </div>
                                     <div>
-                                        <p className="text-[15px] font-bold text-gray-text">2-Factor Auth</p>
+                                        <p className="text-[15px] font-bold text-gray-text dark:text-white">2-Factor Auth</p>
                                         <p className="text-[12px] font-bold text-gray-nav uppercase">Enhanced security</p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/50 backdrop-blur-md border-2 border-border shadow-sm">
+                                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/50 backdrop-blur-md border-2 border-border shadow-sm dark:bg-zinc-800">
                                     <span className="h-1.5 w-1.5 rounded-full bg-gray-nav/40" />
                                     <span className="text-[9px] font-black text-gray-nav uppercase tracking-widest">Coming Soon</span>
                                 </div>
@@ -334,19 +310,18 @@ export const Account: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Section: Danger Zone */}
                     <div className="space-y-8 pt-12 border-t-2 border-border">
                         <div className="flex items-center gap-3 mb-2">
-                             <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-red border-2 border-border shadow-3d-gray">
+                             <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-red border-2 border-border shadow-3d-gray dark:bg-zinc-800">
                                  <AlertTriangle size={20} strokeWidth={2.5} />
                              </div>
                              <h3 className="text-[18px] font-display text-red lowercase">danger zone</h3>
                         </div>
 
-                        <div className="rounded-[32px] border-2 border-red/20 bg-red/5 p-8">
+                        <div className="rounded-[32px] border-2 border-red/20 bg-red/5 p-8 dark:bg-red-500/5">
                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                                 <div>
-                                    <h4 className="text-[16px] font-bold text-gray-text uppercase">Delete Account</h4>
+                                    <h4 className="text-[16px] font-bold text-gray-text uppercase dark:text-white">Delete Account</h4>
                                     <p className="text-[13px] text-gray-light font-medium mt-2 leading-relaxed max-w-sm">
                                         Permanently delete your account and all of your content. This action cannot be undone.
                                     </p>
@@ -366,12 +341,11 @@ export const Account: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Footer Action Bar */}
-                <div className="sticky bottom-0 z-10 flex items-center justify-between border-t-2 border-border bg-white/95 px-4 sm:px-8 py-4 sm:py-6 backdrop-blur-xl gap-3 sm:gap-4">
+                <div className="sticky bottom-0 z-10 flex items-center justify-between border-t-2 border-border bg-white/95 px-4 sm:px-8 py-4 sm:py-6 backdrop-blur-xl gap-3 sm:gap-4 dark:bg-zinc-900/95">
                     <button 
                         type="button" 
                         onClick={handleSignOut}
-                        className="flex items-center justify-center h-12 w-12 sm:w-auto sm:px-4 rounded-xl border-2 border-border bg-white text-gray-nav hover:text-red hover:border-red/30 transition-all shadow-3d-gray active:shadow-none active:translate-y-[2px] group"
+                        className="flex items-center justify-center h-12 w-12 sm:w-auto sm:px-4 rounded-xl border-2 border-border bg-white text-gray-nav hover:text-red hover:border-red/30 transition-all shadow-3d-gray active:shadow-none active:translate-y-[2px] group dark:bg-zinc-800"
                         title="Sign Out"
                     >
                         <LogOut size={20} className="group-hover:scale-110 transition-transform" />
@@ -407,19 +381,18 @@ export const Account: React.FC = () => {
                          </Button>
                     </div>
                 </div>
-
             </form>
         </div>
 
         {/* Delete Confirmation Modal */}
         {showDeleteConfirm && (
-            <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-in fade-in duration-300">
-                <div className="relative w-full max-w-md space-y-6 rounded-[32px] border-2 border-border bg-white p-8 shadow-2xl animate-in zoom-in-95 duration-300">
+            <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-in fade-in duration-300">
+                <div className="relative w-full max-w-md space-y-6 rounded-[32px] border-2 border-border bg-white p-8 shadow-2xl animate-in zoom-in-95 duration-300 dark:bg-zinc-900">
                     <div className="flex flex-col items-center text-center gap-4">
                         <div className="h-16 w-16 rounded-2xl bg-red/10 flex items-center justify-center text-red border-2 border-red/20 shadow-3d-red mb-2">
                              <AlertTriangle size={32} />
                         </div>
-                        <h2 className="text-2xl font-display text-gray-text lowercase">delete everything?</h2>
+                        <h2 className="text-2xl font-display text-gray-text lowercase dark:text-white">delete everything?</h2>
                         <p className="text-[15px] text-gray-light font-medium leading-relaxed">
                             This will permanently wipe all your notes, reflections, and tags. This action <span className="text-red font-bold">cannot be undone</span>.
                         </p>

@@ -57,34 +57,33 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // --- App shell & static assets: Cache-First ---
+  // --- App shell, Static assets & Audio: Cache-First ---
+  const isAudio = url.pathname.endsWith('.mp3') || url.pathname.endsWith('.wav') || url.pathname.endsWith('.m4a') || url.pathname.endsWith('.ogg');
+  const isAudioHost = isSupabase || url.hostname.includes('actions.google.com');
+
   if (
     request.method === 'GET' &&
     (url.origin === self.location.origin ||
       url.hostname.includes('fonts.googleapis.com') ||
       url.hostname.includes('fonts.gstatic.com') ||
-      url.hostname.includes('cdn.quilljs.com'))
+      url.hostname.includes('cdn.quilljs.com') ||
+      (isAudioHost && isAudio)) // Cache audio from Supabase or Google Actions
   ) {
     event.respondWith(
       caches.match(request).then((cached) => {
         if (cached) return cached;
 
-        // Not in cache — fetch, clone, cache, return
         return fetch(request)
           .then((response) => {
-            // Only cache successful, non-opaque responses
-            if (
-              response &&
-              response.status === 200 &&
-              response.type !== 'opaque'
-            ) {
+            // Only cache successful responses. Audio might be opaque if from another CDN,
+            // but Supabase usually allows CORS.
+            if (response && response.status === 200) {
               const cloned = response.clone();
               caches.open(CACHE_NAME).then((cache) => cache.put(request, cloned));
             }
             return response;
           })
           .catch(() => {
-            // Offline fallback: serve index.html for navigation requests
             if (request.mode === 'navigate') {
               return caches.match('/index.html');
             }

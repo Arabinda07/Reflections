@@ -91,14 +91,14 @@ export const AmbientMusicButton: React.FC = () => {
     const handler = (e: MouseEvent) => {
       const target = e.target as Node;
       const isInsideButton = buttonRef.current?.contains(target);
-      const isInsidePopup  = popupRef.current?.contains(target);
+      const isInsidePopup  = popupRef.current?.contains(target) || (target as HTMLElement).closest('.desktop-picker-content');
       
       if (!isInsideButton && !isInsidePopup) {
         setIsOpen(false);
       }
     };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
   }, [isOpen]);
 
   const openPicker = useCallback(() => {
@@ -261,6 +261,7 @@ export const AmbientMusicButton: React.FC = () => {
       <motion.div
         ref={popupRef}
         key="desktop-picker"
+        className="desktop-picker-content"
         initial={{ opacity: 0, y: 10, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 10, scale: 0.95 }}

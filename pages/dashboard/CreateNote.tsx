@@ -928,11 +928,12 @@ Instructions:
               onClick={() => {
                 if (musicPlaying) {
                   stopMusic();
+                  setIsMusicOpen(false);
                 } else {
                   setIsMusicOpen(!isMusicOpen);
                 }
               }}
-              className={`flex items-center gap-2 font-bold uppercase text-[11px] transition-all ${musicPlaying ? 'text-purple-500 bg-purple-500/5' : 'text-gray-nav'}`}
+              className={`flex items-center gap-2 font-bold uppercase text-[11px] transition-all ${musicPlaying ? 'text-purple-500 bg-purple-500/10 dark:bg-purple-500/20' : 'text-gray-nav dark:text-gray-400'}`}
               title="Ambient Sounds"
             >
               <Music size={16} className={musicPlaying ? 'animate-pulse' : ''} />
@@ -950,13 +951,14 @@ Instructions:
                       transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
                       className="music-popup-container pointer-events-auto w-[calc(100%-32px)] sm:w-[240px] liquid-glass-strong sm:fixed relative mb-4 sm:mb-0"
                       style={{
-                        background: 'rgba(255,255,255,0.97)',
+                        background: 'var(--panel-bg, rgba(255,255,255,0.98))',
                         backdropFilter: 'blur(28px)',
                         WebkitBackdropFilter: 'blur(28px)',
-                        border: '1.5px solid rgba(229,229,229,0.9)',
+                        border: '1.5px solid var(--border-color, rgba(229,229,229,0.9))',
                         borderRadius: '24px',
-                        boxShadow: '0 8px 32px -8px rgba(0,0,0,0.16), 0 2px 0 0 #E5E5E5',
+                        boxShadow: '0 8px 32px -8px rgba(0,0,0,0.16)',
                         padding: '16px',
+                        zIndex: 10000,
                         ...(window.innerWidth >= 640 ? {
                           top: musicRef.current ? musicRef.current.getBoundingClientRect().bottom + 12 : 0,
                           left: musicRef.current ? musicRef.current.getBoundingClientRect().left - 80 : 0,
@@ -1012,7 +1014,7 @@ Instructions:
                               <span className="flex flex-col gap-0.5 flex-1 min-w-0">
                                 <span
                                   className="text-[12px] font-black truncate"
-                                  style={{ color: isActive ? track.color : '#27272a' }}
+                                  style={{ color: isActive ? track.color : 'var(--gray-text, #27272a)' }}
                                 >
                                   {track.label}
                                 </span>
