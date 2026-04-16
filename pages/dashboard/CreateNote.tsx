@@ -747,7 +747,8 @@ Instructions:
       }, 600);
     } else {
       // Normal: store target in ref — plane timer will navigate in ~2s
-      navigatePathRef.current = RoutePath.NOTE_DETAIL.replace(':id', noteId);
+      // Navigate to Home so the user lands back on their dashboard
+      navigatePathRef.current = RoutePath.HOME;
     }
   };
 

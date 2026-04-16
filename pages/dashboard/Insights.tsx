@@ -33,7 +33,6 @@ export const Insights: React.FC = () => {
   const navigate = useNavigate();
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
-  const skippedRef = React.useRef(false);
   
   // Freemium States
   const [isPro, setIsPro] = useState(false);
@@ -69,20 +68,8 @@ export const Insights: React.FC = () => {
     fetchData();
   }, []);
 
-  // Early return: show ONLY the animation while loading.
-  // This prevents any flash of page content before the overlay paints.
-  // onSkip lets the user bypass the minimum wait time.
-  if (loading) {
-    return (
-      <AIThinkingState
-        isVisible={true}
-        onSkip={() => {
-          skippedRef.current = true;
-          setLoading(false);
-        }}
-      />
-    );
-  }
+  // We no longer early-return; the page content is always mounted.
+  // AIThinkingState sits as a fixed overlay on top and exits smoothly into the page.
 
   // Soft Aggregation Engine
   const stats = useMemo(() => {
@@ -202,7 +189,11 @@ export const Insights: React.FC = () => {
 
 
   return (
-    <div className="mx-auto max-w-[1000px] animate-in fade-in duration-700 pb-32 px-4 md:px-10">
+    <>
+      {/* Cinematic loading overlay — sits above the page, exits smoothly */}
+      <AIThinkingState isVisible={loading} />
+
+      <div className="mx-auto max-w-[1000px] animate-in fade-in duration-700 pb-32 px-4 md:px-10">
       <nav className="sticky top-4 z-50 mb-16 flex items-center justify-between rounded-2xl border-2 border-border bg-white/90 px-4 py-3 shadow-[0_4px_0_0_#E5E5E5] backdrop-blur-2xl transition-all">
         <div className="flex items-center gap-3">
            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-bold uppercase text-[12px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green">
@@ -413,5 +404,6 @@ export const Insights: React.FC = () => {
 
       <AIThinkingState isVisible={generating} />
     </div>
+    </>
   );
 };
