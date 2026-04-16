@@ -115,7 +115,6 @@ export const AmbientMusicButton: React.FC = () => {
     } else {
       playTrack(track);
     }
-    if (!isMobile()) setIsOpen(false);
   }, [activeTrack, playTrack, stopAll]);
 
   const handleButtonClick = () => {
@@ -224,36 +223,7 @@ export const AmbientMusicButton: React.FC = () => {
     );
   };
 
-  // ─── Volume slider shared UI ───────────────────────────────────────────
-  const renderVolumeSlider = () => (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: '10px',
-      padding: '4px 4px 0',
-    }}>
-      {/* Speaker low icon */}
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-        stroke={labelColor} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-        <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-      </svg>
-      <input
-        type="range"
-        min={0.05} max={0.8} step={0.01}
-        value={volume}
-        onChange={e => setVolume(parseFloat(e.target.value))}
-        style={{ flex: 1, accentColor: activeTrack?.color ?? '#58cc02', cursor: 'pointer' }}
-      />
-      {/* Speaker high icon */}
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-        stroke={labelColor} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-        <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-        <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-      </svg>
-    </div>
-  );
+
 
   // ─── Desktop popup ─────────────────────────────────────────────────────
   const desktopPopup = !isMobile() && isOpen && createPortal(
@@ -313,8 +283,7 @@ export const AmbientMusicButton: React.FC = () => {
           {AMBIENT_TRACKS.map(t => renderTrackRow(t, true))}
         </div>
 
-        {/* Volume slider — only when playing */}
-        {isPlaying && renderVolumeSlider()}
+
       </motion.div>
     </AnimatePresence>,
     document.body
@@ -387,22 +356,7 @@ export const AmbientMusicButton: React.FC = () => {
               {AMBIENT_TRACKS.map(t => renderTrackRow(t, false))}
             </div>
 
-            {/* Volume slider */}
-            {isPlaying && (
-              <div style={{
-                padding: '12px 4px 0',
-                borderTop: `1.5px solid ${trackBorder}`,
-              }}>
-                <span style={{
-                  display: 'block', marginBottom: '10px',
-                  fontFamily: 'Nunito, sans-serif', fontSize: '10px', fontWeight: 900,
-                  textTransform: 'uppercase', letterSpacing: '0.18em', color: sheetTitle,
-                }}>
-                  Volume
-                </span>
-                {renderVolumeSlider()}
-              </div>
-            )}
+
           </motion.div>
         </>
       )}

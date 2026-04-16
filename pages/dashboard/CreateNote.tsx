@@ -216,12 +216,7 @@ export const CreateNote: React.FC = () => {
   const [showPlane, setShowPlane] = useState(false);
   const navigatePathRef = useRef<string | null>(null); // kept for type-safety, no longer drives nav
 
-  const AMBIENT_TRACKS = [
-    { id: 'rain', name: 'Soft Rain', url: 'https://actions.google.com/sounds/v1/weather/rain_heavy_loud.ogg' },
-    { id: 'waves', name: 'Deep Focus', url: 'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg' },
-    { id: 'coffee', name: 'Calm Vibe', url: 'https://actions.google.com/sounds/v1/ambiences/coffee_shop.ogg' }
-  ];
-  
+
   const moodRef = useRef<HTMLDivElement>(null);
   const tagsRef = useRef<HTMLDivElement>(null);
   const musicRef = useRef<HTMLDivElement>(null);
@@ -949,16 +944,8 @@ Instructions:
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 15, scale: 0.95 }}
                       transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-                      className="music-popup-container pointer-events-auto w-[calc(100%-32px)] sm:w-[240px] liquid-glass-strong sm:fixed relative mb-4 sm:mb-0"
+                      className="music-popup-container pointer-events-auto w-[calc(100%-32px)] sm:w-[240px] bg-white/95 dark:bg-[#18181b]/95 border-[1.5px] border-border shadow-[0_8px_32px_-8px_rgba(0,0,0,0.16)] dark:shadow-[0_8px_32px_-8px_rgba(0,0,0,0.6)] backdrop-blur-xl sm:fixed relative mb-4 sm:mb-0 rounded-[24px] p-4 z-[10000]"
                       style={{
-                        background: 'var(--panel-bg, rgba(255,255,255,0.98))',
-                        backdropFilter: 'blur(28px)',
-                        WebkitBackdropFilter: 'blur(28px)',
-                        border: '1.5px solid var(--border-color, rgba(229,229,229,0.9))',
-                        borderRadius: '24px',
-                        boxShadow: '0 8px 32px -8px rgba(0,0,0,0.16)',
-                        padding: '16px',
-                        zIndex: 10000,
                         ...(window.innerWidth >= 640 ? {
                           top: musicRef.current ? musicRef.current.getBoundingClientRect().bottom + 12 : 0,
                           left: musicRef.current ? musicRef.current.getBoundingClientRect().left - 80 : 0,
@@ -1048,20 +1035,6 @@ Instructions:
                         })}
                       </div>
 
-                      {/* Volume slider */}
-                      {musicPlaying && (
-                        <div className="mt-3 pt-3 border-t border-border flex items-center gap-2.5">
-                          <Volume2 size={11} className="text-gray-nav shrink-0" />
-                          <input
-                            type="range"
-                            min={0.05} max={0.8} step={0.01}
-                            value={musicVolume}
-                            onChange={e => setMusicVolume(parseFloat(e.target.value))}
-                            className="flex-1 cursor-pointer"
-                            style={{ accentColor: activeMusicTrack?.color ?? '#818cf8' }}
-                          />
-                        </div>
-                      )}
                     </motion.div>
                   </div>
                 )}

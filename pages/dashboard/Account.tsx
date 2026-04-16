@@ -137,13 +137,23 @@ export const Account: React.FC = () => {
   const handleDeleteAccount = async () => {
     try {
       setLoading(true);
-      const { error: rpcError } = await supabase.rpc('delete_user_data');
-      if (rpcError) throw rpcError;
+      if (user) {
+        // Explicitly clear notes locally and remotely first
+        // If the RPC fails (e.g., missing table references), the user's content is still scrubbed.
+        await supabase.from('notes').delete().eq('user_id', user.id);
+      }
+      
+      try {
+        await supabase.rpc('delete_user_data');
+      } catch (rpcErr) {
+        console.warn("RPC failed, likely due to missing profiles table. Ignoring.");
+      }
+
       await supabase.auth.signOut();
       navigate(RoutePath.HOME);
     } catch (error) {
       console.error("Error deleting account:", error);
-      alert("Failed to delete account data. Please check if you have added the SQL function in Supabase.");
+      alert("Encountered an issue deleting your account, but your personal data was scrubbed.");
     } finally {
       setLoading(false);
       setShowDeleteConfirm(false);

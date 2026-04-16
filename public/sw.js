@@ -47,19 +47,20 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
 
   // --- Never intercept: Supabase API, other external APIs ---
-  const isSupabase = url.hostname.includes('supabase');
+  const isSupabaseStorage = url.hostname.includes('supabase') && url.pathname.includes('/storage/v1/object/public/');
+  const isSupabaseApi = url.hostname.includes('supabase') && !isSupabaseStorage;
   const isGoogleApi = url.hostname.includes('googleapis') && !url.pathname.includes('/css');
   const isCloudFront = url.hostname.includes('cloudfront.net');
   const isEsmSh = url.hostname.includes('esm.sh');
 
-  if (isSupabase || isGoogleApi || isCloudFront || isEsmSh) {
+  if (isSupabaseApi || isGoogleApi || isCloudFront || isEsmSh) {
     // Network-only: always fetch live, never cache
     return;
   }
 
   // --- App shell, Static assets & Audio: Cache-First ---
   const isAudio = url.pathname.endsWith('.mp3') || url.pathname.endsWith('.wav') || url.pathname.endsWith('.m4a') || url.pathname.endsWith('.ogg');
-  const isAudioHost = isSupabase || url.hostname.includes('actions.google.com');
+  const isAudioHost = url.hostname.includes('actions.google.com');
 
   if (
     request.method === 'GET' &&
@@ -67,7 +68,8 @@ self.addEventListener('fetch', (event) => {
       url.hostname.includes('fonts.googleapis.com') ||
       url.hostname.includes('fonts.gstatic.com') ||
       url.hostname.includes('cdn.quilljs.com') ||
-      (isAudioHost && isAudio)) // Cache audio from Supabase or Google Actions
+      (isAudioHost && isAudio) ||
+      isSupabaseStorage) 
   ) {
     event.respondWith(
       caches.match(request).then((cached) => {
