@@ -1,12 +1,15 @@
 <div align="center">
+
 <img width="200" src="https://keordfflghzaicfqsqio.supabase.co/storage/v1/object/public/Assests/icon-1024.png" alt="Reflections Logo" />
 
-#  Reflections
+# Reflections
 
 A calm, AI-powered journaling sanctuary for mental clarity and self-understanding.
 
 No streaks. No pressure. No optimisation loops.  
 Just a quiet space to think, write, and understand yourself.
+
+</div>
 
 ---
 
