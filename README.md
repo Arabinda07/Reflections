@@ -1,6 +1,6 @@
 <div align="center">
+<img width="80" src="https://keordfflghzaicfqsqio.supabase.co/storage/v1/object/public/Assests/icon-1024.png" alt="Reflections Logo" />
 
-<img width="80" src="https://vitejs.dev/logo.svg" alt="Reflections Logo" />
 # 🌿 Reflections
 
 A calm, AI-powered journaling sanctuary for mental clarity and self-understanding.
