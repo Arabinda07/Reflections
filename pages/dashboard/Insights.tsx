@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Sparkles, Brain, Calendar, CheckSquare, Heart, Lock, TrendingUp, Loader2, MessageSquare, Crown } from 'lucide-react';
-import { motion } from 'motion/react';
+import { ArrowLeft, Sparkles, Brain, Calendar, CheckSquare, Heart, Lock, TrendingUp, Loader2, MessageSquare, Crown, Book, ChevronRight, Hash, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '../../components/ui/Button';
-import { RoutePath, Note } from '../../types';
+import { RoutePath, Note, LifeTheme } from '../../types';
 import { noteService } from '../../services/noteService';
 import { GoogleGenAI } from "@google/genai";
 import { supabase } from '../../src/supabaseClient';
 import { LoadingState } from '../../components/ui/LoadingState';
 import { AIThinkingState } from '../../components/ui/AIThinkingState';
+import { wikiService } from '../../services/wikiService';
 
 // Flat soft colors — no gradients
 const MOOD_COLORS: Record<string, string> = {
@@ -37,7 +38,8 @@ export const Insights: React.FC = () => {
   // Freemium States
   const [isPro, setIsPro] = useState(false);
   const [reflectionsUsed, setReflectionsUsed] = useState(0);
-  const [reflectionText, setReflectionText] = useState<string>("");
+  const [themes, setThemes] = useState<LifeTheme[]>([]);
+  const [selectedTheme, setSelectedTheme] = useState<LifeTheme | null>(null);
   const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
@@ -46,13 +48,15 @@ export const Insights: React.FC = () => {
       const minTimePromise = new Promise(resolve => setTimeout(resolve, 7000));
       
       try {
-        const [allNotes, userResponse] = await Promise.all([
+        const [allNotes, userResponse, allThemes] = await Promise.all([
           noteService.getAll(),
           supabase.auth.getUser(),
+          wikiService.getAllThemes(),
           minTimePromise
         ]);
         
         setNotes(allNotes);
+        setThemes(allThemes);
         
         if (userResponse.data.user) {
           const meta = userResponse.data.user.user_metadata || {};
@@ -133,53 +137,10 @@ export const Insights: React.FC = () => {
   }, [notes]);
 
   const handleGenerateReflection = async () => {
-    setGenerating(true);
-    
-    // Create a promise that resolves after 7 seconds for the "Joy" factor
-    const minTimePromise = new Promise(resolve => setTimeout(resolve, 7000));
-    
-    try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
-      const notesContext = notes
-        .slice(0, 15) // Context window
-        .map(n => `Title: ${n.title}\nContent: ${n.content.replace(/<[^>]*>/g, '')}\nMood: ${n.mood || 'None'}`)
-        .join('\n\n---\n\n');
-
-      const prompt = `You are a grounding journaling assistant. Review the user's recent entries and provide 1-2 short paragraphs with concrete observations from their notes. Offer one gentle takeaway or question. Do not use process narration, meta-framing, or attempt to be profound. Just reflect what you see directly.
-
-      Recent Notes:
-      ${notesContext}`;
-
-      const generatePromise = ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt
-      });
-
-      // Wait for BOTH the AI and the 7-second animation timer to complete
-      const [response] = await Promise.all([generatePromise, minTimePromise]);
-      
-      if (response.text) {
-        setReflectionText(response.text);
-        
-        // Monetization trigger
-        if (!isPro) {
-          const newUsed = reflectionsUsed + 1;
-          setReflectionsUsed(newUsed);
-          
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user) {
-            await supabase.auth.updateUser({
-              data: { reflections_used: newUsed }
-            });
-          }
-        }
-      }
-    } catch (error: any) {
-      console.error("AI deep reflection failed:", error);
-      alert(`Error generating reflection: ${error?.message || "Please check your GEMINI_API_KEY or connection."}`);
-    } finally {
-      setGenerating(false);
-    }
+    // Note: We are migrating towards incremental background ingestion.
+    // For now, this button can act as a "Force Sync" or a trigger for a global audit
+    // but the actual Wiki is populated primarily through Note Saves.
+    navigate(RoutePath.CREATE_NOTE); // Encourage writing to grow the wiki
   };
 
   const isFreeAvailable = !isPro && reflectionsUsed === 0;
@@ -317,90 +278,130 @@ export const Insights: React.FC = () => {
         </div>
       </div>
 
-      {/* PREMIUM AI REFLECTION CONTAINER */}
-      <div className="relative w-full overflow-hidden bg-white border-2 border-border rounded-[32px] p-6 shadow-[0_6px_0_0_#E5E5E5] liquid-glass mb-16">
-        <div className="mb-8 flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
-          <div className="flex items-start gap-5">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[24px] bg-blue/5 text-blue border-2 border-border/50 shadow-3d-gray">
-              <Sparkles size={28} />
+      {/* LLM WIKI / LIFE THEME LIBRARY */}
+      <div className="relative w-full overflow-hidden bg-white border-2 border-border rounded-[32px] p-8 shadow-[0_6px_0_0_#E5E5E5] liquid-glass mb-16">
+        <div className="mb-10 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-5">
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[24px] bg-green/5 text-green border-2 border-green/10 shadow-sm">
+              <Book size={28} />
             </div>
             <div>
-              <div className="flex flex-wrap items-center gap-3">
-                <h2 className="text-3xl font-display text-gray-text lowercase tracking-tight">Deep Reflection</h2>
-                {isPro ? (
-                  <div className="inline-flex items-center gap-1.5 rounded-full border-2 border-amber-200 bg-amber-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-amber-600">
-                    <Crown size={12} /> PRO
-                  </div>
-                ) : (
-                  <div className="inline-flex items-center gap-1.5 rounded-full border-2 border-border bg-gray-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-blue">
-                    <Sparkles size={12} /> 1 Free Reflection
-                  </div>
-                )}
-              </div>
-
+              <h2 className="text-3xl font-display text-gray-text lowercase tracking-tight">Personal Life Wiki</h2>
+              <p className="text-[14px] text-gray-light font-medium">Compiled from {notes.length} reflections</p>
             </div>
           </div>
-
-          <div className="flex flex-wrap gap-2">
+          
+          <div className="flex items-center gap-3">
+            <div className="px-3 py-1 bg-blue/5 border border-blue/10 rounded-full text-[10px] font-black uppercase text-blue">
+               Compounding Insights
+            </div>
           </div>
         </div>
 
-        <div className="mb-0 p-0 rounded-[24px]">
-          {reflectionText ? (
-            <div className="mb-8 p-6 border-2 border-border bg-gray-50/50 dark:border-white/10 dark:bg-white/5 rounded-[24px]">
-              <div
-                className="prose prose-lg max-w-none text-gray-text leading-loose font-sans font-medium dark:prose-invert dark:text-slate-100"
-                dangerouslySetInnerHTML={{ __html: reflectionText.replace(/\n\n/g, '<br/><br/>') }}
-              />
-            </div>
-          ) : isPremiumLocked ? (
-            <div className="mb-8 p-6 text-center py-10 border-2 border-border bg-gray-50/50 dark:border-white/10 dark:bg-white/5 rounded-[24px]">
-              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-border bg-white text-gray-nav shadow-sm dark:border-white/10 dark:bg-white/6 dark:text-slate-300">
-                <Lock size={18} />
-              </div>
-              <p className="text-[17px] font-display lowercase text-gray-text dark:text-slate-50">
-                your first deep reflection has been used
-              </p>
-              <p className="mt-3 max-w-xl mx-auto text-[14px] font-medium leading-relaxed text-gray-light dark:text-slate-400">
-                Upgrade to Pro to continuously map your emotional themes and patterns.
-              </p>
-            </div>
-          ) : null}
-        </div>
-
-        <div className="flex justify-center">
-          {isPremiumLocked || (reflectionText && !isPro) ? (
-            <Button
-              variant={reflectionText && !isPro ? 'secondary' : 'primary'}
-              size="lg"
-              className="w-full sm:w-auto rounded-2xl border-2 border-border px-8 text-[14px] uppercase font-black"
-              onClick={() => {/* Trigger Paywall */}}
-            >
-              <Crown size={18} className="mr-2" />
-              {reflectionText && !isPro ? 'UNLOCK MORE REFLECTIONS' : 'UPGRADE TO PRO'}
-            </Button>
-          ) : (
-            <Button
-              variant="primary"
-              size="lg"
-              className="w-full sm:w-auto rounded-2xl border-2 border-border shadow-3d-gray px-8 text-[14px] uppercase font-black"
-              onClick={handleGenerateReflection}
-              isLoading={generating}
-              disabled={!hasEnoughNotes}
-            >
-              {!hasEnoughNotes ? (
-                <><MessageSquare size={18} className="mr-2" /> WRITE 3 NOTES TO UNLOCK</>
-              ) : reflectionText && isPro ? (
-                <><Sparkles size={18} className="mr-2" /> GENERATE REFLECTION</>
-              ) : isFreeAvailable ? (
-                <><Sparkles size={18} className="mr-2" /> GENERATE REFLECTION</>
-              ) : (
-                <><Sparkles size={18} className="mr-2" /> GENERATE REFLECTION</>
-              )}
-            </Button>
-          )}
-        </div>
+        {themes.length === 0 ? (
+          <div className="text-center py-20 border-2 border-dashed border-border rounded-[24px] bg-gray-50/30">
+             <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-gray-nav shadow-sm mb-4">
+                <Sparkles size={18} />
+             </div>
+             <p className="font-display lowercase text-gray-text text-xl">your wiki is being built.</p>
+             <p className="mt-2 text-gray-light text-[14px] max-w-sm mx-auto">As you journal, the AI librarian will automatically identify and update recurring themes in your life here.</p>
+             <Button 
+               variant="ghost" 
+               className="mt-6 text-[11px] font-black uppercase tracking-widest"
+               onClick={() => navigate(RoutePath.CREATE_NOTE)}
+             >
+                WRITE YOUR FIRST ENTRY
+             </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {themes.map(theme => (
+              <motion.div
+                key={theme.id}
+                whileHover={{ y: -4 }}
+                onClick={() => setSelectedTheme(theme)}
+                className="group cursor-pointer p-6 bg-white border-2 border-border rounded-[24px] shadow-sm hover:shadow-md hover:border-green/30 transition-all flex flex-col justify-between h-[180px]"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav">Life Theme</span>
+                    <Hash size={14} className="text-gray-light opacity-50" />
+                  </div>
+                  <h3 className="text-xl font-display text-gray-text lowercase line-clamp-2 leading-tight group-hover:text-green transition-colors">
+                    {theme.title}
+                  </h3>
+                </div>
+                
+                <div className="flex items-center justify-between mt-4">
+                  <span className="text-[11px] font-medium text-gray-light">
+                    Updated {new Date(theme.updatedAt).toLocaleDateString()}
+                  </span>
+                  <div className="h-8 w-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-green group-hover:text-white transition-all">
+                    <ChevronRight size={16} />
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
+
+      {/* THEME DETAIL MODAL / SLIDE OVER */}
+      <AnimatePresence>
+        {selectedTheme && (
+          <div className="fixed inset-0 z-[10001] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedTheme(null)}
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="relative w-full max-w-2xl max-h-[85vh] overflow-hidden bg-white rounded-[32px] border-2 border-border shadow-2xl flex flex-col"
+            >
+              <div className="sticky top-0 z-10 p-6 border-b border-border bg-white flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-2xl bg-green/10 text-green flex items-center justify-center">
+                    <Book size={20} />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-display text-gray-text lowercase leading-none">{selectedTheme.title}</h3>
+                    <p className="text-[11px] font-black tracking-widest uppercase text-gray-nav mt-1.5 flex items-center gap-2">
+                       Personal Wiki Entry <span className="h-1 w-1 rounded-full bg-border" /> Updated {new Date(selectedTheme.updatedAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setSelectedTheme(null)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X size={20} className="text-gray-nav" />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-8 font-sans">
+                <div 
+                  className="prose prose-slate max-w-none text-gray-text leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: selectedTheme.content.replace(/\n\n/g, '<br/><br/>') }}
+                />
+              </div>
+
+              <div className="p-6 border-t border-border bg-gray-50 flex items-center justify-between">
+                <p className="text-[12px] text-gray-light font-medium italic">
+                  This page evolves as you write more reflections.
+                </p>
+                <Button size="sm" variant="ghost" className="text-[11px] font-black tracking-widest" onClick={() => setSelectedTheme(null)}>
+                  CLOSE ENTRY
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       <AIThinkingState isVisible={generating} />
     </div>

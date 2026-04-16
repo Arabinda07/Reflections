@@ -12,12 +12,12 @@ import { RoutePath, NoteAttachment, Task } from '../../types';
 import { supabase } from '../../src/supabaseClient';
 import { StorageImage } from '../../components/ui/StorageImage';
 import { GoogleGenAI, Type } from "@google/genai";
-import { BreathingGate } from '../../components/wellness/BreathingGate';
 import { LoadingState } from '../../components/ui/LoadingState';
 import { CompanionObservation } from '../../components/ui/CompanionObservation';
 import { PaperPlaneToast } from '../../components/ui/PaperPlaneToast';
 import { observationService } from '../../services/observationService';
 import { DEFAULT_WELLNESS_PROMPTS, getCurrentWellnessPrompt, getNextWellnessPromptState } from '../../services/wellnessPrompts';
+import { aiService } from '../../services/aiService';
 
 // Custom debounce function to avoid CommonJS import issues
 function debounce<T extends (...args: any[]) => any>(
@@ -171,7 +171,7 @@ export const CreateNote: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   
   // New UI states
-  const [isBreathing, setIsBreathing] = useState(!id);
+  const [isBreathing, setIsBreathing] = useState(false);
   const [isReleasing, setIsReleasing] = useState(false);
   const [promptIndex, setPromptIndex] = useState(0);
 
@@ -697,11 +697,16 @@ Instructions:
         attachments: [...existingAttachments, ...uploadedAttachments]
       });
 
-      if (!isUnmounted.current) {
-        if (!id) (window as any)._lastCreatedNoteId = noteId;
-        savedNoteId = noteId;
-        saveSucceeded = true;
-      }
+        if (!isUnmounted.current) {
+          if (!id) (window as any)._lastCreatedNoteId = noteId;
+          savedNoteId = noteId;
+          saveSucceeded = true;
+          
+          // Trigger the LLM Wiki Ingestion in the background (fire and forget)
+          // We fetch the full note object to ensure the AI has context
+          const currentNoteForAi = { id: noteId, title, content, tags, mood, tasks, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+          aiService.processNoteIntoWiki(currentNoteForAi).catch(e => console.error("Wiki ingestion background error:", e));
+        }
 
     } catch (error: any) {
       if (isUnmounted.current) return;
@@ -879,7 +884,7 @@ Instructions:
 
   return (
     <>
-      <BreathingGate active={isBreathing} durationMs={3600} onComplete={handleBreathingComplete} />
+
       <CompanionObservation 
         isVisible={showObservation} 
         text={observationText || ""} 
@@ -891,7 +896,7 @@ Instructions:
         }} 
       />
       {limitReachedOverlay}
-      <div className={`mx-auto max-w-[1180px] transition-opacity duration-1000 ${isBreathing ? 'opacity-0 pointer-events-none' : 'opacity-100 animate-in fade-in duration-500'} pb-20 px-3 sm:px-4 md:px-6`}>
+      <div className="mx-auto max-w-[1180px] animate-in fade-in duration-500 pb-20 px-3 sm:px-4 md:px-6">
         <nav className={`sticky top-4 z-50 mb-8 flex items-center justify-between gap-2 rounded-2xl border-2 border-border bg-white/90 px-3 py-2 sm:px-4 sm:py-3 shadow-[0_4px_0_0_#E5E5E5] backdrop-blur-2xl transition-all duration-500 dark:bg-[#17171b]/90 dark:shadow-[0_4px_0_0_rgba(15,23,42,0.55)] ${isDimmed ? 'opacity-40 hover:opacity-100' : 'opacity-100'}`}>
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-bold uppercase text-[12px] px-2 sm:px-3">

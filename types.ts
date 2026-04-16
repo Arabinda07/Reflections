@@ -26,6 +26,24 @@ export interface Note {
   tasks?: Task[];
 }
 
+export interface LifeTheme {
+  id: string;
+  userId: string;
+  title: string;
+  content: string;
+  state: 'active' | 'archived' | 'resolved';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ThemeCitation {
+  id: string;
+  userId: string;
+  themeId: string;
+  noteId: string;
+  createdAt: string;
+}
+
 export interface User {
   id: string;
   name: string;
