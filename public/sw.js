@@ -2,7 +2,7 @@
 // Strategy: Cache-First for app shell, Network-First for API/Supabase
 // ─────────────────────────────────────────────────────────────────────
 
-const CACHE_NAME = 'reflections-shell-v2';
+const CACHE_NAME = 'reflections-shell-v3';
 
 // Core app shell files to cache on install
 const SHELL_ASSETS = [
@@ -58,27 +58,52 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // --- App shell, Static assets & Audio: Cache-First ---
+  // --- App shell, Static assets & Audio ---
   const isAudio = url.pathname.endsWith('.mp3') || url.pathname.endsWith('.wav') || url.pathname.endsWith('.m4a') || url.pathname.endsWith('.ogg');
   const isAudioHost = url.hostname.includes('actions.google.com');
 
-  if (
-    request.method === 'GET' &&
-    (url.origin === self.location.origin ||
+  const isSameOrigin = url.origin === self.location.origin;
+  const isStaticMedia = 
       url.hostname.includes('fonts.googleapis.com') ||
       url.hostname.includes('fonts.gstatic.com') ||
       url.hostname.includes('cdn.quilljs.com') ||
       (isAudioHost && isAudio) ||
-      isSupabaseStorage) 
-  ) {
+      isSupabaseStorage;
+
+  if (request.method !== 'GET') return;
+
+  // 1. Network-First for App Code (Prevents stale UI trapping)
+  if (isSameOrigin) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const cloned = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, cloned));
+          }
+          return response;
+        })
+        .catch(async () => {
+          // Fallback to cache if network is thoroughly disconnected
+          const cachedResponse = await caches.match(request);
+          if (cachedResponse) return cachedResponse;
+          
+          if (request.mode === 'navigate') {
+            return caches.match('/index.html');
+          }
+        })
+    );
+    return;
+  }
+
+  // 2. Cache-First for Static Assets (Fonts, Ambient Audio, Attachments)
+  if (isStaticMedia) {
     event.respondWith(
       caches.match(request).then((cached) => {
         if (cached) return cached;
 
         return fetch(request)
           .then((response) => {
-            // Only cache successful responses. Audio might be opaque if from another CDN,
-            // but Supabase usually allows CORS.
             if (response && response.status === 200) {
               const cloned = response.clone();
               caches.open(CACHE_NAME).then((cache) => cache.put(request, cloned));
@@ -86,9 +111,7 @@ self.addEventListener('fetch', (event) => {
             return response;
           })
           .catch(() => {
-            if (request.mode === 'navigate') {
-              return caches.match('/index.html');
-            }
+            // Fails silently if offline
           });
       })
     );
