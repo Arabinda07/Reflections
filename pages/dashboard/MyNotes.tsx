@@ -368,11 +368,7 @@ export const MyNotes: React.FC = () => {
              )}
           </div>
       )}
-      {loading && (
-        <div className="flex flex-1 items-center justify-center py-20">
-          <Loader2 className="h-10 w-10 text-blue animate-spin opacity-20" />
-        </div>
-      )}
+      <LoadingState isVisible={loading} message="gathering your thoughts..." />
     </div>
   );
 };

@@ -193,7 +193,7 @@ export const Account: React.FC = () => {
                                 </div>
                              )}
                         </div>
-                        <button type="button" className="absolute bottom-1 right-1 flex h-10 w-10 items-center justify-center rounded-full bg-white text-gray-text border-2 border-border shadow-3d-gray transition-all hover:scale-110 hover:text-blue dark:bg-zinc-800 dark:text-white">
+                        <button type="button" className="absolute bottom-1 right-1 flex h-10 w-10 items-center justify-center rounded-full bg-white text-gray-text border-2 border-border shadow-3d-gray transition-all hover:scale-110 hover:text-blue dark:bg-zinc-800 dark:text-zinc-100">
                             <Camera size={18} />
                         </button>
                         <input 
@@ -205,7 +205,7 @@ export const Account: React.FC = () => {
                         />
                     </div>
 
-                    <h1 className="text-3xl font-display text-gray-text mb-2 lowercase dark:text-white">
+                    <h1 className="text-3xl font-display text-gray-text mb-2 lowercase dark:text-zinc-100">
                         {formData.fullName || formData.displayName || email.split('@')[0] || 'user'}
                     </h1>
                     <p className="text-gray-nav font-extrabold flex items-center gap-2 bg-white px-4 py-1.5 rounded-xl border-2 border-border uppercase text-[11px] tracking-wider dark:bg-zinc-800 dark:text-gray-400">
@@ -221,7 +221,7 @@ export const Account: React.FC = () => {
                              <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-blue border-2 border-border shadow-3d-gray dark:bg-zinc-800">
                                  <User size={20} strokeWidth={2.5} />
                              </div>
-                             <h3 className="text-[18px] font-display text-gray-text lowercase dark:text-white">personal information</h3>
+                             <h3 className="text-[18px] font-display text-gray-text lowercase dark:text-zinc-100">personal information</h3>
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -253,7 +253,7 @@ export const Account: React.FC = () => {
                                     name="timezone"
                                     value={formData.timezone}
                                     onChange={handleChange}
-                                    className="w-full appearance-none rounded-2xl border-2 border-border bg-white pl-12 pr-5 py-4 text-[15px] font-bold text-gray-text transition-all duration-300 hover:border-blue/30 focus:border-blue focus:outline-none shadow-3d-gray dark:bg-zinc-800 dark:text-white"
+                                    className="w-full appearance-none rounded-2xl border-2 border-border bg-white pl-12 pr-5 py-4 text-[15px] font-bold text-gray-text transition-all duration-300 hover:border-blue/30 focus:border-blue focus:outline-none shadow-3d-gray dark:bg-zinc-800 dark:text-zinc-100"
                                 >
                                     <option value="UTC">UTC (Coordinated Universal Time)</option>
                                     <option value="America/New_York">Eastern Time (ET)</option>
@@ -279,7 +279,7 @@ export const Account: React.FC = () => {
                              <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-blue border-2 border-border shadow-3d-gray dark:bg-zinc-800">
                                  <Shield size={20} strokeWidth={2.5} />
                              </div>
-                             <h3 className="text-[18px] font-display text-gray-text lowercase dark:text-white">security & login</h3>
+                             <h3 className="text-[18px] font-display text-gray-text lowercase dark:text-zinc-100">security & login</h3>
                         </div>
 
                         <div className="rounded-[32px] border-2 border-border bg-white p-8 shadow-3d-gray dark:bg-zinc-900">
@@ -289,7 +289,7 @@ export const Account: React.FC = () => {
                                         <Key size={20} />
                                     </div>
                                     <div>
-                                        <p className="text-[15px] font-bold text-gray-text dark:text-white">Password</p>
+                                        <p className="text-[15px] font-bold text-gray-text dark:text-zinc-100">Password</p>
                                         <p className="text-[12px] font-bold text-gray-nav uppercase">
                                             {lastSignIn ? `Last active: ${new Date(lastSignIn).toLocaleDateString()}` : 'Secure your account'}
                                         </p>
@@ -308,7 +308,7 @@ export const Account: React.FC = () => {
                                         <Smartphone size={20} />
                                     </div>
                                     <div>
-                                        <p className="text-[15px] font-bold text-gray-text dark:text-white">2-Factor Auth</p>
+                                        <p className="text-[15px] font-bold text-gray-text dark:text-zinc-100">2-Factor Auth</p>
                                         <p className="text-[12px] font-bold text-gray-nav uppercase">Enhanced security</p>
                                     </div>
                                 </div>
@@ -331,7 +331,7 @@ export const Account: React.FC = () => {
                         <div className="rounded-[32px] border-2 border-red/20 bg-red/5 p-8 dark:bg-red-500/5">
                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                                 <div>
-                                    <h4 className="text-[16px] font-bold text-gray-text uppercase dark:text-white">Delete Account</h4>
+                                    <h4 className="text-[16px] font-bold text-gray-text uppercase dark:text-zinc-100">Delete Account</h4>
                                     <p className="text-[13px] text-gray-light font-medium mt-2 leading-relaxed max-w-sm">
                                         Permanently delete your account and all of your content. This action cannot be undone.
                                     </p>
@@ -402,7 +402,7 @@ export const Account: React.FC = () => {
                         <div className="h-16 w-16 rounded-2xl bg-red/10 flex items-center justify-center text-red border-2 border-red/20 shadow-3d-red mb-2">
                              <AlertTriangle size={32} />
                         </div>
-                        <h2 className="text-2xl font-display text-gray-text lowercase dark:text-white">delete everything?</h2>
+                        <h2 className="text-2xl font-display text-gray-text lowercase dark:text-zinc-100">delete everything?</h2>
                         <p className="text-[15px] text-gray-light font-medium leading-relaxed">
                             This will permanently wipe all your notes, reflections, and tags. This action <span className="text-red font-bold">cannot be undone</span>.
                         </p>

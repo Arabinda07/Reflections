@@ -31,26 +31,7 @@ function debounce<T extends (...args: any[]) => any>(
   };
 }
 
-// ── Soft audio & haptic feedback ─────────────────────────────────────────
-// Generates an 880 Hz sine tone (≈ 75ms) that mimics a soft wooden tap.
-// Called inside click handlers (user-gesture context) so AudioContext is allowed.
-function playSoftClick() {
-  try {
-    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-    if (!AudioCtx) return;
-    const ctx = new AudioCtx();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.type = 'sine';
-    osc.frequency.value = 880;
-    gain.gain.setValueAtTime(0.07, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.075);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.075);
-  } catch {}
-}
+// ── Hardcoded Haptics ONLY per User Request ───────────────────────────────
 
 const apiKey = typeof process !== 'undefined' && process.env.GEMINI_API_KEY 
   ? process.env.GEMINI_API_KEY 
@@ -197,7 +178,9 @@ export const CreateNote: React.FC = () => {
   const [isMoodOpen, setIsMoodOpen] = useState(false);
   const [isTagsOpen, setIsTagsOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-  const [isZenMode, setIsZenMode] = useState(false);
+  const [isFlowing, setIsFlowing] = useState(false);
+  const [isTasksOpen, setIsTasksOpen] = useState(false);
+  const flowTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
   
   // Mindful Features States
@@ -304,6 +287,43 @@ export const CreateNote: React.FC = () => {
       isUnmounted.current = true;
     };
   }, []);
+
+  // Flow State (Auto-fade) mechanics
+  useEffect(() => {
+    const handleWake = () => {
+      if (flowTimeoutRef.current) clearTimeout(flowTimeoutRef.current);
+      if (isFlowing) setIsFlowing(false);
+    };
+
+    const handleKeydown = (e: KeyboardEvent) => {
+      if (!isFocused) return;
+      if (e.key === 'Escape') {
+        handleWake();
+        return;
+      }
+      
+      // Enter Flow State on typable keys or interactions
+      if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') {
+        setIsFlowing(true);
+        if (flowTimeoutRef.current) clearTimeout(flowTimeoutRef.current);
+        flowTimeoutRef.current = setTimeout(() => {
+          setIsFlowing(false);
+        }, 3000);
+      }
+    };
+
+    // Global desktop/mobile wake listeners
+    window.addEventListener('keydown', handleKeydown);
+    window.addEventListener('mousemove', handleWake);
+    window.addEventListener('touchstart', handleWake, { passive: true });
+
+    return () => {
+      window.removeEventListener('keydown', handleKeydown);
+      window.removeEventListener('mousemove', handleWake);
+      window.removeEventListener('touchstart', handleWake);
+      if (flowTimeoutRef.current) clearTimeout(flowTimeoutRef.current);
+    };
+  }, [isFocused, isFlowing]);
 
   const handleBreathingComplete = useCallback(() => {
     setIsBreathing(false);
@@ -630,7 +650,6 @@ Instructions:
 
   const handleSave = async () => {
     if (!title.trim() && !content.trim()) return;
-    playSoftClick();
     navigator.vibrate?.(10);
     setSaving(true);
 
@@ -755,6 +774,7 @@ Instructions:
   };
 
   const toggleTask = (taskId: string) => {
+    navigator.vibrate?.([10, 50, 10]);
     setTasks(tasks.map(t => {
       if (t.id === taskId) {
         const newCompleted = !t.completed;
@@ -855,7 +875,7 @@ Instructions:
   const wordCount = content.replace(/<[^>]*>/g, '').trim().split(/\s+/).filter(Boolean).length;
   const canReflect = wordCount >= 100;
 
-  const isDimmed = isZenMode;
+  const isDimmed = isFlowing;
 
   return (
     <>
@@ -887,22 +907,6 @@ Instructions:
         </div>
         
         <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto no-scrollbar min-w-0">
-          {/* Focus button: always visible on desktop; on mobile, only shows when writing */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => { playSoftClick(); navigator.vibrate?.(8); setIsZenMode(!isZenMode); }}
-            className={`${
-              hasContent ? 'flex' : 'hidden sm:flex'
-            } items-center gap-2 font-bold uppercase text-[11px] transition-all shrink-0 ${
-              isZenMode ? 'text-blue bg-blue/5' : 'text-gray-nav'
-            }`}
-            title={isZenMode ? "Exit Zen Mode" : "Enter Zen Mode"}
-          >
-            {isZenMode ? <Eye size={16} /> : <EyeOff size={16} />}
-            <span className="hidden sm:inline">Zen</span>
-          </Button>
-
           {/* Whisper Mode Button */}
           <Button
             variant="ghost"
@@ -975,7 +979,6 @@ Instructions:
                             <button
                               key={track.id}
                               onClick={() => {
-                                playSoftClick();
                                 navigator.vibrate?.(6);
                                 if (isActive) { stopMusic(); }
                                 else { playMusicTrack(track); }
@@ -1392,38 +1395,76 @@ Instructions:
                 </div>
 
                 {/* Tasks Section */}
-                <div className={`mt-12 border-t-2 border-border pt-8 transition-all duration-500 ${isDimmed ? 'opacity-30 hover:opacity-100' : 'opacity-100'}`}>
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-[12px] font-extrabold text-gray-text uppercase tracking-widest flex items-center gap-2">
-                      <ListTodo size={16} className="text-blue" />
-                      Actionable Tasks
-                    </h3>
+                <div className={`mt-12 border-t-2 border-border pt-6 transition-all duration-500 ${isDimmed ? 'opacity-10 sm:opacity-20 hover:opacity-100' : 'opacity-100'}`}>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                     <button 
-                      onClick={addTask}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 border-blue/20 bg-blue/5 text-blue text-[10px] font-black uppercase tracking-widest hover:bg-blue/10 transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]"
+                      onClick={() => setIsTasksOpen(!isTasksOpen)}
+                      className="flex items-center gap-3 group text-left w-full sm:w-auto"
                     >
-                      <Plus size={14} />
-                      Add Task
+                      <div className={`flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-300 ${isTasksOpen ? 'bg-blue text-white shadow-[0_2px_10px_rgba(28,176,246,0.2)]' : 'bg-gray-50 text-gray-nav dark:bg-white/5'}`}>
+                        <ListTodo size={16} />
+                      </div>
+                      <h3 className="text-[13px] font-extrabold text-gray-text uppercase tracking-widest transition-colors group-hover:text-blue dark:text-zinc-100 flex-1">
+                        Actionable Tasks {tasks.length > 0 && !isTasksOpen && <span className="ml-2 px-2 py-0.5 rounded-full bg-blue/10 text-blue text-[10px]">{tasks.length}</span>}
+                      </h3>
+                      <ChevronRight size={16} className={`text-gray-nav transition-transform duration-300 ${isTasksOpen ? 'rotate-90 text-blue' : ''}`} />
                     </button>
+                    
+                    <AnimatePresence>
+                      {isTasksOpen && (
+                        <motion.button 
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.95 }}
+                          transition={{ duration: 0.2 }}
+                          onClick={addTask}
+                          className="flex justify-center items-center gap-1.5 w-full sm:w-auto px-4 py-2.5 sm:px-3 sm:py-1.5 rounded-[14px] sm:rounded-xl border-2 border-blue/20 bg-blue/5 text-blue text-[12px] sm:text-[10px] font-black uppercase tracking-widest hover:bg-blue/10 transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]"
+                        >
+                          <Plus size={14} />
+                          Add Task
+                        </motion.button>
+                      )}
+                    </AnimatePresence>
                   </div>
 
-                  <div className="space-y-3">
-                    {tasks.length === 0 ? (
-                      <div className="p-8 rounded-3xl border-2 border-dashed border-border dark:border-white/10 bg-gray-50/50 dark:bg-white/5 text-center">
-                        <p className="text-[13px] font-bold text-gray-nav uppercase tracking-widest opacity-40">No tasks added yet</p>
-                      </div>
-                    ) : (
-                      tasks.map((task) => (
-                        <TaskRow
-                          key={task.id} 
-                          task={task}
-                          updateTask={updateTask}
-                          toggleTask={toggleTask}
-                          removeTask={removeTask}
-                        />
-                      ))
+                  <AnimatePresence>
+                    {isTasksOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        className="overflow-hidden"
+                      >
+                        <div className="flex flex-col gap-3 sm:gap-4 pt-2 pb-4">
+                          {tasks.length === 0 ? (
+                            <div className="text-center py-6 px-4 bg-gray-50 dark:bg-white/5 rounded-2xl border-2 border-dashed border-border dark:border-white/10">
+                              <p className="text-[13px] font-bold text-gray-nav mb-2">No tasks added yet</p>
+                              <p className="text-[11px] font-semibold text-gray-light max-w-[200px] mx-auto leading-relaxed">
+                                Write down follow-up actions or gentle reminders from today's entry.
+                              </p>
+                              <button 
+                                onClick={addTask}
+                                className="mt-4 text-blue text-[11px] font-black uppercase tracking-widest hover:underline"
+                              >
+                                + Create your first task
+                              </button>
+                            </div>
+                          ) : (
+                            tasks.map((task) => (
+                              <TaskRow
+                                key={task.id} 
+                                task={task}
+                                updateTask={updateTask}
+                                toggleTask={toggleTask}
+                                removeTask={removeTask}
+                              />
+                            ))
+                          )}
+                        </div>
+                      </motion.div>
                     )}
-                  </div>
+                  </AnimatePresence>
                 </div>
 
                 {aiReflection && (
@@ -1556,7 +1597,7 @@ Instructions:
         </motion.div>
         )}
       </AnimatePresence>
-      <LoadingState isVisible={loading} />
+      <LoadingState isVisible={loading} message="revisiting your thoughts..." />
       <PaperPlaneToast
         isVisible={showPlane}
         onAnimationComplete={handlePlaneAnimationComplete}

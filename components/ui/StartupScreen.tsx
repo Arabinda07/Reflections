@@ -53,12 +53,11 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
               style={{
                 fontFamily: 'Nunito, sans-serif',
                 fontSize: '20px',
-                color: '#4b4b4b',
-                opacity: 0.75,
                 letterSpacing: '-0.02em',
                 textTransform: 'lowercase',
                 fontWeight: 700,
               }}
+              className="text-gray-text opacity-75 dark:text-zinc-100"
             >
               reflections
             </span>

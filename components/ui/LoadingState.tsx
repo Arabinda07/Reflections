@@ -6,8 +6,6 @@ import { motion, AnimatePresence } from 'motion/react';
 const BRAND_WORDMARK_STYLE: React.CSSProperties = {
   fontFamily: 'Nunito, sans-serif',
   fontSize: '20px',
-  color: '#4b4b4b',
-  opacity: 0.75,
   letterSpacing: '-0.02em',
   textTransform: 'lowercase',
   fontWeight: 700,
@@ -48,8 +46,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.7 }}
-          className="fixed inset-0 z-[10000] flex flex-col items-center justify-center"
-          style={{ backgroundColor: '#ffffff' }}
+          className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-white dark:bg-body"
         >
           {/* Finger-Tapping Brand Lottie */}
           <div className="w-[260px] h-[260px] sm:w-[320px] sm:h-[320px]">
@@ -85,7 +82,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
             transition={{ delay: 1, duration: 1 }}
             className="absolute bottom-14 flex flex-col items-center gap-2"
           >
-            <span style={BRAND_WORDMARK_STYLE}>reflections</span>
+            <span style={BRAND_WORDMARK_STYLE} className="text-gray-text opacity-75 dark:text-zinc-100">reflections</span>
             <div style={BRAND_DIVIDER_STYLE} />
           </motion.div>
         </motion.div>

@@ -14,8 +14,6 @@ const MESSAGES = [
 const BRAND_WORDMARK_STYLE: React.CSSProperties = {
   fontFamily: 'Nunito, sans-serif',
   fontSize: '20px',
-  color: '#4b4b4b',
-  opacity: 0.75,
   letterSpacing: '-0.02em',
   textTransform: 'lowercase',
   fontWeight: 700,
@@ -79,8 +77,7 @@ export const AIThinkingState: React.FC<AIThinkingStateProps> = ({ isVisible, onS
           animate={{ opacity: 1 }}
           exit={{ opacity: 0, scale: 1.03 }}
           transition={{ duration: 0.7, ease: "easeInOut" }}
-          className="fixed inset-0 z-[10000] flex flex-col items-center justify-center"
-          style={{ backgroundColor: '#ffffff' }}
+          className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-white dark:bg-body"
         >
           {/* Spark Lottie Animation */}
           <div className="w-[280px] h-[280px] sm:w-[340px] sm:h-[340px]">
@@ -154,7 +151,7 @@ export const AIThinkingState: React.FC<AIThinkingStateProps> = ({ isVisible, onS
             transition={{ delay: 0.8, duration: 1 }}
             className="absolute bottom-14 flex flex-col items-center gap-2"
           >
-            <span style={BRAND_WORDMARK_STYLE}>reflections</span>
+            <span style={BRAND_WORDMARK_STYLE} className="text-gray-text opacity-75 dark:text-zinc-100">reflections</span>
             <div style={BRAND_DIVIDER_STYLE} />
           </motion.div>
         </motion.div>
