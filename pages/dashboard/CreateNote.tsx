@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
-import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Loader2, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Meh, Frown, Sun, Cloud, Moon, Heart, Brain, Coffee, MessageSquare, Tag as TagIcon, CheckCircle2, Check, CheckSquare, Square, Plus, Trash2, Eye, EyeOff, ListTodo, Wind, Target, Mic, MicOff, Music, Play, Pause, Volume2 } from 'lucide-react';
+import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Frown, Sun, Cloud, Moon, Brain, Tag as TagIcon, CheckCircle2, Check, Plus, Trash2, Eye, EyeOff, ListTodo, Wind, Mic, MicOff, Music, Play, Pause, Volume2 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Editor, EditorRef } from '../../components/ui/Editor';
 import { noteService } from '../../services/noteService';
@@ -155,7 +155,6 @@ export const CreateNote: React.FC = () => {
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
   const [saving, setSaving] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [loading, setLoading] = useState(true);
   const [isLimitReached, setIsLimitReached] = useState(false);
   const [activePlaceholder, setActivePlaceholder] = useState<string | null>(initialPrompt || null);
@@ -886,11 +885,14 @@ Instructions:
         </div>
         
         <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto no-scrollbar min-w-0">
+          {/* Focus button: always visible on desktop; on mobile, only shows when writing */}
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setIsFocusModeManual(!isFocusModeManual)}
-            className={`hidden sm:flex items-center gap-2 font-bold uppercase text-[11px] transition-all shrink-0 ${
+            className={`${
+              hasContent ? 'flex' : 'hidden sm:flex'
+            } items-center gap-2 font-bold uppercase text-[11px] transition-all shrink-0 ${
               isFocusModeManual ? 'text-blue bg-blue/5' : 'text-gray-nav'
             }`}
             title={isFocusModeManual ? "Disable Focus Mode" : "Enable Focus Mode"}
@@ -991,54 +993,31 @@ Instructions:
               <span className="hidden sm:inline">RELEASE</span>
           </Button>
 
-          <AnimatePresence mode="wait">
-            {saveStatus === 'saving' && (
-              <motion.div 
-                key="saving"
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                className="flex shrink-0 items-center gap-1.5 rounded-full border border-blue/10 bg-blue/5 px-2 py-1 text-[11px] font-bold text-blue dark:border-sky-400/20 dark:bg-sky-400/12 dark:text-sky-100"
-              >
-                <Loader2 size={12} className="animate-spin shrink-0" />
-                <span className="hidden sm:inline">Saving...</span>
-              </motion.div>
-            )}
-            {saveStatus === 'saved' && (
-              <motion.div 
-                key="saved"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                className="flex shrink-0 items-center gap-1.5 rounded-full border border-green/10 bg-green/5 px-2 py-1 text-[11px] font-bold text-green dark:border-emerald-400/20 dark:bg-emerald-400/12 dark:text-emerald-100"
-              >
-                <Check size={12} className="text-green shrink-0" />
-                <span className="hidden sm:inline">Saved</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
-            <Button 
-              variant="secondary" 
-              size="sm" 
-              className="shrink-0 border-2 border-border text-blue shadow-3d-gray active:shadow-none active:translate-y-[2px] transition-all dark:bg-white/6 px-2 sm:px-3 dark:text-sky-100 dark:shadow-[0_3px_0_0_rgba(15,23,42,0.55)]"
-              disabled={!canEnhance || isReflecting}
-              onClick={handleAiReflect}
-              isLoading={isReflecting}
-            >
-                <Wand2 className="h-3.5 w-3.5 sm:mr-2" />
-                <span className="hidden sm:inline">AI REFLECT</span>
-            </Button>
-            <Button 
-              onClick={handleSave} 
-              size="sm" 
-              variant="primary"
-              className="shrink-0 shadow-3d-green px-2 sm:px-3 active:shadow-none active:translate-y-[2px] transition-all"
-              isLoading={saving} 
-              disabled={!canSave}
-            >
-              <Save className="h-3.5 w-3.5 sm:mr-2" />
-              <span className="hidden sm:inline">SAVE</span>
-            </Button>
+          <Button 
+            variant="secondary" 
+            size="sm" 
+            className="shrink-0 border-2 border-border text-blue shadow-3d-gray active:shadow-none active:translate-y-[2px] transition-all dark:bg-white/6 px-2 sm:px-3 dark:text-sky-100 dark:shadow-[0_3px_0_0_rgba(15,23,42,0.55)]"
+            disabled={!canEnhance || isReflecting}
+            onClick={handleAiReflect}
+            isLoading={isReflecting}
+          >
+              <Wand2 className="h-3.5 w-3.5 sm:mr-2" />
+              <span className="hidden sm:inline">AI REFLECT</span>
+          </Button>
+
+          {/* Save button: always on desktop; hides on mobile when hasContent (it moves to bottom) */}
+          <Button 
+            onClick={handleSave} 
+            size="sm" 
+            variant="primary"
+            className={`shrink-0 shadow-3d-green px-2 sm:px-3 active:shadow-none active:translate-y-[2px] transition-all ${
+              hasContent ? 'hidden sm:flex' : 'flex'
+            }`}
+            disabled={!canSave || saving || showPlane}
+          >
+            <Save className="h-3.5 w-3.5 sm:mr-2" />
+            <span className="hidden sm:inline">SAVE</span>
+          </Button>
         </div>
       </nav>
 
@@ -1267,10 +1246,18 @@ Instructions:
                           className="text-[17px] text-gray-text/90 min-h-[400px]"
                       />
                     </div>
-                    {/* Persistent Spark Prompt FAB in Body */}
-                    {(!content || content === '<p><br></p>') && (
-                      <div className="absolute bottom-6 right-6 z-20">
+
+                    {/* Bottom contextual action: Spark FAB (no content) ↔ Mobile Save button (has content) */}
+                    <div className="absolute bottom-6 right-6 z-20 sm:right-6">
+                      <AnimatePresence mode="wait">
+                        {!hasContent ? (
+                          /* ── Spark prompt FAB — shown when editor is blank ── */
                           <motion.button
+                            key="spark-fab"
+                            initial={{ opacity: 0, scale: 0.85, y: 8 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.85, y: 8 }}
+                            transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={cycleSparkPrompt}
@@ -1279,8 +1266,24 @@ Instructions:
                           >
                               <Sparkles size={22} className="relative z-10" />
                           </motion.button>
-                      </div>
-                    )}
+                        ) : (
+                          /* ── Mobile Save button — visible on mobile only when content exists ── */
+                          <motion.button
+                            key="mobile-save"
+                            initial={{ opacity: 0, scale: 0.85, y: 12 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.85, y: 12 }}
+                            transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+                            onClick={handleSave}
+                            disabled={!canSave || saving || showPlane}
+                            className="sm:hidden flex items-center gap-3 px-6 py-3.5 rounded-2xl bg-green text-white font-black uppercase text-[13px] tracking-wider shadow-3d-green active:shadow-none active:translate-y-[2px] transition-all disabled:opacity-50 disabled:pointer-events-none"
+                          >
+                            <Save size={17} />
+                            Save Entry
+                          </motion.button>
+                        )}
+                      </AnimatePresence>
+                    </div>
 
                 </div>
 
