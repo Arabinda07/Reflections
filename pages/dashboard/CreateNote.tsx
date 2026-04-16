@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Frown, Sun, Cloud, Moon, Brain, Tag as TagIcon, CheckCircle2, Check, Plus, Trash2, Eye, EyeOff, ListTodo, Wind, Mic, MicOff, Music, Play, Pause, Volume2 } from 'lucide-react';
+import { useAmbientAudio, AMBIENT_TRACKS } from '../../hooks/useAmbientAudio';
 import { Button } from '../../components/ui/Button';
 import { Editor, EditorRef } from '../../components/ui/Editor';
 import { noteService } from '../../services/noteService';
@@ -180,11 +181,9 @@ export const CreateNote: React.FC = () => {
   
   // Mindful Features States
   const [isMusicOpen, setIsMusicOpen] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTrack, setCurrentTrack] = useState<string | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  // Shared audio hook — crossfade between tracks
+  const { isPlaying: musicPlaying, activeTrack: activeMusicTrack, volume: musicVolume, playTrack: playMusicTrack, stopAll: stopMusic, setVolume: setMusicVolume } = useAmbientAudio();
   
-  // Whisper Mode States
   const [isWhispering, setIsWhispering] = useState(false);
   const [interimTranscript, setInterimTranscript] = useState('');
   const recognitionRef = useRef<any>(null);
@@ -211,25 +210,6 @@ export const CreateNote: React.FC = () => {
   const isUnmounted = useRef(false);
   const shouldReduceMotion = useReducedMotion();
   const releaseEase = [0.4, 0, 0.2, 1];
-
-  const toggleMusic = (trackUrl: string) => {
-    if (currentTrack === trackUrl) {
-      if (isPlaying) {
-        audioRef.current?.pause();
-        setIsPlaying(false);
-      } else {
-        audioRef.current?.play();
-        setIsPlaying(true);
-      }
-    } else {
-      setCurrentTrack(trackUrl);
-      setIsPlaying(true);
-      if (audioRef.current) {
-        audioRef.current.src = trackUrl;
-        audioRef.current.play();
-      }
-    }
-  };
 
   const toggleWhisper = () => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -928,52 +908,138 @@ Instructions:
                   setIsMusicOpen(false);
                 }
               }}
-              className={`flex items-center gap-2 font-bold uppercase text-[11px] transition-all ${isPlaying ? 'text-purple-500 bg-purple-500/5' : 'text-gray-nav'}`}
+              className={`flex items-center gap-2 font-bold uppercase text-[11px] transition-all ${musicPlaying ? 'text-purple-500 bg-purple-500/5' : 'text-gray-nav'}`}
               title="Ambient Sounds"
             >
-              <Music size={16} />
+              <Music size={16} className={musicPlaying ? 'animate-pulse' : ''} />
               <span className="hidden md:inline">Sounds</span>
             </Button>
-            
+
             {createPortal(
               <AnimatePresence>
                 {isMusicOpen && (
                   <div className="fixed inset-0 z-[10000] pointer-events-none flex items-end justify-center sm:items-start sm:justify-start">
-                    <motion.div 
+                    <motion.div
                       initial={{ opacity: 0, y: 15, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 15, scale: 0.95 }}
-                      className="music-popup-container pointer-events-auto p-5 bg-white border-2 border-border rounded-[32px] shadow-2xl w-[calc(100%-32px)] sm:w-[260px] liquid-glass-strong sm:fixed relative mb-4 sm:mb-0"
-                      style={window.innerWidth >= 640 ? {
-                        top: musicRef.current ? musicRef.current.getBoundingClientRect().bottom + window.scrollY + 12 : 0,
-                        left: musicRef.current ? musicRef.current.getBoundingClientRect().left - 100 + window.scrollX : 0
-                      } : {}}
+                      transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+                      className="music-popup-container pointer-events-auto w-[calc(100%-32px)] sm:w-[240px] liquid-glass-strong sm:fixed relative mb-4 sm:mb-0"
+                      style={{
+                        background: 'rgba(255,255,255,0.97)',
+                        backdropFilter: 'blur(28px)',
+                        WebkitBackdropFilter: 'blur(28px)',
+                        border: '1.5px solid rgba(229,229,229,0.9)',
+                        borderRadius: '24px',
+                        boxShadow: '0 8px 32px -8px rgba(0,0,0,0.16), 0 2px 0 0 #E5E5E5',
+                        padding: '16px',
+                        ...(window.innerWidth >= 640 ? {
+                          top: musicRef.current ? musicRef.current.getBoundingClientRect().bottom + window.scrollY + 12 : 0,
+                          left: musicRef.current ? musicRef.current.getBoundingClientRect().left - 80 + window.scrollX : 0,
+                        } : {}),
+                      }}
                     >
-                      <div className="flex items-center justify-between mb-4 px-1">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav flex items-center gap-2">
-                          <Volume2 size={12} /> Ambient Focus
+                      {/* Header */}
+                      <div className="flex items-center justify-between mb-3 px-1">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav flex items-center gap-1.5">
+                          <Volume2 size={11} /> Ambient Focus
                         </span>
+                        {musicPlaying && (
+                          <motion.div
+                            animate={{ opacity: [1, 0.35, 1] }}
+                            transition={{ duration: 1.5, repeat: Infinity }}
+                            className="w-1.5 h-1.5 rounded-full"
+                            style={{ backgroundColor: activeMusicTrack?.color ?? '#818cf8' }}
+                          />
+                        )}
                       </div>
-                      <div className="space-y-2">
-                        {AMBIENT_TRACKS.map(track => (
-                          <button
-                            key={track.id}
-                            onClick={() => toggleMusic(track.url)}
-                            className={`w-full flex items-center justify-between p-3 rounded-2xl border-2 transition-all ${
-                              currentTrack === track.url 
-                                ? 'border-purple-500/30 bg-purple-500/5 text-purple-600' 
-                                : 'border-border bg-white text-gray-text hover:border-purple-500/30'
-                            }`}
-                          >
-                            <span className="text-[12px] font-bold">{track.name}</span>
-                            {currentTrack === track.url && isPlaying ? (
-                              <Pause size={14} className="text-purple-500" />
-                            ) : (
-                              <Play size={14} className={currentTrack === track.url ? "text-purple-500" : "text-gray-nav"} />
-                            )}
-                          </button>
-                        ))}
+
+                      {/* Track list */}
+                      <div className="flex flex-col gap-1.5">
+                        {AMBIENT_TRACKS.map(track => {
+                          const isActive = activeMusicTrack?.id === track.id;
+                          return (
+                            <button
+                              key={track.id}
+                              onClick={() => {
+                                if (isActive) { stopMusic(); }
+                                else { playMusicTrack(track); }
+                              }}
+                              className="w-full flex items-center gap-2.5 p-2.5 rounded-2xl border-[1.5px] transition-all text-left"
+                              style={{
+                                borderColor: isActive ? `${track.color}55` : 'rgba(229,229,229,0.9)',
+                                backgroundColor: isActive ? `${track.color}10` : 'transparent',
+                              }}
+                            >
+                              {/* Emoji badge */}
+                              <span
+                                className="w-9 h-9 rounded-xl flex items-center justify-center text-[15px] shrink-0"
+                                style={{
+                                  backgroundColor: `${track.color}18`,
+                                  border: `1.5px solid ${track.color}30`,
+                                }}
+                              >
+                                {track.emoji}
+                              </span>
+
+                              {/* Label + mood */}
+                              <span className="flex flex-col gap-0.5 flex-1 min-w-0">
+                                <span
+                                  className="text-[12px] font-black truncate"
+                                  style={{ color: isActive ? track.color : '#27272a' }}
+                                >
+                                  {track.label}
+                                </span>
+                                <span
+                                  className="text-[9px] font-black uppercase tracking-widest"
+                                  style={{ color: isActive ? track.color : '#a1a1aa' }}
+                                >
+                                  {track.mood}
+                                </span>
+                              </span>
+
+                              {/* Waveform or dot */}
+                              {isActive ? (
+                                <div className="flex items-center gap-[3px] h-5 shrink-0">
+                                  {[
+                                    { h: [5, 13, 5],  d: 0.55 },
+                                    { h: [13, 5, 13], d: 0.70 },
+                                    { h: [7, 17, 7],  d: 0.48 },
+                                    { h: [15, 7, 15], d: 0.62 },
+                                  ].map((bar, i) => (
+                                    <motion.div
+                                      key={i}
+                                      style={{ width: '3px', borderRadius: '9999px', backgroundColor: track.color }}
+                                      animate={{ height: bar.h.map(v => `${v}px`) }}
+                                      transition={{ duration: bar.d, repeat: Infinity, repeatType: 'mirror', ease: 'easeInOut', delay: i * 0.08 }}
+                                    />
+                                  ))}
+                                </div>
+                              ) : (
+                                <span
+                                  className="w-2 h-2 rounded-full shrink-0"
+                                  style={{ backgroundColor: `${track.color}70` }}
+                                />
+                              )}
+                            </button>
+                          );
+                        })}
                       </div>
+
+                      {/* Volume slider */}
+                      {musicPlaying && (
+                        <div className="mt-3 pt-3 border-t border-border flex items-center gap-2.5">
+                          <Volume2 size={11} className="text-gray-nav shrink-0" />
+                          <input
+                            type="range"
+                            min={0.05} max={0.8} step={0.01}
+                            value={musicVolume}
+                            onChange={e => setMusicVolume(parseFloat(e.target.value))}
+                            className="flex-1 cursor-pointer"
+                            style={{ accentColor: activeMusicTrack?.color ?? '#818cf8' }}
+                          />
+                        </div>
+                      )}
                     </motion.div>
                   </div>
                 )}
@@ -981,6 +1047,7 @@ Instructions:
               document.body
             )}
           </div>
+
 
           <Button 
             variant="ghost" 
