@@ -6,7 +6,6 @@ const MESSAGES = [
   "noticing patterns",
   "weaving thoughts",
   "gathering insights",
-  "finding clarity",
   "centering sanctuary"
 ];
 
