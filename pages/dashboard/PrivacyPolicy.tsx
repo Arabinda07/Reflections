@@ -20,127 +20,101 @@ export const PrivacyPolicy: React.FC = () => {
         </button>
 
         {/* Header */}
-        <div className="mb-12 flex items-center gap-4">
-          <div className="h-14 w-14 rounded-2xl bg-green flex items-center justify-center text-white shadow-3d-green shrink-0">
-            <Sparkles size={28} fill="currentColor" />
-          </div>
-          <div>
-            <h1 className="font-display text-[32px] sm:text-[40px] text-gray-text lowercase tracking-tight">
-              privacy policy
-            </h1>
-            <p className="text-[13px] font-bold text-gray-nav uppercase tracking-widest mt-1">
-              Last updated: April 15, 2026
-            </p>
-          </div>
+        <div className="mb-12">
+          <h1 className="font-display text-[40px] sm:text-[56px] lowercase tracking-tight bg-gradient-to-r from-green via-blue to-green bg-clip-text text-transparent animate-gradient-x drop-shadow-sm">
+            privacy policy
+          </h1>
+          <p className="text-[11px] font-black text-gray-nav uppercase tracking-[0.2em] mt-2">
+            Last updated: April 16, 2026
+          </p>
         </div>
 
         {/* Intro */}
-        <div className="rounded-[24px] border-2 border-border bg-green/5 p-6 mb-10">
-          <p className="text-[16px] font-medium text-gray-text leading-relaxed">
-            Reflections is a private journaling app. We believe your thoughts belong to you — not to us, not to advertisers, not to anyone else. This policy explains exactly what we collect and why.
+        <div className="rounded-[32px] border-2 border-border bg-gray-50/30 dark:bg-white/5 p-8 mb-12">
+          <p className="text-[17px] font-medium text-gray-text leading-relaxed">
+            Reflections operates on a principle of radical data ownership. We facilitate a high-integrity journaling environment where your thoughts remain your exclusive property. Our governance framework ensures that we do not monetize, share, or exploit your personal reflections.
           </p>
         </div>
 
         <div className="space-y-10 text-gray-text">
 
-          {/* Section 1 */}
           <section>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-10 w-10 rounded-xl bg-blue/10 flex items-center justify-center text-blue shrink-0">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-blue border-2 border-border shadow-3d-gray dark:bg-zinc-800">
                 <Database size={20} />
               </div>
-              <h2 className="text-[18px] font-black uppercase tracking-widest">What We Collect</h2>
+              <h2 className="text-[14px] font-black uppercase tracking-widest text-gray-nav">Data Acquisitions</h2>
             </div>
-            <div className="pl-14 space-y-3 text-[15px] font-medium leading-relaxed text-gray-text">
-              <p><strong>Account information:</strong> Your email address and display name, provided when you create an account. Used only for authentication.</p>
-              <p><strong>Journal entries:</strong> The text, mood tags, and attachments you write in the app. Stored securely on Supabase (a GDPR-compliant cloud database). We cannot read your journal entries — they are stored under your user account only.</p>
-              <p><strong>Usage data:</strong> Anonymous, aggregated counts (e.g., number of notes this month) used to enforce your plan limits. Not linked to individual content.</p>
-              <p><strong>Device data:</strong> We do not collect device identifiers, location, contacts, or any sensor data.</p>
+            <div className="pl-16 space-y-4 text-[15px] font-medium leading-relaxed text-gray-text">
+              <p><strong>Identity:</strong> Email and display name, utilized exclusively for secure authentication and account recovery.</p>
+              <p><strong>Content:</strong> Notes, mood data, and media attachments. All content is stored on encrypted clusters with Row-Level Security (RLS) ensuring access is restricted to your authenticated session.</p>
+              <p><strong>Persistence:</strong> Supabase Cloud (GDPR-compliant) manages secure storage for text and binary media without administrative oversight into content records.</p>
             </div>
           </section>
 
-          {/* Section 2 */}
           <section>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-10 w-10 rounded-xl bg-green/10 flex items-center justify-center text-green shrink-0">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-green border-2 border-border shadow-3d-gray dark:bg-zinc-800">
                 <Lock size={20} />
               </div>
-              <h2 className="text-[18px] font-black uppercase tracking-widest">How We Use It</h2>
+              <h2 className="text-[14px] font-black uppercase tracking-widest text-gray-nav">Secure Synthesis (AI)</h2>
             </div>
-            <div className="pl-14 space-y-3 text-[15px] font-medium leading-relaxed text-gray-text">
-              <p><strong>To run the app:</strong> Your account data lets you log in and sync your notes across devices.</p>
-              <p><strong>AI features:</strong> When you use "AI Reflect", your note content is sent to the Google Gemini API to generate a reflection. This content is not stored by us after the response is returned. Google's API usage is governed by their privacy policy.</p>
-              <p><strong>We never:</strong> Sell your data, share it with advertisers, train AI models on your journal content, or use it for any purpose other than running the features you explicitly use.</p>
+            <div className="pl-16 space-y-4 text-[15px] font-medium leading-relaxed text-gray-text">
+              <p><strong>Processing:</strong> We leverage Google Gemini for Reflections and Life Wiki synthesis. Data is processed ephemerally; we maintain a zero-retention policy for content handled via these feature ports.</p>
+              <p><strong>Commitment:</strong> We never train AI models on user data. Your reflections are processed in a secure, non-training environment to generate personal insights requested by you.</p>
+              <p><strong>Non-Exploitation:</strong> We strictly prohibit data harvesting for advertising or outside monetization. We are your data custodians, not its owners.</p>
             </div>
           </section>
 
-          {/* Section 3 */}
           <section>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-10 w-10 rounded-xl bg-golden/10 flex items-center justify-center text-golden shrink-0">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-golden border-2 border-border shadow-3d-gray dark:bg-zinc-800">
                 <Shield size={20} />
               </div>
-              <h2 className="text-[18px] font-black uppercase tracking-widest">Data Security</h2>
+              <h2 className="text-[14px] font-black uppercase tracking-widest text-gray-nav">Security Infrastructure</h2>
             </div>
-            <div className="pl-14 space-y-3 text-[15px] font-medium leading-relaxed text-gray-text">
-              <p>Your data is stored on <strong>Supabase</strong>, which is hosted on AWS and is GDPR-compliant. All data is encrypted in transit (HTTPS) and at rest.</p>
-              <p>We use Row-Level Security (RLS) in our database, meaning your notes are only accessible by your own user account — not by other users, and not by us.</p>
-              <p>Authentication is handled by Supabase Auth, which follows industry-standard security practices.</p>
+            <div className="pl-16 space-y-4 text-[15px] font-medium leading-relaxed text-gray-text">
+              <p>Data residency is maintained on <strong>Supabase</strong> (AWS architecture), utilizing industry-standard encryption for data in transit (TLS) and at rest (AES-256).</p>
+              <p>Architecture level security is enforced via Row-Level Security (RLS), meaning your entries are cryptographically isolated and inaccessible to any unauthorized entity, including our administrators.</p>
             </div>
           </section>
 
-          {/* Section 4 */}
           <section>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-10 w-10 rounded-xl bg-red/10 flex items-center justify-center text-red shrink-0">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-red border-2 border-border shadow-3d-gray dark:bg-zinc-800">
                 <Shield size={20} />
               </div>
-              <h2 className="text-[18px] font-black uppercase tracking-widest">Your Rights</h2>
+              <h2 className="text-[14px] font-black uppercase tracking-widest text-gray-nav">Subject Rights</h2>
             </div>
-            <div className="pl-14 space-y-3 text-[15px] font-medium leading-relaxed text-gray-text">
-              <p><strong>Access:</strong> You can view all your data through the app at any time.</p>
-              <p><strong>Delete:</strong> You can delete any journal entry from the app. You can also delete your account and all associated data permanently via the Settings menu in the app. If you have any trouble, contact us at the email below.</p>
-              <p><strong>Export:</strong> We are working on a data export feature. Until then, contact us to request your data in a portable format.</p>
-              <p>These rights apply to all users, including users in the EU (GDPR) and California (CCPA).</p>
+            <div className="pl-16 space-y-4 text-[15px] font-medium leading-relaxed text-gray-text">
+              <p><strong>Autonomy:</strong> You maintain full CRUD (Create, Read, Update, Delete) rights over your data. Account termination results in the immediate and permanent purging of all associated content records.</p>
+              <p><strong>Portability:</strong> While we finalize automated export tools, data portability requests are handled manually via the contact channel below.</p>
             </div>
           </section>
 
-          {/* Section 5 */}
           <section>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-10 w-10 rounded-xl bg-blue/10 flex items-center justify-center text-blue shrink-0">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-blue border-2 border-border shadow-3d-gray dark:bg-zinc-800">
                 <Mail size={20} />
               </div>
-              <h2 className="text-[18px] font-black uppercase tracking-widest">Contact</h2>
+              <h2 className="text-[14px] font-black uppercase tracking-widest text-gray-nav">Inquiry Channel</h2>
             </div>
-            <div className="pl-14 space-y-3 text-[15px] font-medium leading-relaxed text-gray-text">
-              <p>Questions, data deletion requests, or concerns about this policy:</p>
+            <div className="pl-16 space-y-4 text-[15px] font-medium leading-relaxed text-gray-text">
+              <p>Directed inquiries regarding this governance framework or data deletion protocols may be submitted to:</p>
               <a
                 href="mailto:robinsaha@gmail.com"
-                className="inline-flex items-center gap-2 text-green font-bold hover:underline"
+                className="inline-flex items-center gap-2 text-green font-bold hover:underline tracking-tight"
               >
-                <Mail size={16} />
                 robinsaha@gmail.com
               </a>
-              <p className="text-[13px] text-gray-nav">
-                Reflections is built and maintained by Arabinda.
-              </p>
             </div>
           </section>
 
-          {/* Children */}
-          <section className="rounded-[24px] border-2 border-border bg-gray-50/50 dark:bg-white/5 p-6">
-            <h2 className="text-[14px] font-black uppercase tracking-widest text-gray-nav mb-3">Children's Privacy</h2>
+          {/* Governance Footer */}
+          <section className="rounded-[32px] border-2 border-border bg-gray-50/50 dark:bg-white/5 p-8">
+            <h2 className="text-[12px] font-black uppercase tracking-[0.15em] text-gray-nav mb-4">Governance & Policy Updates</h2>
             <p className="text-[14px] font-medium text-gray-text leading-relaxed">
-              Reflections is intended for users aged 13 and above. We do not knowingly collect data from children under 13. If you believe a child has created an account, please contact us immediately and we will delete the account.
-            </p>
-          </section>
-
-          {/* Changes */}
-          <section className="rounded-[24px] border-2 border-border bg-gray-50/50 dark:bg-white/5 p-6">
-            <h2 className="text-[14px] font-black uppercase tracking-widest text-gray-nav mb-3">Changes to This Policy</h2>
-            <p className="text-[14px] font-medium text-gray-text leading-relaxed">
-              If we make significant changes, we will notify you within the app before they take effect. The "Last updated" date at the top of this page always reflects the most recent version.
+              Reflections is designed for individuals aged 13 and above. If we implement significant changes to this framework, we will provide advanced notice via the application interface. This document remains the definitive standard for our data relationship.
             </p>
           </section>
 
@@ -148,9 +122,6 @@ export const PrivacyPolicy: React.FC = () => {
 
         {/* Footer */}
         <div className="mt-16 pt-8 border-t-2 border-border text-center">
-          <p className="text-[12px] font-black text-gray-nav uppercase tracking-widest">
-            Reflections — Your thoughts, your sanctuary.
-          </p>
         </div>
       </div>
     </div>

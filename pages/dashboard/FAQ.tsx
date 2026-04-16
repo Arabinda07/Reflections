@@ -4,7 +4,7 @@ import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
 import { 
   Heart, Sparkles, Brain, Shield, Cloud, Sun, Moon, Zap, 
   PenTool, Tags, Calendar as CalendarIcon, CheckSquare,
-  Lock, ArrowRight, BookOpen, Compass, CheckCircle2, Paperclip, Image as ImageIcon, Headphones, Target
+  Lock, ArrowRight, BookOpen, Compass, CheckCircle2, Paperclip, Image as ImageIcon, Headphones, Target, Mic
 } from 'lucide-react';
 
 import Spline from '@splinetool/react-spline';
@@ -126,15 +126,15 @@ export const FAQ: React.FC = () => {
                 step: "02",
                 icon: PenTool,
                 color: "blue",
-                title: "Feeling Stuck?",
-                desc: "If the page is blank, tap the Daily Spark in the editor. It's there to give you a quick nudge."
+                title: "Daily Spark",
+                desc: "Facing a blank page? Tap the spark in the editor for a gentle, context-aware prompt to get the words moving."
               },
               {
                 step: "03",
                 icon: Tags,
                 color: "green",
-                title: "Group your notes",
-                desc: "Use tags to find recurring themes. It helps you see how different parts of your life connect over time."
+                title: "Focus on the Flow",
+                desc: "Use Focus Mode to let the UI fade away. It’s just you and your thoughts, without the digital noise."
               },
               {
                 step: "04",
@@ -241,9 +241,9 @@ export const FAQ: React.FC = () => {
                     <Sparkles size={26} opacity={0.9} />
                   </div>
                   <div>
-                    <h3 className="text-[28px] font-display text-gray-text lowercase">the future: deeper paths</h3>
+                    <h3 className="text-[28px] font-display text-gray-text lowercase">sanctuary intelligence</h3>
                     <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/70 dark:bg-white/5 border border-white/50 dark:border-white/10 text-gray-text text-[10px] font-black uppercase tracking-widest mt-1 shadow-sm backdrop-blur-sm">
-                      <Lock size={12} className="text-blue opacity-80" /> Coming Soon
+                      <Shield size={12} className="text-blue opacity-80" /> Private & Secure
                     </div>
                   </div>
                 </div>
@@ -251,18 +251,18 @@ export const FAQ: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10 w-full">
                   <div className="bg-white/40 dark:bg-white/5 p-6 rounded-3xl border border-white/20 dark:border-white/10 backdrop-blur-md">
                     <h4 className="text-[18px] font-bold text-gray-text mb-3 flex items-center gap-2">
-                      <Brain size={20} className="text-blue" /> Smart Reflections
+                       Smart Reflections
                     </h4>
                     <p className="text-[15px] text-gray-light font-medium leading-relaxed">
-                      AI reflections that help you spot patterns in your writing. Secure, compassionate, and fully private.
+                      Detailed mirrors of your growth. We use Google Gemini to process reflections, but we never store your data for training. Your notes stay yours.
                     </p>
                   </div>
                   <div className="bg-white/40 dark:bg-white/5 p-6 rounded-3xl border border-white/20 dark:border-white/10 backdrop-blur-md">
                     <h4 className="text-[18px] font-bold text-gray-text mb-3 flex items-center gap-2">
-                      <Shield size={20} className="text-green" /> Advanced Security
+                      The Life Wiki
                     </h4>
                     <p className="text-[15px] text-gray-light font-medium leading-relaxed">
-                      Two-factor authentication and extra layers of protection for your most intimate thoughts.
+                      A compounding library of your recurring themes. The AI librarian identifies patterns in the background so you can see your life's narrative evolve.
                     </p>
                   </div>
                 </div>
@@ -304,37 +304,37 @@ export const FAQ: React.FC = () => {
                 icon: CheckSquare,
                 title: 'tasks',
                 tone: 'text-orange bg-orange/10',
-                body: 'Capture caring actions like \'Drink water\' or \'Call home\' directly inside your notes. Use them for follow-through, not pressure.'
+                body: 'Capture follow-up actions like \'Drink water\' or \'Check in with family\' directly inside your notes for better follow-through.'
               },
               {
                 icon: Headphones,
                 title: 'ambient sound',
                 tone: 'text-blue bg-blue/10',
-                body: 'Use the headphone icon in the editor to quiet the room. Tap once to choose a sound, and again to turn it off.'
+                body: 'Choose from a library of generative sounds to quiet the room. Tap once to select, and again to turn it off.'
+              },
+              {
+                icon: Mic,
+                title: 'whisper mode',
+                tone: 'text-blue bg-blue/10',
+                body: 'For days when typing feels heavy. Speak your thoughts directly into the editor and have them transcribed instantly.'
               },
               {
                 icon: Target,
                 title: 'daily spark',
                 tone: 'text-green bg-green/10',
-                body: 'Facing a blank page? Tap the spark button in the editor for a quick mindfulness prompt.'
+                body: 'Context-aware mindfulness prompts that help you find a starting point on days when the page feels blank.'
               },
               {
                 icon: Brain,
                 title: 'ai reflection',
                 tone: 'text-blue bg-blue/10',
-                body: 'Get a mirror of your growth. Use it after you have written a few paragraphs to help spot patterns you might miss.'
+                body: 'Get a mirror of your thoughts. Use it after writing to help notice patterns you might miss while in the flow.'
               },
               {
                 icon: BookOpen,
                 title: 'insights',
                 tone: 'text-green bg-green/10',
                 body: 'Visit the Insights page to see your long-term moods, themes, and resilience over time.'
-              },
-              {
-                icon: Compass,
-                title: 'release',
-                tone: 'text-purple-500 bg-purple-500/10',
-                body: 'For the heavy stuff. Write it all out, then use \'Release\' to let the feeling go and move on.'
               }
             ].map((item, index) => (
               <motion.div
