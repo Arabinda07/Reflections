@@ -67,6 +67,7 @@ export const AmbientMusicButton: React.FC = () => {
   const [showHint, setShowHint] = useState(false);
   const isDark    = useDarkMode();
   const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const popupRef  = useRef<HTMLDivElement | null>(null);
   const [popupRight, setPopupRight] = useState(20);
 
   const { isPlaying, activeTrack, volume, playTrack, stopAll, setVolume } = useAmbientAudio();
@@ -88,7 +89,11 @@ export const AmbientMusicButton: React.FC = () => {
   useEffect(() => {
     if (!isOpen || isMobile()) return;
     const handler = (e: MouseEvent) => {
-      if (buttonRef.current && !buttonRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      const isInsideButton = buttonRef.current?.contains(target);
+      const isInsidePopup  = popupRef.current?.contains(target);
+      
+      if (!isInsideButton && !isInsidePopup) {
         setIsOpen(false);
       }
     };
@@ -254,6 +259,7 @@ export const AmbientMusicButton: React.FC = () => {
   const desktopPopup = !isMobile() && isOpen && createPortal(
     <AnimatePresence>
       <motion.div
+        ref={popupRef}
         key="desktop-picker"
         initial={{ opacity: 0, y: 10, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
