@@ -22,10 +22,10 @@ export const Button: React.FC<ButtonProps> = ({
     secondary: "bg-white/80 border-2 border-border text-blue shadow-sm liquid-glass",
     outline: "bg-transparent border-2 border-border text-gray-text hover:bg-gray-50",
     ghost: "bg-transparent text-gray-nav hover:bg-gray-100 hover:text-gray-text",
-    danger: "bg-red text-pure-white shadow-sm liquid-glass",
+    danger: "bg-red text-pure-white shadow-sm",
     liquid: "liquid-glass text-white",
     'liquid-strong': "liquid-glass-strong text-white",
-    green: "bg-green text-pure-white shadow-sm liquid-glass",
+    green: "bg-green text-pure-white shadow-sm",
   };
 
   const sizes = {

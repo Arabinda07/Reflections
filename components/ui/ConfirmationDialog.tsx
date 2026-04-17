@@ -53,7 +53,10 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
       />
       
       {/* Modal Card / Bottom Sheet Container */}
-      <div className="relative w-full sm:max-w-md overflow-hidden rounded-t-[40px] sm:rounded-[40px] border-t-2 sm:border-2 border-border bg-white shadow-2xl animate-in slide-in-from-bottom sm:zoom-in-95 duration-500 ease-out-expo">
+      <div 
+        className="relative w-full sm:max-w-md overflow-hidden rounded-t-[40px] sm:rounded-[40px] border-t-2 sm:border-2 border-border shadow-2xl animate-in slide-in-from-bottom sm:zoom-in-95 duration-500 ease-out-expo"
+        style={{ backgroundColor: 'var(--panel-bg)' }}
+      >
         
         {/* Mobile Handle (Only visible on mobile) */}
         <div className="sm:hidden flex justify-center pt-4 pb-1">
@@ -78,7 +81,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
 
           {/* High-Contrast Typography */}
           <div className="text-center space-y-4 mb-12">
-            <h3 className="text-[32px] font-display text-gray-text leading-tight lowercase">
+            <h3 className="text-[32px] font-display text-gray-text leading-tight lowercase font-black">
               {title}
             </h3>
             <p className="text-[17px] text-gray-light font-medium leading-relaxed">
