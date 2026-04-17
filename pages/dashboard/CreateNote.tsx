@@ -894,7 +894,7 @@ export const CreateNote: React.FC = () => {
         <div className="flex h-screen w-full bg-white dark:bg-panel-bg overflow-hidden relative selection:bg-blue/10">
           {/* Sidebar - Liquid Glass Drawer on Mobile, Fixed on Desktop */}
           <aside 
-            className={`fixed left-0 top-0 bottom-0 w-[280px] sm:w-[320px] lg:w-[240px] border-r-2 border-border z-50 transition-all duration-700 ease-out-expo px-6 py-8 flex flex-col gap-8 
+            className={`fixed left-0 top-0 bottom-0 w-[220px] lg:w-[240px] border-r-2 border-border z-50 transition-all duration-700 ease-out-expo px-6 py-8 flex flex-col gap-8 
               ${isMobile ? 'liquid-glass-strong rounded-r-[40px] shadow-2xl overflow-y-auto' : 'bg-white dark:bg-panel-bg'}
               ${isMobile ? (isSidebarOpen ? 'translate-x-0' : '-translate-x-full') : (isDimmed ? '-translate-x-full opacity-0 pointer-events-none' : 'translate-x-0 opacity-100')}
             `}
@@ -956,19 +956,19 @@ export const CreateNote: React.FC = () => {
                   </button>
                </div>
 
-               {/* Attach & Cover Grid */}
-               <div className="grid grid-cols-2 gap-3 mt-2">
-                 <label className="group flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-border bg-white cursor-pointer transition-all duration-300 hover:bg-blue/5 hover:border-blue/30 hover:text-blue active:scale-95">
-                    <Paperclip size={20} className="mb-2 opacity-50 group-hover:opacity-100" />
-                    <span className="text-[10px] font-black">FILES</span>
-                    <input type="file" multiple className="hidden" onChange={handleAttachmentUpload} />
-                 </label>
-                 
-                 <label className="group flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-border bg-white cursor-pointer transition-all duration-300 hover:bg-blue/5 hover:border-blue/30 hover:text-blue active:scale-95">
-                    <ImageIcon size={20} className="mb-2 opacity-50 group-hover:opacity-100" />
-                    <span className="text-[10px] font-black">COVER</span>
-                    <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
-                 </label>
+               {/* Attach & Cover Grid/Stack */}
+               <div className={`grid gap-3 mt-2 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
+                  <label className="group flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-border bg-white cursor-pointer transition-all duration-300 hover:bg-blue/5 hover:border-blue/30 hover:text-blue active:scale-95">
+                     <Paperclip size={20} className="mb-2 opacity-50 group-hover:opacity-100" />
+                     <span className="text-[10px] font-black">FILES</span>
+                     <input type="file" multiple className="hidden" onChange={handleAttachmentUpload} />
+                  </label>
+                  
+                  <label className="group flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-border bg-white cursor-pointer transition-all duration-300 hover:bg-blue/5 hover:border-blue/30 hover:text-blue active:scale-95">
+                     <ImageIcon size={20} className="mb-2 opacity-50 group-hover:opacity-100" />
+                     <span className="text-[10px] font-black">COVER</span>
+                     <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
+                  </label>
                </div>
             </div>
 
@@ -1135,7 +1135,7 @@ export const CreateNote: React.FC = () => {
                               setIsFocused(false);
                               setIsTitleFocused(false);
                             }}
-                            className={`w-full border-none bg-transparent text-[42px] font-serif font-semibold text-gray-text placeholder:text-border/40 focus:outline-none focus:ring-0 p-0 mb-4 tracking-tight transition-all duration-700 ${isDimmed ? (isMobile ? 'opacity-0 scale-95' : 'opacity-25') : 'opacity-100 scale-100'}`}
+                            className={`w-full border-none bg-transparent text-[42px] font-serif font-semibold text-gray-text placeholder:text-border/40 focus:outline-none focus:ring-0 p-0 mb-4 tracking-tight transition-all duration-700 ${isDimmed ? (isMobile ? 'opacity-40 scale-[0.98]' : 'opacity-25') : 'opacity-100 scale-100'}`}
                         />
                         
                         <div 
@@ -1148,7 +1148,8 @@ export const CreateNote: React.FC = () => {
                                 value={content} 
                                 onChange={(val) => {
                                   setContent(val);
-                                  if (isFocused && !isTitleFocused) {
+                                  // Strong trigger for Zen mode on any input
+                                  if (isFocused || isTitleFocused) {
                                     setIsFlowing(true);
                                     if (flowTimeoutRef.current) clearTimeout(flowTimeoutRef.current);
                                     if (!isMobile) {
@@ -1161,41 +1162,6 @@ export const CreateNote: React.FC = () => {
                                 className="text-[19px] leading-[1.7] text-gray-text/90"
                             />
                             
-                            {/* Universal Floating Actions (Elevated) */}
-                            <div className="fixed bottom-20 right-8 z-50">
-                              <AnimatePresence mode="wait">
-                                {showPlane ? null : !hasContent ? (
-                                  /* ── AI Spark FAB ── */
-                                  <motion.button
-                                    key="spark-fab"
-                                    initial={{ opacity: 0, scale: 0.85, y: 10 }}
-                                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                                    exit={{ opacity: 0, scale: 0.85, y: 10 }}
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={cycleSparkPrompt}
-                                    className={`flex h-16 w-16 items-center justify-center rounded-2xl border-2 border-border bg-white shadow-xl text-blue transition-all duration-300 hover:shadow-2xl active:scale-95 ${isDimmed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
-                                  >
-                                    <Sparkles size={24} className={isGeneratingPrompts ? 'animate-pulse' : ''} />
-                                  </motion.button>
-                                ) : (
-                                  /* ── Save FAB ── */
-                                  <motion.button
-                                    key="save-fab"
-                                    initial={{ opacity: 0, scale: 0.85, y: 10 }}
-                                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                                    exit={{ opacity: 0, scale: 0.85, y: 10 }}
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={handleSave}
-                                    disabled={!canSave || saving}
-                                    className={`flex h-16 w-16 items-center justify-center rounded-2xl bg-green text-white shadow-xl transition-all duration-300 active:scale-95 ${isDimmed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
-                                  >
-                                    {saving ? <Loader2 size={24} className="animate-spin" /> : <Save size={24} />}
-                                  </motion.button>
-                                )}
-                              </AnimatePresence>
-                            </div>
                         </div>
                       </div>
 
@@ -1280,9 +1246,49 @@ export const CreateNote: React.FC = () => {
                           </div>
                         )}
                       </div>
+                             </div>
+                          </div>
+                        )}
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
+
+                {/* Root-Level Universal Floating Actions (Ensures Screen Consistency) */}
+                <div className={`fixed z-50 transition-all duration-700 ${isMobile ? 'right-4 top-1/2 -translate-y-1/2' : 'bottom-20 right-8'}`}>
+                  <AnimatePresence mode="wait">
+                    {showPlane ? null : !hasContent ? (
+                      /* ── AI Spark FAB ── */
+                      <motion.button
+                        key="spark-fab"
+                        initial={{ opacity: 0, scale: 0.85, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.85, y: 10 }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={cycleSparkPrompt}
+                        className={`flex h-16 w-16 items-center justify-center rounded-2xl border-2 border-blue/20 bg-white/80 backdrop-blur-xl shadow-xl text-blue transition-all duration-700 hover:shadow-2xl active:scale-95 ${isDimmed ? 'opacity-0 pointer-events-none translate-x-4' : 'opacity-100 translate-x-0'}`}
+                      >
+                        <Sparkles size={24} className={isGeneratingPrompts ? 'animate-pulse' : ''} />
+                      </motion.button>
+                    ) : (
+                      /* ── Save FAB ── */
+                      <motion.button
+                        key="save-fab"
+                        initial={{ opacity: 0, scale: 0.85, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.85, y: 10 }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={handleSave}
+                        disabled={!canSave || saving}
+                        className={`flex h-16 w-16 items-center justify-center rounded-2xl bg-green text-white shadow-xl transition-all duration-700 active:scale-95 ${isDimmed ? 'opacity-0 pointer-events-none translate-x-4' : 'opacity-100 translate-x-0'}`}
+                      >
+                        {saving ? <Loader2 size={24} className="animate-spin" /> : <Save size={24} />}
+                      </motion.button>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
             </div>
           </main>
@@ -1291,23 +1297,44 @@ export const CreateNote: React.FC = () => {
           {createPortal(
             <AnimatePresence>
               {isMoodOpen && (
-                <div className="fixed inset-0 z-[100] pointer-events-none flex items-center justify-center sm:items-start sm:justify-start">
-                  <div className="absolute inset-0 bg-black/5 pointer-events-auto" onClick={() => setIsMoodOpen(false)} />
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
                   <motion.div 
-                    initial={{ opacity: 0, scale: 0.9, x: 20 }}
-                    animate={{ opacity: 1, scale: 1, x: 260 }}
-                    exit={{ opacity: 0, scale: 0.9, x: 20 }}
-                    className="pointer-events-auto bg-white/95 dark:bg-panel-bg/95 border-2 border-border rounded-[32px] p-6 shadow-2xl w-[280px] fixed top-24 backdrop-blur-xl"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 bg-black/40 backdrop-blur-md" 
+                    onClick={() => setIsMoodOpen(false)} 
+                  />
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                    className="relative w-full max-w-[340px] bg-white/90 dark:bg-panel-bg/90 liquid-glass-strong border-2 border-border/40 rounded-[40px] p-8 shadow-2xl overflow-hidden"
                   >
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-[12px] font-black text-gray-nav uppercase tracking-tighter">Current Mood</span>
-                      <button onClick={() => setIsMoodOpen(false)}><X size={16} /></button>
+                    <div className="flex items-center justify-between mb-8">
+                      <div>
+                        <h3 className="text-[18px] font-black text-gray-text tracking-tight">How are you?</h3>
+                        <p className="text-[11px] font-bold text-gray-nav">Select your current energy</p>
+                      </div>
+                      <button 
+                        onClick={() => setIsMoodOpen(false)}
+                        className="h-10 w-10 flex items-center justify-center rounded-2xl bg-gray-100 dark:bg-white/5 text-gray-nav hover:text-red transition-all"
+                      >
+                        <X size={20} />
+                      </button>
                     </div>
-                    <div className="grid grid-cols-3 gap-2">
+
+                    <div className="grid grid-cols-3 gap-3">
                        {moods.map(m => (
-                         <button key={m.id} onClick={() => { handleMoodSelect(m.id); setIsMoodOpen(false); }} className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all ${mood === m.id ? `${m.color} border-current` : 'border-transparent hover:bg-gray-50'}`}>
-                           {React.createElement(m.icon, { size: 20 })}
-                           <span className="mt-1 text-[9px] font-black uppercase tracking-tighter">{m.label}</span>
+                         <button 
+                           key={m.id} 
+                           onClick={() => { handleMoodSelect(m.id); setIsMoodOpen(false); }} 
+                           className={`group flex flex-col items-center justify-center p-4 rounded-[28px] border-2 transition-all duration-300 active:scale-95 ${mood === m.id ? `${m.color} border-current shadow-lg` : 'bg-white dark:bg-white/5 border-transparent hover:border-border'}`}
+                         >
+                           <div className={`mb-2 transition-transform duration-500 group-hover:scale-110 ${mood === m.id ? 'scale-110' : ''}`}>
+                             {React.createElement(m.icon, { size: 24 })}
+                           </div>
+                           <span className="text-[10px] font-black uppercase tracking-tighter">{m.label}</span>
                          </button>
                        ))}
                     </div>
@@ -1321,24 +1348,61 @@ export const CreateNote: React.FC = () => {
           {createPortal(
             <AnimatePresence>
               {isTagsOpen && (
-                <div className="fixed inset-0 z-[100] pointer-events-none flex items-center justify-center sm:items-start sm:justify-start">
-                  <div className="absolute inset-0 bg-black/5 pointer-events-auto" onClick={() => setIsTagsOpen(false)} />
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
                   <motion.div 
-                    initial={{ opacity: 0, scale: 0.9, x: 20 }}
-                    animate={{ opacity: 1, scale: 1, x: 260 }}
-                    exit={{ opacity: 0, scale: 0.9, x: 20 }}
-                    className="pointer-events-auto bg-white/95 dark:bg-panel-bg/95 border-2 border-border rounded-[32px] p-6 shadow-2xl w-[320px] fixed top-48 backdrop-blur-xl"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 bg-black/40 backdrop-blur-md" 
+                    onClick={() => setIsTagsOpen(false)} 
+                  />
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                    className="relative w-full max-w-[380px] bg-white/90 dark:bg-panel-bg/90 liquid-glass-strong border-2 border-border/40 rounded-[40px] p-8 shadow-2xl"
                   >
-                    <div className="mb-4">
-                      <span className="text-[12px] font-black text-gray-nav uppercase tracking-widest mb-3 block">Topic Tags</span>
-                      <input type="text" placeholder="Add tag..." value={tagInput} onChange={(e) => setTagInput(e.target.value)} onKeyDown={handleAddTag} className="w-full px-4 py-2 rounded-xl border-2 border-border focus:border-blue outline-none text-[13px] font-bold" />
+                    <div className="flex items-center justify-between mb-8">
+                       <div>
+                         <h3 className="text-[18px] font-black text-gray-text tracking-tight">Sanctuary Tags</h3>
+                         <p className="text-[11px] font-bold text-gray-nav">Organize your thoughts</p>
+                       </div>
+                       <button 
+                        onClick={() => setIsTagsOpen(false)}
+                        className="h-10 w-10 flex items-center justify-center rounded-2xl bg-gray-100 dark:bg-white/5 text-gray-nav hover:text-red transition-all"
+                      >
+                        <X size={20} />
+                      </button>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      {tags.map(tag => (
-                        <span key={tag} className="px-2 py-1 rounded-lg bg-gray-50 border border-border text-[11px] font-black flex items-center gap-1.5">
-                          #{tag} <X size={10} className="cursor-pointer" onClick={() => removeTag(tag)} />
-                        </span>
-                      ))}
+
+                    <div className="space-y-6">
+                      <div className="relative">
+                        <input 
+                          type="text" 
+                          placeholder="Type and press Enter..." 
+                          value={tagInput} 
+                          onChange={(e) => setTagInput(e.target.value)} 
+                          onKeyDown={handleAddTag} 
+                          className="w-full pl-4 pr-12 py-3.5 rounded-2xl border-2 border-border dark:border-white/10 bg-white/50 dark:bg-black/20 focus:border-blue outline-none text-[14px] font-bold transition-all" 
+                        />
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-nav/40">
+                          <TagIcon size={18} />
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto pr-2">
+                        {tags.length === 0 && <p className="text-[11px] font-bold text-gray-nav/40 italic">No tags added yet...</p>}
+                        {tags.map(tag => (
+                          <motion.span 
+                            key={tag} 
+                            initial={{ scale: 0.8, opacity: 0 }} 
+                            animate={{ scale: 1, opacity: 1 }}
+                            className="px-3 py-1.5 rounded-xl bg-blue/5 border-2 border-blue/20 text-[11px] font-black text-blue flex items-center gap-2 group"
+                          >
+                            #{tag} 
+                            <X size={12} className="cursor-pointer opacity-40 group-hover:opacity-100 hover:text-red transition-all" onClick={() => removeTag(tag)} />
+                          </motion.span>
+                        ))}
+                      </div>
                     </div>
                   </motion.div>
                 </div>
@@ -1350,27 +1414,58 @@ export const CreateNote: React.FC = () => {
           {createPortal(
             <AnimatePresence>
               {isMusicOpen && (
-                <div className="fixed inset-0 z-[100] pointer-events-none flex items-end justify-center sm:items-start sm:justify-end sm:pr-24 sm:pt-20">
-                  <div className="absolute inset-0 pointer-events-auto" onClick={() => setIsMusicOpen(false)} />
+                <div className="fixed inset-0 z-[110] flex items-end">
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 bg-black/40 backdrop-blur-sm" 
+                    onClick={() => setIsMusicOpen(false)} 
+                  />
                   <motion.div
-                    initial={{ opacity: 0, y: 15, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 15, scale: 0.95 }}
-                    className="pointer-events-auto w-[240px] bg-white/95 dark:bg-[#18181b]/95 border-2 border-border shadow-2xl rounded-[28px] p-4 backdrop-blur-xl relative"
+                    initial={{ y: '100%' }}
+                    animate={{ y: 0 }}
+                    exit={{ y: '100%' }}
+                    transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                    className="relative w-full bg-white dark:bg-panel-bg liquid-glass-strong border-t-2 border-border/40 rounded-t-[40px] shadow-[0_-20px_50px_-20px_rgba(0,0,0,0.3)] px-6 py-10 pb-12 sm:px-12"
                   >
-                    <div className="flex flex-col gap-1.5">
-                      {AMBIENT_TRACKS.map(track => {
-                        const isActive = activeMusicTrack?.id === track.id;
-                        return (
-                          <button key={track.id} onClick={() => isActive ? stopMusic() : playMusicTrack(track)} className={`w-full flex items-center justify-between p-3 rounded-2xl border-2 transition-all ${isActive ? 'bg-purple-500/5 border-purple-500/30' : 'border-transparent hover:bg-gray-50'}`}>
-                             <div className="flex items-center gap-3">
-                               <span className="text-xl">{track.emoji}</span>
-                               <span className={`text-[12px] font-black ${isActive ? 'text-purple-500' : 'text-gray-text'}`}>{track.label}</span>
-                             </div>
-                             {isActive && <div className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-ping" />}
-                          </button>
-                        );
-                      })}
+                    <div className="max-w-4xl mx-auto">
+                      <div className="flex items-center justify-between mb-10">
+                        <div>
+                          <h3 className="text-[22px] font-black text-gray-text tracking-tight">Ambient Sanctuary</h3>
+                          <p className="text-[12px] font-bold text-gray-nav">Curated soundscapes for immersive focus</p>
+                        </div>
+                        <button 
+                          onClick={() => setIsMusicOpen(false)}
+                          className="h-12 w-12 flex items-center justify-center rounded-2xl bg-gray-100 dark:bg-white/5 text-gray-nav hover:text-red transition-all"
+                        >
+                          <X size={24} />
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                        {AMBIENT_TRACKS.map(track => {
+                          const isActive = activeMusicTrack?.id === track.id;
+                          return (
+                            <button 
+                              key={track.id} 
+                              onClick={() => isActive ? stopMusic() : playMusicTrack(track)} 
+                              className={`group relative flex flex-col items-center justify-center p-6 rounded-[32px] border-2 transition-all duration-700 active:scale-95 ${isActive ? 'bg-purple-500/10 border-purple-500/40 text-purple-500 shadow-lg shadow-purple-500/10' : 'bg-white dark:bg-white/5 border-transparent hover:border-border'}`}
+                            >
+                               <div className={`text-3xl mb-3 transition-transform duration-700 ${isActive ? 'scale-125' : 'group-hover:scale-110'}`}>
+                                 {track.emoji}
+                               </div>
+                               <span className={`text-[11px] font-black uppercase tracking-widest ${isActive ? 'text-purple-500' : 'text-gray-nav'}`}>{track.label}</span>
+                               {isActive && (
+                                 <motion.div 
+                                   layoutId="active-track"
+                                   className="absolute -bottom-2 w-1.5 h-1.5 rounded-full bg-purple-500 shadow-[0_0_10px_#a855f7]"
+                                 />
+                               )}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                   </motion.div>
                 </div>
