@@ -18,6 +18,7 @@ import { NotFound } from './pages/NotFound';
 import { RoutePath } from './types';
 import { useSync } from './hooks/useSync';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 // Wrapper to initialize hooks inside Context
 const SyncWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -30,6 +31,7 @@ function App() {
     <PWAInstallProvider>
       <AuthProvider>
         <Analytics />
+        <SpeedInsights />
         <Router>
           <SyncWrapper>
             <Routes>
