@@ -17,6 +17,7 @@ import { PrivacyPolicy } from './pages/dashboard/PrivacyPolicy';
 import { NotFound } from './pages/NotFound';
 import { RoutePath } from './types';
 import { useSync } from './hooks/useSync';
+import { Analytics } from '@vercel/analytics/react';
 
 // Wrapper to initialize hooks inside Context
 const SyncWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -28,6 +29,7 @@ function App() {
   return (
     <PWAInstallProvider>
       <AuthProvider>
+        <Analytics />
         <Router>
           <SyncWrapper>
             <Routes>

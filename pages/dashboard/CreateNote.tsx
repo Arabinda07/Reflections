@@ -892,17 +892,21 @@ export const CreateNote: React.FC = () => {
 
       {isContentVisible && (
         <div className="flex h-screen w-full bg-white dark:bg-panel-bg overflow-hidden relative selection:bg-blue/10">
-          {/* Sidebar - Drawer on Mobile, Fixed on Desktop */}
+          {/* Sidebar - Liquid Glass Drawer on Mobile, Fixed on Desktop */}
           <aside 
-            className={`fixed left-0 top-0 bottom-0 w-[240px] border-r-2 border-border bg-white dark:bg-panel-bg z-50 transition-all duration-700 ease-out-expo px-6 py-8 flex flex-col gap-8 
+            className={`fixed left-0 top-0 bottom-0 w-[280px] sm:w-[320px] lg:w-[240px] border-r-2 border-border z-50 transition-all duration-700 ease-out-expo px-6 py-8 flex flex-col gap-8 
+              ${isMobile ? 'liquid-glass-strong rounded-r-[40px] shadow-2xl overflow-y-auto' : 'bg-white dark:bg-panel-bg'}
               ${isMobile ? (isSidebarOpen ? 'translate-x-0' : '-translate-x-full') : (isDimmed ? '-translate-x-full opacity-0 pointer-events-none' : 'translate-x-0 opacity-100')}
             `}
           >
             <div className="flex flex-col gap-2">
-              <div className="flex items-center justify-between lg:block">
-                <span className="text-[10px] font-black text-blue tracking-widest uppercase opacity-50 mb-2">Sanctuary Log</span>
-                <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-2 text-gray-nav hover:text-red transition-colors">
-                  <X size={18} />
+              <div className="flex items-center justify-between lg:block mb-4">
+                <span className="text-[10px] font-black text-blue tracking-widest uppercase opacity-70">Personalize Entry</span>
+                <button 
+                  onClick={() => setIsSidebarOpen(false)} 
+                  className="lg:hidden h-10 w-10 flex items-center justify-center rounded-xl bg-red/10 text-red hover:bg-red/20 transition-all active:scale-90"
+                >
+                  <X size={20} />
                 </button>
               </div>
               <div className="flex items-center gap-2 text-[12px] font-extrabold text-gray-nav">
@@ -1005,14 +1009,15 @@ export const CreateNote: React.FC = () => {
               </div>
 
               <div className="flex items-center gap-2">
-                {/* Personalize Trigger (Mobile Only) */}
+                {/* Personalize Trigger (Mobile Only) - Liquid Glass styled */}
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setIsSidebarOpen(true)}
-                  className="lg:hidden flex items-center gap-2 rounded-xl border-2 border-border font-black text-[11px] text-gray-nav px-3"
+                  className="lg:hidden flex items-center gap-2 rounded-xl border-2 border-border/40 liquid-glass font-black text-[11px] text-gray-text px-4 py-2"
                 >
-                  <Smile size={16} />
+                  <Smile size={16} className="text-blue" />
+                  <span>Mood</span>
                 </Button>
 
                 {/* Whisper Mode Button */}
@@ -1156,8 +1161,8 @@ export const CreateNote: React.FC = () => {
                                 className="text-[19px] leading-[1.7] text-gray-text/90"
                             />
                             
-                            {/* Universal Floating Actions (Bottom-Right) */}
-                            <div className="fixed bottom-8 right-8 z-50">
+                            {/* Universal Floating Actions (Elevated) */}
+                            <div className="fixed bottom-20 right-8 z-50">
                               <AnimatePresence mode="wait">
                                 {showPlane ? null : !hasContent ? (
                                   /* ── AI Spark FAB ── */

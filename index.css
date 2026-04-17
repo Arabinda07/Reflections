@@ -292,6 +292,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
     letter-spacing: 0.013em !important;
     max-width: 82ch;
     margin: 0 auto;
+    text-align: left !important;
     border: none !important;
     outline: none !important;
     font-family: var(--font-editor) !important;
@@ -308,6 +309,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
     color: var(--gray-light) !important;
     font-style: normal !important;
     left: 0 !important;
+    right: auto !important;
+    text-align: left !important;
   }
 
   .ql-snow .ql-stroke {
