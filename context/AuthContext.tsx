@@ -25,16 +25,25 @@ const mapSessionToUser = (session: Session): User => ({
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showStartup, setShowStartup] = useState(true);
+  const [showStartup, setShowStartup] = useState(() => {
+    // Check if splash has already been shown in this session
+    return !sessionStorage.getItem('startup_shown');
+  });
   const [minTimeReached, setMinTimeReached] = useState(false);
 
   // Minimum duration for the startup animation (3.5 seconds)
   useEffect(() => {
+    // If we've already shown it this session, don't wait
+    if (!showStartup) {
+      setMinTimeReached(true);
+      return;
+    }
+
     const timer = setTimeout(() => {
       setMinTimeReached(true);
     }, 3500);
     return () => clearTimeout(timer);
-  }, []);
+  }, [showStartup]);
 
   useEffect(() => {
     let mounted = true;
@@ -72,18 +81,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Hide startup screen only when both conditions are met
   useEffect(() => {
-    if (!loading && minTimeReached) {
+    if (!loading && minTimeReached && showStartup) {
       // Extended delay to ensure the StartupScreen's exit animation (800ms) has time to finish
       const fadeOutTimer = setTimeout(() => {
         setShowStartup(false);
+        sessionStorage.setItem('startup_shown', 'true');
       }, 800);
       return () => clearTimeout(fadeOutTimer);
     }
-  }, [loading, minTimeReached]);
+  }, [loading, minTimeReached, showStartup]);
 
   const logout = async () => {
     try {
       await supabase.auth.signOut();
+      if (sessionStorage.getItem('startup_shown')) {
+         sessionStorage.removeItem('startup_shown');
+      }
       setUser(null);
     } catch (error) {
       console.error('Error signing out:', error);
@@ -97,9 +110,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       {/* 
         CRITICAL FIX: We always render children to keep the Router and its state alive.
-        The StartupScreen covers it visually until we're ready.
+        FIX (Glimpse): We hide them with CSS opacity so they don't "flash" before the overlay mounts.
       */}
-      {children}
+      <div 
+        className="flex-1 contents"
+        style={{ 
+          opacity: showStartup ? 0 : 1, 
+          visibility: showStartup ? 'hidden' : 'visible',
+          transition: 'opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), visibility 1.2s'
+        }}
+      >
+        {children}
+      </div>
     </AuthContext.Provider>
   );
 };

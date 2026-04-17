@@ -5,6 +5,7 @@ interface EditorProps {
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
+  hideToolbar?: boolean;
 }
 
 export interface EditorRef {
@@ -14,7 +15,7 @@ export interface EditorRef {
 // Access the global Quill object from CDN
 declare const Quill: any;
 
-export const Editor = forwardRef<EditorRef, EditorProps>(({ value, onChange, placeholder, className = '' }, ref) => {
+export const Editor = forwardRef<EditorRef, EditorProps>(({ value, onChange, placeholder, className = '', hideToolbar = false }, ref) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const quillInstance = useRef<any>(null);
 
@@ -37,7 +38,7 @@ export const Editor = forwardRef<EditorRef, EditorProps>(({ value, onChange, pla
         theme: 'snow',
         placeholder: placeholder || 'Start typing...',
         modules: {
-          toolbar: [
+          toolbar: hideToolbar ? false : [
             [{ 'header': [1, 2, 3, false] }],
             ['bold', 'italic', 'underline', 'strike'],
             [{ 'color': [] }, { 'background': [] }],
