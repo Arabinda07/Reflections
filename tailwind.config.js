@@ -39,12 +39,24 @@ export default {
         red: 'var(--red)',
         orange: 'var(--orange)',
         golden: 'var(--golden)',
-        white: 'rgba(var(--panel-bg-rgb), <alpha-value>)',
+        white: 'var(--panel-bg)',
         black: 'var(--gray-text)',
       },
       backgroundColor: {
-        white: 'rgba(var(--panel-bg-rgb), <alpha-value>)',
         body: 'var(--bg-color)',
+      },
+      spacing: {
+        'space-05': 'var(--space-05)',
+        'space-1': 'var(--space-1)',
+        'space-2': 'var(--space-2)',
+        'space-3': 'var(--space-3)',
+        'space-4': 'var(--space-4)',
+        'space-5': 'var(--space-5)',
+        'space-6': 'var(--space-6)',
+        'space-8': 'var(--space-8)',
+        'space-10': 'var(--space-10)',
+        'space-12': 'var(--space-12)',
+        'space-16': 'var(--space-16)',
       },
       transitionTimingFunction: {
         'out-quart': 'cubic-bezier(0.25, 1, 0.5, 1)',
@@ -53,5 +65,7 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/container-queries'),
+  ],
 };

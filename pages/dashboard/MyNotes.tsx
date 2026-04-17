@@ -230,7 +230,7 @@ export const MyNotes: React.FC = () => {
                 <CalendarIcon size={18} className="text-blue" />
                 {format(selectedDate, 'MMMM do, yyyy')}
               </h3>
-              <span className="text-[11px] font-bold text-gray-nav bg-gray-100 px-2 py-1 rounded-lg">
+              <span className="text-[11px] font-bold text-gray-nav bg-border px-2 py-1 rounded-lg">
                 {notesOnSelectedDate.length} {notesOnSelectedDate.length === 1 ? 'Note' : 'Notes'}
               </span>
             </div>
@@ -261,7 +261,7 @@ export const MyNotes: React.FC = () => {
                   </div>
                 ))
               ) : (
-                <div className="flex flex-col items-center justify-center py-12 text-center bg-gray-50/50 rounded-[32px] border-2 border-dashed border-border">
+                <div className="flex flex-col items-center justify-center py-12 text-center bg-white rounded-[32px] border-2 border-dashed border-border">
                   <div className="h-12 w-12 rounded-xl bg-white border-2 border-border flex items-center justify-center text-gray-nav/30 mb-4">
                     <FileText size={24} />
                   </div>
@@ -405,9 +405,9 @@ export const MyNotes: React.FC = () => {
       {/* Undo Toast */}
       {removedNote && createPortal(
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[999999] animate-in slide-in-from-bottom-5 fade-in duration-300">
-          <div className="flex items-center gap-4 rounded-[20px] bg-[#1a1a1a] px-6 py-3.5 text-white shadow-2xl border-2 border-[#333]">
+          <div className="flex items-center gap-4 rounded-[20px] bg-black px-6 py-3.5 text-white shadow-2xl border-2 border-border">
             <span className="text-[13px] font-bold">Entry removed from timeline</span>
-            <div className="h-4 w-[2px] bg-white/20"></div>
+            <div className="h-4 w-[2px] bg-border/20"></div>
             <button 
               onClick={handleUndoDelete}
               className="text-[13px] font-extrabold text-white uppercase hover:text-green active:scale-[0.98] tracking-widest transition-colors duration-200"

@@ -30,11 +30,11 @@
   --blue: oklch(0.65 0.15 245);
   --blue-shadow: oklch(0.50 0.15 245);
   
-  /* Tinted Neutrals (Chroma 0.012 leaning toward hue 135) */
-  --gray-text: oklch(0.35 0.012 135);
-  --gray-light: oklch(0.55 0.012 135);
-  --border-color: oklch(0.90 0.012 135);
-  --nav-text: oklch(0.65 0.012 135);
+  /* Tinted Neutrals (Strict Chroma 0.01 leaning toward hue 135) */
+  --gray-text: oklch(0.25 0.01 135);
+  --gray-light: oklch(0.55 0.01 135);
+  --border-color: oklch(0.92 0.01 135);
+  --nav-text: oklch(0.60 0.01 135);
   
   --footer-green: oklch(0.72 0.18 135);
   --red: oklch(0.65 0.18 20);
@@ -42,9 +42,9 @@
   --orange: oklch(0.75 0.15 50);
   --golden: oklch(0.85 0.15 80);
   
-  --bg-color: oklch(0.99 0.005 135);
-  --panel-bg: oklch(0.97 0.008 135);
-  --panel-bg-rgb: 247, 248, 246; /* fallback for backwards compatibility */
+  --bg-color: oklch(0.99 0.01 135);
+  --panel-bg: oklch(0.98 0.01 135);
+  --panel-bg-rgb: 247, 248, 246; /* legacy fallback */
 
   /* Phased Typography Scale (1.25 Ratio / 18px Base) */
   --text-base: 1.125rem;    /* 18px */
@@ -54,6 +54,19 @@
   --text-3xl: 2.746rem;     /* ~44px */
   --text-sm: 0.9rem;        /* ~14.4px */
   --text-xs: 0.72rem;       /* ~11.5px */
+
+  /* 4pt Spatial Scale Variables */
+  --space-05: 0.125rem; /* 2px */
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
 }
 
 .dark {
@@ -65,11 +78,11 @@
   --blue: oklch(0.75 0.15 245);
   --blue-shadow: oklch(0.40 0.15 245);
   
-  /* Tinted Neutrals - Dark Mode (Chroma 0.012 leaning toward hue 135) */
-  --gray-text: oklch(0.85 0.012 135);
-  --gray-light: oklch(0.65 0.012 135);
-  --border-color: oklch(0.28 0.012 135);
-  --nav-text: oklch(0.70 0.012 135);
+  /* Tinted Neutrals - Dark Mode (Chroma 0.02 leaning toward hue 135) */
+  --gray-text: oklch(0.85 0.02 135);
+  --gray-light: oklch(0.65 0.02 135);
+  --border-color: oklch(0.25 0.02 135);
+  --nav-text: oklch(0.70 0.02 135);
   
   /* Pure black #000 explicitly banned, utilizing dark gray base */
   --bg-color: oklch(0.18 0.012 135);

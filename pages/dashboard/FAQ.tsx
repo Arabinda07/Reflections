@@ -33,7 +33,7 @@ export const FAQ: React.FC = () => {
   }, []);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-white dark:bg-[#121212] selection:bg-green/30 selection:text-green-hover pb-32 transition-colors duration-300">
+    <div className="relative min-h-screen overflow-hidden bg-body selection:bg-green/30 selection:text-green-hover pb-32 transition-colors duration-300">
       
       {/* Ambient Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">

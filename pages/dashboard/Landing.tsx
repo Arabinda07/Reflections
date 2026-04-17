@@ -21,7 +21,7 @@ export const Landing: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-white dark:bg-[#121212] selection:bg-green/30 selection:text-green-hover transition-colors duration-300">
+    <div className="relative min-h-screen overflow-hidden bg-body selection:bg-green/30 selection:text-green-hover transition-colors duration-300">
       {/* Ambient Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-green/5 blur-[120px] rounded-full animate-pulse" />

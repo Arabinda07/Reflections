@@ -64,7 +64,7 @@ export const DashboardLayout: React.FC = () => {
   const navItems = isAuthenticated ? authNavItems : guestNavItems;
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-[#121212] font-sans selection:bg-green/30 selection:text-green-hover transition-colors duration-300">
+    <div className="min-h-screen flex flex-col bg-body font-sans selection:bg-green/30 selection:text-green-hover transition-colors duration-300">
       {/* Fixed Navbar */}
       <nav className="fixed top-0 left-0 right-0 h-[64px] border-b-2 border-border z-[100] flex justify-center liquid-glass">
         <div className="w-full max-w-[1440px] px-4 md:px-10 flex items-center justify-between">
@@ -156,7 +156,7 @@ export const DashboardLayout: React.FC = () => {
       {/* Mobile Menu Overlay - Moved OUTSIDE of nav to avoid overflow:hidden from liquid-glass */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-[105] md:hidden animate-in fade-in duration-500">
-          <div className="absolute inset-0 bg-white/96 dark:bg-[#0a0a0b]/96 backdrop-blur-3xl" onClick={() => setIsMobileMenuOpen(false)} />
+          <div className="absolute inset-0 bg-white backdrop-blur-3xl" onClick={() => setIsMobileMenuOpen(false)} />
           
           {/* Ambient Background for Mobile Menu */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">

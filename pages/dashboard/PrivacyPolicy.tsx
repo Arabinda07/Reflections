@@ -7,7 +7,7 @@ export const PrivacyPolicy: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#121212] px-4 py-12 sm:px-6">
+    <div className="min-h-screen bg-body px-4 py-12 sm:px-6">
       <div className="mx-auto max-w-3xl">
 
         {/* Back button */}
