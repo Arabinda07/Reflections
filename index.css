@@ -305,7 +305,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   }
 
   .ql-editor.ql-blank::before {
-    color: var(--border-color) !important;
+    color: var(--gray-light) !important;
     font-style: normal !important;
     left: 0 !important;
   }

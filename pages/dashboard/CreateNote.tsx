@@ -302,9 +302,7 @@ export const CreateNote: React.FC = () => {
       if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') {
         setIsFlowing(true);
         if (flowTimeoutRef.current) clearTimeout(flowTimeoutRef.current);
-        flowTimeoutRef.current = setTimeout(() => {
-          setIsFlowing(false);
-        }, 3000);
+        // Perpetual Zen: Stays faded until mouse/touch wake event
       }
     };
 
@@ -857,7 +855,7 @@ export const CreateNote: React.FC = () => {
       {/* LoadingState removed as per user request for instant creative flow */}
       {isContentVisible && (
         <div className="mx-auto max-w-[1180px] animate-in fade-in duration-500 pb-20 px-3 sm:px-4 md:px-6">
-        <nav className={`sticky top-4 z-50 mb-8 flex items-center justify-between gap-2 rounded-2xl border-2 border-border bg-white/90 dark:bg-panel-bg/90 px-3 py-2 sm:px-4 sm:py-3 shadow-sm backdrop-blur-2xl transition-all duration-700 ${isDimmed ? 'opacity-0 pointer-events-none scale-[0.98]' : 'opacity-100 scale-100'}`}>
+        <nav className={`sticky top-4 z-50 mb-8 flex items-center justify-between gap-2 rounded-2xl border-2 border-border bg-white/90 dark:bg-panel-bg/90 px-3 py-2 sm:px-4 sm:py-3 shadow-sm backdrop-blur-2xl transition-all duration-700 ${isDimmed ? (isMobile ? 'opacity-0 pointer-events-none scale-[0.98]' : 'opacity-25 pointer-events-none') : 'opacity-100 scale-100'}`}>
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-bold text-[12px] px-2 sm:px-3">
              <ArrowLeft className="h-4 w-4 sm:mr-2" />
@@ -1051,9 +1049,7 @@ export const CreateNote: React.FC = () => {
             onClick={handleSave} 
             size="sm" 
             variant="primary"
-            className={`shrink-0 shadow-sm px-2 sm:px-3  active:scale-[0.98] transition-all duration-300 ease-out-quart ${
-              hasContent ? 'hidden sm:flex' : 'flex'
-            }`}
+            className={`shrink-0 shadow-sm px-2 sm:px-3  active:scale-[0.98] transition-all duration-300 ease-out-quart hidden sm:flex`}
             disabled={!canSave || saving || showPlane}
           >
             <Save className="h-3.5 w-3.5 sm:mr-2" />
@@ -1096,7 +1092,7 @@ export const CreateNote: React.FC = () => {
             )}
 
             <div className="flex-1 px-4 py-6 sm:px-6 md:px-10 md:py-8 lg:px-12 lg:py-10">
-                <div className={`mb-12 flex flex-wrap items-center justify-between gap-4 transition-all duration-700 ${isDimmed ? 'opacity-0 pointer-events-none translate-y-2' : 'opacity-100 translate-y-0'}`}>
+                <div className={`mb-12 flex flex-wrap items-center justify-between gap-4 transition-all duration-700 ${isDimmed ? (isMobile ? 'opacity-0 pointer-events-none translate-y-2' : 'opacity-25 pointer-events-none') : 'opacity-100 translate-y-0'}`}>
                     <div className="flex items-center gap-2 text-[11px] font-extrabold text-gray-nav">
                         <Calendar size={13} />
                         <span>{new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
@@ -1270,7 +1266,7 @@ export const CreateNote: React.FC = () => {
                     onChange={(e) => setTitle(e.target.value)}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
-                    className={`editor-body w-full border-none bg-transparent text-3xl sm:text-4xl font-semibold text-gray-text placeholder:text-border focus:outline-none focus:ring-0 p-0 mb-12 tracking-[-0.01em] leading-tight transition-all duration-700 ${isDimmed ? 'opacity-0 pointer-events-none -translate-y-2' : 'opacity-100 translate-y-0'}`}
+                    className={`editor-body w-full border-none bg-transparent text-3xl sm:text-4xl font-semibold text-gray-text placeholder:text-border focus:outline-none focus:ring-0 p-0 mb-12 tracking-[-0.01em] leading-tight transition-all duration-700 ${isDimmed ? (isMobile ? 'opacity-0 pointer-events-none -translate-y-2' : 'opacity-25 pointer-events-none') : 'opacity-100 translate-y-0'}`}
                 />
                 
                 <div 
@@ -1361,7 +1357,7 @@ export const CreateNote: React.FC = () => {
                 </div>
 
                 {/* Tasks Section */}
-                <div className={`mt-12 border-t-2 border-border pt-6 transition-all duration-700 ${isDimmed ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 translate-y-0'}`}>
+                <div className={`mt-12 border-t-2 border-border pt-6 transition-all duration-700 ${isDimmed ? (isMobile ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-25 pointer-events-none') : 'opacity-100 translate-y-0'}`}>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                     <button 
                       onClick={() => setIsTasksOpen(!isTasksOpen)}
@@ -1466,7 +1462,7 @@ export const CreateNote: React.FC = () => {
                 )}
 
                 {(newAttachments.length > 0 || existingAttachments.length > 0) && (
-                  <div className={`mt-12 border-t-2 border-border pt-8 transition-all duration-700 ${isDimmed ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-100 translate-y-0'}`}>
+                  <div className={`mt-12 border-t-2 border-border pt-8 transition-all duration-700 ${isDimmed ? (isMobile ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-25 pointer-events-none') : 'opacity-100 translate-y-0'}`}>
                     <h3 className="text-[13px] font-extrabold text-gray-text mb-6 flex items-center gap-2">
                       <Paperclip size={16} className="text-gray-nav" />
                       Attachments ({newAttachments.length + existingAttachments.length})
@@ -1554,7 +1550,7 @@ export const CreateNote: React.FC = () => {
                 )}
             </div>
 
-            <div className={`border-t-2 border-border bg-white/50 dark:bg-white/5 px-8 py-4 text-center transition-all duration-700 ${isDimmed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+            <div className={`border-t-2 border-border bg-white/50 dark:bg-white/5 px-8 py-4 text-center transition-all duration-700 ${isDimmed ? (isMobile ? 'opacity-0 pointer-events-none' : 'opacity-25 pointer-events-none') : 'opacity-100'}`}>
                 <p className="text-[11px] font-extrabold text-gray-nav">
                    Your journal is a safe space for your thoughts.
                 </p>

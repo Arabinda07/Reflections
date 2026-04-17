@@ -17,14 +17,18 @@ export const SyncBanner: React.FC = () => {
     // If we regain connection while the banner is showing, switch to recovery state
     else if (isOnline && showBanner && bannerMode === 'offline') {
       setBannerMode('recovery');
-      
-      // Auto-hide the success banner after 3 seconds
-      const timer = setTimeout(() => {
-        setShowBanner(false);
-      }, 3000);
-      return () => clearTimeout(timer);
     }
   }, [isOnline, showBanner, bannerMode]);
+
+  useEffect(() => {
+    // Auto-hide the success banner after 4 seconds to give user time to read
+    if (showBanner && bannerMode === 'recovery') {
+      const timer = setTimeout(() => {
+        setShowBanner(false);
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [showBanner, bannerMode]);
 
   return (
     <AnimatePresence>
