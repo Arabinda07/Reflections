@@ -1135,7 +1135,7 @@ export const CreateNote: React.FC = () => {
                               setIsFocused(false);
                               setIsTitleFocused(false);
                             }}
-                            className={`w-full border-none bg-transparent text-[42px] font-serif font-semibold text-gray-text placeholder:text-border/40 focus:outline-none focus:ring-0 p-0 mb-4 tracking-tight transition-all duration-700 ${isDimmed ? (isMobile ? 'opacity-40 scale-[0.98]' : 'opacity-25') : 'opacity-100 scale-100'}`}
+                            className={`w-full border-none bg-transparent text-[42px] font-serif font-semibold text-gray-text placeholder:text-border/40 focus:outline-none focus:ring-0 p-0 mb-4 tracking-tight transition-all duration-700 ${isDimmed ? (isMobile ? 'opacity-80 scale-[0.98]' : 'opacity-25') : 'opacity-100 scale-100'}`}
                         />
                         
                         <div 
@@ -1243,10 +1243,6 @@ export const CreateNote: React.FC = () => {
                                 );
                               })}
                             </div>
-                          </div>
-                        )}
-                      </div>
-                             </div>
                           </div>
                         )}
                       </div>
