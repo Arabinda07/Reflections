@@ -139,10 +139,10 @@ export const Home: React.FC = () => {
         <motion.div
           animate={{ y: [-5, 5, -5] }}
           transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-          className="relative z-10 flex flex-col items-center text-center max-w-2xl w-full pt-[110px] sm:pt-[160px]"
+          className="relative z-10 flex flex-col gap-32 sm:gap-48 items-center text-center max-w-2xl w-full pt-[110px] sm:pt-[160px]"
         >
           <h1
-            className="font-display text-[36px] sm:text-[52px] lg:text-[64px] lowercase mb-44 sm:mb-56 tracking-tighter leading-none px-2"
+            className="font-display text-[36px] sm:text-[52px] lg:text-[64px] lowercase tracking-tighter leading-none px-2"
             style={{ color: '#ffffff', textShadow: '0 4px 12px rgba(0,0,0,0.8)' }}
           >
             welcome back, {user?.name?.split(' ')[0] || 'learner'}
@@ -167,10 +167,10 @@ export const Home: React.FC = () => {
           <div className="panel-label">Emotional Overview</div>
           <div className="flex flex-col gap-6">
             <div
-              className="bg-white border-2 border-border rounded-[32px] p-8 shadow-sm hover:shadow-none hover:-translate-y-1 transition-all duration-300 ease-out-quart liquid-glass cursor-pointer group"
+              className="flex flex-col gap-6 bg-white border-2 border-border rounded-[32px] p-8 shadow-sm hover:shadow-none hover:-translate-y-1 transition-all duration-300 ease-out-quart liquid-glass cursor-pointer group"
               onClick={() => navigate(RoutePath.NOTES)}
             >
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between">
                 <div className="h-14 w-14 rounded-2xl bg-blue/10 flex items-center justify-center text-blue shadow-sm group-hover:scale-110 transition-transform">
                   <FolderOpen size={28} />
                 </div>
@@ -178,20 +178,22 @@ export const Home: React.FC = () => {
                   View All <ArrowRight size={12} />
                 </div>
               </div>
-              <h3 className="text-[16px] font-bold text-gray-nav uppercase tracking-wider mb-2">Total Reflections</h3>
-              <div className="flex items-baseline gap-2">
-                <span className="text-[40px] font-display text-gray-text">
-                  {isCountLoading ? '...' : noteCount ?? '0'}
-                </span>
-                <span className="text-[12px] font-extrabold text-green uppercase">Synced with Cloud</span>
+              <div className="flex flex-col gap-2">
+                <h3 className="text-[16px] font-bold text-gray-nav uppercase tracking-wider">Total Reflections</h3>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-[40px] font-display text-gray-text">
+                    {isCountLoading ? '...' : noteCount ?? '0'}
+                  </span>
+                  <span className="text-[12px] font-extrabold text-green uppercase">Synced with Cloud</span>
+                </div>
               </div>
             </div>
 
             <div
-              className="bg-white border-2 border-border rounded-[32px] p-8 shadow-sm hover:shadow-none hover:-translate-y-1 transition-all duration-300 ease-out-quart liquid-glass cursor-pointer group"
+              className="flex flex-col gap-6 bg-white border-2 border-border rounded-[32px] p-8 shadow-sm hover:shadow-none hover:-translate-y-1 transition-all duration-300 ease-out-quart liquid-glass cursor-pointer group"
               onClick={() => navigate(RoutePath.INSIGHTS)}
             >
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between">
                 <div className="h-14 w-14 rounded-2xl bg-green/10 flex items-center justify-center text-green shadow-sm group-hover:scale-110 transition-transform">
                   <Brain size={28} />
                 </div>
@@ -199,8 +201,10 @@ export const Home: React.FC = () => {
                   Get Insights <ArrowRight size={12} />
                 </div>
               </div>
-              <h3 className="text-[16px] font-bold text-gray-nav uppercase tracking-wider mb-2">Mental Health Insights</h3>
-              <p className="text-[15px] text-gray-light font-medium leading-relaxed">AI is ready to analyze your patterns and provide compassionate feedback.</p>
+              <div className="flex flex-col gap-2">
+                <h3 className="text-[16px] font-bold text-gray-nav uppercase tracking-wider">Mental Health Insights</h3>
+                <p className="text-[15px] text-gray-light font-medium leading-relaxed">AI is ready to analyze your patterns and provide compassionate feedback.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -208,15 +212,15 @@ export const Home: React.FC = () => {
         {/* Panel 2: Daily Mindfulness */}
         <div className="p-6 sm:p-10 lg:border-l-2 border-border flex flex-col justify-center">
           <div className="panel-label">Daily Mindfulness</div>
-          <div className="group relative overflow-hidden bg-white border-2 border-border rounded-[32px] p-8 shadow-sm liquid-glass flex flex-col">
-            <div className="relative z-10">
-              <div className="mb-6 flex items-start justify-between gap-4">
+          <div className="group relative overflow-hidden bg-white border-2 border-border rounded-[32px] p-8 shadow-sm liquid-glass flex flex-col gap-8">
+            <div className="relative z-10 flex flex-col gap-8">
+              <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[22px] bg-blue/10 text-blue shadow-sm border-2 border-border/50">
                     <Target size={22} />
                   </div>
-                  <div>
-                    <h4 className="text-[16px] font-bold text-gray-nav uppercase tracking-wider mb-1">Today's Focus</h4>
+                  <div className="flex flex-col gap-1">
+                    <h4 className="text-[16px] font-bold text-gray-nav uppercase tracking-wider">Today's Focus</h4>
                     <p className="text-[14px] text-gray-light font-medium">A small nudge for today</p>
                   </div>
                 </div>
@@ -230,7 +234,7 @@ export const Home: React.FC = () => {
                 </button>
               </div>
 
-              <div className="mb-8 rounded-[24px] border-2 border-border bg-gray-50/50 p-6">
+              <div className="rounded-[24px] border-2 border-border bg-gray-50/50 p-6">
                 <p className="text-[18px] font-medium leading-relaxed text-gray-text sm:text-[20px]">
                   "{dailyPrompt}"
                 </p>
@@ -273,19 +277,19 @@ export const Home: React.FC = () => {
               <Sparkles size={18} />
             </button>
 
-            <div className="relative z-10">
-              <h2 className="text-[32px] font-display text-gray-text lowercase mb-2">welcome to ai notes</h2>
-              <p className="text-[15px] text-gray-light font-medium leading-relaxed mb-8">
+            <div className="relative z-10 flex flex-col gap-8">
+              <h2 className="text-[32px] font-display text-gray-text lowercase">welcome to ai notes</h2>
+              <p className="text-[15px] text-gray-light font-medium leading-relaxed">
                 Your intelligent companion for mental wellness and journaling. Here's what you can do:
               </p>
 
-              <div className="space-y-6 mb-8">
+              <div className="flex flex-col gap-6">
                 <div className="flex gap-4">
                   <div className="h-12 w-12 shrink-0 rounded-2xl bg-green/10 flex items-center justify-center text-green shadow-sm border-2 border-border">
                     <Sparkles size={24} />
                   </div>
-                  <div>
-                    <h3 className="text-[16px] font-bold text-gray-text mb-1">AI Reflection</h3>
+                  <div className="flex flex-col gap-1">
+                    <h3 className="text-[16px] font-bold text-gray-text">AI Reflection</h3>
                     <p className="text-[14px] text-gray-light font-medium leading-relaxed">
                       Get personalized insights, compassionate feedback, and dynamic prompts based on your entries.
                     </p>
@@ -296,8 +300,8 @@ export const Home: React.FC = () => {
                   <div className="h-12 w-12 shrink-0 rounded-2xl bg-blue/10 flex items-center justify-center text-blue shadow-sm border-2 border-border">
                     <Smile size={24} />
                   </div>
-                  <div>
-                    <h3 className="text-[16px] font-bold text-gray-text mb-1">Mood Tracking</h3>
+                  <div className="flex flex-col gap-1">
+                    <h3 className="text-[16px] font-bold text-gray-text">Mood Tracking</h3>
                     <p className="text-[14px] text-gray-light font-medium leading-relaxed">
                       Log your emotions with each entry and visualize your mood trends over time on your calendar.
                     </p>
@@ -308,8 +312,8 @@ export const Home: React.FC = () => {
                   <div className="h-12 w-12 shrink-0 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-500 shadow-sm border-2 border-border">
                     <Tag size={24} />
                   </div>
-                  <div>
-                    <h3 className="text-[16px] font-bold text-gray-text mb-1">Smart Organization</h3>
+                  <div className="flex flex-col gap-1">
+                    <h3 className="text-[16px] font-bold text-gray-text">Smart Organization</h3>
                     <p className="text-[14px] text-gray-light font-medium leading-relaxed">
                       Add custom tags to your notes to easily filter and find your thoughts later.
                     </p>
