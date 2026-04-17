@@ -1,28 +1,82 @@
 import { supabase } from '../src/supabaseClient';
 import { LifeTheme, ThemeCitation, Note } from '../types';
 
-// Map snake_case from Supabase to camelCase for our TypeScript interfaces
+// ─────────────────────────────────────────────
+// Wiki Page Types
+// 'theme'             → freeform user-created life themes (backward compatible)
+// 'mood_patterns'     → recurring emotional states and triggers
+// 'recurring_themes'  → topics the user keeps returning to
+// 'self_model'        → how the user describes themselves, their values
+// 'timeline'          → key moments and turning points
+// 'index'             → one-liner summaries of all pages (Gemini reads this first on every query)
+// ─────────────────────────────────────────────
+export type WikiPageType =
+  | 'theme'
+  | 'mood_patterns'
+  | 'recurring_themes'
+  | 'self_model'
+  | 'timeline'
+  | 'index';
+
+export const STRUCTURED_WIKI_PAGES: WikiPageType[] = [
+  'mood_patterns',
+  'recurring_themes',
+  'self_model',
+  'timeline',
+];
+
+// ─────────────────────────────────────────────
+// Mappers
+// ─────────────────────────────────────────────
 const mapToLifeTheme = (data: any): LifeTheme => ({
   id: data.id,
   userId: data.user_id,
   title: data.title,
   content: data.content,
   state: data.state,
+  pageType: data.page_type as WikiPageType,
   createdAt: data.created_at,
   updatedAt: data.updated_at,
 });
 
+// user_id removed — column was dropped in schema patch
 const mapToThemeCitation = (data: any): ThemeCitation => ({
   id: data.id,
-  userId: data.user_id,
   themeId: data.theme_id,
   noteId: data.note_id,
   createdAt: data.created_at,
 });
 
+// ─────────────────────────────────────────────
+// Wiki Service
+// ─────────────────────────────────────────────
 export const wikiService = {
+
+  // ── Freeform User Themes ──────────────────
+
   /**
-   * Fetch all active life themes for the current user.
+   * Returns only freeform life themes the user created (page_type = 'theme').
+   * Used by aiService during ingest to avoid Gemini touching structured wiki pages.
+   */
+  getUserThemes: async (): Promise<LifeTheme[]> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    const { data, error } = await supabase
+      .from('life_themes')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('page_type', 'theme')
+      .eq('state', 'active')
+      .order('updated_at', { ascending: false });
+
+    if (error) throw error;
+    return (data || []).map(mapToLifeTheme);
+  },
+
+  /**
+   * Returns all active life themes (freeform + structured wiki pages).
+   * Used by the UI to display everything.
    */
   getAllThemes: async (): Promise<LifeTheme[]> => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -58,7 +112,7 @@ export const wikiService = {
   },
 
   /**
-   * Create a brand new Life Theme.
+   * Create a new freeform life theme.
    */
   createTheme: async (title: string, content: string): Promise<LifeTheme> => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -70,7 +124,8 @@ export const wikiService = {
         user_id: user.id,
         title,
         content,
-        state: 'active'
+        state: 'active',
+        page_type: 'theme',
       })
       .select()
       .single();
@@ -80,7 +135,7 @@ export const wikiService = {
   },
 
   /**
-   * Update the content of an existing Life Theme.
+   * Update the content of an existing theme (freeform or structured).
    */
   updateThemeContent: async (themeId: string, newContent: string): Promise<LifeTheme> => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -98,19 +153,93 @@ export const wikiService = {
     return mapToLifeTheme(data);
   },
 
+  // ── Structured Wiki Pages ─────────────────
+
   /**
-   * Links a Note to a Theme so the user knows exactly where the insight originated from.
+   * Fetch a single structured wiki page by type (e.g. 'mood_patterns').
+   * Returns null if it hasn't been created yet.
    */
-  addCitation: async (themeId: string, noteId: string): Promise<ThemeCitation> => {
+  getWikiPage: async (pageType: WikiPageType): Promise<LifeTheme | null> => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
     const { data, error } = await supabase
-      .from('theme_citations')
+      .from('life_themes')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('page_type', pageType)
+      .single();
+
+    if (error) return null;
+    return mapToLifeTheme(data);
+  },
+
+  /**
+   * Fetch all structured wiki pages (excludes freeform themes).
+   * Returns only the pages that have been created so far.
+   */
+  getAllWikiPages: async (): Promise<LifeTheme[]> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    const { data, error } = await supabase
+      .from('life_themes')
+      .select('*')
+      .eq('user_id', user.id)
+      .in('page_type', STRUCTURED_WIKI_PAGES)
+      .eq('state', 'active');
+
+    if (error) throw error;
+    return (data || []).map(mapToLifeTheme);
+  },
+
+  /**
+   * Create or update a structured wiki page.
+   * Uses upsert on (user_id, page_type) — there is exactly one of each per user.
+   */
+  upsertWikiPage: async (
+    pageType: WikiPageType,
+    title: string,
+    content: string
+  ): Promise<LifeTheme> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    // Check if it already exists so we can update vs insert
+    const existing = await wikiService.getWikiPage(pageType);
+
+    if (existing) {
+      return wikiService.updateThemeContent(existing.id, content);
+    }
+
+    const { data, error } = await supabase
+      .from('life_themes')
       .insert({
         user_id: user.id,
+        title,
+        content,
+        state: 'active',
+        page_type: pageType,
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return mapToLifeTheme(data);
+  },
+
+  // ── Citations ─────────────────────────────
+
+  /**
+   * Links a note to a theme.
+   * user_id removed — RLS enforces ownership via life_themes join.
+   */
+  addCitation: async (themeId: string, noteId: string): Promise<ThemeCitation> => {
+    const { data, error } = await supabase
+      .from('theme_citations')
+      .insert({
         theme_id: themeId,
-        note_id: noteId
+        note_id: noteId,
       })
       .select()
       .single();
@@ -118,27 +247,25 @@ export const wikiService = {
     if (error) throw error;
     return mapToThemeCitation(data);
   },
-  
+
   /**
-   * Retrieves all Notes that were used to generate a specific theme.
+   * Retrieves all notes that contributed to a specific theme.
+   * user_id removed from citations query — RLS handles it.
    */
   getThemeSources: async (themeId: string): Promise<Note[]> => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
-    // Fetch the citations to get note IDs
     const { data: citations, error: citeError } = await supabase
       .from('theme_citations')
       .select('note_id')
-      .eq('theme_id', themeId)
-      .eq('user_id', user.id);
+      .eq('theme_id', themeId);
 
     if (citeError) throw citeError;
     if (!citations || citations.length === 0) return [];
 
-    const noteIds = citations.map(c => c.note_id);
+    const noteIds = citations.map((c: any) => c.note_id);
 
-    // Fetch the actual notes
     const { data: notes, error: noteError } = await supabase
       .from('notes')
       .select('*')
@@ -146,8 +273,8 @@ export const wikiService = {
       .eq('user_id', user.id);
 
     if (noteError) throw noteError;
-    
-    return (notes || []).map(data => ({
+
+    return (notes || []).map((data: any) => ({
       id: data.id,
       title: data.title || '',
       content: data.content || '',
@@ -159,5 +286,5 @@ export const wikiService = {
       mood: data.mood || undefined,
       tasks: data.tasks || [],
     }));
-  }
+  },
 };
