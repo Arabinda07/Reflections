@@ -32,7 +32,7 @@ export const PaperPlaneToast: React.FC<PaperPlaneToastProps> = ({
     // Fixed 2-second window — matches the paper plane arc duration
     const timer = setTimeout(() => {
       callbackRef.current();
-    }, 2000);
+    }, 1500);
 
     return () => clearTimeout(timer);
   }, [isVisible]);

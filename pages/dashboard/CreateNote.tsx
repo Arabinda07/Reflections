@@ -591,11 +591,11 @@ export const CreateNote: React.FC = () => {
     navigator.vibrate?.(10);
     setSaving(true);
 
-    // ─── Step 1: Show plane AND start the 2.2-second animation floor simultaneously.
+    // ─── Step 1: Show plane AND start the 1.5-second animation floor simultaneously.
     //     The floor ensures the Lottie always plays for a full, satisfying duration
     //     regardless of how fast or slow the network save completes.
     setShowPlane(true);
-    const animFloor = new Promise<void>(resolve => setTimeout(resolve, 2200));
+    const animFloor = new Promise<void>(resolve => setTimeout(resolve, 1500));
 
     // ─── Step 2: Run the save.
     let saveSucceeded = false;
@@ -665,8 +665,8 @@ export const CreateNote: React.FC = () => {
 
     // ─── Step 3: Wait for the animation floor to complete.
     //     If save finished early (common), we wait here for the remaining time
-    //     so the Lottie always plays for the full 2.2 seconds.
-    //     If save was slow (> 2.2s), animFloor is already resolved and this is instant.
+    //     so the Lottie always plays for the full 1.5 seconds.
+    //     If save was slow (> 1.5s), animFloor is already resolved and this is instant.
     await animFloor;
 
     if (isUnmounted.current) return;

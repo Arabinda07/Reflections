@@ -11,7 +11,7 @@ interface ConfirmationDialogProps {
   confirmLabel?: string;
   cancelLabel?: string;
   isConfirming?: boolean;
-  variant?: 'danger' | 'primary';
+  variant?: 'danger' | 'primary' | 'green';
 }
 
 export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
@@ -53,7 +53,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
       />
       
       {/* Modal Card / Bottom Sheet Container */}
-      <div className="relative w-full sm:max-w-md overflow-hidden rounded-t-[40px] sm:rounded-[40px] border-t-2 sm:border-2 border-border bg-white shadow-2xl animate-in slide-in-from-bottom sm:zoom-in-95 duration-500 ease-out-expo dark:bg-zinc-900">
+      <div className="relative w-full sm:max-w-md overflow-hidden rounded-t-[40px] sm:rounded-[40px] border-t-2 sm:border-2 border-border bg-white shadow-2xl animate-in slide-in-from-bottom sm:zoom-in-95 duration-500 ease-out-expo">
         
         {/* Mobile Handle (Only visible on mobile) */}
         <div className="sm:hidden flex justify-center pt-4 pb-1">
@@ -78,10 +78,10 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
 
           {/* High-Contrast Typography */}
           <div className="text-center space-y-4 mb-12">
-            <h3 className="text-[32px] font-display text-gray-text leading-tight lowercase dark:text-zinc-100">
+            <h3 className="text-[32px] font-display text-gray-text leading-tight lowercase">
               {title}
             </h3>
-            <p className="text-[17px] text-gray-light font-medium leading-relaxed dark:text-zinc-400">
+            <p className="text-[17px] text-gray-light font-medium leading-relaxed">
               {description}
             </p>
           </div>
@@ -100,7 +100,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
               variant="secondary"
               onClick={onClose}
               disabled={isConfirming}
-              className="w-full h-[72px] rounded-2xl border-2 border-border bg-white text-gray-nav hover:text-gray-text shadow-sm active:scale-[0.98] text-[18px] font-black dark:bg-zinc-800 dark:text-zinc-100"
+              className="w-full h-[72px] rounded-2xl border-2 border-border bg-white text-gray-nav hover:text-gray-text shadow-sm active:scale-[0.98] text-[18px] font-black"
             >
               {cancelLabel}
             </Button>
@@ -110,7 +110,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
         {/* Desktop Close Button (X) */}
         <button 
           onClick={onClose}
-          className="absolute top-6 right-6 p-2 rounded-xl text-gray-nav hover:text-gray-text hover:bg-gray-100 dark:hover:bg-zinc-800 transition-all duration-300 hidden sm:block"
+          className="absolute top-6 right-6 p-2 rounded-xl text-gray-nav hover:text-gray-text hover:bg-gray-100 transition-all duration-300 hidden sm:block"
           aria-label="Close"
         >
           <X size={28} />
