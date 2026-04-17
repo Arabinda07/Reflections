@@ -71,7 +71,8 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             animate={{ y: 0, scale: 1, opacity: 1 }}
             exit={{ y: '100%', scale: 0.95, opacity: 0 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300, mass: 0.8 }}
-            className="relative w-full sm:max-w-md overflow-hidden rounded-t-[40px] sm:rounded-[40px] border-t-2 sm:border-2 border-border shadow-2xl z-10"
+            className="relative w-full sm:max-w-[320px] overflow-hidden rounded-t-[32px] sm:rounded-[32px] border-t-2 sm:border-2 border-border shadow-2xl z-10"
+
             style={{ backgroundColor: 'var(--panel-bg)' }}
           >
             {/* Mobile Handle */}
@@ -79,18 +80,9 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
               <div className="h-1.5 w-12 rounded-full bg-border/40" />
             </div>
 
-            <div className="flex flex-col p-6 sm:p-8">
-              {/* High-Signal Icon Header */}
-              <div className="flex justify-center mb-6">
+            <div className="flex flex-col p-5 sm:p-6">
 
-                <div className={`h-24 w-24 rounded-[32px] flex items-center justify-center border-4 shadow-sm ${
-                  variant === 'danger' 
-                    ? 'bg-red/10 border-red/20 text-red' 
-                    : 'bg-blue/10 border-blue/20 text-blue'
-                }`}>
-                  <AlertTriangle size={48} strokeWidth={2.5} className={variant === 'primary' ? 'rotate-180' : ''} />
-                </div>
-              </div>
+
 
               {/* High-Contrast Typography (Conditional) */}
               {(title || description) && (
