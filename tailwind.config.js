@@ -40,7 +40,6 @@ export default {
         orange: 'var(--orange)',
         golden: 'var(--golden)',
         white: 'rgb(var(--panel-bg-rgb) / <alpha-value>)',
-        'pure-white': '#ffffff',
         black: 'var(--gray-text)',
       },
       backgroundColor: {
