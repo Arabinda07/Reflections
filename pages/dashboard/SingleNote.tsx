@@ -7,6 +7,7 @@ import { storageService } from '../../services/storageService';
 import { Note, RoutePath, Task } from '../../types';
 import { StorageImage } from '../../components/ui/StorageImage';
 import { LoadingState } from '../../components/ui/LoadingState';
+import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
 
 export const SingleNote: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -38,21 +39,6 @@ export const SingleNote: React.FC = () => {
     fetchNote();
   }, [id, navigate]);
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setIsConfirmOpen(false);
-      }
-    };
-    
-    if (isConfirmOpen) {
-      window.addEventListener('keydown', handleKeyDown);
-    }
-    
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isConfirmOpen]);
 
   const initiateDelete = () => {
     setIsConfirmOpen(true);
@@ -294,34 +280,17 @@ export const SingleNote: React.FC = () => {
       </div>
       )}
 
-      {/* Confirmation Modal */}
-      {isConfirmOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-dark-blue/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="relative w-full max-w-md space-y-6 rounded-[32px] border-2 border-border bg-white px-8 py-8 shadow-sm overflow-hidden">
-            <div className="space-y-2">
-              <h3 className="text-[20px] font-display text-gray-text">Delete this note?</h3>
-              <p className="text-[15px] text-gray-light font-medium leading-relaxed">
-                This action cannot be undone. Are you sure you want to permanently delete this note?
-              </p>
-            </div>
-            
-            <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-              <button 
-                onClick={() => setIsConfirmOpen(false)}
-                className="rounded-2xl border-2 border-border bg-white px-6 py-3 text-[13px] font-extrabold text-gray-nav hover:bg-gray-100 transition-all duration-300 ease-out-quart shadow-sm active:scale-[0.98]"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={performDelete}
-                className="rounded-2xl bg-red px-6 py-3 text-[13px] font-extrabold text-white shadow-sm transition-all duration-300 ease-out-quart hover:brightness-110 active:scale-[0.98]"
-              >
-                {isDeleting ? 'Deleting...' : 'Delete note'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={performDelete}
+        title="Delete this note?"
+        description="This action cannot be undone. Are you sure you want to permanently delete this note from your sanctuary?"
+        confirmLabel={isDeleting ? 'Deleting...' : 'Delete note'}
+        isConfirming={isDeleting}
+        variant="danger"
+      />
     </>
   );
 };

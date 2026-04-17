@@ -1,4 +1,4 @@
-import { WikiPageType } from './services/wikiService';
+import type { WikiPageType } from './services/wikiTypes';
 
 export interface NoteAttachment {
   name: string;
@@ -43,7 +43,6 @@ export interface LifeTheme {
 
 export interface ThemeCitation {
   id: string;
-  // userId removed — ownership is enforced via RLS join on life_themes
   themeId: string;
   noteId: string;
   createdAt: string;

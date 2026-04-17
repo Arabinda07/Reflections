@@ -74,13 +74,14 @@
 }
 
 .dark {
-  --green: oklch(0.78 0.18 135);
-  --green-hover: oklch(0.85 0.18 135);
-  --green-shadow: oklch(0.45 0.18 135);
+  --green: oklch(0.62 0.17 135);
+  --green-hover: oklch(0.68 0.17 135);
+  --green-shadow: oklch(0.40 0.17 135);
   
   --dark-blue: oklch(0.85 0.05 260);
-  --blue: oklch(0.75 0.15 245);
+  --blue: oklch(0.60 0.15 245);
   --blue-shadow: oklch(0.40 0.15 245);
+  --red: oklch(0.58 0.18 20);
   
   /* Tinted Neutrals - Dark Mode (Chroma 0.02 leaning toward hue 135) */
   --gray-text: oklch(0.85 0.02 135);
