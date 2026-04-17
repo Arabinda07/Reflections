@@ -285,8 +285,7 @@ export const SingleNote: React.FC = () => {
         isOpen={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
         onConfirm={performDelete}
-        title="Delete this note?"
-        description="This action cannot be undone. Are you sure you want to permanently delete this note from your sanctuary?"
+
         confirmLabel={isDeleting ? 'Deleting...' : 'Delete note'}
         isConfirming={isDeleting}
         variant="danger"

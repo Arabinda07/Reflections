@@ -7,8 +7,9 @@ interface ConfirmationDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  title: string;
-  description: string;
+  title?: string;
+  description?: string;
+
   confirmLabel?: string;
   cancelLabel?: string;
   isConfirming?: boolean;
@@ -78,9 +79,10 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
               <div className="h-1.5 w-12 rounded-full bg-border/40" />
             </div>
 
-            <div className="flex flex-col p-8 sm:p-12">
+            <div className="flex flex-col p-6 sm:p-8">
               {/* High-Signal Icon Header */}
-              <div className="flex justify-center mb-8">
+              <div className="flex justify-center mb-6">
+
                 <div className={`h-24 w-24 rounded-[32px] flex items-center justify-center border-4 shadow-sm ${
                   variant === 'danger' 
                     ? 'bg-red/10 border-red/20 text-red' 
@@ -90,15 +92,22 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
                 </div>
               </div>
 
-              {/* High-Contrast Typography */}
-              <div className="text-center space-y-4 mb-12">
-                <h3 className="text-[32px] font-display text-gray-text leading-tight lowercase font-black" style={{ color: 'var(--gray-text)' }}>
-                  {title}
-                </h3>
-                <p className="text-[17px] text-gray-light font-medium leading-relaxed" style={{ color: 'var(--gray-light)' }}>
-                  {description}
-                </p>
-              </div>
+              {/* High-Contrast Typography (Conditional) */}
+              {(title || description) && (
+                <div className="text-center space-y-3 mb-8">
+                  {title && (
+                    <h3 className="text-[28px] font-display text-gray-text leading-tight lowercase font-black" style={{ color: 'var(--gray-text)' }}>
+                      {title}
+                    </h3>
+                  )}
+                  {description && (
+                    <p className="text-[16px] text-gray-light font-medium leading-relaxed" style={{ color: 'var(--gray-light)' }}>
+                      {description}
+                    </p>
+                  )}
+                </div>
+              )}
+
 
               {/* Action Buttons */}
               <div className="flex flex-col gap-4">
@@ -106,7 +115,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
                   variant={variant}
                   onClick={onConfirm}
                   isLoading={isConfirming}
-                  className="w-full h-[72px] rounded-2xl shadow-xl active:scale-[0.98] text-[18px] font-black tracking-tight"
+                  className="w-full h-[64px] rounded-2xl shadow-xl active:scale-[0.98] text-[17px] font-black tracking-tight"
                 >
                   {confirmLabel}
                 </Button>
@@ -114,8 +123,9 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
                   variant="secondary"
                   onClick={onClose}
                   disabled={isConfirming}
-                  className="w-full h-[72px] rounded-2xl border-2 border-border bg-white text-gray-nav hover:text-gray-text shadow-sm active:scale-[0.98] text-[18px] font-black"
+                  className="w-full h-[64px] rounded-2xl border-2 border-border bg-white text-gray-nav hover:text-gray-text shadow-sm active:scale-[0.98] text-[17px] font-black"
                 >
+
                   {cancelLabel}
                 </Button>
               </div>
