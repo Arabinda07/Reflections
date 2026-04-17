@@ -173,10 +173,12 @@ export const CreateNote: React.FC = () => {
   const [isFocused, setIsFocused] = useState(false);
   const [isFlowing, setIsFlowing] = useState(false);
   const [isTasksOpen, setIsTasksOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+  const [isTitleFocused, setIsTitleFocused] = useState(false);
   // Setting visibility to true immediately to avoid jank
   const [isContentVisible, setIsContentVisible] = useState(true);
   const flowTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [dragStartY, setDragStartY] = useState<number | null>(null);
   const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
   
   // Mindful Features States
@@ -300,9 +302,16 @@ export const CreateNote: React.FC = () => {
       
       // Enter Flow State on typable keys or interactions
       if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') {
+        if (isTitleFocused) return; // Don't trigger flow while typing title
         setIsFlowing(true);
         if (flowTimeoutRef.current) clearTimeout(flowTimeoutRef.current);
-        // Perpetual Zen: Stays faded until mouse/touch wake event
+        
+        // Auto-return for Desktop only (5 seconds)
+        if (!isMobile) {
+          flowTimeoutRef.current = setTimeout(() => {
+            setIsFlowing(false);
+          }, 5000);
+        }
       }
     };
 
@@ -320,10 +329,38 @@ export const CreateNote: React.FC = () => {
   }, [isFocused, isFlowing]);
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 640);
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    
+    // Drag to wake logic for mobile
+    const handleTouchStart = (e: TouchEvent) => {
+      setDragStartY(e.touches[0].clientY);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (dragStartY !== null && isFlowing && isMobile) {
+        const deltaY = e.touches[0].clientY - dragStartY;
+        if (Math.abs(deltaY) > 50) { // Dragged 50px
+          if (flowTimeoutRef.current) clearTimeout(flowTimeoutRef.current);
+          setIsFlowing(false);
+          setDragStartY(null);
+        }
+      }
+    };
+
+    const handleTouchEnd = () => setDragStartY(null);
+
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    window.addEventListener('touchstart', handleTouchStart);
+    window.addEventListener('touchmove', handleTouchMove);
+    window.addEventListener('touchend', handleTouchEnd);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [dragStartY, isFlowing, isMobile]);
 
   // Robust Auto-Focus logic
   useEffect(() => {
@@ -836,11 +873,10 @@ export const CreateNote: React.FC = () => {
   const wordCount = content.replace(/<[^>]*>/g, '').trim().split(/\s+/).filter(Boolean).length;
   const canReflect = wordCount >= 100;
 
-  const isDimmed = isFlowing && isMobile;
+  const isDimmed = isFlowing && !isTitleFocused;
 
   return (
     <>
-
       <CompanionObservation 
         isVisible={showObservation} 
         text={observationText || ""} 
@@ -852,718 +888,444 @@ export const CreateNote: React.FC = () => {
         }} 
       />
       {limitReachedOverlay}
-      {/* LoadingState removed as per user request for instant creative flow */}
+
       {isContentVisible && (
-        <div className="mx-auto max-w-[1180px] animate-in fade-in duration-500 pb-20 px-3 sm:px-4 md:px-6">
-        <nav className={`sticky top-4 z-50 mb-8 flex items-center justify-between gap-2 rounded-2xl border-2 border-border bg-white/90 dark:bg-panel-bg/90 px-3 py-2 sm:px-4 sm:py-3 shadow-sm backdrop-blur-2xl transition-all duration-700 ${isDimmed ? (isMobile ? 'opacity-0 pointer-events-none scale-[0.98]' : 'opacity-25 pointer-events-none') : 'opacity-100 scale-100'}`}>
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-           <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-bold text-[12px] px-2 sm:px-3">
-             <ArrowLeft className="h-4 w-4 sm:mr-2" />
-             <span className="hidden sm:inline">Back</span>
-           </Button>
-           <div className="h-4 w-[2px] bg-border"></div>
-           <div className="flex flex-col">
-             <span className="text-[12px] font-extrabold text-gray-nav">
-                {id ? 'Edit' : ''}
-             </span>
-           </div>
-        </div>
-        
-        <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto no-scrollbar min-w-0">
-          {/* Whisper Mode Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={toggleWhisper}
-            className={`flex items-center gap-2 font-bold text-[11px] transition-all duration-300 ease-out-quart ${isWhispering ? 'text-blue bg-blue/5' : 'text-gray-nav'}`}
-            title="Whisper Mode"
+        <div className="flex h-screen w-full bg-white dark:bg-panel-bg overflow-hidden relative selection:bg-blue/10">
+          {/* Sidebar - Desktop Only Desktop Actions */}
+          <aside 
+            className={`fixed left-0 top-0 bottom-0 w-[240px] border-r-2 border-border bg-white dark:bg-panel-bg z-40 transition-all duration-700 ease-out-expo px-6 py-8 flex flex-col gap-8 ${isDimmed ? '-translate-x-full opacity-0 pointer-events-none' : 'translate-x-0 opacity-100'} hidden lg:flex`}
           >
-            {isWhispering ? <Mic size={16} className="animate-pulse" /> : <MicOff size={16} />}
-            <span className="hidden md:inline">Whisper</span>
-          </Button>
-
-          {/* Music Player Button */}
-          <div className="relative" ref={musicRef}>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                if (musicPlaying) {
-                  stopMusic();
-                  setIsMusicOpen(false);
-                } else {
-                  setIsMusicOpen(!isMusicOpen);
-                }
-              }}
-              className={`flex items-center gap-2 font-bold text-[11px] transition-all duration-300 ease-out-quart ${musicPlaying ? 'text-purple-500 bg-purple-500/10 dark:bg-purple-500/20' : 'text-gray-nav dark:text-gray-400'}`}
-              title="Ambient Sounds"
-            >
-              <Music size={16} className={musicPlaying ? 'animate-pulse' : ''} />
-              <span className="hidden md:inline">Sounds</span>
-            </Button>
-
-            {createPortal(
-              <AnimatePresence>
-                {isMusicOpen && (
-                  <div className="fixed inset-0 z-[10000] pointer-events-none flex items-end justify-center sm:items-start sm:justify-start">
-                    <motion.div
-                      initial={{ opacity: 0, y: 15, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 15, scale: 0.95 }}
-                      transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-                      className="music-popup-container pointer-events-auto w-[calc(100%-32px)] sm:w-[240px] bg-white/95 dark:bg-[#18181b]/95 border-[1.5px] border-border shadow-sm dark:shadow-sm backdrop-blur-xl sm:fixed relative mb-4 sm:mb-0 rounded-[24px] p-4 z-[10000]"
-                      style={{
-                        ...(window.innerWidth >= 640 ? {
-                          top: musicRef.current ? musicRef.current.getBoundingClientRect().bottom + 12 : 0,
-                          left: musicRef.current ? musicRef.current.getBoundingClientRect().left - 80 : 0,
-                        } : {}),
-                      }}
-                    >
-                      {/* Header */}
-                      <div className="flex items-center justify-between mb-3 px-1">
-                        <span className="text-[11px] font-black text-gray-nav flex items-center gap-1.5">
-                          <Volume2 size={11} /> Ambient focus
-                        </span>
-                        {musicPlaying && (
-                          <motion.div
-                            animate={{ opacity: [1, 0.35, 1] }}
-                            transition={{ duration: 1.5, repeat: Infinity }}
-                            className="w-1.5 h-1.5 rounded-full"
-                            style={{ backgroundColor: activeMusicTrack?.color ?? '#818cf8' }}
-                          />
-                        )}
-                      </div>
-
-                      {/* Track list */}
-                      <div className="flex flex-col gap-1.5">
-                        {AMBIENT_TRACKS.map(track => {
-                          const isActive = activeMusicTrack?.id === track.id;
-                          return (
-                            <button
-                              key={track.id}
-                              onClick={() => {
-                                navigator.vibrate?.(6);
-                                if (isActive) { stopMusic(); }
-                                else { playMusicTrack(track); }
-                              }}
-                              className="w-full flex items-center gap-2.5 p-2.5 rounded-2xl border-[1.5px] transition-all duration-300 ease-out-quart text-left"
-                              style={{
-                                borderColor: isActive ? `${track.color}55` : 'rgba(229,229,229,0.9)',
-                                backgroundColor: isActive ? `${track.color}10` : 'transparent',
-                              }}
-                            >
-                              {/* Emoji badge */}
-                              <span
-                                className="w-9 h-9 rounded-xl flex items-center justify-center text-[15px] shrink-0"
-                                style={{
-                                  backgroundColor: `${track.color}18`,
-                                  border: `1.5px solid ${track.color}30`,
-                                }}
-                              >
-                                {track.emoji}
-                              </span>
-
-                              {/* Label only */}
-                              <span className="flex flex-col gap-0.5 flex-1 min-w-0">
-                                <span
-                                  className="text-[12px] font-black truncate"
-                                  style={{ color: isActive ? track.color : 'var(--gray-text, #27272a)' }}
-                                >
-                                  {track.label}
-                                </span>
-                              </span>
-
-                              {/* Waveform or dot */}
-                              {isActive ? (
-                                <div className="flex items-center gap-[3px] h-5 shrink-0">
-                                  {[
-                                    { h: [5, 13, 5],  d: 0.55 },
-                                    { h: [13, 5, 13], d: 0.70 },
-                                    { h: [7, 17, 7],  d: 0.48 },
-                                    { h: [15, 7, 15], d: 0.62 },
-                                  ].map((bar, i) => (
-                                    <motion.div
-                                      key={i}
-                                      style={{ width: '3px', borderRadius: '9999px', backgroundColor: track.color }}
-                                      animate={{ height: bar.h.map(v => `${v}px`) }}
-                                      transition={{ duration: bar.d, repeat: Infinity, repeatType: 'mirror', ease: 'easeInOut', delay: i * 0.08 }}
-                                    />
-                                  ))}
-                                </div>
-                              ) : (
-                                <span
-                                  className="w-2 h-2 rounded-full shrink-0"
-                                  style={{ backgroundColor: `${track.color}70` }}
-                                />
-                              )}
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                    </motion.div>
-                  </div>
-                )}
-              </AnimatePresence>,
-              document.body
-            )}
-          </div>
-
-
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={handleRelease} 
-            className="hidden sm:flex text-gray-nav hover:text-red hover:bg-red/5 font-bold text-[11px] transition-all duration-300 ease-out-quart shrink-0 px-2 sm:px-3" 
-            disabled={isReleasing}
-          >
-              <Wind className="h-3.5 w-3.5 sm:mr-2" />
-              <span className="hidden sm:inline">Release</span>
-          </Button>
-
-          <AnimatePresence>
-            {canReflect && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.82, x: -8 }}
-                animate={{ opacity: 1, scale: 1, x: 0 }}
-                exit={{ opacity: 0, scale: 0.82, x: -8 }}
-                transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-              >
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="shrink-0 border-2 border-border text-blue shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart dark:bg-white/6 px-2 sm:px-3 dark:text-sky-100 dark:shadow-sm"
-                  disabled={isReflecting}
-                  onClick={handleAiReflect}
-                  isLoading={isReflecting}
-                >
-                  <Wand2 className="h-3.5 w-3.5 sm:mr-2" />
-                  <span className="hidden sm:inline">Ai reflect</span>
-                </Button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Save button: always on desktop; hides on mobile when hasContent (it moves to bottom) */}
-          <Button 
-            onClick={handleSave} 
-            size="sm" 
-            variant="primary"
-            className={`shrink-0 shadow-sm px-2 sm:px-3  active:scale-[0.98] transition-all duration-300 ease-out-quart hidden sm:flex`}
-            disabled={!canSave || saving || showPlane}
-          >
-            <Save className="h-3.5 w-3.5 sm:mr-2" />
-            <span className="hidden sm:inline">Save</span>
-          </Button>
-        </div>
-      </nav>
-
-      <AnimatePresence mode="wait">
-        {!isReleasing && (
-          <motion.div
-            key="editor-shell"
-            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 20, filter: 'blur(10px)' }}
-            animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
-            exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -50, scale: 0.98, filter: 'blur(12px)' }}
-            transition={{ duration: 1.2, ease: releaseEase }}
-            className="mx-auto w-full max-w-[1100px]"
-          >
-          <div className="relative min-h-[70vh] rounded-[32px] border-2 border-border bg-white dark:bg-panel-bg shadow-sm flex flex-col liquid-glass !overflow-visible dark:shadow-sm">
-            {imagePreview && (
-              <div className="relative aspect-[21/9] w-full group bg-white dark:bg-panel-bg border-b-2 border-border rounded-t-[30px] overflow-hidden">
-                  <StorageImage 
-                    path={imagePreview} 
-                    alt="Cover" 
-                    className="h-full w-full object-cover" 
-                  />
-                  <div className="absolute top-4 right-4 flex gap-2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                      <label className="cursor-pointer rounded-xl bg-white border-2 border-border px-3 py-1.5 text-[11px] font-bold text-gray-text shadow-sm hover:bg-white dark:hover:bg-panel-bg transition-colors">
-                          Change
-                          <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
-                      </label>
-                      <button 
-                          onClick={handleRemoveCover}
-                          className="rounded-xl bg-white p-1.5 text-gray-nav border-2 border-border shadow-sm hover:text-red transition-colors"
-                      >
-                          <X size={16} />
-                      </button>
-                  </div>
+            <div className="flex flex-col gap-2">
+              <span className="text-[10px] font-black text-blue tracking-widest uppercase opacity-50 mb-2">Sanctuary Log</span>
+              <div className="flex items-center gap-2 text-[12px] font-extrabold text-gray-nav">
+                <Calendar size={14} className="text-gray-nav" />
+                <span>{new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
               </div>
-            )}
+            </div>
 
-            <div className="flex-1 px-4 py-6 sm:px-6 md:px-10 md:py-8 lg:px-12 lg:py-10">
-                <div className={`mb-12 flex flex-wrap items-center justify-between gap-4 transition-all duration-700 ${isDimmed ? (isMobile ? 'opacity-0 pointer-events-none translate-y-2' : 'opacity-25 pointer-events-none') : 'opacity-100 translate-y-0'}`}>
-                    <div className="flex items-center gap-2 text-[11px] font-extrabold text-gray-nav">
-                        <Calendar size={13} />
-                        <span>{new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                    </div>
-
-                    <div className="flex w-full items-center gap-2 overflow-x-auto no-scrollbar pb-2 sm:overflow-visible sm:pb-0 sm:flex-wrap sm:gap-3 sm:w-auto">
-
-
-                       {/* Progressive Disclosure: Mood Button */}
-                       <div className="relative" ref={moodRef}>
-                          <button 
-                            onClick={() => setIsMoodOpen(!isMoodOpen)}
-                            className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all duration-300 ease-out-expo shadow-sm active:brightness-95 ${mood ? 'bg-blue/5 border-blue text-blue' : 'bg-white dark:bg-panel-bg border-border text-gray-nav hover:border-blue/30'}`}
-                          >
-                            {mood ? (
-                              <>
-                                {React.createElement(moods.find(m => m.id === mood)?.icon || Smile, { size: 16 })}
-                                <span className="text-[10px] sm:text-[11px] font-black">{mood}</span>
-                              </>
-                            ) : (
-                              <>
-                                <Smile size={16} />
-                                <span className="text-[10px] sm:text-[11px] font-black">Mood</span>
-                              </>
-                            )}
-                          </button>
-                          
-                          {createPortal(
-                            <AnimatePresence>
-                              {isMoodOpen && (
-                                <div className="fixed inset-0 z-[10000] pointer-events-none flex items-end justify-center sm:items-start sm:justify-center">
-                                  <motion.div 
-                                    initial={{ opacity: 0, y: 15, scale: 0.95 }}
-                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                    exit={{ opacity: 0, y: 15, scale: 0.95 }}
-                                    transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-                                    className="mood-popup-container pointer-events-auto liquid-glass-strong border-2 border-border rounded-[32px] p-6 shadow-2xl w-[calc(100%-32px)] sm:w-[280px] sm:fixed relative mb-4 sm:mb-0"
-                                    style={window.innerWidth >= 640 ? {
-                                      top: moodRef.current ? moodRef.current.getBoundingClientRect().bottom + window.scrollY + 12 : 0,
-                                      left: moodRef.current ? moodRef.current.getBoundingClientRect().left + window.scrollX : 0
-                                    } : {}}
-                                  >
-                                    <div className="flex items-center justify-between mb-4 px-1">
-                                      <span className="text-[12px] font-black text-gray-nav">How are you?</span>
-                                      {mood && <button onClick={() => handleMoodSelect(mood)} className="text-[11px] font-bold text-red">Clear</button>}
-                                    </div>
-                                    <div className="grid grid-cols-3 gap-2">
-                                      {moods.map((m) => {
-                                        const Icon = m.icon;
-                                        const isSelected = mood === m.id;
-                                        return (
-                                          <button
-                                            key={m.id}
-                                            onClick={() => {
-                                              handleMoodSelect(m.id);
-                                              setIsMoodOpen(false);
-                                            }}
-                                            className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all duration-300 ease-out-quart ${isSelected ? `${m.color} border-current` : 'border-transparent hover:bg-gray-50 text-gray-nav'}`}
-                                          >
-                                            <Icon size={20} />
-                                            <span className="mt-1 text-[9px] font-bold">{m.label}</span>
-                                          </button>
-                                        );
-                                      })}
-                                    </div>
-                                  </motion.div>
-                                </div>
-                              )}
-                            </AnimatePresence>,
-                            document.body
-                          )}
-                       </div>
-
-                       {/* Progressive Disclosure: Tags Button */}
-                       <div className="relative" ref={tagsRef}>
-                          <button 
-                            onClick={() => setIsTagsOpen(!isTagsOpen)}
-                            className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all duration-300 ease-out-expo shadow-sm active:brightness-95 ${tags.length > 0 ? 'bg-green/5 border-green text-green' : 'bg-white dark:bg-panel-bg border-border text-gray-nav hover:border-green/30'}`}
-                          >
-                            <TagIcon size={16} />
-                            <span className="text-[10px] sm:text-[11px] font-black">{tags.length > 0 ? `${tags.length} tags` : 'Tags'}</span>
-                          </button>
-
-                          {createPortal(
-                            <AnimatePresence>
-                              {isTagsOpen && (
-                                <div className="fixed inset-0 z-[10000] pointer-events-none flex items-end justify-center sm:items-start sm:justify-center">
-                                  <motion.div 
-                                    initial={{ opacity: 0, y: 15, scale: 0.95 }}
-                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                    exit={{ opacity: 0, y: 15, scale: 0.95 }}
-                                    transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-                                    className="tags-popup-container pointer-events-auto liquid-glass-strong border-2 border-border rounded-[32px] p-6 shadow-2xl w-[calc(100%-32px)] sm:w-[320px] sm:fixed relative mb-4 sm:mb-0"
-                                    style={window.innerWidth >= 640 ? {
-                                      top: tagsRef.current ? tagsRef.current.getBoundingClientRect().bottom + window.scrollY + 12 : 0,
-                                      left: tagsRef.current ? tagsRef.current.getBoundingClientRect().left - 40 + window.scrollX : 0
-                                    } : {}}
-                                  >
-                                    <div className="mb-4">
-                                      <span className="text-[12px] font-black text-gray-nav block mb-3">Add tags</span>
-                                      <div className="relative">
-                                        <TagIcon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-nav" />
-                                        <input 
-                                          type="text"
-                                          placeholder="Type and press Enter..."
-                                          value={tagInput}
-                                          onChange={(e) => setTagInput(e.target.value)}
-                                          onKeyDown={handleAddTag}
-                                          className="w-full pl-9 pr-4 py-2 rounded-xl border-2 border-border bg-white text-[13px] font-bold focus:border-blue focus:outline-none transition-all duration-300 ease-out-quart"
-                                        />
-                                      </div>
-                                    </div>
-
-                                    {suggestedTags.length > 0 && (
-                                      <div className="mb-4">
-                                        <span className="text-[11px] font-black text-blue block mb-2">Ai suggestions</span>
-                                        <div className="flex flex-wrap gap-2">
-                                          {suggestedTags.map(tag => (
-                                            <button 
-                                              key={tag}
-                                              onClick={() => {
-                                                if (!tags.includes(tag)) setTags([...tags, tag]);
-                                                setSuggestedTags(prev => prev.filter(t => t !== tag));
-                                              }}
-                                              className="px-2 py-1 rounded-lg bg-blue/5 border border-blue/10 text-blue text-[10px] font-bold hover:bg-blue/10 transition-all duration-300 ease-out-quart"
-                                            >
-                                              +{tag}
-                                            </button>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    )}
-
-                                    <div className="flex flex-wrap gap-2 max-h-[120px] overflow-y-auto pr-1 custom-scrollbar">
-                                      {tags.map(tag => (
-                                        <span key={tag} className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-gray-100 border border-border text-gray-text text-[11px] font-bold">
-                                          #{tag}
-                                          <button onClick={() => removeTag(tag)} className="hover:text-red transition-colors">
-                                            <X size={10} />
-                                          </button>
-                                        </span>
-                                      ))}
-                                    </div>
-                                  </motion.div>
-                                </div>
-                              )}
-                            </AnimatePresence>,
-                            document.body
-                          )}
-                       </div>
-
-                       <label className="group flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-border bg-white px-3 sm:px-4 py-2 text-[10px] sm:text-[11px] font-black text-gray-nav transition-all duration-300 ease-out-quart hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-sm active:scale-[0.98]">
-                          <Paperclip size={16} className="text-gray-nav group-hover:text-blue" />
-                          <span className="hidden xs:inline">Attach</span>
-                          <input type="file" multiple className="hidden" onChange={handleAttachmentUpload} />
-                       </label>
-                       {!imagePreview && (
-                          <label className="group flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-border bg-white px-3 sm:px-4 py-2 text-[10px] sm:text-[11px] font-black text-gray-nav transition-all duration-300 ease-out-expo hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-sm active:brightness-95">
-                             <ImageIcon size={16} className="text-gray-nav group-hover:text-blue" />
-                             <span className="hidden xs:inline">Cover</span>
-                             <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
-                          </label>
-                       )}
-                    </div>
-                </div>
-
-                <input
-                    type="text"
-                    placeholder="Title your entry..."
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    onFocus={() => setIsFocused(true)}
-                    onBlur={() => setIsFocused(false)}
-                    className={`editor-body w-full border-none bg-transparent text-3xl sm:text-4xl font-semibold text-gray-text placeholder:text-border focus:outline-none focus:ring-0 p-0 mb-12 tracking-[-0.01em] leading-tight transition-all duration-700 ${isDimmed ? (isMobile ? 'opacity-0 pointer-events-none -translate-y-2' : 'opacity-25 pointer-events-none') : 'opacity-100 translate-y-0'}`}
-                />
-                
-                <div 
-                  className="relative min-h-[400px]"
-                  onFocusCapture={() => setIsFocused(true)}
-                  onBlurCapture={() => setIsFocused(false)}
-                >
-                    <div className="editor-body mx-auto max-w-[82ch] relative">
-                      <Editor 
-                          ref={editorInstanceRef}
-                          value={content} 
-                          onChange={setContent} 
-                          placeholder={activePlaceholder || (id ? "Continue writing..." : "Start typing... or click ✨ below for a spark.")}
-                          hideToolbar={isMobile}
-                          className="text-[17px] text-gray-text/90 min-h-[400px]"
-                      />
-                    </div>
-
-                    {/* Bottom contextual action: Spark FAB (no content) ↔ Mobile Save FAB (has content) ↔ nothing (lottie playing) */}
-                    <div className="absolute bottom-6 right-6 z-20">
-                      <AnimatePresence mode="wait">
-                        {showPlane ? null : !hasContent ? (
-                          /* ── Spark prompt FAB — shown when editor is blank ── */
-                          <motion.button
-                            key="spark-fab"
-                            initial={{ opacity: 0, scale: 0.85, y: 8 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.85, y: 8 }}
-                            transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={cycleSparkPrompt}
-                            className={`flex h-14 w-14 items-center justify-center rounded-full border-2 border-border bg-white shadow-sm backdrop-blur-xl transition-all duration-300 ease-out-quart text-blue hover:text-blue/80 hover:shadow-none hover:translate-y-[2px] ${isGeneratingPrompts ? 'animate-pulse' : ''}`}
-                            title={sparkPrompt}
-                          >
-                            <Sparkles size={22} className="relative z-10" />
-                          </motion.button>
-                        ) : (
-                          /* ── Mobile Save FAB — icon-only, multi-state, fades to let Lottie take over ── */
-                          <motion.button
-                            key="mobile-save"
-                            initial={{ opacity: 0, scale: 0.75 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{
-                                opacity: 0,
-                              scale: 0.65,
-                              transition: { duration: 0.32, ease: [0.4, 0, 1, 1] },
-                            }}
-                            transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
-                            whileTap={{ brightness: 0.95 }}
-                            onClick={handleSave}
-                            disabled={!canSave || saving}
-                            className="sm:hidden relative flex h-16 w-16 items-center justify-center rounded-2xl bg-green text-white disabled:opacity-40 disabled:pointer-events-none"
-                            style={{
-                              boxShadow: saving
-                                ? '0 2px 0 0 #61B800'
-                                : '0 4px 0 0 #61B800',
-                            }}
-                          >
-                            <AnimatePresence mode="wait">
-                              {saving ? (
-                                <motion.div
-                                  key="spinner"
-                                  initial={{ opacity: 0, rotate: -45, scale: 0.5 }}
-                                  animate={{ opacity: 1, rotate: 0, scale: 1 }}
-                                  exit={{ opacity: 0, scale: 0.5 }}
-                                  transition={{ duration: 0.15 }}
-                                >
-                                  <Loader2 size={22} className="animate-spin" />
-                                </motion.div>
-                              ) : (
-                                <motion.div
-                                  key="save-icon"
-                                  initial={{ opacity: 0, scale: 0.5 }}
-                                  animate={{ opacity: 1, scale: 1 }}
-                                  exit={{ opacity: 0, scale: 0.5 }}
-                                  transition={{ duration: 0.15 }}
-                                >
-                                  <Save size={22} />
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
-                          </motion.button>
-                        )}
-                      </AnimatePresence>
-                    </div>
-
-                </div>
-
-                {/* Tasks Section */}
-                <div className={`mt-12 border-t-2 border-border pt-6 transition-all duration-700 ${isDimmed ? (isMobile ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-25 pointer-events-none') : 'opacity-100 translate-y-0'}`}>
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-                    <button 
-                      onClick={() => setIsTasksOpen(!isTasksOpen)}
-                      className="flex items-center gap-3 group text-left w-full sm:w-auto"
-                    >
-                      <div className={`flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-300 ${isTasksOpen ? 'bg-blue text-white' : 'bg-gray-50 text-gray-nav dark:bg-white/5'}`}>
-                        <ListTodo size={16} />
-                      </div>
-                      <h3 className="text-[14px] font-extrabold text-gray-text transition-colors group-hover:text-blue dark:text-zinc-100 flex-1">
-                        Actionable tasks {tasks.length > 0 && !isTasksOpen && <span className="ml-2 px-2 py-0.5 rounded-full bg-blue/10 text-blue text-[10px]">{tasks.length}</span>}
-                      </h3>
-                      <ChevronRight size={16} className={`text-gray-nav transition-transform duration-300 ${isTasksOpen ? 'rotate-90 text-blue' : ''}`} />
-                    </button>
-                    
-                    <AnimatePresence>
-                      {isTasksOpen && (
-                        <motion.button 
-                          initial={{ opacity: 0, scale: 0.95 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.95 }}
-                          transition={{ duration: 0.2 }}
-                          onClick={addTask}
-                          className="flex justify-center items-center gap-1.5 w-full sm:w-auto px-4 py-2.5 sm:px-3 sm:py-1.5 rounded-[14px] sm:rounded-xl border-2 border-blue/20 bg-blue/5 text-blue text-[12px] sm:text-[10px] font-black hover:bg-blue/10 transition-all duration-300 ease-out-quart"
-                        >
-                          <Plus size={14} />
-                          Add task
-                        </motion.button>
+            <div className="flex flex-col gap-4">
+               <span className="text-[10px] font-black text-gray-nav tracking-widest uppercase opacity-40">Personalize</span>
+               
+               {/* Mood Button */}
+               <div className="relative" ref={moodRef}>
+                  <button 
+                    onClick={() => setIsMoodOpen(!isMoodOpen)}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl border-2 transition-all duration-300 ease-out-expo active:scale-95 ${mood ? 'bg-blue/5 border-blue text-blue' : 'bg-white dark:bg-panel-bg border-border text-gray-nav hover:border-blue/30'}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      {mood ? (
+                        <>
+                          {React.createElement(moods.find(m => m.id === mood)?.icon || Smile, { size: 18 })}
+                          <span className="text-[12px] font-black">{mood}</span>
+                        </>
+                      ) : (
+                        <>
+                          <Smile size={18} />
+                          <span className="text-[12px] font-black uppercase tracking-tight">Mood</span>
+                        </>
                       )}
-                    </AnimatePresence>
-                  </div>
+                    </div>
+                    <ChevronRight size={14} className={isMoodOpen ? 'rotate-90' : ''} />
+                  </button>
+                  {/* Portals remain at the end to keep code clean */}
+               </div>
 
-                  <AnimatePresence>
-                    {isTasksOpen && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: 'easeInOut' }}
-                        className="overflow-hidden"
-                      >
-                        <div className="flex flex-col gap-3 sm:gap-4 pt-2 pb-4">
-                          {tasks.length === 0 ? (
-                            <div className="text-center py-12 px-4 bg-gray-50 dark:bg-white/5 rounded-2xl border-2 border-dashed border-border dark:border-white/10">
-                              <h3 className="font-display text-[24px] text-gray-text mb-2">Your personal sanctuary awaits.</h3>
-                              <p className="text-gray-light mb-8 max-w-sm mx-auto font-medium text-[13px]">
-                                Begin your journey of reflection. Every entry is a step toward clarity.
-                              </p>
-                              <button 
-                                onClick={addTask}
-                                className="mt-4 text-blue text-[11px] font-black hover:underline"
-                              >
-                                + Create your first task
-                              </button>
-                            </div>
-                          ) : (
-                            tasks.map((task) => (
-                              <TaskRow
-                                key={task.id} 
-                                task={task}
-                                updateTask={updateTask}
-                                toggleTask={toggleTask}
-                                removeTask={removeTask}
-                              />
-                            ))
-                          )}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+               {/* Tags Button */}
+               <div className="relative" ref={tagsRef}>
+                  <button 
+                    onClick={() => setIsTagsOpen(!isTagsOpen)}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl border-2 transition-all duration-300 ease-out-expo active:scale-95 ${tags.length > 0 ? 'bg-green/5 border-green text-green' : 'bg-white dark:bg-panel-bg border-border text-gray-nav hover:border-green/30'}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <TagIcon size={18} />
+                      <span className="text-[12px] font-black uppercase tracking-tight">{tags.length > 0 ? `${tags.length} Tags` : 'Tags'}</span>
+                    </div>
+                    <ChevronRight size={14} className={isTagsOpen ? 'rotate-90' : ''} />
+                  </button>
+               </div>
+
+               {/* Attach & Cover Grid */}
+               <div className="grid grid-cols-2 gap-3 mt-2">
+                 <label className="group flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-border bg-white cursor-pointer transition-all duration-300 hover:bg-blue/5 hover:border-blue/30 hover:text-blue active:scale-95">
+                    <Paperclip size={20} className="mb-2 opacity-50 group-hover:opacity-100" />
+                    <span className="text-[10px] font-black">FILES</span>
+                    <input type="file" multiple className="hidden" onChange={handleAttachmentUpload} />
+                 </label>
+                 
+                 <label className="group flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-border bg-white cursor-pointer transition-all duration-300 hover:bg-blue/5 hover:border-blue/30 hover:text-blue active:scale-95">
+                    <ImageIcon size={20} className="mb-2 opacity-50 group-hover:opacity-100" />
+                    <span className="text-[10px] font-black">COVER</span>
+                    <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
+                 </label>
+               </div>
+            </div>
+
+            <div className="mt-auto space-y-4">
+               {/* Quick Info */}
+               <div className="p-4 rounded-2xl bg-gray-50 border border-border">
+                  <p className="text-[10px] font-bold text-gray-nav flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue animate-pulse" />
+                    Cloud Synced
+                  </p>
+               </div>
+            </div>
+          </aside>
+
+          {/* Main Content Area */}
+          <main className={`flex-1 flex flex-col min-w-0 transition-all duration-700 ease-out-expo ${isDimmed ? 'lg:pl-0' : 'lg:pl-[240px]'}`}>
+            
+            {/* Slim Top Bar */}
+            <nav className={`sticky top-0 z-40 flex items-center justify-between px-6 py-4 bg-white/80 dark:bg-panel-bg/80 backdrop-blur-xl border-b border-border transition-all duration-700 ${isDimmed ? 'opacity-0 -translate-y-full pointer-events-none' : 'opacity-100 translate-y-0'}`}>
+              <div className="flex items-center gap-4">
+                 <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="rounded-xl border-2 border-border text-gray-nav hover:text-gray-text font-black text-[12px] px-4">
+                   <ArrowLeft className="h-4 w-4 mr-2" />
+                   Back
+                 </Button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {/* Whisper Mode Button */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={toggleWhisper}
+                  className={`flex items-center gap-2 rounded-xl border-2 border-border font-black text-[11px] transition-all duration-300 px-4 ${isWhispering ? 'text-blue bg-blue/5 border-blue' : 'text-gray-nav'}`}
+                >
+                  {isWhispering ? <Mic size={16} className="animate-pulse" /> : <MicOff size={16} />}
+                  <span>Whisper</span>
+                </Button>
+
+                {/* Music Player Button */}
+                <div className="relative" ref={musicRef}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      if (musicPlaying) {
+                        stopMusic();
+                        setIsMusicOpen(false);
+                      } else {
+                        setIsMusicOpen(!isMusicOpen);
+                      }
+                    }}
+                    className={`flex items-center gap-2 rounded-xl border-2 border-border font-black text-[11px] transition-all duration-300 px-4 ${musicPlaying ? 'text-purple-500 bg-purple-500/10 border-purple-500/30' : 'text-gray-nav'}`}
+                  >
+                    <Music size={16} className={musicPlaying ? 'animate-pulse' : ''} />
+                    <span>Sounds</span>
+                  </Button>
                 </div>
 
-                {aiReflection && (
-                  <div className="mt-12 animate-in fade-in slide-in-from-bottom-6 duration-700">
-                    <div className="relative overflow-hidden rounded-[32px] border border-sky-100 bg-[linear-gradient(180deg,rgba(247,251,255,0.98),rgba(255,255,255,0.98))] p-6 shadow-sm sm:p-8">
-                      <div className="absolute inset-x-0 top-0 h-24 bg-[radial-gradient(circle_at_top_right,rgba(125,211,252,0.18),transparent_55%)] pointer-events-none" />
-                      <div className="absolute bottom-0 left-0 h-20 w-20 rounded-full bg-emerald-100/40 blur-3xl pointer-events-none" />
+                <div className="h-6 w-[1.5px] bg-border mx-2"></div>
 
-                      <div className="relative z-10">
-                        <div className="flex items-center gap-3 mb-5">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-sky-100 bg-white text-blue shadow-sm">
-                            <Brain size={20} />
-                          </div>
-                          <div className="flex-1 flex flex-col items-end">
-                            <h4 className="text-[12px] font-black text-blue/55 leading-none mb-1 w-full text-left">Reflection</h4>
-                            <p className="text-[13px] font-bold text-gray-text leading-none w-full text-right">A softer mirror for what you wrote</p>
-                          </div>
-                        </div>
-
-                        <div className="rounded-[24px] border border-white/70 bg-white/80 px-4 py-5 sm:px-5">
-                          <p className="text-[16px] leading-relaxed text-gray-text font-medium italic sm:text-[17px]">
-                            "{aiReflection}"
-                          </p>
-                        </div>
-
-                        <div className="mt-5 flex items-center gap-4">
-                          <div className="h-[1px] flex-1 bg-gradient-to-r from-sky-100 to-transparent"></div>
-                          <span className="text-[10px] font-extrabold text-gray-nav">For reflection, not medical advice</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                {canReflect && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="border-2 border-border text-blue active:scale-95 font-black text-[11px] px-4"
+                    disabled={isReflecting}
+                    onClick={handleAiReflect}
+                    isLoading={isReflecting}
+                  >
+                    <Wand2 className="h-4 w-4 mr-2" />
+                    Ai reflect
+                  </Button>
                 )}
 
-                {(newAttachments.length > 0 || existingAttachments.length > 0) && (
-                  <div className={`mt-12 border-t-2 border-border pt-8 transition-all duration-700 ${isDimmed ? (isMobile ? 'opacity-0 pointer-events-none translate-y-4' : 'opacity-25 pointer-events-none') : 'opacity-100 translate-y-0'}`}>
-                    <h3 className="text-[13px] font-extrabold text-gray-text mb-6 flex items-center gap-2">
-                      <Paperclip size={16} className="text-gray-nav" />
-                      Attachments ({newAttachments.length + existingAttachments.length})
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                      {existingAttachments.map((att) => (
-                        <div key={att.path} className="group relative flex items-center gap-4 p-5 rounded-[24px] border-2 border-border bg-white dark:bg-panel-bg hover:bg-blue/5 dark:hover:bg-blue/10 hover:border-blue/30 transition-all duration-500 shadow-sm hover:shadow-none hover:translate-y-[2px] liquid-glass">
-                          <div className="h-16 w-16 shrink-0 rounded-2xl bg-white dark:bg-panel-bg border-2 border-border flex items-center justify-center text-gray-nav shadow-inner overflow-hidden">
-                             {att.type?.startsWith('image/') ? (
-                               <StorageImage 
-                                 path={att.path} 
-                                 alt={att.name} 
-                                 className="h-full w-full object-cover transition-transform group-hover:scale-110" 
-                               />
-                             ) : (
-                               <div className="text-blue/40 group-hover:text-blue transition-colors">
-                                 {getFileIcon(att.type || '')}
-                               </div>
-                             )}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-[14px] font-bold text-gray-text truncate mb-1">{att.name}</p>
-                            <div className="flex items-center gap-2">
-                              <span className="text-[11px] text-gray-nav font-black">{formatFileSize(att.size)}</span>
-                              <span className="h-1 w-1 rounded-full bg-border"></span>
-                              <div className="flex items-center gap-1">
-                                <CheckCircle2 size={10} className="text-emerald-500" />
-                                <span className="text-[11px] text-emerald-500 font-black">Cloud</span>
-                              </div>
+                <Button 
+                  onClick={handleSave} 
+                  size="sm" 
+                  variant="primary"
+                  className="shadow-md active:scale-95 px-6 font-black text-[11px]"
+                  disabled={!canSave || saving || showPlane}
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  Save
+                </Button>
+              </div>
+            </nav>
+
+            {/* Content Canvas */}
+            <div className={`flex-1 overflow-y-auto px-6 py-12 sm:px-12 md:px-24 transition-all duration-1000 ease-out-expo ${isDimmed ? 'pt-8' : 'pt-20'}`}>
+              <div className="mx-auto w-full max-w-[900px]">
+                <AnimatePresence mode="wait">
+                  {!isReleasing && (
+                    <motion.div
+                      key="editor-canvas"
+                      initial={false}
+                      animate={{ 
+                        y: isDimmed ? -80 : 0,
+                        opacity: 1,
+                        scale: isDimmed && isMobile ? 1 : 1
+                      }}
+                      transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1] }}
+                      className="relative"
+                    >
+                      {/* Cover Image in Canvas */}
+                      {imagePreview && (
+                        <div className={`relative mb-12 aspect-[21/9] w-full group rounded-3xl overflow-hidden border-2 border-border shadow-sm transition-all duration-700 ${isDimmed ? (isMobile ? 'opacity-0 -translate-y-4' : 'opacity-25') : 'opacity-100'}`}>
+                            <StorageImage 
+                              path={imagePreview} 
+                              alt="Cover" 
+                              className="h-full w-full object-cover" 
+                            />
+                            <div className="absolute top-4 right-4 flex gap-2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                                <label className="cursor-pointer rounded-xl bg-white border-2 border-border px-3 py-1.5 text-[11px] font-bold text-gray-text shadow-sm hover:bg-gray-50">
+                                    Change
+                                    <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
+                                </label>
+                                <button 
+                                    onClick={handleRemoveCover}
+                                    className="rounded-xl bg-white p-1.5 text-gray-nav border-2 border-border shadow-sm hover:text-red transition-colors"
+                                >
+                                    <X size={16} />
+                                </button>
                             </div>
-                          </div>
-                          <button 
-                            onClick={() => removeExistingAttachment(att)}
-                            className="h-10 w-10 rounded-xl bg-white dark:bg-panel-bg text-gray-nav border-2 border-border shadow-sm flex items-center justify-center hover:text-red hover:border-red/30 active:scale-[0.98] transition-all duration-200"
-                            title="Remove attachment"
-                          >
-                            <X size={18} strokeWidth={2.5} />
-                          </button>
                         </div>
-                      ))}
-                      {newAttachments.map((file, index) => {
-                        const isImage = file.type?.startsWith('image/');
-                        const previewUrl = isImage ? URL.createObjectURL(file) : null;
-                        return (
-                          <div key={`new-${index}`} className="group relative flex items-center gap-4 p-5 rounded-[24px] border-2 border-blue/20 bg-blue/5 hover:bg-white dark:hover:bg-panel-bg hover:border-blue/40 transition-all duration-500 shadow-sm hover:shadow-none hover:translate-y-[2px] liquid-glass animate-in zoom-in-95 duration-300">
-                            <div className="h-16 w-16 shrink-0 rounded-2xl bg-white border-2 border-blue/20 flex items-center justify-center text-blue shadow-inner overflow-hidden">
-                              {isImage && previewUrl ? (
-                                <img 
-                                  src={previewUrl} 
-                                  alt="preview" 
-                                  className="h-full w-full object-cover transition-transform group-hover:scale-110"
-                                  onLoad={() => {
-                                    if (previewUrl) URL.revokeObjectURL(previewUrl);
-                                  }}
-                                />
-                              ) : (
-                                <div className="text-blue/60 group-hover:text-blue transition-colors">
-                                  {getFileIcon(file.type)}
-                                </div>
-                              )}
+                      )}
+
+                      {/* Editor Title & Body */}
+                      <div className="relative">
+                        <input
+                            type="text"
+                            placeholder="Title your entry..."
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            onFocus={() => {
+                              setIsFocused(true);
+                              setIsTitleFocused(true);
+                              if (isFlowing) setIsFlowing(false);
+                            }}
+                            onBlur={() => {
+                              setIsFocused(false);
+                              setIsTitleFocused(false);
+                            }}
+                            className={`w-full border-none bg-transparent text-4xl sm:text-5xl font-black text-gray-text placeholder:text-border focus:outline-none focus:ring-0 p-0 mb-8 tracking-tighter transition-all duration-700 ${isDimmed ? (isMobile ? 'opacity-0 scale-95' : 'opacity-25') : 'opacity-100 scale-100'}`}
+                        />
+                        
+                        <div 
+                          className="relative min-h-[500px]"
+                          onFocusCapture={() => setIsFocused(true)}
+                          onBlurCapture={() => setIsFocused(false)}
+                        >
+                            <Editor 
+                                ref={editorInstanceRef}
+                                value={content} 
+                                onChange={(val) => {
+                                  setContent(val);
+                                  if (isFocused && !isTitleFocused) {
+                                    setIsFlowing(true);
+                                    if (flowTimeoutRef.current) clearTimeout(flowTimeoutRef.current);
+                                    if (!isMobile) {
+                                      flowTimeoutRef.current = setTimeout(() => setIsFlowing(false), 5000);
+                                    }
+                                  }
+                                }} 
+                                placeholder={activePlaceholder || (id ? "Continue writing..." : "Start typing... or click ✨ below for a spark.")}
+                                hideToolbar={isMobile}
+                                className="text-[19px] leading-[1.7] text-gray-text/90"
+                            />
+                            
+                            {/* Mobile Floating Action (Visible only on mobile or small screens) */}
+                            <div className="fixed bottom-8 right-8 z-50 lg:hidden">
+                              <AnimatePresence>
+                                {hasContent && !isDimmed && (
+                                  <motion.button
+                                    initial={{ scale: 0, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    exit={{ scale: 0, opacity: 0 }}
+                                    onClick={handleSave}
+                                    className="h-16 w-16 rounded-3xl bg-green text-white shadow-xl flex items-center justify-center active:scale-95"
+                                  >
+                                    <Save size={24} />
+                                  </motion.button>
+                                )}
+                              </AnimatePresence>
                             </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-[14px] font-bold text-gray-text truncate mb-1">{file.name}</p>
-                              <div className="flex items-center gap-2">
-                                <span className="text-[11px] text-gray-nav font-black">{formatFileSize(file.size)}</span>
-                                <span className="h-1 w-1 rounded-full bg-blue/20"></span>
-                                <div className="flex items-center gap-1">
-                                  <Loader2 size={10} className="text-blue animate-spin" />
-                                  <span className="text-[11px] text-blue font-black">Pending</span>
-                                </div>
-                              </div>
-                            </div>
-                            <button 
-                              onClick={() => removeNewAttachment(index)}
-                              className="h-10 w-10 rounded-xl bg-white dark:bg-panel-bg text-gray-nav border-2 border-border shadow-sm flex items-center justify-center hover:text-red hover:border-red/30 active:scale-[0.98] transition-all duration-200"
-                              title="Remove attachment"
-                            >
-                              <X size={18} strokeWidth={2.5} />
-                            </button>
+                        </div>
+                      </div>
+
+                      {/* Actionable items - Faded in Flow State */}
+                      <div className={`mt-20 space-y-20 transition-all duration-700 ${isDimmed ? (isMobile ? 'opacity-0 translate-y-8' : 'opacity-25') : 'opacity-100 translate-y-0'}`}>
+                        {/* Tasks Section */}
+                        <div className="border-t-2 border-border pt-12">
+                          <div className="flex items-center justify-between mb-8">
+                             <div className="flex items-center gap-3">
+                               <div className="w-10 h-10 rounded-2xl bg-blue/10 text-blue flex items-center justify-center">
+                                 <ListTodo size={20} />
+                               </div>
+                               <div>
+                                 <h3 className="text-[16px] font-black text-gray-text">Actionable Tasks</h3>
+                                 <p className="text-[12px] font-bold text-gray-nav">What needs doing?</p>
+                               </div>
+                             </div>
+                             <button onClick={addTask} className="px-4 py-2 rounded-xl bg-blue text-white text-[11px] font-black hover:shadow-lg transition-all active:scale-95">
+                               + Add New
+                             </button>
                           </div>
+                          
+                          <div className="grid gap-4">
+                             {tasks.map((task) => (
+                               <TaskRow key={task.id} task={task} updateTask={updateTask} toggleTask={toggleTask} removeTask={removeTask} />
+                             ))}
+                          </div>
+                        </div>
+
+                        {(newAttachments.length > 0 || existingAttachments.length > 0) && (
+                          <div className="border-t-2 border-border pt-12 text-gray-nav">
+                            <h3 className="text-[13px] font-black uppercase tracking-widest text-gray-nav/60 mb-8">Attachments</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                               {existingAttachments.map((att) => (
+                                <div key={att.path} className="group relative flex items-center gap-4 p-5 rounded-[24px] border-2 border-border bg-white dark:bg-panel-bg hover:bg-blue/5 dark:hover:bg-blue/10 hover:border-blue/30 transition-all duration-500 shadow-sm hover:shadow-none hover:translate-y-[2px] liquid-glass">
+                                  <div className="h-12 w-12 shrink-0 rounded-2xl bg-white dark:bg-panel-bg border-2 border-border flex items-center justify-center text-gray-nav shadow-inner overflow-hidden">
+                                     {att.type?.startsWith('image/') ? (
+                                       <StorageImage 
+                                         path={att.path} 
+                                         alt={att.name} 
+                                         className="h-full w-full object-cover transition-transform group-hover:scale-110" 
+                                       />
+                                     ) : (
+                                       <div className="text-blue/40 group-hover:text-blue transition-colors">
+                                         {getFileIcon(att.type || '')}
+                                       </div>
+                                     )}
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <p className="text-[13px] font-bold text-gray-text truncate">{att.name}</p>
+                                  </div>
+                                  <button 
+                                    onClick={() => removeExistingAttachment(att)}
+                                    className="h-8 w-8 rounded-lg bg-white dark:bg-panel-bg text-gray-nav border-2 border-border shadow-sm flex items-center justify-center hover:text-red hover:border-red/30 active:scale-[0.98] transition-all duration-200"
+                                    title="Remove attachment"
+                                  >
+                                    <X size={14} />
+                                  </button>
+                                </div>
+                              ))}
+                              {newAttachments.map((file, index) => {
+                                const isImage = file.type?.startsWith('image/');
+                                return (
+                                  <div key={`new-${index}`} className="group relative flex items-center gap-4 p-5 rounded-[24px] border-2 border-blue/20 bg-blue/5 hover:bg-white dark:hover:bg-panel-bg hover:border-blue/40 transition-all duration-500 shadow-sm hover:shadow-none hover:translate-y-[2px] liquid-glass animate-in zoom-in-95 duration-300">
+                                    <div className="h-12 w-12 shrink-0 rounded-2xl bg-white border-2 border-blue/20 flex items-center justify-center text-blue shadow-inner overflow-hidden">
+                                      {getFileIcon(file.type)}
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                      <p className="text-[13px] font-bold text-gray-text truncate">{file.name}</p>
+                                    </div>
+                                    <button 
+                                      onClick={() => removeNewAttachment(index)}
+                                      className="h-8 w-8 rounded-lg bg-white dark:bg-panel-bg text-gray-nav border-2 border-border shadow-sm flex items-center justify-center hover:text-red hover:border-red/30 active:scale-[0.98] transition-all duration-200"
+                                      title="Remove attachment"
+                                    >
+                                      <X size={14} />
+                                    </button>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+          </main>
+
+          {/* Global Portals for Sidebar buttons */}
+          {createPortal(
+            <AnimatePresence>
+              {isMoodOpen && (
+                <div className="fixed inset-0 z-[100] pointer-events-none flex items-center justify-center sm:items-start sm:justify-start">
+                  <div className="absolute inset-0 bg-black/5 pointer-events-auto" onClick={() => setIsMoodOpen(false)} />
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9, x: 20 }}
+                    animate={{ opacity: 1, scale: 1, x: 260 }}
+                    exit={{ opacity: 0, scale: 0.9, x: 20 }}
+                    className="pointer-events-auto bg-white/95 dark:bg-panel-bg/95 border-2 border-border rounded-[32px] p-6 shadow-2xl w-[280px] fixed top-24 backdrop-blur-xl"
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="text-[12px] font-black text-gray-nav uppercase tracking-tighter">Current Mood</span>
+                      <button onClick={() => setIsMoodOpen(false)}><X size={16} /></button>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                       {moods.map(m => (
+                         <button key={m.id} onClick={() => { handleMoodSelect(m.id); setIsMoodOpen(false); }} className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all ${mood === m.id ? `${m.color} border-current` : 'border-transparent hover:bg-gray-50'}`}>
+                           {React.createElement(m.icon, { size: 20 })}
+                           <span className="mt-1 text-[9px] font-black uppercase tracking-tighter">{m.label}</span>
+                         </button>
+                       ))}
+                    </div>
+                  </motion.div>
+                </div>
+              )}
+            </AnimatePresence>,
+            document.body
+          )}
+
+          {createPortal(
+            <AnimatePresence>
+              {isTagsOpen && (
+                <div className="fixed inset-0 z-[100] pointer-events-none flex items-center justify-center sm:items-start sm:justify-start">
+                  <div className="absolute inset-0 bg-black/5 pointer-events-auto" onClick={() => setIsTagsOpen(false)} />
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9, x: 20 }}
+                    animate={{ opacity: 1, scale: 1, x: 260 }}
+                    exit={{ opacity: 0, scale: 0.9, x: 20 }}
+                    className="pointer-events-auto bg-white/95 dark:bg-panel-bg/95 border-2 border-border rounded-[32px] p-6 shadow-2xl w-[320px] fixed top-48 backdrop-blur-xl"
+                  >
+                    <div className="mb-4">
+                      <span className="text-[12px] font-black text-gray-nav uppercase tracking-widest mb-3 block">Topic Tags</span>
+                      <input type="text" placeholder="Add tag..." value={tagInput} onChange={(e) => setTagInput(e.target.value)} onKeyDown={handleAddTag} className="w-full px-4 py-2 rounded-xl border-2 border-border focus:border-blue outline-none text-[13px] font-bold" />
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {tags.map(tag => (
+                        <span key={tag} className="px-2 py-1 rounded-lg bg-gray-50 border border-border text-[11px] font-black flex items-center gap-1.5">
+                          #{tag} <X size={10} className="cursor-pointer" onClick={() => removeTag(tag)} />
+                        </span>
+                      ))}
+                    </div>
+                  </motion.div>
+                </div>
+              )}
+            </AnimatePresence>,
+            document.body
+          )}
+          
+          {createPortal(
+            <AnimatePresence>
+              {isMusicOpen && (
+                <div className="fixed inset-0 z-[100] pointer-events-none flex items-end justify-center sm:items-start sm:justify-end sm:pr-24 sm:pt-20">
+                  <div className="absolute inset-0 pointer-events-auto" onClick={() => setIsMusicOpen(false)} />
+                  <motion.div
+                    initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 15, scale: 0.95 }}
+                    className="pointer-events-auto w-[240px] bg-white/95 dark:bg-[#18181b]/95 border-2 border-border shadow-2xl rounded-[28px] p-4 backdrop-blur-xl relative"
+                  >
+                    <div className="flex flex-col gap-1.5">
+                      {AMBIENT_TRACKS.map(track => {
+                        const isActive = activeMusicTrack?.id === track.id;
+                        return (
+                          <button key={track.id} onClick={() => isActive ? stopMusic() : playMusicTrack(track)} className={`w-full flex items-center justify-between p-3 rounded-2xl border-2 transition-all ${isActive ? 'bg-purple-500/5 border-purple-500/30' : 'border-transparent hover:bg-gray-50'}`}>
+                             <div className="flex items-center gap-3">
+                               <span className="text-xl">{track.emoji}</span>
+                               <span className={`text-[12px] font-black ${isActive ? 'text-purple-500' : 'text-gray-text'}`}>{track.label}</span>
+                             </div>
+                             {isActive && <div className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-ping" />}
+                          </button>
                         );
                       })}
                     </div>
-                  </div>
-                )}
-            </div>
+                  </motion.div>
+                </div>
+              )}
+            </AnimatePresence>,
+            document.body
+          )}
 
-            <div className={`border-t-2 border-border bg-white/50 dark:bg-white/5 px-8 py-4 text-center transition-all duration-700 ${isDimmed ? (isMobile ? 'opacity-0 pointer-events-none' : 'opacity-25 pointer-events-none') : 'opacity-100'}`}>
-                <p className="text-[11px] font-extrabold text-gray-nav">
-                   Your journal is a safe space for your thoughts.
-                </p>
-            </div>
-          </div>
-        </motion.div>
-        )}
-      </AnimatePresence>
-      <PaperPlaneToast
-        isVisible={showPlane}
-        onAnimationComplete={handlePlaneAnimationComplete}
-      />
-      </div>
+          <PaperPlaneToast isVisible={showPlane} onAnimationComplete={handlePlaneAnimationComplete} />
+        </div>
       )}
     </>
   );
