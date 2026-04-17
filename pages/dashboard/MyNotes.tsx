@@ -354,11 +354,11 @@ export const MyNotes: React.FC = () => {
                        <div className="flex items-center text-[12px] font-bold text-blue group-hover:opacity-70 transition-all duration-300">
                           <span>Open</span>
                           <ArrowUpRight size={14} className="ml-1 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                       </div>
                     </div>
                   </div>
                 </div>
               ))}
-
             </div>
           )}
           
