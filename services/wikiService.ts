@@ -1,29 +1,6 @@
 import { supabase } from '../src/supabaseClient';
 import { LifeTheme, ThemeCitation, Note } from '../types';
-
-// ─────────────────────────────────────────────
-// Wiki Page Types
-// 'theme'             → freeform user-created life themes (backward compatible)
-// 'mood_patterns'     → recurring emotional states and triggers
-// 'recurring_themes'  → topics the user keeps returning to
-// 'self_model'        → how the user describes themselves, their values
-// 'timeline'          → key moments and turning points
-// 'index'             → one-liner summaries of all pages (Gemini reads this first on every query)
-// ─────────────────────────────────────────────
-export type WikiPageType =
-  | 'theme'
-  | 'mood_patterns'
-  | 'recurring_themes'
-  | 'self_model'
-  | 'timeline'
-  | 'index';
-
-export const STRUCTURED_WIKI_PAGES: WikiPageType[] = [
-  'mood_patterns',
-  'recurring_themes',
-  'self_model',
-  'timeline',
-];
+import { WikiPageType, STRUCTURED_WIKI_PAGES } from './wikiTypes';
 
 // ─────────────────────────────────────────────
 // Mappers
@@ -39,7 +16,6 @@ const mapToLifeTheme = (data: any): LifeTheme => ({
   updatedAt: data.updated_at,
 });
 
-// user_id removed — column was dropped in schema patch
 const mapToThemeCitation = (data: any): ThemeCitation => ({
   id: data.id,
   themeId: data.theme_id,

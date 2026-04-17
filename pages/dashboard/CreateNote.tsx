@@ -11,13 +11,13 @@ import { storageService } from '../../services/storageService';
 import { RoutePath, NoteAttachment, Task } from '../../types';
 import { supabase } from '../../src/supabaseClient';
 import { StorageImage } from '../../components/ui/StorageImage';
-import { GoogleGenAI, Type } from "@google/genai";
 import { LoadingState } from '../../components/ui/LoadingState';
 import { CompanionObservation } from '../../components/ui/CompanionObservation';
 import { PaperPlaneToast } from '../../components/ui/PaperPlaneToast';
 import { observationService } from '../../services/observationService';
 import { DEFAULT_WELLNESS_PROMPTS, getCurrentWellnessPrompt, getNextWellnessPromptState } from '../../services/wellnessPrompts';
 import { aiService } from '../../services/aiService';
+import { aiClient } from '../../services/aiClient';
 
 // Custom debounce function to avoid CommonJS import issues
 function debounce<T extends (...args: any[]) => any>(
@@ -30,13 +30,6 @@ function debounce<T extends (...args: any[]) => any>(
     timeout = setTimeout(() => func.apply(this, args), wait);
   };
 }
-
-// ── Hardcoded Haptics ONLY per User Request ───────────────────────────────
-
-const apiKey = typeof process !== 'undefined' && process.env.GEMINI_API_KEY 
-  ? process.env.GEMINI_API_KEY 
-  : (import.meta as any).env?.VITE_GEMINI_API_KEY || "";
-const ai = new GoogleGenAI({ apiKey });
 
 interface TaskRowProps {
   task: Task;
@@ -432,49 +425,23 @@ export const CreateNote: React.FC = () => {
     setIsGeneratingPrompts(true);
     try {
       const pastNotes = await noteService.getRecent(3);
-      
-      // Build a richer context from the last 3 notes, stripping HTML
-      const pastContext = pastNotes
-        .filter(n => n.id !== id)
-        .map(n => {
-          const cleanContent = n.content.replace(/<[^>]*>/g, '').slice(0, 300);
-          return `Title: ${n.title}\nMood: ${n.mood || 'Unspecified'}\nContent: ${cleanContent}`;
-        })
-        .join('\n\n');
-      
-      const moodContext = currentMood ? `The user is currently feeling ${currentMood}.` : 'The user hasn\'t specified their mood for this new entry yet.';
-      const context = pastContext 
-        ? `Here are their 3 most recent entries for context:\n${pastContext}` 
-        : 'The user is just starting their journey and has no past entries yet.';
 
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: `You are a thoughtful, grounded journaling partner. Your goal is to help the user connect their current mood with recurring themes in their life.
-
-Context:
-${moodContext}
-
-${context}
-
-Instructions:
-1. Identify a recurring theme, an unresolved tension, or a pattern from these recent entries.
-2. Generate 4 brief, personalized journaling prompts. 
-3. One prompt should be a "gentle nudge," one should be a "deep question," and two should relate to their specific recurring themes.
-4. Avoid "AI-poetry" or flowery language. Be direct, human, and helpful—like a friend who listens well.
-5. Return only a JSON array of strings.`,
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.ARRAY,
-            items: { type: Type.STRING }
-          }
-        }
+      const result = await aiClient.requestJson<string[]>('prompts', {
+        note: {
+          title,
+          content,
+          mood,
+        },
+        currentMood,
+        recentNotes: pastNotes
+          .filter(n => n.id !== id)
+          .map(n => ({
+            title: n.title,
+            mood: n.mood,
+            content: n.content,
+          })),
       });
 
-      const text = response.text || "[]";
-      const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
-      const result = JSON.parse(cleanText);
-      
       if (Array.isArray(result) && result.length > 0) {
         setDynamicPrompts(result);
       } else {
@@ -552,43 +519,29 @@ Instructions:
     setIsReflecting(true);
     setAiReflection(null);
     try {
-      const plainText = content.replace(/<[^>]*>/g, '');
-      const moodText = mood ? `The user is feeling ${mood}.` : 'The user has not specified a specific mood.';
-      const titleText = title ? `The entry is titled "${title}".` : 'The entry has no title.';
-      
       const pastNotes = await noteService.getAll();
-      const pastContext = pastNotes
-        .filter(n => n.id !== id)
-        .slice(0, 5)
-        .map(n => n.title)
-        .filter(Boolean)
-        .join(', ');
 
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: `You are a compassionate mental health journaling assistant. 
-        Based on the following journal entry and the user's past context, provide a brief (2-3 sentences), empathetic reflection.
-        
-        CRITICAL RULES:
-        1. If the current entry is too short (less than 50 words) and there are fewer than 3 past entries, DO NOT hallucinate deep insights. Instead, warmly encourage the user to write more so you can get to know them better.
-        2. If you have enough data, reference specific themes or emotions mentioned.
-        3. Be supportive, non-judgmental, and deeply contextual.
-        
-        Past Context (titles of recent entries):
-        ${pastContext || 'No past entries yet.'}
-        
-        Current Entry Context:
-        - Title: ${title || 'Untitled'}
-        - Mood: ${mood || 'Not specified'}
-        
-        Entry Content:
-        ${plainText}
-        
-        Your response should be warm, insightful, and encourage further self-reflection.`,
+      const reflection = await aiClient.requestText('reflection', {
+        note: {
+          title,
+          content,
+          mood,
+          createdAt: new Date().toISOString(),
+        },
+        recentNotes: pastNotes
+          .filter(n => n.id !== id)
+          .slice(0, 5)
+          .map(n => ({
+            title: n.title,
+            mood: n.mood,
+            content: n.content,
+          })),
+        wikiPages: [],
+        indexPage: null,
       });
-      
+
       if (isUnmounted.current) return;
-      setAiReflection(response.text || "I'm here to listen. Your thoughts are valid.");
+      setAiReflection(reflection || "I'm here to listen. Your thoughts are valid.");
     } catch (error) {
       if (isUnmounted.current) return;
       console.error("AI Reflection failed:", error);
@@ -602,21 +555,9 @@ Instructions:
     if (!content || content === '<p><br></p>') return;
     try {
       const plainText = content.replace(/<[^>]*>/g, '');
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: `Based on this journal entry, suggest 3 relevant tags for organization. Return only a JSON array of strings.
-        
-        Entry:
-        ${plainText}`,
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.ARRAY,
-            items: { type: Type.STRING }
-          }
-        }
+      const result = await aiClient.requestJson<string[]>('tags', {
+        content: plainText,
       });
-      const result = JSON.parse(response.text || "[]");
       setSuggestedTags(result);
     } catch (error) {
       console.error("Failed to suggest tags:", error);
