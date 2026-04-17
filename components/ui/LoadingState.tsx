@@ -76,16 +76,6 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
             {message}
           </motion.p>
 
-          {/* Brand Wordmark — canonical style */}
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1, duration: 1 }}
-            className="absolute bottom-14 flex flex-col items-center gap-2"
-          >
-            <span style={BRAND_WORDMARK_STYLE} className="text-gray-text opacity-75 dark:text-zinc-100">reflections</span>
-            <div style={BRAND_DIVIDER_STYLE} />
-          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>,

@@ -45,12 +45,6 @@ export const CompanionObservation: React.FC<CompanionObservationProps> = ({ isVi
             <p className="text-[20px] md:text-[24px] font-display text-gray-text lowercase leading-relaxed tracking-tight">
               {text}
             </p>
-            <motion.div 
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ delay: 2.5, duration: 2 }}
-              className="h-1 w-12 bg-blue/20 mx-auto mt-6 rounded-full origin-center"
-            />
           </motion.div>
         </motion.div>
       )}
