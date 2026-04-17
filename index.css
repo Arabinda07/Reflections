@@ -291,7 +291,6 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
     line-height: 2.05 !important;
     letter-spacing: 0.013em !important;
     max-width: 82ch;
-    margin: 0 auto;
     text-align: left !important;
     border: none !important;
     outline: none !important;

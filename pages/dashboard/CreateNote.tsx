@@ -922,14 +922,14 @@ export const CreateNote: React.FC = () => {
                <div className="relative" ref={moodRef}>
                   <button 
                     onClick={() => setIsMoodOpen(!isMoodOpen)}
-                    className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl border-2 transition-all duration-300 ease-out-expo active:scale-95 ${mood ? 'bg-blue/5 border-blue text-blue' : 'bg-white dark:bg-panel-bg border-border text-gray-nav hover:border-blue/30'}`}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl border-2 transition-all duration-700 ease-out-expo active:scale-95 ${mood ? 'bg-blue/10 border-blue text-blue shadow-[0_0_15px_rgba(59,130,246,0.1)]' : 'bg-white dark:bg-panel-bg border-border text-gray-nav hover:border-blue/30'}`}
                   >
                     <div className="flex items-center gap-3">
                       {mood ? (
-                        <>
+                        <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="flex items-center gap-3">
                           {React.createElement(moods.find(m => m.id === mood)?.icon || Smile, { size: 18 })}
                           <span className="text-[12px] font-black">{mood}</span>
-                        </>
+                        </motion.div>
                       ) : (
                         <>
                           <Smile size={18} />
@@ -1082,7 +1082,7 @@ export const CreateNote: React.FC = () => {
 
             {/* Content Canvas */}
             <div className={`flex-1 overflow-y-auto px-6 py-4 sm:px-12 md:px-24 transition-all duration-1000 ease-out-expo ${isDimmed ? 'pt-2' : 'pt-6'}`}>
-              <div className={`mx-auto w-full transition-all duration-1000 ease-out-expo ${isDimmed ? 'max-w-[1100px]' : 'max-w-[900px]'}`}>
+              <div className={`w-full transition-all duration-1000 ease-out-expo ${isDimmed ? 'max-w-[1100px] ml-0' : 'max-w-[900px] mx-auto'}`}>
                 <AnimatePresence mode="wait">
                   {!isReleasing && (
                     <motion.div
