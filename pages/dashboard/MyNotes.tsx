@@ -12,6 +12,8 @@ import 'react-calendar/dist/Calendar.css';
 import './Calendar.css';
 import { format, isSameDay } from 'date-fns';
 import { LoadingState } from '../../components/ui/LoadingState';
+import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
+
 
 export const MyNotes: React.FC = () => {
   const navigate = useNavigate();
@@ -20,20 +22,13 @@ export const MyNotes: React.FC = () => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [isContentVisible, setIsContentVisible] = useState(false);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [removedNote, setRemovedNote] = useState<{note: Note, timer: NodeJS.Timeout} | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [noteIdToDelete, setNoteIdToDelete] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'calendar'>('grid');
+
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   
-  // Cleanup pending deletions on unmount
-  useEffect(() => {
-    return () => {
-      if (removedNote) {
-        clearTimeout(removedNote.timer);
-        noteService.delete(removedNote.note.id).catch(console.error);
-      }
-    };
-  }, [removedNote]);
 
   const queryParams = new URLSearchParams(location.search);
   const tagFilter = queryParams.get('tag');
@@ -70,37 +65,28 @@ export const MyNotes: React.FC = () => {
     isSameDay(new Date(note.updatedAt), selectedDate)
   );
 
-  const handleDelete = (e: React.MouseEvent, id: string) => {
+  const initiateDelete = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    
-    const noteToDelete = notes.find(n => n.id === id);
-    if (!noteToDelete) return;
-
-    // Optimistic UI slice
-    setNotes(prev => prev.filter(n => n.id !== id));
-
-    // If there was an existing pending deletion, flush it immediately
-    if (removedNote) {
-      clearTimeout(removedNote.timer);
-      noteService.delete(removedNote.note.id).catch(console.error);
-    }
-
-    // Set 5-second timer for backend execution
-    const timer = setTimeout(() => {
-      noteService.delete(id).catch(console.error);
-      setRemovedNote(prev => (prev?.note.id === id ? null : prev));
-    }, 5000);
-
-    setRemovedNote({ note: noteToDelete, timer });
+    setNoteIdToDelete(id);
+    setIsConfirmOpen(true);
   };
 
-  const handleUndoDelete = () => {
-    if (removedNote) {
-      clearTimeout(removedNote.timer);
-      setNotes(prev => [removedNote.note, ...prev].sort((a,b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()));
-      setRemovedNote(null);
+  const performDelete = async () => {
+    if (!noteIdToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      await noteService.delete(noteIdToDelete);
+      setNotes(prev => prev.filter(n => n.id !== noteIdToDelete));
+      setIsConfirmOpen(false);
+    } catch (error) {
+      console.error("Failed to delete note:", error);
+    } finally {
+      setIsDeleting(false);
+      setNoteIdToDelete(null);
     }
   };
+
 
   const getPreviewText = (html: string) => {
     if (!html || html === '<p><br></p>') return "No content available";
@@ -313,16 +299,17 @@ export const MyNotes: React.FC = () => {
                 
                 {/* Delete Button */}
                 <button 
-                  onClick={(e) => handleDelete(e, note.id)}
-                  disabled={deletingId === note.id}
+                  onClick={(e) => initiateDelete(e, note.id)}
+                  disabled={isDeleting && noteIdToDelete === note.id}
                   className="absolute top-4 left-4 z-20 h-9 w-9 flex items-center justify-center rounded-xl bg-white dark:bg-panel-bg border-2 border-border text-gray-nav hover:text-red hover:border-red/30 shadow-sm active:brightness-95 transition-all duration-300"
                 >
-                  {deletingId === note.id ? (
+                  {isDeleting && noteIdToDelete === note.id ? (
                     <Loader2 size={16} className="animate-spin text-red" />
                   ) : (
                     <Trash2 size={16} />
                   )}
                 </button>
+
                 
                 {/* Date & Mood Badge */}
                 <div className="absolute top-4 right-4 z-20 flex flex-col items-end gap-2">
@@ -408,24 +395,18 @@ export const MyNotes: React.FC = () => {
           </div>
       )}
 
-      {/* Undo Toast */}
-      {removedNote && createPortal(
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[999999] animate-in slide-in-from-bottom-5 fade-in duration-300">
-          <div className="flex items-center gap-4 rounded-[20px] bg-black px-6 py-3.5 text-white shadow-2xl border-2 border-border">
-            <span className="text-[13px] font-bold">Entry removed from timeline</span>
-            <div className="h-4 w-[2px] bg-border/20"></div>
-            <button 
-              onClick={handleUndoDelete}
-              className="text-[13px] font-extrabold text-white uppercase hover:text-green active:brightness-95 tracking-widest transition-colors duration-200"
-            >
-              Undo
-            </button>
-          </div>
-        </div>,
-        document.body
-      )}
-        </div>
-      )}
+      {/* Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={performDelete}
+        title="Delete this note?"
+        description="This action cannot be undone. Are you sure you want to permanently delete this note from your sanctuary?"
+        confirmLabel={isDeleting ? 'Deleting...' : 'Delete note'}
+        isConfirming={isDeleting}
+        variant="danger"
+      />
     </>
   );
 };
+
