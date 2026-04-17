@@ -123,14 +123,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
               </div>
             </div>
 
-            {/* Desktop Close Button (X) */}
-            <button 
-              onClick={onClose}
-              className="absolute top-6 right-6 p-2 rounded-xl text-gray-nav hover:text-gray-text hover:bg-gray-100 transition-all duration-300 hidden sm:block"
-              aria-label="Close"
-            >
-              <X size={28} />
-            </button>
+
           </motion.div>
         </div>
       )}
