@@ -31,13 +31,13 @@ export const Landing: React.FC = () => {
       <div className="relative z-10 flex flex-col items-center px-4 sm:px-6 py-16 sm:py-20 md:py-32">
         {/* Hero Text At Top */}
         <div className="text-center max-w-4xl mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green/10 border-2 border-green/20 text-green text-[12px] font-black uppercase tracking-[0.2em] mb-8 animate-in slide-in-from-bottom-4 duration-500">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green/10 border-2 border-green/20 text-green text-[12px] font-black mb-8 animate-in slide-in-from-bottom-4 duration-500">
             <Sparkles size={14} />
-            <span>The Future of Journaling</span>
+            <span>The future of journaling</span>
           </div>
           
-          <h1 className="text-5xl sm:text-6xl md:text-8xl font-display text-gray-text lowercase leading-tight md:leading-[1.1] mb-8 tracking-tighter animate-in slide-in-from-bottom-6 duration-700 drop-shadow-sm hover:scale-[1.02] transition-transform">
-            your mind, <br />
+          <h1 className="text-5xl sm:text-6xl md:text-8xl font-display text-gray-text leading-tight md:leading-[1.1] mb-8 tracking-tighter animate-in slide-in-from-bottom-6 duration-700 drop-shadow-sm hover:scale-[1.02] transition-transform">
+            Your mind, <br />
             <span className="bg-gradient-to-r from-green via-blue to-green bg-clip-text text-transparent animate-gradient-x drop-shadow-md">beautifully</span> <br />
             organized.
           </h1>
@@ -50,7 +50,7 @@ export const Landing: React.FC = () => {
           transition={{ duration: 1, delay: 0.2 }}
           className="w-full max-w-6xl mb-16 flex flex-col items-center"
         >
-          <p className="text-[12px] sm:text-[14px] font-black uppercase tracking-[0.4em] text-gray-nav mb-6">Experience the Sanctuary</p>
+          <p className="text-[14px] font-black text-gray-nav mb-6">Experience the sanctuary</p>
           <div className="relative w-full group">
             {/* Persistent breathing glow that intensifies on hover */}
             <div className="absolute -inset-4 bg-gradient-to-r from-green/30 via-blue/30 to-green/30 rounded-[48px] blur-2xl opacity-50 animate-pulse group-hover:opacity-100 transition-opacity duration-1000" />
@@ -95,19 +95,19 @@ export const Landing: React.FC = () => {
             <Button 
               variant="primary" 
               size="lg" 
-              className="w-full sm:w-auto h-16 sm:h-20 px-8 sm:px-12 text-[16px] sm:text-[20px] font-bold uppercase rounded-[20px] sm:rounded-[24px] shadow-sm liquid-glass group"
+              className="w-full sm:w-auto h-16 sm:h-20 px-8 sm:px-12 text-[16px] sm:text-[20px] font-bold rounded-[20px] sm:rounded-[24px] shadow-sm liquid-glass group"
               onClick={() => navigate(RoutePath.SIGNUP)}
             >
-              <span>Enter Sanctuary</span>
+              <span>Enter sanctuary</span>
               <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
             <Button 
               variant="secondary" 
               size="lg" 
-              className="w-full sm:w-auto h-16 sm:h-20 px-8 sm:px-12 text-[16px] sm:text-[20px] font-bold uppercase rounded-[20px] sm:rounded-[24px] border-2 border-border text-blue shadow-sm liquid-glass"
+              className="w-full sm:w-auto h-16 sm:h-20 px-8 sm:px-12 text-[16px] sm:text-[20px] font-bold rounded-[20px] sm:rounded-[24px] border-2 border-border text-blue shadow-sm liquid-glass"
               onClick={() => navigate(RoutePath.LOGIN)}
             >
-              Sign In
+              Sign in
             </Button>
           </div>
           
@@ -117,11 +117,11 @@ export const Landing: React.FC = () => {
              <Button 
                variant="ghost" 
                size="sm" 
-               className="text-[14px] font-bold uppercase tracking-widest text-gray-nav hover:text-blue hover:bg-blue/5 border-2 border-transparent hover:border-blue/10 rounded-full px-6 py-3 transition-all duration-300 ease-out-quart flex items-center gap-2"
+               className="text-[14px] font-bold text-gray-nav hover:text-blue hover:bg-blue/5 border-2 border-transparent hover:border-blue/10 rounded-full px-6 py-3 transition-all duration-300 ease-out-quart flex items-center gap-2"
                onClick={() => navigate(RoutePath.FAQ)}
              >
                <Sparkles size={16} />
-               <span>Explore How It Works (FAQ)</span>
+               <span>Explore how it works (FAQ)</span>
              </Button>
           </div>
 
@@ -135,12 +135,12 @@ export const Landing: React.FC = () => {
             >
               <button
                 onClick={triggerInstall}
-                className="flex items-center gap-3 px-6 py-3 rounded-full border-2 border-green/30 bg-green/5 text-green font-black uppercase tracking-widest text-[13px] transition-all duration-300 ease-out-quart hover:bg-green/10 hover:border-green/50 active:scale-[0.97]"
+                className="flex items-center gap-3 px-6 py-3 rounded-full border-2 border-green/30 bg-green/5 text-green font-black text-[13px] transition-all duration-300 ease-out-quart hover:bg-green/10 hover:border-green/50 active:scale-[0.97]"
               >
                 <Download size={16} />
-                Install App — Free
+                Install app — free
               </button>
-              <p className="text-[11px] font-bold text-gray-nav uppercase tracking-widest">
+              <p className="text-[11px] font-bold text-gray-nav">
                 No app store needed · Works offline
               </p>
             </motion.div>

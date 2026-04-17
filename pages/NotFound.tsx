@@ -11,13 +11,13 @@ export const NotFound: React.FC = () => {
       <div className="h-20 w-20 rounded-[28px] bg-blue/5 text-blue mb-8 flex items-center justify-center border border-blue/10 bg-white liquid-glass">
         <Sparkles size={40} className="opacity-50" />
       </div>
-      <h1 className="text-4xl font-display text-gray-text lowercase mb-4">this path doesn't exist yet.</h1>
+      <h1 className="text-4xl font-display text-gray-text mb-4">This path doesn't exist yet.</h1>
       <p className="max-w-md text-gray-light font-medium mb-10">
-        it's hiding in the quiet space between thoughts. let's head back to the sanctuary.
+        It's hiding in the quiet space between thoughts. Let's head back to the sanctuary.
       </p>
-      <Button variant="primary" size="lg" onClick={() => navigate(RoutePath.HOME)} className="rounded-2xl border-2 border-border shadow-sm px-8 uppercase font-black">
+      <Button variant="primary" size="lg" onClick={() => navigate(RoutePath.HOME)} className="rounded-2xl border-2 border-border shadow-sm px-8 font-black">
         <ArrowLeft size={18} className="mr-2" />
-        RETURN HOME
+        Return home
       </Button>
     </div>
   );

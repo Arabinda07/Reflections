@@ -55,8 +55,8 @@ export const DashboardLayout: React.FC = () => {
   ];
 
   const authNavItems = [
-    { label: 'My Notes', path: RoutePath.NOTES },
-    { label: 'Create Note', path: RoutePath.CREATE_NOTE },
+    { label: 'My notes', path: RoutePath.NOTES },
+    { label: 'Create note', path: RoutePath.CREATE_NOTE },
     { label: 'Account', path: RoutePath.ACCOUNT },
     { label: 'FAQ', path: RoutePath.FAQ },
   ];
@@ -77,8 +77,8 @@ export const DashboardLayout: React.FC = () => {
               <div className="h-10 w-10 rounded-xl bg-green flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform">
                 <Sparkles size={24} fill="currentColor" />
               </div>
-              <span className="font-display text-[20px] sm:text-[24px] bg-gradient-to-r from-green via-blue to-green bg-clip-text text-transparent animate-gradient-x lowercase tracking-tight truncate max-w-[150px] sm:max-w-none">
-                reflections
+              <span className="font-display text-[20px] sm:text-[24px] bg-gradient-to-r from-green via-blue to-green bg-clip-text text-transparent animate-gradient-x tracking-tight truncate max-w-[150px] sm:max-w-none">
+                Reflections
               </span>
             </div>
           </div>
@@ -96,7 +96,7 @@ export const DashboardLayout: React.FC = () => {
               <button
                 key={item.label}
                 onClick={() => navigate(item.path)}
-                className="px-4 py-2 text-[13px] font-extrabold uppercase tracking-[0.5px] text-gray-nav hover:text-green hover:bg-green/5 rounded-xl transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-1"
+                className="px-4 py-2 text-[13px] font-extrabold text-gray-nav hover:text-green hover:bg-green/5 rounded-xl transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-1"
               >
                 {item.label}
               </button>
@@ -109,7 +109,7 @@ export const DashboardLayout: React.FC = () => {
                 onClick={() => logout()}
                 className="text-red hover:bg-red/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red"
               >
-                LOGOUT
+                Logout
               </Button>
             ) : (
               <div className="flex gap-2">
@@ -119,7 +119,7 @@ export const DashboardLayout: React.FC = () => {
                   onClick={() => navigate(RoutePath.LOGIN)}
                   className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
                 >
-                  SIGN IN
+                  Sign in
                 </Button>
                 <Button 
                   variant="primary" 
@@ -127,7 +127,7 @@ export const DashboardLayout: React.FC = () => {
                   onClick={() => navigate(RoutePath.SIGNUP)}
                   className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green"
                 >
-                  SIGN UP
+                  Sign up
                 </Button>
               </div>
             )}
@@ -178,7 +178,7 @@ export const DashboardLayout: React.FC = () => {
               <div className="h-12 w-12 rounded-2xl bg-green flex items-center justify-center text-white shadow-sm">
                 <Sparkles size={28} fill="currentColor" />
               </div>
-              <span className="font-display text-[28px] bg-gradient-to-r from-green via-blue to-green bg-clip-text text-transparent animate-gradient-x lowercase">reflections</span>
+              <span className="font-display text-[28px] bg-gradient-to-r from-green via-blue to-green bg-clip-text text-transparent animate-gradient-x">Reflections</span>
             </div>
 
             {isAuthenticated ? (
@@ -188,7 +188,7 @@ export const DashboardLayout: React.FC = () => {
                     <button
                       key={item.label}
                       onClick={() => handleNavigation(item.path)}
-                      className="w-full p-6 text-left text-[24px] font-black uppercase tracking-widest text-gray-text border-b-2 border-border/50 hover:text-green transition-all duration-300 ease-out-quart active:bg-green/5 rounded-2xl flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset"
+                      className="w-full p-6 text-left text-[24px] font-black text-gray-text border-b-2 border-border/50 hover:text-green transition-all duration-300 ease-out-quart active:bg-green/5 rounded-2xl flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset"
                     >
                       <span>{item.label}</span>
                       <ArrowRight className="opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -203,10 +203,10 @@ export const DashboardLayout: React.FC = () => {
                         await triggerInstall();
                         setIsMobileMenuOpen(false);
                       }}
-                      className="w-full flex items-center justify-center gap-3 p-5 rounded-2xl border-2 border-green/30 bg-green/5 text-green font-black uppercase tracking-widest text-[14px] transition-all duration-300 ease-out-quart hover:bg-green/10 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+                      className="w-full flex items-center justify-center gap-3 p-5 rounded-2xl border-2 border-green/30 bg-green/5 text-green font-black text-[14px] transition-all duration-300 ease-out-quart hover:bg-green/10 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
                     >
                       <Download size={20} />
-                      Add to Home Screen
+                      Add to home screen
                     </button>
                   )}
                   <Button 
@@ -216,9 +216,9 @@ export const DashboardLayout: React.FC = () => {
                       logout();
                       setIsMobileMenuOpen(false);
                     }}
-                    className="w-full text-red hover:bg-red/5 h-16 font-black uppercase tracking-widest border-2 border-red/10 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-1"
+                    className="w-full text-red hover:bg-red/5 h-16 font-black border-2 border-red/10 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-1"
                   >
-                    LOGOUT
+                    Logout
                   </Button>
                 </div>
               </>
@@ -233,7 +233,7 @@ export const DashboardLayout: React.FC = () => {
                   <button
                     key={item.label}
                     onClick={() => handleNavigation(item.path)}
-                    className="w-full p-6 text-left text-[24px] font-black uppercase tracking-widest text-gray-text border-b-2 border-border/50 hover:text-green transition-all duration-300 ease-out-quart active:bg-green/5 rounded-2xl flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset"
+                    className="w-full p-6 text-left text-[24px] font-black text-gray-text border-b-2 border-border/50 hover:text-green transition-all duration-300 ease-out-quart active:bg-green/5 rounded-2xl flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset"
                   >
                     <span>{item.label}</span>
                     <ArrowRight className="opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -258,25 +258,25 @@ export const DashboardLayout: React.FC = () => {
           <div className="flex items-center gap-8">
             <button 
               onClick={() => navigate(RoutePath.HOME)}
-              className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-colors"
+              className="text-[11px] font-black text-gray-nav hover:text-green transition-colors"
             >
               Home
             </button>
             <button 
               onClick={() => navigate(RoutePath.FAQ)}
-              className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-colors"
+              className="text-[11px] font-black text-gray-nav hover:text-green transition-colors"
             >
               FAQ
             </button>
             <button 
               onClick={() => navigate(RoutePath.PRIVACY)}
-              className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-colors"
+              className="text-[11px] font-black text-gray-nav hover:text-green transition-colors"
             >
-              Privacy Policy
+              Privacy policy
             </button>
           </div>
 
-          <div className="text-[11px] font-black uppercase tracking-widest text-gray-nav/50">
+          <div className="text-[11px] font-black text-gray-nav/50">
             © 2026 <a 
               href="https://arabinda07.github.io/" 
               target="_blank" 

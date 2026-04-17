@@ -824,8 +824,8 @@ Instructions:
             </div>
 
             <div className="space-y-4">
-              <h2 className="text-[32px] font-display lowercase tracking-tight text-gray-text leading-tight">
-                Plan Limit Reached
+              <h2 className="text-[32px] font-display tracking-tight text-gray-text leading-tight">
+                Plan limit reached
               </h2>
               <p className="text-gray-light text-[18px] font-medium leading-relaxed max-w-sm mx-auto">
                 Free users can create a maximum of <span className="text-blue font-bold">30 notes per month</span>. Upgrade for unlimited creative space.
@@ -856,7 +856,7 @@ Instructions:
               </Button>
             </div>
             
-            <p className="text-[11px] font-black text-gray-nav/60 tracking-widest">
+            <p className="text-[11px] font-black text-gray-nav/60">
               Join 2,000+ users on Pro
             </p>
           </div>
@@ -1597,7 +1597,7 @@ Instructions:
             </div>
 
             <div className={`border-t-2 border-border bg-white/50 px-8 py-4 text-center transition-all duration-500 ${isFocused ? 'opacity-20' : 'opacity-100'}`}>
-                <p className="text-[11px] font-extrabold text-gray-nav uppercase tracking-widest">
+                <p className="text-[11px] font-extrabold text-gray-nav">
                    Your journal is a safe space for your thoughts.
                 </p>
             </div>
@@ -1605,7 +1605,7 @@ Instructions:
         </motion.div>
         )}
       </AnimatePresence>
-      <LoadingState isVisible={loading} message="revisiting your thoughts..." />
+      <LoadingState isVisible={loading} message="Revisiting your thoughts..." />
       <PaperPlaneToast
         isVisible={showPlane}
         onAnimationComplete={handlePlaneAnimationComplete}
