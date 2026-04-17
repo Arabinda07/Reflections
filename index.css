@@ -67,6 +67,10 @@
   --space-10: 2.5rem;   /* 40px */
   --space-12: 3rem;     /* 48px */
   --space-16: 4rem;     /* 64px */
+
+  /* Natural Physics: Out-Quart (Exponential) Easing */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-speed: 350ms;
 }
 
 .dark {
@@ -95,6 +99,7 @@ body {
   color: var(--gray-text);
   background-color: var(--bg-color);
   font-weight: 400;
+  transition: background-color var(--transition-speed) var(--ease-out-expo), color var(--transition-speed) var(--ease-out-expo);
 }
 
 /* Impeccable Design: Strict Focus Rings */
@@ -318,10 +323,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   }
 
   .chooser-chip {
-    @apply flex flex-row items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 bg-white border-border text-gray-nav transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] dark:bg-white/5 dark:border-white/10 dark:text-slate-300 dark:shadow-[0_2px_0_0_rgba(15_23_42_/_0.3)];
+    @apply flex flex-row items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 bg-white border-border text-gray-nav transition-all duration-300 dark:bg-white/5 dark:border-white/10 dark:text-slate-300;
     font-weight: 900;
     white-space: nowrap;
     flex-shrink: 0;
+    transition-timing-function: var(--ease-out-expo);
   }
 
   .chooser-chip:hover {

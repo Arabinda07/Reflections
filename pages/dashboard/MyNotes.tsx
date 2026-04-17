@@ -176,7 +176,7 @@ export const MyNotes: React.FC = () => {
                 <button 
                   key={tag}
                   onClick={() => navigate(`${RoutePath.NOTES}?tag=${encodeURIComponent(tag as string)}`)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-50 border border-border text-[12px] font-bold text-gray-nav hover:text-blue hover:border-blue/30 transition-all duration-300 ease-out-quart shadow-sm active:scale-[0.98]"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-50 border border-border text-[12px] font-bold text-gray-nav hover:text-blue hover:border-blue/30 transition-all duration-300 active:brightness-95 shadow-sm"
                 >
                   <Tag size={12} /> {tag}
                 </button>
@@ -241,7 +241,7 @@ export const MyNotes: React.FC = () => {
                   <div 
                     key={note.id}
                     onClick={() => navigate(RoutePath.NOTE_DETAIL.replace(':id', note.id))}
-                    className="group cursor-pointer p-5 rounded-2xl bg-white border-2 border-border shadow-sm hover:shadow-none hover:translate-y-[2px] transition-all duration-200"
+                    className="group cursor-pointer p-5 rounded-2xl bg-white border-2 border-border shadow-sm hover:shadow-none transition-all duration-300"
                   >
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-bold text-gray-text group-hover:text-blue transition-colors truncate pr-4">{note.title}</h4>
@@ -285,7 +285,7 @@ export const MyNotes: React.FC = () => {
             <div 
               key={note.id} 
               onClick={() => navigate(RoutePath.NOTE_DETAIL.replace(':id', note.id))}
-              className="group cursor-pointer flex flex-col overflow-hidden rounded-2xl bg-white border-2 border-border shadow-sm transition-all duration-300 hover:shadow-xl hover:translate-y-[-4px] hover:scale-[1.01] liquid-glass animate-in fade-in slide-in-from-bottom-4"
+              className="group cursor-pointer flex flex-col overflow-hidden rounded-2xl bg-white border-2 border-border shadow-sm transition-all duration-500 ease-out-expo hover:border-blue/30"
               style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
             >
               {/* Image / Header */}
@@ -296,7 +296,7 @@ export const MyNotes: React.FC = () => {
                     <StorageImage 
                         path={note.thumbnailUrl} 
                         alt={note.title} 
-                        className="h-full w-full object-cover transition-transform duration-700 ease-out will-change-transform group-hover:scale-110" 
+                        className="h-full w-full object-cover transition-transform duration-700 ease-out will-change-transform group-hover:scale-105" 
                     />
                    </>
                 ) : (
@@ -309,7 +309,7 @@ export const MyNotes: React.FC = () => {
                 <button 
                   onClick={(e) => handleDelete(e, note.id)}
                   disabled={deletingId === note.id}
-                  className="absolute top-4 left-4 z-20 h-9 w-9 flex items-center justify-center rounded-xl bg-white border-2 border-border text-gray-nav hover:text-red hover:border-red/30 shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart"
+                  className="absolute top-4 left-4 z-20 h-9 w-9 flex items-center justify-center rounded-xl bg-white border-2 border-border text-gray-nav hover:text-red hover:border-red/30 shadow-sm active:brightness-95 transition-all duration-300"
                 >
                   {deletingId === note.id ? (
                     <Loader2 size={16} className="animate-spin text-red" />
@@ -362,7 +362,7 @@ export const MyNotes: React.FC = () => {
                       </div>
                       <span className="text-[12px] font-bold text-gray-nav">Edited {format(new Date(note.updatedAt), 'MMM d')}</span>
                    </div>
-                   <div className="flex items-center text-[12px] font-bold text-blue group-hover:opacity-70 transition-all duration-300 ease-out-quart">
+                   <div className="flex items-center text-[12px] font-bold text-blue group-hover:opacity-70 transition-all duration-300">
                       <span>Open</span>
                       <ArrowUpRight size={14} className="ml-1 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                    </div>
@@ -378,25 +378,25 @@ export const MyNotes: React.FC = () => {
              <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-sm border-2 border-border mb-6">
                  <FileText size={28} className="text-gray-nav" />
              </div>
-             <h3 className="font-display text-[24px] text-gray-text">The space is yours to fill</h3>
-             <p className="text-gray-light mb-8 max-w-sm font-medium">
-               {tagFilter ? `We couldn't find any reflections with "${tagFilter}".` : "Capture your first thought. Even a single sentence is a great start."}
-             </p>
+              <h3 className="font-display text-[24px] text-gray-text">Your personal sanctuary awaits.</h3>
+              <p className="text-gray-light mb-8 max-w-sm font-medium">
+                {tagFilter ? `We couldn't find any reflections with "${tagFilter}".` : "Begin your journey of reflection. Every entry is a step toward clarity."}
+              </p>
              {tagFilter ? (
                <Button 
                   onClick={() => navigate(RoutePath.NOTES)} 
                   variant="secondary" 
-                  className="h-[48px] px-8 text-[15px] font-bold rounded-xl border-2 border-border text-gray-text shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart"
+                  className="h-[48px] px-8 text-[15px] font-bold rounded-xl border-2 border-border text-gray-text shadow-sm active:brightness-95 transition-all duration-300"
                 >
                   Clear filter
                 </Button>
              ) : (
-               <Button 
-                  onClick={() => navigate(RoutePath.CREATE_NOTE)} 
-                  variant="primary" 
-                  className="h-[48px] px-8 text-[15px] font-bold rounded-xl shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart"
+                <Button 
+                   onClick={() => navigate(RoutePath.CREATE_NOTE)} 
+                   variant="primary" 
+                   className="h-[48px] px-8 text-[15px] font-bold rounded-xl shadow-sm active:brightness-95 transition-all duration-300"
                 >
-                  Log a reflection
+                   Log a reflection
                 </Button>
              )}
           </div>
@@ -410,7 +410,7 @@ export const MyNotes: React.FC = () => {
             <div className="h-4 w-[2px] bg-border/20"></div>
             <button 
               onClick={handleUndoDelete}
-              className="text-[13px] font-extrabold text-white uppercase hover:text-green active:scale-[0.98] tracking-widest transition-colors duration-200"
+              className="text-[13px] font-extrabold text-white uppercase hover:text-green active:brightness-95 tracking-widest transition-colors duration-200"
             >
               Undo
             </button>

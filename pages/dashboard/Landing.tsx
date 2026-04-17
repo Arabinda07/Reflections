@@ -36,7 +36,7 @@ export const Landing: React.FC = () => {
             <span>The future of journaling</span>
           </div>
           
-          <h1 className="text-5xl sm:text-6xl md:text-8xl font-display text-gray-text leading-tight md:leading-[1.1] mb-8 tracking-tighter animate-in slide-in-from-bottom-6 duration-700 drop-shadow-sm hover:scale-[1.02] transition-transform">
+          <h1 className="text-5xl sm:text-6xl md:text-8xl font-display text-gray-text leading-tight md:leading-[1.1] mb-8 tracking-tighter animate-in slide-in-from-bottom-6 duration-700 drop-shadow-sm transition-all">
             Your mind, <br />
             <span className="text-green drop-shadow-md">beautifully</span> <br />
             organized.
@@ -135,7 +135,7 @@ export const Landing: React.FC = () => {
             >
               <button
                 onClick={triggerInstall}
-                className="flex items-center gap-3 px-6 py-3 rounded-full border-2 border-green/30 bg-green/5 text-green font-black text-[13px] transition-all duration-300 ease-out-quart hover:bg-green/10 hover:border-green/50 active:scale-[0.97]"
+                className="group relative inline-flex items-center gap-2 px-8 h-[56px] rounded-2xl bg-green text-white font-extrabold text-[15px] shadow-sm transition-all duration-300 active:brightness-95 overflow-hidden"
               >
                 <Download size={16} />
                 Install app — free

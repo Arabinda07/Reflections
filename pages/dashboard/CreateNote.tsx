@@ -78,7 +78,7 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
           : {
               scale: 1,
               borderColor: 'var(--border-color)',
-              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
+              boxShadow: '0 1px 2px rgba(var(--gray-text-rgb), 0.04)',
             }
       }
       transition={{ duration: 0.45, ease: 'easeOut' }}
@@ -1152,7 +1152,7 @@ Instructions:
                        <div className="relative" ref={moodRef}>
                           <button 
                             onClick={() => setIsMoodOpen(!isMoodOpen)}
-                            className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all duration-300 ease-out-quart shadow-sm  active:scale-[0.98] ${mood ? 'bg-blue/5 border-blue text-blue' : 'bg-white border-border text-gray-nav hover:border-blue/30'}`}
+                            className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all duration-300 ease-out-expo shadow-sm active:brightness-95 ${mood ? 'bg-blue/5 border-blue text-blue' : 'bg-white border-border text-gray-nav hover:border-blue/30'}`}
                           >
                             {mood ? (
                               <>
@@ -1217,7 +1217,7 @@ Instructions:
                        <div className="relative" ref={tagsRef}>
                           <button 
                             onClick={() => setIsTagsOpen(!isTagsOpen)}
-                            className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all duration-300 ease-out-quart shadow-sm  active:scale-[0.98] ${tags.length > 0 ? 'bg-green/5 border-green text-green' : 'bg-white border-border text-gray-nav hover:border-green/30'}`}
+                            className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all duration-300 ease-out-expo shadow-sm active:brightness-95 ${tags.length > 0 ? 'bg-green/5 border-green text-green' : 'bg-white border-border text-gray-nav hover:border-green/30'}`}
                           >
                             <TagIcon size={16} />
                             <span className="text-[10px] sm:text-[11px] font-black">{tags.length > 0 ? `${tags.length} tags` : 'Tags'}</span>
@@ -1297,7 +1297,7 @@ Instructions:
                           <input type="file" multiple className="hidden" onChange={handleAttachmentUpload} />
                        </label>
                        {!imagePreview && (
-                          <label className="group flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-border bg-white px-3 sm:px-4 py-2 text-[10px] sm:text-[11px] font-black text-gray-nav transition-all duration-300 ease-out-quart hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-sm active:scale-[0.98]">
+                          <label className="group flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-border bg-white px-3 sm:px-4 py-2 text-[10px] sm:text-[11px] font-black text-gray-nav transition-all duration-300 ease-out-expo hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-sm active:brightness-95">
                              <ImageIcon size={16} className="text-gray-nav group-hover:text-blue" />
                              <span className="hidden xs:inline">Cover</span>
                              <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
@@ -1357,19 +1357,19 @@ Instructions:
                             initial={{ opacity: 0, scale: 0.75 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{
-                              opacity: 0,
+                                opacity: 0,
                               scale: 0.65,
                               transition: { duration: 0.32, ease: [0.4, 0, 1, 1] },
                             }}
                             transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
-                            whileTap={{ scale: 0.82, transition: { duration: 0.08 } }}
+                            whileTap={{ brightness: 0.95 }}
                             onClick={handleSave}
                             disabled={!canSave || saving}
                             className="sm:hidden relative flex h-16 w-16 items-center justify-center rounded-2xl bg-green text-white disabled:opacity-40 disabled:pointer-events-none"
                             style={{
                               boxShadow: saving
-                                ? '0 2px 0 0 #61B800, 0 0 0 3px rgba(88,204,2,0.12)'
-                                : '0 4px 0 0 #61B800, 0 8px 20px -4px rgba(88,204,2,0.4)',
+                                ? '0 2px 0 0 #61B800'
+                                : '0 4px 0 0 #61B800',
                             }}
                           >
                             <AnimatePresence mode="wait">
@@ -1409,7 +1409,7 @@ Instructions:
                       onClick={() => setIsTasksOpen(!isTasksOpen)}
                       className="flex items-center gap-3 group text-left w-full sm:w-auto"
                     >
-                      <div className={`flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-300 ${isTasksOpen ? 'bg-blue text-white shadow-sm' : 'bg-gray-50 text-gray-nav dark:bg-white/5'}`}>
+                      <div className={`flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-300 ${isTasksOpen ? 'bg-blue text-white' : 'bg-gray-50 text-gray-nav dark:bg-white/5'}`}>
                         <ListTodo size={16} />
                       </div>
                       <h3 className="text-[14px] font-extrabold text-gray-text transition-colors group-hover:text-blue dark:text-zinc-100 flex-1">
@@ -1426,7 +1426,7 @@ Instructions:
                           exit={{ opacity: 0, scale: 0.95 }}
                           transition={{ duration: 0.2 }}
                           onClick={addTask}
-                          className="flex justify-center items-center gap-1.5 w-full sm:w-auto px-4 py-2.5 sm:px-3 sm:py-1.5 rounded-[14px] sm:rounded-xl border-2 border-blue/20 bg-blue/5 text-blue text-[12px] sm:text-[10px] font-black hover:bg-blue/10 transition-all duration-300 ease-out-quart shadow-sm active:scale-[0.98]"
+                          className="flex justify-center items-center gap-1.5 w-full sm:w-auto px-4 py-2.5 sm:px-3 sm:py-1.5 rounded-[14px] sm:rounded-xl border-2 border-blue/20 bg-blue/5 text-blue text-[12px] sm:text-[10px] font-black hover:bg-blue/10 transition-all duration-300 ease-out-quart"
                         >
                           <Plus size={14} />
                           Add task
@@ -1446,10 +1446,10 @@ Instructions:
                       >
                         <div className="flex flex-col gap-3 sm:gap-4 pt-2 pb-4">
                           {tasks.length === 0 ? (
-                            <div className="text-center py-6 px-4 bg-gray-50 dark:bg-white/5 rounded-2xl border-2 border-dashed border-border dark:border-white/10">
-                              <p className="text-[13px] font-bold text-gray-nav mb-2">No tasks added yet</p>
-                              <p className="text-[11px] font-semibold text-gray-light max-w-[200px] mx-auto leading-relaxed">
-                                Write down follow-up actions or gentle reminders from today's entry.
+                            <div className="text-center py-12 px-4 bg-gray-50 dark:bg-white/5 rounded-2xl border-2 border-dashed border-border dark:border-white/10">
+                              <h3 className="font-display text-[24px] text-gray-text mb-2">Your personal sanctuary awaits.</h3>
+                              <p className="text-gray-light mb-8 max-w-sm mx-auto font-medium text-[13px]">
+                                Begin your journey of reflection. Every entry is a step toward clarity.
                               </p>
                               <button 
                                 onClick={addTask}
