@@ -21,7 +21,7 @@ export const PrivacyPolicy: React.FC = () => {
 
         {/* Header */}
         <div className="mb-12">
-          <h1 className="font-display text-[40px] sm:text-[56px] tracking-tight bg-gradient-to-r from-green via-blue to-green bg-clip-text text-transparent animate-gradient-x drop-shadow-sm">
+          <h1 className="font-display text-[40px] sm:text-[56px] tracking-tight text-green drop-shadow-sm">
             Privacy policy
           </h1>
           <p className="text-[11px] font-black text-gray-nav mt-2">

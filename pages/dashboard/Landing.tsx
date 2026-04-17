@@ -38,7 +38,7 @@ export const Landing: React.FC = () => {
           
           <h1 className="text-5xl sm:text-6xl md:text-8xl font-display text-gray-text leading-tight md:leading-[1.1] mb-8 tracking-tighter animate-in slide-in-from-bottom-6 duration-700 drop-shadow-sm hover:scale-[1.02] transition-transform">
             Your mind, <br />
-            <span className="bg-gradient-to-r from-green via-blue to-green bg-clip-text text-transparent animate-gradient-x drop-shadow-md">beautifully</span> <br />
+            <span className="text-green drop-shadow-md">beautifully</span> <br />
             organized.
           </h1>
         </div>
@@ -53,7 +53,7 @@ export const Landing: React.FC = () => {
           <p className="text-[14px] font-black text-gray-nav mb-6">Experience the sanctuary</p>
           <div className="relative w-full group">
             {/* Persistent breathing glow that intensifies on hover */}
-            <div className="absolute -inset-4 bg-gradient-to-r from-green/30 via-blue/30 to-green/30 rounded-[48px] blur-2xl opacity-50 animate-pulse group-hover:opacity-100 transition-opacity duration-1000" />
+            <div className="absolute -inset-4 bg-gray-200 rounded-[48px] blur-2xl opacity-50 animate-pulse group-hover:opacity-100 transition-opacity duration-1000" />
             <div className="relative aspect-video rounded-[24px] sm:rounded-[40px] border-2 border-border bg-white/50 backdrop-blur-xl shadow-sm overflow-hidden liquid-glass p-2 sm:p-4">
               <div className="w-full h-full rounded-[16px] sm:rounded-[32px] overflow-hidden border-2 border-white/20 relative">
                 <video 

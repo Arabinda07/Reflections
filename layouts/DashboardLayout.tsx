@@ -77,7 +77,7 @@ export const DashboardLayout: React.FC = () => {
               <div className="h-10 w-10 rounded-xl bg-green flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform">
                 <Sparkles size={24} fill="currentColor" />
               </div>
-              <span className="font-display text-[20px] sm:text-[24px] bg-gradient-to-r from-green via-blue to-green bg-clip-text text-transparent animate-gradient-x tracking-tight truncate max-w-[150px] sm:max-w-none">
+              <span className="font-display text-[20px] sm:text-[24px] text-green tracking-tight truncate max-w-[150px] sm:max-w-none">
                 Reflections
               </span>
             </div>
@@ -178,7 +178,7 @@ export const DashboardLayout: React.FC = () => {
               <div className="h-12 w-12 rounded-2xl bg-green flex items-center justify-center text-white shadow-sm">
                 <Sparkles size={28} fill="currentColor" />
               </div>
-              <span className="font-display text-[28px] bg-gradient-to-r from-green via-blue to-green bg-clip-text text-transparent animate-gradient-x">Reflections</span>
+              <span className="font-display text-[28px] text-green">Reflections</span>
             </div>
 
             {isAuthenticated ? (

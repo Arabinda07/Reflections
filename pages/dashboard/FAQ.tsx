@@ -59,7 +59,7 @@ export const FAQ: React.FC = () => {
               
               <h1 className="text-5xl sm:text-6xl md:text-8xl font-display text-gray-text leading-tight md:leading-[0.9] mb-8 tracking-tighter drop-shadow-sm">
                 Untangle your <br />
-                <span className="bg-gradient-to-r from-green via-blue to-green bg-clip-text text-transparent animate-gradient-x drop-shadow-md">thoughts.</span>
+                <span className="text-green drop-shadow-md">thoughts.</span>
               </h1>
               
               <p className="text-[18px] sm:text-[22px] text-gray-light font-medium leading-relaxed max-w-3xl mx-auto mb-6">

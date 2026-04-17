@@ -45,6 +45,15 @@
   --bg-color: oklch(0.99 0.005 135);
   --panel-bg: oklch(0.97 0.008 135);
   --panel-bg-rgb: 247, 248, 246; /* fallback for backwards compatibility */
+
+  /* Phased Typography Scale (1.25 Ratio / 18px Base) */
+  --text-base: 1.125rem;    /* 18px */
+  --text-lg: 1.406rem;      /* ~22.5px */
+  --text-xl: 1.758rem;      /* ~28px */
+  --text-2xl: 2.197rem;     /* ~35px */
+  --text-3xl: 2.746rem;     /* ~44px */
+  --text-sm: 0.9rem;        /* ~14.4px */
+  --text-xs: 0.72rem;       /* ~11.5px */
 }
 
 .dark {
@@ -82,8 +91,9 @@ button:focus, a:focus, input:focus, textarea:focus, select:focus {
 }
 button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, [role="button"]:focus-visible, [tabindex="0"]:focus-visible {
   outline: 2px solid var(--green);
-  outline-offset: 3px;
-  border-radius: inherit;
+  outline-offset: 4px;
+  border-radius: 4px; /* Strict geometric focus for clarity */
+  box-shadow: 0 0 0 4px oklch(from var(--green) l c h / 0.1);
 }
 
 @layer components {
