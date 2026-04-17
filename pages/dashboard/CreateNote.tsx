@@ -102,7 +102,7 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
         onClick={() => toggleTask(task.id)}
         className={`relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border-2 transition-all duration-300 ${
           task.completed
-            ? 'border-sky-400 bg-sky-400 text-white shadow-[0_0_18px_rgba(14,165,233,0.38)]'
+            ? 'border-sky-400 bg-sky-400 text-white shadow-sm'
             : 'border-border text-transparent hover:border-sky-300'
         }`}
         aria-label={task.completed ? 'Mark task incomplete' : 'Mark task complete'}
@@ -136,7 +136,7 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
         <button
           type="button"
           onClick={() => removeTask(task.id)}
-          className="p-2 rounded-xl text-gray-nav hover:text-red hover:bg-red/5 transition-all"
+          className="p-2 rounded-xl text-gray-nav hover:text-red hover:bg-red/5 transition-all duration-300 ease-out-quart"
           aria-label="Remove task"
         >
           <Trash2 size={16} />
@@ -357,12 +357,14 @@ export const CreateNote: React.FC = () => {
     const checkLimitAndFetch = async () => {
       try {
         if (!id) {
-          // If creating a NEW note, unblock UI immediately
-          if (isUnmounted.current) return;
-          setLoading(false);
-          
           // Generate initial prompts for new note without awaiting
           generateDynamicPrompts();
+
+          // Wait for cinematic display time for the sanctuary loader
+          await new Promise(resolve => setTimeout(resolve, 2500));
+
+          if (isUnmounted.current) return;
+          setLoading(false);
           
           // Check count for current month asynchronously
           const count = await noteService.getMonthlyCount();
@@ -809,14 +811,14 @@ Instructions:
   const limitReachedOverlay = isLimitReached ? (
     <div className="fixed inset-0 z-[200] bg-white/80 backdrop-blur-md flex items-center justify-center p-4">
       <div className="w-full max-w-2xl animate-in fade-in zoom-in-95 duration-500 py-12 md:py-20">
-        <div className="relative overflow-hidden rounded-[40px] border border-white/80 bg-white/90 shadow-[0_40px_100px_-15px_rgba(0,0,0,0.05)] p-10 md:p-14 text-center ring-1 ring-white/50">
+        <div className="relative overflow-hidden rounded-[40px] border border-white/80 bg-white/90 shadow-sm p-10 md:p-14 text-center ring-1 ring-white/50">
           
           {/* Ambient Glows */}
           <div className="absolute top-[-20%] left-[-10%] w-[300px] h-[300px] bg-blue/10 blur-[80px] rounded-full pointer-events-none" />
           <div className="absolute bottom-[-10%] right-[-10%] w-[300px] h-[300px] bg-green/10 blur-[80px] rounded-full pointer-events-none" />
 
           <div className="relative z-10 flex flex-col items-center gap-8">
-            <div className="flex h-20 w-20 items-center justify-center rounded-[24px] bg-blue/10 text-blue shadow-3d-gray border-2 border-border border-blue/20">
+            <div className="flex h-20 w-20 items-center justify-center rounded-[24px] bg-blue/10 text-blue shadow-sm border-2 border-border border-blue/20">
               <Zap size={36} fill="currentColor" className="opacity-80" />
             </div>
 
@@ -833,7 +835,7 @@ Instructions:
               <Button 
                 variant="primary" 
                 size="lg" 
-                className="rounded-[20px] shadow-3d-green group h-14"
+                className="rounded-[20px] shadow-sm group h-14"
                 onClick={() => {}} // Placeholder for upgrade
               >
                 <Sparkles size={18} className="mr-2 group-hover:rotate-12 transition-transform" />
@@ -843,7 +845,7 @@ Instructions:
               <Button 
                 variant="secondary" 
                 size="lg" 
-                className="rounded-[20px] h-14 shadow-3d-gray text-gray-nav"
+                className="rounded-[20px] h-14 shadow-sm text-gray-nav"
                 onClick={() => {
                   setIsLimitReached(false);
                   navigate(RoutePath.NOTES);
@@ -897,7 +899,7 @@ Instructions:
       />
       {limitReachedOverlay}
       <div className="mx-auto max-w-[1180px] animate-in fade-in duration-500 pb-20 px-3 sm:px-4 md:px-6">
-        <nav className={`sticky top-4 z-50 mb-8 flex items-center justify-between gap-2 rounded-2xl border-2 border-border bg-white/90 px-3 py-2 sm:px-4 sm:py-3 shadow-[0_4px_0_0_#E5E5E5] backdrop-blur-2xl transition-all duration-500 dark:bg-[#17171b]/90 dark:shadow-[0_4px_0_0_rgba(15,23,42,0.55)] ${isDimmed ? 'opacity-40 hover:opacity-100' : 'opacity-100'}`}>
+        <nav className={`sticky top-4 z-50 mb-8 flex items-center justify-between gap-2 rounded-2xl border-2 border-border bg-white/90 px-3 py-2 sm:px-4 sm:py-3 shadow-sm backdrop-blur-2xl transition-all duration-500 dark:bg-[#17171b]/90 dark:shadow-sm ${isDimmed ? 'opacity-40 hover:opacity-100' : 'opacity-100'}`}>
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-bold uppercase text-[12px] px-2 sm:px-3">
              <ArrowLeft className="h-4 w-4 sm:mr-2" />
@@ -917,7 +919,7 @@ Instructions:
             variant="ghost"
             size="sm"
             onClick={toggleWhisper}
-            className={`flex items-center gap-2 font-bold uppercase text-[11px] transition-all ${isWhispering ? 'text-blue bg-blue/5' : 'text-gray-nav'}`}
+            className={`flex items-center gap-2 font-bold uppercase text-[11px] transition-all duration-300 ease-out-quart ${isWhispering ? 'text-blue bg-blue/5' : 'text-gray-nav'}`}
             title="Whisper Mode"
           >
             {isWhispering ? <Mic size={16} className="animate-pulse" /> : <MicOff size={16} />}
@@ -937,7 +939,7 @@ Instructions:
                   setIsMusicOpen(!isMusicOpen);
                 }
               }}
-              className={`flex items-center gap-2 font-bold uppercase text-[11px] transition-all ${musicPlaying ? 'text-purple-500 bg-purple-500/10 dark:bg-purple-500/20' : 'text-gray-nav dark:text-gray-400'}`}
+              className={`flex items-center gap-2 font-bold uppercase text-[11px] transition-all duration-300 ease-out-quart ${musicPlaying ? 'text-purple-500 bg-purple-500/10 dark:bg-purple-500/20' : 'text-gray-nav dark:text-gray-400'}`}
               title="Ambient Sounds"
             >
               <Music size={16} className={musicPlaying ? 'animate-pulse' : ''} />
@@ -953,7 +955,7 @@ Instructions:
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 15, scale: 0.95 }}
                       transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-                      className="music-popup-container pointer-events-auto w-[calc(100%-32px)] sm:w-[240px] bg-white/95 dark:bg-[#18181b]/95 border-[1.5px] border-border shadow-[0_8px_32px_-8px_rgba(0,0,0,0.16)] dark:shadow-[0_8px_32px_-8px_rgba(0,0,0,0.6)] backdrop-blur-xl sm:fixed relative mb-4 sm:mb-0 rounded-[24px] p-4 z-[10000]"
+                      className="music-popup-container pointer-events-auto w-[calc(100%-32px)] sm:w-[240px] bg-white/95 dark:bg-[#18181b]/95 border-[1.5px] border-border shadow-sm dark:shadow-sm backdrop-blur-xl sm:fixed relative mb-4 sm:mb-0 rounded-[24px] p-4 z-[10000]"
                       style={{
                         ...(window.innerWidth >= 640 ? {
                           top: musicRef.current ? musicRef.current.getBoundingClientRect().bottom + 12 : 0,
@@ -988,7 +990,7 @@ Instructions:
                                 if (isActive) { stopMusic(); }
                                 else { playMusicTrack(track); }
                               }}
-                              className="w-full flex items-center gap-2.5 p-2.5 rounded-2xl border-[1.5px] transition-all text-left"
+                              className="w-full flex items-center gap-2.5 p-2.5 rounded-2xl border-[1.5px] transition-all duration-300 ease-out-quart text-left"
                               style={{
                                 borderColor: isActive ? `${track.color}55` : 'rgba(229,229,229,0.9)',
                                 backgroundColor: isActive ? `${track.color}10` : 'transparent',
@@ -1056,7 +1058,7 @@ Instructions:
             variant="ghost" 
             size="sm" 
             onClick={handleRelease} 
-            className="hidden sm:flex text-gray-nav hover:text-red hover:bg-red/5 font-bold uppercase text-[11px] transition-all shrink-0 px-2 sm:px-3" 
+            className="hidden sm:flex text-gray-nav hover:text-red hover:bg-red/5 font-bold uppercase text-[11px] transition-all duration-300 ease-out-quart shrink-0 px-2 sm:px-3" 
             disabled={isReleasing}
           >
               <Wind className="h-3.5 w-3.5 sm:mr-2" />
@@ -1074,7 +1076,7 @@ Instructions:
                 <Button
                   variant="secondary"
                   size="sm"
-                  className="shrink-0 border-2 border-border text-blue shadow-3d-gray active:shadow-none active:translate-y-[2px] transition-all dark:bg-white/6 px-2 sm:px-3 dark:text-sky-100 dark:shadow-[0_3px_0_0_rgba(15,23,42,0.55)]"
+                  className="shrink-0 border-2 border-border text-blue shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart dark:bg-white/6 px-2 sm:px-3 dark:text-sky-100 dark:shadow-sm"
                   disabled={isReflecting}
                   onClick={handleAiReflect}
                   isLoading={isReflecting}
@@ -1091,7 +1093,7 @@ Instructions:
             onClick={handleSave} 
             size="sm" 
             variant="primary"
-            className={`shrink-0 shadow-3d-green px-2 sm:px-3 active:shadow-none active:translate-y-[2px] transition-all ${
+            className={`shrink-0 shadow-sm px-2 sm:px-3  active:scale-[0.98] transition-all duration-300 ease-out-quart ${
               hasContent ? 'hidden sm:flex' : 'flex'
             }`}
             disabled={!canSave || saving || showPlane}
@@ -1112,7 +1114,7 @@ Instructions:
             transition={{ duration: 1.2, ease: releaseEase }}
             className="mx-auto w-full max-w-[1100px]"
           >
-          <div className="relative min-h-[70vh] rounded-[32px] border-2 border-border bg-white shadow-[0_8px_0_0_#E5E5E5] flex flex-col liquid-glass !overflow-visible dark:bg-[#17171b] dark:shadow-[0_8px_0_0_rgba(15,23,42,0.58)]">
+          <div className="relative min-h-[70vh] rounded-[32px] border-2 border-border bg-white shadow-sm flex flex-col liquid-glass !overflow-visible dark:bg-[#17171b] dark:shadow-sm">
             {imagePreview && (
               <div className="relative aspect-[21/9] w-full group bg-white border-b-2 border-border rounded-t-[30px] overflow-hidden">
                   <StorageImage 
@@ -1121,13 +1123,13 @@ Instructions:
                     className="h-full w-full object-cover" 
                   />
                   <div className="absolute top-4 right-4 flex gap-2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                      <label className="cursor-pointer rounded-xl bg-white border-2 border-border px-3 py-1.5 text-[11px] font-bold text-gray-text shadow-[0_2px_0_0_#E5E5E5] hover:bg-white transition-colors">
+                      <label className="cursor-pointer rounded-xl bg-white border-2 border-border px-3 py-1.5 text-[11px] font-bold text-gray-text shadow-sm hover:bg-white transition-colors">
                           CHANGE
                           <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
                       </label>
                       <button 
                           onClick={handleRemoveCover}
-                          className="rounded-xl bg-white p-1.5 text-gray-nav border-2 border-border shadow-[0_2px_0_0_#E5E5E5] hover:text-red transition-colors"
+                          className="rounded-xl bg-white p-1.5 text-gray-nav border-2 border-border shadow-sm hover:text-red transition-colors"
                       >
                           <X size={16} />
                       </button>
@@ -1149,7 +1151,7 @@ Instructions:
                        <div className="relative" ref={moodRef}>
                           <button 
                             onClick={() => setIsMoodOpen(!isMoodOpen)}
-                            className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] ${mood ? 'bg-blue/5 border-blue text-blue' : 'bg-white border-border text-gray-nav hover:border-blue/30'}`}
+                            className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all duration-300 ease-out-quart shadow-sm  active:scale-[0.98] ${mood ? 'bg-blue/5 border-blue text-blue' : 'bg-white border-border text-gray-nav hover:border-blue/30'}`}
                           >
                             {mood ? (
                               <>
@@ -1194,7 +1196,7 @@ Instructions:
                                               handleMoodSelect(m.id);
                                               setIsMoodOpen(false);
                                             }}
-                                            className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all ${isSelected ? `${m.color} border-current` : 'border-transparent hover:bg-gray-50 text-gray-nav'}`}
+                                            className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all duration-300 ease-out-quart ${isSelected ? `${m.color} border-current` : 'border-transparent hover:bg-gray-50 text-gray-nav'}`}
                                           >
                                             <Icon size={20} />
                                             <span className="mt-1 text-[9px] font-bold uppercase">{m.label}</span>
@@ -1214,7 +1216,7 @@ Instructions:
                        <div className="relative" ref={tagsRef}>
                           <button 
                             onClick={() => setIsTagsOpen(!isTagsOpen)}
-                            className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] ${tags.length > 0 ? 'bg-green/5 border-green text-green' : 'bg-white border-border text-gray-nav hover:border-green/30'}`}
+                            className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all duration-300 ease-out-quart shadow-sm  active:scale-[0.98] ${tags.length > 0 ? 'bg-green/5 border-green text-green' : 'bg-white border-border text-gray-nav hover:border-green/30'}`}
                           >
                             <TagIcon size={16} />
                             <span className="text-[10px] sm:text-[11px] font-black uppercase">{tags.length > 0 ? `${tags.length} Tags` : 'Tags'}</span>
@@ -1245,7 +1247,7 @@ Instructions:
                                           value={tagInput}
                                           onChange={(e) => setTagInput(e.target.value)}
                                           onKeyDown={handleAddTag}
-                                          className="w-full pl-9 pr-4 py-2 rounded-xl border-2 border-border bg-white text-[13px] font-bold focus:border-blue focus:outline-none transition-all"
+                                          className="w-full pl-9 pr-4 py-2 rounded-xl border-2 border-border bg-white text-[13px] font-bold focus:border-blue focus:outline-none transition-all duration-300 ease-out-quart"
                                         />
                                       </div>
                                     </div>
@@ -1261,7 +1263,7 @@ Instructions:
                                                 if (!tags.includes(tag)) setTags([...tags, tag]);
                                                 setSuggestedTags(prev => prev.filter(t => t !== tag));
                                               }}
-                                              className="px-2 py-1 rounded-lg bg-blue/5 border border-blue/10 text-blue text-[10px] font-bold hover:bg-blue/10 transition-all"
+                                              className="px-2 py-1 rounded-lg bg-blue/5 border border-blue/10 text-blue text-[10px] font-bold hover:bg-blue/10 transition-all duration-300 ease-out-quart"
                                             >
                                               +{tag}
                                             </button>
@@ -1288,13 +1290,13 @@ Instructions:
                           )}
                        </div>
 
-                       <label className="group flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-border bg-white px-3 sm:px-4 py-2 text-[10px] sm:text-[11px] font-black uppercase text-gray-nav transition-all hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]">
+                       <label className="group flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-border bg-white px-3 sm:px-4 py-2 text-[10px] sm:text-[11px] font-black uppercase text-gray-nav transition-all duration-300 ease-out-quart hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-sm active:scale-[0.98]">
                           <Paperclip size={16} className="text-gray-nav group-hover:text-blue" />
                           <span className="hidden xs:inline">ATTACH</span>
                           <input type="file" multiple className="hidden" onChange={handleAttachmentUpload} />
                        </label>
                        {!imagePreview && (
-                          <label className="group flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-border bg-white px-3 sm:px-4 py-2 text-[10px] sm:text-[11px] font-black uppercase text-gray-nav transition-all hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]">
+                          <label className="group flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-border bg-white px-3 sm:px-4 py-2 text-[10px] sm:text-[11px] font-black uppercase text-gray-nav transition-all duration-300 ease-out-quart hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-sm active:scale-[0.98]">
                              <ImageIcon size={16} className="text-gray-nav group-hover:text-blue" />
                              <span className="hidden xs:inline">COVER</span>
                              <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
@@ -1342,7 +1344,7 @@ Instructions:
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={cycleSparkPrompt}
-                            className={`flex h-14 w-14 items-center justify-center rounded-full border-2 border-border bg-white shadow-3d-gray backdrop-blur-xl transition-all text-blue hover:text-blue/80 hover:shadow-none hover:translate-y-[2px] ${isGeneratingPrompts ? 'animate-pulse' : ''}`}
+                            className={`flex h-14 w-14 items-center justify-center rounded-full border-2 border-border bg-white shadow-sm backdrop-blur-xl transition-all duration-300 ease-out-quart text-blue hover:text-blue/80 hover:shadow-none hover:translate-y-[2px] ${isGeneratingPrompts ? 'animate-pulse' : ''}`}
                             title={sparkPrompt}
                           >
                             <Sparkles size={22} className="relative z-10" />
@@ -1406,7 +1408,7 @@ Instructions:
                       onClick={() => setIsTasksOpen(!isTasksOpen)}
                       className="flex items-center gap-3 group text-left w-full sm:w-auto"
                     >
-                      <div className={`flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-300 ${isTasksOpen ? 'bg-blue text-white shadow-[0_2px_10px_rgba(28,176,246,0.2)]' : 'bg-gray-50 text-gray-nav dark:bg-white/5'}`}>
+                      <div className={`flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-300 ${isTasksOpen ? 'bg-blue text-white shadow-sm' : 'bg-gray-50 text-gray-nav dark:bg-white/5'}`}>
                         <ListTodo size={16} />
                       </div>
                       <h3 className="text-[13px] font-extrabold text-gray-text uppercase tracking-widest transition-colors group-hover:text-blue dark:text-zinc-100 flex-1">
@@ -1423,7 +1425,7 @@ Instructions:
                           exit={{ opacity: 0, scale: 0.95 }}
                           transition={{ duration: 0.2 }}
                           onClick={addTask}
-                          className="flex justify-center items-center gap-1.5 w-full sm:w-auto px-4 py-2.5 sm:px-3 sm:py-1.5 rounded-[14px] sm:rounded-xl border-2 border-blue/20 bg-blue/5 text-blue text-[12px] sm:text-[10px] font-black uppercase tracking-widest hover:bg-blue/10 transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]"
+                          className="flex justify-center items-center gap-1.5 w-full sm:w-auto px-4 py-2.5 sm:px-3 sm:py-1.5 rounded-[14px] sm:rounded-xl border-2 border-blue/20 bg-blue/5 text-blue text-[12px] sm:text-[10px] font-black uppercase tracking-widest hover:bg-blue/10 transition-all duration-300 ease-out-quart shadow-sm active:scale-[0.98]"
                         >
                           <Plus size={14} />
                           Add Task
@@ -1474,13 +1476,13 @@ Instructions:
 
                 {aiReflection && (
                   <div className="mt-12 animate-in fade-in slide-in-from-bottom-6 duration-700">
-                    <div className="relative overflow-hidden rounded-[32px] border border-sky-100 bg-[linear-gradient(180deg,rgba(247,251,255,0.98),rgba(255,255,255,0.98))] p-6 shadow-[0_10px_30px_-22px_rgba(14,165,233,0.45)] sm:p-8">
+                    <div className="relative overflow-hidden rounded-[32px] border border-sky-100 bg-[linear-gradient(180deg,rgba(247,251,255,0.98),rgba(255,255,255,0.98))] p-6 shadow-sm sm:p-8">
                       <div className="absolute inset-x-0 top-0 h-24 bg-[radial-gradient(circle_at_top_right,rgba(125,211,252,0.18),transparent_55%)] pointer-events-none" />
                       <div className="absolute bottom-0 left-0 h-20 w-20 rounded-full bg-emerald-100/40 blur-3xl pointer-events-none" />
 
                       <div className="relative z-10">
                         <div className="flex items-center gap-3 mb-5">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-sky-100 bg-white text-blue shadow-[0_2px_0_0_rgba(226,232,240,0.9)]">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-sky-100 bg-white text-blue shadow-sm">
                             <Brain size={20} />
                           </div>
                           <div className="flex-1 flex flex-col items-end">
@@ -1512,7 +1514,7 @@ Instructions:
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       {existingAttachments.map((att) => (
-                        <div key={att.path} className="group relative flex items-center gap-4 p-5 rounded-[24px] border-2 border-border bg-white hover:bg-blue/5 hover:border-blue/30 transition-all duration-500 shadow-3d-gray hover:shadow-none hover:translate-y-[2px] liquid-glass">
+                        <div key={att.path} className="group relative flex items-center gap-4 p-5 rounded-[24px] border-2 border-border bg-white hover:bg-blue/5 hover:border-blue/30 transition-all duration-500 shadow-sm hover:shadow-none hover:translate-y-[2px] liquid-glass">
                           <div className="h-16 w-16 shrink-0 rounded-2xl bg-white border-2 border-border flex items-center justify-center text-gray-nav shadow-inner overflow-hidden">
                              {att.type?.startsWith('image/') ? (
                                <StorageImage 
@@ -1539,7 +1541,7 @@ Instructions:
                           </div>
                           <button 
                             onClick={() => removeExistingAttachment(att)}
-                            className="h-10 w-10 rounded-xl bg-white text-gray-nav border-2 border-border shadow-[0_2px_0_0_#E5E5E5] flex items-center justify-center hover:text-red hover:border-red/30 active:shadow-none active:translate-y-[2px] transition-all duration-200"
+                            className="h-10 w-10 rounded-xl bg-white text-gray-nav border-2 border-border shadow-sm flex items-center justify-center hover:text-red hover:border-red/30 active:scale-[0.98] transition-all duration-200"
                             title="Remove attachment"
                           >
                             <X size={18} strokeWidth={2.5} />
@@ -1550,7 +1552,7 @@ Instructions:
                         const isImage = file.type?.startsWith('image/');
                         const previewUrl = isImage ? URL.createObjectURL(file) : null;
                         return (
-                          <div key={`new-${index}`} className="group relative flex items-center gap-4 p-5 rounded-[24px] border-2 border-blue/20 bg-blue/5 hover:bg-white hover:border-blue/40 transition-all duration-500 shadow-3d-blue hover:shadow-none hover:translate-y-[2px] liquid-glass animate-in zoom-in-95 duration-300">
+                          <div key={`new-${index}`} className="group relative flex items-center gap-4 p-5 rounded-[24px] border-2 border-blue/20 bg-blue/5 hover:bg-white hover:border-blue/40 transition-all duration-500 shadow-sm hover:shadow-none hover:translate-y-[2px] liquid-glass animate-in zoom-in-95 duration-300">
                             <div className="h-16 w-16 shrink-0 rounded-2xl bg-white border-2 border-blue/20 flex items-center justify-center text-blue shadow-inner overflow-hidden">
                               {isImage && previewUrl ? (
                                 <img 
@@ -1580,7 +1582,7 @@ Instructions:
                             </div>
                             <button 
                               onClick={() => removeNewAttachment(index)}
-                              className="h-10 w-10 rounded-xl bg-white text-gray-nav border-2 border-border shadow-[0_2px_0_0_#E5E5E5] flex items-center justify-center hover:text-red hover:border-red/30 active:shadow-none active:translate-y-[2px] transition-all duration-200"
+                              className="h-10 w-10 rounded-xl bg-white text-gray-nav border-2 border-border shadow-sm flex items-center justify-center hover:text-red hover:border-red/30 active:scale-[0.98] transition-all duration-200"
                               title="Remove attachment"
                             >
                               <X size={18} strokeWidth={2.5} />

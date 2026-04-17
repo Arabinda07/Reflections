@@ -15,7 +15,7 @@ export const NotFound: React.FC = () => {
       <p className="max-w-md text-gray-light font-medium mb-10">
         it's hiding in the quiet space between thoughts. let's head back to the sanctuary.
       </p>
-      <Button variant="primary" size="lg" onClick={() => navigate(RoutePath.HOME)} className="rounded-2xl border-2 border-border shadow-3d-gray px-8 uppercase font-black">
+      <Button variant="primary" size="lg" onClick={() => navigate(RoutePath.HOME)} className="rounded-2xl border-2 border-border shadow-sm px-8 uppercase font-black">
         <ArrowLeft size={18} className="mr-2" />
         RETURN HOME
       </Button>

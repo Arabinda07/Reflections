@@ -174,13 +174,13 @@ export const Account: React.FC = () => {
   return (
     <div className="relative w-full max-w-4xl mx-auto pb-20 animate-in fade-in duration-700 px-4 md:px-0">
         
-        <div className="relative rounded-[40px] border-2 border-border bg-white shadow-[0_12px_0_0_#E5E5E5] overflow-hidden transition-all duration-500 liquid-glass dark:bg-zinc-900/50">
+        <div className="relative rounded-[40px] border-2 border-border bg-white shadow-sm overflow-hidden transition-all duration-500 liquid-glass dark:bg-zinc-900/50">
             
             <form onSubmit={handleSubmit} className="divide-y-2 divide-border">
                 
                 <div className="px-10 py-12 flex flex-col items-center justify-center text-center relative overflow-hidden">
                     <div className="group relative mb-6 cursor-pointer" onClick={() => document.getElementById('avatar-upload')?.click()}>
-                        <div className="h-32 w-32 rounded-full p-1 bg-white border-4 border-border shadow-3d-gray transition-transform duration-500 group-hover:scale-105 relative overflow-hidden dark:bg-zinc-800">
+                        <div className="h-32 w-32 rounded-full p-1 bg-white border-4 border-border shadow-sm transition-transform duration-500 group-hover:scale-105 relative overflow-hidden dark:bg-zinc-800">
                              {avatarPath ? (
                                 <StorageImage 
                                     path={avatarPath} 
@@ -193,7 +193,7 @@ export const Account: React.FC = () => {
                                 </div>
                              )}
                         </div>
-                        <button type="button" className="absolute bottom-1 right-1 flex h-10 w-10 items-center justify-center rounded-full bg-white text-gray-text border-2 border-border shadow-3d-gray transition-all hover:scale-110 hover:text-blue dark:bg-zinc-800 dark:text-zinc-100">
+                        <button type="button" className="absolute bottom-1 right-1 flex h-10 w-10 items-center justify-center rounded-full bg-white text-gray-text border-2 border-border shadow-sm transition-all duration-300 ease-out-quart hover:scale-110 hover:text-blue dark:bg-zinc-800 dark:text-zinc-100">
                             <Camera size={18} />
                         </button>
                         <input 
@@ -218,7 +218,7 @@ export const Account: React.FC = () => {
                     
                     <div className="space-y-8">
                         <div className="flex items-center gap-3 mb-6">
-                             <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-blue border-2 border-border shadow-3d-gray dark:bg-zinc-800">
+                             <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-blue border-2 border-border shadow-sm dark:bg-zinc-800">
                                  <User size={20} strokeWidth={2.5} />
                              </div>
                              <h3 className="text-[18px] font-display text-gray-text lowercase dark:text-zinc-100">personal information</h3>
@@ -253,7 +253,7 @@ export const Account: React.FC = () => {
                                     name="timezone"
                                     value={formData.timezone}
                                     onChange={handleChange}
-                                    className="w-full appearance-none rounded-2xl border-2 border-border bg-white pl-12 pr-5 py-4 text-[15px] font-bold text-gray-text transition-all duration-300 hover:border-blue/30 focus:border-blue focus:outline-none shadow-3d-gray dark:bg-zinc-800 dark:text-zinc-100"
+                                    className="w-full appearance-none rounded-2xl border-2 border-border bg-white pl-12 pr-5 py-4 text-[15px] font-bold text-gray-text transition-all duration-300 hover:border-blue/30 focus:border-blue focus:outline-none shadow-sm dark:bg-zinc-800 dark:text-zinc-100"
                                 >
                                     <option value="UTC">UTC (Coordinated Universal Time)</option>
                                     <option value="America/New_York">Eastern Time (ET)</option>
@@ -276,13 +276,13 @@ export const Account: React.FC = () => {
 
                     <div className="space-y-8 pt-12 border-t-2 border-border">
                         <div className="flex items-center gap-3 mb-2">
-                             <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-blue border-2 border-border shadow-3d-gray dark:bg-zinc-800">
+                             <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-blue border-2 border-border shadow-sm dark:bg-zinc-800">
                                  <Shield size={20} strokeWidth={2.5} />
                              </div>
                              <h3 className="text-[18px] font-display text-gray-text lowercase dark:text-zinc-100">security & login</h3>
                         </div>
 
-                        <div className="rounded-[32px] border-2 border-border bg-white p-8 shadow-3d-gray dark:bg-zinc-900">
+                        <div className="rounded-[32px] border-2 border-border bg-white p-8 shadow-sm dark:bg-zinc-900">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-4">
                                     <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white border-2 border-border text-gray-nav dark:bg-zinc-800">
@@ -295,7 +295,7 @@ export const Account: React.FC = () => {
                                         </p>
                                     </div>
                                 </div>
-                                <Button type="button" variant="secondary" size="sm" onClick={handlePasswordReset} className="border-2 border-border shadow-3d-gray active:shadow-none active:translate-y-[2px] text-blue font-extrabold px-6">
+                                <Button type="button" variant="secondary" size="sm" onClick={handlePasswordReset} className="border-2 border-border shadow-sm active:scale-[0.98] text-blue font-extrabold px-6">
                                     RESET
                                 </Button>
                             </div>
@@ -322,7 +322,7 @@ export const Account: React.FC = () => {
 
                     <div className="space-y-8 pt-12 border-t-2 border-border">
                         <div className="flex items-center gap-3 mb-2">
-                             <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-red border-2 border-border shadow-3d-gray dark:bg-zinc-800">
+                             <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center text-red border-2 border-border shadow-sm dark:bg-zinc-800">
                                  <AlertTriangle size={20} strokeWidth={2.5} />
                              </div>
                              <h3 className="text-[18px] font-display text-red lowercase">danger zone</h3>
@@ -340,7 +340,7 @@ export const Account: React.FC = () => {
                                     type="button" 
                                     variant="danger" 
                                     size="sm" 
-                                    className="shadow-3d-red active:shadow-none active:translate-y-[2px] font-extrabold"
+                                    className="shadow-sm active:scale-[0.98] font-extrabold"
                                     onClick={() => setShowDeleteConfirm(true)}
                                 >
                                     <Trash2 className="mr-2 h-4 w-4" />
@@ -355,7 +355,7 @@ export const Account: React.FC = () => {
                     <button 
                         type="button" 
                         onClick={handleSignOut}
-                        className="flex items-center justify-center h-12 w-12 sm:w-auto sm:px-4 rounded-xl border-2 border-border bg-white text-gray-nav hover:text-red hover:border-red/30 transition-all shadow-3d-gray active:shadow-none active:translate-y-[2px] group dark:bg-zinc-800"
+                        className="flex items-center justify-center h-12 w-12 sm:w-auto sm:px-4 rounded-xl border-2 border-border bg-white text-gray-nav hover:text-red hover:border-red/30 transition-all duration-300 ease-out-quart shadow-sm active:scale-[0.98] group dark:bg-zinc-800"
                         title="Sign Out"
                     >
                         <LogOut size={20} className="group-hover:scale-110 transition-transform" />
@@ -366,7 +366,7 @@ export const Account: React.FC = () => {
                             type="button" 
                             variant="secondary" 
                             onClick={() => navigate(RoutePath.HOME)} 
-                            className="flex items-center justify-center h-12 w-12 sm:w-auto !px-0 sm:!px-6 border-2 border-border text-gray-nav font-extrabold shadow-3d-gray active:shadow-none active:translate-y-[2px]"
+                            className="flex items-center justify-center h-12 w-12 sm:w-auto !px-0 sm:!px-6 border-2 border-border text-gray-nav font-extrabold shadow-sm active:scale-[0.98]"
                             title="Cancel"
                          >
                              <X size={20} className="sm:mr-2" />
@@ -375,7 +375,7 @@ export const Account: React.FC = () => {
                          <Button 
                             type="submit" 
                             disabled={loading || isSaved}
-                            className={`flex items-center justify-center h-12 w-12 sm:w-auto !px-0 sm:!px-8 font-extrabold transition-all duration-300 ${isSaved ? 'bg-green text-white border-green shadow-3d-green' : 'shadow-3d-green active:shadow-none active:translate-y-[2px]'}`}
+                            className={`flex items-center justify-center h-12 w-12 sm:w-auto !px-0 sm:!px-8 font-extrabold transition-all duration-300 ${isSaved ? 'bg-green text-white border-green shadow-sm' : 'shadow-sm  active:scale-[0.98]'}`}
                             title="Save Changes"
                          >
                              {loading ? (
@@ -399,7 +399,7 @@ export const Account: React.FC = () => {
             <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-in fade-in duration-300">
                 <div className="relative w-full max-w-md space-y-6 rounded-[32px] border-2 border-border bg-white p-8 shadow-2xl animate-in zoom-in-95 duration-300 dark:bg-zinc-900">
                     <div className="flex flex-col items-center text-center gap-4">
-                        <div className="h-16 w-16 rounded-2xl bg-red/10 flex items-center justify-center text-red border-2 border-red/20 shadow-3d-red mb-2">
+                        <div className="h-16 w-16 rounded-2xl bg-red/10 flex items-center justify-center text-red border-2 border-red/20 shadow-sm mb-2">
                              <AlertTriangle size={32} />
                         </div>
                         <h2 className="text-2xl font-display text-gray-text lowercase dark:text-zinc-100">delete everything?</h2>
@@ -411,7 +411,7 @@ export const Account: React.FC = () => {
                     <div className="flex flex-col gap-3 pt-4">
                         <Button 
                             variant="danger" 
-                            className="w-full h-14 font-extrabold shadow-3d-red active:shadow-none active:translate-y-[2px]"
+                            className="w-full h-14 font-extrabold shadow-sm active:scale-[0.98]"
                             onClick={handleDeleteAccount}
                             disabled={loading}
                         >
@@ -419,7 +419,7 @@ export const Account: React.FC = () => {
                         </Button>
                         <Button 
                             variant="secondary" 
-                            className="w-full h-14 font-extrabold border-2 border-border shadow-3d-gray active:shadow-none active:translate-y-[2px]"
+                            className="w-full h-14 font-extrabold border-2 border-border shadow-sm active:scale-[0.98]"
                             onClick={() => setShowDeleteConfirm(false)}
                             disabled={loading}
                         >

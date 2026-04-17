@@ -160,7 +160,7 @@ export const FAQ: React.FC = () => {
                 </div>
 
                 {/* Card */}
-                <div className="w-full p-8 rounded-[32px] border-2 border-border bg-white dark:bg-[#1E1E1E] shadow-3d-gray flex-1 flex flex-col text-center hover:border-border/80 transition-colors">
+                <div className="w-full p-8 rounded-[32px] border-2 border-border bg-white dark:bg-[#1E1E1E] shadow-sm flex-1 flex flex-col text-center hover:border-border/80 transition-colors">
                   <span className={`text-[12px] font-black uppercase tracking-widest text-${item.color} mb-3`}>Step {item.step}</span>
                   <h3 className="text-[22px] font-display text-gray-text lowercase mb-4 leading-tight">{item.title}</h3>
                   <p className="text-[15px] font-medium text-gray-light leading-relaxed flex-1">
@@ -187,7 +187,7 @@ export const FAQ: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             
             {/* Free Tiers */}
-            <div className="col-span-1 p-8 rounded-[32px] border-2 border-border bg-white dark:bg-[#1E1E1E] shadow-3d-gray hover:shadow-lg transition-all flex flex-col group liquid-glass">
+            <div className="col-span-1 p-8 rounded-[32px] border-2 border-border bg-white dark:bg-[#1E1E1E] shadow-sm hover:shadow-lg transition-all duration-300 ease-out-quart flex flex-col group liquid-glass">
               <div className="h-12 w-12 rounded-xl bg-blue/10 text-blue flex items-center justify-center mb-6 group-hover:bg-blue group-hover:text-white transition-colors duration-300">
                 <Shield size={24} />
               </div>
@@ -200,7 +200,7 @@ export const FAQ: React.FC = () => {
               </div>
             </div>
 
-            <div className="col-span-1 p-8 rounded-[32px] border-2 border-border bg-white dark:bg-[#1E1E1E] shadow-3d-gray hover:shadow-lg transition-all flex flex-col group liquid-glass">
+            <div className="col-span-1 p-8 rounded-[32px] border-2 border-border bg-white dark:bg-[#1E1E1E] shadow-sm hover:shadow-lg transition-all duration-300 ease-out-quart flex flex-col group liquid-glass">
               <div className="h-12 w-12 rounded-xl bg-green/10 text-green flex items-center justify-center mb-6 group-hover:bg-green group-hover:text-white transition-colors duration-300">
                 <Heart size={24} />
               </div>
@@ -213,7 +213,7 @@ export const FAQ: React.FC = () => {
               </div>
             </div>
 
-            <div className="col-span-1 p-8 rounded-[32px] border-2 border-border bg-white dark:bg-[#1E1E1E] shadow-3d-gray hover:shadow-lg transition-all flex flex-col group liquid-glass">
+            <div className="col-span-1 p-8 rounded-[32px] border-2 border-border bg-white dark:bg-[#1E1E1E] shadow-sm hover:shadow-lg transition-all duration-300 ease-out-quart flex flex-col group liquid-glass">
               <div className="h-12 w-12 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center mb-6 group-hover:bg-purple-500 group-hover:text-white transition-colors duration-300">
                 <CalendarIcon size={24} />
               </div>
@@ -227,7 +227,7 @@ export const FAQ: React.FC = () => {
             </div>
 
             {/* Premium / Horizon - Soft Light Leak Aura */}
-            <div className="md:col-span-2 lg:col-span-3 mt-6 relative rounded-[40px] p-0 group overflow-hidden border-2 border-white/20 dark:border-[#2a2a2a] bg-white/40 dark:bg-[#121212]/40 backdrop-blur-3xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.05)] transition-all">
+            <div className="md:col-span-2 lg:col-span-3 mt-6 relative rounded-[40px] p-0 group overflow-hidden border-2 border-white/20 dark:border-[#2a2a2a] bg-white/40 dark:bg-[#121212]/40 backdrop-blur-3xl shadow-sm transition-all duration-300 ease-out-quart">
               
               {/* Soft Light Leak */}
               <div className="absolute -top-32 -right-32 w-96 h-96 bg-blue/10 dark:bg-blue/5 rounded-full blur-[80px] pointer-events-none transition-opacity duration-1000 group-hover:opacity-80"></div>
@@ -343,7 +343,7 @@ export const FAQ: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 0.45, delay: index * 0.05 }}
-                className="rounded-[32px] border-2 border-border bg-white p-8 shadow-3d-gray liquid-glass"
+                className="rounded-[32px] border-2 border-border bg-white p-8 shadow-sm liquid-glass"
               >
                 <div className={`mb-6 flex h-12 w-12 items-center justify-center rounded-2xl ${item.tone}`}>
                   <item.icon size={22} />

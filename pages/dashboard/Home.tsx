@@ -150,7 +150,7 @@ export const Home: React.FC = () => {
           <Button
             variant="primary"
             size="lg"
-            className="h-[56px] sm:h-[64px] px-8 sm:px-12 text-[16px] sm:text-[18px] font-bold uppercase rounded-2xl shadow-3d-green active:shadow-none active:translate-y-[4px] transition-all liquid-glass group"
+            className="h-[56px] sm:h-[64px] px-8 sm:px-12 text-[16px] sm:text-[18px] font-bold uppercase rounded-2xl shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart liquid-glass group"
             onClick={() => handleCreateClick()}
           >
             <PlusCircle className="mr-3 group-hover:rotate-90 transition-transform duration-300" />
@@ -167,11 +167,11 @@ export const Home: React.FC = () => {
           <div className="panel-label">Emotional Overview</div>
           <div className="flex flex-col gap-6">
             <div
-              className="bg-white border-2 border-border rounded-[32px] p-8 shadow-[0_8px_0_0_#E5E5E5] hover:shadow-none hover:translate-y-[4px] transition-all liquid-glass cursor-pointer group"
+              className="bg-white border-2 border-border rounded-[32px] p-8 shadow-sm hover:shadow-none hover:-translate-y-1 transition-all duration-300 ease-out-quart liquid-glass cursor-pointer group"
               onClick={() => navigate(RoutePath.NOTES)}
             >
               <div className="flex items-center justify-between mb-6">
-                <div className="h-14 w-14 rounded-2xl bg-blue/10 flex items-center justify-center text-blue shadow-3d-gray group-hover:scale-110 transition-transform">
+                <div className="h-14 w-14 rounded-2xl bg-blue/10 flex items-center justify-center text-blue shadow-sm group-hover:scale-110 transition-transform">
                   <FolderOpen size={28} />
                 </div>
                 <div className="flex items-center gap-2 text-[11px] font-black uppercase text-blue tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
@@ -188,11 +188,11 @@ export const Home: React.FC = () => {
             </div>
 
             <div
-              className="bg-white border-2 border-border rounded-[32px] p-8 shadow-[0_8px_0_0_#E5E5E5] hover:shadow-none hover:translate-y-[4px] transition-all liquid-glass cursor-pointer group"
+              className="bg-white border-2 border-border rounded-[32px] p-8 shadow-sm hover:shadow-none hover:-translate-y-1 transition-all duration-300 ease-out-quart liquid-glass cursor-pointer group"
               onClick={() => navigate(RoutePath.INSIGHTS)}
             >
               <div className="flex items-center justify-between mb-6">
-                <div className="h-14 w-14 rounded-2xl bg-green/10 flex items-center justify-center text-green shadow-3d-gray group-hover:scale-110 transition-transform">
+                <div className="h-14 w-14 rounded-2xl bg-green/10 flex items-center justify-center text-green shadow-sm group-hover:scale-110 transition-transform">
                   <Brain size={28} />
                 </div>
                 <div className="flex items-center gap-2 text-[11px] font-black uppercase text-green tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
@@ -208,11 +208,11 @@ export const Home: React.FC = () => {
         {/* Panel 2: Daily Mindfulness */}
         <div className="p-6 sm:p-10 lg:border-l-2 border-border flex flex-col justify-center">
           <div className="panel-label">Daily Mindfulness</div>
-          <div className="group relative overflow-hidden bg-white border-2 border-border rounded-[32px] p-8 shadow-[0_8px_0_0_#E5E5E5] liquid-glass flex flex-col">
+          <div className="group relative overflow-hidden bg-white border-2 border-border rounded-[32px] p-8 shadow-sm liquid-glass flex flex-col">
             <div className="relative z-10">
               <div className="mb-6 flex items-start justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[22px] bg-blue/10 text-blue shadow-3d-gray border-2 border-border/50">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[22px] bg-blue/10 text-blue shadow-sm border-2 border-border/50">
                     <Target size={22} />
                   </div>
                   <div>
@@ -222,7 +222,7 @@ export const Home: React.FC = () => {
                 </div>
                 <button
                   onClick={refreshPrompt}
-                  className={`flex h-10 w-10 items-center justify-center rounded-2xl bg-white border-2 border-border text-gray-nav shadow-sm hover:text-blue hover:border-blue/30 transition-all ${isRefreshing ? 'opacity-50' : 'opacity-100'}`}
+                  className={`flex h-10 w-10 items-center justify-center rounded-2xl bg-white border-2 border-border text-gray-nav shadow-sm hover:text-blue hover:border-blue/30 transition-all duration-300 ease-out-quart ${isRefreshing ? 'opacity-50' : 'opacity-100'}`}
                   title="Refresh Prompt"
                   disabled={isRefreshing}
                 >
@@ -240,7 +240,7 @@ export const Home: React.FC = () => {
                 <Button
                   variant="secondary"
                   size="lg"
-                  className="w-full border-2 border-border bg-white text-blue font-extrabold uppercase shadow-3d-gray sm:w-auto"
+                  className="w-full border-2 border-border bg-white text-blue font-extrabold uppercase shadow-sm sm:w-auto"
                   onClick={() => handleCreateClick(dailyPrompt)}
                 >
                   Start Writing
@@ -254,7 +254,7 @@ export const Home: React.FC = () => {
       {/* Onboarding Modal */}
       {showOnboarding && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-dark-blue/40 backdrop-blur-sm p-4 animate-in fade-in duration-300">
-          <div className="relative w-full max-w-lg space-y-6 rounded-[32px] border-2 border-border bg-white p-8 shadow-[0_12px_0_0_#E5E5E5] overflow-hidden liquid-glass">
+          <div className="relative w-full max-w-lg space-y-6 rounded-[32px] border-2 border-border bg-white p-8 shadow-sm overflow-hidden liquid-glass">
             <div className="absolute top-[-20%] right-[-10%] w-[200px] h-[200px] bg-green/10 blur-[60px] rounded-full pointer-events-none" />
             <div className="absolute bottom-[-10%] left-[-10%] w-[200px] h-[200px] bg-blue/10 blur-[60px] rounded-full pointer-events-none" />
 
@@ -281,7 +281,7 @@ export const Home: React.FC = () => {
 
               <div className="space-y-6 mb-8">
                 <div className="flex gap-4">
-                  <div className="h-12 w-12 shrink-0 rounded-2xl bg-green/10 flex items-center justify-center text-green shadow-3d-gray border-2 border-border">
+                  <div className="h-12 w-12 shrink-0 rounded-2xl bg-green/10 flex items-center justify-center text-green shadow-sm border-2 border-border">
                     <Sparkles size={24} />
                   </div>
                   <div>
@@ -293,7 +293,7 @@ export const Home: React.FC = () => {
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="h-12 w-12 shrink-0 rounded-2xl bg-blue/10 flex items-center justify-center text-blue shadow-3d-gray border-2 border-border">
+                  <div className="h-12 w-12 shrink-0 rounded-2xl bg-blue/10 flex items-center justify-center text-blue shadow-sm border-2 border-border">
                     <Smile size={24} />
                   </div>
                   <div>
@@ -305,7 +305,7 @@ export const Home: React.FC = () => {
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="h-12 w-12 shrink-0 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-500 shadow-3d-gray border-2 border-border">
+                  <div className="h-12 w-12 shrink-0 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-500 shadow-sm border-2 border-border">
                     <Tag size={24} />
                   </div>
                   <div>
@@ -319,7 +319,7 @@ export const Home: React.FC = () => {
 
               <Button
                 variant="primary"
-                className="w-full h-[56px] text-[16px] font-bold uppercase rounded-xl shadow-3d-green active:shadow-none active:translate-y-[4px] transition-all liquid-glass"
+                className="w-full h-[56px] text-[16px] font-bold uppercase rounded-xl shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart liquid-glass"
                 onClick={handleCloseOnboarding}
               >
                 Let's Get Started

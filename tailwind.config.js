@@ -14,8 +14,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Nunito', 'DIN Round Pro', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        display: ['Feather Bold', 'Nunito', 'sans-serif'],
+        sans: ['"Schibsted Grotesk"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        display: ['"Feather Bold"', '"Schibsted Grotesk"', 'sans-serif'],
       },
       colors: {
         green: {
@@ -45,11 +45,10 @@ export default {
         white: 'rgba(var(--panel-bg-rgb), <alpha-value>)',
         body: 'var(--bg-color)',
       },
-      boxShadow: {
-        '3d-green': '0 4px 0 0 var(--green-shadow)',
-        '3d-gray': '0 4px 0 0 var(--border-color)',
-        '3d-blue': '0 4px 0 0 var(--blue-shadow)',
-        '3d-red': '0 4px 0 0 var(--red-shadow)',
+      transitionTimingFunction: {
+        'out-quart': 'cubic-bezier(0.25, 1, 0.5, 1)',
+        'out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',
+        'out-quint': 'cubic-bezier(0.22, 1, 0.36, 1)',
       },
     },
   },

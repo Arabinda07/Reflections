@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..900&family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
 
 @font-face {
   font-family: 'Feather Bold';
@@ -16,51 +16,63 @@
 
 @layer base {
   :root {
-    --font-editor: 'DM Sans', 'Nunito', sans-serif;
+    --font-editor: 'Spectral', serif;
   }
 }
 
 :root {
-  --green: rgb(88, 204, 2);
-  --green-hover: rgb(75, 178, 0);
-  --green-shadow: #61B800;
-  --dark-blue: rgb(16, 15, 62);
-  --blue: rgb(28, 176, 246);
-  --blue-shadow: #1899D6;
-  --gray-text: rgb(75, 75, 75);
-  --gray-light: rgb(119, 119, 119);
-  --border-color: rgb(229, 229, 229);
-  --nav-text: rgb(110, 110, 110);
-  --footer-green: #4EC604;
-  --red: #FF4B4B;
-  --red-shadow: #CC3C3C;
-  --orange: #FF9600;
-  --golden: #FFC800;
-  --bg-color: #ffffff;
-  --panel-bg: #ffffff;
-  --panel-bg-rgb: 255, 255, 255;
+  /* Brand Hue = 135 (Classic Wellness Green) */
+  --green: oklch(0.70 0.18 135);
+  --green-hover: oklch(0.65 0.18 135);
+  --green-shadow: oklch(0.55 0.18 135);
+  
+  --dark-blue: oklch(0.25 0.05 260);
+  --blue: oklch(0.65 0.15 245);
+  --blue-shadow: oklch(0.50 0.15 245);
+  
+  /* Tinted Neutrals (Chroma 0.012 leaning toward hue 135) */
+  --gray-text: oklch(0.35 0.012 135);
+  --gray-light: oklch(0.55 0.012 135);
+  --border-color: oklch(0.90 0.012 135);
+  --nav-text: oklch(0.65 0.012 135);
+  
+  --footer-green: oklch(0.72 0.18 135);
+  --red: oklch(0.65 0.18 20);
+  --red-shadow: oklch(0.55 0.18 20);
+  --orange: oklch(0.75 0.15 50);
+  --golden: oklch(0.85 0.15 80);
+  
+  --bg-color: oklch(0.99 0.005 135);
+  --panel-bg: oklch(0.97 0.008 135);
+  --panel-bg-rgb: 247, 248, 246; /* fallback for backwards compatibility */
 }
 
 .dark {
-  --green: rgb(88, 204, 2);
-  --green-hover: rgb(100, 220, 10);
-  --green-shadow: #3f7a00;
-  --dark-blue: rgb(200, 200, 255);
-  --blue: rgb(28, 176, 246);
-  --blue-shadow: #0f6a9c;
-  --gray-text: rgb(220, 220, 220);
-  --gray-light: rgb(160, 160, 160);
-  --border-color: rgb(60, 60, 60);
-  --nav-text: rgb(200, 200, 200);
-  --bg-color: #121212;
-  --panel-bg: #1e1e1e;
-  --panel-bg-rgb: 30, 30, 30;
+  --green: oklch(0.78 0.18 135);
+  --green-hover: oklch(0.85 0.18 135);
+  --green-shadow: oklch(0.45 0.18 135);
+  
+  --dark-blue: oklch(0.85 0.05 260);
+  --blue: oklch(0.75 0.15 245);
+  --blue-shadow: oklch(0.40 0.15 245);
+  
+  /* Tinted Neutrals - Dark Mode (Chroma 0.012 leaning toward hue 135) */
+  --gray-text: oklch(0.85 0.012 135);
+  --gray-light: oklch(0.65 0.012 135);
+  --border-color: oklch(0.28 0.012 135);
+  --nav-text: oklch(0.70 0.012 135);
+  
+  /* Pure black #000 explicitly banned, utilizing dark gray base */
+  --bg-color: oklch(0.18 0.012 135);
+  --panel-bg: oklch(0.22 0.012 135);
+  --panel-bg-rgb: 40, 42, 39;
 }
 
 body {
-  font-family: 'Nunito', 'DIN Round Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Schibsted Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
   color: var(--gray-text);
   background-color: var(--bg-color);
+  font-weight: 400;
 }
 
 @layer components {

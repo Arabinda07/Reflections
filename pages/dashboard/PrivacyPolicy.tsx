@@ -40,7 +40,7 @@ export const PrivacyPolicy: React.FC = () => {
 
           <section>
             <div className="flex items-center gap-4 mb-6">
-              <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-blue border-2 border-border shadow-3d-gray dark:bg-zinc-800">
+              <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-blue border-2 border-border shadow-sm dark:bg-zinc-800">
                 <Database size={20} />
               </div>
               <h2 className="text-[14px] font-black uppercase tracking-widest text-gray-nav">Data Acquisitions</h2>
@@ -54,7 +54,7 @@ export const PrivacyPolicy: React.FC = () => {
 
           <section>
             <div className="flex items-center gap-4 mb-6">
-              <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-green border-2 border-border shadow-3d-gray dark:bg-zinc-800">
+              <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-green border-2 border-border shadow-sm dark:bg-zinc-800">
                 <Lock size={20} />
               </div>
               <h2 className="text-[14px] font-black uppercase tracking-widest text-gray-nav">Secure Synthesis (AI)</h2>
@@ -68,7 +68,7 @@ export const PrivacyPolicy: React.FC = () => {
 
           <section>
             <div className="flex items-center gap-4 mb-6">
-              <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-golden border-2 border-border shadow-3d-gray dark:bg-zinc-800">
+              <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-golden border-2 border-border shadow-sm dark:bg-zinc-800">
                 <Shield size={20} />
               </div>
               <h2 className="text-[14px] font-black uppercase tracking-widest text-gray-nav">Security Infrastructure</h2>
@@ -81,7 +81,7 @@ export const PrivacyPolicy: React.FC = () => {
 
           <section>
             <div className="flex items-center gap-4 mb-6">
-              <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-red border-2 border-border shadow-3d-gray dark:bg-zinc-800">
+              <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-red border-2 border-border shadow-sm dark:bg-zinc-800">
                 <Shield size={20} />
               </div>
               <h2 className="text-[14px] font-black uppercase tracking-widest text-gray-nav">Subject Rights</h2>
@@ -94,7 +94,7 @@ export const PrivacyPolicy: React.FC = () => {
 
           <section>
             <div className="flex items-center gap-4 mb-6">
-              <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-blue border-2 border-border shadow-3d-gray dark:bg-zinc-800">
+              <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-blue border-2 border-border shadow-sm dark:bg-zinc-800">
                 <Mail size={20} />
               </div>
               <h2 className="text-[14px] font-black uppercase tracking-widest text-gray-nav">Inquiry Channel</h2>

@@ -215,7 +215,7 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
                 e.stopPropagation();
                 stopPreset();
               }}
-              className="p-1 text-gray-nav hover:text-red hover:bg-red/5 rounded-lg transition-all"
+              className="p-1 text-gray-nav hover:text-red hover:bg-red/5 rounded-lg transition-all duration-300 ease-out-quart"
               title="Turn ambient sound off"
             >
               <VolumeX size={14} />
@@ -243,7 +243,7 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
                       playPreset(preset);
                       setIsOpen(false);
                     }}
-                    className={`w-full rounded-xl border-2 p-3 text-left transition-all ${
+                    className={`w-full rounded-xl border-2 p-3 text-left transition-all duration-300 ease-out-quart ${
                       isPresetPlaying
                         ? 'bg-slate-50 border-sky-100 text-blue shadow-sm dark:bg-white/10 dark:border-sky-400/30 dark:text-sky-100'
                         : 'border-transparent bg-gray-50/80 text-gray-text hover:border-border hover:bg-gray-100 dark:bg-white/5 dark:text-slate-300 dark:hover:border-white/10 dark:hover:bg-white/10'
@@ -297,7 +297,7 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
                         playPreset(preset);
                         setIsOpen(false);
                       }}
-                      className={`w-full rounded-xl border-2 p-4 text-left transition-all ${
+                      className={`w-full rounded-xl border-2 p-4 text-left transition-all duration-300 ease-out-quart ${
                         isPresetPlaying
                           ? 'bg-slate-50 border-sky-100 text-blue shadow-sm dark:bg-white/10 dark:border-sky-400/30 dark:text-sky-100'
                           : 'border-transparent bg-gray-50/80 text-gray-text hover:border-border hover:bg-gray-100 dark:bg-white/5 dark:text-slate-300 dark:hover:border-white/10 dark:hover:bg-white/10'

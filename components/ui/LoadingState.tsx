@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -37,7 +38,9 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
   message = "gathering your thoughts...",
   isVisible = true
 }) => {
-  return (
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
     <AnimatePresence>
       {isVisible && (
         <motion.div 
@@ -87,6 +90,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };

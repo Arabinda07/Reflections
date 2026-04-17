@@ -133,7 +133,7 @@ export const SingleNote: React.FC = () => {
               size="sm" 
               onClick={handleEdit}
               disabled={isDeleting}
-              className="border-2 border-border text-blue shadow-3d-gray active:shadow-none active:translate-y-[2px] transition-all liquid-glass"
+              className="border-2 border-border text-blue shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart liquid-glass"
             >
               <Edit3 className="mr-2 h-3.5 w-3.5" />
               EDIT
@@ -144,7 +144,7 @@ export const SingleNote: React.FC = () => {
               onClick={initiateDelete} 
               isLoading={isDeleting}
               disabled={isDeleting}
-              className="border-2 border-border text-red shadow-3d-gray active:shadow-none active:translate-y-[2px] transition-all hover:bg-red/5 hover:border-red/30 liquid-glass"
+              className="border-2 border-border text-red shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart hover:bg-red/5 hover:border-red/30 liquid-glass"
             >
               <Trash2 className="mr-2 h-3.5 w-3.5" />
               DELETE
@@ -161,7 +161,7 @@ export const SingleNote: React.FC = () => {
         )}
 
         {/* Note Content */}
-        <article className="rounded-[32px] border-2 border-border bg-white shadow-[0_8px_0_0_#E5E5E5] overflow-hidden liquid-glass">
+        <article className="rounded-[32px] border-2 border-border bg-white shadow-sm overflow-hidden liquid-glass">
           {note.thumbnailUrl && (
             <div className="h-64 w-full bg-white border-b-2 border-border">
               <StorageImage 
@@ -223,7 +223,7 @@ export const SingleNote: React.FC = () => {
                     {note.tasks.map((task) => (
                       <div 
                         key={task.id} 
-                        className={`flex items-center gap-4 p-4 rounded-[24px] border-2 transition-all ${
+                        className={`flex items-center gap-4 p-4 rounded-[24px] border-2 transition-all duration-300 ease-out-quart ${
                           task.completed 
                             ? 'border-border bg-gray-50/30 opacity-60' 
                             : 'border-border bg-white shadow-sm hover:border-blue/30'
@@ -232,7 +232,7 @@ export const SingleNote: React.FC = () => {
                         <button 
                           onClick={() => !task.completed && toggleTask(task.id)}
                           disabled={task.completed}
-                          className={`h-6 w-6 rounded-lg border-2 flex items-center justify-center transition-all ${
+                          className={`h-6 w-6 rounded-lg border-2 flex items-center justify-center transition-all duration-300 ease-out-quart ${
                             task.completed 
                               ? 'bg-blue border-blue text-white cursor-default' 
                               : 'border-border text-transparent hover:border-blue/50'
@@ -241,7 +241,7 @@ export const SingleNote: React.FC = () => {
                           <Check size={14} strokeWidth={3} />
                         </button>
                         <div className="flex-1">
-                          <p className={`text-[14px] font-bold text-gray-text transition-all ${task.completed ? 'line-through' : ''}`}>
+                          <p className={`text-[14px] font-bold text-gray-text transition-all duration-300 ease-out-quart ${task.completed ? 'line-through' : ''}`}>
                             {task.text}
                           </p>
                           {task.dueDate && (
@@ -265,7 +265,7 @@ export const SingleNote: React.FC = () => {
                  </h3>
                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {note.attachments.map((att, idx) => (
-                      <div key={idx} className="flex items-center gap-3 p-3 rounded-xl border-2 border-border bg-white hover:bg-blue/5 hover:border-blue/30 transition-all group">
+                      <div key={idx} className="flex items-center gap-3 p-3 rounded-xl border-2 border-border bg-white hover:bg-blue/5 hover:border-blue/30 transition-all duration-300 ease-out-quart group">
                          <div className="h-10 w-10 shrink-0 rounded-lg bg-white border-2 border-border flex items-center justify-center text-gray-nav shadow-sm">
                             <FileText size={20} />
                          </div>
@@ -292,7 +292,7 @@ export const SingleNote: React.FC = () => {
       {/* Confirmation Modal */}
       {isConfirmOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-dark-blue/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="relative w-full max-w-md space-y-6 rounded-[32px] border-2 border-border bg-white px-8 py-8 shadow-[0_12px_0_0_#E5E5E5] overflow-hidden">
+          <div className="relative w-full max-w-md space-y-6 rounded-[32px] border-2 border-border bg-white px-8 py-8 shadow-sm overflow-hidden">
             <div className="space-y-2">
               <h3 className="text-[20px] font-display text-gray-text lowercase">delete this note?</h3>
               <p className="text-[15px] text-gray-light font-medium leading-relaxed">
@@ -303,13 +303,13 @@ export const SingleNote: React.FC = () => {
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
               <button 
                 onClick={() => setIsConfirmOpen(false)}
-                className="rounded-2xl border-2 border-border bg-white px-6 py-3 text-[13px] font-extrabold text-gray-nav uppercase hover:bg-gray-100 transition-all shadow-[0_4px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]"
+                className="rounded-2xl border-2 border-border bg-white px-6 py-3 text-[13px] font-extrabold text-gray-nav uppercase hover:bg-gray-100 transition-all duration-300 ease-out-quart shadow-sm active:scale-[0.98]"
               >
                 CANCEL
               </button>
               <button
                 onClick={performDelete}
-                className="rounded-2xl bg-red px-6 py-3 text-[13px] font-extrabold text-white uppercase shadow-[0_4px_0_0_#B80000] transition-all hover:brightness-110 active:shadow-none active:translate-y-[2px]"
+                className="rounded-2xl bg-red px-6 py-3 text-[13px] font-extrabold text-white uppercase shadow-sm transition-all duration-300 ease-out-quart hover:brightness-110 active:scale-[0.98]"
               >
                 {isDeleting ? 'DELETING...' : 'DELETE NOTE'}
               </button>

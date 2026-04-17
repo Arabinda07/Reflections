@@ -148,7 +148,7 @@ export const MyNotes: React.FC = () => {
                 <button 
                   key={tag}
                   onClick={() => navigate(`${RoutePath.NOTES}?tag=${encodeURIComponent(tag as string)}`)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-50 border border-border text-[12px] font-bold text-gray-nav hover:text-blue hover:border-blue/30 transition-all shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px]"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-50 border border-border text-[12px] font-bold text-gray-nav hover:text-blue hover:border-blue/30 transition-all duration-300 ease-out-quart shadow-sm active:scale-[0.98]"
                 >
                   <Tag size={12} /> {tag}
                 </button>
@@ -157,17 +157,17 @@ export const MyNotes: React.FC = () => {
           )}
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex bg-white border-2 border-border rounded-xl p-1 shadow-[0_2px_0_0_#E5E5E5]">
+          <div className="flex bg-white border-2 border-border rounded-xl p-1 shadow-sm">
             <button 
               onClick={() => setViewMode('grid')}
-              className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-blue/10 text-blue' : 'text-gray-nav hover:bg-gray-50'}`}
+              className={`p-2 rounded-lg transition-all duration-300 ease-out-quart ${viewMode === 'grid' ? 'bg-blue/10 text-blue' : 'text-gray-nav hover:bg-gray-50'}`}
               title="Grid View"
             >
               <LayoutGrid size={20} />
             </button>
             <button 
               onClick={() => setViewMode('calendar')}
-              className={`p-2 rounded-lg transition-all ${viewMode === 'calendar' ? 'bg-blue/10 text-blue' : 'text-gray-nav hover:bg-gray-50'}`}
+              className={`p-2 rounded-lg transition-all duration-300 ease-out-quart ${viewMode === 'calendar' ? 'bg-blue/10 text-blue' : 'text-gray-nav hover:bg-gray-50'}`}
               title="Calendar View"
             >
               <CalendarIcon size={20} />
@@ -176,7 +176,7 @@ export const MyNotes: React.FC = () => {
           <Button 
             onClick={() => navigate(RoutePath.CREATE_NOTE)} 
             variant="primary"
-            className="h-[48px] px-8 text-[15px] font-bold uppercase rounded-xl shadow-3d-green active:shadow-none active:translate-y-[4px] transition-all"
+            className="h-[48px] px-8 text-[15px] font-bold uppercase rounded-xl shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart"
           >
             <Plus className="mr-2 h-5 w-5" />
             CREATE NOTE
@@ -187,7 +187,7 @@ export const MyNotes: React.FC = () => {
       {viewMode === 'calendar' ? (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in slide-in-from-bottom-4 duration-500">
           <div className="lg:col-span-7 xl:col-span-8">
-            <div className="bg-white border-2 border-border rounded-[32px] p-6 sm:p-8 shadow-[0_8px_0_0_#E5E5E5] liquid-glass">
+            <div className="bg-white border-2 border-border rounded-[32px] p-6 sm:p-8 shadow-sm liquid-glass">
               <ReactCalendar 
                 onChange={(val) => setSelectedDate(val as Date)} 
                 value={selectedDate}
@@ -213,7 +213,7 @@ export const MyNotes: React.FC = () => {
                   <div 
                     key={note.id}
                     onClick={() => navigate(RoutePath.NOTE_DETAIL.replace(':id', note.id))}
-                    className="group cursor-pointer p-5 rounded-2xl bg-white border-2 border-border shadow-[0_4px_0_0_#E5E5E5] hover:shadow-none hover:translate-y-[2px] transition-all duration-200"
+                    className="group cursor-pointer p-5 rounded-2xl bg-white border-2 border-border shadow-sm hover:shadow-none hover:translate-y-[2px] transition-all duration-200"
                   >
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-bold text-gray-text group-hover:text-blue transition-colors truncate pr-4">{note.title}</h4>
@@ -257,7 +257,7 @@ export const MyNotes: React.FC = () => {
             <div 
               key={note.id} 
               onClick={() => navigate(RoutePath.NOTE_DETAIL.replace(':id', note.id))}
-              className="group cursor-pointer flex flex-col overflow-hidden rounded-2xl bg-white border-2 border-border shadow-[0_4px_0_0_#E5E5E5] transition-all duration-300 hover:shadow-xl hover:translate-y-[-4px] hover:scale-[1.01] liquid-glass animate-in fade-in slide-in-from-bottom-4"
+              className="group cursor-pointer flex flex-col overflow-hidden rounded-2xl bg-white border-2 border-border shadow-sm transition-all duration-300 hover:shadow-xl hover:translate-y-[-4px] hover:scale-[1.01] liquid-glass animate-in fade-in slide-in-from-bottom-4"
               style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
             >
               {/* Image / Header */}
@@ -281,7 +281,7 @@ export const MyNotes: React.FC = () => {
                 <button 
                   onClick={(e) => handleDelete(e, note.id)}
                   disabled={deletingId === note.id}
-                  className="absolute top-4 left-4 z-20 h-9 w-9 flex items-center justify-center rounded-xl bg-white border-2 border-border text-gray-nav hover:text-red hover:border-red/30 shadow-[0_2px_0_0_#E5E5E5] active:shadow-none active:translate-y-[2px] transition-all"
+                  className="absolute top-4 left-4 z-20 h-9 w-9 flex items-center justify-center rounded-xl bg-white border-2 border-border text-gray-nav hover:text-red hover:border-red/30 shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart"
                 >
                   {deletingId === note.id ? (
                     <Loader2 size={16} className="animate-spin text-red" />
@@ -292,7 +292,7 @@ export const MyNotes: React.FC = () => {
                 
                 {/* Date & Mood Badge */}
                 <div className="absolute top-4 right-4 z-20 flex flex-col items-end gap-2">
-                     <div className="flex items-center gap-2 rounded-xl bg-white border-2 border-border px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-gray-nav shadow-[0_2px_0_0_#E5E5E5]">
+                     <div className="flex items-center gap-2 rounded-xl bg-white border-2 border-border px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-gray-nav shadow-sm">
                         <div className="flex items-center gap-1.5 border-r-2 border-border pr-2 mr-0.5">
                           <CalendarIcon size={12} className="text-gray-nav" />
                           <span>{new Date(note.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
@@ -329,12 +329,12 @@ export const MyNotes: React.FC = () => {
 
                 <div className="mt-auto flex items-center justify-between border-t-2 border-border pt-4">
                    <div className="flex items-center gap-2">
-                      <div className="h-6 w-6 rounded-full bg-blue flex items-center justify-center text-[10px] font-extrabold text-white shadow-3d-blue">
+                      <div className="h-6 w-6 rounded-full bg-blue flex items-center justify-center text-[10px] font-extrabold text-white shadow-sm">
                         {user?.name?.charAt(0) || 'U'}
                       </div>
                       <span className="text-[12px] font-bold text-gray-nav">Edited {format(new Date(note.updatedAt), 'MMM d')}</span>
                    </div>
-                   <div className="flex items-center text-[12px] font-extrabold uppercase tracking-wider text-blue group-hover:opacity-70 transition-all">
+                   <div className="flex items-center text-[12px] font-extrabold uppercase tracking-wider text-blue group-hover:opacity-70 transition-all duration-300 ease-out-quart">
                       <span>OPEN</span>
                       <ArrowUpRight size={14} className="ml-1 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                    </div>
@@ -347,7 +347,7 @@ export const MyNotes: React.FC = () => {
       
       {!loading && filteredNotes.length === 0 && (
           <div className="flex h-80 flex-col items-center justify-center rounded-[32px] border-2 border-dashed border-border bg-white text-center px-4">
-             <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-3d-gray border-2 border-border mb-6">
+             <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-sm border-2 border-border mb-6">
                  <FileText size={28} className="text-gray-nav" />
              </div>
              <h3 className="font-display text-[24px] text-gray-text lowercase">The space is quiet</h3>
@@ -358,7 +358,7 @@ export const MyNotes: React.FC = () => {
                <Button 
                   onClick={() => navigate(RoutePath.NOTES)} 
                   variant="secondary" 
-                  className="h-[48px] px-8 text-[15px] font-bold uppercase rounded-xl border-2 border-border text-gray-text shadow-3d-gray active:shadow-none active:translate-y-[4px] transition-all"
+                  className="h-[48px] px-8 text-[15px] font-bold uppercase rounded-xl border-2 border-border text-gray-text shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart"
                 >
                   CLEAR FILTER
                 </Button>
@@ -366,7 +366,7 @@ export const MyNotes: React.FC = () => {
                <Button 
                   onClick={() => navigate(RoutePath.CREATE_NOTE)} 
                   variant="primary" 
-                  className="h-[48px] px-8 text-[15px] font-bold uppercase rounded-xl shadow-3d-green active:shadow-none active:translate-y-[4px] transition-all"
+                  className="h-[48px] px-8 text-[15px] font-bold uppercase rounded-xl shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart"
                 >
                   CREATE YOUR FIRST NOTE
                 </Button>

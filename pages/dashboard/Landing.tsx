@@ -54,7 +54,7 @@ export const Landing: React.FC = () => {
           <div className="relative w-full group">
             {/* Persistent breathing glow that intensifies on hover */}
             <div className="absolute -inset-4 bg-gradient-to-r from-green/30 via-blue/30 to-green/30 rounded-[48px] blur-2xl opacity-50 animate-pulse group-hover:opacity-100 transition-opacity duration-1000" />
-            <div className="relative aspect-video rounded-[24px] sm:rounded-[40px] border-2 border-border bg-white/50 backdrop-blur-xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] overflow-hidden liquid-glass p-2 sm:p-4">
+            <div className="relative aspect-video rounded-[24px] sm:rounded-[40px] border-2 border-border bg-white/50 backdrop-blur-xl shadow-sm overflow-hidden liquid-glass p-2 sm:p-4">
               <div className="w-full h-full rounded-[16px] sm:rounded-[32px] overflow-hidden border-2 border-white/20 relative">
                 <video 
                   ref={videoRef}
@@ -69,7 +69,7 @@ export const Landing: React.FC = () => {
                 {/* Custom Mute Button */}
                 <button
                   onClick={toggleMute}
-                  className="absolute bottom-4 right-4 p-3 bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full text-white transition-all z-10"
+                  className="absolute bottom-4 right-4 p-3 bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full text-white transition-all duration-300 ease-out-quart z-10"
                   aria-label={isMuted ? "Unmute video" : "Mute video"}
                 >
                   {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
@@ -95,7 +95,7 @@ export const Landing: React.FC = () => {
             <Button 
               variant="primary" 
               size="lg" 
-              className="w-full sm:w-auto h-16 sm:h-20 px-8 sm:px-12 text-[16px] sm:text-[20px] font-bold uppercase rounded-[20px] sm:rounded-[24px] shadow-3d-green liquid-glass group"
+              className="w-full sm:w-auto h-16 sm:h-20 px-8 sm:px-12 text-[16px] sm:text-[20px] font-bold uppercase rounded-[20px] sm:rounded-[24px] shadow-sm liquid-glass group"
               onClick={() => navigate(RoutePath.SIGNUP)}
             >
               <span>Enter Sanctuary</span>
@@ -104,7 +104,7 @@ export const Landing: React.FC = () => {
             <Button 
               variant="secondary" 
               size="lg" 
-              className="w-full sm:w-auto h-16 sm:h-20 px-8 sm:px-12 text-[16px] sm:text-[20px] font-bold uppercase rounded-[20px] sm:rounded-[24px] border-2 border-border text-blue shadow-3d-gray liquid-glass"
+              className="w-full sm:w-auto h-16 sm:h-20 px-8 sm:px-12 text-[16px] sm:text-[20px] font-bold uppercase rounded-[20px] sm:rounded-[24px] border-2 border-border text-blue shadow-sm liquid-glass"
               onClick={() => navigate(RoutePath.LOGIN)}
             >
               Sign In
@@ -117,7 +117,7 @@ export const Landing: React.FC = () => {
              <Button 
                variant="ghost" 
                size="sm" 
-               className="text-[14px] font-bold uppercase tracking-widest text-gray-nav hover:text-blue hover:bg-blue/5 border-2 border-transparent hover:border-blue/10 rounded-full px-6 py-3 transition-all flex items-center gap-2"
+               className="text-[14px] font-bold uppercase tracking-widest text-gray-nav hover:text-blue hover:bg-blue/5 border-2 border-transparent hover:border-blue/10 rounded-full px-6 py-3 transition-all duration-300 ease-out-quart flex items-center gap-2"
                onClick={() => navigate(RoutePath.FAQ)}
              >
                <Sparkles size={16} />
@@ -135,7 +135,7 @@ export const Landing: React.FC = () => {
             >
               <button
                 onClick={triggerInstall}
-                className="flex items-center gap-3 px-6 py-3 rounded-full border-2 border-green/30 bg-green/5 text-green font-black uppercase tracking-widest text-[13px] transition-all hover:bg-green/10 hover:border-green/50 active:scale-[0.97]"
+                className="flex items-center gap-3 px-6 py-3 rounded-full border-2 border-green/30 bg-green/5 text-green font-black uppercase tracking-widest text-[13px] transition-all duration-300 ease-out-quart hover:bg-green/10 hover:border-green/50 active:scale-[0.97]"
               >
                 <Download size={16} />
                 Install App — Free

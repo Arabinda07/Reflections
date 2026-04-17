@@ -66,9 +66,9 @@ export const SignIn: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F7F7F7] p-6">
-      <div className="w-full max-w-[420px] bg-white border-2 border-border rounded-[32px] p-8 sm:p-10 shadow-[0_8px_0_0_#E5E5E5] liquid-glass">
+      <div className="w-full max-w-[420px] bg-white border-2 border-border rounded-[32px] p-8 sm:p-10 shadow-sm liquid-glass">
         <div className="flex flex-col items-center">
-          <div className="mb-6 h-[80px] w-[80px] flex items-center justify-center rounded-2xl bg-blue text-white shadow-3d-blue">
+          <div className="mb-6 h-[80px] w-[80px] flex items-center justify-center rounded-2xl bg-blue text-white shadow-sm">
              <Lock size={40} strokeWidth={2.5} />
           </div>
 

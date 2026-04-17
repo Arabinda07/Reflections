@@ -74,7 +74,7 @@ export const DashboardLayout: React.FC = () => {
               className="flex items-center gap-2 cursor-pointer group"
               onClick={() => handleNavigation(RoutePath.HOME)}
             >
-              <div className="h-10 w-10 rounded-xl bg-green flex items-center justify-center text-white shadow-3d-green group-hover:scale-110 transition-transform">
+              <div className="h-10 w-10 rounded-xl bg-green flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform">
                 <Sparkles size={24} fill="currentColor" />
               </div>
               <span className="font-display text-[20px] sm:text-[24px] bg-gradient-to-r from-green via-blue to-green bg-clip-text text-transparent animate-gradient-x lowercase tracking-tight truncate max-w-[150px] sm:max-w-none">
@@ -167,7 +167,7 @@ export const DashboardLayout: React.FC = () => {
           {/* Close Button */}
           <button 
             onClick={() => setIsMobileMenuOpen(false)}
-            className="absolute top-4 right-4 p-3 rounded-2xl text-gray-nav hover:text-green hover:bg-green/5 transition-all z-[110] border-2 border-border dark:border-white/10 bg-white dark:bg-[#1e1e1e] shadow-3d-gray active:shadow-none active:translate-y-[2px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
+            className="absolute top-4 right-4 p-3 rounded-2xl text-gray-nav hover:text-green hover:bg-green/5 transition-all duration-300 ease-out-quart z-[110] border-2 border-border dark:border-white/10 bg-white dark:bg-[#1e1e1e] shadow-sm active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
             aria-label="Close menu"
           >
             <X size={24} />
@@ -175,7 +175,7 @@ export const DashboardLayout: React.FC = () => {
 
           <div className="relative flex flex-col p-8 pt-24 gap-6 h-full overflow-y-auto">
             <div className="flex items-center gap-3 mb-8">
-              <div className="h-12 w-12 rounded-2xl bg-green flex items-center justify-center text-white shadow-3d-green">
+              <div className="h-12 w-12 rounded-2xl bg-green flex items-center justify-center text-white shadow-sm">
                 <Sparkles size={28} fill="currentColor" />
               </div>
               <span className="font-display text-[28px] bg-gradient-to-r from-green via-blue to-green bg-clip-text text-transparent animate-gradient-x lowercase">reflections</span>
@@ -188,7 +188,7 @@ export const DashboardLayout: React.FC = () => {
                     <button
                       key={item.label}
                       onClick={() => handleNavigation(item.path)}
-                      className="w-full p-6 text-left text-[24px] font-black uppercase tracking-widest text-gray-text border-b-2 border-border/50 hover:text-green transition-all active:bg-green/5 rounded-2xl flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset"
+                      className="w-full p-6 text-left text-[24px] font-black uppercase tracking-widest text-gray-text border-b-2 border-border/50 hover:text-green transition-all duration-300 ease-out-quart active:bg-green/5 rounded-2xl flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset"
                     >
                       <span>{item.label}</span>
                       <ArrowRight className="opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -203,7 +203,7 @@ export const DashboardLayout: React.FC = () => {
                         await triggerInstall();
                         setIsMobileMenuOpen(false);
                       }}
-                      className="w-full flex items-center justify-center gap-3 p-5 rounded-2xl border-2 border-green/30 bg-green/5 text-green font-black uppercase tracking-widest text-[14px] transition-all hover:bg-green/10 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+                      className="w-full flex items-center justify-center gap-3 p-5 rounded-2xl border-2 border-green/30 bg-green/5 text-green font-black uppercase tracking-widest text-[14px] transition-all duration-300 ease-out-quart hover:bg-green/10 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
                     >
                       <Download size={20} />
                       Add to Home Screen
@@ -233,7 +233,7 @@ export const DashboardLayout: React.FC = () => {
                   <button
                     key={item.label}
                     onClick={() => handleNavigation(item.path)}
-                    className="w-full p-6 text-left text-[24px] font-black uppercase tracking-widest text-gray-text border-b-2 border-border/50 hover:text-green transition-all active:bg-green/5 rounded-2xl flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset"
+                    className="w-full p-6 text-left text-[24px] font-black uppercase tracking-widest text-gray-text border-b-2 border-border/50 hover:text-green transition-all duration-300 ease-out-quart active:bg-green/5 rounded-2xl flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset"
                   >
                     <span>{item.label}</span>
                     <ArrowRight className="opacity-0 group-hover:opacity-100 transition-opacity" />

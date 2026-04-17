@@ -155,7 +155,7 @@ export const Insights: React.FC = () => {
       <AIThinkingState isVisible={loading} />
 
       <div className="mx-auto max-w-[1000px] animate-in fade-in duration-700 pb-32 px-4 md:px-10">
-      <nav className="sticky top-4 z-50 mb-16 flex items-center justify-between rounded-2xl border-2 border-border bg-white/90 px-4 py-3 shadow-[0_4px_0_0_#E5E5E5] backdrop-blur-2xl transition-all">
+      <nav className="sticky top-4 z-50 mb-16 flex items-center justify-between rounded-2xl border-2 border-border bg-white/90 px-4 py-3 shadow-sm backdrop-blur-2xl transition-all duration-300 ease-out-quart">
         <div className="flex items-center gap-3">
            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-bold uppercase text-[12px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green">
              <ArrowLeft className="mr-2 h-4 w-4" />
@@ -179,28 +179,28 @@ export const Insights: React.FC = () => {
 
       {/* 4 Soft Metric Cards Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-16">
-        <div className="bg-white border-2 border-border rounded-[32px] p-6 shadow-[0_6px_0_0_#E5E5E5] flex flex-col justify-between liquid-glass grow transition-transform hover:-translate-y-1">
+        <div className="bg-white border-2 border-border rounded-[32px] p-6 shadow-sm flex flex-col justify-between liquid-glass grow transition-transform hover:-translate-y-1">
           <Calendar size={20} className="text-blue mb-6 opacity-70" />
           <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-nav mb-2">This Month</h4>
           <span className="text-4xl font-display text-gray-text block mb-1">{stats.monthNotes}</span>
           <p className="text-[12px] font-medium text-gray-light">notes in {new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}</p>
         </div>
 
-        <div className="bg-white border-2 border-border rounded-[32px] p-6 shadow-[0_6px_0_0_#E5E5E5] flex flex-col justify-between liquid-glass grow transition-transform hover:-translate-y-1">
+        <div className="bg-white border-2 border-border rounded-[32px] p-6 shadow-sm flex flex-col justify-between liquid-glass grow transition-transform hover:-translate-y-1">
           <TrendingUp size={20} className="text-green mb-6 opacity-70" />
           <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-nav mb-2">Writing Rhythm</h4>
           <span className="text-4xl font-display text-gray-text block mb-1">{stats.daysCheckedIn}</span>
           <p className="text-[12px] font-medium text-gray-light">unique days checked in</p>
         </div>
 
-        <div className="bg-white border-2 border-border rounded-[32px] p-6 shadow-[0_6px_0_0_#E5E5E5] flex flex-col justify-between liquid-glass grow transition-transform hover:-translate-y-1">
+        <div className="bg-white border-2 border-border rounded-[32px] p-6 shadow-sm flex flex-col justify-between liquid-glass grow transition-transform hover:-translate-y-1">
           <Heart size={20} className="text-purple-500 mb-6 opacity-70" />
           <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-nav mb-2">Prevalent Mood</h4>
           <span className="text-4xl font-display text-gray-text block mb-1 capitalize truncate">{stats.topMood === 'undefined' ? '-' : stats.topMood}</span>
           <p className="text-[12px] font-medium text-gray-light">your most frequent feeling</p>
         </div>
 
-        <div className="bg-white border-2 border-border rounded-[32px] p-6 shadow-[0_6px_0_0_#E5E5E5] flex flex-col justify-between liquid-glass grow transition-transform hover:-translate-y-1">
+        <div className="bg-white border-2 border-border rounded-[32px] p-6 shadow-sm flex flex-col justify-between liquid-glass grow transition-transform hover:-translate-y-1">
           <CheckSquare size={20} className="text-orange mb-6 opacity-70" />
           <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-nav mb-2">Action Momentum</h4>
           <span className="text-4xl font-display text-gray-text block mb-1">{stats.taskProgress}%</span>
@@ -210,7 +210,7 @@ export const Insights: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
         {/* Stacked Soft Mood Bars */}
-        <div className="bg-white dark:bg-[#1E1E1E] border-2 border-border rounded-[40px] p-8 shadow-[0_8px_0_0_#E5E5E5] dark:shadow-[0_8px_0_0_rgba(15,23,42,0.55)] liquid-glass flex flex-col min-h-[300px]">
+        <div className="bg-white dark:bg-[#1E1E1E] border-2 border-border rounded-[40px] p-8 shadow-sm dark:shadow-sm liquid-glass flex flex-col min-h-[300px]">
           <h3 className="text-[14px] font-extrabold text-gray-text uppercase tracking-wider mb-6">Mood Frequency</h3>
           {stats.moodData.length === 0 ? (
             <div className="flex-1 flex items-center justify-center">
@@ -251,7 +251,7 @@ export const Insights: React.FC = () => {
         </div>
 
         {/* Mind Map / Tags Cloud */}
-        <div className="bg-white border-2 border-border rounded-[40px] p-8 shadow-[0_8px_0_0_#E5E5E5] liquid-glass relative min-h-[300px] flex flex-col">
+        <div className="bg-white border-2 border-border rounded-[40px] p-8 shadow-sm liquid-glass relative min-h-[300px] flex flex-col">
           <h3 className="text-[14px] font-extrabold text-gray-text uppercase tracking-wider mb-6">Cognitive Mind Map</h3>
           {stats.topTags.length === 0 ? (
              <div className="flex-1 flex items-center justify-center">
@@ -279,7 +279,7 @@ export const Insights: React.FC = () => {
       </div>
 
       {/* LLM WIKI / LIFE THEME LIBRARY */}
-      <div className="relative w-full overflow-hidden bg-white border-2 border-border rounded-[32px] p-8 shadow-[0_6px_0_0_#E5E5E5] liquid-glass mb-16">
+      <div className="relative w-full overflow-hidden bg-white border-2 border-border rounded-[32px] p-8 shadow-sm liquid-glass mb-16">
         <div className="mb-10 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-5">
             <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[24px] bg-green/5 text-green border-2 border-green/10 shadow-sm">
@@ -320,7 +320,7 @@ export const Insights: React.FC = () => {
                 key={theme.id}
                 whileHover={{ y: -4 }}
                 onClick={() => setSelectedTheme(theme)}
-                className="group cursor-pointer p-6 bg-white border-2 border-border rounded-[24px] shadow-sm hover:shadow-md hover:border-green/30 transition-all flex flex-col justify-between h-[180px]"
+                className="group cursor-pointer p-6 bg-white border-2 border-border rounded-[24px] shadow-sm hover:shadow-md hover:border-green/30 transition-all duration-300 ease-out-quart flex flex-col justify-between h-[180px]"
               >
                 <div>
                   <div className="flex items-center justify-between mb-3">
@@ -336,7 +336,7 @@ export const Insights: React.FC = () => {
                   <span className="text-[11px] font-medium text-gray-light">
                     Updated {new Date(theme.updatedAt).toLocaleDateString()}
                   </span>
-                  <div className="h-8 w-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-green group-hover:text-white transition-all">
+                  <div className="h-8 w-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-green group-hover:text-white transition-all duration-300 ease-out-quart">
                     <ChevronRight size={16} />
                   </div>
                 </div>
