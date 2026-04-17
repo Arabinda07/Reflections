@@ -180,6 +180,7 @@ export const CreateNote: React.FC = () => {
   const [isFocused, setIsFocused] = useState(false);
   const [isFlowing, setIsFlowing] = useState(false);
   const [isTasksOpen, setIsTasksOpen] = useState(false);
+  const [isContentVisible, setIsContentVisible] = useState(false);
   const flowTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
   
@@ -366,6 +367,7 @@ export const CreateNote: React.FC = () => {
 
           if (isUnmounted.current) return;
           setLoading(false);
+          setTimeout(() => setIsContentVisible(true), 400);
           
           // Check count for current month asynchronously
           const count = await noteService.getMonthlyCount();
@@ -410,10 +412,12 @@ export const CreateNote: React.FC = () => {
              navigate(RoutePath.NOTES);
           }
           setLoading(false);
+          setTimeout(() => setIsContentVisible(true), 400);
         }
       } catch (error) {
         console.error("Failed to initialize note view", error);
         setLoading(false);
+        setTimeout(() => setIsContentVisible(true), 400);
       }
     };
 
@@ -899,7 +903,9 @@ Instructions:
         }} 
       />
       {limitReachedOverlay}
-      <div className="mx-auto max-w-[1180px] animate-in fade-in duration-500 pb-20 px-3 sm:px-4 md:px-6">
+      <LoadingState isVisible={loading} message="Revisiting your thoughts..." />
+      {isContentVisible && (
+        <div className="mx-auto max-w-[1180px] animate-in fade-in duration-700 pb-20 px-3 sm:px-4 md:px-6">
         <nav className={`sticky top-4 z-50 mb-8 flex items-center justify-between gap-2 rounded-2xl border-2 border-border bg-white/90 px-3 py-2 sm:px-4 sm:py-3 shadow-sm backdrop-blur-2xl transition-all duration-500 dark:bg-[#17171b]/90 dark:shadow-sm ${isDimmed ? 'opacity-40 hover:opacity-100' : 'opacity-100'}`}>
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-bold text-[12px] px-2 sm:px-3">
@@ -1605,12 +1611,12 @@ Instructions:
         </motion.div>
         )}
       </AnimatePresence>
-      <LoadingState isVisible={loading} message="Revisiting your thoughts..." />
       <PaperPlaneToast
         isVisible={showPlane}
         onAnimationComplete={handlePlaneAnimationComplete}
       />
       </div>
+      )}
     </>
   );
 };

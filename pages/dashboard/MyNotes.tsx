@@ -19,6 +19,7 @@ export const MyNotes: React.FC = () => {
   const { user } = useAuth();
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isContentVisible, setIsContentVisible] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [removedNote, setRemovedNote] = useState<{note: Note, timer: NodeJS.Timeout} | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'calendar'>('grid');
@@ -50,6 +51,8 @@ export const MyNotes: React.FC = () => {
       console.error("Failed to fetch notes", error);
     } finally {
       setLoading(false);
+      // Synchronize with LoadingState exit animation
+      setTimeout(() => setIsContentVisible(true), 400);
     }
   };
 
@@ -148,7 +151,10 @@ export const MyNotes: React.FC = () => {
   };
 
   return (
-    <div className="space-y-10 animate-in fade-in duration-500 pb-12 px-4 md:px-10">
+    <>
+      <LoadingState isVisible={loading} message="gathering your thoughts..." />
+      {isContentVisible && (
+        <div className="space-y-10 animate-in fade-in duration-700 pb-12 px-4 md:px-10">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-border pb-8 gap-4">
         <div>
           <h1 className="font-display text-[40px] text-gray-text lowercase">my notes</h1>
@@ -418,7 +424,8 @@ export const MyNotes: React.FC = () => {
         </div>,
         document.body
       )}
-      <LoadingState isVisible={loading} message="gathering your thoughts..." />
-    </div>
+        </div>
+      )}
+    </>
   );
 };
