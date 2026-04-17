@@ -899,7 +899,7 @@ export const CreateNote: React.FC = () => {
         <div className="flex h-screen w-full bg-white dark:bg-panel-bg overflow-hidden relative selection:bg-blue/10">
           {/* Sidebar - Liquid Glass Drawer on Mobile, Fixed on Desktop */}
           <aside 
-            className={`fixed left-0 top-0 bottom-0 w-[220px] lg:w-[240px] border-r-2 border-border z-50 transition-all duration-700 ease-out-expo px-6 py-8 flex flex-col gap-8 
+            className={`fixed left-0 top-0 bottom-0 w-[200px] lg:w-[180px] border-r-2 border-border z-50 transition-all duration-700 ease-out-expo px-4 py-8 flex flex-col gap-6 
               ${isMobile ? 'liquid-glass-strong rounded-r-[40px] shadow-2xl overflow-y-auto' : 'bg-white dark:bg-panel-bg'}
               ${isMobile ? (isSidebarOpen ? 'translate-x-0' : '-translate-x-full') : (isDimmed ? '-translate-x-full opacity-0 pointer-events-none' : 'translate-x-0 opacity-100')}
             `}
@@ -944,7 +944,6 @@ export const CreateNote: React.FC = () => {
                     </div>
                     <ChevronRight size={14} className={isMoodOpen ? 'rotate-90' : ''} />
                   </button>
-                  {/* Portals remain at the end to keep code clean */}
                </div>
 
                {/* Tags Button */}
@@ -961,17 +960,44 @@ export const CreateNote: React.FC = () => {
                   </button>
                </div>
 
-               {/* Attach & Cover Grid/Stack */}
-               <div className={`grid gap-3 mt-2 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
-                  <label className="group flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-border bg-white cursor-pointer transition-all duration-300 hover:bg-blue/5 hover:border-blue/30 hover:text-blue active:scale-95">
-                     <Paperclip size={20} className="mb-2 opacity-50 group-hover:opacity-100" />
-                     <span className="text-[10px] font-black">FILES</span>
+               {/* Sounds Button (Consolidated from Header) */}
+               <div className="relative" ref={musicRef}>
+                  <button 
+                    onClick={() => setIsMusicOpen(!isMusicOpen)}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl border-2 transition-all duration-300 ease-out-expo active:scale-95 ${musicPlaying ? 'bg-purple-500/10 border-purple-500 text-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.1)]' : 'bg-white dark:bg-panel-bg border-border text-gray-nav hover:border-purple-500/30'}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Headphones size={18} />
+                      <span className="text-[12px] font-black uppercase tracking-tight">{musicPlaying && activeMusicTrack ? activeMusicTrack.label : 'Sounds'}</span>
+                    </div>
+                    <ChevronRight size={14} className={isMusicOpen ? 'rotate-90' : ''} />
+                  </button>
+               </div>
+
+               {/* Whisper Toggle (Consolidated from Header) */}
+               <div className="relative">
+                  <button 
+                    onClick={toggleWhisper}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl border-2 transition-all duration-300 ease-out-expo active:scale-95 ${isWhispering ? 'bg-blue/10 border-blue text-blue shadow-[0_0_15px_rgba(59,130,246,0.1)]' : 'bg-white dark:bg-panel-bg border-border text-gray-nav hover:border-blue/30'}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      {isWhispering ? <Mic size={18} className="animate-pulse" /> : <MicOff size={18} />}
+                      <span className="text-[12px] font-black uppercase tracking-tight">Whisper</span>
+                    </div>
+                  </button>
+               </div>
+
+               {/* Attach & Cover Grid/Stack - Compact */}
+               <div className={`grid gap-2 mt-2 grid-cols-2`}>
+                  <label className="group flex flex-col items-center justify-center p-3 rounded-2xl border-2 border-border bg-white dark:bg-panel-bg cursor-pointer transition-all duration-300 hover:bg-blue/5 hover:border-blue/30 hover:text-blue active:scale-95">
+                     <Paperclip size={16} className="mb-1 opacity-50 group-hover:opacity-100" />
+                     <span className="text-[9px] font-black">FILES</span>
                      <input type="file" multiple className="hidden" onChange={handleAttachmentUpload} />
                   </label>
                   
-                  <label className="group flex flex-col items-center justify-center p-4 rounded-2xl border-2 border-border bg-white cursor-pointer transition-all duration-300 hover:bg-blue/5 hover:border-blue/30 hover:text-blue active:scale-95">
-                     <ImageIcon size={20} className="mb-2 opacity-50 group-hover:opacity-100" />
-                     <span className="text-[10px] font-black">COVER</span>
+                  <label className="group flex flex-col items-center justify-center p-3 rounded-2xl border-2 border-border bg-white dark:bg-panel-bg cursor-pointer transition-all duration-300 hover:bg-blue/5 hover:border-blue/30 hover:text-blue active:scale-95">
+                     <ImageIcon size={16} className="mb-1 opacity-50 group-hover:opacity-100" />
+                     <span className="text-[9px] font-black">COVER</span>
                      <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
                   </label>
                </div>
@@ -979,7 +1005,7 @@ export const CreateNote: React.FC = () => {
 
             <div className="mt-auto space-y-4">
                {/* Quick Info */}
-               <div className="p-4 rounded-2xl bg-gray-50 border border-border">
+               <div className="p-3 rounded-2xl bg-gray-50 dark:bg-white/5 border border-border transition-colors">
                   <p className="text-[10px] font-bold text-gray-nav flex items-center gap-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-blue animate-pulse" />
                     Cloud Synced
@@ -1002,7 +1028,7 @@ export const CreateNote: React.FC = () => {
           </AnimatePresence>
 
           {/* Main Content Area */}
-          <main className={`flex-1 flex flex-col min-w-0 transition-all duration-700 ease-out-expo ${isDimmed ? 'lg:pl-0' : (isMobile ? 'lg:pl-0' : 'lg:pl-[240px]')}`}>
+          <main className={`flex-1 flex flex-col min-w-0 transition-all duration-700 ease-out-expo ${isDimmed ? 'lg:pl-0' : (isMobile ? 'lg:pl-0' : 'lg:pl-[180px]')}`}>
             
             {/* Slim Top Bar */}
             <nav className={`sticky top-0 z-40 flex items-center justify-between px-6 py-4 bg-white/80 dark:bg-panel-bg/80 backdrop-blur-xl border-b border-border transition-all duration-700 ${isDimmed ? 'opacity-0 -translate-y-full pointer-events-none' : 'opacity-100 translate-y-0'}`}>
@@ -1013,7 +1039,7 @@ export const CreateNote: React.FC = () => {
                  </Button>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 {/* Personalize Trigger (Mobile Only) - Liquid Glass styled */}
                 <Button
                   variant="ghost"
@@ -1022,39 +1048,8 @@ export const CreateNote: React.FC = () => {
                   className="lg:hidden flex items-center gap-2 rounded-xl border-2 border-border/40 liquid-glass font-black text-[11px] text-gray-text px-4 py-2"
                 >
                   <Smile size={16} className="text-blue" />
-                  <span>Mood</span>
+                  <span>Personalize</span>
                 </Button>
-
-                {/* Whisper Mode Button */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={toggleWhisper}
-                  className={`flex items-center gap-2 rounded-xl border-2 border-border font-black text-[11px] transition-all duration-300 px-4 ${isWhispering ? 'text-blue bg-blue/5 border-blue' : 'text-gray-nav'}`}
-                >
-                  {isWhispering ? <Mic size={16} className="animate-pulse" /> : <MicOff size={16} />}
-                  <span className="hidden sm:inline">Whisper</span>
-                </Button>
-
-                {/* Music Player Button */}
-                <div className="relative" ref={musicRef}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      if (musicPlaying) {
-                        stopMusic();
-                        setIsMusicOpen(false);
-                      } else {
-                        setIsMusicOpen(!isMusicOpen);
-                      }
-                    }}
-                    className={`flex items-center gap-2 rounded-xl border-2 border-border font-black text-[11px] transition-all duration-300 px-4 ${musicPlaying ? 'text-purple-500 bg-purple-500/10 border-purple-500/30' : 'text-gray-nav'}`}
-                  >
-                    <Music size={16} className={musicPlaying ? 'animate-pulse' : ''} />
-                    <span>Sounds</span>
-                  </Button>
-                </div>
 
                 <div className="h-6 w-[1.5px] bg-border mx-2"></div>
 
@@ -1415,58 +1410,54 @@ export const CreateNote: React.FC = () => {
           {createPortal(
             <AnimatePresence>
               {isMusicOpen && (
-                <div className="fixed inset-0 z-[110] flex items-end">
+                <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
                   <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="absolute inset-0 bg-black/40 backdrop-blur-sm" 
+                    className="absolute inset-0 bg-black/40 backdrop-blur-md" 
                     onClick={() => setIsMusicOpen(false)} 
                   />
                   <motion.div
-                    initial={{ y: '100%' }}
-                    animate={{ y: 0 }}
-                    exit={{ y: '100%' }}
-                    transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                    className="relative w-full bg-white dark:bg-panel-bg liquid-glass-strong border-t-2 border-border/40 rounded-t-[40px] shadow-[0_-20px_50px_-20px_rgba(0,0,0,0.3)] px-6 py-8 pb-10 sm:px-12"
+                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                    className="relative w-full max-w-[340px] bg-white/95 dark:bg-panel-bg/95 liquid-glass-strong border-2 border-border/40 rounded-[40px] p-8 shadow-2xl overflow-hidden"
                   >
-                    <div className="max-w-4xl mx-auto">
-                      <div className="flex items-center justify-between mb-10">
-                        <div>
-                          <h3 className="text-[22px] font-black text-gray-text tracking-tight">Ambient Sanctuary</h3>
-                          <p className="text-[12px] font-bold text-gray-nav">Curated soundscapes for immersive focus</p>
-                        </div>
-                        <button 
-                          onClick={() => setIsMusicOpen(false)}
-                          className="h-12 w-12 flex items-center justify-center rounded-2xl bg-gray-100 dark:bg-white/5 text-gray-nav hover:text-red transition-all"
-                        >
-                          <X size={24} />
-                        </button>
+                    <div className="flex items-center justify-between mb-8">
+                      <div>
+                        <h3 className="text-[18px] font-black text-gray-text tracking-tight">Ambient sounds</h3>
+                        <p className="text-[11px] font-bold text-gray-nav">Curated focus loops</p>
                       </div>
+                      <button 
+                        onClick={() => setIsMusicOpen(false)}
+                        className="h-10 w-10 flex items-center justify-center rounded-2xl bg-gray-100 dark:bg-white/5 text-gray-nav hover:text-red transition-all"
+                      >
+                        <X size={20} />
+                      </button>
+                    </div>
 
-                      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-                        {AMBIENT_TRACKS.map(track => {
-                          const isActive = activeMusicTrack?.id === track.id;
-                          return (
-                            <button 
-                              key={track.id} 
-                              onClick={() => isActive ? stopMusic() : playMusicTrack(track)} 
-                              className={`group relative flex flex-col items-center justify-center p-3 sm:p-5 rounded-[24px] sm:rounded-[32px] border-2 transition-all duration-700 active:scale-95 ${isActive ? 'bg-purple-500/10 border-purple-500/40 text-purple-500 shadow-lg shadow-purple-500/10' : 'bg-white dark:bg-white/5 border-transparent hover:border-border'}`}
-                            >
-                               <div className={`text-xl sm:text-2xl mb-2 transition-transform duration-700 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}>
-                                 {track.emoji}
-                               </div>
-                               <span className={`text-[9px] sm:text-[11px] font-black uppercase tracking-tight sm:tracking-widest ${isActive ? 'text-purple-500' : 'text-gray-nav'}`}>{track.label}</span>
-                               {isActive && (
-                                 <motion.div 
-                                   layoutId="active-track"
-                                   className="absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-purple-500 shadow-[0_0_10px_#a855f7]"
-                                 />
-                               )}
-                            </button>
-                          );
-                        })}
-                      </div>
+                    <div className="space-y-3">
+                      {AMBIENT_TRACKS.map(track => {
+                        const isActive = activeMusicTrack?.id === track.id;
+                        return (
+                          <button 
+                            key={track.id} 
+                            onClick={() => isActive ? stopMusic() : playMusicTrack(track)} 
+                            className={`w-full group relative flex items-center gap-4 p-4 rounded-3xl border-2 transition-all duration-300 active:scale-[0.98] ${isActive ? 'bg-white dark:bg-panel-bg border-purple-500/30' : 'bg-white/50 dark:bg-white/5 border-transparent hover:border-border'}`}
+                          >
+                            <div className={`h-12 w-12 rounded-2xl flex items-center justify-center text-xl transition-all duration-500 ${isActive ? 'bg-purple-500/10 scale-105' : 'bg-gray-100 dark:bg-white/5'}`}>
+                              {track.emoji}
+                            </div>
+                            <span className={`flex-1 text-left text-[14px] font-black ${isActive ? 'text-gray-text' : 'text-gray-nav'}`}>
+                              {track.label}
+                            </span>
+                            {isActive && (
+                              <div className="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.5)]" />
+                            )}
+                          </button>
+                        );
+                      })}
                     </div>
                   </motion.div>
                 </div>
