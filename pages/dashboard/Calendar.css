@@ -155,3 +155,47 @@
 .react-calendar--selectRange .react-calendar__tile--hover {
   background-color: #e5e7eb;
 }
+
+/* Dark Mode Overrides */
+.dark .react-calendar {
+  background: var(--bg-color) !important;
+  color: var(--gray-text) !important;
+}
+
+.dark .react-calendar__navigation button {
+  color: var(--gray-text) !important;
+}
+
+.dark .react-calendar__navigation button:enabled:hover,
+.dark .react-calendar__navigation button:enabled:focus {
+  background-color: var(--border-color) !important;
+}
+
+.dark .react-calendar__month-view__weekdays {
+  color: var(--gray-light) !important;
+}
+
+.dark .react-calendar__month-view__days__day--neighboringMonth {
+  color: var(--gray-light) !important;
+  opacity: 0.4;
+}
+
+.dark .react-calendar__tile {
+  color: var(--gray-text) !important;
+}
+
+.dark .react-calendar__tile:enabled:hover,
+.dark .react-calendar__tile:enabled:focus {
+  background-color: var(--border-color) !important;
+}
+
+.dark .react-calendar__tile--now {
+  background: var(--border-color) !important;
+  color: var(--blue) !important;
+}
+
+.dark .react-calendar__tile--now:enabled:hover,
+.dark .react-calendar__tile--now:enabled:focus {
+  background: var(--border-color) !important;
+  opacity: 0.8;
+}

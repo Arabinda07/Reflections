@@ -66,11 +66,12 @@ export const PaperPlaneToast: React.FC<PaperPlaneToastProps> = ({
               gap: '12px',
               padding: '10px 20px 10px 12px',
               borderRadius: '20px',
-              backgroundColor: 'rgba(255,255,255,0.95)',
+              backgroundColor: 'var(--panel-bg)',
+              opacity: 0.98,
               backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
-              border: '1.5px solid rgba(229,229,229,0.9)',
-              boxShadow: '0 8px 28px -6px rgba(0,0,0,0.12), 0 2px 0 0 #E5E5E5',
+              border: '1.5px solid var(--border-color)',
+              boxShadow: '0 8px 28px -6px rgba(0,0,0,0.12)',
             }}
           >
             {/* Paper plane Lottie */}
@@ -89,7 +90,7 @@ export const PaperPlaneToast: React.FC<PaperPlaneToastProps> = ({
                 fontFamily: '"Schibsted Grotesk", sans-serif',
                 fontSize: '13px',
                 fontWeight: 800,
-                color: '#4b4b4b',
+                color: 'var(--gray-text)',
                 whiteSpace: 'nowrap',
               }}
             >

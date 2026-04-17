@@ -1,3 +1,5 @@
+import { WikiPageType } from './services/wikiService';
+
 export interface NoteAttachment {
   name: string;
   path: string;
@@ -17,7 +19,7 @@ export interface Note {
   id: string;
   title: string;
   content: string;
-  createdAt: string; // ISO Date string
+  createdAt: string;
   updatedAt: string;
   thumbnailUrl?: string;
   tags?: string[];
@@ -32,13 +34,16 @@ export interface LifeTheme {
   title: string;
   content: string;
   state: 'active' | 'archived' | 'resolved';
+  // Distinguishes freeform user themes from LLM-maintained wiki pages.
+  // 'theme' = user-created (default, backward compatible)
+  pageType: WikiPageType;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface ThemeCitation {
   id: string;
-  userId: string;
+  // userId removed — ownership is enforced via RLS join on life_themes
   themeId: string;
   noteId: string;
   createdAt: string;

@@ -82,7 +82,7 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
             }
       }
       transition={{ duration: 0.45, ease: 'easeOut' }}
-      className={`group relative flex items-center gap-2 overflow-hidden rounded-[24px] border-2 p-3 sm:gap-4 sm:p-4 bg-white dark:bg-[#1e1e1e] transition-colors duration-300 ${task.completed ? 'bg-emerald-50/60 dark:bg-emerald-900/10' : ''}`}
+      className={`group relative flex items-center gap-2 overflow-hidden rounded-[24px] border-2 p-3 sm:gap-4 sm:p-4 bg-white dark:bg-panel-bg transition-colors duration-300 ${task.completed ? 'bg-emerald-50/60 dark:bg-emerald-900/10' : ''}`}
     >
       <AnimatePresence>
         {rippleKey > 0 && task.completed && (
@@ -180,7 +180,8 @@ export const CreateNote: React.FC = () => {
   const [isFocused, setIsFocused] = useState(false);
   const [isFlowing, setIsFlowing] = useState(false);
   const [isTasksOpen, setIsTasksOpen] = useState(false);
-  const [isContentVisible, setIsContentVisible] = useState(false);
+  // Setting visibility to true immediately to avoid jank
+  const [isContentVisible, setIsContentVisible] = useState(true);
   const flowTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
   
@@ -361,13 +362,9 @@ export const CreateNote: React.FC = () => {
           // Generate initial prompts for new note without awaiting
           generateDynamicPrompts();
 
-          // Wait for cinematic display time for the sanctuary loader
-          // Extended to 4000ms to account for network fetching of the Lottie
-          await new Promise(resolve => setTimeout(resolve, 4000));
-
           if (isUnmounted.current) return;
           setLoading(false);
-          setTimeout(() => setIsContentVisible(true), 400);
+          setIsContentVisible(true);
           
           // Check count for current month asynchronously
           const count = await noteService.getMonthlyCount();
@@ -376,14 +373,8 @@ export const CreateNote: React.FC = () => {
             setIsLimitReached(true);
           }
         } else {
-          // If editing an EXISTING note, we must block to fetch data
-          // Implement a 6-second "Joy" timer for the Sanctuary transition
-          const minTimePromise = new Promise(resolve => setTimeout(resolve, 6000));
-          
-          const [note] = await Promise.all([
-            noteService.getById(id),
-            minTimePromise
-          ]);
+          // Fetch EXISTING note data immediately
+          const note = await noteService.getById(id);
 
           if (isUnmounted.current) return;
           if (note) {
@@ -401,7 +392,6 @@ export const CreateNote: React.FC = () => {
               tags: note.tags || [],
               tasks: note.tasks || []
             };
-            // Generate prompts based on existing mood
             generateDynamicPrompts(note.mood);
             
             // Focus editor for existing note
@@ -412,12 +402,12 @@ export const CreateNote: React.FC = () => {
              navigate(RoutePath.NOTES);
           }
           setLoading(false);
-          setTimeout(() => setIsContentVisible(true), 400);
+          setIsContentVisible(true);
         }
       } catch (error) {
         console.error("Failed to initialize note view", error);
         setLoading(false);
-        setTimeout(() => setIsContentVisible(true), 400);
+        setIsContentVisible(true);
       }
     };
 
@@ -903,10 +893,10 @@ Instructions:
         }} 
       />
       {limitReachedOverlay}
-      <LoadingState isVisible={loading} message="Revisiting your thoughts..." />
+      {/* LoadingState removed as per user request for instant creative flow */}
       {isContentVisible && (
-        <div className="mx-auto max-w-[1180px] animate-in fade-in duration-700 pb-20 px-3 sm:px-4 md:px-6">
-        <nav className={`sticky top-4 z-50 mb-8 flex items-center justify-between gap-2 rounded-2xl border-2 border-border bg-white/90 px-3 py-2 sm:px-4 sm:py-3 shadow-sm backdrop-blur-2xl transition-all duration-500 dark:bg-[#17171b]/90 dark:shadow-sm ${isDimmed ? 'opacity-40 hover:opacity-100' : 'opacity-100'}`}>
+        <div className="mx-auto max-w-[1180px] animate-in fade-in duration-500 pb-20 px-3 sm:px-4 md:px-6">
+        <nav className={`sticky top-4 z-50 mb-8 flex items-center justify-between gap-2 rounded-2xl border-2 border-border bg-white/90 dark:bg-panel-bg/90 px-3 py-2 sm:px-4 sm:py-3 shadow-sm backdrop-blur-2xl transition-all duration-500 ${isDimmed ? 'opacity-40 hover:opacity-100' : 'opacity-100'}`}>
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-bold text-[12px] px-2 sm:px-3">
              <ArrowLeft className="h-4 w-4 sm:mr-2" />
@@ -1121,16 +1111,16 @@ Instructions:
             transition={{ duration: 1.2, ease: releaseEase }}
             className="mx-auto w-full max-w-[1100px]"
           >
-          <div className="relative min-h-[70vh] rounded-[32px] border-2 border-border bg-white shadow-sm flex flex-col liquid-glass !overflow-visible dark:bg-[#17171b] dark:shadow-sm">
+          <div className="relative min-h-[70vh] rounded-[32px] border-2 border-border bg-white dark:bg-panel-bg shadow-sm flex flex-col liquid-glass !overflow-visible dark:shadow-sm">
             {imagePreview && (
-              <div className="relative aspect-[21/9] w-full group bg-white border-b-2 border-border rounded-t-[30px] overflow-hidden">
+              <div className="relative aspect-[21/9] w-full group bg-white dark:bg-panel-bg border-b-2 border-border rounded-t-[30px] overflow-hidden">
                   <StorageImage 
                     path={imagePreview} 
                     alt="Cover" 
                     className="h-full w-full object-cover" 
                   />
                   <div className="absolute top-4 right-4 flex gap-2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                      <label className="cursor-pointer rounded-xl bg-white border-2 border-border px-3 py-1.5 text-[11px] font-bold text-gray-text shadow-sm hover:bg-white transition-colors">
+                      <label className="cursor-pointer rounded-xl bg-white border-2 border-border px-3 py-1.5 text-[11px] font-bold text-gray-text shadow-sm hover:bg-white dark:hover:bg-panel-bg transition-colors">
                           Change
                           <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
                       </label>
@@ -1158,7 +1148,7 @@ Instructions:
                        <div className="relative" ref={moodRef}>
                           <button 
                             onClick={() => setIsMoodOpen(!isMoodOpen)}
-                            className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all duration-300 ease-out-expo shadow-sm active:brightness-95 ${mood ? 'bg-blue/5 border-blue text-blue' : 'bg-white border-border text-gray-nav hover:border-blue/30'}`}
+                            className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all duration-300 ease-out-expo shadow-sm active:brightness-95 ${mood ? 'bg-blue/5 border-blue text-blue' : 'bg-white dark:bg-panel-bg border-border text-gray-nav hover:border-blue/30'}`}
                           >
                             {mood ? (
                               <>
@@ -1223,7 +1213,7 @@ Instructions:
                        <div className="relative" ref={tagsRef}>
                           <button 
                             onClick={() => setIsTagsOpen(!isTagsOpen)}
-                            className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all duration-300 ease-out-expo shadow-sm active:brightness-95 ${tags.length > 0 ? 'bg-green/5 border-green text-green' : 'bg-white border-border text-gray-nav hover:border-green/30'}`}
+                            className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all duration-300 ease-out-expo shadow-sm active:brightness-95 ${tags.length > 0 ? 'bg-green/5 border-green text-green' : 'bg-white dark:bg-panel-bg border-border text-gray-nav hover:border-green/30'}`}
                           >
                             <TagIcon size={16} />
                             <span className="text-[10px] sm:text-[11px] font-black">{tags.length > 0 ? `${tags.length} tags` : 'Tags'}</span>
@@ -1521,8 +1511,8 @@ Instructions:
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       {existingAttachments.map((att) => (
-                        <div key={att.path} className="group relative flex items-center gap-4 p-5 rounded-[24px] border-2 border-border bg-white hover:bg-blue/5 hover:border-blue/30 transition-all duration-500 shadow-sm hover:shadow-none hover:translate-y-[2px] liquid-glass">
-                          <div className="h-16 w-16 shrink-0 rounded-2xl bg-white border-2 border-border flex items-center justify-center text-gray-nav shadow-inner overflow-hidden">
+                        <div key={att.path} className="group relative flex items-center gap-4 p-5 rounded-[24px] border-2 border-border bg-white dark:bg-panel-bg hover:bg-blue/5 dark:hover:bg-blue/10 hover:border-blue/30 transition-all duration-500 shadow-sm hover:shadow-none hover:translate-y-[2px] liquid-glass">
+                          <div className="h-16 w-16 shrink-0 rounded-2xl bg-white dark:bg-panel-bg border-2 border-border flex items-center justify-center text-gray-nav shadow-inner overflow-hidden">
                              {att.type?.startsWith('image/') ? (
                                <StorageImage 
                                  path={att.path} 
@@ -1548,7 +1538,7 @@ Instructions:
                           </div>
                           <button 
                             onClick={() => removeExistingAttachment(att)}
-                            className="h-10 w-10 rounded-xl bg-white text-gray-nav border-2 border-border shadow-sm flex items-center justify-center hover:text-red hover:border-red/30 active:scale-[0.98] transition-all duration-200"
+                            className="h-10 w-10 rounded-xl bg-white dark:bg-panel-bg text-gray-nav border-2 border-border shadow-sm flex items-center justify-center hover:text-red hover:border-red/30 active:scale-[0.98] transition-all duration-200"
                             title="Remove attachment"
                           >
                             <X size={18} strokeWidth={2.5} />
@@ -1559,7 +1549,7 @@ Instructions:
                         const isImage = file.type?.startsWith('image/');
                         const previewUrl = isImage ? URL.createObjectURL(file) : null;
                         return (
-                          <div key={`new-${index}`} className="group relative flex items-center gap-4 p-5 rounded-[24px] border-2 border-blue/20 bg-blue/5 hover:bg-white hover:border-blue/40 transition-all duration-500 shadow-sm hover:shadow-none hover:translate-y-[2px] liquid-glass animate-in zoom-in-95 duration-300">
+                          <div key={`new-${index}`} className="group relative flex items-center gap-4 p-5 rounded-[24px] border-2 border-blue/20 bg-blue/5 hover:bg-white dark:hover:bg-panel-bg hover:border-blue/40 transition-all duration-500 shadow-sm hover:shadow-none hover:translate-y-[2px] liquid-glass animate-in zoom-in-95 duration-300">
                             <div className="h-16 w-16 shrink-0 rounded-2xl bg-white border-2 border-blue/20 flex items-center justify-center text-blue shadow-inner overflow-hidden">
                               {isImage && previewUrl ? (
                                 <img 
@@ -1589,7 +1579,7 @@ Instructions:
                             </div>
                             <button 
                               onClick={() => removeNewAttachment(index)}
-                              className="h-10 w-10 rounded-xl bg-white text-gray-nav border-2 border-border shadow-sm flex items-center justify-center hover:text-red hover:border-red/30 active:scale-[0.98] transition-all duration-200"
+                              className="h-10 w-10 rounded-xl bg-white dark:bg-panel-bg text-gray-nav border-2 border-border shadow-sm flex items-center justify-center hover:text-red hover:border-red/30 active:scale-[0.98] transition-all duration-200"
                               title="Remove attachment"
                             >
                               <X size={18} strokeWidth={2.5} />
@@ -1602,7 +1592,7 @@ Instructions:
                 )}
             </div>
 
-            <div className={`border-t-2 border-border bg-white/50 px-8 py-4 text-center transition-all duration-500 ${isFocused ? 'opacity-20' : 'opacity-100'}`}>
+            <div className={`border-t-2 border-border bg-white/50 dark:bg-white/5 px-8 py-4 text-center transition-all duration-500 ${isFocused ? 'opacity-20' : 'opacity-100'}`}>
                 <p className="text-[11px] font-extrabold text-gray-nav">
                    Your journal is a safe space for your thoughts.
                 </p>

@@ -191,7 +191,7 @@ export const MyNotes: React.FC = () => {
           )}
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex bg-white border-2 border-border rounded-xl p-1 shadow-sm">
+          <div className="flex bg-white dark:bg-panel-bg border-2 border-border rounded-xl p-1 shadow-sm">
             <button 
               onClick={() => setViewMode('grid')}
               className={`p-2 rounded-lg transition-all duration-300 ease-out-quart ${viewMode === 'grid' ? 'bg-blue/10 text-blue' : 'text-gray-nav hover:bg-gray-50'}`}
@@ -221,7 +221,7 @@ export const MyNotes: React.FC = () => {
       {viewMode === 'calendar' ? (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in slide-in-from-bottom-4 duration-500">
           <div className="lg:col-span-7 xl:col-span-8">
-            <div className="bg-white border-2 border-border rounded-[32px] p-6 sm:p-8 shadow-sm liquid-glass">
+            <div className="bg-white dark:bg-panel-bg border-2 border-border rounded-[32px] p-6 sm:p-8 shadow-sm liquid-glass">
               <ReactCalendar 
                 onChange={(val) => setSelectedDate(val as Date)} 
                 value={selectedDate}
@@ -247,7 +247,7 @@ export const MyNotes: React.FC = () => {
                   <div 
                     key={note.id}
                     onClick={() => navigate(RoutePath.NOTE_DETAIL.replace(':id', note.id))}
-                    className="group cursor-pointer p-5 rounded-2xl bg-white border-2 border-border shadow-sm hover:shadow-none transition-all duration-300"
+                    className="group cursor-pointer p-5 rounded-2xl bg-white dark:bg-panel-bg border-2 border-border shadow-sm hover:shadow-none transition-all duration-300"
                   >
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-bold text-gray-text group-hover:text-blue transition-colors truncate pr-4">{note.title}</h4>
@@ -267,8 +267,8 @@ export const MyNotes: React.FC = () => {
                   </div>
                 ))
               ) : (
-                <div className="flex flex-col items-center justify-center py-12 text-center bg-white rounded-[32px] border-2 border-dashed border-border">
-                  <div className="h-12 w-12 rounded-xl bg-white border-2 border-border flex items-center justify-center text-gray-nav/30 mb-4">
+                <div className="flex flex-col items-center justify-center py-12 text-center bg-white dark:bg-panel-bg rounded-[32px] border-2 border-dashed border-border">
+                  <div className="h-12 w-12 rounded-xl bg-white dark:bg-panel-bg border-2 border-border flex items-center justify-center text-gray-nav/30 mb-4">
                     <FileText size={24} />
                   </div>
                   <p className="text-[14px] font-bold text-gray-nav">No entries for this day</p>
@@ -291,11 +291,11 @@ export const MyNotes: React.FC = () => {
             <div 
               key={note.id} 
               onClick={() => navigate(RoutePath.NOTE_DETAIL.replace(':id', note.id))}
-              className="group cursor-pointer flex flex-col overflow-hidden rounded-2xl bg-white border-2 border-border shadow-sm transition-all duration-500 ease-out-expo hover:border-blue/30"
+              className="group cursor-pointer flex flex-col overflow-hidden rounded-2xl bg-white dark:bg-panel-bg border-2 border-border shadow-sm transition-all duration-500 ease-out-expo hover:border-blue/30"
               style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
             >
               {/* Image / Header */}
-              <div className="relative h-44 w-full overflow-hidden bg-white border-b-2 border-border">
+              <div className="relative h-44 w-full overflow-hidden bg-white dark:bg-panel-bg border-b-2 border-border">
                 {note.thumbnailUrl ? (
                    <>
                     <div className="absolute inset-0 bg-blue/0 transition-colors duration-500 group-hover:bg-blue/5 z-10" />
@@ -306,7 +306,7 @@ export const MyNotes: React.FC = () => {
                     />
                    </>
                 ) : (
-                   <div className="h-full w-full bg-white flex items-center justify-center">
+                   <div className="h-full w-full bg-white dark:bg-panel-bg flex items-center justify-center">
                       <FileText className="text-border transition-colors group-hover:text-blue/30" size={48} strokeWidth={1} />
                    </div>
                 )}
@@ -315,7 +315,7 @@ export const MyNotes: React.FC = () => {
                 <button 
                   onClick={(e) => handleDelete(e, note.id)}
                   disabled={deletingId === note.id}
-                  className="absolute top-4 left-4 z-20 h-9 w-9 flex items-center justify-center rounded-xl bg-white border-2 border-border text-gray-nav hover:text-red hover:border-red/30 shadow-sm active:brightness-95 transition-all duration-300"
+                  className="absolute top-4 left-4 z-20 h-9 w-9 flex items-center justify-center rounded-xl bg-white dark:bg-panel-bg border-2 border-border text-gray-nav hover:text-red hover:border-red/30 shadow-sm active:brightness-95 transition-all duration-300"
                 >
                   {deletingId === note.id ? (
                     <Loader2 size={16} className="animate-spin text-red" />
@@ -326,7 +326,7 @@ export const MyNotes: React.FC = () => {
                 
                 {/* Date & Mood Badge */}
                 <div className="absolute top-4 right-4 z-20 flex flex-col items-end gap-2">
-                     <div className="flex items-center gap-2 rounded-xl bg-white border-2 border-border px-3 py-1 text-[11px] font-bold text-gray-nav shadow-sm">
+                     <div className="flex items-center gap-2 rounded-xl bg-white dark:bg-panel-bg border-2 border-border px-3 py-1 text-[11px] font-bold text-gray-nav shadow-sm">
                         <div className="flex items-center gap-1.5 border-r-2 border-border pr-2 mr-0.5">
                           <CalendarIcon size={12} className="text-gray-nav" />
                           <span>{new Date(note.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
@@ -380,8 +380,8 @@ export const MyNotes: React.FC = () => {
       )}
       
       {!loading && filteredNotes.length === 0 && (
-          <div className="flex h-80 flex-col items-center justify-center rounded-[32px] border-2 border-dashed border-border bg-white text-center px-4">
-             <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-sm border-2 border-border mb-6">
+          <div className="flex h-80 flex-col items-center justify-center rounded-[32px] border-2 border-dashed border-border bg-white dark:bg-panel-bg text-center px-4">
+             <div className="h-16 w-16 bg-white dark:bg-panel-bg rounded-2xl flex items-center justify-center shadow-sm border-2 border-border mb-6">
                  <FileText size={28} className="text-gray-nav" />
              </div>
               <h3 className="font-display text-[24px] text-gray-text">Your personal sanctuary awaits.</h3>

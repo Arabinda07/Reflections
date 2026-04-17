@@ -13,7 +13,7 @@ export const SingleNote: React.FC = () => {
   const navigate = useNavigate();
   const [note, setNote] = useState<Note | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isContentVisible, setIsContentVisible] = useState(false);
+  const [isContentVisible, setIsContentVisible] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +32,7 @@ export const SingleNote: React.FC = () => {
         console.error("Failed to fetch note", err);
       } finally {
         setLoading(false);
-        setTimeout(() => setIsContentVisible(true), 400);
+        setIsContentVisible(true);
       }
     };
     fetchNote();
@@ -122,9 +122,9 @@ export const SingleNote: React.FC = () => {
 
   return (
     <>
-      <LoadingState isVisible={loading} message="finding your note..." />
+      {/* LoadingState removed for instant detail view */}
       {isContentVisible && note && (
-        <div className="mx-auto max-w-3xl space-y-6 animate-in fade-in duration-700 pb-20 relative px-4 md:px-0 pt-4">
+        <div className="mx-auto max-w-3xl space-y-6 animate-in fade-in duration-500 pb-20 relative px-4 md:px-0 pt-4">
         {/* Sticky Header */}
         <div className="flex items-center justify-between sticky top-4 bg-white/80 backdrop-blur-xl py-3 px-4 sm:px-6 rounded-[24px] border-2 border-border shadow-sm z-10 mb-8 liquid-glass">
           <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.NOTES)} className="-ml-2 text-gray-nav hover:text-gray-text font-bold text-[12px]">
