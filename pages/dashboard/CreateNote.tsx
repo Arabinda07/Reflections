@@ -167,6 +167,7 @@ export const CreateNote: React.FC = () => {
   const [isBreathing, setIsBreathing] = useState(false);
   const [isReleasing, setIsReleasing] = useState(false);
   const [promptIndex, setPromptIndex] = useState(0);
+  const [isPromptPulse, setIsPromptPulse] = useState(false);
 
   const [isMoodOpen, setIsMoodOpen] = useState(false);
   const [isTagsOpen, setIsTagsOpen] = useState(false);
@@ -787,6 +788,10 @@ export const CreateNote: React.FC = () => {
     const nextState = getNextWellnessPromptState(promptIndex, dynamicPrompts);
     setPromptIndex(nextState.nextIndex);
     setActivePlaceholder(nextState.prompt);
+    
+    // Trigger visual "blink" feedback
+    setIsPromptPulse(true);
+    setTimeout(() => setIsPromptPulse(false), 1000);
   };
 
   const handleRelease = () => {
@@ -1135,11 +1140,11 @@ export const CreateNote: React.FC = () => {
                               setIsFocused(false);
                               setIsTitleFocused(false);
                             }}
-                            className={`w-full border-none bg-transparent text-[42px] font-serif font-semibold text-gray-text placeholder:text-border/40 focus:outline-none focus:ring-0 p-0 mb-4 tracking-tight transition-all duration-700 ${isDimmed ? (isMobile ? 'opacity-80 scale-[0.98]' : 'opacity-25') : 'opacity-100 scale-100'}`}
+                            className={`w-full border-none bg-transparent text-[42px] font-serif font-semibold text-gray-text placeholder:text-border/40 focus:outline-none focus:ring-0 p-0 mb-4 tracking-tight transition-all duration-700 opacity-100 scale-100`}
                         />
                         
                         <div 
-                          className="relative min-h-[500px]"
+                          className={`relative min-h-[500px] transition-all duration-500 ${isPromptPulse ? 'opacity-40 animate-pulse' : 'opacity-100'}`}
                           onFocusCapture={() => setIsFocused(true)}
                           onBlurCapture={() => setIsFocused(false)}
                         >
@@ -1423,7 +1428,7 @@ export const CreateNote: React.FC = () => {
                     animate={{ y: 0 }}
                     exit={{ y: '100%' }}
                     transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                    className="relative w-full bg-white dark:bg-panel-bg liquid-glass-strong border-t-2 border-border/40 rounded-t-[40px] shadow-[0_-20px_50px_-20px_rgba(0,0,0,0.3)] px-6 py-10 pb-12 sm:px-12"
+                    className="relative w-full bg-white dark:bg-panel-bg liquid-glass-strong border-t-2 border-border/40 rounded-t-[40px] shadow-[0_-20px_50px_-20px_rgba(0,0,0,0.3)] px-6 py-8 pb-10 sm:px-12"
                   >
                     <div className="max-w-4xl mx-auto">
                       <div className="flex items-center justify-between mb-10">
@@ -1439,23 +1444,23 @@ export const CreateNote: React.FC = () => {
                         </button>
                       </div>
 
-                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
                         {AMBIENT_TRACKS.map(track => {
                           const isActive = activeMusicTrack?.id === track.id;
                           return (
                             <button 
                               key={track.id} 
                               onClick={() => isActive ? stopMusic() : playMusicTrack(track)} 
-                              className={`group relative flex flex-col items-center justify-center p-6 rounded-[32px] border-2 transition-all duration-700 active:scale-95 ${isActive ? 'bg-purple-500/10 border-purple-500/40 text-purple-500 shadow-lg shadow-purple-500/10' : 'bg-white dark:bg-white/5 border-transparent hover:border-border'}`}
+                              className={`group relative flex flex-col items-center justify-center p-3 sm:p-5 rounded-[24px] sm:rounded-[32px] border-2 transition-all duration-700 active:scale-95 ${isActive ? 'bg-purple-500/10 border-purple-500/40 text-purple-500 shadow-lg shadow-purple-500/10' : 'bg-white dark:bg-white/5 border-transparent hover:border-border'}`}
                             >
-                               <div className={`text-3xl mb-3 transition-transform duration-700 ${isActive ? 'scale-125' : 'group-hover:scale-110'}`}>
+                               <div className={`text-xl sm:text-2xl mb-2 transition-transform duration-700 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}>
                                  {track.emoji}
                                </div>
-                               <span className={`text-[11px] font-black uppercase tracking-widest ${isActive ? 'text-purple-500' : 'text-gray-nav'}`}>{track.label}</span>
+                               <span className={`text-[9px] sm:text-[11px] font-black uppercase tracking-tight sm:tracking-widest ${isActive ? 'text-purple-500' : 'text-gray-nav'}`}>{track.label}</span>
                                {isActive && (
                                  <motion.div 
                                    layoutId="active-track"
-                                   className="absolute -bottom-2 w-1.5 h-1.5 rounded-full bg-purple-500 shadow-[0_0_10px_#a855f7]"
+                                   className="absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-purple-500 shadow-[0_0_10px_#a855f7]"
                                  />
                                )}
                             </button>
