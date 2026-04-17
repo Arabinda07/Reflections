@@ -3,15 +3,15 @@ import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 const MESSAGES = [
-  "noticing patterns",
-  "weaving thoughts",
-  "gathering insights",
-  "centering sanctuary"
+  "Noticing patterns",
+  "Weaving thoughts",
+  "Gathering insights",
+  "Centering sanctuary"
 ];
 
 // Canonical brand footer style — light-mode locked, shared across all sanctuary animations
 const BRAND_WORDMARK_STYLE: React.CSSProperties = {
-  fontFamily: 'Nunito, sans-serif',
+  fontFamily: '"Schibsted Grotesk", sans-serif',
   fontSize: '20px',
   letterSpacing: '-0.02em',
   textTransform: 'lowercase',
@@ -98,10 +98,8 @@ export const AIThinkingState: React.FC<AIThinkingStateProps> = ({ isVisible, onS
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.45 }}
                 style={{
-                  fontSize: '13px',
-                  fontWeight: 900,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.25em',
+                  fontSize: '15px',
+                  fontWeight: 600,
                   color: '#777777',
                 }}
               >
@@ -122,15 +120,13 @@ export const AIThinkingState: React.FC<AIThinkingStateProps> = ({ isVisible, onS
                 onClick={onSkip}
                 style={{
                   marginTop: '28px',
-                  padding: '8px 24px',
+                  padding: '10px 24px',
                   borderRadius: '9999px',
                   border: '1.5px solid rgba(0,0,0,0.1)',
                   backgroundColor: 'rgba(0,0,0,0.04)',
-                  fontFamily: 'Nunito, sans-serif',
-                  fontSize: '11px',
-                  fontWeight: 900,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.2em',
+                  fontFamily: '"Schibsted Grotesk", sans-serif',
+                  fontSize: '13px',
+                  fontWeight: 800,
                   color: '#999999',
                   cursor: 'pointer',
                   transition: 'background-color 0.2s',
@@ -138,7 +134,7 @@ export const AIThinkingState: React.FC<AIThinkingStateProps> = ({ isVisible, onS
                 onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.08)')}
                 onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.04)')}
               >
-                skip →
+                Skip
               </motion.button>
             )}
           </AnimatePresence>

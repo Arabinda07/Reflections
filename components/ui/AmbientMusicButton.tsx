@@ -195,7 +195,7 @@ export const AmbientMusicButton: React.FC = () => {
         {/* Label + mood tag */}
         <span style={{ display: 'flex', flexDirection: 'column', gap: '2px', flex: 1, minWidth: 0 }}>
           <span style={{
-            fontFamily: 'Nunito, sans-serif',
+            fontFamily: '"Schibsted Grotesk", sans-serif',
             fontSize: compact ? '12px' : '14px',
             fontWeight: 800,
             color: isActive ? track.color : (compact ? (isDark ? '#e4e4e7' : '#27272a') : trackText),
@@ -260,11 +260,10 @@ export const AmbientMusicButton: React.FC = () => {
           paddingBottom: '2px',
         }}>
           <span style={{
-            fontFamily: 'Nunito, sans-serif', fontSize: '10px', fontWeight: 900,
-            textTransform: 'uppercase', letterSpacing: '0.2em',
+            fontFamily: '"Schibsted Grotesk", sans-serif', fontSize: '12px', fontWeight: 800,
             color: labelColor,
           }}>
-            Ambient Sounds
+            Ambient sounds
           </span>
           {isPlaying && (
             <motion.div
@@ -336,15 +335,15 @@ export const AmbientMusicButton: React.FC = () => {
               padding: '0 4px 18px',
             }}>
               <span style={{
-                fontFamily: 'Nunito, sans-serif', fontSize: '11px', fontWeight: 900,
-                textTransform: 'uppercase', letterSpacing: '0.2em', color: sheetTitle,
+                fontFamily: '"Schibsted Grotesk", sans-serif', fontSize: '13px', fontWeight: 800,
+                color: sheetTitle,
               }}>
-                Ambient Sounds
+                Ambient sounds
               </span>
               {isPlaying && (
                 <span style={{
-                  fontFamily: 'Nunito, sans-serif', fontSize: '10px', fontWeight: 800,
-                  color: accentColor, textTransform: 'uppercase', letterSpacing: '0.1em',
+                  fontFamily: '"Schibsted Grotesk", sans-serif', fontSize: '12px', fontWeight: 700,
+                  color: accentColor,
                 }}>
                   ♪ {activeTrack?.label}
                 </span>
@@ -384,13 +383,12 @@ export const AmbientMusicButton: React.FC = () => {
                 backgroundColor: 'rgba(0,0,0,0.78)',
                 backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
                 padding: '6px 12px', borderRadius: '10px', whiteSpace: 'nowrap',
-                fontFamily: 'Nunito, sans-serif', fontSize: '11px',
-                fontWeight: 800, textTransform: 'uppercase',
-                letterSpacing: '0.12em', color: '#ffffff',
+                fontFamily: '"Schibsted Grotesk", sans-serif', fontSize: '12px',
+                fontWeight: 800, color: '#ffffff',
                 pointerEvents: 'none',
               }}
             >
-              Ambient Sounds
+              Ambient sounds
               <span style={{
                 position: 'absolute', right: '-6px', top: '50%', transform: 'translateY(-50%)',
                 width: 0, height: 0,
@@ -456,9 +454,8 @@ export const AmbientMusicButton: React.FC = () => {
               exit={{ opacity: 0, y: -4 }}
               transition={{ duration: 0.25 }}
               style={{
-                fontFamily: 'Nunito, sans-serif', fontSize: '9px',
-                fontWeight: 900, textTransform: 'uppercase',
-                letterSpacing: '0.14em', color: 'rgba(255,255,255,0.85)',
+                fontFamily: '"Schibsted Grotesk", sans-serif', fontSize: '11px',
+                fontWeight: 700, color: 'rgba(255,255,255,0.85)',
                 whiteSpace: 'nowrap', textShadow: '0 1px 4px rgba(0,0,0,0.5)',
               }}
             >

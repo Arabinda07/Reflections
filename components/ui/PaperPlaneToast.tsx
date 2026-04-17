@@ -86,16 +86,14 @@ export const PaperPlaneToast: React.FC<PaperPlaneToastProps> = ({
             {/* Label */}
             <span
               style={{
-                fontFamily: 'Nunito, sans-serif',
+                fontFamily: '"Schibsted Grotesk", sans-serif',
                 fontSize: '13px',
                 fontWeight: 800,
-                letterSpacing: '0.15em',
-                textTransform: 'uppercase',
                 color: '#4b4b4b',
                 whiteSpace: 'nowrap',
               }}
             >
-              sending to your sanctuary
+              Sending to your sanctuary
             </span>
           </div>
         </motion.div>

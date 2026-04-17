@@ -165,7 +165,7 @@ export const Account: React.FC = () => {
       <div className="flex h-screen w-full items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="h-8 w-8 animate-spin rounded-full border-[3px] border-blue border-t-transparent" />
-          <span className="text-[12px] font-black text-gray-nav uppercase tracking-widest">Loading account...</span>
+          <span className="text-[14px] font-bold text-gray-nav">Loading account...</span>
         </div>
       </div>
     );
@@ -208,7 +208,7 @@ export const Account: React.FC = () => {
                     <h1 className="text-3xl font-display text-gray-text mb-2 lowercase dark:text-zinc-100">
                         {formData.fullName || formData.displayName || email.split('@')[0] || 'user'}
                     </h1>
-                    <p className="text-gray-nav font-extrabold flex items-center gap-2 bg-white px-4 py-1.5 rounded-xl border-2 border-border uppercase text-[11px] tracking-wider dark:bg-zinc-800 dark:text-gray-400">
+                    <p className="text-gray-nav font-bold flex items-center gap-2 bg-white px-4 py-1.5 rounded-xl border-2 border-border text-[13px] dark:bg-zinc-800 dark:text-gray-400">
                         <Mail size={14} />
                         {email}
                     </p>
@@ -244,7 +244,7 @@ export const Account: React.FC = () => {
                         </div>
 
                         <div>
-                             <label className="ml-1 mb-3 block text-[11px] font-extrabold uppercase tracking-widest text-gray-nav">
+                             <label className="ml-1 mb-3 block text-[13px] font-bold text-gray-nav">
                                 Timezone
                             </label>
                             <div className="relative group">
@@ -290,13 +290,13 @@ export const Account: React.FC = () => {
                                     </div>
                                     <div>
                                         <p className="text-[15px] font-bold text-gray-text dark:text-zinc-100">Password</p>
-                                        <p className="text-[12px] font-bold text-gray-nav uppercase">
+                                        <p className="text-[12px] font-bold text-gray-nav">
                                             {lastSignIn ? `Last active: ${new Date(lastSignIn).toLocaleDateString()}` : 'Secure your account'}
                                         </p>
                                     </div>
                                 </div>
                                 <Button type="button" variant="secondary" size="sm" onClick={handlePasswordReset} className="border-2 border-border shadow-sm active:scale-[0.98] text-blue font-extrabold px-6">
-                                    RESET
+                                    Reset
                                 </Button>
                             </div>
                             
@@ -309,12 +309,12 @@ export const Account: React.FC = () => {
                                     </div>
                                     <div>
                                         <p className="text-[15px] font-bold text-gray-text dark:text-zinc-100">2-Factor Auth</p>
-                                        <p className="text-[12px] font-bold text-gray-nav uppercase">Enhanced security</p>
+                                        <p className="text-[12px] font-bold text-gray-nav">Enhanced security</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/50 backdrop-blur-md border-2 border-border shadow-sm dark:bg-zinc-800">
                                     <span className="h-1.5 w-1.5 rounded-full bg-gray-nav/40" />
-                                    <span className="text-[9px] font-black text-gray-nav uppercase tracking-widest">Coming Soon</span>
+                                    <span className="text-[10px] font-black text-gray-nav">Coming soon</span>
                                 </div>
                             </div>
                         </div>
@@ -331,7 +331,7 @@ export const Account: React.FC = () => {
                         <div className="rounded-[32px] border-2 border-red/20 bg-red/5 p-8 dark:bg-red-500/5">
                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                                 <div>
-                                    <h4 className="text-[16px] font-bold text-gray-text uppercase dark:text-zinc-100">Delete Account</h4>
+                                    <h4 className="text-[16px] font-bold text-gray-text dark:text-zinc-100">Delete account</h4>
                                     <p className="text-[13px] text-gray-light font-medium mt-2 leading-relaxed max-w-sm">
                                         Permanently delete your account and all of your content. This action cannot be undone.
                                     </p>
@@ -344,7 +344,7 @@ export const Account: React.FC = () => {
                                     onClick={() => setShowDeleteConfirm(true)}
                                 >
                                     <Trash2 className="mr-2 h-4 w-4" />
-                                    DELETE ACCOUNT
+                                    Delete account
                                 </Button>
                              </div>
                         </div>
@@ -359,7 +359,7 @@ export const Account: React.FC = () => {
                         title="Sign Out"
                     >
                         <LogOut size={20} className="group-hover:scale-110 transition-transform" />
-                        <span className="hidden sm:inline ml-2 text-[13px] font-black uppercase tracking-widest">SIGN OUT</span>
+                        <span className="hidden sm:inline ml-2 text-[14px] font-bold">Sign out</span>
                     </button>
                     <div className="flex items-center gap-2 sm:gap-4">
                          <Button 
@@ -370,7 +370,7 @@ export const Account: React.FC = () => {
                             title="Cancel"
                          >
                              <X size={20} className="sm:mr-2" />
-                             <span className="hidden sm:inline text-[14px] uppercase">CANCEL</span>
+                             <span className="hidden sm:inline text-[14px]">Cancel</span>
                          </Button>
                          <Button 
                             type="submit" 
@@ -385,8 +385,8 @@ export const Account: React.FC = () => {
                              ) : (
                                <Save size={20} className="sm:mr-2" />
                              )}
-                             <span className="hidden sm:inline text-[14px] uppercase">
-                                {loading ? 'SAVING...' : isSaved ? 'SAVED!' : 'SAVE'}
+                             <span className="hidden sm:inline text-[14px]">
+                                {loading ? 'Saving...' : isSaved ? 'Saved!' : 'Save'}
                              </span>
                          </Button>
                     </div>
@@ -415,7 +415,7 @@ export const Account: React.FC = () => {
                             onClick={handleDeleteAccount}
                             disabled={loading}
                         >
-                            {loading ? 'WIPING DATA...' : 'YES, WIPE EVERYTHING'}
+                            {loading ? 'Wiping data...' : 'Yes, wipe everything'}
                         </Button>
                         <Button 
                             variant="secondary" 
@@ -423,7 +423,7 @@ export const Account: React.FC = () => {
                             onClick={() => setShowDeleteConfirm(false)}
                             disabled={loading}
                         >
-                            CANCEL
+                            Cancel
                         </Button>
                     </div>
                 </div>

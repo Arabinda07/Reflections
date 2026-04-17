@@ -72,8 +72,8 @@ export const SignIn: React.FC = () => {
              <Lock size={40} strokeWidth={2.5} />
           </div>
 
-          <h1 className="font-display text-[32px] text-gray-text lowercase mb-2">
-            sign in
+          <h1 className="font-display text-[32px] text-gray-text mb-2">
+            Sign in
           </h1>
           <p className="text-[15px] font-bold text-gray-light text-center mb-8">
             Welcome back to your safe space.
@@ -116,10 +116,10 @@ export const SignIn: React.FC = () => {
             <Button 
               type="submit" 
               variant="primary"
-              className="w-full h-[52px] text-[15px] font-bold uppercase" 
+              className="w-full h-[52px] text-[15px] font-bold" 
               isLoading={loading}
             >
-              SIGN IN
+              Sign in
             </Button>
 
             {error && (
@@ -131,7 +131,7 @@ export const SignIn: React.FC = () => {
 
           <div className="my-8 flex w-full items-center gap-4">
             <div className="h-[2px] flex-1 bg-border" />
-            <span className="text-[13px] font-bold text-gray-nav uppercase">OR</span>
+            <span className="text-[13px] font-bold text-gray-nav">Or</span>
             <div className="h-[2px] flex-1 bg-border" />
           </div>
 
@@ -143,11 +143,11 @@ export const SignIn: React.FC = () => {
             className="w-full h-[52px] gap-3"
           >
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="h-5 w-5" alt="Google" />
-            <span className="text-blue font-bold uppercase">CONTINUE WITH GOOGLE</span>
+            <span className="text-blue font-bold">Continue with Google</span>
           </Button>
 
           <p className="mt-8 text-[15px] font-bold text-gray-light">
-            Don't have an account? <Link to={RoutePath.SIGNUP} className="text-blue hover:opacity-70 uppercase">SIGN UP</Link>
+            Don't have an account? <Link to={RoutePath.SIGNUP} className="text-blue hover:opacity-70">Sign up</Link>
           </p>
         </div>
       </div>

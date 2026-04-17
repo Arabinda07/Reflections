@@ -204,10 +204,10 @@ export const MyNotes: React.FC = () => {
           <Button 
             onClick={() => navigate(RoutePath.CREATE_NOTE)} 
             variant="primary"
-            className="h-[48px] px-8 text-[15px] font-bold uppercase rounded-xl shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart"
+            className="h-[48px] px-8 text-[15px] font-bold rounded-xl shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart"
           >
             <Plus className="mr-2 h-5 w-5" />
-            CREATE NOTE
+            Create note
           </Button>
         </div>
       </div>
@@ -226,7 +226,7 @@ export const MyNotes: React.FC = () => {
           </div>
           <div className="lg:col-span-5 xl:col-span-4 space-y-6">
             <div className="flex items-center justify-between">
-              <h3 className="text-[14px] font-black uppercase tracking-widest text-gray-text flex items-center gap-2">
+              <h3 className="text-[14px] font-black text-gray-text flex items-center gap-2">
                 <CalendarIcon size={18} className="text-blue" />
                 {format(selectedDate, 'MMMM do, yyyy')}
               </h3>
@@ -320,7 +320,7 @@ export const MyNotes: React.FC = () => {
                 
                 {/* Date & Mood Badge */}
                 <div className="absolute top-4 right-4 z-20 flex flex-col items-end gap-2">
-                     <div className="flex items-center gap-2 rounded-xl bg-white border-2 border-border px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-gray-nav shadow-sm">
+                     <div className="flex items-center gap-2 rounded-xl bg-white border-2 border-border px-3 py-1 text-[11px] font-bold text-gray-nav shadow-sm">
                         <div className="flex items-center gap-1.5 border-r-2 border-border pr-2 mr-0.5">
                           <CalendarIcon size={12} className="text-gray-nav" />
                           <span>{new Date(note.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
@@ -340,7 +340,7 @@ export const MyNotes: React.FC = () => {
               <div className="flex flex-1 flex-col p-6">
                 <div className="flex flex-wrap gap-1.5 mb-3">
                   {note.tags?.map(tag => (
-                    <span key={tag} className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-blue/5 border border-blue/10 text-blue text-[10px] font-black uppercase tracking-tight">
+                    <span key={tag} className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-blue/5 border border-blue/10 text-blue text-[10px] font-black">
                       <Tag size={8} />
                       {tag}
                     </span>
@@ -362,8 +362,8 @@ export const MyNotes: React.FC = () => {
                       </div>
                       <span className="text-[12px] font-bold text-gray-nav">Edited {format(new Date(note.updatedAt), 'MMM d')}</span>
                    </div>
-                   <div className="flex items-center text-[12px] font-extrabold uppercase tracking-wider text-blue group-hover:opacity-70 transition-all duration-300 ease-out-quart">
-                      <span>OPEN</span>
+                   <div className="flex items-center text-[12px] font-bold text-blue group-hover:opacity-70 transition-all duration-300 ease-out-quart">
+                      <span>Open</span>
                       <ArrowUpRight size={14} className="ml-1 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                    </div>
                 </div>
@@ -378,7 +378,7 @@ export const MyNotes: React.FC = () => {
              <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-sm border-2 border-border mb-6">
                  <FileText size={28} className="text-gray-nav" />
              </div>
-             <h3 className="font-display text-[24px] text-gray-text lowercase">The space is yours to fill</h3>
+             <h3 className="font-display text-[24px] text-gray-text">The space is yours to fill</h3>
              <p className="text-gray-light mb-8 max-w-sm font-medium">
                {tagFilter ? `We couldn't find any reflections with "${tagFilter}".` : "Capture your first thought. Even a single sentence is a great start."}
              </p>
@@ -386,17 +386,17 @@ export const MyNotes: React.FC = () => {
                <Button 
                   onClick={() => navigate(RoutePath.NOTES)} 
                   variant="secondary" 
-                  className="h-[48px] px-8 text-[15px] font-bold uppercase rounded-xl border-2 border-border text-gray-text shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart"
+                  className="h-[48px] px-8 text-[15px] font-bold rounded-xl border-2 border-border text-gray-text shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart"
                 >
-                  CLEAR FILTER
+                  Clear filter
                 </Button>
              ) : (
                <Button 
                   onClick={() => navigate(RoutePath.CREATE_NOTE)} 
                   variant="primary" 
-                  className="h-[48px] px-8 text-[15px] font-bold uppercase rounded-xl shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart"
+                  className="h-[48px] px-8 text-[15px] font-bold rounded-xl shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart"
                 >
-                  LOG A REFLECTION
+                  Log a reflection
                 </Button>
              )}
           </div>

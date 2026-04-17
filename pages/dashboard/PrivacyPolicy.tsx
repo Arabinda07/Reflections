@@ -13,7 +13,7 @@ export const PrivacyPolicy: React.FC = () => {
         {/* Back button */}
         <button
           onClick={() => navigate(-1)}
-          className="mb-10 flex items-center gap-2 text-[12px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-colors"
+          className="mb-10 flex items-center gap-2 text-[12px] font-black text-gray-nav hover:text-green transition-colors"
         >
           <ArrowLeft size={16} />
           Back
@@ -21,10 +21,10 @@ export const PrivacyPolicy: React.FC = () => {
 
         {/* Header */}
         <div className="mb-12">
-          <h1 className="font-display text-[40px] sm:text-[56px] lowercase tracking-tight bg-gradient-to-r from-green via-blue to-green bg-clip-text text-transparent animate-gradient-x drop-shadow-sm">
-            privacy policy
+          <h1 className="font-display text-[40px] sm:text-[56px] tracking-tight bg-gradient-to-r from-green via-blue to-green bg-clip-text text-transparent animate-gradient-x drop-shadow-sm">
+            Privacy policy
           </h1>
-          <p className="text-[11px] font-black text-gray-nav uppercase tracking-[0.2em] mt-2">
+          <p className="text-[11px] font-black text-gray-nav mt-2">
             Last updated: April 16, 2026
           </p>
         </div>
@@ -43,7 +43,7 @@ export const PrivacyPolicy: React.FC = () => {
               <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-blue border-2 border-border shadow-sm dark:bg-zinc-800">
                 <Database size={20} />
               </div>
-              <h2 className="text-[14px] font-black uppercase tracking-widest text-gray-nav">Data Acquisitions</h2>
+              <h2 className="text-[14px] font-black text-gray-nav">Data acquisitions</h2>
             </div>
             <div className="pl-16 space-y-4 text-[15px] font-medium leading-relaxed text-gray-text">
               <p><strong>Identity:</strong> Email and display name, utilized exclusively for secure authentication and account recovery.</p>
@@ -57,7 +57,7 @@ export const PrivacyPolicy: React.FC = () => {
               <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-green border-2 border-border shadow-sm dark:bg-zinc-800">
                 <Lock size={20} />
               </div>
-              <h2 className="text-[14px] font-black uppercase tracking-widest text-gray-nav">Secure Synthesis (AI)</h2>
+              <h2 className="text-[14px] font-black text-gray-nav">Secure synthesis (Ai)</h2>
             </div>
             <div className="pl-16 space-y-4 text-[15px] font-medium leading-relaxed text-gray-text">
               <p><strong>Processing:</strong> We leverage Google Gemini for Reflections and Life Wiki synthesis. Data is processed ephemerally; we maintain a zero-retention policy for content handled via these feature ports.</p>
@@ -71,7 +71,7 @@ export const PrivacyPolicy: React.FC = () => {
               <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-golden border-2 border-border shadow-sm dark:bg-zinc-800">
                 <Shield size={20} />
               </div>
-              <h2 className="text-[14px] font-black uppercase tracking-widest text-gray-nav">Security Infrastructure</h2>
+              <h2 className="text-[14px] font-black text-gray-nav">Security infrastructure</h2>
             </div>
             <div className="pl-16 space-y-4 text-[15px] font-medium leading-relaxed text-gray-text">
               <p>Data residency is maintained on <strong>Supabase</strong> (AWS architecture), utilizing industry-standard encryption for data in transit (TLS) and at rest (AES-256).</p>
@@ -84,7 +84,7 @@ export const PrivacyPolicy: React.FC = () => {
               <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-red border-2 border-border shadow-sm dark:bg-zinc-800">
                 <Shield size={20} />
               </div>
-              <h2 className="text-[14px] font-black uppercase tracking-widest text-gray-nav">Subject Rights</h2>
+              <h2 className="text-[14px] font-black text-gray-nav">Subject rights</h2>
             </div>
             <div className="pl-16 space-y-4 text-[15px] font-medium leading-relaxed text-gray-text">
               <p><strong>Autonomy:</strong> You maintain full CRUD (Create, Read, Update, Delete) rights over your data. Account termination results in the immediate and permanent purging of all associated content records.</p>
@@ -97,7 +97,7 @@ export const PrivacyPolicy: React.FC = () => {
               <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-blue border-2 border-border shadow-sm dark:bg-zinc-800">
                 <Mail size={20} />
               </div>
-              <h2 className="text-[14px] font-black uppercase tracking-widest text-gray-nav">Inquiry Channel</h2>
+              <h2 className="text-[14px] font-black text-gray-nav">Inquiry channel</h2>
             </div>
             <div className="pl-16 space-y-4 text-[15px] font-medium leading-relaxed text-gray-text">
               <p>Directed inquiries regarding this governance framework or data deletion protocols may be submitted to:</p>
@@ -112,7 +112,7 @@ export const PrivacyPolicy: React.FC = () => {
 
           {/* Governance Footer */}
           <section className="rounded-[32px] border-2 border-border bg-gray-50/50 dark:bg-white/5 p-8">
-            <h2 className="text-[12px] font-black uppercase tracking-[0.15em] text-gray-nav mb-4">Governance & Policy Updates</h2>
+            <h2 className="text-[12px] font-black text-gray-nav mb-4">Governance & policy updates</h2>
             <p className="text-[14px] font-medium text-gray-text leading-relaxed">
               Reflections is designed for individuals aged 13 and above. If we implement significant changes to this framework, we will provide advanced notice via the application interface. This document remains the definitive standard for our data relationship.
             </p>

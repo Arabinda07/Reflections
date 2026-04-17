@@ -157,12 +157,12 @@ export const Insights: React.FC = () => {
       <div className="mx-auto max-w-[1000px] animate-in fade-in duration-700 pb-32 px-4 md:px-10">
       <nav className="sticky top-4 z-50 mb-16 flex items-center justify-between rounded-2xl border-2 border-border bg-white/90 px-4 py-3 shadow-sm backdrop-blur-2xl transition-all duration-300 ease-out-quart">
         <div className="flex items-center gap-3">
-           <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-bold uppercase text-[12px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green">
+           <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-bold text-[12px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green">
              <ArrowLeft className="mr-2 h-4 w-4" />
-             BACK
+             Back
            </Button>
            <div className="h-4 w-[2px] bg-border"></div>
-           <span className="text-[12px] font-extrabold text-gray-nav uppercase tracking-wider">Stats & Insights</span>
+           <span className="text-[12px] font-extrabold text-gray-nav">Stats & insights</span>
         </div>
       </nav>
 
@@ -171,7 +171,7 @@ export const Insights: React.FC = () => {
         <div className="inline-flex h-[72px] w-[72px] items-center justify-center rounded-[28px] bg-blue/5 text-blue mb-8 shadow-sm border border-blue/10 bg-white liquid-glass">
           <Brain size={36} className="opacity-80 drop-shadow-sm" />
         </div>
-        <h1 className="text-4xl md:text-5xl font-display text-gray-text lowercase mb-4 tracking-tighter drop-shadow-sm">your monthly wellness journey</h1>
+        <h1 className="text-4xl md:text-5xl font-display text-gray-text mb-4 tracking-tighter drop-shadow-sm">Your monthly wellness journey</h1>
         <p className="text-[16px] md:text-[18px] text-gray-light font-medium leading-relaxed max-w-lg mx-auto">
           A gentle look at the patterns your journaling is quietly making, with space for deep reflection when you choose it.
         </p>
@@ -181,28 +181,28 @@ export const Insights: React.FC = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-16">
         <div className="bg-white border-2 border-border rounded-[32px] p-6 shadow-sm flex flex-col justify-between liquid-glass grow transition-transform hover:scale-[1.02]">
           <Calendar size={20} className="text-blue mb-6 opacity-70" />
-          <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-nav mb-2">This Month</h4>
+          <h4 className="text-[12px] font-black text-gray-nav mb-2">This month</h4>
           <span className="text-4xl font-display text-gray-text block mb-1">{stats.monthNotes}</span>
           <p className="text-[12px] font-medium text-gray-light">notes in {new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}</p>
         </div>
 
         <div className="bg-white border-2 border-border rounded-[32px] p-6 shadow-sm flex flex-col justify-between liquid-glass grow transition-transform hover:scale-[1.02]">
           <TrendingUp size={20} className="text-green mb-6 opacity-70" />
-          <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-nav mb-2">Writing Rhythm</h4>
+          <h4 className="text-[12px] font-black text-gray-nav mb-2">Writing rhythm</h4>
           <span className="text-4xl font-display text-gray-text block mb-1">{stats.daysCheckedIn}</span>
           <p className="text-[12px] font-medium text-gray-light">unique days checked in</p>
         </div>
 
         <div className="bg-white border-2 border-border rounded-[32px] p-6 shadow-sm flex flex-col justify-between liquid-glass grow transition-transform hover:scale-[1.02]">
           <Heart size={20} className="text-purple-500 mb-6 opacity-70" />
-          <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-nav mb-2">Prevalent Mood</h4>
+          <h4 className="text-[12px] font-black text-gray-nav mb-2">Prevalent mood</h4>
           <span className="text-4xl font-display text-gray-text block mb-1 capitalize truncate">{stats.topMood === 'undefined' ? '-' : stats.topMood}</span>
           <p className="text-[12px] font-medium text-gray-light">your most frequent feeling</p>
         </div>
 
         <div className="bg-white border-2 border-border rounded-[32px] p-6 shadow-sm flex flex-col justify-between liquid-glass grow transition-transform hover:scale-[1.02]">
           <CheckSquare size={20} className="text-orange mb-6 opacity-70" />
-          <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-nav mb-2">Action Momentum</h4>
+          <h4 className="text-[12px] font-black text-gray-nav mb-2">Action momentum</h4>
           <span className="text-4xl font-display text-gray-text block mb-1">{stats.taskProgress}%</span>
           <p className="text-[12px] font-medium text-gray-light">{stats.completedTasks} of {stats.totalTasks} tasks finished</p>
         </div>
@@ -211,7 +211,7 @@ export const Insights: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
         {/* Stacked Soft Mood Bars */}
         <div className="bg-white dark:bg-[#1E1E1E] border-2 border-border rounded-[40px] p-8 shadow-sm dark:shadow-sm liquid-glass flex flex-col min-h-[300px]">
-          <h3 className="text-[14px] font-extrabold text-gray-text uppercase tracking-wider mb-6">Mood Frequency</h3>
+          <h3 className="text-[14px] font-extrabold text-gray-text mb-6">Mood frequency</h3>
           {stats.moodData.length === 0 ? (
             <div className="flex-1 flex items-center justify-center">
               <p className="text-[13px] text-gray-nav font-medium italic">Label some moods to see your pattern.</p>
@@ -226,7 +226,7 @@ export const Insights: React.FC = () => {
                 return (
                   <div key={entry.name} className="flex items-center gap-4">
                     <span
-                      className="text-[11px] font-black uppercase tracking-widest w-14 shrink-0 capitalize"
+                      className="text-[11px] font-black w-14 shrink-0 capitalize"
                       style={{ color }}
                     >
                       {entry.name}
@@ -252,7 +252,7 @@ export const Insights: React.FC = () => {
 
         {/* Mind Map / Tags Cloud */}
         <div className="bg-white border-2 border-border rounded-[40px] p-8 shadow-sm liquid-glass relative min-h-[300px] flex flex-col">
-          <h3 className="text-[14px] font-extrabold text-gray-text uppercase tracking-wider mb-6">Cognitive Mind Map</h3>
+          <h3 className="text-[14px] font-extrabold text-gray-text mb-6">Cognitive mind map</h3>
           {stats.topTags.length === 0 ? (
              <div className="flex-1 flex items-center justify-center">
                <p className="text-[13px] text-gray-nav font-medium italic">Tag your entries to build a mind map.</p>
@@ -286,14 +286,14 @@ export const Insights: React.FC = () => {
               <Book size={28} />
             </div>
             <div>
-              <h2 className="text-3xl font-display text-gray-text lowercase tracking-tight">Personal Life Wiki</h2>
+              <h2 className="text-3xl font-display text-gray-text tracking-tight">Personal life wiki</h2>
               <p className="text-[14px] text-gray-light font-medium">Compiled from {notes.length} reflections</p>
             </div>
           </div>
           
           <div className="flex items-center gap-3">
-            <div className="px-3 py-1 bg-blue/5 border border-blue/10 rounded-full text-[10px] font-black uppercase text-blue">
-               Compounding Insights
+            <div className="px-3 py-1 bg-blue/5 border border-blue/10 rounded-full text-[10px] font-black text-blue">
+               Compounding insights
             </div>
           </div>
         </div>
@@ -303,14 +303,14 @@ export const Insights: React.FC = () => {
              <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-gray-nav shadow-sm mb-4">
                 <Sparkles size={18} />
              </div>
-             <p className="font-display lowercase text-gray-text text-xl">your wiki is being built.</p>
+             <p className="font-display text-gray-text text-xl">Your wiki is being built.</p>
              <p className="mt-2 text-gray-light text-[14px] max-w-sm mx-auto">As you journal, the AI librarian will automatically identify and update recurring themes in your life here.</p>
              <Button 
                variant="ghost" 
-               className="mt-6 text-[11px] font-black uppercase tracking-widest"
+               className="mt-6 text-[11px] font-black"
                onClick={() => navigate(RoutePath.CREATE_NOTE)}
              >
-                WRITE YOUR FIRST ENTRY
+                Write your first entry
              </Button>
           </div>
         ) : (
@@ -324,10 +324,10 @@ export const Insights: React.FC = () => {
               >
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav">Life Theme</span>
+                    <span className="text-[11px] font-black text-gray-nav">Life theme</span>
                     <Hash size={14} className="text-gray-light opacity-50" />
                   </div>
-                  <h3 className="text-xl font-display text-gray-text lowercase line-clamp-2 leading-tight group-hover:text-green transition-colors">
+                  <h3 className="text-xl font-display text-gray-text line-clamp-2 leading-tight group-hover:text-green transition-colors">
                     {theme.title}
                   </h3>
                 </div>
@@ -369,9 +369,9 @@ export const Insights: React.FC = () => {
                     <Book size={20} />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-display text-gray-text lowercase leading-none">{selectedTheme.title}</h3>
-                    <p className="text-[11px] font-black tracking-widest uppercase text-gray-nav mt-1.5 flex items-center gap-2">
-                       Personal Wiki Entry <span className="h-1 w-1 rounded-full bg-border" /> Updated {new Date(selectedTheme.updatedAt).toLocaleDateString()}
+                    <h3 className="text-2xl font-display text-gray-text leading-none">{selectedTheme.title}</h3>
+                    <p className="text-[11px] font-black text-gray-nav mt-1.5 flex items-center gap-2">
+                       Personal wiki entry <span className="h-1 w-1 rounded-full bg-border" /> Updated {new Date(selectedTheme.updatedAt).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
@@ -394,8 +394,8 @@ export const Insights: React.FC = () => {
                 <p className="text-[12px] text-gray-light font-medium italic">
                   This page evolves as you write more reflections.
                 </p>
-                <Button size="sm" variant="ghost" className="text-[11px] font-black tracking-widest" onClick={() => setSelectedTheme(null)}>
-                  CLOSE ENTRY
+                <Button size="sm" variant="ghost" className="text-[11px] font-black" onClick={() => setSelectedTheme(null)}>
+                  Close entry
                 </Button>
               </div>
             </motion.div>

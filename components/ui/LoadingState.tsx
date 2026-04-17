@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 
 // Canonical brand footer style — identical across all sanctuary animations
 const BRAND_WORDMARK_STYLE: React.CSSProperties = {
-  fontFamily: 'Nunito, sans-serif',
+  fontFamily: '"Schibsted Grotesk", sans-serif',
   fontSize: '20px',
   letterSpacing: '-0.02em',
   textTransform: 'lowercase',
@@ -35,7 +35,7 @@ interface LoadingStateProps {
  * Light-mode locked. All colors hardcoded inline.
  */
 export const LoadingState: React.FC<LoadingStateProps> = ({ 
-  message = "gathering your thoughts...",
+  message = "Gathering your thoughts...",
   isVisible = true
 }) => {
   if (typeof document === 'undefined') return null;
@@ -67,11 +67,9 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.7 }}
             style={{
-              marginTop: '8px',
-              fontSize: '13px',
-              fontWeight: 900,
-              textTransform: 'uppercase',
-              letterSpacing: '0.25em',
+              marginTop: '12px',
+              fontSize: '15px',
+              fontWeight: 600,
               color: '#777777',
             }}
           >

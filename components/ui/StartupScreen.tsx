@@ -51,7 +51,7 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
           >
             <span
               style={{
-                fontFamily: 'Nunito, sans-serif',
+                fontFamily: '"Schibsted Grotesk", sans-serif',
                 fontSize: '20px',
                 letterSpacing: '-0.02em',
                 textTransform: 'lowercase',

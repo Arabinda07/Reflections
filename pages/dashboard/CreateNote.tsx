@@ -856,7 +856,7 @@ Instructions:
               </Button>
             </div>
             
-            <p className="text-[11px] font-black text-gray-nav/60 uppercase tracking-widest">
+            <p className="text-[11px] font-black text-gray-nav/60 tracking-widest">
               Join 2,000+ users on Pro
             </p>
           </div>
@@ -902,14 +902,14 @@ Instructions:
       <div className="mx-auto max-w-[1180px] animate-in fade-in duration-500 pb-20 px-3 sm:px-4 md:px-6">
         <nav className={`sticky top-4 z-50 mb-8 flex items-center justify-between gap-2 rounded-2xl border-2 border-border bg-white/90 px-3 py-2 sm:px-4 sm:py-3 shadow-sm backdrop-blur-2xl transition-all duration-500 dark:bg-[#17171b]/90 dark:shadow-sm ${isDimmed ? 'opacity-40 hover:opacity-100' : 'opacity-100'}`}>
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-           <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-bold uppercase text-[12px] px-2 sm:px-3">
+           <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-bold text-[12px] px-2 sm:px-3">
              <ArrowLeft className="h-4 w-4 sm:mr-2" />
-             <span className="hidden sm:inline">BACK</span>
+             <span className="hidden sm:inline">Back</span>
            </Button>
            <div className="h-4 w-[2px] bg-border"></div>
            <div className="flex flex-col">
-             <span className="text-[12px] font-extrabold text-gray-nav uppercase tracking-wider">
-                {id ? 'EDIT' : ''}
+             <span className="text-[12px] font-extrabold text-gray-nav">
+                {id ? 'Edit' : ''}
              </span>
            </div>
         </div>
@@ -920,7 +920,7 @@ Instructions:
             variant="ghost"
             size="sm"
             onClick={toggleWhisper}
-            className={`flex items-center gap-2 font-bold uppercase text-[11px] transition-all duration-300 ease-out-quart ${isWhispering ? 'text-blue bg-blue/5' : 'text-gray-nav'}`}
+            className={`flex items-center gap-2 font-bold text-[11px] transition-all duration-300 ease-out-quart ${isWhispering ? 'text-blue bg-blue/5' : 'text-gray-nav'}`}
             title="Whisper Mode"
           >
             {isWhispering ? <Mic size={16} className="animate-pulse" /> : <MicOff size={16} />}
@@ -940,7 +940,7 @@ Instructions:
                   setIsMusicOpen(!isMusicOpen);
                 }
               }}
-              className={`flex items-center gap-2 font-bold uppercase text-[11px] transition-all duration-300 ease-out-quart ${musicPlaying ? 'text-purple-500 bg-purple-500/10 dark:bg-purple-500/20' : 'text-gray-nav dark:text-gray-400'}`}
+              className={`flex items-center gap-2 font-bold text-[11px] transition-all duration-300 ease-out-quart ${musicPlaying ? 'text-purple-500 bg-purple-500/10 dark:bg-purple-500/20' : 'text-gray-nav dark:text-gray-400'}`}
               title="Ambient Sounds"
             >
               <Music size={16} className={musicPlaying ? 'animate-pulse' : ''} />
@@ -966,8 +966,8 @@ Instructions:
                     >
                       {/* Header */}
                       <div className="flex items-center justify-between mb-3 px-1">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav flex items-center gap-1.5">
-                          <Volume2 size={11} /> Ambient Focus
+                        <span className="text-[11px] font-black text-gray-nav flex items-center gap-1.5">
+                          <Volume2 size={11} /> Ambient focus
                         </span>
                         {musicPlaying && (
                           <motion.div
@@ -1059,11 +1059,11 @@ Instructions:
             variant="ghost" 
             size="sm" 
             onClick={handleRelease} 
-            className="hidden sm:flex text-gray-nav hover:text-red hover:bg-red/5 font-bold uppercase text-[11px] transition-all duration-300 ease-out-quart shrink-0 px-2 sm:px-3" 
+            className="hidden sm:flex text-gray-nav hover:text-red hover:bg-red/5 font-bold text-[11px] transition-all duration-300 ease-out-quart shrink-0 px-2 sm:px-3" 
             disabled={isReleasing}
           >
               <Wind className="h-3.5 w-3.5 sm:mr-2" />
-              <span className="hidden sm:inline">RELEASE</span>
+              <span className="hidden sm:inline">Release</span>
           </Button>
 
           <AnimatePresence>
@@ -1083,7 +1083,7 @@ Instructions:
                   isLoading={isReflecting}
                 >
                   <Wand2 className="h-3.5 w-3.5 sm:mr-2" />
-                  <span className="hidden sm:inline">AI REFLECT</span>
+                  <span className="hidden sm:inline">Ai reflect</span>
                 </Button>
               </motion.div>
             )}
@@ -1100,7 +1100,7 @@ Instructions:
             disabled={!canSave || saving || showPlane}
           >
             <Save className="h-3.5 w-3.5 sm:mr-2" />
-            <span className="hidden sm:inline">SAVE</span>
+            <span className="hidden sm:inline">Save</span>
           </Button>
         </div>
       </nav>
@@ -1125,7 +1125,7 @@ Instructions:
                   />
                   <div className="absolute top-4 right-4 flex gap-2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
                       <label className="cursor-pointer rounded-xl bg-white border-2 border-border px-3 py-1.5 text-[11px] font-bold text-gray-text shadow-sm hover:bg-white transition-colors">
-                          CHANGE
+                          Change
                           <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
                       </label>
                       <button 
@@ -1140,7 +1140,7 @@ Instructions:
 
             <div className="flex-1 px-4 py-6 sm:px-6 md:px-10 md:py-8 lg:px-12 lg:py-10">
                 <div className={`mb-12 flex flex-wrap items-center justify-between gap-4 transition-all duration-500 ${isDimmed ? 'opacity-30 hover:opacity-100' : 'opacity-100'}`}>
-                    <div className="flex items-center gap-2 text-[11px] font-extrabold text-gray-nav uppercase tracking-wider">
+                    <div className="flex items-center gap-2 text-[11px] font-extrabold text-gray-nav">
                         <Calendar size={13} />
                         <span>{new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                     </div>
@@ -1157,12 +1157,12 @@ Instructions:
                             {mood ? (
                               <>
                                 {React.createElement(moods.find(m => m.id === mood)?.icon || Smile, { size: 16 })}
-                                <span className="text-[10px] sm:text-[11px] font-black uppercase">{mood}</span>
+                                <span className="text-[10px] sm:text-[11px] font-black">{mood}</span>
                               </>
                             ) : (
                               <>
                                 <Smile size={16} />
-                                <span className="text-[10px] sm:text-[11px] font-black uppercase">Mood</span>
+                                <span className="text-[10px] sm:text-[11px] font-black">Mood</span>
                               </>
                             )}
                           </button>
@@ -1170,7 +1170,7 @@ Instructions:
                           {createPortal(
                             <AnimatePresence>
                               {isMoodOpen && (
-                                <div className="fixed inset-0 z-[10000] pointer-events-none flex items-end justify-center sm:items-start sm:justify-start">
+                                <div className="fixed inset-0 z-[10000] pointer-events-none flex items-end justify-center sm:items-start sm:justify-center">
                                   <motion.div 
                                     initial={{ opacity: 0, y: 15, scale: 0.95 }}
                                     animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -1183,8 +1183,8 @@ Instructions:
                                     } : {}}
                                   >
                                     <div className="flex items-center justify-between mb-4 px-1">
-                                      <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav">How are you?</span>
-                                      {mood && <button onClick={() => handleMoodSelect(mood)} className="text-[10px] font-bold text-red uppercase">Clear</button>}
+                                      <span className="text-[12px] font-black text-gray-nav">How are you?</span>
+                                      {mood && <button onClick={() => handleMoodSelect(mood)} className="text-[11px] font-bold text-red">Clear</button>}
                                     </div>
                                     <div className="grid grid-cols-3 gap-2">
                                       {moods.map((m) => {
@@ -1200,7 +1200,7 @@ Instructions:
                                             className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all duration-300 ease-out-quart ${isSelected ? `${m.color} border-current` : 'border-transparent hover:bg-gray-50 text-gray-nav'}`}
                                           >
                                             <Icon size={20} />
-                                            <span className="mt-1 text-[9px] font-bold uppercase">{m.label}</span>
+                                            <span className="mt-1 text-[9px] font-bold">{m.label}</span>
                                           </button>
                                         );
                                       })}
@@ -1220,13 +1220,13 @@ Instructions:
                             className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-all duration-300 ease-out-quart shadow-sm  active:scale-[0.98] ${tags.length > 0 ? 'bg-green/5 border-green text-green' : 'bg-white border-border text-gray-nav hover:border-green/30'}`}
                           >
                             <TagIcon size={16} />
-                            <span className="text-[10px] sm:text-[11px] font-black uppercase">{tags.length > 0 ? `${tags.length} Tags` : 'Tags'}</span>
+                            <span className="text-[10px] sm:text-[11px] font-black">{tags.length > 0 ? `${tags.length} tags` : 'Tags'}</span>
                           </button>
 
                           {createPortal(
                             <AnimatePresence>
                               {isTagsOpen && (
-                                <div className="fixed inset-0 z-[10000] pointer-events-none flex items-end justify-center sm:items-start sm:justify-start">
+                                <div className="fixed inset-0 z-[10000] pointer-events-none flex items-end justify-center sm:items-start sm:justify-center">
                                   <motion.div 
                                     initial={{ opacity: 0, y: 15, scale: 0.95 }}
                                     animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -1239,7 +1239,7 @@ Instructions:
                                     } : {}}
                                   >
                                     <div className="mb-4">
-                                      <span className="text-[10px] font-black uppercase tracking-widest text-gray-nav block mb-3">Add Tags</span>
+                                      <span className="text-[12px] font-black text-gray-nav block mb-3">Add tags</span>
                                       <div className="relative">
                                         <TagIcon size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-nav" />
                                         <input 
@@ -1255,7 +1255,7 @@ Instructions:
 
                                     {suggestedTags.length > 0 && (
                                       <div className="mb-4">
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-blue block mb-2">AI Suggestions</span>
+                                        <span className="text-[11px] font-black text-blue block mb-2">Ai suggestions</span>
                                         <div className="flex flex-wrap gap-2">
                                           {suggestedTags.map(tag => (
                                             <button 
@@ -1291,15 +1291,15 @@ Instructions:
                           )}
                        </div>
 
-                       <label className="group flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-border bg-white px-3 sm:px-4 py-2 text-[10px] sm:text-[11px] font-black uppercase text-gray-nav transition-all duration-300 ease-out-quart hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-sm active:scale-[0.98]">
+                       <label className="group flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-border bg-white px-3 sm:px-4 py-2 text-[10px] sm:text-[11px] font-black text-gray-nav transition-all duration-300 ease-out-quart hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-sm active:scale-[0.98]">
                           <Paperclip size={16} className="text-gray-nav group-hover:text-blue" />
-                          <span className="hidden xs:inline">ATTACH</span>
+                          <span className="hidden xs:inline">Attach</span>
                           <input type="file" multiple className="hidden" onChange={handleAttachmentUpload} />
                        </label>
                        {!imagePreview && (
-                          <label className="group flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-border bg-white px-3 sm:px-4 py-2 text-[10px] sm:text-[11px] font-black uppercase text-gray-nav transition-all duration-300 ease-out-quart hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-sm active:scale-[0.98]">
+                          <label className="group flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-border bg-white px-3 sm:px-4 py-2 text-[10px] sm:text-[11px] font-black text-gray-nav transition-all duration-300 ease-out-quart hover:bg-blue/5 hover:text-blue hover:border-blue/30 shadow-sm active:scale-[0.98]">
                              <ImageIcon size={16} className="text-gray-nav group-hover:text-blue" />
-                             <span className="hidden xs:inline">COVER</span>
+                             <span className="hidden xs:inline">Cover</span>
                              <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
                           </label>
                        )}
@@ -1313,7 +1313,7 @@ Instructions:
                     onChange={(e) => setTitle(e.target.value)}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
-                    className="editor-body w-full border-none bg-transparent text-3xl sm:text-4xl font-semibold text-gray-text placeholder:text-border focus:outline-none focus:ring-0 p-0 mb-12 tracking-[-0.01em] leading-tight lowercase"
+                    className="editor-body w-full border-none bg-transparent text-3xl sm:text-4xl font-semibold text-gray-text placeholder:text-border focus:outline-none focus:ring-0 p-0 mb-12 tracking-[-0.01em] leading-tight"
                 />
                 
                 <div 
@@ -1412,8 +1412,8 @@ Instructions:
                       <div className={`flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-300 ${isTasksOpen ? 'bg-blue text-white shadow-sm' : 'bg-gray-50 text-gray-nav dark:bg-white/5'}`}>
                         <ListTodo size={16} />
                       </div>
-                      <h3 className="text-[13px] font-extrabold text-gray-text uppercase tracking-widest transition-colors group-hover:text-blue dark:text-zinc-100 flex-1">
-                        Actionable Tasks {tasks.length > 0 && !isTasksOpen && <span className="ml-2 px-2 py-0.5 rounded-full bg-blue/10 text-blue text-[10px]">{tasks.length}</span>}
+                      <h3 className="text-[14px] font-extrabold text-gray-text transition-colors group-hover:text-blue dark:text-zinc-100 flex-1">
+                        Actionable tasks {tasks.length > 0 && !isTasksOpen && <span className="ml-2 px-2 py-0.5 rounded-full bg-blue/10 text-blue text-[10px]">{tasks.length}</span>}
                       </h3>
                       <ChevronRight size={16} className={`text-gray-nav transition-transform duration-300 ${isTasksOpen ? 'rotate-90 text-blue' : ''}`} />
                     </button>
@@ -1426,10 +1426,10 @@ Instructions:
                           exit={{ opacity: 0, scale: 0.95 }}
                           transition={{ duration: 0.2 }}
                           onClick={addTask}
-                          className="flex justify-center items-center gap-1.5 w-full sm:w-auto px-4 py-2.5 sm:px-3 sm:py-1.5 rounded-[14px] sm:rounded-xl border-2 border-blue/20 bg-blue/5 text-blue text-[12px] sm:text-[10px] font-black uppercase tracking-widest hover:bg-blue/10 transition-all duration-300 ease-out-quart shadow-sm active:scale-[0.98]"
+                          className="flex justify-center items-center gap-1.5 w-full sm:w-auto px-4 py-2.5 sm:px-3 sm:py-1.5 rounded-[14px] sm:rounded-xl border-2 border-blue/20 bg-blue/5 text-blue text-[12px] sm:text-[10px] font-black hover:bg-blue/10 transition-all duration-300 ease-out-quart shadow-sm active:scale-[0.98]"
                         >
                           <Plus size={14} />
-                          Add Task
+                          Add task
                         </motion.button>
                       )}
                     </AnimatePresence>
@@ -1453,7 +1453,7 @@ Instructions:
                               </p>
                               <button 
                                 onClick={addTask}
-                                className="mt-4 text-blue text-[11px] font-black uppercase tracking-widest hover:underline"
+                                className="mt-4 text-blue text-[11px] font-black hover:underline"
                               >
                                 + Create your first task
                               </button>
@@ -1487,7 +1487,7 @@ Instructions:
                             <Brain size={20} />
                           </div>
                           <div className="flex-1 flex flex-col items-end">
-                            <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-blue/55 leading-none mb-1 w-full text-left">Reflection</h4>
+                            <h4 className="text-[12px] font-black text-blue/55 leading-none mb-1 w-full text-left">Reflection</h4>
                             <p className="text-[13px] font-bold text-gray-text leading-none w-full text-right">A softer mirror for what you wrote</p>
                           </div>
                         </div>
@@ -1500,7 +1500,7 @@ Instructions:
 
                         <div className="mt-5 flex items-center gap-4">
                           <div className="h-[1px] flex-1 bg-gradient-to-r from-sky-100 to-transparent"></div>
-                          <span className="text-[10px] font-extrabold text-gray-nav uppercase tracking-widest">For reflection, not medical advice</span>
+                          <span className="text-[10px] font-extrabold text-gray-nav">For reflection, not medical advice</span>
                         </div>
                       </div>
                     </div>
@@ -1509,7 +1509,7 @@ Instructions:
 
                 {(newAttachments.length > 0 || existingAttachments.length > 0) && (
                   <div className={`mt-12 border-t-2 border-border pt-8 transition-all duration-500 ${isFocused ? 'opacity-30 hover:opacity-100' : 'opacity-100'}`}>
-                    <h3 className="text-[12px] font-extrabold text-gray-text uppercase tracking-wider mb-6 flex items-center gap-2">
+                    <h3 className="text-[13px] font-extrabold text-gray-text mb-6 flex items-center gap-2">
                       <Paperclip size={16} className="text-gray-nav" />
                       Attachments ({newAttachments.length + existingAttachments.length})
                     </h3>
@@ -1532,11 +1532,11 @@ Instructions:
                           <div className="min-w-0 flex-1">
                             <p className="text-[14px] font-bold text-gray-text truncate mb-1">{att.name}</p>
                             <div className="flex items-center gap-2">
-                              <span className="text-[10px] text-gray-nav font-black uppercase tracking-widest">{formatFileSize(att.size)}</span>
+                              <span className="text-[11px] text-gray-nav font-black">{formatFileSize(att.size)}</span>
                               <span className="h-1 w-1 rounded-full bg-border"></span>
                               <div className="flex items-center gap-1">
                                 <CheckCircle2 size={10} className="text-emerald-500" />
-                                <span className="text-[10px] text-emerald-500 font-black uppercase tracking-widest">Cloud</span>
+                                <span className="text-[11px] text-emerald-500 font-black">Cloud</span>
                               </div>
                             </div>
                           </div>
@@ -1573,11 +1573,11 @@ Instructions:
                             <div className="min-w-0 flex-1">
                               <p className="text-[14px] font-bold text-gray-text truncate mb-1">{file.name}</p>
                               <div className="flex items-center gap-2">
-                                <span className="text-[10px] text-gray-nav font-black uppercase tracking-widest">{formatFileSize(file.size)}</span>
+                                <span className="text-[11px] text-gray-nav font-black">{formatFileSize(file.size)}</span>
                                 <span className="h-1 w-1 rounded-full bg-blue/20"></span>
                                 <div className="flex items-center gap-1">
                                   <Loader2 size={10} className="text-blue animate-spin" />
-                                  <span className="text-[10px] text-blue font-black uppercase tracking-tighter">Pending</span>
+                                  <span className="text-[11px] text-blue font-black">Pending</span>
                                 </div>
                               </div>
                             </div>

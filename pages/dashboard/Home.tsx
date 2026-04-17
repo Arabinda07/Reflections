@@ -143,19 +143,19 @@ export const Home: React.FC = () => {
           className="relative z-10 flex flex-col gap-32 sm:gap-48 items-center text-center max-w-2xl w-full pt-[110px] sm:pt-[160px]"
         >
           <h1
-            className="font-display text-[36px] sm:text-[52px] lg:text-[64px] lowercase tracking-tighter leading-none px-2"
+            className="font-display text-[36px] sm:text-[52px] lg:text-[64px] tracking-tighter leading-none px-2"
             style={{ color: '#ffffff', textShadow: '0 4px 12px rgba(0,0,0,0.8)' }}
           >
-            welcome back, {user?.name?.split(' ')[0] || 'learner'}
+            Welcome back, {user?.name?.split(' ')[0] || 'learner'}
           </h1>
           <Button
             variant="primary"
             size="lg"
-            className="h-[56px] sm:h-[64px] px-8 sm:px-12 text-[16px] sm:text-[18px] font-bold uppercase rounded-2xl shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart liquid-glass group"
+            className="h-[56px] sm:h-[64px] px-8 sm:px-12 text-[16px] sm:text-[18px] font-bold rounded-2xl shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart liquid-glass group"
             onClick={() => handleCreateClick()}
           >
             <PlusCircle className="mr-3 group-hover:rotate-90 transition-transform duration-300" />
-            New Entry
+            New entry
           </Button>
         </motion.div>
       </section>
@@ -175,17 +175,17 @@ export const Home: React.FC = () => {
                 <div className="h-14 w-14 rounded-2xl bg-blue/10 flex items-center justify-center text-blue shadow-sm group-hover:scale-110 transition-transform">
                   <FolderOpen size={28} />
                 </div>
-                <div className="flex items-center gap-2 text-[11px] font-black uppercase text-blue tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-                  View All <ArrowRight size={12} />
+                <div className="flex items-center gap-2 text-[11px] font-black text-blue tracking-wide opacity-0 group-hover:opacity-100 transition-opacity">
+                  View all <ArrowRight size={12} />
                 </div>
               </div>
               <div className="flex flex-col gap-2">
-                <h3 className="text-[16px] font-bold text-gray-nav uppercase tracking-wider">Total Reflections</h3>
+                <h3 className="text-[14px] font-bold text-gray-nav">Total reflections</h3>
                 <div className="flex items-baseline gap-2">
                   <span className="text-[40px] font-display text-gray-text">
                     {isCountLoading ? '...' : noteCount ?? '0'}
                   </span>
-                  <span className="text-[12px] font-extrabold text-green uppercase">Synced with Cloud</span>
+                  <span className="text-[12px] font-extrabold text-green">Synced with cloud</span>
                 </div>
               </div>
             </div>
@@ -198,12 +198,12 @@ export const Home: React.FC = () => {
                 <div className="h-14 w-14 rounded-2xl bg-green/10 flex items-center justify-center text-green shadow-sm group-hover:scale-110 transition-transform">
                   <Brain size={28} />
                 </div>
-                <div className="flex items-center gap-2 text-[11px] font-black uppercase text-green tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-                  Get Insights <ArrowRight size={12} />
+                <div className="flex items-center gap-2 text-[11px] font-black text-green tracking-wide opacity-0 group-hover:opacity-100 transition-opacity">
+                  Get insights <ArrowRight size={12} />
                 </div>
               </div>
               <div className="flex flex-col gap-2">
-                <h3 className="text-[16px] font-bold text-gray-nav uppercase tracking-wider">Mental Health Insights</h3>
+                <h3 className="text-[14px] font-bold text-gray-nav">Mental health insights</h3>
                 <p className="text-[15px] text-gray-light font-medium leading-relaxed">AI is ready to analyze your patterns and provide compassionate feedback.</p>
               </div>
             </div>
@@ -221,7 +221,7 @@ export const Home: React.FC = () => {
                     <Target size={22} />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <h4 className="text-[16px] font-bold text-gray-nav uppercase tracking-wider">Today's Focus</h4>
+                    <h4 className="text-[14px] font-bold text-gray-nav">Today's focus</h4>
                     <p className="text-[14px] text-gray-light font-medium">A small nudge for today</p>
                   </div>
                 </div>
@@ -245,10 +245,10 @@ export const Home: React.FC = () => {
                 <Button
                   variant="secondary"
                   size="lg"
-                  className="w-full border-2 border-border bg-white text-blue font-extrabold uppercase shadow-sm sm:w-auto"
+                  className="w-full border-2 border-border bg-white text-blue font-extrabold shadow-sm sm:w-auto"
                   onClick={() => handleCreateClick(dailyPrompt)}
                 >
-                  Start Writing
+                  Start writing
                 </Button>
               </div>
             </div>
@@ -281,7 +281,7 @@ export const Home: React.FC = () => {
             </button>
 
             <div className="relative z-10 flex flex-col gap-8">
-              <h2 className="text-[32px] font-display text-gray-text lowercase">welcome to ai notes</h2>
+              <h2 className="text-[32px] font-display text-gray-text">Welcome to Reflections</h2>
               <p className="text-[15px] text-gray-light font-medium leading-relaxed">
                 Your intelligent companion for mental wellness and journaling. Here's what you can do:
               </p>
@@ -292,7 +292,7 @@ export const Home: React.FC = () => {
                     <Sparkles size={24} />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <h3 className="text-[16px] font-bold text-gray-text">AI Reflection</h3>
+                    <h3 className="text-[16px] font-bold text-gray-text">Ai reflection</h3>
                     <p className="text-[14px] text-gray-light font-medium leading-relaxed">
                       Get personalized insights, compassionate feedback, and dynamic prompts based on your entries.
                     </p>
@@ -304,7 +304,7 @@ export const Home: React.FC = () => {
                     <Smile size={24} />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <h3 className="text-[16px] font-bold text-gray-text">Mood Tracking</h3>
+                    <h3 className="text-[16px] font-bold text-gray-text">Mood tracking</h3>
                     <p className="text-[14px] text-gray-light font-medium leading-relaxed">
                       Log your emotions with each entry and visualize your mood trends over time on your calendar.
                     </p>
@@ -316,7 +316,7 @@ export const Home: React.FC = () => {
                     <Tag size={24} />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <h3 className="text-[16px] font-bold text-gray-text">Smart Organization</h3>
+                    <h3 className="text-[16px] font-bold text-gray-text">Smart organization</h3>
                     <p className="text-[14px] text-gray-light font-medium leading-relaxed">
                       Add custom tags to your notes to easily filter and find your thoughts later.
                     </p>
@@ -326,10 +326,10 @@ export const Home: React.FC = () => {
 
               <Button
                 variant="primary"
-                className="w-full h-[56px] text-[16px] font-bold uppercase rounded-xl shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart liquid-glass"
+                className="w-full h-[56px] text-[16px] font-bold rounded-xl shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart liquid-glass"
                 onClick={handleCloseOnboarding}
               >
-                Let's Get Started
+                Let's get started
               </Button>
             </div>
           </div>

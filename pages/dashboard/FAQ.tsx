@@ -52,13 +52,13 @@ export const FAQ: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green/10 border-2 border-green/20 text-green text-[12px] font-black uppercase tracking-[0.2em] mb-8 shadow-sm">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green/10 border-2 border-green/20 text-green text-[12px] font-black mb-8 shadow-sm">
                 <Heart size={14} className="animate-pulse" />
-                <span>Your Mental Health Sanctuary</span>
+                <span>Your mental health sanctuary</span>
               </div>
               
-              <h1 className="text-5xl sm:text-6xl md:text-8xl font-display text-gray-text lowercase leading-tight md:leading-[0.9] mb-8 tracking-tighter drop-shadow-sm">
-                untangle your <br />
+              <h1 className="text-5xl sm:text-6xl md:text-8xl font-display text-gray-text leading-tight md:leading-[0.9] mb-8 tracking-tighter drop-shadow-sm">
+                Untangle your <br />
                 <span className="bg-gradient-to-r from-green via-blue to-green bg-clip-text text-transparent animate-gradient-x drop-shadow-md">thoughts.</span>
               </h1>
               
@@ -98,7 +98,7 @@ export const FAQ: React.FC = () => {
             ========================================= */}
         <section className="mb-40 max-w-7xl mx-auto" ref={journeyRef}>
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-6xl font-display text-gray-text lowercase mb-6 tracking-tight">the journey</h2>
+            <h2 className="text-4xl md:text-6xl font-display text-gray-text mb-6 tracking-tight">The journey</h2>
             <p className="text-[18px] text-gray-light font-medium max-w-2xl mx-auto">
               Healing doesn't happen overnight. It's a practice. Here is how you seamlessly embed this sanctuary into your daily life.
             </p>
@@ -119,21 +119,21 @@ export const FAQ: React.FC = () => {
                 step: "01",
                 icon: Cloud,
                 color: "green",
-                title: "Morning or Night",
+                title: "Morning or night",
                 desc: "Start your day with an intention or end it by clearing your head. Write whenever it fits your schedule."
               },
               {
                 step: "02",
                 icon: PenTool,
                 color: "blue",
-                title: "Daily Spark",
+                title: "Daily spark",
                 desc: "Facing a blank page? Tap the spark in the editor for a gentle, context-aware prompt to get the words moving."
               },
               {
                 step: "03",
                 icon: Tags,
                 color: "green",
-                title: "Focus on the Flow",
+                title: "Focus on the flow",
                 desc: "Use Focus Mode to let the UI fade away. It’s just you and your thoughts, without the digital noise."
               },
               {
@@ -161,8 +161,8 @@ export const FAQ: React.FC = () => {
 
                 {/* Card */}
                 <div className="w-full p-8 rounded-[32px] border-2 border-border bg-white dark:bg-[#1E1E1E] shadow-sm flex-1 flex flex-col text-center hover:border-border/80 transition-colors">
-                  <span className={`text-[12px] font-black uppercase tracking-widest text-${item.color} mb-3`}>Step {item.step}</span>
-                  <h3 className="text-[22px] font-display text-gray-text lowercase mb-4 leading-tight">{item.title}</h3>
+                  <span className={`text-[12px] font-black text-${item.color} mb-3`}>Step {item.step}</span>
+                  <h3 className="text-[22px] font-display text-gray-text mb-4 leading-tight">{item.title}</h3>
                   <p className="text-[15px] font-medium text-gray-light leading-relaxed flex-1">
                     {item.desc}
                   </p>
@@ -178,7 +178,7 @@ export const FAQ: React.FC = () => {
             ========================================= */}
         <section className="mb-20 max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-6xl font-display text-gray-text lowercase mb-6 tracking-tight">the toolkit</h2>
+            <h2 className="text-4xl md:text-6xl font-display text-gray-text mb-6 tracking-tight">The toolkit</h2>
             <p className="text-[18px] text-gray-light font-medium max-w-2xl mx-auto">
               A breakdown of the features designed to support your journey. Essential free tools today, and powerful premium horizon upgrades coming soon.
             </p>
@@ -191,12 +191,12 @@ export const FAQ: React.FC = () => {
               <div className="h-12 w-12 rounded-xl bg-blue/10 text-blue flex items-center justify-center mb-6 group-hover:bg-blue group-hover:text-white transition-colors duration-300">
                 <Shield size={24} />
               </div>
-              <h4 className="text-[20px] font-display text-gray-text lowercase mb-3">It's 100% private</h4>
+              <h4 className="text-[20px] font-display text-gray-text mb-3">It's 100% private</h4>
               <p className="text-[14px] text-gray-light font-medium leading-relaxed mb-6 flex-1">
                 We can't read your notes. Your data is stored securely on Supabase and belongs only to you.
               </p>
-              <div className="pt-4 border-t border-border flex items-center gap-2 text-[10px] font-black text-gray-nav uppercase">
-                <CheckCircle2 size={14} className="text-green" /> Totally Secure
+              <div className="pt-4 border-t border-border flex items-center gap-2 text-[10px] font-black text-gray-nav">
+                <CheckCircle2 size={14} className="text-green" /> Totally secure
               </div>
             </div>
 
@@ -204,12 +204,12 @@ export const FAQ: React.FC = () => {
               <div className="h-12 w-12 rounded-xl bg-green/10 text-green flex items-center justify-center mb-6 group-hover:bg-green group-hover:text-white transition-colors duration-300">
                 <Heart size={24} />
               </div>
-              <h4 className="text-[20px] font-display text-gray-text lowercase mb-3">Visual patterns</h4>
+              <h4 className="text-[20px] font-display text-gray-text mb-3">Visual patterns</h4>
               <p className="text-[14px] text-gray-light font-medium leading-relaxed mb-6 flex-1">
                 See how your mood changes over the week or month. It's a simple way to spot rhythms you might miss.
               </p>
-              <div className="pt-4 border-t border-border flex items-center gap-2 text-[10px] font-black text-gray-nav uppercase">
-                <CheckCircle2 size={14} className="text-green" /> Built-in Tracking
+              <div className="pt-4 border-t border-border flex items-center gap-2 text-[10px] font-black text-gray-nav">
+                <CheckCircle2 size={14} className="text-green" /> Built-in tracking
               </div>
             </div>
 
@@ -217,11 +217,11 @@ export const FAQ: React.FC = () => {
               <div className="h-12 w-12 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center mb-6 group-hover:bg-purple-500 group-hover:text-white transition-colors duration-300">
                 <CalendarIcon size={24} />
               </div>
-              <h4 className="text-[20px] font-display text-gray-text lowercase mb-3">Store what matters</h4>
+              <h4 className="text-[20px] font-display text-gray-text mb-3">Store what matters</h4>
               <p className="text-[14px] text-gray-light font-medium leading-relaxed mb-6 flex-1">
                 Attach images, files, or tasks directly to your notes to keep your reflections complete.
               </p>
-              <div className="pt-4 border-t border-border flex items-center gap-2 text-[10px] font-black text-gray-nav uppercase">
+              <div className="pt-4 border-t border-border flex items-center gap-2 text-[10px] font-black text-gray-nav">
                 <CheckCircle2 size={14} className="text-green" /> No storage limits
               </div>
             </div>
@@ -241,9 +241,9 @@ export const FAQ: React.FC = () => {
                     <Sparkles size={26} opacity={0.9} />
                   </div>
                   <div>
-                    <h3 className="text-[28px] font-display text-gray-text lowercase">sanctuary intelligence</h3>
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/70 dark:bg-white/5 border border-white/50 dark:border-white/10 text-gray-text text-[10px] font-black uppercase tracking-widest mt-1 shadow-sm backdrop-blur-sm">
-                      <Shield size={12} className="text-blue opacity-80" /> Private & Secure
+                    <h3 className="text-[28px] font-display text-gray-text">Sanctuary intelligence</h3>
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/70 dark:bg-white/5 border border-white/50 dark:border-white/10 text-gray-text text-[10px] font-black mt-1 shadow-sm backdrop-blur-sm">
+                      <Shield size={12} className="text-blue opacity-80" /> Private & secure
                     </div>
                   </div>
                 </div>
@@ -274,7 +274,7 @@ export const FAQ: React.FC = () => {
 
         <section className="mb-24 max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-6xl font-display text-gray-text lowercase mb-6 tracking-tight">using the sanctuary</h2>
+            <h2 className="text-4xl md:text-6xl font-display text-gray-text mb-6 tracking-tight">Using the sanctuary</h2>
             <p className="text-[18px] text-gray-light font-medium max-w-3xl mx-auto leading-relaxed">
               The best rituals are gentle and repeatable. These small tools are here to make your notes easier to return to, easier to understand later, and softer to live inside while you write.
             </p>
@@ -284,55 +284,55 @@ export const FAQ: React.FC = () => {
             {[
               {
                 icon: ImageIcon,
-                title: 'cover images',
+                title: 'Cover images',
                 tone: 'text-blue bg-blue/10',
                 body: 'Covers make your journal easier to scan and recognize later. Match the atmospheric tension or the literal view of your day.'
               },
               {
                 icon: Paperclip,
-                title: 'attachments',
+                title: 'Attachments',
                 tone: 'text-green bg-green/10',
                 body: 'Attach photos or documents that belong to the story you are processing. Keeps the context all in one place.'
               },
               {
                 icon: Tags,
-                title: 'tags',
+                title: 'Tags',
                 tone: 'text-purple-500 bg-purple-500/10',
                 body: 'Use simple, recurring themes (Work, Home, Health) to see the bigger picture of your journey.'
               },
               {
                 icon: CheckSquare,
-                title: 'tasks',
+                title: 'Tasks',
                 tone: 'text-orange bg-orange/10',
                 body: 'Capture follow-up actions like \'Drink water\' or \'Check in with family\' directly inside your notes for better follow-through.'
               },
               {
                 icon: Headphones,
-                title: 'ambient sound',
+                title: 'Ambient sound',
                 tone: 'text-blue bg-blue/10',
                 body: 'Choose from a library of generative sounds to quiet the room. Tap once to select, and again to turn it off.'
               },
               {
                 icon: Mic,
-                title: 'whisper mode',
+                title: 'Whisper mode',
                 tone: 'text-blue bg-blue/10',
                 body: 'For days when typing feels heavy. Speak your thoughts directly into the editor and have them transcribed instantly.'
               },
               {
                 icon: Target,
-                title: 'daily spark',
+                title: 'Daily spark',
                 tone: 'text-green bg-green/10',
                 body: 'Context-aware mindfulness prompts that help you find a starting point on days when the page feels blank.'
               },
               {
                 icon: Brain,
-                title: 'ai reflection',
+                title: 'Ai reflection',
                 tone: 'text-blue bg-blue/10',
                 body: 'Get a mirror of your thoughts. Use it after writing to help notice patterns you might miss while in the flow.'
               },
               {
                 icon: BookOpen,
-                title: 'insights',
+                title: 'Insights',
                 tone: 'text-green bg-green/10',
                 body: 'Visit the Insights page to see your long-term moods, themes, and resilience over time.'
               }
@@ -348,7 +348,7 @@ export const FAQ: React.FC = () => {
                 <div className={`mb-6 flex h-12 w-12 items-center justify-center rounded-2xl ${item.tone}`}>
                   <item.icon size={22} />
                 </div>
-                <h3 className="mb-3 text-[22px] font-display lowercase text-gray-text">{item.title}</h3>
+                <h3 className="mb-3 text-[22px] font-display text-gray-text">{item.title}</h3>
                 <p className="text-[15px] font-medium leading-relaxed text-gray-light">
                   {item.body}
                 </p>
@@ -369,10 +369,10 @@ export const FAQ: React.FC = () => {
         <Button 
           variant="primary"
           onClick={() => navigate(RoutePath.SIGNUP)}
-          className="h-10 px-5 text-[11px] sm:text-[12px] font-black uppercase tracking-widest rounded-full shadow-lg liquid-glass opacity-90 hover:opacity-100 transition-opacity hover:scale-[1.02] hover:shadow-xl flex items-center gap-2 group"
+          className="h-10 px-5 text-[11px] sm:text-[12px] font-black rounded-full shadow-lg liquid-glass opacity-90 hover:opacity-100 transition-opacity hover:scale-[1.02] hover:shadow-xl flex items-center gap-2 group"
         >
           <Sparkles size={14} className="group-hover:rotate-12 transition-transform" />
-          <span>Start Journaling</span>
+          <span>Start journaling</span>
         </Button>
       </motion.div>
 

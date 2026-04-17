@@ -15,6 +15,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['"Schibsted Grotesk"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        serif: ['"Spectral"', 'serif'],
         display: ['"Feather Bold"', '"Schibsted Grotesk"', 'sans-serif'],
       },
       colors: {

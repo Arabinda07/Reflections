@@ -51,8 +51,6 @@
   min-width: 44px;
   background: none;
   font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
   font-size: 14px;
   color: #1a1a1a;
 }
@@ -69,7 +67,6 @@
 
 .react-calendar__month-view__weekdays {
   text-align: center;
-  text-transform: uppercase;
   font-weight: 800;
   font-size: 11px;
   color: #9ca3af;

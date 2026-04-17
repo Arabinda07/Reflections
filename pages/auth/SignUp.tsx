@@ -83,8 +83,8 @@ export const SignUp: React.FC = () => {
              <UserPlus size={40} strokeWidth={2.5} />
           </div>
 
-          <h1 className="font-display text-[32px] text-gray-text lowercase mb-2">
-            create account
+          <h1 className="font-display text-[32px] text-gray-text mb-2">
+            Create account
           </h1>
           <p className="text-[15px] font-bold text-gray-light text-center mb-8">
             Start your journey to a clearer mind.
@@ -124,10 +124,10 @@ export const SignUp: React.FC = () => {
             <Button 
               type="submit" 
               variant="primary"
-              className="w-full h-[52px] text-[15px] font-bold uppercase mt-4" 
+              className="w-full h-[52px] text-[15px] font-bold mt-4" 
               isLoading={loading}
             >
-              CREATE ACCOUNT
+              Create account
             </Button>
 
             {error && (
@@ -139,7 +139,7 @@ export const SignUp: React.FC = () => {
 
           <div className="my-8 flex w-full items-center gap-4">
             <div className="h-[2px] flex-1 bg-border" />
-            <span className="text-[13px] font-bold text-gray-nav uppercase">OR</span>
+            <span className="text-[13px] font-bold text-gray-nav">Or</span>
             <div className="h-[2px] flex-1 bg-border" />
           </div>
 
@@ -151,11 +151,11 @@ export const SignUp: React.FC = () => {
             className="w-full h-[52px] gap-3"
           >
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="h-5 w-5" alt="Google" />
-            <span className="text-blue font-bold uppercase">CONTINUE WITH GOOGLE</span>
+            <span className="text-blue font-bold">Continue with Google</span>
           </Button>
 
           <p className="mt-8 text-[15px] font-bold text-gray-light">
-            Already have an account? <Link to={RoutePath.LOGIN} className="text-blue hover:opacity-70 uppercase">SIGN IN</Link>
+            Already have an account? <Link to={RoutePath.LOGIN} className="text-blue hover:opacity-70">Sign in</Link>
           </p>
         </div>
       </div>
