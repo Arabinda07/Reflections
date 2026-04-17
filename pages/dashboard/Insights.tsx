@@ -179,28 +179,28 @@ export const Insights: React.FC = () => {
 
       {/* 4 Soft Metric Cards Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-16">
-        <div className="bg-white border-2 border-border rounded-[32px] p-6 shadow-sm flex flex-col justify-between liquid-glass grow transition-transform hover:-translate-y-1">
+        <div className="bg-white border-2 border-border rounded-[32px] p-6 shadow-sm flex flex-col justify-between liquid-glass grow transition-transform hover:scale-[1.02]">
           <Calendar size={20} className="text-blue mb-6 opacity-70" />
           <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-nav mb-2">This Month</h4>
           <span className="text-4xl font-display text-gray-text block mb-1">{stats.monthNotes}</span>
           <p className="text-[12px] font-medium text-gray-light">notes in {new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}</p>
         </div>
 
-        <div className="bg-white border-2 border-border rounded-[32px] p-6 shadow-sm flex flex-col justify-between liquid-glass grow transition-transform hover:-translate-y-1">
+        <div className="bg-white border-2 border-border rounded-[32px] p-6 shadow-sm flex flex-col justify-between liquid-glass grow transition-transform hover:scale-[1.02]">
           <TrendingUp size={20} className="text-green mb-6 opacity-70" />
           <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-nav mb-2">Writing Rhythm</h4>
           <span className="text-4xl font-display text-gray-text block mb-1">{stats.daysCheckedIn}</span>
           <p className="text-[12px] font-medium text-gray-light">unique days checked in</p>
         </div>
 
-        <div className="bg-white border-2 border-border rounded-[32px] p-6 shadow-sm flex flex-col justify-between liquid-glass grow transition-transform hover:-translate-y-1">
+        <div className="bg-white border-2 border-border rounded-[32px] p-6 shadow-sm flex flex-col justify-between liquid-glass grow transition-transform hover:scale-[1.02]">
           <Heart size={20} className="text-purple-500 mb-6 opacity-70" />
           <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-nav mb-2">Prevalent Mood</h4>
           <span className="text-4xl font-display text-gray-text block mb-1 capitalize truncate">{stats.topMood === 'undefined' ? '-' : stats.topMood}</span>
           <p className="text-[12px] font-medium text-gray-light">your most frequent feeling</p>
         </div>
 
-        <div className="bg-white border-2 border-border rounded-[32px] p-6 shadow-sm flex flex-col justify-between liquid-glass grow transition-transform hover:-translate-y-1">
+        <div className="bg-white border-2 border-border rounded-[32px] p-6 shadow-sm flex flex-col justify-between liquid-glass grow transition-transform hover:scale-[1.02]">
           <CheckSquare size={20} className="text-orange mb-6 opacity-70" />
           <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-nav mb-2">Action Momentum</h4>
           <span className="text-4xl font-display text-gray-text block mb-1">{stats.taskProgress}%</span>

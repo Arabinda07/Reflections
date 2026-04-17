@@ -118,7 +118,8 @@ export const Home: React.FC = () => {
   }
 
   return (
-    <div className="animate-in fade-in duration-700">
+    <>
+      <div className="animate-in fade-in duration-700" {...((showOnboarding ? { inert: "" } : {}) as any)}>
       {/* Hero Section - Cinematic Hero with 3D Float */}
       <section className="relative flex flex-col items-center justify-start pt-0 pb-16 sm:pb-24 px-6 sm:px-10 overflow-hidden border-b-2 border-border min-h-[400px] sm:min-h-[500px]">
         {/* Hero Video Background */}
@@ -167,7 +168,7 @@ export const Home: React.FC = () => {
           <div className="panel-label">Emotional Overview</div>
           <div className="flex flex-col gap-6">
             <div
-              className="flex flex-col gap-6 bg-white border-2 border-border rounded-[32px] p-8 shadow-sm hover:shadow-none hover:-translate-y-1 transition-all duration-300 ease-out-quart liquid-glass cursor-pointer group"
+              className="flex flex-col gap-6 bg-white border-2 border-border rounded-[32px] p-8 shadow-sm hover:shadow-none hover:scale-[1.02] transition-all duration-300 ease-out-quart liquid-glass cursor-pointer group"
               onClick={() => navigate(RoutePath.NOTES)}
             >
               <div className="flex items-center justify-between">
@@ -190,7 +191,7 @@ export const Home: React.FC = () => {
             </div>
 
             <div
-              className="flex flex-col gap-6 bg-white border-2 border-border rounded-[32px] p-8 shadow-sm hover:shadow-none hover:-translate-y-1 transition-all duration-300 ease-out-quart liquid-glass cursor-pointer group"
+              className="flex flex-col gap-6 bg-white border-2 border-border rounded-[32px] p-8 shadow-sm hover:shadow-none hover:scale-[1.02] transition-all duration-300 ease-out-quart liquid-glass cursor-pointer group"
               onClick={() => navigate(RoutePath.INSIGHTS)}
             >
               <div className="flex items-center justify-between">
@@ -253,6 +254,8 @@ export const Home: React.FC = () => {
             </div>
           </div>
         </div>
+      </div>
+
       </div>
 
       {/* Onboarding Modal */}
@@ -336,6 +339,6 @@ export const Home: React.FC = () => {
       <div style={{ position: 'fixed', bottom: '24px', right: '20px', zIndex: 8000 }}>
         <AmbientMusicButton />
       </div>
-    </div>
+    </>
   );
 };

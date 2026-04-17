@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Plus, FileText, ArrowUpRight, Calendar as CalendarIcon, Search, Smile, Meh, Frown, Sun, Cloud, Moon, Zap, Trash2, Loader2, LayoutGrid, Calendar, Tag, X } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
@@ -19,8 +20,19 @@ export const MyNotes: React.FC = () => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [removedNote, setRemovedNote] = useState<{note: Note, timer: NodeJS.Timeout} | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'calendar'>('grid');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  
+  // Cleanup pending deletions on unmount
+  useEffect(() => {
+    return () => {
+      if (removedNote) {
+        clearTimeout(removedNote.timer);
+        noteService.delete(removedNote.note.id).catch(console.error);
+      }
+    };
+  }, [removedNote]);
 
   const queryParams = new URLSearchParams(location.search);
   const tagFilter = queryParams.get('tag');
@@ -55,19 +67,35 @@ export const MyNotes: React.FC = () => {
     isSameDay(new Date(note.updatedAt), selectedDate)
   );
 
-  const handleDelete = async (e: React.MouseEvent, id: string) => {
+  const handleDelete = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    if (!window.confirm("Are you sure you want to delete this note?")) return;
     
-    setDeletingId(id);
-    try {
-      await noteService.delete(id);
-      setNotes(prev => prev.filter(n => n.id !== id));
-    } catch (error) {
-      console.error("Failed to delete note", error);
-      alert("Failed to delete note");
-    } finally {
-      setDeletingId(null);
+    const noteToDelete = notes.find(n => n.id === id);
+    if (!noteToDelete) return;
+
+    // Optimistic UI slice
+    setNotes(prev => prev.filter(n => n.id !== id));
+
+    // If there was an existing pending deletion, flush it immediately
+    if (removedNote) {
+      clearTimeout(removedNote.timer);
+      noteService.delete(removedNote.note.id).catch(console.error);
+    }
+
+    // Set 5-second timer for backend execution
+    const timer = setTimeout(() => {
+      noteService.delete(id).catch(console.error);
+      setRemovedNote(prev => (prev?.note.id === id ? null : prev));
+    }, 5000);
+
+    setRemovedNote({ note: noteToDelete, timer });
+  };
+
+  const handleUndoDelete = () => {
+    if (removedNote) {
+      clearTimeout(removedNote.timer);
+      setNotes(prev => [removedNote.note, ...prev].sort((a,b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()));
+      setRemovedNote(null);
     }
   };
 
@@ -350,9 +378,9 @@ export const MyNotes: React.FC = () => {
              <div className="h-16 w-16 bg-white rounded-2xl flex items-center justify-center shadow-sm border-2 border-border mb-6">
                  <FileText size={28} className="text-gray-nav" />
              </div>
-             <h3 className="font-display text-[24px] text-gray-text lowercase">The space is quiet</h3>
+             <h3 className="font-display text-[24px] text-gray-text lowercase">The space is yours to fill</h3>
              <p className="text-gray-light mb-8 max-w-sm font-medium">
-               {tagFilter ? `No notes found with the tag "${tagFilter}".` : "Take a breath, and when you are ready, leave a thought here."}
+               {tagFilter ? `We couldn't find any reflections with "${tagFilter}".` : "Capture your first thought. Even a single sentence is a great start."}
              </p>
              {tagFilter ? (
                <Button 
@@ -368,10 +396,27 @@ export const MyNotes: React.FC = () => {
                   variant="primary" 
                   className="h-[48px] px-8 text-[15px] font-bold uppercase rounded-xl shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart"
                 >
-                  CREATE YOUR FIRST NOTE
+                  LOG A REFLECTION
                 </Button>
              )}
           </div>
+      )}
+
+      {/* Undo Toast */}
+      {removedNote && createPortal(
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[999999] animate-in slide-in-from-bottom-5 fade-in duration-300">
+          <div className="flex items-center gap-4 rounded-[20px] bg-[#1a1a1a] px-6 py-3.5 text-white shadow-2xl border-2 border-[#333]">
+            <span className="text-[13px] font-bold">Entry removed from timeline</span>
+            <div className="h-4 w-[2px] bg-white/20"></div>
+            <button 
+              onClick={handleUndoDelete}
+              className="text-[13px] font-extrabold text-white uppercase hover:text-green active:scale-[0.98] tracking-widest transition-colors duration-200"
+            >
+              Undo
+            </button>
+          </div>
+        </div>,
+        document.body
       )}
       <LoadingState isVisible={loading} message="gathering your thoughts..." />
     </div>

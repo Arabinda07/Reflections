@@ -36,7 +36,7 @@ export const Landing: React.FC = () => {
             <span>The Future of Journaling</span>
           </div>
           
-          <h1 className="text-5xl sm:text-6xl md:text-8xl font-display text-gray-text lowercase leading-tight md:leading-[1.1] mb-8 tracking-tighter animate-in slide-in-from-bottom-6 duration-700 drop-shadow-sm hover:-translate-y-1 transition-transform">
+          <h1 className="text-5xl sm:text-6xl md:text-8xl font-display text-gray-text lowercase leading-tight md:leading-[1.1] mb-8 tracking-tighter animate-in slide-in-from-bottom-6 duration-700 drop-shadow-sm hover:scale-[1.02] transition-transform">
             your mind, <br />
             <span className="bg-gradient-to-r from-green via-blue to-green bg-clip-text text-transparent animate-gradient-x drop-shadow-md">beautifully</span> <br />
             organized.

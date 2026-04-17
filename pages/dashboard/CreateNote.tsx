@@ -361,7 +361,8 @@ export const CreateNote: React.FC = () => {
           generateDynamicPrompts();
 
           // Wait for cinematic display time for the sanctuary loader
-          await new Promise(resolve => setTimeout(resolve, 2500));
+          // Extended to 4000ms to account for network fetching of the Lottie
+          await new Promise(resolve => setTimeout(resolve, 4000));
 
           if (isUnmounted.current) return;
           setLoading(false);

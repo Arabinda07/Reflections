@@ -75,6 +75,17 @@ body {
   font-weight: 400;
 }
 
+/* Impeccable Design: Strict Focus Rings */
+/* Replaces invisible mouse-hover dependency for Keyboard users */
+button:focus, a:focus, input:focus, textarea:focus, select:focus {
+  outline: none;
+}
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, [role="button"]:focus-visible, [tabindex="0"]:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 3px;
+  border-radius: inherit;
+}
+
 @layer components {
   .liquid-glass {
     background: rgba(var(--panel-bg-rgb, 255, 255, 255), 0.01);

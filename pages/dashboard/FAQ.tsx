@@ -154,7 +154,7 @@ export const FAQ: React.FC = () => {
               >
                 {/* Step Connector Node */}
                 <div className="bg-body p-2 rounded-full mb-6">
-                  <div className={`h-20 w-20 rounded-full border-4 border-white dark:border-[#1E1E1E] bg-${item.color}/10 text-${item.color} flex items-center justify-center font-black shadow-lg shadow-${item.color}/20 ring-1 ring-border group-hover:-translate-y-2 group-hover:scale-110 transition-all duration-300 liquid-glass`}>
+                  <div className={`h-20 w-20 rounded-full border-4 border-white dark:border-[#1E1E1E] bg-${item.color}/10 text-${item.color} flex items-center justify-center font-black shadow-lg shadow-${item.color}/20 ring-1 ring-border group-hover:scale-[1.08] transition-all duration-300 liquid-glass`}>
                     <item.icon size={28} />
                   </div>
                 </div>
@@ -369,7 +369,7 @@ export const FAQ: React.FC = () => {
         <Button 
           variant="primary"
           onClick={() => navigate(RoutePath.SIGNUP)}
-          className="h-10 px-5 text-[11px] sm:text-[12px] font-black uppercase tracking-widest rounded-full shadow-lg liquid-glass opacity-90 hover:opacity-100 transition-opacity hover:-translate-y-1 hover:shadow-xl flex items-center gap-2 group"
+          className="h-10 px-5 text-[11px] sm:text-[12px] font-black uppercase tracking-widest rounded-full shadow-lg liquid-glass opacity-90 hover:opacity-100 transition-opacity hover:scale-[1.02] hover:shadow-xl flex items-center gap-2 group"
         >
           <Sparkles size={14} className="group-hover:rotate-12 transition-transform" />
           <span>Start Journaling</span>

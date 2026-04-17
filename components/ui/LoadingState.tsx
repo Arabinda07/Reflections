@@ -49,7 +49,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.7 }}
-          className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-white dark:bg-body"
+          className="fixed inset-0 !z-[999999] flex flex-col items-center justify-center bg-white dark:bg-[#121212]"
         >
           {/* Finger-Tapping Brand Lottie */}
           <div className="w-[260px] h-[260px] sm:w-[320px] sm:h-[320px]">
