@@ -1,14 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Sparkles, Brain, Calendar, CheckSquare, Heart, Lock, TrendingUp, Loader2, MessageSquare, Crown, Book, ChevronRight, Hash, X } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '../../components/ui/Button';
 import { RoutePath, Note, LifeTheme } from '../../types';
 import { noteService } from '../../services/noteService';
-import { GoogleGenAI } from "@google/genai";
 import { supabase } from '../../src/supabaseClient';
-import { LoadingState } from '../../components/ui/LoadingState';
-import { AIThinkingState } from '../../components/ui/AIThinkingState';
 import { wikiService } from '../../services/wikiService';
 
 // Flat soft colors — no gradients
@@ -33,26 +29,21 @@ const MOOD_BG: Record<string, string> = {
 export const Insights: React.FC = () => {
   const navigate = useNavigate();
   const [notes, setNotes] = useState<Note[]>([]);
-  const [loading, setLoading] = useState(true);
   
   // Freemium States
   const [isPro, setIsPro] = useState(false);
   const [reflectionsUsed, setReflectionsUsed] = useState(0);
   const [themes, setThemes] = useState<LifeTheme[]>([]);
   const [selectedTheme, setSelectedTheme] = useState<LifeTheme | null>(null);
-  const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      // Minimum display time for the initial sanctuary entry (7 seconds)
-      const minTimePromise = new Promise(resolve => setTimeout(resolve, 7000));
       
       try {
         const [allNotes, userResponse, allThemes] = await Promise.all([
           noteService.getAll(),
           supabase.auth.getUser(),
-          wikiService.getAllThemes(),
-          minTimePromise
+          wikiService.getAllThemes()
         ]);
         
         setNotes(allNotes);
@@ -64,12 +55,10 @@ export const Insights: React.FC = () => {
           setReflectionsUsed(meta.reflections_used || 0);
         }
       } catch (error) {
-        console.error("Failed to fetch insights data:", error);
-      } finally {
-        setLoading(false);
       }
     };
     fetchData();
+    console.info("[Reflections] Insights Page v2 - No Animations");
   }, []);
 
   // We no longer early-return; the page content is always mounted.
@@ -143,18 +132,11 @@ export const Insights: React.FC = () => {
     navigate(RoutePath.CREATE_NOTE); // Encourage writing to grow the wiki
   };
 
-  const isFreeAvailable = !isPro && reflectionsUsed === 0;
-  const isPremiumLocked = !isPro && reflectionsUsed > 0 && !reflectionText;
-  const hasEnoughNotes = notes.length >= 3;
 
 
 
   return (
-    <>
-      {/* Cinematic loading overlay — sits above the page, exits smoothly */}
-      <AIThinkingState isVisible={loading} />
-
-      <div className="mx-auto max-w-[1000px] animate-in fade-in duration-700 pb-32 px-4 md:px-10">
+      <div className="mx-auto max-w-[1000px] pb-32 px-4 md:px-10">
       <nav className="sticky top-4 z-50 mb-16 flex items-center justify-between rounded-2xl border-2 border-border bg-white/90 px-4 py-3 shadow-sm backdrop-blur-2xl transition-all duration-300 ease-out-quart">
         <div className="flex items-center gap-3">
            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-bold text-[12px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green">
@@ -232,13 +214,10 @@ export const Insights: React.FC = () => {
                       {entry.name}
                     </span>
                     <div className="relative flex-1 h-8 rounded-full overflow-hidden" style={{ background: bg }}>
-                      <motion.div
-                        className="absolute inset-y-0 left-0 rounded-full"
-                        style={{ backgroundColor: color }}
-                        initial={{ width: 0 }}
-                        animate={{ width: `${pct}%` }}
-                        transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1], delay: 0.1 }}
-                      />
+                    <div
+                      className="absolute inset-y-0 left-0 rounded-full"
+                      style={{ backgroundColor: color, width: `${pct}%` }}
+                    />
                     </div>
                     <span className="text-[12px] font-extrabold text-gray-nav w-6 text-right shrink-0">
                       {entry.value}
@@ -316,9 +295,8 @@ export const Insights: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {themes.map(theme => (
-              <motion.div
+              <div
                 key={theme.id}
-                whileHover={{ y: -4 }}
                 onClick={() => setSelectedTheme(theme)}
                 className="group cursor-pointer p-6 bg-white border-2 border-border rounded-[24px] shadow-sm hover:shadow-md hover:border-green/30 transition-all duration-300 ease-out-quart flex flex-col justify-between h-[180px]"
               >
@@ -340,27 +318,20 @@ export const Insights: React.FC = () => {
                     <ChevronRight size={16} />
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         )}
       </div>
 
       {/* THEME DETAIL MODAL / SLIDE OVER */}
-      <AnimatePresence>
         {selectedTheme && (
           <div className="fixed inset-0 z-[10001] flex items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+            <div
               onClick={() => setSelectedTheme(null)}
               className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             />
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+            <div
               className="relative w-full max-w-2xl max-h-[85vh] overflow-hidden bg-white rounded-[32px] border-2 border-border shadow-2xl flex flex-col"
             >
               <div className="sticky top-0 z-10 p-6 border-b border-border bg-white flex items-center justify-between">
@@ -398,13 +369,9 @@ export const Insights: React.FC = () => {
                   Close entry
                 </Button>
               </div>
-            </motion.div>
+            </div>
           </div>
         )}
-      </AnimatePresence>
-
-      <AIThinkingState isVisible={generating} />
-    </div>
-    </>
+      </div>
   );
 };

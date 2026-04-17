@@ -2,7 +2,7 @@
 // Strategy: Cache-First for app shell, Network-First for API/Supabase
 // ─────────────────────────────────────────────────────────────────────
 
-const CACHE_NAME = 'reflections-shell-v4';
+const CACHE_NAME = 'reflections-shell-v6';
 
 // Core app shell files to cache on install
 const SHELL_ASSETS = [
