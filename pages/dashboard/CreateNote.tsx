@@ -177,6 +177,7 @@ export const CreateNote: React.FC = () => {
   const [isTitleFocused, setIsTitleFocused] = useState(false);
   // Setting visibility to true immediately to avoid jank
   const [isContentVisible, setIsContentVisible] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const flowTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [dragStartY, setDragStartY] = useState<number | null>(null);
   const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
@@ -891,12 +892,19 @@ export const CreateNote: React.FC = () => {
 
       {isContentVisible && (
         <div className="flex h-screen w-full bg-white dark:bg-panel-bg overflow-hidden relative selection:bg-blue/10">
-          {/* Sidebar - Desktop Only Desktop Actions */}
+          {/* Sidebar - Drawer on Mobile, Fixed on Desktop */}
           <aside 
-            className={`fixed left-0 top-0 bottom-0 w-[240px] border-r-2 border-border bg-white dark:bg-panel-bg z-40 transition-all duration-700 ease-out-expo px-6 py-8 flex flex-col gap-8 ${isDimmed ? '-translate-x-full opacity-0 pointer-events-none' : 'translate-x-0 opacity-100'} hidden lg:flex`}
+            className={`fixed left-0 top-0 bottom-0 w-[240px] border-r-2 border-border bg-white dark:bg-panel-bg z-50 transition-all duration-700 ease-out-expo px-6 py-8 flex flex-col gap-8 
+              ${isMobile ? (isSidebarOpen ? 'translate-x-0' : '-translate-x-full') : (isDimmed ? '-translate-x-full opacity-0 pointer-events-none' : 'translate-x-0 opacity-100')}
+            `}
           >
             <div className="flex flex-col gap-2">
-              <span className="text-[10px] font-black text-blue tracking-widest uppercase opacity-50 mb-2">Sanctuary Log</span>
+              <div className="flex items-center justify-between lg:block">
+                <span className="text-[10px] font-black text-blue tracking-widest uppercase opacity-50 mb-2">Sanctuary Log</span>
+                <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-2 text-gray-nav hover:text-red transition-colors">
+                  <X size={18} />
+                </button>
+              </div>
               <div className="flex items-center gap-2 text-[12px] font-extrabold text-gray-nav">
                 <Calendar size={14} className="text-gray-nav" />
                 <span>{new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
@@ -971,8 +979,21 @@ export const CreateNote: React.FC = () => {
             </div>
           </aside>
 
+          {/* Backdrop for Mobile Sidebar */}
+          <AnimatePresence>
+            {isMobile && isSidebarOpen && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsSidebarOpen(false)}
+                className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[45]"
+              />
+            )}
+          </AnimatePresence>
+
           {/* Main Content Area */}
-          <main className={`flex-1 flex flex-col min-w-0 transition-all duration-700 ease-out-expo ${isDimmed ? 'lg:pl-0' : 'lg:pl-[240px]'}`}>
+          <main className={`flex-1 flex flex-col min-w-0 transition-all duration-700 ease-out-expo ${isDimmed ? 'lg:pl-0' : (isMobile ? 'lg:pl-0' : 'lg:pl-[240px]')}`}>
             
             {/* Slim Top Bar */}
             <nav className={`sticky top-0 z-40 flex items-center justify-between px-6 py-4 bg-white/80 dark:bg-panel-bg/80 backdrop-blur-xl border-b border-border transition-all duration-700 ${isDimmed ? 'opacity-0 -translate-y-full pointer-events-none' : 'opacity-100 translate-y-0'}`}>
@@ -984,6 +1005,16 @@ export const CreateNote: React.FC = () => {
               </div>
 
               <div className="flex items-center gap-2">
+                {/* Personalize Trigger (Mobile Only) */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsSidebarOpen(true)}
+                  className="lg:hidden flex items-center gap-2 rounded-xl border-2 border-border font-black text-[11px] text-gray-nav px-3"
+                >
+                  <Smile size={16} />
+                </Button>
+
                 {/* Whisper Mode Button */}
                 <Button
                   variant="ghost"
@@ -992,7 +1023,7 @@ export const CreateNote: React.FC = () => {
                   className={`flex items-center gap-2 rounded-xl border-2 border-border font-black text-[11px] transition-all duration-300 px-4 ${isWhispering ? 'text-blue bg-blue/5 border-blue' : 'text-gray-nav'}`}
                 >
                   {isWhispering ? <Mic size={16} className="animate-pulse" /> : <MicOff size={16} />}
-                  <span>Whisper</span>
+                  <span className="hidden sm:inline">Whisper</span>
                 </Button>
 
                 {/* Music Player Button */}
@@ -1035,7 +1066,7 @@ export const CreateNote: React.FC = () => {
                   onClick={handleSave} 
                   size="sm" 
                   variant="primary"
-                  className="shadow-md active:scale-95 px-6 font-black text-[11px]"
+                  className="hidden lg:flex shadow-md active:scale-95 px-6 font-black text-[11px]"
                   disabled={!canSave || saving || showPlane}
                 >
                   <Save className="h-4 w-4 mr-2" />
@@ -1045,8 +1076,8 @@ export const CreateNote: React.FC = () => {
             </nav>
 
             {/* Content Canvas */}
-            <div className={`flex-1 overflow-y-auto px-6 py-12 sm:px-12 md:px-24 transition-all duration-1000 ease-out-expo ${isDimmed ? 'pt-8' : 'pt-20'}`}>
-              <div className="mx-auto w-full max-w-[900px]">
+            <div className={`flex-1 overflow-y-auto px-6 py-4 sm:px-12 md:px-24 transition-all duration-1000 ease-out-expo ${isDimmed ? 'pt-2' : 'pt-6'}`}>
+              <div className={`mx-auto w-full transition-all duration-1000 ease-out-expo ${isDimmed ? 'max-w-[1100px]' : 'max-w-[900px]'}`}>
                 <AnimatePresence mode="wait">
                   {!isReleasing && (
                     <motion.div
@@ -1099,7 +1130,7 @@ export const CreateNote: React.FC = () => {
                               setIsFocused(false);
                               setIsTitleFocused(false);
                             }}
-                            className={`w-full border-none bg-transparent text-4xl sm:text-5xl font-black text-gray-text placeholder:text-border focus:outline-none focus:ring-0 p-0 mb-8 tracking-tighter transition-all duration-700 ${isDimmed ? (isMobile ? 'opacity-0 scale-95' : 'opacity-25') : 'opacity-100 scale-100'}`}
+                            className={`w-full border-none bg-transparent text-[42px] font-serif font-semibold text-gray-text placeholder:text-border/40 focus:outline-none focus:ring-0 p-0 mb-4 tracking-tight transition-all duration-700 ${isDimmed ? (isMobile ? 'opacity-0 scale-95' : 'opacity-25') : 'opacity-100 scale-100'}`}
                         />
                         
                         <div 
@@ -1125,18 +1156,37 @@ export const CreateNote: React.FC = () => {
                                 className="text-[19px] leading-[1.7] text-gray-text/90"
                             />
                             
-                            {/* Mobile Floating Action (Visible only on mobile or small screens) */}
-                            <div className="fixed bottom-8 right-8 z-50 lg:hidden">
-                              <AnimatePresence>
-                                {hasContent && !isDimmed && (
+                            {/* Universal Floating Actions (Bottom-Right) */}
+                            <div className="fixed bottom-8 right-8 z-50">
+                              <AnimatePresence mode="wait">
+                                {showPlane ? null : !hasContent ? (
+                                  /* ── AI Spark FAB ── */
                                   <motion.button
-                                    initial={{ scale: 0, opacity: 0 }}
-                                    animate={{ scale: 1, opacity: 1 }}
-                                    exit={{ scale: 0, opacity: 0 }}
-                                    onClick={handleSave}
-                                    className="h-16 w-16 rounded-3xl bg-green text-white shadow-xl flex items-center justify-center active:scale-95"
+                                    key="spark-fab"
+                                    initial={{ opacity: 0, scale: 0.85, y: 10 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.85, y: 10 }}
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={cycleSparkPrompt}
+                                    className={`flex h-16 w-16 items-center justify-center rounded-2xl border-2 border-border bg-white shadow-xl text-blue transition-all duration-300 hover:shadow-2xl active:scale-95 ${isDimmed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
                                   >
-                                    <Save size={24} />
+                                    <Sparkles size={24} className={isGeneratingPrompts ? 'animate-pulse' : ''} />
+                                  </motion.button>
+                                ) : (
+                                  /* ── Save FAB ── */
+                                  <motion.button
+                                    key="save-fab"
+                                    initial={{ opacity: 0, scale: 0.85, y: 10 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.85, y: 10 }}
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={handleSave}
+                                    disabled={!canSave || saving}
+                                    className={`flex h-16 w-16 items-center justify-center rounded-2xl bg-green text-white shadow-xl transition-all duration-300 active:scale-95 ${isDimmed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+                                  >
+                                    {saving ? <Loader2 size={24} className="animate-spin" /> : <Save size={24} />}
                                   </motion.button>
                                 )}
                               </AnimatePresence>
