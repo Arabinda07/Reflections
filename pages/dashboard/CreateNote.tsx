@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
-import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Frown, Sun, Cloud, Moon, Brain, Tag as TagIcon, CheckCircle2, Check, Plus, Trash2, Eye, EyeOff, ListTodo, Wind, Mic, MicOff, Music, Play, Pause, Volume2, Loader2 } from 'lucide-react';
+import { Save, ArrowLeft, Image as ImageIcon, Wand2, X, Calendar, Paperclip, File as FileIcon, FileText, Zap, Sparkles, ChevronRight, Smile, Frown, Sun, Cloud, Moon, Brain, Tag as TagIcon, CheckCircle2, Check, Plus, Trash2, Eye, EyeOff, ListTodo, Wind, Mic, MicOff, Music, Headphones, Play, Pause, Volume2, Loader2 } from 'lucide-react';
 import { useAmbientAudio, AMBIENT_TRACKS } from '../../hooks/useAmbientAudio';
 import { Button } from '../../components/ui/Button';
 import { Editor, EditorRef } from '../../components/ui/Editor';
