@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import trailData from '../../lottie/trail-loading.json';
+import trailData from '@/src/lottie/trail-loading.json';
 
 interface CompanionObservationProps {
   isVisible: boolean;

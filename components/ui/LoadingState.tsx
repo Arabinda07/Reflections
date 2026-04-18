@@ -2,7 +2,7 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { motion, AnimatePresence } from 'motion/react';
-import loadingData from '../../lottie/loading.json';
+import loadingData from '@/src/lottie/loading.json';
 
 // Canonical brand footer style — identical across all sanctuary animations
 const BRAND_WORDMARK_STYLE: React.CSSProperties = {

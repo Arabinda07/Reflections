@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sparkles, ArrowLeft } from 'lucide-react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import errorData from '@/src/lottie/error-404.json';
 import { Button } from '../components/ui/Button';
 import { RoutePath } from '../types';
 
@@ -11,7 +12,7 @@ export const NotFound: React.FC = () => {
     <div className="flex min-h-[80vh] flex-col items-center justify-center p-4 text-center">
       <div className="h-48 w-48 sm:h-64 sm:w-64 mb-8">
         <DotLottieReact
-          src="/assets/lottie/Error 404.json"
+          data={errorData}
           loop
           autoplay
           className="w-full h-full"

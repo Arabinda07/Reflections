@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { motion, AnimatePresence } from 'motion/react';
-import paperPlaneData from '../../lottie/paperplane.json';
+import paperPlaneData from '@/src/lottie/paperplane.json';
 
 interface PaperPlaneToastProps {
   /** Show the plane — triggers the animation */
