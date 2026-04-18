@@ -64,22 +64,23 @@ export const PaperPlaneToast: React.FC<PaperPlaneToastProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: '12px',
-              padding: '10px 20px 10px 12px',
-              borderRadius: '20px',
+              padding: '10px 24px 10px 14px',
+              borderRadius: '24px',
               backgroundColor: 'var(--panel-bg)',
               opacity: 0.98,
               backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
               border: '1.5px solid var(--border-color)',
-              boxShadow: '0 8px 28px -6px rgba(0,0,0,0.12)',
+              boxShadow: '0 8px 32px -8px rgba(0,0,0,0.15)',
             }}
           >
             {/* Paper plane Lottie */}
-            <div style={{ width: '52px', height: '52px', flexShrink: 0 }}>
+            <div style={{ width: '74px', height: '74px', flexShrink: 0, margin: '-10px 0 -12px -8px' }}>
               <DotLottieReact
+                key={isVisible ? 'visible' : 'hidden'}
                 src="https://lottie.host/44bd266f-34f2-4b70-87df-fb47ff5962a5/4mw21xhUNV.lottie"
                 autoplay
-                loop={true}
+                loop
                 style={{ width: '100%', height: '100%' }}
               />
             </div>
@@ -94,7 +95,7 @@ export const PaperPlaneToast: React.FC<PaperPlaneToastProps> = ({
                 whiteSpace: 'nowrap',
               }}
             >
-              Sending to your sanctuary
+              Sending to Sanctuary
             </span>
           </div>
         </motion.div>
