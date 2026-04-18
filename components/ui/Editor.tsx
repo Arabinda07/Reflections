@@ -1,4 +1,7 @@
 import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+import Quill from 'quill';
+import 'quill/dist/quill.snow.css';
+
 
 interface EditorProps {
   value: string;
@@ -12,8 +15,7 @@ export interface EditorRef {
   focus: () => void;
 }
 
-// Access the global Quill object from CDN
-declare const Quill: any;
+// Quill is now imported locally
 
 export const Editor = forwardRef<EditorRef, EditorProps>(({ value, onChange, placeholder, className = '', hideToolbar = false }, ref) => {
   const editorRef = useRef<HTMLDivElement>(null);
