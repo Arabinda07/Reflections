@@ -18,10 +18,8 @@ import { observationService } from '../../services/observationService';
 import { DEFAULT_WELLNESS_PROMPTS, getCurrentWellnessPrompt, getNextWellnessPromptState } from '../../services/wellnessPrompts';
 import { aiService } from '../../services/aiService';
 import { aiClient } from '../../services/aiClient';
-import {
   getOrderedTasks,
   getTaskDrawerTriggerLabel,
-  getTaskMainPaddingClass,
 } from './createNoteTasks';
 
 // Custom debounce function to avoid CommonJS import issues
@@ -41,9 +39,10 @@ interface TaskRowProps {
   updateTask: (taskId: string, updates: Partial<Task>) => void;
   toggleTask: (taskId: string) => void;
   removeTask: (taskId: string) => void;
+  addTask: () => void;
 }
 
-const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeTask }) => {
+const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeTask, addTask }) => {
   const [showCompletedText, setShowCompletedText] = useState(task.completed);
   const [rippleKey, setRippleKey] = useState(0);
   const wasCompleted = useRef(task.completed);
@@ -136,6 +135,16 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
       />
 
       <div className={`relative z-10 flex shrink-0 items-center gap-1 transition-all duration-300 sm:gap-2 ${task.completed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+        <motion.button
+          type="button"
+          onClick={addTask}
+          whileHover={{ scale: 1.2, rotate: 90, color: 'rgb(59, 130, 246)' }}
+          whileTap={{ scale: 0.9 }}
+          className="p-2 rounded-xl text-gray-nav hover:bg-blue/5 transition-all duration-300 ease-out-quart"
+          aria-label="Add another task"
+        >
+          <Plus size={16} />
+        </motion.button>
         <button
           type="button"
           onClick={() => removeTask(task.id)}
@@ -1134,7 +1143,10 @@ export const CreateNote: React.FC = () => {
             </AnimatePresence>
 
             {/* Main Content Area */}
-            <main className={`flex-1 flex flex-col min-w-0 transition-all duration-700 ease-out-expo ${getTaskMainPaddingClass({ isMobile, isTasksOpen })}`}>
+            <motion.main 
+              layout
+              className="flex-1 flex flex-col min-w-0"
+            >
             
             {/* Slim Top Bar */}
             <nav className={`sticky top-0 z-40 flex items-center justify-between px-6 py-4 bg-white/80 dark:bg-panel-bg/80 backdrop-blur-xl border-b border-border transition-all duration-700 ${isDimmed ? 'opacity-0 -translate-y-full pointer-events-none' : 'opacity-100 translate-y-0'}`}>
@@ -1370,7 +1382,7 @@ export const CreateNote: React.FC = () => {
                 </div>
               </div>
             </div>
-            </main>
+            </motion.main>
           </div>
 
           {/* Global Portals for Sidebar buttons */}
@@ -1550,68 +1562,68 @@ export const CreateNote: React.FC = () => {
             document.body
           )}
 
-          {/* Sanctuary Side Drawer for Tasks */}
-          <AnimatePresence>
-            {isTasksOpen && (
-              <motion.div
-                id="create-note-task-drawer"
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -20, opacity: 0 }}
-                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                role={isMobile ? 'dialog' : undefined}
-                aria-modal={isMobile ? true : undefined}
-                aria-labelledby={isMobile ? taskDrawerTitleId : undefined}
-                aria-describedby={isMobile ? taskDrawerDescriptionId : undefined}
-                className={`fixed bottom-0 z-[45] border-r-2 border-border transition-all duration-700 ease-out-expo flex flex-col
-                  ${isMobile 
-                    ? 'top-0 left-0 right-0 bg-white/95 dark:bg-panel-bg/95 backdrop-blur-xl z-[100] px-6 py-8 shadow-2xl' 
-                    : 'top-[64px] left-[180px] w-[260px] bg-white dark:bg-panel-bg px-5 py-8 shadow-[10px_0_30px_rgba(0,0,0,0.02)]'
-                  }
-                `}
-              >
-                <div className="flex items-center justify-between mb-8">
-                  <div>
-                    <h3 id={taskDrawerTitleId} className="text-[18px] font-black text-gray-text tracking-tight leading-tight">Gentle tasks</h3>
-                    <p id={taskDrawerDescriptionId} className="text-[10px] font-bold text-gray-nav mt-1 opacity-60">Small nudges for this note</p>
-                  </div>
-                  {isMobile && (
-                    <button 
-                      ref={taskDrawerCloseRef}
-                      onClick={closeTaskDrawer}
-                      aria-label="Close tasks"
-                      className="h-10 w-10 flex items-center justify-center rounded-2xl bg-gray-100 dark:bg-white/5 text-gray-nav"
-                    >
-                      <X size={20} />
-                    </button>
-                  )}
-                </div>
-
-                <div className="flex-1 overflow-y-auto pr-1 space-y-3 custom-scrollbar no-scrollbar scroll-smooth">
-                  {tasks.length === 0 ? (
-                    <div className="text-center py-12 opacity-30 select-none">
-                      <ListTodo size={32} className="mx-auto mb-3 opacity-40" />
-                      <p className="text-[11px] font-bold italic">Nothing here yet. Add one small thing you want to hold onto.</p>
-                    </div>
-                  ) : (
-                    getOrderedTasks(tasks).map((task) => (
-                      <TaskRow key={task.id} task={task} updateTask={updateTask} toggleTask={toggleTask} removeTask={removeTask} />
-                    ))
-                  )}
-                </div>
-
-                <div className="mt-6">
-                  <button 
-                    onClick={addTask}
-                    className="w-full h-12 flex items-center justify-center gap-2 rounded-2xl bg-blue/5 border-2 border-dashed border-blue/20 text-blue text-[11px] font-black hover:bg-blue/10 hover:border-blue/40 transition-all active:scale-[0.98]"
+          {/* Task Portal Modal */}
+          {createPortal(
+            <AnimatePresence>
+              {isTasksOpen && (
+                <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 bg-black/40 backdrop-blur-md" 
+                    onClick={closeTaskDrawer} 
+                  />
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                    className="relative w-full max-w-[420px] bg-white/95 dark:bg-panel-bg/95 liquid-glass-strong border-2 border-border/40 rounded-[40px] p-8 shadow-2xl flex flex-col max-h-[80vh]"
                   >
-                    <Plus size={16} />
-                    <span>Add Task</span>
-                  </button>
+                    <div className="flex items-center justify-between mb-8">
+                      <div className="flex items-center gap-3">
+                         <div className="h-10 w-10 rounded-2xl bg-blue/10 flex items-center justify-center text-blue">
+                            <ListTodo size={20} />
+                         </div>
+                         <span className="text-[14px] font-black text-gray-nav uppercase tracking-widest">Tasks</span>
+                      </div>
+                      <button 
+                        ref={taskDrawerCloseRef}
+                        onClick={closeTaskDrawer}
+                        className="h-10 w-10 flex items-center justify-center rounded-2xl bg-gray-100 dark:bg-white/5 text-gray-nav hover:text-red transition-all"
+                      >
+                        <X size={20} />
+                      </button>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto pr-1 space-y-3 custom-scrollbar no-scrollbar scroll-smooth mb-6">
+                      {tasks.length === 0 ? (
+                        <div className="text-center py-12 opacity-30 select-none">
+                          <ListTodo size={32} className="mx-auto mb-3 opacity-40" />
+                          <p className="text-[11px] font-bold italic">Nothing here yet. Add one small thing you want to hold onto.</p>
+                        </div>
+                      ) : (
+                        getOrderedTasks(tasks).map((task) => (
+                          <TaskRow key={task.id} task={task} updateTask={updateTask} toggleTask={toggleTask} removeTask={removeTask} addTask={addTask} />
+                        ))
+                      )}
+                    </div>
+
+                    <div>
+                      <button 
+                        onClick={addTask}
+                        className="w-full h-14 flex items-center justify-center gap-3 rounded-[24px] bg-blue text-white text-[13px] font-black hover:bg-blue/90 shadow-lg shadow-blue/20 transition-all active:scale-[0.98]"
+                      >
+                        <Plus size={20} />
+                        <span>Add New Task</span>
+                      </button>
+                    </div>
+                  </motion.div>
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+              )}
+            </AnimatePresence>,
+            document.body
+          )}
 
           <PaperPlaneToast isVisible={showPlane} onAnimationComplete={handlePlaneAnimationComplete} />
         </div>

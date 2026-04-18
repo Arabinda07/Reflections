@@ -209,7 +209,10 @@ export const SingleNote: React.FC = () => {
           </aside>
 
           {/* Main Content Area */}
-          <main className={`flex-1 flex flex-col min-w-0 transition-all duration-700 ease-out-expo ${isMobile ? 'pl-0' : (isTasksOpen ? 'pl-[440px]' : 'pl-[180px]')}`}>
+          <motion.main 
+            layout
+            className="flex-1 flex flex-col min-w-0"
+          >
             <div className="overflow-y-auto h-full px-4 md:px-0 pt-4 custom-scrollbar">
               <div className="mx-auto max-w-3xl space-y-6 animate-in fade-in duration-500 pb-20 relative px-4">
         {/* Sticky Header */}
@@ -347,8 +350,7 @@ export const SingleNote: React.FC = () => {
           </div>
         </article>
             </div>
-          </div>
-        </main>
+          </motion.main>
 
           {/* Mood Portal (View Only) */}
           {createPortal(
@@ -417,79 +419,71 @@ export const SingleNote: React.FC = () => {
             document.body
           )}
 
-          {/* Sanctuary Side Drawer for Tasks */}
-          <AnimatePresence>
-            {isTasksOpen && (
-              <motion.div
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -20, opacity: 0 }}
-                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                className={`fixed bottom-0 z-[45] border-r-2 border-border transition-all duration-700 ease-out-expo flex flex-col
-                  ${isMobile 
-                    ? 'top-0 left-0 right-0 bg-white/95 dark:bg-panel-bg/95 backdrop-blur-xl z-[100] px-6 py-8' 
-                    : 'top-[64px] left-[180px] w-[260px] bg-white dark:bg-panel-bg px-5 py-8 shadow-[10px_0_30px_rgba(0,0,0,0.02)]'
-                  }
-                `}
-              >
-                <div className="flex items-center justify-between mb-8">
-                  <div>
-                    <h3 className="text-[18px] font-black text-gray-text tracking-tight leading-tight">Actionable Tasks</h3>
-                    <p className="text-[10px] font-bold text-gray-nav mt-1 opacity-60">Items from this reflection</p>
-                  </div>
-                  {isMobile && (
-                    <button 
-                      onClick={() => setIsTasksOpen(false)}
-                      className="h-10 w-10 flex items-center justify-center rounded-2xl bg-gray-100 dark:bg-white/5 text-gray-nav"
-                    >
-                      <X size={20} />
-                    </button>
-                  )}
-                </div>
-
-                <div className="flex-1 overflow-y-auto pr-1 space-y-3 custom-scrollbar no-scrollbar scroll-smooth">
-                  {!note.tasks || note.tasks.length === 0 ? (
-                    <div className="text-center py-12 opacity-30 select-none">
-                      <ListTodo size={32} className="mx-auto mb-3 opacity-40" />
-                      <p className="text-[11px] font-bold italic">No tasks in this sanctuary.</p>
-                    </div>
-                  ) : (
-                    note.tasks.map((task) => (
-                      <div 
-                        key={task.id} 
-                        className={`flex items-center gap-3 p-3 rounded-[20px] border-2 transition-all duration-300 ${
-                          task.completed 
-                            ? 'border-emerald-100/50 bg-emerald-50/30 opacity-60' 
-                            : 'border-border bg-white shadow-sm hover:border-blue/30'
-                        }`}
-                      >
-                        <button 
-                          onClick={() => !task.completed && toggleTask(task.id)}
-                          disabled={task.completed}
-                          className={`h-5 w-5 rounded-lg border-2 flex items-center justify-center transition-all duration-300 ${
-                            task.completed 
-                              ? 'bg-emerald-500 border-emerald-500 text-white cursor-default' 
-                              : 'border-border text-transparent hover:border-blue/50'
-                          }`}
-                        >
-                          <Check size={12} strokeWidth={4} />
-                        </button>
-                        <div className="flex-1 min-w-0">
-                          <p className={`text-[12px] font-bold text-gray-text truncate transition-all duration-300 ${task.completed ? 'line-through opacity-50' : ''}`}>
-                            {task.text}
-                          </p>
-                        </div>
+          {/* Task Portal Modal (Read-Only) */}
+          {createPortal(
+            <AnimatePresence>
+              {isTasksOpen && (
+                <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 bg-black/40 backdrop-blur-md" 
+                    onClick={() => setIsTasksOpen(false)} 
+                  />
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                    className="relative w-full max-w-[420px] bg-white/95 dark:bg-panel-bg/95 liquid-glass-strong border-2 border-border/40 rounded-[40px] p-8 shadow-2xl flex flex-col max-h-[80vh]"
+                  >
+                    <div className="flex items-center justify-between mb-8">
+                      <div className="flex items-center gap-3">
+                         <div className="h-10 w-10 rounded-2xl bg-blue/10 flex items-center justify-center text-blue">
+                            <ListTodo size={20} />
+                         </div>
+                         <span className="text-[14px] font-black text-gray-nav uppercase tracking-widest">Tasks</span>
                       </div>
-                    ))
-                  )}
-                </div>
+                      <button 
+                        onClick={() => setIsTasksOpen(false)}
+                        className="h-10 w-10 flex items-center justify-center rounded-2xl bg-gray-100 dark:bg-white/5 text-gray-nav hover:text-red transition-all"
+                      >
+                        <X size={20} />
+                      </button>
+                    </div>
 
-                <div className="mt-6 p-4 rounded-2xl bg-gray-50/50 dark:bg-white/5 border border-dashed border-border text-center">
-                   <p className="text-[10px] font-black text-gray-nav uppercase tracking-tighter">Read Only in View Mode</p>
+                    <div className="flex-1 overflow-y-auto pr-1 space-y-3 custom-scrollbar no-scrollbar scroll-smooth">
+                      {note.tasks && note.tasks.length > 0 ? (
+                        note.tasks.map((task) => (
+                          <div
+                            key={task.id}
+                            className={`flex items-center gap-3 p-4 rounded-3xl border-2 transition-all duration-300 ${task.completed ? 'bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200/30' : 'bg-white dark:bg-white/5 border-transparent'}`}
+                          >
+                            <div className={`h-6 w-6 rounded-lg border-2 flex items-center justify-center transition-all ${task.completed ? 'bg-sky-400 border-sky-400 text-white' : 'border-border text-transparent'}`}>
+                              <Check size={14} strokeWidth={3} />
+                            </div>
+                            <span className={`text-[14px] font-bold ${task.completed ? 'line-through text-gray-nav opacity-50' : 'text-gray-text'}`}>
+                              {task.text}
+                            </span>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-center py-12 opacity-30 select-none">
+                          <ListTodo size={32} className="mx-auto mb-3 opacity-40" />
+                          <p className="text-[11px] font-bold italic">No tasks for this reflection.</p>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="mt-6 p-4 rounded-2xl bg-gray-50/50 dark:bg-white/5 border border-dashed border-border text-center">
+                       <p className="text-[10px] font-black text-gray-nav uppercase tracking-tighter">Read Only in View Mode</p>
+                    </div>
+                  </motion.div>
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+              )}
+            </AnimatePresence>,
+            document.body
+          )}
         </div>
       )}
 
