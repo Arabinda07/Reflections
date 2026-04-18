@@ -42,28 +42,44 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
             />
           </div>
 
-          {/* Brand Wordmark — cinematic fallback style */}
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 1 }}
-            className="absolute bottom-14 flex flex-col items-center gap-2 z-20"
-          >
-            <span
+          {/* Brand Wordmark — premium staggered reveal */}
+          <div className="absolute bottom-14 flex flex-col items-center gap-2 z-20">
+            <motion.span
+              initial={{ opacity: 0, y: 15, filter: 'blur(10px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              transition={{ 
+                duration: 1.2, 
+                delay: 0.6, 
+                ease: [0.22, 1, 0.36, 1] 
+              }}
               style={{
                 fontFamily: '"Schibsted Grotesk", sans-serif',
                 fontSize: '20px',
                 letterSpacing: '-0.02em',
                 textTransform: 'lowercase',
                 fontWeight: 700,
-                color: 'rgba(255, 255, 255, 0.85)', // Lightened for visibility over video
-                textShadow: '0 2px 4px rgba(0,0,0,0.1)' // Very subtle shadow for legibility
+                color: 'rgba(255, 255, 255, 0.9)',
+                textShadow: '0 2px 8px rgba(0,0,0,0.2)'
               }}
             >
               reflections
-            </span>
-            <div style={{ height: '2px', width: '32px', borderRadius: '9999px', backgroundColor: 'rgba(88,204,2,0.4)' }} />
-          </motion.div>
+            </motion.span>
+            
+            <motion.div 
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: 32, opacity: 1 }}
+              transition={{ 
+                duration: 0.8, 
+                delay: 1.3, 
+                ease: "easeOut" 
+              }}
+              style={{ 
+                height: '2px', 
+                borderRadius: '9999px', 
+                backgroundColor: 'rgba(88,204,2,0.6)' 
+              }} 
+            />
+          </div>
 
         </motion.div>
       )}

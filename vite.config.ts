@@ -42,7 +42,7 @@ export default defineConfig(({ mode }) => {
           },
           workbox: {
             maximumFileSizeToCacheInBytes: 50 * 1024 * 1024, // 50 MiB
-            globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,json,spline,splinecode}'],
+            globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,mp4,json,spline,splinecode}'],
             runtimeCaching: [
               {
                 urlPattern: /^https:\/\/.*\.supabase\.co\/auth\/.*/i,
@@ -64,8 +64,6 @@ export default defineConfig(({ mode }) => {
                   cacheableResponse: {
                     statuses: [0, 200],
                   },
-                  // Add range requests plugin to support video seeking (scrubbing)
-                  // and reliable streaming in Safari
                   rangeRequests: true,
                 },
               },
