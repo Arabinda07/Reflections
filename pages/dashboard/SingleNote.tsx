@@ -222,17 +222,6 @@ export const SingleNote: React.FC = () => {
             Back
           </Button>
           <div className="flex gap-2 items-center">
-            {isMobile && (
-              <Button 
-                variant="secondary" 
-                size="sm" 
-                onClick={() => setIsSidebarOpen(true)}
-                className="border-2 border-border text-gray-text shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart liquid-glass mr-1"
-              >
-                <ChevronRight className={`mr-2 h-3.5 w-3.5 transition-transform ${isSidebarOpen ? 'rotate-180' : ''}`} />
-                Personalize
-              </Button>
-            )}
             <Button 
               variant="secondary" 
               size="sm" 
