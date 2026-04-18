@@ -122,20 +122,11 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
         value={task.text}
         onChange={(e) => updateTask(task.id, { text: e.target.value })}
         readOnly={task.completed}
-        placeholder="Your Task"
+        placeholder="What needs to be done?"
         aria-label={`Task text for ${taskLabel}`}
         className={`relative z-10 flex-1 min-w-0 bg-transparent border-none outline-none ring-0 focus:ring-0 focus:outline-none text-[14px] px-1 font-bold text-gray-text placeholder:text-border transition-all duration-500 ${
           showCompletedText ? 'line-through text-gray-nav cursor-default decoration-sky-400 decoration-2' : ''
         }`}
-      />
-
-      <input
-        id={dueDateInputId}
-        type="date"
-        value={task.dueDate || ''}
-        onChange={(e) => updateTask(task.id, { dueDate: e.target.value || undefined })}
-        className="relative z-10 h-8 shrink-0 rounded-lg border border-border bg-white px-2 text-[11px] font-bold text-gray-nav outline-none transition-colors duration-300 focus:border-blue/40 dark:bg-panel-bg"
-        aria-label={`Due date for ${taskLabel}`}
       />
 
       <div className={`relative z-10 flex shrink-0 items-center gap-1 transition-all duration-300 sm:gap-2 ${task.completed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
@@ -1565,10 +1556,10 @@ export const CreateNote: React.FC = () => {
                 aria-modal={isMobile ? true : undefined}
                 aria-labelledby={isMobile ? taskDrawerTitleId : undefined}
                 aria-describedby={isMobile ? taskDrawerDescriptionId : undefined}
-                className={`fixed top-0 bottom-0 z-[45] border-r-2 border-border transition-all duration-700 ease-out-expo flex flex-col
+                className={`fixed bottom-0 z-[45] border-r-2 border-border transition-all duration-700 ease-out-expo flex flex-col
                   ${isMobile 
-                    ? 'left-0 right-0 bg-white/95 dark:bg-panel-bg/95 backdrop-blur-xl z-[100] px-6 py-8 shadow-2xl' 
-                    : 'left-[180px] w-[260px] bg-white dark:bg-panel-bg px-5 py-8 shadow-[10px_0_30px_rgba(0,0,0,0.02)]'
+                    ? 'top-0 left-0 right-0 bg-white/95 dark:bg-panel-bg/95 backdrop-blur-xl z-[100] px-6 py-8 shadow-2xl' 
+                    : 'top-[64px] left-[180px] w-[260px] bg-white dark:bg-panel-bg px-5 py-8 shadow-[10px_0_30px_rgba(0,0,0,0.02)]'
                   }
                 `}
               >

@@ -23,6 +23,8 @@ export const SingleNote: React.FC = () => {
   
   // Sanctuary Portal States
   const [isTasksOpen, setIsTasksOpen] = useState(false);
+  const [isMoodOpen, setIsMoodOpen] = useState(false);
+  const [isTagsOpen, setIsTagsOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
@@ -423,10 +425,10 @@ export const SingleNote: React.FC = () => {
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: -20, opacity: 0 }}
                 transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                className={`fixed top-0 bottom-0 z-[45] border-r-2 border-border transition-all duration-700 ease-out-expo flex flex-col
+                className={`fixed bottom-0 z-[45] border-r-2 border-border transition-all duration-700 ease-out-expo flex flex-col
                   ${isMobile 
-                    ? 'left-0 right-0 bg-white/95 dark:bg-panel-bg/95 backdrop-blur-xl z-[100] px-6 py-8' 
-                    : 'left-[180px] w-[260px] bg-white dark:bg-panel-bg px-5 py-8 shadow-[10px_0_30px_rgba(0,0,0,0.02)]'
+                    ? 'top-0 left-0 right-0 bg-white/95 dark:bg-panel-bg/95 backdrop-blur-xl z-[100] px-6 py-8' 
+                    : 'top-[64px] left-[180px] w-[260px] bg-white dark:bg-panel-bg px-5 py-8 shadow-[10px_0_30px_rgba(0,0,0,0.02)]'
                   }
                 `}
               >
