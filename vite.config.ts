@@ -41,9 +41,8 @@ export default defineConfig(({ mode }) => {
             ]
           },
           workbox: {
-            globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,mp4,json,spline,splinecode}'],
-            // Exclude Supabase API and other external APIs from the service worker cache
-            // We want these to always be live (Network Only)
+            maximumFileSizeToCacheInBytes: 50 * 1024 * 1024, // 50 MiB
+            globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,json,spline,splinecode}'],
             runtimeCaching: [
               {
                 urlPattern: /^https:\/\/.*\.supabase\.co\/auth\/.*/i,
@@ -52,6 +51,23 @@ export default defineConfig(({ mode }) => {
               {
                 urlPattern: /^https:\/\/.*\.supabase\.co\/rest\/v1\/.*/i,
                 handler: 'NetworkOnly',
+              },
+              {
+                urlPattern: /.*\.mp4$/,
+                handler: 'CacheFirst',
+                options: {
+                  cacheName: 'app-videos',
+                  expiration: {
+                    maxEntries: 10,
+                    maxAgeSeconds: 60 * 60 * 24 * 30, // 30 Days
+                  },
+                  cacheableResponse: {
+                    statuses: [0, 200],
+                  },
+                  // Add range requests plugin to support video seeking (scrubbing)
+                  // and reliable streaming in Safari
+                  rangeRequests: true,
+                },
               },
               {
                 urlPattern: /^https:\/\/.*\.supabase\.co\/storage\/v1\/object\/public\/.*/i,
