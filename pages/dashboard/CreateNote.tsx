@@ -753,18 +753,15 @@ export const CreateNote: React.FC = () => {
       if (!isUnmounted.current) setSaving(false);
     }
 
-    if (!saveSucceeded && !isUnmounted.current) {
-      // If we reached here without success, it's likely a timeout or failure
-      setShowPlane(false);
-      return;
-    }
+    // If saveSucceeded is false at this point, it means we hit the 3-second snappy duration cap.
+    // We proceed to navigation anyway to keep the UX smooth, trusting background persistence.
 
     // ─── Step 3: Wait for the visual floor (if save was instant).
     await visualFloor;
 
     if (isUnmounted.current) return;
 
-    // ─── Step 4: Check milestones, then navigate.
+    // ─── Step 4: Check milestones, then navigate to My Notes.
     const resolvedNoteId = savedNoteId || id || (window as any)._lastCreatedNoteId;
     const totalCount = await noteService.getCount();
     const recentNotes = await noteService.getRecent(10);
@@ -775,19 +772,19 @@ export const CreateNote: React.FC = () => {
     );
 
     if (observation) {
-      // Milestone: dismiss the plane, show the observation card, navigate home after.
+      // Milestone: dismiss the plane, show the observation card, navigate to My Notes after.
       setShowPlane(false);
       if (!isUnmounted.current) {
         setObservationText(observation.text);
         setShowObservation(true);
-        setPendingNavigation(RoutePath.HOME);
+        setPendingNavigation(RoutePath.NOTES);
         observationService.markObservationShown();
       }
     } else {
-      // Normal: fade the plane out, then glide to the homepage.
+      // Normal: fade the plane out, then glide to My Notes.
       setShowPlane(false);
       setTimeout(() => {
-        if (!isUnmounted.current) navigate(RoutePath.HOME);
+        if (!isUnmounted.current) navigate(RoutePath.NOTES);
       }, 450); // matches the AnimatePresence exit duration (0.5s)
     }
   };
