@@ -56,10 +56,11 @@ function App() {
                 <Route path={RoutePath.NOTE_DETAIL} element={<ProtectedRoute><SingleNote /></ProtectedRoute>} />
                 <Route path={RoutePath.ACCOUNT} element={<ProtectedRoute><Account /></ProtectedRoute>} />
                 <Route path={RoutePath.INSIGHTS} element={<ProtectedRoute><Insights /></ProtectedRoute>} />
+                
+                {/* Fallback inside layout */}
+                <Route path="*" element={<NotFound />} />
               </Route>
 
-              {/* Fallback */}
-              <Route path="*" element={<DashboardLayout><NotFound /></DashboardLayout>} />
             </Routes>
           </SyncWrapper>
         </Router>

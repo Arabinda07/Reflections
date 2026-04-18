@@ -325,14 +325,14 @@ export const Insights: React.FC = () => {
       </div>
 
       {/* THEME DETAIL MODAL / SLIDE OVER */}
-        {selectedTheme && (
-          <div className="fixed inset-0 z-[10001] flex items-center justify-center p-4">
+        {selectedTheme && createPortal(
+          <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4 animate-in fade-in duration-300">
             <div
               onClick={() => setSelectedTheme(null)}
               className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             />
             <div
-              className="relative w-full max-w-2xl max-h-[85vh] overflow-hidden bg-white rounded-[32px] border-2 border-border shadow-2xl flex flex-col"
+              className="relative w-full max-w-2xl max-h-[85vh] overflow-hidden bg-white rounded-[32px] border-2 border-border shadow-2xl flex flex-col liquid-glass-strong"
             >
               <div className="sticky top-0 z-10 p-6 border-b border-border bg-white flex items-center justify-between">
                 <div className="flex items-center gap-4">
@@ -370,7 +370,8 @@ export const Insights: React.FC = () => {
                 </Button>
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
   );

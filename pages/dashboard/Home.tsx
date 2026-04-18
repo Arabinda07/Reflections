@@ -1,7 +1,7 @@
 import { ArrowRight, Brain, FolderOpen, PlusCircle, RefreshCw, Smile, Sparkles, Tag, Target, UserPlus } from 'lucide-react';
 import { motion } from 'motion/react';
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { useAuth } from '../../context/AuthContext';
 import { noteService } from '../../services/noteService';
@@ -13,12 +13,17 @@ import { AmbientMusicButton } from '../../components/ui/AmbientMusicButton';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const isFromSave = location.state?.fromSave;
   const { isAuthenticated, user } = useAuth();
   const [noteCount, setNoteCount] = useState<number | null>(null);
   const [isCountLoading, setIsCountLoading] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [dailyPrompt, setDailyPrompt] = useState(DEFAULT_WELLNESS_PROMPTS[0]);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Snappy duration for post-save landing, otherwise standard cinematic 700ms
+  const entranceDuration = isFromSave ? 0.3 : 0.7;
 
   useEffect(() => {
     // Randomize initial prompt
@@ -119,7 +124,7 @@ export const Home: React.FC = () => {
 
   return (
     <>
-      <div className="animate-in fade-in duration-700" {...((showOnboarding ? { inert: "" } : {}) as any)}>
+      <div className={`fade-in`} style={{ animationDuration: `${entranceDuration}s` }} {...((showOnboarding ? { inert: "" } : {}) as any)}>
       {/* Hero Section - Cinematic Hero with 3D Float */}
       <section className="relative flex flex-col items-center justify-start pt-0 pb-16 sm:pb-24 px-6 sm:px-10 overflow-hidden border-b-2 border-border min-h-[400px] sm:min-h-[500px]">
         {/* Hero Video Background */}
@@ -137,13 +142,24 @@ export const Home: React.FC = () => {
 
         {/* Floating Text Container */}
         <motion.div
-          animate={{ y: [-5, 5, -5] }}
-          transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+          animate={{ 
+            y: [-5, 5, -5],
+            scale: isFromSave ? [1, 1.02, 1] : 1,
+            opacity: isFromSave ? [0, 1] : 1
+          }}
+          transition={{ 
+            y: { repeat: Infinity, duration: 4, ease: "easeInOut" },
+            scale: { duration: 1, ease: "easeOut" },
+            opacity: { duration: entranceDuration }
+          }}
           className="relative z-10 flex flex-col gap-32 sm:gap-48 items-center text-center max-w-2xl w-full pt-[110px] sm:pt-[160px]"
         >
           <h1
             className="font-display text-[36px] sm:text-[52px] lg:text-[64px] tracking-tighter leading-none px-2"
-            style={{ color: '#ffffff', textShadow: '0 4px 12px rgba(0,0,0,0.8)' }}
+            style={{ 
+              color: '#ffffff', 
+              textShadow: isFromSave ? '0 0 20px rgba(255,255,255,0.4), 0 4px 12px rgba(0,0,0,0.8)' : '0 4px 12px rgba(0,0,0,0.8)' 
+            }}
           >
             Welcome back, {user?.name?.split(' ')[0] || 'learner'}
           </h1>
@@ -213,20 +229,20 @@ export const Home: React.FC = () => {
         <div className="p-6 sm:p-10 lg:border-l-2 border-border flex flex-col justify-center">
           <div className="panel-label">Daily Mindfulness</div>
           <div className="group relative overflow-hidden bg-white border-2 border-border rounded-[32px] p-8 shadow-sm liquid-glass flex flex-col gap-8">
-            <div className="relative z-10 flex flex-col gap-8">
+            <div className="relative z-10 flex flex-col gap-6">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[22px] bg-blue/10 text-blue shadow-sm border-2 border-border/50">
-                    <Target size={22} />
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue/10 text-blue border-2 border-border/30">
+                    <Target size={20} />
                   </div>
-                  <div className="flex flex-col gap-1">
-                    <h4 className="text-[14px] font-bold text-gray-nav">Today's focus</h4>
-                    <p className="text-[14px] text-gray-light font-medium">A small nudge for today</p>
+                  <div className="flex flex-col">
+                    <h4 className="text-[13px] font-bold text-gray-nav tracking-tight">Today's focus</h4>
+                    <p className="text-[11px] text-gray-light font-bold lowercase opacity-70">A small nudge for today</p>
                   </div>
                 </div>
                 <button
                   onClick={refreshPrompt}
-                  className={`flex h-10 w-10 items-center justify-center rounded-2xl bg-white border-2 border-border text-gray-nav shadow-sm hover:text-blue hover:border-blue/30 transition-all duration-300 ease-out-quart ${isRefreshing ? 'opacity-50' : 'opacity-100'}`}
+                  className={`flex h-10 w-10 items-center justify-center rounded-2xl bg-white/50 border-2 border-border text-gray-nav shadow-sm hover:text-blue hover:border-blue/30 transition-all duration-300 ease-out-quart ${isRefreshing ? 'opacity-50' : 'opacity-100'}`}
                   title="Refresh Prompt"
                   disabled={isRefreshing}
                 >
@@ -234,17 +250,25 @@ export const Home: React.FC = () => {
                 </button>
               </div>
 
-              <div className="rounded-[24px] border-2 border-border bg-gray-50/50 p-6">
-                <p className="text-[18px] font-medium leading-relaxed text-gray-text sm:text-[20px]">
+              <div className="py-2">
+                <p 
+                  className="text-[17px] sm:text-[18px] text-gray-text leading-relaxed font-italic"
+                  style={{ 
+                    fontFamily: 'var(--font-editor)',
+                    fontStyle: 'italic',
+                    opacity: isRefreshing ? 0 : 1,
+                    transition: 'opacity 0.3s ease'
+                  }}
+                >
                   "{dailyPrompt}"
                 </p>
               </div>
 
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
                 <Button
                   variant="secondary"
                   size="lg"
-                  className="w-full border-2 border-border bg-white text-blue font-extrabold shadow-sm sm:w-auto"
+                  className="w-full border-2 border-border bg-white text-blue font-extrabold shadow-sm sm:w-auto h-12 rounded-2xl active:scale-[0.98] transition-all"
                   onClick={() => handleCreateClick(dailyPrompt)}
                 >
                   Start writing
