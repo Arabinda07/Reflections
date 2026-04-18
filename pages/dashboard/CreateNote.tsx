@@ -69,20 +69,25 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
   return (
     <motion.div
       layout
+      initial={{ opacity: 0, scale: 0.95, y: 10 }}
       animate={
         task.completed
           ? {
+              opacity: 1,
+              y: 0,
               scale: 0.99,
               borderColor: 'rgba(125, 211, 252, 0.45)',
               boxShadow: '0 0 0 1px rgba(186, 230, 253, 0.35), 0 18px 45px -35px rgba(14, 165, 233, 0.55)',
             }
           : {
+              opacity: 1,
+              y: 0,
               scale: 1,
               borderColor: 'var(--border-color)',
               boxShadow: '0 1px 2px rgba(var(--gray-text-rgb), 0.04)',
             }
       }
-      transition={{ duration: 0.45, ease: 'easeOut' }}
+      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
       className={`group relative flex items-center gap-2 overflow-hidden rounded-[24px] border-2 p-3 sm:gap-4 sm:p-4 bg-white dark:bg-panel-bg transition-colors duration-300 ${task.completed ? 'bg-emerald-50/60 dark:bg-emerald-900/10' : ''}`}
     >
       <AnimatePresence>
@@ -122,6 +127,7 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
         value={task.text}
         onChange={(e) => updateTask(task.id, { text: e.target.value })}
         readOnly={task.completed}
+        autoFocus={!task.text}
         placeholder="What needs to be done?"
         aria-label={`Task text for ${taskLabel}`}
         className={`relative z-10 flex-1 min-w-0 bg-transparent border-none outline-none ring-0 focus:ring-0 focus:outline-none text-[14px] px-1 font-bold text-gray-text placeholder:text-border transition-all duration-500 ${
@@ -767,6 +773,7 @@ export const CreateNote: React.FC = () => {
   };
 
   const addTask = () => {
+    navigator.vibrate?.(10);
     const newTask: Task = {
       id: Math.random().toString(36).substr(2, 9),
       text: '',
