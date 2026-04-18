@@ -30,9 +30,10 @@ export const CompanionObservation: React.FC<CompanionObservationProps> = ({ isVi
         >
           <div className="w-72 h-72 md:w-96 md:h-96 -mt-10">
             <DotLottieReact
-              src="https://lottie.host/cb641a5d-d1e7-4be2-8e0d-0011f4c70b87/Ur1AVC0l3b.lottie"
-              autoplay
-              loop={false}
+              key={isVisible ? 'visible' : 'hidden'}
+              src="/assets/lottie/Trail loading.json"
+              autoplay={true}
+              loop={true}
             />
           </div>
           

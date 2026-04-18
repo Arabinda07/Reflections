@@ -679,64 +679,68 @@ export const CreateNote: React.FC = () => {
     navigator.vibrate?.(10);
     setSaving(true);
 
-    // ─── Step 1: Show plane AND start the 1.5-second animation floor simultaneously.
-    //     The floor ensures the Lottie always plays for a full, satisfying duration
-    //     regardless of how fast or slow the network save completes.
+    // ─── Step 1: Start the race. 
+    //     We create a 3-second "Global Cap" to ensure the user isn't stuck if network hangs.
+    //     We ALSO keep a 1.2-second "Visual Floor" for a satisfying animation.
     setShowPlane(true);
-    const animFloor = new Promise<void>(resolve => setTimeout(resolve, 1500));
+    const visualFloor = new Promise<void>(resolve => setTimeout(resolve, 1200));
+    const globalCap = new Promise<void>(resolve => setTimeout(resolve, 3000));
 
     // ─── Step 2: Run the save.
     let saveSucceeded = false;
     let savedNoteId: string | null = null;
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      // We wrap the save in a Promise.race with the globalCap to avoid deadlocks
+      await Promise.race([
+        (async () => {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) throw new Error("Not authenticated");
 
-      let noteId = id;
+          let noteId = id;
 
-      if (!noteId) {
-        const newNote = await noteService.create({ title, content, tags, mood, tasks });
-        noteId = newNote.id;
-      }
+          if (!noteId) {
+            const newNote = await noteService.create({ title, content, tags, mood, tasks });
+            noteId = newNote.id;
+          }
 
-      let finalThumbnailUrl = imagePreview;
+          let finalThumbnailUrl = imagePreview;
 
-      if (imagePreview && imagePreview.startsWith('blob:')) {
-        const response = await fetch(imagePreview);
-        const blob = await response.blob();
-        const file = new File([blob], "cover.jpg", { type: blob.type });
-        finalThumbnailUrl = await storageService.uploadFile(file, user.id, 'notes', noteId);
-      } else if (!imagePreview) {
-        finalThumbnailUrl = undefined;
-      }
+          if (imagePreview && imagePreview.startsWith('blob:')) {
+            const response = await fetch(imagePreview);
+            const blob = await response.blob();
+            const file = new File([blob], "cover.jpg", { type: blob.type });
+            finalThumbnailUrl = await storageService.uploadFile(file, user.id, 'notes', noteId);
+          } else if (!imagePreview) {
+            finalThumbnailUrl = undefined;
+          }
 
-      const uploadedAttachments: NoteAttachment[] = [];
-      for (const file of newAttachments) {
-        const path = await storageService.uploadFile(file, user.id, 'notes', noteId);
-        uploadedAttachments.push({ name: file.name, size: file.size, type: file.type, path, id: path });
-      }
+          const uploadedAttachments: NoteAttachment[] = [];
+          for (const file of newAttachments) {
+            const path = await storageService.uploadFile(file, user.id, 'notes', noteId);
+            uploadedAttachments.push({ name: file.name, size: file.size, type: file.type, path, id: path });
+          }
 
-      await noteService.update(noteId, {
-        title, content, mood, tags, tasks,
-        thumbnailUrl: finalThumbnailUrl || undefined,
-        attachments: [...existingAttachments, ...uploadedAttachments]
-      });
+          await noteService.update(noteId, {
+            title, content, mood, tags, tasks,
+            thumbnailUrl: finalThumbnailUrl || undefined,
+            attachments: [...existingAttachments, ...uploadedAttachments]
+          });
 
-        if (!isUnmounted.current) {
-          if (!id) (window as any)._lastCreatedNoteId = noteId;
-          savedNoteId = noteId;
-          saveSucceeded = true;
-          
-          // Trigger the LLM Wiki Ingestion in the background (fire and forget)
-          // We fetch the full note object to ensure the AI has context
-          const currentNoteForAi = { id: noteId, title, content, tags, mood, tasks, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
-          aiService.processNoteIntoWiki(currentNoteForAi).catch(e => console.error("Wiki ingestion background error:", e));
-        }
+          if (!isUnmounted.current) {
+            if (!id) (window as any)._lastCreatedNoteId = noteId;
+            savedNoteId = noteId;
+            saveSucceeded = true;
+            
+            const currentNoteForAi = { id: noteId, title, content, tags, mood, tasks, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+            aiService.processNoteIntoWiki(currentNoteForAi).catch(e => console.error("Wiki ingestion background error:", e));
+          }
+        })(),
+        globalCap
+      ]);
 
     } catch (error: any) {
       if (isUnmounted.current) return;
-      // Save failed — kill the plane immediately and surface the error.
       setShowPlane(false);
       if (error.message === 'FREE_LIMIT_REACHED') {
         setIsLimitReached(true);
@@ -749,13 +753,14 @@ export const CreateNote: React.FC = () => {
       if (!isUnmounted.current) setSaving(false);
     }
 
-    if (!saveSucceeded || isUnmounted.current) return;
+    if (!saveSucceeded && !isUnmounted.current) {
+      // If we reached here without success, it's likely a timeout or failure
+      setShowPlane(false);
+      return;
+    }
 
-    // ─── Step 3: Wait for the animation floor to complete.
-    //     If save finished early (common), we wait here for the remaining time
-    //     so the Lottie always plays for the full 1.5 seconds.
-    //     If save was slow (> 1.5s), animFloor is already resolved and this is instant.
-    await animFloor;
+    // ─── Step 3: Wait for the visual floor (if save was instant).
+    await visualFloor;
 
     if (isUnmounted.current) return;
 

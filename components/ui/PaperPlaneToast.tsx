@@ -23,19 +23,8 @@ export const PaperPlaneToast: React.FC<PaperPlaneToastProps> = ({
   isVisible,
   onAnimationComplete,
 }) => {
-  const callbackRef = useRef(onAnimationComplete);
-  callbackRef.current = onAnimationComplete; // always up-to-date
-
-  useEffect(() => {
-    if (!isVisible) return;
-
-    // Fixed 2-second window — matches the paper plane arc duration
-    const timer = setTimeout(() => {
-      callbackRef.current();
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, [isVisible]);
+  // Timing is now entirely driven by the parent (CreateNote.tsx)
+  // to ensure a deterministic 3-second maximum window.
 
   return (
     <AnimatePresence>
@@ -78,9 +67,10 @@ export const PaperPlaneToast: React.FC<PaperPlaneToastProps> = ({
             <div style={{ width: '80px', height: '80px', flexShrink: 0, margin: '-14px 0 -14px -8px' }}>
               <DotLottieReact
                 key={isVisible ? 'visible' : 'hidden'}
-                src="/assets/lottie/Loading 40 _ Paperplane.json"
+                src="/assets/lottie/paperplane.json"
                 autoplay={true}
                 loop={true}
+                speed={1.5}
                 style={{ width: '100%', height: '100%' }}
               />
             </div>
