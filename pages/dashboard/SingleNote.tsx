@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Edit3, Trash2, ArrowLeft, Calendar, Clock, AlertCircle, Paperclip, FileText, Download, Smile, Sun, Cloud, Frown, Zap, Moon, Tag, ListTodo, Check } from 'lucide-react';
+import { Edit3, Trash2, ArrowLeft, Calendar, Clock, AlertCircle, Paperclip, FileText, Download, Smile, Sun, Cloud, Frown, Zap, Moon, Tag, ListTodo, Check, X, ChevronRight } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '../../components/ui/Button';
 import { noteService } from '../../services/noteService';
 import { storageService } from '../../services/storageService';
@@ -18,6 +20,17 @@ export const SingleNote: React.FC = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Sanctuary Portal States
+  const [isTasksOpen, setIsTasksOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (!id) return;
@@ -110,14 +123,111 @@ export const SingleNote: React.FC = () => {
     <>
       {/* LoadingState removed for instant detail view */}
       {isContentVisible && note && (
-        <div className="mx-auto max-w-3xl space-y-6 animate-in fade-in duration-500 pb-20 relative px-4 md:px-0 pt-4">
+        <div className="flex h-screen w-full bg-white dark:bg-panel-bg overflow-hidden relative selection:bg-blue/10">
+          {/* Sidebar - Integrated Sanctuary Control */}
+          <aside 
+            className={`fixed left-0 top-0 bottom-0 w-[200px] lg:w-[180px] border-r-2 border-border z-50 transition-all duration-700 ease-out-expo px-4 py-8 flex flex-col gap-6 
+              ${isMobile ? 'liquid-glass-strong rounded-r-[40px] shadow-2xl overflow-y-auto' : 'bg-white dark:bg-panel-bg'}
+              ${isMobile ? (isSidebarOpen ? 'translate-x-0' : '-translate-x-full') : 'translate-x-0 opacity-100'}
+            `}
+          >
+            <div className="flex flex-col gap-2">
+              <span className="text-[10px] font-black text-blue tracking-widest uppercase opacity-70">Sanctuary View</span>
+              <div className="flex items-center gap-2 text-[12px] font-extrabold text-gray-nav mt-2">
+                <Calendar size={14} className="text-gray-nav" />
+                <span>{new Date(note.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-4">
+               <span className="text-[10px] font-black text-gray-nav tracking-widest uppercase opacity-40">Personalize</span>
+               
+               {/* Mood Toggle (Portal Trigger) */}
+               <div className="relative">
+                  <button 
+                    onClick={() => setIsMoodOpen(true)}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl border-2 transition-all duration-300 active:scale-95 ${note.mood ? 'bg-blue/10 border-blue text-blue shadow-[0_0_15px_rgba(59,130,246,0.1)]' : 'bg-white dark:bg-panel-bg border-border text-gray-nav hover:border-blue/30'}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      {note.mood ? (
+                        <>
+                          {getMoodIcon(note.mood)}
+                          <span className="text-[12px] font-black">{note.mood}</span>
+                        </>
+                      ) : (
+                        <>
+                          <Smile size={18} />
+                          <span className="text-[12px] font-black uppercase tracking-tight">Set Mood</span>
+                        </>
+                      )}
+                    </div>
+                    <ChevronRight size={14} className={isMoodOpen ? 'rotate-90' : ''} />
+                  </button>
+               </div>
+
+               {/* Tags Display (Portal Trigger) */}
+               <div className="relative">
+                  <button 
+                    onClick={() => setIsTagsOpen(true)}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl border-2 transition-all duration-300 active:scale-95 ${note.tags && note.tags.length > 0 ? 'bg-green/5 border-green text-green' : 'bg-white dark:bg-panel-bg border-border text-gray-nav hover:border-blue/30'}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Tag size={18} />
+                      <span className="text-[12px] font-black uppercase tracking-tight">{note.tags?.length || 0} Tags</span>
+                    </div>
+                    <ChevronRight size={14} className={isTagsOpen ? 'rotate-90' : ''} />
+                  </button>
+               </div>
+
+               {/* Tasks Button (Consolidated Portal) */}
+               <div className="relative">
+                  <button 
+                    onClick={() => setIsTasksOpen(true)}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl border-2 transition-all duration-300 ease-out-expo active:scale-95 ${note.tasks?.some(t => !t.completed) ? 'bg-blue/5 border-blue/40 text-blue shadow-[0_0_15px_rgba(59,130,246,0.05)]' : 'bg-white dark:bg-panel-bg border-border text-gray-nav hover:border-blue/30'}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <ListTodo size={18} />
+                      <span className="text-[12px] font-black uppercase tracking-tight">
+                        {note.tasks?.filter(t => !t.completed).length > 0 ? `${note.tasks.filter(t => !t.completed).length} Tasks` : 'Tasks'}
+                      </span>
+                    </div>
+                    <ChevronRight size={14} className={isTasksOpen ? 'rotate-90' : ''} />
+                  </button>
+               </div>
+            </div>
+
+            <div className="mt-auto">
+               <div className="p-3 rounded-2xl bg-gray-50 dark:bg-white/5 border border-border">
+                  <p className="text-[10px] font-bold text-gray-nav flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue" />
+                    Locked for Reflection
+                  </p>
+               </div>
+            </div>
+          </aside>
+
+          {/* Main Content Area */}
+          <main className={`flex-1 flex flex-col min-w-0 transition-all duration-700 ease-out-expo ${isMobile ? 'pl-0' : (isTasksOpen ? 'pl-[440px]' : 'pl-[180px]')}`}>
+            <div className="overflow-y-auto h-full px-4 md:px-0 pt-4 custom-scrollbar">
+              <div className="mx-auto max-w-3xl space-y-6 animate-in fade-in duration-500 pb-20 relative px-4">
         {/* Sticky Header */}
         <div className="flex items-center justify-between sticky top-4 bg-white/80 backdrop-blur-xl py-3 px-4 sm:px-6 rounded-[24px] border-2 border-border shadow-sm z-10 mb-8 liquid-glass">
           <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.NOTES)} className="-ml-2 text-gray-nav hover:text-gray-text font-bold text-[12px]">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Button>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+            {isMobile && (
+              <Button 
+                variant="secondary" 
+                size="sm" 
+                onClick={() => setIsSidebarOpen(true)}
+                className="border-2 border-border text-gray-text shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart liquid-glass mr-1"
+              >
+                <ChevronRight className={`mr-2 h-3.5 w-3.5 transition-transform ${isSidebarOpen ? 'rotate-180' : ''}`} />
+                Personalize
+              </Button>
+            )}
             <Button 
               variant="secondary" 
               size="sm" 
@@ -202,49 +312,6 @@ export const SingleNote: React.FC = () => {
               dangerouslySetInnerHTML={{ __html: note.content }}
             />
 
-            {/* Tasks Section */}
-            {note.tasks && note.tasks.length > 0 && (
-              <div className="mt-12 border-t-2 border-border pt-8">
-                 <h3 className="text-[13px] font-extrabold text-gray-text mb-4 flex items-center gap-2">
-                    <ListTodo size={16} className="text-blue" />
-                    Actionable tasks
-                 </h3>
-                 <div className="space-y-3">
-                    {note.tasks.map((task) => (
-                      <div 
-                        key={task.id} 
-                        className={`flex items-center gap-4 p-4 rounded-[24px] border-2 transition-all duration-300 ease-out-quart ${
-                          task.completed 
-                            ? 'border-border bg-gray-50/30 opacity-60' 
-                            : 'border-border bg-white shadow-sm hover:border-blue/30'
-                        }`}
-                      >
-                        <button 
-                          onClick={() => !task.completed && toggleTask(task.id)}
-                          disabled={task.completed}
-                          className={`h-6 w-6 rounded-lg border-2 flex items-center justify-center transition-all duration-300 ease-out-quart ${
-                            task.completed 
-                              ? 'bg-blue border-blue text-white cursor-default' 
-                              : 'border-border text-transparent hover:border-blue/50'
-                          }`}
-                        >
-                          <Check size={14} strokeWidth={3} />
-                        </button>
-                        <div className="flex-1">
-                          <p className={`text-[14px] font-bold text-gray-text transition-all duration-300 ease-out-quart ${task.completed ? 'line-through' : ''}`}>
-                            {task.text}
-                          </p>
-                          {task.dueDate && (
-                            <p className="text-[11px] font-bold text-gray-nav mt-0.5">
-                              Due: {new Date(task.dueDate).toLocaleDateString()}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                 </div>
-              </div>
-            )}
 
             {/* Attachments Section */}
             {note.attachments && note.attachments.length > 0 && (
@@ -277,7 +344,151 @@ export const SingleNote: React.FC = () => {
             )}
           </div>
         </article>
-      </div>
+            </div>
+          </div>
+        </main>
+
+          {/* Mood Portal (View Only) */}
+          {createPortal(
+            <AnimatePresence>
+              {isMoodOpen && (
+                <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={() => setIsMoodOpen(false)} />
+                  <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative w-full max-w-[320px] bg-white/95 dark:bg-panel-bg/95 border-2 border-border/40 rounded-[40px] p-8 shadow-2xl">
+                    <div className="flex items-center justify-between mb-8">
+                      <div>
+                        <h3 className="text-[18px] font-black text-gray-text tracking-tight">Reflection Mood</h3>
+                        <p className="text-[11px] font-bold text-gray-nav">How you felt</p>
+                      </div>
+                      <button onClick={() => setIsMoodOpen(false)} className="h-10 w-10 flex items-center justify-center rounded-2xl bg-gray-100 dark:bg-white/5 text-gray-nav hover:text-red transition-all">
+                        <X size={20} />
+                      </button>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                       {note.mood ? (
+                         <div className="w-full p-6 rounded-3xl bg-blue/5 border-2 border-blue/10 flex flex-col items-center gap-4">
+                            <div className="scale-150">{getMoodIcon(note.mood)}</div>
+                            <span className="text-[16px] font-black text-blue uppercase tracking-widest">{note.mood}</span>
+                         </div>
+                       ) : (
+                         <p className="text-[12px] font-bold text-gray-nav italic">No mood was set for this reflection.</p>
+                       )}
+                    </div>
+                  </motion.div>
+                </div>
+              )}
+            </AnimatePresence>,
+            document.body
+          )}
+
+          {/* Tags Portal (View Only) */}
+          {createPortal(
+            <AnimatePresence>
+              {isTagsOpen && (
+                <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={() => setIsTagsOpen(false)} />
+                  <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative w-full max-w-[380px] bg-white/95 dark:bg-panel-bg/95 border-2 border-border/40 rounded-[40px] p-8 shadow-2xl">
+                    <div className="flex items-center justify-between mb-8">
+                      <div>
+                        <h3 className="text-[18px] font-black text-gray-text tracking-tight">Sanctuary Tags</h3>
+                        <p className="text-[11px] font-bold text-gray-nav">Note organization</p>
+                      </div>
+                      <button onClick={() => setIsTagsOpen(false)} className="h-10 w-10 flex items-center justify-center rounded-2xl bg-gray-100 dark:bg-white/5 text-gray-nav hover:text-red transition-all">
+                        <X size={20} />
+                      </button>
+                    </div>
+                    <div className="flex flex-wrap gap-2 max-h-[300px] overflow-y-auto">
+                      {note.tags && note.tags.length > 0 ? (
+                        note.tags.map(tag => (
+                          <span key={tag} className="px-4 py-2 rounded-2xl bg-green/5 border-2 border-green/10 text-[12px] font-black text-green">
+                            #{tag}
+                          </span>
+                        ))
+                      ) : (
+                        <p className="text-[12px] font-bold text-gray-nav italic">No tags for this note.</p>
+                      )}
+                    </div>
+                  </motion.div>
+                </div>
+              )}
+            </AnimatePresence>,
+            document.body
+          )}
+
+          {/* Sanctuary Side Drawer for Tasks */}
+          <AnimatePresence>
+            {isTasksOpen && (
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -20, opacity: 0 }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                className={`fixed top-0 bottom-0 z-[45] border-r-2 border-border transition-all duration-700 ease-out-expo flex flex-col
+                  ${isMobile 
+                    ? 'left-0 right-0 bg-white/95 dark:bg-panel-bg/95 backdrop-blur-xl z-[100] px-6 py-8' 
+                    : 'left-[180px] w-[260px] bg-white dark:bg-panel-bg px-5 py-8 shadow-[10px_0_30px_rgba(0,0,0,0.02)]'
+                  }
+                `}
+              >
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <h3 className="text-[18px] font-black text-gray-text tracking-tight leading-tight">Actionable Tasks</h3>
+                    <p className="text-[10px] font-bold text-gray-nav mt-1 opacity-60">Items from this reflection</p>
+                  </div>
+                  {isMobile && (
+                    <button 
+                      onClick={() => setIsTasksOpen(false)}
+                      className="h-10 w-10 flex items-center justify-center rounded-2xl bg-gray-100 dark:bg-white/5 text-gray-nav"
+                    >
+                      <X size={20} />
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex-1 overflow-y-auto pr-1 space-y-3 custom-scrollbar no-scrollbar scroll-smooth">
+                  {!note.tasks || note.tasks.length === 0 ? (
+                    <div className="text-center py-12 opacity-30 select-none">
+                      <ListTodo size={32} className="mx-auto mb-3 opacity-40" />
+                      <p className="text-[11px] font-bold italic">No tasks in this sanctuary.</p>
+                    </div>
+                  ) : (
+                    note.tasks.map((task) => (
+                      <div 
+                        key={task.id} 
+                        className={`flex items-center gap-3 p-3 rounded-[20px] border-2 transition-all duration-300 ${
+                          task.completed 
+                            ? 'border-emerald-100/50 bg-emerald-50/30 opacity-60' 
+                            : 'border-border bg-white shadow-sm hover:border-blue/30'
+                        }`}
+                      >
+                        <button 
+                          onClick={() => !task.completed && toggleTask(task.id)}
+                          disabled={task.completed}
+                          className={`h-5 w-5 rounded-lg border-2 flex items-center justify-center transition-all duration-300 ${
+                            task.completed 
+                              ? 'bg-emerald-500 border-emerald-500 text-white cursor-default' 
+                              : 'border-border text-transparent hover:border-blue/50'
+                          }`}
+                        >
+                          <Check size={12} strokeWidth={4} />
+                        </button>
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-[12px] font-bold text-gray-text truncate transition-all duration-300 ${task.completed ? 'line-through opacity-50' : ''}`}>
+                            {task.text}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                <div className="mt-6 p-4 rounded-2xl bg-gray-50/50 dark:bg-white/5 border border-dashed border-border text-center">
+                   <p className="text-[10px] font-black text-gray-nav uppercase tracking-tighter">Read Only in View Mode</p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       )}
 
       {/* Confirmation Dialog */}

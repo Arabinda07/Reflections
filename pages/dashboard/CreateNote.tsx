@@ -18,6 +18,11 @@ import { observationService } from '../../services/observationService';
 import { DEFAULT_WELLNESS_PROMPTS, getCurrentWellnessPrompt, getNextWellnessPromptState } from '../../services/wellnessPrompts';
 import { aiService } from '../../services/aiService';
 import { aiClient } from '../../services/aiClient';
+import {
+  getOrderedTasks,
+  getTaskDrawerTriggerLabel,
+  getTaskMainPaddingClass,
+} from './createNoteTasks';
 
 // Custom debounce function to avoid CommonJS import issues
 function debounce<T extends (...args: any[]) => any>(
@@ -42,6 +47,9 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
   const [showCompletedText, setShowCompletedText] = useState(task.completed);
   const [rippleKey, setRippleKey] = useState(0);
   const wasCompleted = useRef(task.completed);
+  const taskLabel = task.text.trim() || 'Untitled task';
+  const textInputId = `task-text-${task.id}`;
+  const dueDateInputId = `task-due-${task.id}`;
 
   useEffect(() => {
     if (task.completed) {
@@ -109,23 +117,28 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
       </button>
 
       <input
+        id={textInputId}
         type="text"
         value={task.text}
         onChange={(e) => updateTask(task.id, { text: e.target.value })}
         readOnly={task.completed}
         placeholder="Your Task"
+        aria-label={`Task text for ${taskLabel}`}
         className={`relative z-10 flex-1 min-w-0 bg-transparent border-none outline-none ring-0 focus:ring-0 focus:outline-none text-[14px] px-1 font-bold text-gray-text placeholder:text-border transition-all duration-500 ${
           showCompletedText ? 'line-through text-gray-nav cursor-default decoration-sky-400 decoration-2' : ''
         }`}
       />
 
+      <input
+        id={dueDateInputId}
+        type="date"
+        value={task.dueDate || ''}
+        onChange={(e) => updateTask(task.id, { dueDate: e.target.value || undefined })}
+        className="relative z-10 h-8 shrink-0 rounded-lg border border-border bg-white px-2 text-[11px] font-bold text-gray-nav outline-none transition-colors duration-300 focus:border-blue/40 dark:bg-panel-bg"
+        aria-label={`Due date for ${taskLabel}`}
+      />
+
       <div className={`relative z-10 flex shrink-0 items-center gap-1 transition-all duration-300 sm:gap-2 ${task.completed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-        <input
-          type="date"
-          value={task.dueDate || ''}
-          onChange={(e) => updateTask(task.id, { dueDate: e.target.value })}
-          className="text-[11px] font-bold text-gray-nav bg-gray-50 dark:bg-white/5 border-none rounded-lg p-1 focus:ring-0 dark:text-slate-300"
-        />
         <button
           type="button"
           onClick={() => removeTask(task.id)}
@@ -182,6 +195,12 @@ export const CreateNote: React.FC = () => {
   const flowTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [dragStartY, setDragStartY] = useState<number | null>(null);
   const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
+  const shellRef = useRef<HTMLDivElement>(null);
+  const taskTriggerRef = useRef<HTMLButtonElement>(null);
+  const taskDrawerCloseRef = useRef<HTMLButtonElement>(null);
+  const wasTaskDrawerOpenRef = useRef(isTasksOpen);
+  const taskDrawerTitleId = 'create-note-task-drawer-title';
+  const taskDrawerDescriptionId = 'create-note-task-drawer-description';
   
   // Mindful Features States
   const [isMusicOpen, setIsMusicOpen] = useState(false);
@@ -802,6 +821,74 @@ export const CreateNote: React.FC = () => {
     }, 1500);
   };
 
+  const closeTaskDrawer = () => {
+    setIsTasksOpen(false);
+  };
+
+  const toggleTaskDrawer = () => {
+    if (isTasksOpen) {
+      closeTaskDrawer();
+      return;
+    }
+
+    if (isMobile) {
+      setIsSidebarOpen(false);
+    }
+
+    setIsTasksOpen(true);
+  };
+
+  useEffect(() => {
+    const wasOpen = wasTaskDrawerOpenRef.current;
+    wasTaskDrawerOpenRef.current = isTasksOpen;
+
+    if (wasOpen && !isTasksOpen) {
+      taskTriggerRef.current?.focus();
+      return;
+    }
+
+    if (!wasOpen && isTasksOpen && isMobile) {
+      taskDrawerCloseRef.current?.focus();
+    }
+  }, [isMobile, isTasksOpen]);
+
+  useEffect(() => {
+    if (!isTasksOpen) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeTaskDrawer();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isTasksOpen]);
+
+  useEffect(() => {
+    const shell = shellRef.current;
+    if (!shell) {
+      return;
+    }
+
+    const shouldInertShell = isMobile && isTasksOpen;
+    if (shouldInertShell) {
+      shell.setAttribute('inert', '');
+      shell.setAttribute('aria-hidden', 'true');
+    } else {
+      shell.removeAttribute('inert');
+      shell.removeAttribute('aria-hidden');
+    }
+
+    return () => {
+      shell.removeAttribute('inert');
+      shell.removeAttribute('aria-hidden');
+    };
+  }, [isMobile, isTasksOpen]);
+
 
 
   // LIMIT REACHED UI
@@ -987,6 +1074,26 @@ export const CreateNote: React.FC = () => {
                   </button>
                </div>
 
+                {/* Tasks Button (Consolidated from Canvas) */}
+                <div className="relative">
+                   <button 
+                     ref={taskTriggerRef}
+                     onClick={toggleTaskDrawer}
+                     aria-expanded={isTasksOpen}
+                     aria-controls="create-note-task-drawer"
+                     aria-haspopup={isMobile ? 'dialog' : undefined}
+                     className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl border-2 transition-all duration-300 ease-out-expo active:scale-95 ${tasks.some(t => !t.completed) ? 'bg-blue/5 border-blue/40 text-blue shadow-[0_0_15px_rgba(59,130,246,0.05)]' : 'bg-white dark:bg-panel-bg border-border text-gray-nav hover:border-blue/30'}`}
+                   >
+                     <div className="flex items-center gap-3">
+                       <ListTodo size={18} />
+                       <span className="text-[12px] font-black uppercase tracking-tight">
+                         {getTaskDrawerTriggerLabel(tasks).label}
+                       </span>
+                     </div>
+                     <ChevronRight size={14} className={isTasksOpen ? 'rotate-90' : ''} />
+                   </button>
+                </div>
+
                {/* Attach & Cover Grid/Stack - Compact */}
                <div className={`grid gap-2 mt-2 grid-cols-2`}>
                   <label className="group flex flex-col items-center justify-center p-3 rounded-2xl border-2 border-border bg-white dark:bg-panel-bg cursor-pointer transition-all duration-300 hover:bg-blue/5 hover:border-blue/30 hover:text-blue active:scale-95">
@@ -1014,21 +1121,22 @@ export const CreateNote: React.FC = () => {
             </div>
           </aside>
 
-          {/* Backdrop for Mobile Sidebar */}
-          <AnimatePresence>
-            {isMobile && isSidebarOpen && (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setIsSidebarOpen(false)}
-                className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[45]"
-              />
-            )}
-          </AnimatePresence>
+          <div ref={shellRef} aria-hidden={isMobile && isTasksOpen ? true : undefined} className="contents">
+            {/* Backdrop for Mobile Sidebar */}
+            <AnimatePresence>
+              {isMobile && isSidebarOpen && (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setIsSidebarOpen(false)}
+                  className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[45]"
+                />
+              )}
+            </AnimatePresence>
 
-          {/* Main Content Area */}
-          <main className={`flex-1 flex flex-col min-w-0 transition-all duration-700 ease-out-expo ${isDimmed ? 'lg:pl-0' : (isMobile ? 'lg:pl-0' : 'lg:pl-[180px]')}`}>
+            {/* Main Content Area */}
+            <main className={`flex-1 flex flex-col min-w-0 transition-all duration-700 ease-out-expo ${getTaskMainPaddingClass({ isMobile, isTasksOpen })}`}>
             
             {/* Slim Top Bar */}
             <nav className={`sticky top-0 z-40 flex items-center justify-between px-6 py-4 bg-white/80 dark:bg-panel-bg/80 backdrop-blur-xl border-b border-border transition-all duration-700 ${isDimmed ? 'opacity-0 -translate-y-full pointer-events-none' : 'opacity-100 translate-y-0'}`}>
@@ -1167,29 +1275,6 @@ export const CreateNote: React.FC = () => {
 
                       {/* Actionable items - Faded in Flow State */}
                       <div className={`mt-20 space-y-20 transition-all duration-700 ${isDimmed ? (isMobile ? 'opacity-0 translate-y-8' : 'opacity-25') : 'opacity-100 translate-y-0'}`}>
-                        {/* Tasks Section */}
-                        <div className="border-t-2 border-border pt-12">
-                          <div className="flex items-center justify-between mb-8">
-                             <div className="flex items-center gap-3">
-                               <div className="w-10 h-10 rounded-2xl bg-blue/10 text-blue flex items-center justify-center">
-                                 <ListTodo size={20} />
-                               </div>
-                               <div>
-                                 <h3 className="text-[16px] font-black text-gray-text">Actionable Tasks</h3>
-                                 <p className="text-[12px] font-bold text-gray-nav">What needs doing?</p>
-                               </div>
-                             </div>
-                             <button onClick={addTask} className="px-4 py-2 rounded-xl bg-blue text-white text-[11px] font-black hover:shadow-lg transition-all active:scale-95">
-                               + Add New
-                             </button>
-                          </div>
-                          
-                          <div className="grid gap-4">
-                             {tasks.map((task) => (
-                               <TaskRow key={task.id} task={task} updateTask={updateTask} toggleTask={toggleTask} removeTask={removeTask} />
-                             ))}
-                          </div>
-                        </div>
 
                         {(newAttachments.length > 0 || existingAttachments.length > 0) && (
                           <div className="border-t-2 border-border pt-12 text-gray-nav">
@@ -1287,7 +1372,8 @@ export const CreateNote: React.FC = () => {
                 </div>
               </div>
             </div>
-          </main>
+            </main>
+          </div>
 
           {/* Global Portals for Sidebar buttons */}
           {createPortal(
@@ -1465,6 +1551,69 @@ export const CreateNote: React.FC = () => {
             </AnimatePresence>,
             document.body
           )}
+
+          {/* Sanctuary Side Drawer for Tasks */}
+          <AnimatePresence>
+            {isTasksOpen && (
+              <motion.div
+                id="create-note-task-drawer"
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -20, opacity: 0 }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                role={isMobile ? 'dialog' : undefined}
+                aria-modal={isMobile ? true : undefined}
+                aria-labelledby={isMobile ? taskDrawerTitleId : undefined}
+                aria-describedby={isMobile ? taskDrawerDescriptionId : undefined}
+                className={`fixed top-0 bottom-0 z-[45] border-r-2 border-border transition-all duration-700 ease-out-expo flex flex-col
+                  ${isMobile 
+                    ? 'left-0 right-0 bg-white/95 dark:bg-panel-bg/95 backdrop-blur-xl z-[100] px-6 py-8 shadow-2xl' 
+                    : 'left-[180px] w-[260px] bg-white dark:bg-panel-bg px-5 py-8 shadow-[10px_0_30px_rgba(0,0,0,0.02)]'
+                  }
+                `}
+              >
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <h3 id={taskDrawerTitleId} className="text-[18px] font-black text-gray-text tracking-tight leading-tight">Gentle tasks</h3>
+                    <p id={taskDrawerDescriptionId} className="text-[10px] font-bold text-gray-nav mt-1 opacity-60">Small nudges for this note</p>
+                  </div>
+                  {isMobile && (
+                    <button 
+                      ref={taskDrawerCloseRef}
+                      onClick={closeTaskDrawer}
+                      aria-label="Close tasks"
+                      className="h-10 w-10 flex items-center justify-center rounded-2xl bg-gray-100 dark:bg-white/5 text-gray-nav"
+                    >
+                      <X size={20} />
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex-1 overflow-y-auto pr-1 space-y-3 custom-scrollbar no-scrollbar scroll-smooth">
+                  {tasks.length === 0 ? (
+                    <div className="text-center py-12 opacity-30 select-none">
+                      <ListTodo size={32} className="mx-auto mb-3 opacity-40" />
+                      <p className="text-[11px] font-bold italic">Nothing here yet. Add one small thing you want to hold onto.</p>
+                    </div>
+                  ) : (
+                    getOrderedTasks(tasks).map((task) => (
+                      <TaskRow key={task.id} task={task} updateTask={updateTask} toggleTask={toggleTask} removeTask={removeTask} />
+                    ))
+                  )}
+                </div>
+
+                <div className="mt-6">
+                  <button 
+                    onClick={addTask}
+                    className="w-full h-12 flex items-center justify-center gap-2 rounded-2xl bg-blue/5 border-2 border-dashed border-blue/20 text-blue text-[11px] font-black hover:bg-blue/10 hover:border-blue/40 transition-all active:scale-[0.98]"
+                  >
+                    <Plus size={16} />
+                    <span>Add Task</span>
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <PaperPlaneToast isVisible={showPlane} onAnimationComplete={handlePlaneAnimationComplete} />
         </div>
