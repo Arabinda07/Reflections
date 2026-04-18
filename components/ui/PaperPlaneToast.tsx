@@ -78,9 +78,9 @@ export const PaperPlaneToast: React.FC<PaperPlaneToastProps> = ({
             <div style={{ width: '80px', height: '80px', flexShrink: 0, margin: '-14px 0 -14px -8px' }}>
               <DotLottieReact
                 key={isVisible ? 'visible' : 'hidden'}
-                src="https://lottie.host/44bd266f-34f2-4b70-87df-fb47ff5962a5/4mw21xhUNV.lottie"
-                autoplay
-                loop
+                src="/assets/lottie/Loading 40 _ Paperplane.json"
+                autoplay={true}
+                loop={true}
                 style={{ width: '100%', height: '100%' }}
               />
             </div>
