@@ -679,6 +679,17 @@ export const CreateNote: React.FC = () => {
     navigator.vibrate?.(10);
     setSaving(true);
 
+    // ─── NUCLEAR SAFETY TIMER ☢️ ───
+    // If we're still in the editor after 5 seconds, force navigate to HOME.
+    // This ensures the user is never stuck, regardless of network or animation bugs.
+    const nuclearTimer = setTimeout(() => {
+      if (!isUnmounted.current) {
+        console.warn("[NUCLEAR] Safety timer triggered. Forcing navigation to HOME.");
+        setShowPlane(false);
+        navigate(RoutePath.HOME);
+      }
+    }, 5000);
+
     // ─── Step 1: Start the race. 
     //     We create a 3-second "Global Cap" to ensure the user isn't stuck if network hangs.
     //     We ALSO keep a 1.2-second "Visual Floor" for a satisfying animation.
@@ -740,6 +751,7 @@ export const CreateNote: React.FC = () => {
       ]);
 
     } catch (error: any) {
+      clearTimeout(nuclearTimer);
       if (isUnmounted.current) return;
       setShowPlane(false);
       if (error.message === 'FREE_LIMIT_REACHED') {
@@ -754,8 +766,8 @@ export const CreateNote: React.FC = () => {
       console.log("[SAVE] Flow logic reached FINALLY block.");
     }
 
-    // If saveSucceeded is false at this point, it means we hit the 3-second snappy duration cap.
-    // We proceed to navigation anyway to keep the UX smooth, trusting background persistence.
+    // Success or Cap reached — the safety timer is no longer needed.
+    clearTimeout(nuclearTimer);
     console.log(`[SAVE] Completed. success=${saveSucceeded}`);
 
     // ─── Step 3: Wait for the visual floor (if save was instant).
@@ -764,7 +776,7 @@ export const CreateNote: React.FC = () => {
 
     if (isUnmounted.current) return;
 
-    // ─── Step 4: Check milestones, then navigate to My Notes.
+    // ─── Step 4: Check milestones, then navigate to Home.
     const resolvedNoteId = savedNoteId || id || (window as any)._lastCreatedNoteId;
     const totalCount = await noteService.getCount();
     const recentNotes = await noteService.getRecent(10);
@@ -781,17 +793,17 @@ export const CreateNote: React.FC = () => {
         setObservationText(observation.text);
         setShowObservation(true);
         // We pass the state via a custom object or handle it in the navigate call in onComplete
-        setPendingNavigation(RoutePath.NOTES);
+        setPendingNavigation(RoutePath.HOME);
         observationService.markObservationShown();
       }
     } else {
       console.log("[SAVE] Normal exit. Dismissing plane and navigating in 600ms.");
-      // Normal: fade the plane out, then glide to My Notes.
+      // Normal: fade the plane out, then glide to Home.
       setShowPlane(false);
       setTimeout(() => {
-        console.log("[SAVE] Triggering navigation to My Notes...");
+        console.log("[SAVE] Triggering navigation to Home...");
         if (!isUnmounted.current) {
-          navigate(RoutePath.NOTES, { state: { fromSave: true } });
+          navigate(RoutePath.HOME, { state: { fromSave: true } });
         }
       }, 600); // Increased to 600ms to ensure clean Toast unmounting
     }

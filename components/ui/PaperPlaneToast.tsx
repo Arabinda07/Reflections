@@ -87,28 +87,16 @@ export const PaperPlaneToast: React.FC<PaperPlaneToastProps> = ({
               />
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ 
-                fontFamily: '"Schibsted Grotesk", sans-serif',
-                fontSize: '15px', 
-                fontWeight: 800, 
-                color: '#1a1a1a',
-                letterSpacing: '-0.01em',
-                lineHeight: 1.2
-              }}>
-                Sending to sanctuary
-              </span>
-              <span style={{ 
-                fontFamily: '"Schibsted Grotesk", sans-serif',
-                fontSize: '11px', 
-                fontWeight: 600, 
-                color: '#888',
-                textTransform: 'lowercase',
-                opacity: 0.8
-              }}>
-                Finalizing your reflection
-              </span>
-            </div>
+            <span style={{ 
+              fontFamily: '"Schibsted Grotesk", sans-serif',
+              fontSize: '15px', 
+              fontWeight: 800, 
+              color: '#1a1a1a',
+              letterSpacing: '-0.01em',
+              whiteSpace: 'nowrap'
+            }}>
+              Sending to sanctuary
+            </span>
           </motion.div>
         </motion.div>
       )}
