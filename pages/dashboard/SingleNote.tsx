@@ -350,7 +350,8 @@ export const SingleNote: React.FC = () => {
           </div>
         </article>
             </div>
-          </motion.main>
+          </div>
+        </motion.main>
 
           {/* Mood Portal (View Only) */}
           {createPortal(
