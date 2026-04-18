@@ -772,40 +772,48 @@ export const CreateNote: React.FC = () => {
 
     // ─── Step 3: Wait for the visual floor (if save was instant).
     await visualFloor;
-    console.log("[SAVE] Visual floor finished.");
+    console.log("[SAVE] Visual floor finished. DISMISSING UI NOW.");
+
+    // EXTREMELY IMPORTANT: We call setShowPlane(false) HERE.
+    // We do NOT wait for getCount() or milestones. Dismiss the UI first!
+    setShowPlane(false);
 
     if (isUnmounted.current) return;
 
-    // ─── Step 4: Check milestones, then navigate to Home.
-    const resolvedNoteId = savedNoteId || id || (window as any)._lastCreatedNoteId;
-    const totalCount = await noteService.getCount();
-    const recentNotes = await noteService.getRecent(10);
-    const observation = observationService.checkMilestones(
-      { title, content, createdAt: new Date().toISOString() } as any,
-      totalCount,
-      recentNotes
-    );
+    // ─── Step 4: Logic Processing (Milestones etc.)
+    // We wrap this in a try-finally to ensure navigation is NEVER blocked by these calls.
+    try {
+      const resolvedNoteId = savedNoteId || id || (window as any)._lastCreatedNoteId;
+      
+      // Fetch metadata in parallel for speed
+      const [totalCount, recentNotes] = await Promise.all([
+        noteService.getCount(),
+        noteService.getRecent(10)
+      ]).catch(() => [0, []]); // Fallback if network is still hanging
 
-    if (observation) {
-      console.log("[SAVE] Milestone triggered. Showing observation.");
-      setShowPlane(false);
-      if (!isUnmounted.current) {
+      const observation = observationService.checkMilestones(
+        { title, content, createdAt: new Date().toISOString() } as any,
+        totalCount as number,
+        recentNotes as any[]
+      );
+
+      if (observation && !isUnmounted.current) {
+        console.log("[SAVE] Milestone triggered. Switching to observation UI.");
         setObservationText(observation.text);
         setShowObservation(true);
-        // We pass the state via a custom object or handle it in the navigate call in onComplete
         setPendingNavigation(RoutePath.HOME);
         observationService.markObservationShown();
+      } else {
+        console.log("[SAVE] Normal exit. Navigation scheduled.");
+        setTimeout(() => {
+          if (!isUnmounted.current) {
+            navigate(RoutePath.HOME, { state: { fromSave: true } });
+          }
+        }, 500); // 500ms to allow exit animation to breathe
       }
-    } else {
-      console.log("[SAVE] Normal exit. Dismissing plane and navigating in 600ms.");
-      // Normal: fade the plane out, then glide to Home.
-      setShowPlane(false);
-      setTimeout(() => {
-        console.log("[SAVE] Triggering navigation to Home...");
-        if (!isUnmounted.current) {
-          navigate(RoutePath.HOME, { state: { fromSave: true } });
-        }
-      }, 600); // Increased to 600ms to ensure clean Toast unmounting
+    } catch (e) {
+      console.error("[SAVE] Post-save metadata error (silently proceeding):", e);
+      if (!isUnmounted.current) navigate(RoutePath.HOME);
     }
   };
 

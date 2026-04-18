@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import trailData from '@/src/lottie/trail-loading.json';
@@ -9,7 +10,17 @@ interface CompanionObservationProps {
   onComplete: () => void;
 }
 
-export const CompanionObservation: React.FC<CompanionObservationProps> = ({ isVisible, text, onComplete }) => {
+/**
+ * CompanionObservation — Milestone celebration overlay
+ * 
+ * DESIGN: Uses Portal architecture (from LoadingState.tsx) to ensure 
+ * the celebration cards follow the user across page transitions.
+ */
+export const CompanionObservation: React.FC<CompanionObservationProps> = ({ 
+  isVisible, 
+  text, 
+  onComplete 
+}) => {
   useEffect(() => {
     if (isVisible) {
       const timer = setTimeout(() => {
@@ -19,15 +30,31 @@ export const CompanionObservation: React.FC<CompanionObservationProps> = ({ isVi
     }
   }, [isVisible, onComplete]);
 
-  return (
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
     <AnimatePresence>
       {isVisible && (
         <motion.div 
+          key="companion-observation-overlay"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0, scale: 0.98 }}
           transition={{ duration: 1, ease: "easeInOut" }}
-          className="fixed inset-0 z-[300] bg-white/90 backdrop-blur-xl flex flex-col items-center justify-center p-8 text-center"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 999999,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '32px',
+            textAlign: 'center',
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+          }}
         >
           <div className="w-72 h-72 md:w-96 md:h-96 -mt-10">
             <DotLottieReact
@@ -49,6 +76,7 @@ export const CompanionObservation: React.FC<CompanionObservationProps> = ({ isVi
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };
