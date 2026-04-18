@@ -46,7 +46,7 @@ interface TaskRowProps {
 const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeTask, addTask }) => {
   const [showCompletedText, setShowCompletedText] = useState(task.completed);
   const [rippleKey, setRippleKey] = useState(0);
-  const [isAdding, setIsAdding] = useState(false);
+  const [isCommitted, setIsCommitted] = useState(false);
   const wasCompleted = useRef(task.completed);
   const taskLabel = task.text.trim() || 'Untitled task';
   const textInputId = `task-text-${task.id}`;
@@ -140,17 +140,16 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
         <motion.button
           type="button"
           onClick={() => {
-            setIsAdding(true);
-            setTimeout(() => setIsAdding(false), 300);
-            addTask();
+            setIsCommitted(true);
+            setTimeout(() => setIsCommitted(false), 1500);
           }}
-          whileHover={{ scale: 1.2, rotate: 90 }}
-          animate={{ color: isAdding ? 'rgb(34, 197, 94)' : 'rgb(107, 114, 128)' }}
-          whileTap={{ scale: 0.9 }}
+          animate={{ 
+            color: isCommitted ? 'rgb(59, 130, 246)' : 'rgb(156, 163, 175)'
+          }}
           className="p-2 rounded-xl text-gray-nav hover:bg-blue/5 transition-all duration-300 ease-out-quart"
-          aria-label="Add another task"
+          aria-label="Commit task"
         >
-          <Plus size={16} />
+          {isCommitted ? <Sparkles size={16} /> : <Plus size={16} />}
         </motion.button>
         <button
           type="button"
