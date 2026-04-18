@@ -35,7 +35,9 @@ export const MyNotes: React.FC = () => {
 
   const fetchNotes = async () => {
     // Minimum cinematic display time for the sanctuary loader
-    const minTimePromise = new Promise(resolve => setTimeout(resolve, 2500));
+    // If coming from a save, we skip the 2.5s floor for a snappier experience (0.5s floor)
+    const isFromSave = location.state?.fromSave;
+    const minTimePromise = new Promise(resolve => setTimeout(resolve, isFromSave ? 500 : 2500));
     try {
       const [data] = await Promise.all([
         noteService.getAll(),

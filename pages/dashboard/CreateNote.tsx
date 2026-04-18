@@ -777,6 +777,7 @@ export const CreateNote: React.FC = () => {
       if (!isUnmounted.current) {
         setObservationText(observation.text);
         setShowObservation(true);
+        // We pass the state via a custom object or handle it in the navigate call in onComplete
         setPendingNavigation(RoutePath.NOTES);
         observationService.markObservationShown();
       }
@@ -784,8 +785,10 @@ export const CreateNote: React.FC = () => {
       // Normal: fade the plane out, then glide to My Notes.
       setShowPlane(false);
       setTimeout(() => {
-        if (!isUnmounted.current) navigate(RoutePath.NOTES);
-      }, 450); // matches the AnimatePresence exit duration (0.5s)
+        if (!isUnmounted.current) {
+          navigate(RoutePath.NOTES, { state: { fromSave: true } });
+        }
+      }, 600); // Increased to 600ms to ensure clean Toast unmounting
     }
   };
 
@@ -991,7 +994,7 @@ export const CreateNote: React.FC = () => {
         onComplete={() => {
           setShowObservation(false);
           if (pendingNavigation) {
-            navigate(pendingNavigation);
+            navigate(pendingNavigation, { state: { fromSave: true } });
           }
         }} 
       />

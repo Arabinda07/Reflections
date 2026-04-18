@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import trailData from '../../lottie/trail-loading.json';
 
 interface CompanionObservationProps {
   isVisible: boolean;
@@ -30,8 +31,7 @@ export const CompanionObservation: React.FC<CompanionObservationProps> = ({ isVi
         >
           <div className="w-72 h-72 md:w-96 md:h-96 -mt-10">
             <DotLottieReact
-              key={isVisible ? 'visible' : 'hidden'}
-              src="/assets/lottie/Trail loading.json"
+              data={trailData}
               autoplay={true}
               loop={true}
             />

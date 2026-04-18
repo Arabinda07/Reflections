@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { motion, AnimatePresence } from 'motion/react';
+import paperPlaneData from '../../lottie/paperplane.json';
 
 interface PaperPlaneToastProps {
   /** Show the plane — triggers the animation */
@@ -66,8 +67,7 @@ export const PaperPlaneToast: React.FC<PaperPlaneToastProps> = ({
             {/* Paper plane Lottie */}
             <div style={{ width: '80px', height: '80px', flexShrink: 0, margin: '-14px 0 -14px -8px' }}>
               <DotLottieReact
-                key={isVisible ? 'visible' : 'hidden'}
-                src="/assets/lottie/paperplane.json"
+                data={paperPlaneData}
                 autoplay={true}
                 loop={true}
                 speed={1.5}

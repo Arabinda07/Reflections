@@ -2,6 +2,7 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { motion, AnimatePresence } from 'motion/react';
+import loadingData from '../../lottie/loading.json';
 
 // Canonical brand footer style — identical across all sanctuary animations
 const BRAND_WORDMARK_STYLE: React.CSSProperties = {
@@ -54,7 +55,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
           {/* Finger-Tapping Brand Lottie */}
           <div className="w-[260px] h-[260px] sm:w-[320px] sm:h-[320px]">
             <DotLottieReact
-              src="/assets/lottie/loading.json"
+              data={loadingData}
               loop
               autoplay
               className="w-full h-full"
