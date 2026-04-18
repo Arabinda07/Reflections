@@ -46,6 +46,7 @@ interface TaskRowProps {
 const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeTask, addTask }) => {
   const [showCompletedText, setShowCompletedText] = useState(task.completed);
   const [rippleKey, setRippleKey] = useState(0);
+  const [isAdding, setIsAdding] = useState(false);
   const wasCompleted = useRef(task.completed);
   const taskLabel = task.text.trim() || 'Untitled task';
   const textInputId = `task-text-${task.id}`;
@@ -138,8 +139,13 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
       <div className={`relative z-10 flex shrink-0 items-center gap-1 transition-all duration-300 sm:gap-2 ${task.completed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
         <motion.button
           type="button"
-          onClick={addTask}
-          whileHover={{ scale: 1.2, rotate: 90, color: 'rgb(59, 130, 246)' }}
+          onClick={() => {
+            setIsAdding(true);
+            setTimeout(() => setIsAdding(false), 300);
+            addTask();
+          }}
+          whileHover={{ scale: 1.2, rotate: 90 }}
+          animate={{ color: isAdding ? 'rgb(34, 197, 94)' : 'rgb(107, 114, 128)' }}
           whileTap={{ scale: 0.9 }}
           className="p-2 rounded-xl text-gray-nav hover:bg-blue/5 transition-all duration-300 ease-out-quart"
           aria-label="Add another task"
@@ -1146,7 +1152,7 @@ export const CreateNote: React.FC = () => {
             {/* Main Content Area */}
             <motion.main 
               layout
-              className="flex-1 flex flex-col min-w-0"
+              className="flex-1 flex flex-col min-w-0 lg:pl-[180px]"
             >
             
             {/* Slim Top Bar */}

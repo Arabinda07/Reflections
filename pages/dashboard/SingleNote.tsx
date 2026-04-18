@@ -211,7 +211,7 @@ export const SingleNote: React.FC = () => {
           {/* Main Content Area */}
           <motion.main 
             layout
-            className="flex-1 flex flex-col min-w-0"
+            className="flex-1 flex flex-col min-w-0 lg:pl-[180px]"
           >
             <div className="overflow-y-auto h-full px-4 md:px-0 pt-4 custom-scrollbar">
               <div className="mx-auto max-w-3xl space-y-6 animate-in fade-in duration-500 pb-20 relative px-4">
