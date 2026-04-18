@@ -751,13 +751,16 @@ export const CreateNote: React.FC = () => {
       return;
     } finally {
       if (!isUnmounted.current) setSaving(false);
+      console.log("[SAVE] Flow logic reached FINALLY block.");
     }
 
     // If saveSucceeded is false at this point, it means we hit the 3-second snappy duration cap.
     // We proceed to navigation anyway to keep the UX smooth, trusting background persistence.
+    console.log(`[SAVE] Completed. success=${saveSucceeded}`);
 
     // ─── Step 3: Wait for the visual floor (if save was instant).
     await visualFloor;
+    console.log("[SAVE] Visual floor finished.");
 
     if (isUnmounted.current) return;
 
@@ -772,7 +775,7 @@ export const CreateNote: React.FC = () => {
     );
 
     if (observation) {
-      // Milestone: dismiss the plane, show the observation card, navigate to My Notes after.
+      console.log("[SAVE] Milestone triggered. Showing observation.");
       setShowPlane(false);
       if (!isUnmounted.current) {
         setObservationText(observation.text);
@@ -782,9 +785,11 @@ export const CreateNote: React.FC = () => {
         observationService.markObservationShown();
       }
     } else {
+      console.log("[SAVE] Normal exit. Dismissing plane and navigating in 600ms.");
       // Normal: fade the plane out, then glide to My Notes.
       setShowPlane(false);
       setTimeout(() => {
+        console.log("[SAVE] Triggering navigation to My Notes...");
         if (!isUnmounted.current) {
           navigate(RoutePath.NOTES, { state: { fromSave: true } });
         }

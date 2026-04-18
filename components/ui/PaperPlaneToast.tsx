@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { motion, AnimatePresence } from 'motion/react';
 import paperPlaneData from '@/src/lottie/paperplane.json';
@@ -6,65 +7,76 @@ import paperPlaneData from '@/src/lottie/paperplane.json';
 interface PaperPlaneToastProps {
   /** Show the plane — triggers the animation */
   isVisible: boolean;
-  /**
-   * Called exactly 2 seconds after becoming visible.
-   * Deterministic — does not rely on Lottie's onComplete event.
-   */
-  onAnimationComplete: () => void;
+  /** Optional callback for when animation ends */
+  onAnimationComplete?: () => void;
 }
 
 /**
- * PaperPlaneToast
- *
- * Fixed bottom bar. Paper plane Lottie plays for exactly 2 seconds,
- * then calls onAnimationComplete and fades out.
- * Uses a plain setTimeout — immune to Lottie event bugs.
+ * PaperPlaneToast — Global feedback for "Sending to Sanctuary"
+ * 
+ * DESIGN: Uses Portal architecture (from LoadingState.tsx) to survive 
+ * editor unmounts during navigation.
  */
 export const PaperPlaneToast: React.FC<PaperPlaneToastProps> = ({
   isVisible,
   onAnimationComplete,
 }) => {
-  // Timing is now entirely driven by the parent (CreateNote.tsx)
-  // to ensure a deterministic 3-second maximum window.
+  // Fail-safe: Always trigger completion after 3.5s (logic from CompanionObservation)
+  useEffect(() => {
+    if (isVisible) {
+      const timer = setTimeout(() => {
+        console.log("[PLANE] Fail-safe timer triggered.");
+        onAnimationComplete?.();
+      }, 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [isVisible, onAnimationComplete]);
 
-  return (
-    <AnimatePresence>
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
+    <AnimatePresence mode="wait">
       {isVisible && (
         <motion.div
-          key="paper-plane-toast"
-          initial={{ opacity: 0, y: 24, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -16, scale: 1.04 }}
-          transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+          key="sanctuary-plane-overlay"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
           style={{
             position: 'fixed',
-            bottom: '24px',
-            left: 0,
-            right: 0,
-            zIndex: 9000,
+            inset: 0,
+            zIndex: 999999,
             display: 'flex',
+            alignItems: 'center',
             justifyContent: 'center',
             pointerEvents: 'none',
+            backgroundColor: 'rgba(255, 255, 255, 0.3)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
           }}
-          aria-live="polite"
-          aria-label="Saving your entry"
         >
-          <div
+          <motion.div
+            initial={{ scale: 0.8, y: 30 }}
+            animate={{ scale: 1, y: 0 }}
+            exit={{ scale: 0.9, y: -40, opacity: 0 }}
+            transition={{ 
+              type: "spring",
+              damping: 25,
+              stiffness: 200,
+              mass: 0.8
+            }}
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '12px',
-              padding: '10px 24px 10px 12px',
+              backgroundColor: 'white',
+              padding: '12px 24px 12px 16px',
               borderRadius: '24px',
-              backgroundColor: 'var(--panel-bg)',
-              opacity: 0.98,
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              border: '1.5px solid var(--border-color)',
-              boxShadow: '0 12px 36px -12px rgba(0,0,0,0.15)',
+              border: '1px solid rgba(0, 0, 0, 0.05)',
+              boxShadow: '0 20px 50px rgba(0,0,0,0.1), 0 0 1px rgba(0,0,0,0.1)'
             }}
           >
-            {/* Paper plane Lottie */}
             <div style={{ width: '80px', height: '80px', flexShrink: 0, margin: '-14px 0 -14px -8px' }}>
               <DotLottieReact
                 data={paperPlaneData}
@@ -75,21 +87,32 @@ export const PaperPlaneToast: React.FC<PaperPlaneToastProps> = ({
               />
             </div>
 
-            {/* Label */}
-            <span
-              style={{
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ 
                 fontFamily: '"Schibsted Grotesk", sans-serif',
-                fontSize: '13px',
-                fontWeight: 800,
-                color: 'var(--gray-text)',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              Sending to sanctuary
-            </span>
-          </div>
+                fontSize: '15px', 
+                fontWeight: 800, 
+                color: '#1a1a1a',
+                letterSpacing: '-0.01em',
+                lineHeight: 1.2
+              }}>
+                Sending to sanctuary
+              </span>
+              <span style={{ 
+                fontFamily: '"Schibsted Grotesk", sans-serif',
+                fontSize: '11px', 
+                fontWeight: 600, 
+                color: '#888',
+                textTransform: 'lowercase',
+                opacity: 0.8
+              }}>
+                Finalizing your reflection
+              </span>
+            </div>
+          </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };
