@@ -1,70 +1,93 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { offlineStorage } from '../services/offlineStorage';
-import { noteService } from '../services/noteService';
 import { supabase } from '../src/supabaseClient';
+import { useNetworkState } from './useNetworkState';
 
 /**
  * useSync hook
  * 
- * Automatically synchronizes queued offline operations when the device
- * recovers its internet connection.
+ * Re-engineered for Dexie-based status tracking.
+ * Automatically synchronizes pending notes when connectivity is restored.
  */
 export const useSync = () => {
-  const sync = useCallback(async () => {
-    // 1. Check if truly online
-    if (!navigator.onLine) return;
+  const isOnline = useNetworkState();
+  const isSyncing = useRef(false);
 
-    // 2. Get the current user session
+  const sync = useCallback(async () => {
+    // 1. Guards
+    if (!isOnline || isSyncing.current) return;
+
+    // 2. Auth Check
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
 
-    // 3. Get queued operations
-    const queue = await offlineStorage.getQueuedOperations();
-    if (queue.length === 0) return;
+    // 3. Get all pending operations from Dexie
+    const pending = await offlineStorage.getPendingOperations();
+    if (pending.length === 0) return;
 
-    console.log(`Syncing ${queue.length} operations...`);
+    isSyncing.current = true;
+    console.log(`[SyncEngine] Processing ${pending.length} pending changes...`);
 
-    // 4. Process operations sequentially to maintain order integrity
-    for (const op of queue) {
+    // 4. Sequential Sync to maintain causal order
+    for (const note of pending) {
       try {
-        switch (op.action) {
-          case 'create':
-            // The entityId in queue for 'create' is the tempId we used
-            await noteService.create(op.data); 
-            // Note: noteService.create already handles Supabase logic
-            // If it succeeds, we remove from queue.
-            break;
-          case 'update':
-            await noteService.update(op.entityId, op.data);
-            break;
-          case 'delete':
-            await noteService.delete(op.entityId);
-            break;
+        let error = null;
+
+        if (note.syncStatus === 'pending_insert') {
+          ({ error } = await supabase.from('notes').upsert({
+            id: note.id,
+            user_id: session.user.id,
+            title: note.title,
+            content: note.content,
+            thumbnail_url: note.thumbnailUrl,
+            tags: note.tags || [],
+            attachments: note.attachments || [],
+            tasks: note.tasks || [],
+            mood: note.mood,
+            created_at: note.createdAt,
+            updated_at: note.updatedAt
+          }));
+        } 
+        else if (note.syncStatus === 'pending_update') {
+          ({ error } = await supabase.from('notes').update({
+            title: note.title,
+            content: note.content,
+            thumbnail_url: note.thumbnailUrl,
+            tags: note.tags || [],
+            attachments: note.attachments || [],
+            tasks: note.tasks || [],
+            mood: note.mood,
+            updated_at: note.updatedAt
+          }).eq('id', note.id).eq('user_id', session.user.id));
+        } 
+        else if (note.syncStatus === 'pending_delete') {
+          ({ error } = await supabase.from('notes')
+            .delete()
+            .eq('id', note.id)
+            .eq('user_id', session.user.id));
         }
-        
-        // Remove from queue on success
-        if (op.id !== undefined) {
-          await offlineStorage.removeFromQueue(op.id);
+
+        if (!error || error.code === 'PGRST116') { // PGRST116 is "Not Found" for delete — treat as success
+          await offlineStorage.markAsSynced(note.id);
+        } else {
+          throw error;
         }
       } catch (err) {
-        console.error(`Failed to sync operation ${op.action} for ${op.entityId}:`, err);
-        // We stop processing here if a critical error occurs to avoid out-of-order syncs
-        // unless it's a specific "Conflict" error we can handle.
-        break; 
+        console.error(`[SyncEngine] Failed to sync note ${note.id}:`, err);
+        // We pause here to prevent out-of-order failures for this specific note
+        // but we can continue to the next if they are independent
       }
     }
-    
-    console.log('Sync complete.');
-  }, []);
+
+    isSyncing.current = false;
+    console.log('[SyncEngine] Sync cycle complete.');
+  }, [isOnline]);
 
   useEffect(() => {
-    // Initial sync on mount
-    sync();
-
-    // Listen for online events
-    window.addEventListener('online', sync);
-    return () => window.removeEventListener('online', sync);
-  }, [sync]);
+    if (isOnline) {
+      sync();
+    }
+  }, [isOnline, sync]);
 
   return { sync };
 };

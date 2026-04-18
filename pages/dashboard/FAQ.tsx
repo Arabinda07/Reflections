@@ -85,7 +85,7 @@ export const FAQ: React.FC = () => {
           className="relative w-full h-[60vh] min-h-[500px] max-h-[700px] flex items-center justify-center group"
         >
           <div className="absolute inset-0 pointer-events-auto z-0 flex items-center justify-center origin-center transition-transform duration-1000 group-hover:scale-105">
-            <Spline scene="https://prod.spline.design/Dpx2TF6lL963qEnt/scene.splinecode" />
+            <Spline scene="/assets/spline/r_4_x_bot.spline" />
           </div>
         </motion.section>
       </div>

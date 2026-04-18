@@ -1,28 +1,28 @@
 import { useState, useEffect } from 'react';
+import { Network } from '@capacitor/network';
 
 /**
  * useNetworkState
  * 
- * Actively tracks the browser's online/offline status.
- * Returns true if online, false if offline.
+ * Actively tracks connectivity using Capacitor Network API.
+ * This is more reliable than navigator.onLine for mobile-hybrid apps.
  */
 export const useNetworkState = () => {
-  const [isOnline, setIsOnline] = useState<boolean>(
-    typeof navigator !== 'undefined' ? navigator.onLine : true
-  );
+  const [isOnline, setIsOnline] = useState<boolean>(true);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    // Initial check
+    Network.getStatus().then(status => {
+      setIsOnline(status.connected);
+    });
 
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+    // Listen for changes
+    const listener = Network.addListener('networkStatusChange', status => {
+      setIsOnline(status.connected);
+    });
 
     return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
+      listener.then(l => l.remove());
     };
   }, []);
 

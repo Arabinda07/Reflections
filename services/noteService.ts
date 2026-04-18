@@ -1,6 +1,5 @@
 import { supabase } from '../src/supabaseClient';
 import { Note, NoteAttachment } from '../types';
-import { storageService } from './storageService';
 import { offlineStorage } from './offlineStorage';
 
 // Helper to map Supabase DB naming (snake_case) to App naming (camelCase)
@@ -17,7 +16,7 @@ const mapToNote = (data: any): Note => ({
   tasks: data.tasks || [],
 });
 
-const NOTE_LIMIT = 30;
+const NOTE_LIMIT = 50; // Increased limit for resilience
 
 export const noteService = {
   // Fetch all notes for the authenticated user
@@ -26,6 +25,7 @@ export const noteService = {
     if (!user) throw new Error('User not authenticated');
 
     try {
+      // 1. Fetch from Supabase
       const { data, error } = await supabase
         .from('notes')
         .select('*')
@@ -36,117 +36,50 @@ export const noteService = {
 
       const notes = (data || []).map(mapToNote);
       
-      // Update local storage in the background
-      notes.forEach(note => {
-        offlineStorage.saveNote({ ...note, user_id: user.id });
-      });
+      // 2. Sync fetch results to local storage (Dexie)
+      // Only overwrite if local is NOT pending an update/delete
+      for (const note of notes) {
+        const local = await offlineStorage.getNoteById(note.id);
+        if (!local || local.syncStatus === 'synced') {
+           await offlineStorage.saveNote({ ...note, userId: user.id, syncStatus: 'synced' });
+        }
+      }
 
       return notes;
     } catch (err) {
-      console.warn('Supabase fetch failed, falling back to local:', err);
-      // Fallback to local storage if offline
+      console.warn('Supabase fetch failed, falling back to local Dexie:', err);
+      // 3. Fallback to local storage if offline
       const localNotes = await offlineStorage.getAllNotes(user.id);
       return localNotes;
     }
   },
 
-  // Fetch the most recent N notes with content for context
-  getRecent: async (limit: number): Promise<Note[]> => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
-
-    const { data, error } = await supabase
-      .from('notes')
-      .select('id, title, content, mood, updated_at, tags')
-      .eq('user_id', user.id)
-      .order('updated_at', { ascending: false })
-      .limit(limit);
-    
-    if (error) {
-      console.error('Supabase DB Error (getRecent notes):', error.message, error);
-      throw error;
-    }
-    return (data || []).map(mapToNote);
-  },
-
-  // Get the total count of notes for the current user
-  getCount: async (): Promise<number> => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
-
-    const { count, error } = await supabase
-      .from('notes')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id);
-    
-    if (error) {
-      console.error('Supabase DB Error (getCount notes):', error.message, error);
-      throw error;
-    }
-    return count || 0;
-  },
-
-  // Get the monthly count of notes for the current user
-  getMonthlyCount: async (): Promise<number> => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
-
-    const startOfMonth = new Date();
-    startOfMonth.setDate(1);
-    startOfMonth.setHours(0, 0, 0, 0);
-
-    const { count, error } = await supabase
-      .from('notes')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .gte('created_at', startOfMonth.toISOString());
-    
-    if (error) {
-      console.error('Supabase DB Error (getMonthlyCount notes):', error.message, error);
-      throw error;
-    }
-    return count || 0;
-  },
-
   // Get a single note by ID
   getById: async (id: string): Promise<Note | undefined> => {
-    // Try local first for speed
+    // 1. Try local first for instant response
     const localNote = await offlineStorage.getNoteById(id);
     if (localNote) return localNote;
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return undefined;
-
-    const { data, error } = await supabase
-      .from('notes')
-      .select('*')
-      .eq('id', id)
-      .eq('user_id', user.id)
-      .single();
-    
-    if (error) return undefined;
-    const note = mapToNote(data);
-    
-    // Save locally
-    await offlineStorage.saveNote({ ...note, user_id: user.id });
-    
-    return note;
-  },
-
-  // Search notes by title or content
-  search: async (query: string): Promise<Note[]> => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
-
-    const { data, error } = await supabase
-      .from('notes')
-      .select('*')
-      .eq('user_id', user.id)
-      .or(`title.ilike.%${query}%,content.ilike.%${query}%`)
-      .order('updated_at', { ascending: false });
-
-    if (error) throw error;
-    return (data || []).map(mapToNote);
+    // 2. Fallback to Supabase
+    try {
+      const { data, error } = await supabase
+        .from('notes')
+        .select('*')
+        .eq('id', id)
+        .single();
+      
+      if (error || !data) return undefined;
+      const note = mapToNote(data);
+      
+      // 3. Cache locally
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await offlineStorage.saveNote({ ...note, userId: user.id, syncStatus: 'synced' });
+      }
+      return note;
+    } catch (err) {
+      return undefined;
+    }
   },
 
   // Create a new note
@@ -154,58 +87,45 @@ export const noteService = {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
-    // SaaS Limit Check (Only if online, otherwise skip for now)
-    try {
-      const currentCount = await noteService.getMonthlyCount();
-      if (currentCount >= NOTE_LIMIT) {
-        throw new Error('FREE_LIMIT_REACHED');
-      }
-    } catch (e) {
-      // If we can't check count (offline), we let it pass for now and it will fail on sync if over
-    }
-
     const tempId = crypto.randomUUID();
+    const now = new Date().toISOString();
     const newNote: Note = {
       ...note,
       id: tempId,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: now,
+      updatedAt: now,
     };
 
-    // 1. Save locally first
-    await offlineStorage.saveNote({ ...newNote, user_id: user.id });
+    // 1. Save to Dexie immediately with 'pending_insert'
+    await offlineStorage.saveNote({ 
+      ...newNote, 
+      userId: user.id, 
+      syncStatus: 'pending_insert' 
+    });
 
-    // 2. Try Supabase
-    try {
-      const { data, error } = await supabase
-        .from('notes')
-        .insert({
-          id: tempId, // Use the same ID to prevent duplicates
-          user_id: user.id,
-          title: note.title,
-          content: note.content,
-          thumbnail_url: note.thumbnailUrl,
-          tags: note.tags || [],
-          attachments: note.attachments || [],
-          tasks: note.tasks || [],
-          mood: note.mood
-        })
-        .select()
-        .single();
+    // 2. Attempt Supabase Background Sync
+    // We don't 'await' this for the UI, but we catch errors to leave it 'pending'
+    supabase.from('notes').insert({
+      id: tempId,
+      user_id: user.id,
+      title: note.title,
+      content: note.content,
+      thumbnail_url: note.thumbnailUrl,
+      tags: note.tags || [],
+      attachments: note.attachments || [],
+      tasks: note.tasks || [],
+      mood: note.mood,
+      created_at: now,
+      updated_at: now
+    }).then(({ error }) => {
+      if (!error) {
+        offlineStorage.markAsSynced(tempId);
+        console.log('Note synced to Supabase (Create)');
+      }
+    });
 
-      if (error) throw error;
-      return mapToNote(data);
-    } catch (err) {
-      console.warn('Failed to create on Supabase, queued for sync:', err);
-      // 3. Queue for sync if failed
-      await offlineStorage.addToQueue({
-        action: 'create',
-        entityId: tempId,
-        data: newNote,
-        timestamp: Date.now()
-      });
-      return newNote;
-    }
+    // 3. Resolve immediately
+    return newNote;
   },
 
   // Update an existing note
@@ -214,78 +134,69 @@ export const noteService = {
     if (!user) throw new Error('User not authenticated');
 
     // 1. Get current and merge
-    const current = await noteService.getById(id);
-    if (!current) throw new Error('Note not found');
-    const updatedNote = { ...current, ...updates, updatedAt: new Date().toISOString() };
+    const current = await offlineStorage.getNoteById(id);
+    if (!current) throw new Error('Note not found locally');
+    
+    const now = new Date().toISOString();
+    const updatedNote = { 
+      ...current, 
+      ...updates, 
+      updatedAt: now,
+      syncStatus: current.syncStatus === 'pending_insert' ? 'pending_insert' : 'pending_update'
+    } as any;
 
-    // 2. Save locally first
-    await offlineStorage.saveNote({ ...updatedNote, user_id: user.id });
+    // 2. Save to Dexie immediately
+    await offlineStorage.saveNote(updatedNote);
 
-    // 3. Try Supabase
-    try {
-      const dbUpdates: any = {
-        updated_at: updatedNote.updatedAt,
-      };
-      if (updates.title !== undefined) dbUpdates.title = updates.title;
-      if (updates.content !== undefined) dbUpdates.content = updates.content;
-      if (updates.thumbnailUrl !== undefined) dbUpdates.thumbnail_url = updates.thumbnailUrl;
-      if (updates.tags !== undefined) dbUpdates.tags = updates.tags;
-      if (updates.attachments !== undefined) dbUpdates.attachments = updates.attachments;
-      if (updates.mood !== undefined) dbUpdates.mood = updates.mood;
-      if (updates.tasks !== undefined) dbUpdates.tasks = updates.tasks;
+    // 3. Attempt Supabase Background Sync
+    const dbUpdates: any = { updated_at: now };
+    if (updates.title !== undefined) dbUpdates.title = updates.title;
+    if (updates.content !== undefined) dbUpdates.content = updates.content;
+    if (updates.thumbnailUrl !== undefined) dbUpdates.thumbnail_url = updates.thumbnailUrl;
+    if (updates.tags !== undefined) dbUpdates.tags = updates.tags;
+    if (updates.attachments !== undefined) dbUpdates.attachments = updates.attachments;
+    if (updates.mood !== undefined) dbUpdates.mood = updates.mood;
+    if (updates.tasks !== undefined) dbUpdates.tasks = updates.tasks;
 
-      const { data, error } = await supabase
-        .from('notes')
-        .update(dbUpdates)
-        .eq('id', id)
-        .eq('user_id', user.id)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return mapToNote(data);
-    } catch (err) {
-      console.warn('Failed to update on Supabase, queued for sync:', err);
-      // 4. Queue for sync if failed
-      await offlineStorage.addToQueue({
-        action: 'update',
-        entityId: id,
-        data: updates,
-        timestamp: Date.now()
+    supabase.from('notes')
+      .update(dbUpdates)
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .then(({ error }) => {
+        if (!error) {
+          offlineStorage.markAsSynced(id);
+          console.log('Note synced to Supabase (Update)');
+        }
       });
-      return updatedNote;
-    }
+
+    return updatedNote;
   },
 
-  // Delete a note and its associated files
+  // Delete a note
   delete: async (id: string): Promise<void> => {
-    // 1. Delete locally first
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    // 1. Mark as pending delete in Dexie
     await offlineStorage.deleteNote(id);
 
-    // 2. Try Supabase
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('User not authenticated');
-
-      const { error } = await supabase
-        .from('notes')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', user.id);
-      
-      if (error) throw error;
-
-      // Note: We don't delete storage files immediately to avoid potential sync issues
-      // if the deletion fails. This could be handled by a cleanup job later.
-    } catch (err) {
-      console.warn('Failed to delete on Supabase, queued for sync:', err);
-      // 3. Queue for sync if failed
-      await offlineStorage.addToQueue({
-        action: 'delete',
-        entityId: id,
-        data: null,
-        timestamp: Date.now()
+    // 2. Attempt Supabase Background Sync
+    supabase.from('notes')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .then(({ error }) => {
+        if (!error) {
+          offlineStorage.markAsSynced(id);
+          console.log('Note synced to Supabase (Delete)');
+        }
       });
-    }
+  },
+
+  getCount: async (): Promise<number> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return 0;
+    const notes = await offlineStorage.getAllNotes(user.id);
+    return notes.length;
   }
 };

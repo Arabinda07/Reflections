@@ -1,153 +1,86 @@
+import { db, LocalNote } from './db';
+import { SyncOperation } from './offlineStorage';
+
 /**
- * offlineStorage.ts
+ * offlineStorage.ts (Dexie Edition)
  * 
- * High-performance, low-dependency IndexedDB wrapper for offline first operations.
- * Manages local persistence for notes and a synchronization queue.
+ * Re-engineered to use Dexie for high-performance offline persistence.
+ * Manages both the notes table and the query engine for sync operations.
  */
 
-const DB_NAME = 'reflections_offline_db';
-const DB_VERSION = 1;
-const STORES = {
-  NOTES: 'notes',
-  SYNC_QUEUE: 'sync_queue',
-};
+// Preserve existing SyncOperation interface for backward compatibility with sync logic if needed,
+// but we'll primarily use the syncStatus field on the notes themselves for a more robust "Source of Truth".
+export { type SyncOperation };
 
-export interface SyncOperation {
-  id?: number;
-  action: 'create' | 'update' | 'delete';
-  entityId: string;
-  data: any;
-  timestamp: number;
-}
-
-class OfflineStorage {
-  private db: IDBDatabase | null = null;
-
-  private async getDB(): Promise<IDBDatabase> {
-    if (this.db) return this.db;
-
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-      request.onupgradeneeded = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result;
-        
-        // Notes store
-        if (!db.objectStoreNames.contains(STORES.NOTES)) {
-          const noteStore = db.createObjectStore(STORES.NOTES, { keyPath: 'id' });
-          noteStore.createIndex('user_id', 'user_id', { unique: false });
-          noteStore.createIndex('updated_at', 'updated_at', { unique: false });
-        }
-
-        // Sync queue store
-        if (!db.objectStoreNames.contains(STORES.SYNC_QUEUE)) {
-          db.createObjectStore(STORES.SYNC_QUEUE, { keyPath: 'id', autoIncrement: true });
-        }
-      };
-
-      request.onsuccess = () => {
-        this.db = request.result;
-        resolve(this.db);
-      };
-
-      request.onerror = () => reject(request.error);
-    });
-  }
-
+export const offlineStorage = {
   // --- Note Operations ---
 
-  async saveNote(note: any): Promise<void> {
-    const db = await this.getDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORES.NOTES, 'readwrite');
-      const store = tx.objectStore(STORES.NOTES);
-      const request = store.put(note);
+  async saveNote(note: LocalNote): Promise<void> {
+    await db.notes.put(note);
+  },
 
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
-  }
+  async getAllNotes(userId: string): Promise<LocalNote[]> {
+    return await db.notes
+      .where('userId')
+      .equals(userId)
+      // Filter out pending deletes so they don't show up in the UI
+      .filter(note => note.syncStatus !== 'pending_delete')
+      .reverse()
+      .sortBy('updatedAt');
+  },
 
-  async getAllNotes(userId: string): Promise<any[]> {
-    const db = await this.getDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORES.NOTES, 'readonly');
-      const store = tx.objectStore(STORES.NOTES);
-      const index = store.index('user_id');
-      const request = index.getAll(IDBKeyRange.only(userId));
-
-      request.onsuccess = () => {
-        // Sort by updated_at descending locally
-        const notes = request.result.sort((a, b) => 
-          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-        );
-        resolve(notes);
-      };
-      request.onerror = () => reject(request.error);
-    });
-  }
-
-  async getNoteById(id: string): Promise<any | undefined> {
-    const db = await this.getDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORES.NOTES, 'readonly');
-      const store = tx.objectStore(STORES.NOTES);
-      const request = store.get(id);
-
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-    });
-  }
+  async getNoteById(id: string): Promise<LocalNote | undefined> {
+    return await db.notes.get(id);
+  },
 
   async deleteNote(id: string): Promise<void> {
-    const db = await this.getDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORES.NOTES, 'readwrite');
-      const store = tx.objectStore(STORES.NOTES);
-      const request = store.delete(id);
+    const note = await db.notes.get(id);
+    if (note) {
+      // If it was already pending insert (never went to server), just delete it
+      if (note.syncStatus === 'pending_insert') {
+        await db.notes.delete(id);
+      } else {
+        // Otherwise, mark as pending delete so sync engine can process it
+        await db.notes.update(id, { syncStatus: 'pending_delete', updatedAt: new Date().toISOString() });
+      }
+    }
+  },
 
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
-  }
+  // --- Sync Engine Queries ---
 
-  // --- Sync Queue Operations ---
+  async getPendingOperations(): Promise<LocalNote[]> {
+    return await db.notes
+      .where('syncStatus')
+      .anyOf(['pending_insert', 'pending_update', 'pending_delete'])
+      .toArray();
+  },
 
-  async addToQueue(op: Omit<SyncOperation, 'id'>): Promise<void> {
-    const db = await this.getDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORES.SYNC_QUEUE, 'readwrite');
-      const store = tx.objectStore(STORES.SYNC_QUEUE);
-      const request = store.add(op);
+  async markAsSynced(id: string): Promise<void> {
+    const note = await db.notes.get(id);
+    if (!note) return;
+    
+    if (note.syncStatus === 'pending_delete') {
+      await db.notes.delete(id);
+    } else {
+      await db.notes.update(id, { syncStatus: 'synced' });
+    }
+  },
 
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
-  }
-
-  async getQueuedOperations(): Promise<SyncOperation[]> {
-    const db = await this.getDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORES.SYNC_QUEUE, 'readonly');
-      const store = tx.objectStore(STORES.SYNC_QUEUE);
-      const request = store.getAll();
-
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-    });
-  }
+  // Legacy compatibility methods (if used by other parts of the app during transition)
+  async getQueuedOperations(): Promise<any[]> {
+    const pending = await this.getPendingOperations();
+    return pending.map(n => ({
+      id: 0, // Mock id for legacy interface
+      action: n.syncStatus.replace('pending_', '') as 'create' | 'update' | 'delete',
+      entityId: n.id,
+      data: n,
+      timestamp: new Date(n.updatedAt).getTime()
+    }));
+  },
 
   async removeFromQueue(id: number): Promise<void> {
-    const db = await this.getDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(STORES.SYNC_QUEUE, 'readwrite');
-      const store = tx.objectStore(STORES.SYNC_QUEUE);
-      const request = store.delete(id);
-
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
+    // This was used for the separate sync_queue table. 
+    // In the new system, markAsSynced handles this.
+    console.warn('removeFromQueue is legacy. Use markAsSynced instead.');
   }
-}
-
-export const offlineStorage = new OfflineStorage();
+};

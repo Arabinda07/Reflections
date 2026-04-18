@@ -21,11 +21,12 @@ export const SyncBanner: React.FC = () => {
   }, [isOnline, showBanner, bannerMode]);
 
   useEffect(() => {
-    // Auto-hide the success banner after 4 seconds to give user time to read
-    if (showBanner && bannerMode === 'recovery') {
+    // Auto-hide the banner to prevent it from cluttering the sanctuary
+    if (showBanner) {
+      const duration = bannerMode === 'offline' ? 6000 : 3000;
       const timer = setTimeout(() => {
         setShowBanner(false);
-      }, 4000);
+      }, duration);
       return () => clearTimeout(timer);
     }
   }, [showBanner, bannerMode]);

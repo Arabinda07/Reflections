@@ -124,12 +124,11 @@ export const Home: React.FC = () => {
       <section className="relative flex flex-col items-center justify-start pt-0 pb-16 sm:pb-24 px-6 sm:px-10 overflow-hidden border-b-2 border-border min-h-[400px] sm:min-h-[500px]">
         {/* Hero Video Background */}
         <video
-          src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_045634_e1c98c76-1265-4f5c-882a-4276f2080894.mp4"
+          src="/assets/videos/user_hero.mp4"
           autoPlay
           loop
           muted
           playsInline
-          crossOrigin="anonymous"
           className="absolute inset-0 w-full h-full object-cover object-bottom z-0"
         />
 

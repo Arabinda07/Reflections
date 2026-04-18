@@ -1,13 +1,47 @@
-@import url('https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..900&family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
+@font-face {
+  font-family: 'Schibsted Grotesk';
+  src: url('/assets/fonts/SchibstedGrotesk-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Schibsted Grotesk';
+  src: url('/assets/fonts/SchibstedGrotesk-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Spectral';
+  src: url('/assets/fonts/Spectral-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Spectral';
+  src: url('/assets/fonts/Spectral-Italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Spectral';
+  src: url('/assets/fonts/Spectral-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 @font-face {
   font-family: 'Feather Bold';
-  src: url('https://db.onlinewebfonts.com/t/14936bb7a4b6575fd2eee80a3ab52cc2.eot');
-  src: url('https://db.onlinewebfonts.com/t/14936bb7a4b6575fd2eee80a3ab52cc2.eot?#iefix') format('embedded-opentype'),
-    url('https://db.onlinewebfonts.com/t/14936bb7a4b6575fd2eee80a3ab52cc2.woff2') format('woff2'),
-    url('https://db.onlinewebfonts.com/t/14936bb7a4b6575fd2eee80a3ab52cc2.woff') format('woff'),
-    url('https://db.onlinewebfonts.com/t/14936bb7a4b6575fd2eee80a3ab52cc2.ttf') format('truetype'),
-    url('https://db.onlinewebfonts.com/t/14936bb7a4b6575fd2eee80a3ab52cc2.svg#Feather Bold') format('svg');
+  src: url('/assets/fonts/Feather Bold.woff2') format('woff2');
+  font-display: swap;
 }
 
 @tailwind base;

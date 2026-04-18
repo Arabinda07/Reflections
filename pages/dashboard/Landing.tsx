@@ -58,7 +58,7 @@ export const Landing: React.FC = () => {
               <div className="w-full h-full rounded-[16px] sm:rounded-[32px] overflow-hidden border-2 border-white/20 relative">
                 <video 
                   ref={videoRef}
-                  src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260324_151826_c7218672-6e92-402c-9e45-f1e0f454bdc4.mp4"
+                  src="/assets/videos/landing_video.mp4"
                   className="w-full h-full object-cover bg-black/5"
                   autoPlay
                   loop

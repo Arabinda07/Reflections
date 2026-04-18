@@ -1,8 +1,8 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User } from '../types';
 import { supabase } from '../src/supabaseClient';
 import { Session } from '@supabase/supabase-js';
-
+import { useAuthStore } from '../hooks/useAuthStore';
 import { StartupScreen } from '../components/ui/StartupScreen';
 
 interface AuthContextType {
@@ -14,7 +14,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Helper to map Supabase session to our app User type
 const mapSessionToUser = (session: Session): User => ({
   id: session.user.id,
   email: session.user.email || '',
@@ -23,22 +22,19 @@ const mapSessionToUser = (session: Session): User => ({
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const { user, isAuthenticated, setHydrated, setUser, logout, isHydrated } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [showStartup, setShowStartup] = useState(() => {
-    // Check if splash has already been shown in this session
     return !sessionStorage.getItem('startup_shown');
   });
   const [minTimeReached, setMinTimeReached] = useState(false);
 
-  // Minimum duration for the startup animation (3.5 seconds)
+  // Minimum duration for the startup animation
   useEffect(() => {
-    // If we've already shown it this session, don't wait
     if (!showStartup) {
       setMinTimeReached(true);
       return;
     }
-
     const timer = setTimeout(() => {
       setMinTimeReached(true);
     }, 3500);
@@ -48,16 +44,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     let mounted = true;
 
-    // Initial session check
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (mounted) {
-        if (session) {
-          setUser(mapSessionToUser(session));
-        } else {
-          setUser(null);
+      try {
+        // First check Supabase (if online)
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (mounted) {
+          if (session) {
+            setUser(mapSessionToUser(session));
+          } else if (error) {
+            console.warn('Supabase session check failed (likely offline). Using local persisted session.');
+            // Session remains as it was in the persisted Zustand store
+          } else {
+            setUser(null);
+          }
+          setLoading(false);
+          setHydrated(true);
         }
-        setLoading(false);
+      } catch (err) {
+        console.error('Fatal auth check error:', err);
+        if (mounted) {
+          setLoading(false);
+          setHydrated(true);
+        }
       }
     };
 
@@ -77,41 +86,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       mounted = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [setUser, setHydrated]);
 
-  // Hide startup screen only when both conditions are met
+  // Hide startup screen
   useEffect(() => {
-    if (!loading && minTimeReached && showStartup) {
-      // Extended delay to ensure the StartupScreen's exit animation (800ms) has time to finish
+    if (!loading && minTimeReached && showStartup && isHydrated) {
       const fadeOutTimer = setTimeout(() => {
         setShowStartup(false);
         sessionStorage.setItem('startup_shown', 'true');
       }, 800);
       return () => clearTimeout(fadeOutTimer);
     }
-  }, [loading, minTimeReached, showStartup]);
-
-  const logout = async () => {
-    try {
-      await supabase.auth.signOut();
-      if (sessionStorage.getItem('startup_shown')) {
-         sessionStorage.removeItem('startup_shown');
-      }
-      setUser(null);
-    } catch (error) {
-      console.error('Error signing out:', error);
-    }
-  };
+  }, [loading, minTimeReached, showStartup, isHydrated]);
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isInitialCheckDone: !loading, logout }}>
-      {/* StartupScreen is a fixed overlay, so it doesn't interrupt the app mounting */}
+    <AuthContext.Provider value={{ 
+      user, 
+      isAuthenticated, 
+      isInitialCheckDone: !loading && isHydrated, 
+      logout 
+    }}>
       <StartupScreen isVisible={showStartup} />
       
-      {/* 
-        CRITICAL FIX: We always render children to keep the Router and its state alive.
-        FIX (Glimpse): We hide them with CSS opacity so they don't "flash" before the overlay mounts.
-      */}
       <div 
         className="flex-1 contents"
         style={{ 

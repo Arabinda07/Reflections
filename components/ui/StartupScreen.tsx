@@ -33,7 +33,7 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
             <div className="absolute inset-0 bg-green/5 blur-3xl rounded-full scale-75 animate-pulse z-10" />
             
             <video 
-              src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_074327_a4d6275d-82d9-4c83-bfbe-f1fb2213c17c.mp4"
+              src="/assets/videos/sanctuary.mp4"
               autoPlay 
               loop 
               muted 

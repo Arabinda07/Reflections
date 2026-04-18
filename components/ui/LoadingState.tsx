@@ -54,7 +54,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
           {/* Finger-Tapping Brand Lottie */}
           <div className="w-[260px] h-[260px] sm:w-[320px] sm:h-[320px]">
             <DotLottieReact
-              src="https://lottie.host/16016d7c-4339-4feb-bea8-af73664d180d/OE9KL3HbaN.lottie"
+              src="/assets/lottie/loading.json"
               loop
               autoplay
               className="w-full h-full"
