@@ -198,5 +198,32 @@ export const noteService = {
     if (!user) return 0;
     const notes = await offlineStorage.getAllNotes(user.id);
     return notes.length;
+  },
+
+  getRecent: async (limit: number): Promise<Note[]> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return [];
+    
+    // Prioritize local storage for instant "Recent" access
+    const notes = await offlineStorage.getAllNotes(user.id);
+    return notes.slice(0, limit);
+  },
+
+  getMonthlyCount: async (): Promise<number> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return 0;
+    
+    // Filter local notes by the current month
+    const notes = await offlineStorage.getAllNotes(user.id);
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    const monthlyNotes = notes.filter(note => {
+      const noteDate = new Date(note.createdAt);
+      return noteDate.getMonth() === currentMonth && noteDate.getFullYear() === currentYear;
+    });
+
+    return monthlyNotes.length;
   }
 };

@@ -42,7 +42,7 @@ export default defineConfig(({ mode }) => {
           },
           workbox: {
             maximumFileSizeToCacheInBytes: 50 * 1024 * 1024, // 50 MiB
-            globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,mp4,json,spline,splinecode}'],
+            globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,mp4,ogg,m4a,json,spline,splinecode}'],
             runtimeCaching: [
               {
                 urlPattern: /^https:\/\/.*\.supabase\.co\/auth\/.*/i,
@@ -57,6 +57,21 @@ export default defineConfig(({ mode }) => {
                 handler: 'CacheFirst',
                 options: {
                   cacheName: 'app-videos',
+                  expiration: {
+                    maxEntries: 10,
+                    maxAgeSeconds: 60 * 60 * 24 * 30, // 30 Days
+                  },
+                  cacheableResponse: {
+                    statuses: [0, 200],
+                  },
+                  rangeRequests: true,
+                },
+              },
+              {
+                urlPattern: /.*\.(ogg|m4a|mp3)$/,
+                handler: 'CacheFirst',
+                options: {
+                  cacheName: 'app-audio',
                   expiration: {
                     maxEntries: 10,
                     maxAgeSeconds: 60 * 60 * 24 * 30, // 30 Days

@@ -1030,7 +1030,7 @@ export const CreateNote: React.FC = () => {
           {/* Sidebar - Liquid Glass Drawer on Mobile, Fixed on Desktop */}
           <aside 
             className={`fixed left-0 top-0 bottom-0 w-[200px] lg:w-[180px] border-r-2 border-border z-50 transition-all duration-700 ease-out-expo px-4 py-8 flex flex-col gap-6 
-              ${isMobile ? 'liquid-glass-strong rounded-r-[40px] shadow-2xl overflow-y-auto' : 'bg-white dark:bg-panel-bg'}
+              ${isMobile ? 'hidden' : 'bg-white dark:bg-panel-bg'}
               ${isMobile ? (isSidebarOpen ? 'translate-x-0' : '-translate-x-full') : (isDimmed ? '-translate-x-full opacity-0 pointer-events-none' : 'translate-x-0 opacity-100')}
             `}
           >
@@ -1093,14 +1093,25 @@ export const CreateNote: React.FC = () => {
                {/* Sounds Button (Consolidated from Header) */}
                <div className="relative" ref={musicRef}>
                   <button 
-                    onClick={() => setIsMusicOpen(!isMusicOpen)}
+                    onClick={musicPlaying ? stopMusic : () => setIsMusicOpen(true)}
                     className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl border-2 transition-all duration-300 ease-out-expo active:scale-95 ${musicPlaying ? 'bg-purple-500/10 border-purple-500 text-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.1)]' : 'bg-white dark:bg-panel-bg border-border text-gray-nav hover:border-purple-500/30'}`}
                   >
                     <div className="flex items-center gap-3">
                       <Headphones size={18} />
-                      <span className="text-[12px] font-black uppercase tracking-tight">{musicPlaying && activeMusicTrack ? activeMusicTrack.label : 'Sounds'}</span>
+                      <span className="text-[12px] font-black uppercase tracking-tight">
+                        {musicPlaying && activeMusicTrack ? (
+                          <span className="text-[16px] leading-none">{activeMusicTrack.emoji}</span>
+                        ) : 'Sounds'}
+                      </span>
                     </div>
-                    <ChevronRight size={14} className={isMusicOpen ? 'rotate-90' : ''} />
+                    <ChevronRight 
+                      size={14} 
+                      className={`${isMusicOpen ? 'rotate-90' : ''} transition-transform`} 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsMusicOpen(!isMusicOpen);
+                      }}
+                    />
                   </button>
                </div>
 
@@ -1156,10 +1167,10 @@ export const CreateNote: React.FC = () => {
             <div className="mt-auto space-y-4">
                {/* Quick Info */}
                <div className="p-3 rounded-2xl bg-gray-50 dark:bg-white/5 border border-border transition-colors">
-                  <p className="text-[10px] font-bold text-gray-nav flex items-center gap-2">
+                  <div className="text-[10px] font-bold text-gray-nav flex items-center gap-2">
                     <div className="w-1.5 h-1.5 rounded-full bg-blue animate-pulse" />
                     Cloud Synced
-                  </p>
+                  </div>
                </div>
             </div>
           </aside>
@@ -1194,16 +1205,6 @@ export const CreateNote: React.FC = () => {
               </div>
 
               <div className="flex items-center gap-3">
-                {/* Personalize Trigger (Mobile Only) - Liquid Glass styled */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsSidebarOpen(true)}
-                  className="lg:hidden flex items-center gap-2 rounded-xl border-2 border-border/40 liquid-glass font-black text-[11px] text-gray-text px-4 py-2"
-                >
-                  <Smile size={16} className="text-blue" />
-                  <span>Personalize</span>
-                </Button>
 
                 <div className="h-6 w-[1.5px] bg-border mx-2"></div>
 
@@ -1382,7 +1383,22 @@ export const CreateNote: React.FC = () => {
                 </AnimatePresence>
 
                 {/* Root-Level Universal Floating Actions (Ensures Screen Consistency) */}
-                <div className={`fixed z-50 transition-all duration-700 ${isMobile ? 'right-4 top-1/2 -translate-y-1/2' : 'bottom-20 right-8'}`}>
+                {/* Root-Level Universal Floating Actions (Ensures Screen Consistency) */}
+                <div className={`fixed z-50 flex flex-col gap-3 transition-all duration-700 ${isMobile ? 'right-4 bottom-24' : 'bottom-20 right-8'}`}>
+                  {/* Personalize FAB (Mobile Only) */}
+                  {isMobile && !showPlane && (
+                    <motion.button
+                      initial={{ opacity: 0, scale: 0.85, y: 10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                      className={`flex h-14 w-14 items-center justify-center rounded-2xl border-2 ${isSidebarOpen ? 'border-blue bg-blue text-white' : 'border-border bg-white text-gray-nav'} shadow-xl transition-all duration-300 active:scale-95 ${isDimmed ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+                    >
+                      <Smile size={22} />
+                    </motion.button>
+                  )}
+
                   <AnimatePresence mode="wait">
                     {showPlane ? null : !hasContent ? (
                       /* ── AI Spark FAB ── */
@@ -1394,9 +1410,9 @@ export const CreateNote: React.FC = () => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={cycleSparkPrompt}
-                        className={`flex h-16 w-16 items-center justify-center rounded-2xl border-2 border-blue/20 bg-white/80 backdrop-blur-xl shadow-xl text-blue transition-all duration-700 hover:shadow-2xl active:scale-95 ${isDimmed ? 'opacity-0 pointer-events-none translate-x-4' : 'opacity-100 translate-x-0'}`}
+                        className={`flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-blue/20 bg-white/80 backdrop-blur-xl shadow-xl text-blue transition-all duration-700 hover:shadow-2xl active:scale-95 ${isDimmed ? 'opacity-0 pointer-events-none translate-x-4' : 'opacity-100 translate-x-0'}`}
                       >
-                        <Sparkles size={24} className={isGeneratingPrompts ? 'animate-pulse' : ''} />
+                        <Sparkles size={22} className={isGeneratingPrompts ? 'animate-pulse' : ''} />
                       </motion.button>
                     ) : (
                       /* ── Save FAB ── */
@@ -1409,13 +1425,99 @@ export const CreateNote: React.FC = () => {
                         whileTap={{ scale: 0.95 }}
                         onClick={handleSave}
                         disabled={!canSave || saving}
-                        className={`flex h-16 w-16 items-center justify-center rounded-2xl bg-green text-white shadow-xl transition-all duration-700 active:scale-95 ${isDimmed ? 'opacity-0 pointer-events-none translate-x-4' : 'opacity-100 translate-x-0'}`}
+                        className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-blue text-white shadow-xl transition-all duration-700 active:scale-95 ${isDimmed ? 'opacity-0 pointer-events-none translate-x-4' : 'opacity-100 translate-x-0'}`}
                       >
-                        {saving ? <Loader2 size={24} className="animate-spin" /> : <Save size={24} />}
+                        {saving ? <Loader2 size={22} className="animate-spin" /> : <Save size={22} />}
                       </motion.button>
                     )}
                   </AnimatePresence>
                 </div>
+
+                {/* Mobile Bottom Personalize Bar */}
+                <AnimatePresence>
+                  {isMobile && isSidebarOpen && (
+                    <motion.div
+                      initial={{ y: 100, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      exit={{ y: 100, opacity: 0 }}
+                      transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                      className="fixed bottom-4 left-3 right-3 z-[60] flex items-center justify-between gap-1 px-1.5 py-3 bg-white/90 dark:bg-panel-bg/90 backdrop-blur-xl border-2 border-border/40 rounded-[28px] shadow-2xl liquid-glass-strong"
+                    >
+                      {/* Mood */}
+                      <button 
+                        onClick={() => setIsMoodOpen(true)}
+                        className={`flex flex-col items-center gap-1.5 p-2 rounded-2xl transition-all ${mood ? 'text-blue' : 'text-gray-nav'}`}
+                      >
+                        <Smile size={20} />
+                        <span className="text-[9px] font-black uppercase tracking-tight">Mood</span>
+                      </button>
+
+                      {/* Tags */}
+                      <button 
+                        onClick={() => setIsTagsOpen(true)}
+                        className={`flex flex-col items-center gap-1.5 p-2 rounded-2xl transition-all ${tags.length > 0 ? 'text-green' : 'text-gray-nav'}`}
+                      >
+                        <TagIcon size={20} />
+                        <span className="text-[9px] font-black uppercase tracking-tight">Tags</span>
+                      </button>
+
+                      {/* Sounds */}
+                      {/* Sounds - True 1-Click Toggle */}
+                      <button 
+                        onClick={() => musicPlaying ? stopMusic() : setIsMusicOpen(true)}
+                        className={`flex flex-col items-center gap-1.5 p-2 rounded-2xl transition-all ${musicPlaying ? 'text-purple-500 font-bold' : 'text-gray-nav'}`}
+                      >
+                        <div className="relative">
+                          {musicPlaying ? (
+                            <span className="text-[20px] leading-none mb-1 block">{activeMusicTrack?.emoji}</span>
+                          ) : (
+                            <Headphones size={20} />
+                          )}
+                          {musicPlaying && (
+                            <motion.span 
+                              layoutId="music-indicator-p"
+                              className="absolute -top-1 -right-1 w-2 h-2 bg-purple-500 rounded-full"
+                              animate={{ scale: [1, 1.2, 1] }}
+                              transition={{ repeat: Infinity, duration: 2 }}
+                            />
+                          )}
+                        </div>
+                        <span className="text-[9px] font-black uppercase tracking-tight">
+                          {musicPlaying ? 'Stop' : 'Sounds'}
+                        </span>
+                      </button>
+
+                      {/* Whisper */}
+                      <button 
+                        onClick={toggleWhisper}
+                        className={`flex flex-col items-center gap-1.5 p-2 rounded-2xl transition-all ${isWhispering ? 'text-blue animate-pulse' : 'text-gray-nav'}`}
+                      >
+                        {isWhispering ? <Mic size={20} /> : <MicOff size={20} />}
+                        <span className="text-[9px] font-black uppercase tracking-tight">Speak</span>
+                      </button>
+
+                      {/* Tasks */}
+                      <button 
+                        onClick={toggleTaskDrawer}
+                        className={`flex flex-col items-center gap-1.5 p-2 rounded-2xl transition-all ${tasks.some(t => !t.completed) ? 'text-blue' : 'text-gray-nav'}`}
+                      >
+                        <ListTodo size={20} />
+                        <span className="text-[9px] font-black uppercase tracking-tight">Tasks</span>
+                      </button>
+
+                      {/* Divider */}
+                      <div className="w-[1.5px] h-8 bg-border/40 mx-1" />
+
+                      {/* Close */}
+                      <button 
+                        onClick={() => setIsSidebarOpen(false)}
+                        className="p-2 text-red/60 hover:text-red transition-colors"
+                      >
+                        <X size={20} />
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
             </motion.main>
@@ -1575,8 +1677,14 @@ export const CreateNote: React.FC = () => {
                         return (
                           <button 
                             key={track.id} 
-                            onClick={() => isActive ? stopMusic() : playMusicTrack(track)} 
-                            className={`w-full group relative flex items-center gap-4 p-4 rounded-3xl border-2 transition-all duration-300 active:scale-[0.98] ${isActive ? 'bg-white dark:bg-panel-bg border-purple-500/30' : 'bg-white/50 dark:bg-white/5 border-transparent hover:border-border'}`}
+                            onClick={() => {
+                              if (isActive) {
+                                stopMusic();
+                              } else {
+                                playMusicTrack(track);
+                              }
+                            }} 
+                            className={`w-full group relative flex items-center gap-4 p-4 rounded-3xl border-2 transition-all duration-300 active:scale-[0.98] ${isActive ? 'bg-white dark:bg-panel-bg border-purple-500/30 shadow-md ring-1 ring-purple-500/10' : 'bg-white/50 dark:bg-white/5 border-transparent hover:border-border'}`}
                           >
                             <div className={`h-12 w-12 rounded-2xl flex items-center justify-center text-xl transition-all duration-500 ${isActive ? 'bg-purple-500/10 scale-105' : 'bg-gray-100 dark:bg-white/5'}`}>
                               {track.emoji}
