@@ -127,46 +127,38 @@ Every feature exists because journaling is better with it. If removing it wouldn
 
 ## 5. Architecture Overview
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        Browser / Client                     │
-│                                                             │
-│  React 19 + TypeScript + Vite                               │
-│  Pages: Home, CreateNote, MyNotes, Insights, Account, FAQ  │
-│  Components: Editor, StorageImage, AmbientAudio, etc.      │
-│                                                             │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐  │
-│  │  noteService │  │  wikiService │  │    aiService     │  │
-│  │  (CRUD notes)│  │ (wiki CRUD)  │  │ (Gemini calls)   │  │
-│  └──────┬───────┘  └──────┬───────┘  └────────┬─────────┘  │
-└─────────┼─────────────────┼──────────────────┼─────────────┘
-          │                 │                   │
-          ▼                 ▼                   ▼
-┌─────────────────────────────────────────────────────────────┐
-│                        Supabase                             │
-│                                                             │
-│  PostgreSQL                                                 │
-│  ├── auth.users        (managed by Supabase Auth)          │
-│  ├── public.profiles   (name, avatar, plan)                │
-│  ├── public.notes      (journal entries)                   │
-│  ├── public.life_themes (wiki pages — both freeform        │
-│  │                       and structured, by page_type)     │
-│  └── public.theme_citations (note → theme links)          │
-│                                                             │
-│  Storage                                                    │
-│  └── app-files/        (avatars, note covers, attachments) │
-│                                                             │
-│  Row Level Security enforced on every table                 │
-└─────────────────────────────────────────────────────────────┘
-          │
-          ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    Google Gemini API                         │
-│                    (gemini-2.5-flash)                       │
-│                                                             │
-│  All calls made from the browser via @google/genai SDK.     │
-│  No server-side proxy. API key set in environment.         │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+
+    subgraph Client["Browser / Client"]
+        A1["React 19 + TypeScript + Vite"]
+        A2["Pages: Home, CreateNote, MyNotes, Insights, Account, FAQ"]
+        A3["Components: Editor, StorageImage, AmbientAudio"]
+
+        S1["noteService (CRUD notes)"]
+        S2["wikiService (wiki CRUD)"]
+        S3["aiService (Gemini calls)"]
+    end
+
+    subgraph Supabase["Supabase"]
+        B1["PostgreSQL"]
+        B2["auth.users"]
+        B3["public.profiles"]
+        B4["public.notes"]
+        B5["public.life_themes"]
+        B6["public.theme_citations"]
+
+        B7["Storage: app-files/"]
+        B8["Row Level Security"]
+    end
+
+    subgraph Gemini["Google Gemini API (gemini-2.5-flash)"]
+        C1["Called via @google/genai SDK"]
+        C2["No server-side proxy"]
+    end
+
+    Client --> Supabase
+    Client --> Gemini
 ```
 
 ### Key architectural decisions
