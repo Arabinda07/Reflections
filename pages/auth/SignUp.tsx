@@ -76,8 +76,8 @@ export const SignUp: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F7F7F7] p-6">
-      <div className="w-full max-w-[420px] bg-white border-2 border-border rounded-[32px] p-8 sm:p-10 shadow-sm liquid-glass">
+    <div className="min-h-screen flex items-center justify-center bg-body p-6 transition-colors duration-300">
+      <div className="w-full max-w-[420px] bg-white border-2 border-border rounded-[32px] p-8 sm:p-10 shadow-sm liquid-glass dark:shadow-2xl">
         <div className="flex flex-col items-center">
           <div className="mb-6 h-[80px] w-[80px] flex items-center justify-center rounded-2xl bg-green text-white shadow-sm">
              <UserPlus size={40} strokeWidth={2.5} />
@@ -148,10 +148,10 @@ export const SignUp: React.FC = () => {
             type="button"
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="w-full h-[52px] gap-3"
+            className="w-full h-[52px] gap-3 border-2 border-border dark:border-white/10 dark:bg-white/5"
           >
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="h-5 w-5" alt="Google" />
-            <span className="text-blue font-bold">Continue with Google</span>
+            <span className="text-blue dark:text-sky-400 font-bold">Continue with Google</span>
           </Button>
 
           <p className="mt-8 text-[15px] font-bold text-gray-light">
