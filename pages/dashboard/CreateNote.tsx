@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   ArrowLeft, 
   FloppyDisk, 
   Image as ImageIcon, 
-  MagicWand, 
   X, 
-  Calendar, 
+  CalendarBlank, 
   Paperclip, 
   FileText, 
   Sparkle, 
@@ -17,21 +16,17 @@ import {
   Check, 
   Plus, 
   Trash, 
-  Eye, 
-  EyeSlash, 
   ListChecks, 
   Microphone, 
   MicrophoneSlash, 
-  MusicNotes, 
-  Play, 
-  Pause, 
-  SpeakerHigh, 
+  Headphones,
   CircleNotch,
   CaretRight,
   Brain,
   Wind,
   Target,
-  Quotes
+  Lightning,
+  DotsThreeCircle
 } from '@phosphor-icons/react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { useAmbientAudio, AMBIENT_TRACKS } from '../../hooks/useAmbientAudio';
@@ -77,7 +72,7 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
   return (
     <motion.div
       layout
-      className={`group relative flex items-center gap-3 p-3 rounded-2xl transition-all duration-300 hover:bg-white/5 ${task.completed ? 'opacity-60' : ''}`}
+      className={`group relative flex items-center gap-3 p-3 rounded-2xl transition-all duration-300 hover:bg-black/5 dark:hover:bg-white/5 ${task.completed ? 'opacity-60' : ''}`}
     >
       <AnimatePresence>
         {rippleKey > 0 && task.completed && (
@@ -140,23 +135,31 @@ export const CreateNote: React.FC = () => {
   const [tagInput, setTagInput] = useState('');
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isLimitReached, setIsLimitReached] = useState(false);
   const [activePlaceholder, setActivePlaceholder] = useState<string | null>(initialPrompt || null);
   const [isReflecting, setIsReflecting] = useState(false);
   const [aiReflection, setAiReflection] = useState<string | null>(null);
   const [dynamicPrompts, setDynamicPrompts] = useState<string[]>([]);
   const [isGeneratingPrompts, setIsGeneratingPrompts] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [newAttachments, setNewAttachments] = useState<File[]>([]);
   const [existingAttachments, setExistingAttachments] = useState<NoteAttachment[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   
   // UI States
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   const [isFocused, setIsFocused] = useState(false);
+  const [isTitleFocused, setIsTitleFocused] = useState(false);
   const [isFlowing, setIsFlowing] = useState(false);
-  const [isBreathing, setIsBreathing] = useState(true);
+  const [isBreathing, setIsBreathing] = useState(true); 
+  const [isMobileOptionsOpen, setIsMobileOptionsOpen] = useState(false);
+
+  // Sub-modal states
   const [isMoodOpen, setIsMoodOpen] = useState(false);
   const [isTagsOpen, setIsTagsOpen] = useState(false);
   const [isMusicOpen, setIsMusicOpen] = useState(false);
   const [isTasksOpen, setIsTasksOpen] = useState(false);
+  
   const [isWhispering, setIsWhispering] = useState(false);
   const [interimTranscript, setInterimTranscript] = useState('');
   const [showObservation, setShowObservation] = useState(false);
@@ -173,15 +176,23 @@ export const CreateNote: React.FC = () => {
 
   useEffect(() => {
     isUnmounted.current = false;
-    return () => { isUnmounted.current = true; };
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener('resize', handleResize);
+    return () => { 
+      isUnmounted.current = true; 
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   // Auto-transition from Breathing to Editor
   useEffect(() => {
     if (!loading && isBreathing) {
       const timer = setTimeout(() => {
-        if (!isUnmounted.current) setIsBreathing(false);
-      }, 3200);
+        if (!isUnmounted.current) {
+          setIsBreathing(false);
+          editorInstanceRef.current?.focus();
+        }
+      }, 3200); 
       return () => clearTimeout(timer);
     }
   }, [loading, isBreathing]);
@@ -193,14 +204,17 @@ export const CreateNote: React.FC = () => {
       if (isFlowing) setIsFlowing(false);
     };
     const handleKeydown = (e: KeyboardEvent) => {
-      if (!isFocused) return;
+      if (!isFocused && !isTitleFocused) return;
       if (e.key === 'Escape') return handleWake();
       if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') {
+        if (isTitleFocused) return; // Don't flow while typing title
         setIsFlowing(true);
         if (flowTimeoutRef.current) clearTimeout(flowTimeoutRef.current);
-        flowTimeoutRef.current = setTimeout(() => {
-          if (!isUnmounted.current) setIsFlowing(false);
-        }, 5000);
+        if (!isMobile) {
+          flowTimeoutRef.current = setTimeout(() => {
+            if (!isUnmounted.current) setIsFlowing(false);
+          }, 5000);
+        }
       }
     };
     window.addEventListener('keydown', handleKeydown);
@@ -211,16 +225,16 @@ export const CreateNote: React.FC = () => {
       window.removeEventListener('mousemove', handleWake);
       window.removeEventListener('touchstart', handleWake);
     };
-  }, [isFocused, isFlowing]);
+  }, [isFocused, isTitleFocused, isFlowing, isMobile]);
 
   useEffect(() => {
     const fetchNote = async () => {
-      if (!id) {
-        setLoading(false);
-        generateDynamicPrompts();
-        return;
-      }
       try {
+        if (!id) {
+          generateDynamicPrompts();
+          setLoading(false);
+          return;
+        }
         const note = await noteService.getById(id);
         if (note && !isUnmounted.current) {
           setTitle(note.title);
@@ -392,8 +406,10 @@ export const CreateNote: React.FC = () => {
     }
   };
 
+  const hasContent = Boolean(content && content !== '<p><br></p>');
   const wordCount = content.replace(/<[^>]*>/g, '').trim().split(/\s+/).filter(Boolean).length;
   const canReflect = wordCount >= 100;
+  const isDimmed = isFlowing && !isTitleFocused;
 
   if (loading || isBreathing) return (
     <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-body px-6 text-center animate-in fade-in duration-700">
@@ -404,11 +420,7 @@ export const CreateNote: React.FC = () => {
       />
       <div className="relative z-10">
         <div className="w-48 h-48 mx-auto mb-12 opacity-80">
-          <DotLottieReact
-            src="/assets/lottie/loading2.json"
-            autoplay
-            loop
-          />
+          <DotLottieReact src="/assets/lottie/loading2.json" autoplay loop />
         </div>
         <h2 className="text-[32px] md:text-[44px] font-display text-gray-text tracking-tighter mb-4 animate-pulse">Take a breath.</h2>
         <p className="text-[18px] font-serif italic text-gray-light max-w-sm mx-auto">Let the noise settle before you start.</p>
@@ -417,82 +429,206 @@ export const CreateNote: React.FC = () => {
   );
 
   return (
-    <div className="relative min-h-[100dvh] bg-body transition-all duration-700 ease-out-quart overflow-x-hidden">
+    <div className="relative h-[100dvh] bg-body transition-all duration-700 ease-out-quart overflow-hidden flex">
       <div className="grain-overlay" />
 
-      {/* ── Sanctuary Header ── */}
-      <AnimatePresence>
-        {!isFlowing && (
-          <motion.header initial={{ y: -64, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -64, opacity: 0 }} className="fixed top-0 left-0 right-0 h-20 z-50 flex items-center justify-between px-6 lg:px-10">
-            <div className="flex items-center gap-6">
-              <button onClick={() => navigate(RoutePath.HOME)} className="w-12 h-12 rounded-full border border-border flex items-center justify-center hover:bg-white/5 transition-all"><ArrowLeft size={20} weight="bold" /></button>
-              <div className="h-8 w-[1px] bg-border hidden lg:block" />
-              <input type="text" placeholder="Untitled Reflection" value={title} onChange={e => setTitle(e.target.value)} className="bg-transparent border-none outline-none font-display text-[20px] lg:text-[24px] tracking-tight text-gray-text placeholder:text-gray-nav w-full max-w-md" />
+      {/* ── Subtle Back Button ── */}
+      <button 
+        onClick={() => navigate(RoutePath.HOME)}
+        className={`fixed top-6 left-6 z-[60] h-12 w-12 rounded-full border border-border bg-white/50 dark:bg-black/20 backdrop-blur-xl flex items-center justify-center hover:bg-white dark:hover:bg-white/10 transition-all shadow-sm ${isDimmed ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
+      >
+        <ArrowLeft size={20} weight="bold" className="text-gray-text" />
+      </button>
+
+      {/* ── Desktop Sidebar ── */}
+      {!isMobile && (
+        <aside className={`w-[240px] border-r-2 border-border flex flex-col h-full bg-white/50 dark:bg-panel-bg z-40 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isDimmed ? '-translate-x-full opacity-0' : 'translate-x-0 opacity-100'}`}>
+          <div className="pt-24 px-6 pb-6 flex-1 overflow-y-auto custom-scrollbar space-y-4">
+            <span className="text-[10px] font-black text-gray-nav tracking-widest uppercase opacity-40 ml-2">Personalize</span>
+            
+            {/* Options */}
+            <button onClick={() => setIsMoodOpen(true)} className={`w-full flex items-center justify-between p-4 rounded-[20px] transition-all border-2 ${mood ? 'bg-green/10 border-green/20 text-green' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border text-gray-text'}`}>
+              <div className="flex items-center gap-3"><Smiley size={20} weight={mood ? "fill" : "regular"} /><span className="text-[13px] font-bold">{mood ? mood : 'Mood'}</span></div>
+              <CaretRight size={14} className="opacity-40" />
+            </button>
+
+            <button onClick={() => setIsTagsOpen(true)} className={`w-full flex items-center justify-between p-4 rounded-[20px] transition-all border-2 ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border text-gray-text'}`}>
+              <div className="flex items-center gap-3"><TagIcon size={20} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-[13px] font-bold">{tags.length > 0 ? `${tags.length} Tags` : 'Tags'}</span></div>
+              <CaretRight size={14} className="opacity-40" />
+            </button>
+
+            <button onClick={() => setIsMusicOpen(true)} className={`w-full flex items-center justify-between p-4 rounded-[20px] transition-all border-2 ${musicPlaying ? 'bg-green/10 border-green/20 text-green' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border text-gray-text'}`}>
+              <div className="flex items-center gap-3"><Headphones size={20} weight={musicPlaying ? "fill" : "regular"} /><span className="text-[13px] font-bold">{musicPlaying && activeMusicTrack ? activeMusicTrack.emoji : 'Sounds'}</span></div>
+              <CaretRight size={14} className="opacity-40" />
+            </button>
+
+            <button onClick={toggleWhisper} className={`w-full flex items-center justify-between p-4 rounded-[20px] transition-all border-2 ${isWhispering ? 'bg-green/10 border-green/20 text-green animate-pulse' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border text-gray-text'}`}>
+              <div className="flex items-center gap-3">{isWhispering ? <Microphone size={20} weight="fill" /> : <MicrophoneSlash size={20} weight="regular" />}<span className="text-[13px] font-bold">Whisper</span></div>
+            </button>
+
+            <button onClick={() => setIsTasksOpen(true)} className={`w-full flex items-center justify-between p-4 rounded-[20px] transition-all border-2 ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border text-gray-text'}`}>
+              <div className="flex items-center gap-3"><ListChecks size={20} weight={tasks.some(t => !t.completed) ? "fill" : "regular"} /><span className="text-[13px] font-bold">{getTaskDrawerTriggerLabel(tasks).label}</span></div>
+              <CaretRight size={14} className="opacity-40" />
+            </button>
+            
+            <div className="grid grid-cols-2 gap-2 pt-2">
+              <label className="flex flex-col items-center justify-center p-4 rounded-[20px] bg-transparent hover:bg-white dark:hover:bg-white/5 text-gray-text transition-all cursor-pointer">
+                <Paperclip size={20} className="mb-2" /><span className="text-[10px] font-bold uppercase">Files</span>
+                <input type="file" multiple className="hidden" onChange={(e) => {
+                  if (e.target.files) setNewAttachments([...newAttachments, ...Array.from(e.target.files)]);
+                }} />
+              </label>
+              <label className="flex flex-col items-center justify-center p-4 rounded-[20px] bg-transparent hover:bg-white dark:hover:bg-white/5 text-gray-text transition-all cursor-pointer">
+                <ImageIcon size={20} className="mb-2" /><span className="text-[10px] font-bold uppercase">Cover</span>
+                <input type="file" className="hidden" accept="image/*" onChange={(e) => {
+                  if (e.target.files?.[0]) setImagePreview(URL.createObjectURL(e.target.files[0]));
+                }} />
+              </label>
             </div>
-            <div className="flex items-center gap-4">
-              <button onClick={handleSave} disabled={saving || (!title && !content)} className="group flex items-center gap-3 pl-5 pr-2 py-2 rounded-full bg-green text-white font-bold text-[14px] shadow-lg transition-all disabled:opacity-50">
-                Save Reflection
-                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">{saving ? <CircleNotch size={18} className="animate-spin" /> : <FloppyDisk size={18} weight="bold" />}</div>
-              </button>
-            </div>
-          </motion.header>
-        )}
-      </AnimatePresence>
+          </div>
+        </aside>
+      )}
 
       {/* ── Main Canvas ── */}
-      <main className={`relative z-10 pt-32 pb-40 px-6 lg:px-0 transition-all duration-1000 ${isFlowing ? 'opacity-30 blur-sm scale-[0.98]' : 'opacity-100'}`}>
-        <div className="max-w-[82ch] mx-auto min-h-[60vh]">
+      <main className="flex-1 h-full overflow-y-auto relative pt-24 pb-40 px-6 sm:px-12 md:px-20 custom-scrollbar">
+        <div className={`max-w-[800px] mx-auto transition-all duration-1000 ease-[cubic-bezier(0.32,0.72,0,1)] ${isDimmed ? 'opacity-40 scale-[0.98]' : 'opacity-100'}`}>
+          
+          {/* Cover Image */}
           {imagePreview && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="relative w-full aspect-[21/9] rounded-[40px] overflow-hidden mb-12 bezel-outer group">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative w-full aspect-[21/9] rounded-[2rem] overflow-hidden mb-12 bezel-outer group">
               <img src={imagePreview} alt="Cover" className="w-full h-full object-cover" />
-              <button onClick={() => setImagePreview(null)} className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/20 backdrop-blur-xl text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"><X size={20} weight="bold" /></button>
+              <button onClick={() => setImagePreview(null)} className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/40 backdrop-blur-xl text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"><X size={20} weight="bold" /></button>
             </motion.div>
           )}
 
+          {/* Eyebrow Date */}
+          <div className="mb-6 flex items-center gap-2">
+            <span className="rounded-full bg-green/10 text-green px-3 py-1 text-[10px] uppercase tracking-[0.2em] font-bold flex items-center gap-2">
+              <CalendarBlank size={12} weight="bold" />
+              {new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'long', day: 'numeric' })}
+            </span>
+            {canReflect && (
+               <button onClick={handleAiReflect} disabled={isReflecting} className="rounded-full bg-blue/10 text-blue px-3 py-1 text-[10px] uppercase tracking-[0.2em] font-bold flex items-center gap-2 hover:bg-blue/20 transition-all">
+                 {isReflecting ? <CircleNotch size={12} className="animate-spin" /> : <Brain size={12} weight="bold" />}
+                 Reflect
+               </button>
+            )}
+          </div>
+
+          {/* Title as H1 */}
+          <input
+            type="text"
+            placeholder="Untitled Reflection"
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+            onFocus={() => { setIsFocused(true); setIsTitleFocused(true); setIsFlowing(false); }}
+            onBlur={() => { setIsFocused(false); setIsTitleFocused(false); }}
+            className="w-full bg-transparent border-none outline-none font-serif text-[42px] md:text-[56px] leading-tight text-gray-text placeholder:text-border/40 mb-8 p-0"
+          />
+
           <AnimatePresence>
             {isWhispering && interimTranscript && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-8 p-4 rounded-2xl bg-red/5 border border-red/10 text-red font-serif italic text-[18px]">
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-8 p-4 rounded-[2rem] bg-green/5 border border-green/10 text-green font-serif italic text-[18px]">
                 {interimTranscript}...
               </motion.div>
             )}
           </AnimatePresence>
 
-          <Editor ref={editorInstanceRef} content={content} onChange={setContent} onFocusChange={setIsFocused} placeholder={activePlaceholder || "What's on your mind?"} className="text-[20px] lg:text-[22px] font-serif leading-relaxed text-gray-text" />
+          <Editor 
+            ref={editorInstanceRef} 
+            content={content} 
+            onChange={setContent} 
+            onFocusChange={setIsFocused} 
+            placeholder={activePlaceholder || "What's on your mind?"} 
+            hideToolbar={isMobile}
+            className="text-[20px] md:text-[22px] font-serif leading-[1.8] text-gray-text/90" 
+          />
         </div>
       </main>
 
-      {/* ── Fluid Island Toolbar ── */}
-      <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 w-full max-w-fit px-6">
-        <motion.div layout animate={{ y: isFlowing ? 100 : 0, opacity: isFlowing ? 0 : 1 }} className="bezel-outer p-1.5 backdrop-blur-3xl shadow-2xl">
-          <div className="bezel-inner px-4 py-2 flex items-center gap-2">
-            <div className="relative">
-              <button onClick={() => { setIsMoodOpen(!isMoodOpen); setIsTagsOpen(false); setIsMusicOpen(false); setIsTasksOpen(false); }} className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${mood ? 'bg-green/10 text-green' : 'text-gray-nav hover:bg-white/5'}`}><Smiley size={24} weight={mood ? "fill" : "bold"} /></button>
-              <AnimatePresence>{isMoodOpen && (
-                <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: -80 }} className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 bezel-outer min-w-[280px]">
-                  <div className="bezel-inner p-4 grid grid-cols-5 gap-2">
-                    {['peaceful', 'happy', 'neutral', 'sad', 'stressed'].map(m => (
-                      <button key={m} onClick={() => { setMood(m); setIsMoodOpen(false); generateDynamicPrompts(m); }} className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${mood === m ? 'scale-110 ring-2 ring-green' : 'opacity-60'}`}><div className={`w-6 h-6 rounded-full bg-green`} /></button>
-                    ))}
-                  </div>
-                </motion.div>
-              )}</AnimatePresence>
-            </div>
-            <div className="w-[1px] h-6 bg-border mx-1" />
-            <div className="flex items-center gap-1">
-              <button onClick={() => { setIsTagsOpen(!isTagsOpen); setIsMoodOpen(false); }} className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${tags.length > 0 ? 'bg-blue/10 text-blue' : 'text-gray-nav hover:bg-white/5'}`}><TagIcon size={22} weight="bold" /></button>
-              <button onClick={() => setIsMusicOpen(!isMusicOpen)} className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${musicPlaying ? 'bg-purple-500/10 text-purple-500' : 'text-gray-nav hover:bg-white/5'}`}><MusicNotes size={22} weight="bold" /></button>
-              <button onClick={() => setIsTasksOpen(!isTasksOpen)} className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${tasks.some(t => !t.completed) ? 'bg-blue/10 text-blue' : 'text-gray-nav hover:bg-white/5'}`}><ListChecks size={22} weight="bold" /></button>
-              <button onClick={toggleWhisper} className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${isWhispering ? 'bg-red/10 text-red animate-pulse' : 'text-gray-nav hover:bg-white/5'}`}>{isWhispering ? <MicrophoneSlash size={22} weight="bold" /> : <Microphone size={22} weight="bold" />}</button>
-              <label className="w-12 h-12 rounded-full flex items-center justify-center text-gray-nav hover:bg-white/5 cursor-pointer"><ImageIcon size={22} weight="bold" /><input type="file" className="hidden" accept="image/*" onChange={e => { const file = e.target.files?.[0]; if (file) setImagePreview(URL.createObjectURL(file)); }} /></label>
-            </div>
-            <div className="w-[1px] h-6 bg-border mx-1" />
-            <button onClick={cycleSparkPrompt} className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-blue hover:scale-110 transition-all shadow-sm"><Target size={22} weight="bold" /></button>
-            <button onClick={handleAiReflect} disabled={isReflecting || !canReflect} className={`w-12 h-12 rounded-full flex items-center justify-center transition-all shadow-sm ${canReflect ? 'bg-white/5 border border-white/10 text-green hover:scale-110' : 'opacity-20 cursor-not-allowed'}`}>{isReflecting ? <CircleNotch size={20} className="animate-spin" /> : <Sparkle size={22} weight="fill" />}</button>
-          </div>
-        </motion.div>
+      {/* ── Floating Actions ── */}
+      <div className={`fixed z-50 flex gap-4 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isDimmed ? 'opacity-0 translate-y-8' : 'opacity-100 translate-y-0'} ${isMobile ? 'bottom-8 left-6 right-6 justify-between' : 'bottom-10 right-10 flex-col'}`}>
+        
+        {/* Mobile Personalize FAB */}
+        {isMobile && (
+          <button 
+            onClick={() => setIsMobileOptionsOpen(true)}
+            className="group relative h-16 w-16 rounded-full bg-white/80 dark:bg-panel-bg/80 backdrop-blur-3xl border border-white/20 shadow-[0_24px_40px_-10px_rgba(0,0,0,0.15)] flex items-center justify-center text-gray-text hover:text-green transition-all"
+          >
+            <DotsThreeCircle size={28} weight="fill" className="opacity-80" />
+          </button>
+        )}
+
+        {/* Interchangeable Action FAB (Spark / Save) */}
+        <AnimatePresence mode="wait">
+          {!hasContent ? (
+            <motion.button
+              key="spark-fab"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={cycleSparkPrompt}
+              className="group relative h-16 w-16 rounded-full bg-white/80 dark:bg-panel-bg/80 backdrop-blur-3xl border border-white/20 shadow-[0_24px_40px_-10px_rgba(0,0,0,0.15)] flex items-center justify-center text-green transition-all"
+            >
+              <div className="absolute inset-2 rounded-full bg-green/5 group-hover:bg-green/10 transition-colors" />
+              <Target size={28} weight="fill" className={isGeneratingPrompts ? 'animate-pulse' : ''} />
+            </motion.button>
+          ) : (
+            <motion.button
+              key="save-fab"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleSave}
+              disabled={saving}
+              className="group relative h-16 w-16 rounded-full bg-green text-white shadow-[0_24px_40px_-10px_rgba(22,163,74,0.4)] flex items-center justify-center transition-all"
+            >
+              <div className="absolute inset-2 rounded-full bg-black/10 group-hover:scale-110 transition-transform duration-500 ease-out" />
+              {saving ? <CircleNotch size={28} className="animate-spin" /> : <Lightning size={28} weight="fill" className="relative z-10" />}
+            </motion.button>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* ── Global Portals ── */}
+      {/* ── Mobile Modal Expansion (Personalize) ── */}
+      {createPortal(
+        <AnimatePresence>
+          {isMobile && isMobileOptionsOpen && (
+            <div className="fixed inset-0 z-[100] flex flex-col justify-end p-4 pb-24">
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-body/80 backdrop-blur-xl" onClick={() => setIsMobileOptionsOpen(false)} />
+              
+              <motion.div 
+                initial={{ y: "100%", opacity: 0 }} 
+                animate={{ y: 0, opacity: 1 }} 
+                exit={{ y: "100%", opacity: 0 }}
+                transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                className="relative w-full bg-white dark:bg-panel-bg rounded-[2rem] p-6 shadow-2xl border border-border flex flex-col gap-4"
+              >
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-[10px] font-black tracking-widest uppercase opacity-40">Personalize</span>
+                  <button onClick={() => setIsMobileOptionsOpen(false)} className="text-gray-nav hover:text-red p-2"><X size={20} weight="bold" /></button>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <button onClick={() => { setIsMobileOptionsOpen(false); setIsMoodOpen(true); }} className={`flex items-center gap-3 p-4 rounded-2xl border ${mood ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><Smiley size={24} weight={mood ? "fill" : "regular"} /><span className="text-[14px] font-bold">Mood</span></button>
+                  <button onClick={() => { setIsMobileOptionsOpen(false); setIsTagsOpen(true); }} className={`flex items-center gap-3 p-4 rounded-2xl border ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><TagIcon size={24} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-[14px] font-bold">Tags</span></button>
+                  <button onClick={() => { setIsMobileOptionsOpen(false); setIsMusicOpen(true); }} className={`flex items-center gap-3 p-4 rounded-2xl border ${musicPlaying ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><Headphones size={24} weight={musicPlaying ? "fill" : "regular"} /><span className="text-[14px] font-bold">Sounds</span></button>
+                  <button onClick={() => { setIsMobileOptionsOpen(false); setIsTasksOpen(true); }} className={`flex items-center gap-3 p-4 rounded-2xl border ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><ListChecks size={24} weight={tasks.some(t => !t.completed) ? "fill" : "regular"} /><span className="text-[14px] font-bold">Tasks</span></button>
+                  <button onClick={toggleWhisper} className={`flex items-center gap-3 p-4 rounded-2xl border ${isWhispering ? 'bg-green/10 border-green/20 text-green animate-pulse' : 'border-border text-gray-text'}`}>{isWhispering ? <Microphone size={24} weight="fill" /> : <MicrophoneSlash size={24} weight="regular" />}<span className="text-[14px] font-bold">Whisper</span></button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
+
+      {/* ── Sub-Modals (Mood, Tags, Tasks, Music, Reflection) ── */}
+      {/* ... keeping these identical to previous implementation, just ensuring they use green instead of blue ... */}
       {createPortal(
         <AnimatePresence>
           {isTasksOpen && (
@@ -501,13 +637,13 @@ export const CreateNote: React.FC = () => {
               <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative w-full max-w-[420px] bg-white dark:bg-panel-bg bezel-outer shadow-2xl flex flex-col max-h-[80vh]">
                 <div className="bezel-inner p-8 flex flex-col h-full">
                   <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center gap-3"><ListChecks size={24} weight="bold" className="text-blue" /><span className="text-[18px] font-display text-gray-text">Tasks</span></div>
+                    <div className="flex items-center gap-3"><ListChecks size={24} weight="bold" className="text-green" /><span className="text-[18px] font-display text-gray-text">Tasks</span></div>
                     <button onClick={() => setIsTasksOpen(false)} className="text-gray-nav hover:text-red transition-all"><X size={24} weight="bold" /></button>
                   </div>
                   <div className="flex-1 overflow-y-auto space-y-2 mb-8">
                     {getOrderedTasks(tasks).map(t => <TaskRow key={t.id} task={t} updateTask={(tid, updates) => setTasks(tasks.map(x => x.id === tid ? {...x, ...updates} : x))} toggleTask={tid => setTasks(tasks.map(x => x.id === tid ? {...x, completed: !x.completed} : x))} removeTask={tid => setTasks(tasks.filter(x => x.id !== tid))} />)}
                   </div>
-                  <Button onClick={() => setTasks([...tasks, { id: Math.random().toString(36).substr(2, 9), text: '', completed: false }])} className="w-full h-14 rounded-2xl bg-blue text-white font-bold"><Plus size={20} weight="bold" className="mr-2" /> Add Task</Button>
+                  <Button onClick={() => setTasks([...tasks, { id: Math.random().toString(36).substr(2, 9), text: '', completed: false }])} className="w-full h-14 rounded-2xl bg-green text-white font-bold"><Plus size={20} weight="bold" className="mr-2" /> Add Task</Button>
                 </div>
               </motion.div>
             </div>
@@ -517,24 +653,52 @@ export const CreateNote: React.FC = () => {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={() => setIsTagsOpen(false)} />
               <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="relative w-full max-w-[380px] bezel-outer">
                 <div className="bezel-inner p-8">
-                  <h3 className="text-[20px] font-display text-gray-text mb-6">Tags</h3>
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {tags.map(t => <span key={t} className="px-3 py-1.5 rounded-xl bg-blue/5 text-blue text-[12px] font-bold flex items-center gap-2">#{t}<X size={12} className="cursor-pointer" onClick={() => setTags(tags.filter(x => x !== t))} /></span>)}
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-[20px] font-display text-gray-text">Tags</h3>
+                    <button onClick={() => setIsTagsOpen(false)} className="text-gray-nav hover:text-red transition-all"><X size={24} weight="bold" /></button>
                   </div>
-                  <input type="text" placeholder="Add tag..." className="w-full bg-transparent border-none outline-none font-bold text-[14px]" onKeyDown={e => { if (e.key === 'Enter' && (e.target as any).value) { setTags([...tags, (e.target as any).value]); (e.target as any).value = ''; } }} />
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {tags.map(t => <span key={t} className="px-3 py-1.5 rounded-xl bg-green/10 text-green text-[12px] font-bold flex items-center gap-2">#{t}<X size={12} className="cursor-pointer" onClick={() => setTags(tags.filter(x => x !== t))} /></span>)}
+                  </div>
+                  <input type="text" placeholder="Add tag (Press Enter)..." className="w-full bg-transparent border-none outline-none font-bold text-[14px]" onKeyDown={e => { if (e.key === 'Enter' && (e.target as any).value) { setTags([...tags, (e.target as any).value]); (e.target as any).value = ''; } }} />
                 </div>
               </motion.div>
             </div>
+          )}
+          {isMoodOpen && (
+             <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
+               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={() => setIsMoodOpen(false)} />
+               <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="relative w-full max-w-[380px] bezel-outer">
+                 <div className="bezel-inner p-8">
+                   <div className="flex items-center justify-between mb-6">
+                     <h3 className="text-[20px] font-display text-gray-text">Mood</h3>
+                     <button onClick={() => setIsMoodOpen(false)} className="text-gray-nav hover:text-red transition-all"><X size={24} weight="bold" /></button>
+                   </div>
+                   <div className="grid grid-cols-3 gap-3">
+                      {['happy', 'calm', 'anxious', 'sad', 'angry', 'tired'].map(m => (
+                        <button key={m} onClick={() => { setMood(m); setIsMoodOpen(false); generateDynamicPrompts(m); }} className={`flex flex-col items-center p-4 rounded-2xl border-2 transition-all ${mood === m ? 'border-green bg-green/10 text-green' : 'border-border bg-white dark:bg-white/5 text-gray-text'}`}>
+                          <Smiley size={32} weight={mood === m ? "fill" : "regular"} className="mb-2" />
+                          <span className="text-[12px] font-bold capitalize">{m}</span>
+                        </button>
+                      ))}
+                   </div>
+                 </div>
+               </motion.div>
+             </div>
           )}
           {isMusicOpen && (
             <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={() => setIsMusicOpen(false)} />
               <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="relative w-full max-w-[340px] bezel-outer">
                 <div className="bezel-inner p-6 space-y-2">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-[20px] font-display text-gray-text">Sounds</h3>
+                    <button onClick={() => setIsMusicOpen(false)} className="text-gray-nav hover:text-red transition-all"><X size={24} weight="bold" /></button>
+                  </div>
                   {Object.entries(AMBIENT_TRACKS).map(([tid, track]) => (
-                    <button key={tid} onClick={() => playMusicTrack(tid as any)} className={`w-full p-4 rounded-2xl text-left text-[14px] font-bold flex items-center justify-between ${activeMusicTrack === tid ? 'bg-purple-500 text-white' : 'hover:bg-white/5 text-gray-nav'}`}>{track.name}{activeMusicTrack === tid && <CircleNotch size={14} className="animate-spin" />}</button>
+                    <button key={tid} onClick={() => playMusicTrack(tid as any)} className={`w-full p-4 rounded-2xl text-left text-[14px] font-bold flex items-center justify-between border-2 ${activeMusicTrack === tid ? 'border-green bg-green/10 text-green' : 'border-transparent hover:border-border text-gray-text'}`}>{track.name}{activeMusicTrack === tid && <CircleNotch size={16} className="animate-spin" />}</button>
                   ))}
-                  <button onClick={stopMusic} className="w-full p-4 text-red font-bold hover:bg-red/5 rounded-2xl">Stop All</button>
+                  <button onClick={stopMusic} className="w-full p-4 mt-2 border-2 border-transparent text-red font-bold hover:bg-red/5 rounded-2xl">Stop All</button>
                 </div>
               </motion.div>
             </div>

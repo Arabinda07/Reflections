@@ -79,14 +79,16 @@ export const DashboardLayout: React.FC = () => {
   ];
 
   const navItems = isAuthenticated ? authNavItems : guestNavItems;
+  const isCreateNoteRoute = location.pathname.includes('/createnote');
 
   return (
     <div className="min-h-screen flex flex-col bg-body font-sans selection:bg-green/30 selection:text-green transition-colors duration-300">
       {/* Global Grain Texture */}
       <div className="grain-overlay" />
 
-      {/* Fixed Navbar */}
-      <nav className="fixed top-0 left-0 right-0 h-[64px] border-b-2 border-border z-[100] flex justify-center liquid-glass">
+      {/* Fixed Navbar - Hidden on CreateNote */}
+      {!isCreateNoteRoute && (
+        <nav className="fixed top-0 left-0 right-0 h-[64px] border-b-2 border-border z-[100] flex justify-center liquid-glass">
         <div className="w-full max-w-[1440px] px-4 md:px-10 flex items-center justify-between">
           {/* Left Side */}
           <div className="flex items-center gap-4">
@@ -172,6 +174,7 @@ export const DashboardLayout: React.FC = () => {
           </div>
         </div>
       </nav>
+      )}
 
       {/* Mobile Menu Overlay - Moved OUTSIDE of nav to avoid overflow:hidden from liquid-glass */}
       {isMobileMenuOpen && (
@@ -268,7 +271,7 @@ export const DashboardLayout: React.FC = () => {
 
       {/* Main Content */}
       <SyncBanner />
-      <main className="pt-[64px] w-full max-w-[1440px] mx-auto flex-grow">
+      <main className={`w-full max-w-[1440px] mx-auto flex-grow ${isCreateNoteRoute ? '' : 'pt-[64px]'}`}>
         <Outlet />
       </main>
 

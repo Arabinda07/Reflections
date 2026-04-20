@@ -89,24 +89,28 @@ export const FAQ: React.FC = () => {
         </div>
       </section>
 
-      {/* Cinematic Video Moment — Full Bleed */}
-      <section className="relative z-0 w-full mb-40 overflow-hidden">
+      {/* Cinematic Showcase — No Crop */}
+      <section className="relative z-10 w-full px-6 mb-40 flex justify-center overflow-hidden">
         <motion.div 
           style={{ scale: videoScale }}
-          className="relative w-full h-[50vh] md:h-[70vh] min-h-[400px]"
+          className="relative w-full max-w-[1200px] aspect-video bezel-outer shadow-[0_48px_100px_-20px_rgba(0,0,0,0.5)]"
         >
-          {/* Gradient Masks for seamless blending */}
-          <div className="absolute inset-x-0 top-0 h-32 z-10 bg-gradient-to-b from-body to-transparent pointer-events-none" />
-          <div className="absolute inset-x-0 bottom-0 h-32 z-10 bg-gradient-to-t from-body to-transparent pointer-events-none" />
+          {/* Decorative Glow */}
+          <div className="absolute inset-0 bg-white/5 blur-[120px] -z-10 scale-125 opacity-30" />
           
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover"
-            src="/assets/videos/twist.mp4"
-          />
+          <div className="bezel-inner overflow-hidden bg-[#FBFBFB] dark:bg-[#FBFBFB]">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-contain"
+              src="/assets/videos/twist.mp4"
+            />
+          </div>
+          
+          {/* Letterbox Frame Detail */}
+          <div className="absolute inset-0 pointer-events-none border border-white/5 rounded-[inherit]" />
         </motion.div>
       </section>
 

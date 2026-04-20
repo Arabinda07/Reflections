@@ -111,9 +111,9 @@ export const Home: React.FC = () => {
               transition={{ duration: entranceDuration, ease: [0.32, 0.72, 0, 1] }}
               className="max-w-4xl"
             >
-              <h1 className="font-display tracking-tighter leading-none !text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.5)] mb-12" style={{ fontSize: 'clamp(40px, 7vw, 92px)' }}>
+              <h1 className="font-display tracking-tighter leading-none drop-shadow-[0_4px_24px_rgba(0,0,0,0.5)] mb-12" style={{ color: '#ffffff', fontSize: 'clamp(40px, 7vw, 92px)' }}>
                 Welcome back, <br />
-                <span className="font-serif italic !text-green drop-shadow-[0_4px_24px_rgba(0,0,0,0.5)]">{user?.name?.split(' ')[0] || 'Reflector'}</span>
+                <span className="font-serif italic drop-shadow-[0_4px_24px_rgba(0,0,0,0.5)]" style={{ color: '#16a34a' }}>{user?.name?.split(' ')[0] || 'Reflector'}</span>
               </h1>
             </motion.div>
           </div>
