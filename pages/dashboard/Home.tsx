@@ -108,7 +108,7 @@ export const Home: React.FC = () => {
 
   return (
     <>
-      <div className="relative min-h-screen bg-body" {...((showOnboarding ? { "aria-hidden": "true" } : {}) as any)}>
+      <div className="relative min-h-full flex flex-col flex-1 bg-body" {...((showOnboarding ? { "aria-hidden": "true" } : {}) as any)}>
         
         {/* Cinematic Hero */}
         <section className="relative w-full h-[70dvh] min-h-[500px] overflow-hidden">
@@ -146,53 +146,49 @@ export const Home: React.FC = () => {
             <div className="label-caps mb-16 opacity-50">Sanctuary Overview</div>
             
             <div className="flex flex-col gap-16">
-              <Magnetic strength={10}>
-                <button 
-                  onClick={() => navigate(RoutePath.NOTES)}
-                  className="group w-full text-left transition-all duration-700 flex flex-col md:flex-row items-start md:items-end justify-between gap-8"
-                >
-                  <div>
-                    <span className="text-[14px] font-medium text-gray-nav flex items-center gap-3 mb-4">
-                      <FolderOpen size={20} className="text-green" weight="light" />
-                      Reflections written
-                    </span>
-                    <h2 className="text-7xl md:text-8xl font-display text-gray-text leading-none tracking-tight group-hover:text-green transition-colors duration-500">
-                      {isCountLoading ? '...' : displayCount}
-                    </h2>
+              <button 
+                onClick={() => navigate(RoutePath.NOTES)}
+                className="group w-full text-left transition-all duration-700 flex flex-col md:flex-row items-start md:items-end justify-between gap-8"
+              >
+                <div>
+                  <span className="text-[14px] font-medium text-gray-nav flex items-center gap-3 mb-4">
+                    <FolderOpen size={20} className="text-green" weight="light" />
+                    Reflections written
+                  </span>
+                  <h2 className="text-7xl md:text-8xl font-display text-gray-text leading-none tracking-tight group-hover:text-green transition-colors duration-500">
+                    {isCountLoading ? '...' : displayCount}
+                  </h2>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-green/10 text-green text-[10px] font-black uppercase tracking-widest">
+                    <div className="w-1 h-1 rounded-full bg-green animate-pulse" />
+                    Syncing
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-green/10 text-green text-[10px] font-black uppercase tracking-widest">
-                      <div className="w-1 h-1 rounded-full bg-green animate-pulse" />
-                      Syncing
-                    </div>
-                    <div className="w-12 h-12 rounded-full border border-border flex items-center justify-center group-hover:bg-green group-hover:text-white group-hover:border-green transition-all duration-500">
-                      <CaretRight size={20} weight="light" />
-                    </div>
+                  <div className="w-12 h-12 rounded-full border border-border flex items-center justify-center group-hover:bg-green group-hover:text-white group-hover:border-green transition-all duration-500">
+                    <CaretRight size={20} weight="light" />
                   </div>
-                </button>
-              </Magnetic>
+                </div>
+              </button>
 
               <div className="h-[1px] w-full bg-border opacity-50" />
 
-              <Magnetic strength={10}>
-                <button 
-                  onClick={() => navigate(RoutePath.INSIGHTS)}
-                  className="group w-full text-left transition-all duration-700 flex flex-col md:flex-row items-start md:items-center justify-between gap-8"
-                >
-                  <div>
-                    <span className="text-[14px] font-medium text-gray-nav flex items-center gap-3 mb-4">
-                      <Brain size={20} className="text-green" weight="light" />
-                      Patterns discovered
-                    </span>
-                    <p className="text-2xl md:text-3xl font-serif italic text-gray-light max-w-sm leading-snug group-hover:text-gray-text transition-colors duration-500">
-                      AI Librarian is analyzing your growth.
-                    </p>
-                  </div>
-                  <div className="w-12 h-12 rounded-full border border-border flex items-center justify-center group-hover:bg-green group-hover:text-white group-hover:border-green transition-all duration-500 shrink-0">
-                    <CaretRight size={20} weight="light" />
-                  </div>
-                </button>
-              </Magnetic>
+              <button 
+                onClick={() => navigate(RoutePath.INSIGHTS)}
+                className="group w-full text-left transition-all duration-700 flex flex-col md:flex-row items-start md:items-center justify-between gap-8"
+              >
+                <div>
+                  <span className="text-[14px] font-medium text-gray-nav flex items-center gap-3 mb-4">
+                    <Brain size={20} className="text-green" weight="light" />
+                    Patterns discovered
+                  </span>
+                  <p className="text-2xl md:text-3xl font-serif italic text-gray-light max-w-sm leading-snug group-hover:text-gray-text transition-colors duration-500">
+                    AI Librarian is analyzing your growth.
+                  </p>
+                </div>
+                <div className="w-12 h-12 rounded-full border border-border flex items-center justify-center group-hover:bg-green group-hover:text-white group-hover:border-green transition-all duration-500 shrink-0">
+                  <CaretRight size={20} weight="light" />
+                </div>
+              </button>
             </div>
           </div>
 
@@ -226,18 +222,16 @@ export const Home: React.FC = () => {
                   </p>
                 </div>
 
-                <Magnetic strength={25}>
-                  <Button
-                    variant="primary"
-                    className="group w-full h-16 rounded-2xl text-[18px] font-bold bg-white dark:bg-white/5 border border-border flex items-center justify-center gap-4 pl-10 pr-2"
-                    onClick={() => handleCreateClick(dailyPrompt)}
-                  >
-                    Start writing
-                    <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center transition-transform duration-700 group-hover:translate-x-1 group-hover:bg-white/30">
-                      <ArrowRight size={20} weight="light" />
-                    </div>
-                  </Button>
-                </Magnetic>
+                <Button
+                  variant="primary"
+                  className="group w-full h-16 rounded-[24px] text-[18px] font-black flex items-center justify-center gap-4 pl-10 pr-2 shadow-xl shadow-green/20"
+                  onClick={() => handleCreateClick(dailyPrompt)}
+                >
+                  Start writing
+                  <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center transition-transform duration-700 group-hover:translate-x-1 group-hover:bg-white/30">
+                    <ArrowRight size={20} weight="light" />
+                  </div>
+                </Button>
               </div>
             </div>
           </div>

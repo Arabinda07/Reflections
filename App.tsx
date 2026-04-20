@@ -9,6 +9,7 @@ import { RoutePath } from './types';
 import { useSync } from './hooks/useSync';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
+import { supabase } from './src/supabaseClient';
 
 // Lazy load non-critical routes to reduce initial bundle size
 const SignIn = lazy(() => import('./pages/auth/SignIn').then(m => ({ default: m.SignIn })));
@@ -36,7 +37,6 @@ const SyncWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   useEffect(() => {
     // Optimistically preload critical routes after initial paint
     const preloadRoutes = () => {
-      import('./pages/dashboard/Home');
       import('./pages/dashboard/CreateNote');
       import('./pages/dashboard/FAQ');
     };
@@ -53,6 +53,36 @@ const SyncWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 };
 
 function App() {
+  useEffect(() => {
+    // Detect if this is an OAuth popup callback
+    const isPopup = window.opener && window.opener !== window;
+    const hasAuthParams = window.location.hash.includes('access_token=') || 
+                         window.location.hash.includes('error=') ||
+                         window.location.search.includes('code=') ||
+                         window.location.search.includes('error=');
+    
+    if (isPopup && hasAuthParams) {
+      // Small delay fallback in case auth state doesn't trigger
+      let timer: number;
+      
+      // Subscribe to auth state changes to ensure session is saved before closing
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+        if (event === 'SIGNED_IN') {
+          window.close();
+        }
+      });
+      
+      timer = window.setTimeout(() => {
+        window.close();
+      }, 2000);
+      
+      return () => {
+        clearTimeout(timer);
+        subscription.unsubscribe();
+      };
+    }
+  }, []);
+
   return (
     <PWAInstallProvider>
       <AuthProvider>

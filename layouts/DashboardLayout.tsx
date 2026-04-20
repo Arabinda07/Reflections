@@ -79,16 +79,19 @@ export const DashboardLayout: React.FC = () => {
   ];
 
   const navItems = isAuthenticated ? authNavItems : guestNavItems;
-  const isCreateNoteRoute = location.pathname.includes('/createnote');
+  const isSanctuaryRoute = location.pathname.includes('/new') || location.pathname.includes('/edit') || (location.pathname.startsWith('/notes/') && location.pathname !== '/notes/');
+  const isLandingRoute = location.pathname === RoutePath.HOME && !isAuthenticated;
+  const hideMainPadding = isSanctuaryRoute || isLandingRoute;
+  const navBackground = isLandingRoute ? 'bg-transparent' : 'bg-white/90 dark:bg-[#121212]/90 backdrop-blur-xl';
 
   return (
-    <div className="min-h-screen flex flex-col bg-body font-sans selection:bg-green/30 selection:text-green transition-colors duration-300">
+    <div className="h-screen flex flex-col bg-body font-sans selection:bg-green/30 selection:text-green transition-colors duration-300 overflow-hidden relative">
       {/* Global Grain Texture */}
-      <div className="grain-overlay" />
+      <div className="grain-overlay pointer-events-none" />
 
-      {/* Fixed Navbar - Hidden on CreateNote */}
-      {!isCreateNoteRoute && (
-        <nav className="fixed top-0 left-0 right-0 h-[64px] border-b-2 border-border z-[100] flex justify-center liquid-glass">
+      {/* Navbar - Stationary Anchor (Floats on Landing) */}
+      {!isSanctuaryRoute && (
+        <nav className={`h-[64px] border-b-2 border-border z-[100] flex justify-center transition-colors duration-500 ${isLandingRoute ? 'fixed top-0 left-0 right-0 bg-transparent' : 'flex-none relative bg-white/90 dark:bg-[#121212]/90 backdrop-blur-xl'}`}>
         <div className="w-full max-w-[1440px] px-4 md:px-10 flex items-center justify-between">
           {/* Left Side */}
           <div className="flex items-center gap-4">
@@ -269,48 +272,52 @@ export const DashboardLayout: React.FC = () => {
         </div>
       )}
 
-      {/* Main Content */}
+      {/* Main Content - Scrollable Region */}
       <SyncBanner />
-      <main className={`w-full max-w-[1440px] mx-auto flex-grow ${isCreateNoteRoute ? '' : 'pt-[64px]'}`}>
-        <Outlet />
-      </main>
+      <main className="flex-1 overflow-y-auto relative custom-scrollbar flex flex-col">
+        <div className="w-full max-w-[1440px] mx-auto flex-1 flex flex-col">
+          <Outlet />
+          
+          {/* Global Footer - Anchored to bottom of scroll content */}
+          {!isSanctuaryRoute && (
+            <footer className="w-full border-t border-border py-8 mt-auto bg-white/50 dark:bg-black/20 backdrop-blur-sm">
+              <div className="max-w-[1440px] mx-auto px-4 md:px-10 flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div className="flex items-center gap-8">
+                  <button 
+                    onClick={() => navigate(RoutePath.HOME)}
+                    className="text-[11px] font-black text-gray-nav hover:text-green transition-colors"
+                  >
+                    Home
+                  </button>
+                  <button 
+                    onClick={() => navigate(RoutePath.FAQ)}
+                    className="text-[11px] font-black text-gray-nav hover:text-green transition-colors"
+                  >
+                    FAQ
+                  </button>
+                  <button 
+                    onClick={() => navigate(RoutePath.PRIVACY)}
+                    className="text-[11px] font-black text-gray-nav hover:text-green transition-colors"
+                  >
+                    Privacy policy
+                  </button>
+                </div>
 
-      {/* Global Footer - Minimalist */}
-      <footer className="w-full border-t border-border py-8 mt-12 bg-white/50 dark:bg-black/20 backdrop-blur-sm">
-        <div className="max-w-[1440px] mx-auto px-4 md:px-10 flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-8">
-            <button 
-              onClick={() => navigate(RoutePath.HOME)}
-              className="text-[11px] font-black text-gray-nav hover:text-green transition-colors"
-            >
-              Home
-            </button>
-            <button 
-              onClick={() => navigate(RoutePath.FAQ)}
-              className="text-[11px] font-black text-gray-nav hover:text-green transition-colors"
-            >
-              FAQ
-            </button>
-            <button 
-              onClick={() => navigate(RoutePath.PRIVACY)}
-              className="text-[11px] font-black text-gray-nav hover:text-green transition-colors"
-            >
-              Privacy policy
-            </button>
-          </div>
-
-          <div className="text-[11px] font-black text-gray-nav/50">
-            © 2026 <a 
-              href="https://arabinda07.github.io/" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="hover:text-green hover:underline transition-all duration-300"
-            >
-              Arabinda
-            </a>
-          </div>
+                <div className="text-[11px] font-black text-gray-nav/50">
+                  © 2026 <a 
+                    href="https://arabinda07.github.io/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-green hover:underline transition-all duration-300"
+                  >
+                    Arabinda
+                  </a>
+                </div>
+              </div>
+            </footer>
+          )}
         </div>
-      </footer>
+      </main>
     </div>
   );
 };

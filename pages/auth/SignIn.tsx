@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Envelope, Lock, CheckCircle } from '@phosphor-icons/react';
 import { Input } from '../../components/ui/Input';
@@ -46,9 +47,10 @@ export const SignIn: React.FC = () => {
   const handleGoogleLogin = async () => {
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
+          skipBrowserRedirect: true,
           redirectTo: `${window.location.origin}/`,
         },
       });
@@ -56,10 +58,45 @@ export const SignIn: React.FC = () => {
       if (error) {
         setError(error.message);
         setLoading(false);
+        return;
       }
-    } catch (err) {
+
+      if (data?.url) {
+        // Open the OAuth URL in a popup window
+        const width = 500;
+        const height = 600;
+        const left = window.screenX + (window.outerWidth - width) / 2;
+        const top = window.screenY + (window.outerHeight - height) / 2;
+        
+        const popup = window.open(
+          data.url, 
+          'supabase-oauth-popup', 
+          `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no,scrollbars=yes,resizable=yes`
+        );
+
+        // Fallback: If popup is blocked by the browser, fallback to standard redirect
+        if (!popup) {
+          window.location.href = data.url;
+          return;
+        }
+
+        // Monitor the popup to detect when it closes
+        const checkPopup = setInterval(async () => {
+          if (popup.closed) {
+            clearInterval(checkPopup);
+            // After popup closes, double check the session (in case onAuthStateChange missed it)
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+              navigate(RoutePath.HOME);
+            } else {
+              setLoading(false);
+            }
+          }
+        }, 1000);
+      }
+    } catch (err: any) {
       console.error("Google login error:", err);
-      setError("An unexpected error occurred during Google login.");
+      setError(err.message || "An unexpected error occurred during Google login.");
       setLoading(false);
     }
   };
@@ -122,11 +159,20 @@ export const SignIn: React.FC = () => {
               Sign in
             </Button>
 
-            {error && (
-              <p className="text-[13px] font-bold text-red text-center mt-2 animate-in fade-in slide-in-from-top-1">
-                {error}
-              </p>
-            )}
+            <div className="min-h-[24px] mt-2 flex items-center justify-center">
+              <AnimatePresence>
+                {error && (
+                  <motion.p 
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    className="text-[13px] font-bold text-red text-center"
+                  >
+                    {error}
+                  </motion.p>
+                )}
+              </AnimatePresence>
+            </div>
           </form>
 
           <div className="my-8 flex w-full items-center gap-4">

@@ -27,8 +27,8 @@ export default {
         'ui-lg': ['1.25rem', { lineHeight: '1.3' }],    /* 20px */
         'ui-xl': ['1.563rem', { lineHeight: '1.2' }],   /* 25px */
         /* Marketing Fluid Scale */
-        'mk-display': ['clamp(2.5rem, 5vw + 1rem, 4.5rem)', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
-        'mk-h1': ['clamp(2rem, 4vw + 1rem, 3.5rem)', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
+        'mk-display': ['clamp(2.5rem, 5vw + 1rem, 4.5rem)', { lineHeight: '1.2', letterSpacing: '-0.02em' }],
+        'mk-h1': ['clamp(2rem, 4vw + 1rem, 3.5rem)', { lineHeight: '1.2', letterSpacing: '-0.02em' }],
         'mk-h2': ['clamp(1.5rem, 3vw + 1rem, 2.5rem)', { lineHeight: '1.2', letterSpacing: '-0.01em' }],
         'mk-h3': ['clamp(1.25rem, 2vw + 1rem, 1.75rem)', { lineHeight: '1.3' }],
         'mk-body': ['clamp(1rem, 1vw + 0.875rem, 1.125rem)', { lineHeight: '1.6' }],
@@ -55,7 +55,7 @@ export default {
         orange: 'var(--orange)',
         golden: 'var(--golden)',
         white: 'rgb(var(--panel-bg-rgb) / <alpha-value>)',
-        black: 'var(--gray-text)',
+        black: 'rgb(var(--black-rgb) / <alpha-value>)',
       },
       backgroundColor: {
         body: 'var(--bg-color)',

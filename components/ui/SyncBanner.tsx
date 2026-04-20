@@ -23,7 +23,7 @@ export const SyncBanner: React.FC = () => {
   useEffect(() => {
     // Auto-hide the banner to prevent it from cluttering the sanctuary
     if (showBanner) {
-      const duration = bannerMode === 'offline' ? 6000 : 3000;
+      const duration = 3000;
       const timer = setTimeout(() => {
         setShowBanner(false);
       }, duration);
@@ -44,10 +44,10 @@ export const SyncBanner: React.FC = () => {
         >
           <div
             className={`
-              flex items-center gap-3 px-4 py-3 rounded-2xl border-2 shadow-2xl backdrop-blur-2xl liquid-glass
+              flex items-center gap-3 px-4 py-3 rounded-2xl border-2 shadow-2xl backdrop-blur-2xl bg-panel-bg
               ${bannerMode === 'offline' 
-                ? 'bg-amber-500/10 border-amber-500/20 text-amber-700 dark:bg-[#1E1E1E]/80 dark:border-amber-500/30 dark:text-amber-400'
-                : 'bg-green/10 border-green/20 text-green-700 dark:bg-[#1E1E1E]/80 dark:border-green/30 dark:text-green-400'
+                ? 'border-amber-500/20 text-amber-700 dark:border-amber-500/30 dark:text-amber-400'
+                : 'border-green/20 text-green-700 dark:border-green/30 dark:text-green-400'
               }
             `}
             style={{ WebkitBackdropFilter: 'blur(20px)' }}

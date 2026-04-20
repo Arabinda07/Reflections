@@ -37,7 +37,7 @@ export const Landing: React.FC = () => {
       <div className="min-h-[100dvh] w-full relative">
 
         {/* ── Left panel: content ── */}
-        <div className="relative z-20 flex flex-col justify-between h-[100dvh] px-6 pt-20 pb-12 sm:px-12 sm:pt-28 sm:pb-12 lg:px-16 lg:pt-32 lg:pb-12 xl:px-24 pointer-events-none">
+        <div className="relative z-20 flex flex-col justify-between min-h-[100dvh] px-6 pt-[180px] pb-12 sm:px-12 sm:pt-[200px] sm:pb-12 lg:px-16 lg:pt-[220px] lg:pb-12 xl:px-24 pointer-events-none">
 
           {/* Hero headline — the one bold moment */}
           <div className="flex flex-col gap-8 lg:gap-12 lg:w-[60%] xl:w-[55%]">
@@ -73,7 +73,7 @@ export const Landing: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.6 }}
-            className="pointer-events-auto flex flex-wrap items-center gap-x-8 gap-y-6"
+            className="pointer-events-auto flex flex-col items-start sm:flex-row sm:items-center sm:flex-wrap gap-x-8 gap-y-6"
           >
             <button
               onClick={() => navigate(RoutePath.SIGNUP)}

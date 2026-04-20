@@ -53,7 +53,7 @@ export const FAQ: React.FC = () => {
   }, []);
 
   return (
-    <div className="relative min-h-screen bg-body text-gray-text pb-32 transition-colors duration-300">
+    <div className="relative min-h-full bg-body text-gray-text pb-32 transition-colors duration-300">
       
       {/* Editorial Hero */}
       <section className="relative z-10 w-full max-w-[1440px] mx-auto px-6 py-24 lg:py-32">
@@ -137,7 +137,6 @@ export const FAQ: React.FC = () => {
                 variants={staggerItem}
                 initial="hidden"
                 whileInView="show"
-                style={{ y: i % 2 === 0 ? y1 : y2 }}
                 viewport={{ once: true, margin: "-50px" }}
                 className={`${item.gridSpan} group border-t border-border pt-10`}
               >

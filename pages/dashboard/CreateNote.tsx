@@ -32,8 +32,7 @@ import {
   Target,
   Lightning,
   DotsThreeCircle,
-  PaperPlaneTilt,
-  FloppyDisk
+  PaperPlaneTilt
 } from '@phosphor-icons/react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { Magnetic } from '../../components/ui/Magnetic';
@@ -430,7 +429,7 @@ export const CreateNote: React.FC = () => {
   const isDimmed = isFlowing && !isTitleFocused;
 
   return (
-    <div className="relative h-[100dvh] bg-body transition-colors duration-700 ease-out-quart overflow-hidden flex">
+    <div className="relative flex-1 flex h-full bg-body transition-colors duration-700 ease-out-quart overflow-hidden">
       <AnimatePresence>
         {(loading || isBreathing) && (
           <motion.div 
@@ -456,18 +455,32 @@ export const CreateNote: React.FC = () => {
       </AnimatePresence>
       <div className="grain-overlay" />
 
-      {/* ── Subtle Back Button ── */}
-      <button 
-        onClick={() => navigate(RoutePath.HOME)}
-        className={`fixed bottom-8 lg:bottom-auto lg:top-6 left-4 lg:left-6 z-[80] h-12 w-12 rounded-full border border-border bg-white/50 dark:bg-black/20 backdrop-blur-xl flex items-center justify-center hover:bg-white dark:hover:bg-white/10 transition-all shadow-sm ${isDimmed ? 'opacity-0 translate-y-8 lg:-translate-y-4' : 'opacity-100 translate-y-0'}`}
-      >
-        <ArrowLeft size={20} weight="bold" className="text-gray-text" />
-      </button>
+      {/* ── Mobile Back Button ── */}
+      {isMobile && (
+        <button 
+          onClick={() => navigate(RoutePath.NOTES)}
+          className={`fixed top-4 left-4 z-[80] h-10 w-10 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-xl border border-border flex items-center justify-center text-gray-text hover:bg-white transition-all shadow-sm ${isDimmed ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
+        >
+          <ArrowLeft size={18} weight="bold" />
+        </button>
+      )}
 
       {/* ── Desktop Sidebar ── */}
       {!isMobile && (
         <aside className={`w-[240px] border-r-2 border-border flex flex-col h-full bg-white/50 dark:bg-panel-bg z-40 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isDimmed ? '-translate-x-full opacity-0' : 'translate-x-0 opacity-100'}`}>
-          <div className="pt-24 px-6 pb-6 flex-1 overflow-y-auto custom-scrollbar space-y-4">
+          <div className="pt-8 px-6 pb-6 flex-1 overflow-y-auto custom-scrollbar space-y-4">
+            
+            {/* Desktop Back Button */}
+            <button 
+              onClick={() => navigate(RoutePath.NOTES)}
+              className="flex items-center gap-2 text-gray-nav hover:text-gray-text text-[13px] font-bold mb-8 group transition-colors"
+            >
+              <div className="h-8 w-8 rounded-full border border-border bg-white flex items-center justify-center group-hover:bg-gray-100 transition-colors">
+                <ArrowLeft size={14} weight="bold" />
+              </div>
+              Back to Notes
+            </button>
+
             <span className="text-[10px] font-black text-gray-nav tracking-widest uppercase opacity-40 ml-2">Personalize</span>
             
             {/* Options */}

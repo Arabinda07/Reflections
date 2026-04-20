@@ -125,7 +125,7 @@ export const SingleNote: React.FC = () => {
     <>
       {/* LoadingState removed for instant detail view */}
       {isContentVisible && note && (
-        <div className="flex h-screen w-full bg-body overflow-hidden relative selection:bg-blue/10">
+        <div className="flex flex-1 h-full w-full bg-body overflow-hidden relative selection:bg-blue/10">
           {/* Sidebar - Integrated Sanctuary Control */}
           <aside 
             className={`fixed left-0 top-0 bottom-0 w-[200px] lg:w-[180px] border-r border-border z-50 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] px-4 py-8 flex flex-col gap-6 

@@ -78,7 +78,8 @@
   
   --bg-color: oklch(0.99 0.01 135);
   --panel-bg: oklch(0.98 0.01 135);
-  --panel-bg-rgb: 247, 248, 246; /* legacy fallback */
+  --panel-bg-rgb: 247 248 246;
+  --black-rgb: 0 0 0;
 
   /* Phased Typography Scale (1.25 Ratio / 18px Base) */
   --text-base: 1.125rem;    /* 18px */
@@ -126,7 +127,8 @@
   /* Pure black #000 explicitly banned, utilizing dark gray base */
   --bg-color: oklch(0.18 0.012 135);
   --panel-bg: oklch(0.22 0.012 135);
-  --panel-bg-rgb: 40, 42, 39;
+  --panel-bg-rgb: 40 42 39;
+  --black-rgb: 0 0 0;
 }
 
 body {

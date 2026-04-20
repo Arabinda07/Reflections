@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Envelope, Lock, User, UserPlus } from '@phosphor-icons/react';
 import { Input } from '../../components/ui/Input';
@@ -130,11 +131,20 @@ export const SignUp: React.FC = () => {
               Create account
             </Button>
 
-            {error && (
-              <p className="text-[13px] font-bold text-red text-center mt-2 animate-in fade-in slide-in-from-top-1">
-                {error}
-              </p>
-            )}
+            <div className="min-h-[24px] mt-2 flex items-center justify-center">
+              <AnimatePresence>
+                {error && (
+                  <motion.p 
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    className="text-[13px] font-bold text-red text-center"
+                  >
+                    {error}
+                  </motion.p>
+                )}
+              </AnimatePresence>
+            </div>
           </form>
 
           <div className="my-8 flex w-full items-center gap-4">
