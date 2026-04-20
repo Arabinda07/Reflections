@@ -110,7 +110,7 @@
   text-align: center;
   font-weight: 800;
   font-size: 14px;
-  border-radius: 16px;
+  border-radius: 9999px; /* Pill shape */
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   border: 2px solid transparent;
@@ -152,7 +152,7 @@
 .react-calendar__tile--active {
   background: var(--green) !important;
   color: white !important;
-  box-shadow: 0 8px 24px rgba(143, 188, 143, 0.4);
+  box-shadow: none !important; /* Removed glow */
   transform: scale(1.05);
 }
 

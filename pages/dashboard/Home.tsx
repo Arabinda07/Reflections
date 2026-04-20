@@ -224,7 +224,7 @@ export const Home: React.FC = () => {
 
                 <Button
                   variant="primary"
-                  className="group w-full h-16 rounded-[24px] text-[18px] font-black flex items-center justify-center gap-4 pl-10 pr-2 shadow-xl shadow-green/20"
+                  className="group w-full h-16 rounded-[24px] text-[18px] font-black flex items-center justify-center gap-4 pl-10 pr-2"
                   onClick={() => handleCreateClick(dailyPrompt)}
                 >
                   Start writing
