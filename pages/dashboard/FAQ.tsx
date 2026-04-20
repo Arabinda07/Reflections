@@ -89,24 +89,24 @@ export const FAQ: React.FC = () => {
         </div>
       </section>
 
-      {/* Cinematic Video Moment */}
-      <section className="relative z-10 w-full px-6 mb-40 overflow-hidden">
+      {/* Cinematic Video Moment — Full Bleed */}
+      <section className="relative z-0 w-full mb-40 overflow-hidden">
         <motion.div 
           style={{ scale: videoScale }}
-          className="w-full h-[60vh] min-h-[450px] rounded-[48px] overflow-hidden bg-white/5 dark:bg-white/2 relative group shadow-2xl"
+          className="relative w-full h-[50vh] md:h-[70vh] min-h-[400px]"
         >
+          {/* Gradient Masks for seamless blending */}
+          <div className="absolute inset-x-0 top-0 h-32 z-10 bg-gradient-to-b from-body to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-32 z-10 bg-gradient-to-t from-body to-transparent pointer-events-none" />
+          
           <video
             autoPlay
             loop
             muted
             playsInline
-            className="absolute inset-0 w-full h-full object-cover z-0"
-            src="/assets/videos/twist_compressed.mp4"
+            className="w-full h-full object-cover"
+            src="/assets/videos/twist.mp4"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-body/40 via-transparent to-body/40 pointer-events-none" />
-          <div className="absolute bottom-10 left-10 z-10">
-            <span className="text-[11px] font-black uppercase tracking-[0.3em] text-white/50">Atmospheric Simulation 01</span>
-          </div>
         </motion.div>
       </section>
 
