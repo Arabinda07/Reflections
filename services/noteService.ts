@@ -16,7 +16,6 @@ const mapToNote = (data: any): Note => ({
   tasks: data.tasks || [],
 });
 
-
 export const noteService = {
   // Fetch all notes for the authenticated user
   getAll: async (): Promise<Note[]> => {
@@ -206,6 +205,7 @@ export const noteService = {
       return count ?? 0;
     } catch (err) {
       console.warn('Supabase getCount failed, falling back to local Dexie:', err);
+      // Includes pending-insert notes by design — offline UX shows notes the user wrote.
       const notes = await offlineStorage.getAllNotes(user.id);
       return notes.length;
     }
@@ -240,6 +240,7 @@ export const noteService = {
       return count ?? 0;
     } catch (err) {
       console.warn('Supabase getMonthlyCount failed, falling back to local Dexie:', err);
+      // Includes pending-insert notes by design — prevents offline limit bypass.
       const notes = await offlineStorage.getAllNotes(user.id);
       // Use UTC boundaries to match the Supabase path
       return notes.filter(note => {
