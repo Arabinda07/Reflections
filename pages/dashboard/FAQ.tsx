@@ -279,7 +279,8 @@ export const FAQ: React.FC = () => {
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="fixed bottom-8 right-8 z-[100]"
+        className="fixed z-[100]"
+        style={{ bottom: 'calc(2rem + env(safe-area-inset-bottom))', right: '2rem' }}
       >
         <Magnetic strength={30}>
           <button

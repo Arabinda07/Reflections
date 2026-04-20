@@ -584,7 +584,10 @@ export const CreateNote: React.FC = () => {
       </main>
 
       {/* ── Floating Actions ── */}
-      <div className={`fixed z-50 flex gap-4 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isDimmed ? 'opacity-0 translate-y-8' : 'opacity-100 translate-y-0'} ${isMobile ? 'bottom-8 left-6 right-6 justify-between' : 'bottom-10 right-10 flex-col'}`}>
+      <div 
+        className={`fixed z-50 flex gap-4 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isDimmed ? 'opacity-0 translate-y-8' : 'opacity-100 translate-y-0'} ${isMobile ? 'left-6 right-6 justify-between' : 'flex-col'}`}
+        style={{ bottom: isMobile ? 'calc(2rem + env(safe-area-inset-bottom))' : '2.5rem', right: isMobile ? undefined : '2.5rem' }}
+      >
         
         {/* Mobile Personalize FAB */}
         {isMobile && (
@@ -639,7 +642,7 @@ export const CreateNote: React.FC = () => {
       {createPortal(
         <AnimatePresence>
           {isMobile && isMobileOptionsOpen && (
-            <div className="fixed inset-0 z-[100] flex flex-col justify-end p-4 pb-24">
+            <div className="fixed inset-0 z-[100] flex flex-col justify-end p-4" style={{ paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))' }}>
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-body/80 backdrop-blur-xl" onClick={() => setIsMobileOptionsOpen(false)} />
               
               <motion.div 

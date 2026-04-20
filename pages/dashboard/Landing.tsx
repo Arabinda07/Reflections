@@ -37,7 +37,7 @@ export const Landing: React.FC = () => {
       <div className="min-h-[100dvh] w-full relative">
 
         {/* ── Left panel: content ── */}
-        <div className="relative z-20 flex flex-col justify-between min-h-[100dvh] px-6 pt-[180px] pb-12 sm:px-12 sm:pt-[200px] sm:pb-12 lg:px-16 lg:pt-[220px] lg:pb-12 xl:px-24 pointer-events-none">
+        <div className="relative z-20 flex flex-col justify-between min-h-[100dvh] px-6 pt-[70px] pb-12 sm:px-12 sm:pt-[90px] sm:pb-12 lg:px-16 lg:pt-[110px] lg:pb-12 xl:px-24 pointer-events-none">
 
           {/* Hero headline — the one bold moment */}
           <div className="flex flex-col gap-8 lg:gap-12 lg:w-[60%] xl:w-[55%]">
@@ -77,7 +77,7 @@ export const Landing: React.FC = () => {
           >
             <button
               onClick={() => navigate(RoutePath.SIGNUP)}
-              className="group flex items-center gap-3 text-[18px] font-black text-gray-text hover:text-green transition-all duration-300"
+              className="group flex items-center gap-3 text-[16px] sm:text-[18px] font-black text-white bg-green hover:bg-green-hover px-8 py-4 rounded-full shadow-[0_8px_24px_-8px_rgba(22,163,74,0.4)] transition-all duration-300 pointer-events-auto"
             >
               Begin writing
               <ArrowRight size={22} className="group-hover:translate-x-1.5 transition-transform duration-500 ease-out-expo" />

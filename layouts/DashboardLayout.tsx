@@ -91,7 +91,7 @@ export const DashboardLayout: React.FC = () => {
 
       {/* Navbar - Stationary Anchor (Floats on Landing) */}
       {!isSanctuaryRoute && (
-        <nav className={`h-[64px] border-b-2 border-border z-[100] flex justify-center transition-colors duration-500 ${isLandingRoute ? 'fixed top-0 left-0 right-0 bg-transparent' : 'flex-none relative bg-white/90 dark:bg-[#121212]/90 backdrop-blur-xl'}`}>
+        <nav className={`h-[64px] border-b-2 border-border z-[100] flex justify-center transition-colors duration-500 ${isLandingRoute ? 'fixed top-0 left-0 right-0 bg-white/80 dark:bg-[#121212]/80 backdrop-blur-md md:bg-transparent md:backdrop-blur-none md:border-b-0 pt-[env(safe-area-inset-top)]' : 'flex-none relative bg-white/90 dark:bg-[#121212]/90 backdrop-blur-xl pt-[env(safe-area-inset-top)]'}`}>
         <div className="w-full max-w-[1440px] px-4 md:px-10 flex items-center justify-between">
           {/* Left Side */}
           <div className="flex items-center gap-4">
@@ -221,7 +221,7 @@ export const DashboardLayout: React.FC = () => {
                     </button>
                   ))}
                 </div>
-                <div className="mt-8 flex flex-col gap-4 pb-10">
+                <div className="mt-8 flex flex-col gap-4" style={{ paddingBottom: 'calc(2.5rem + env(safe-area-inset-bottom))' }}>
                   {/* PWA Install Button — only visible when browser supports it */}
                   {canInstall && (
                     <button
@@ -249,7 +249,7 @@ export const DashboardLayout: React.FC = () => {
                 </div>
               </>
             ) : (
-              <div className="flex flex-col gap-2 pb-10">
+              <div className="flex flex-col gap-2" style={{ paddingBottom: 'calc(2.5rem + env(safe-area-inset-bottom))' }}>
                 {[
                   { label: 'Homepage', path: RoutePath.HOME },
                   { label: 'FAQ', path: RoutePath.FAQ },

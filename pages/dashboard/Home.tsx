@@ -281,7 +281,7 @@ export const Home: React.FC = () => {
         </div>
       )}
 
-      <div style={{ position: 'fixed', bottom: '24px', right: '20px', zIndex: 8000 }}>
+      <div style={{ position: 'fixed', bottom: 'calc(24px + env(safe-area-inset-bottom))', right: '20px', zIndex: 8000 }}>
         <AmbientMusicButton />
       </div>
     </>
