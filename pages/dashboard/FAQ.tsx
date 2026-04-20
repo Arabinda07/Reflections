@@ -49,7 +49,7 @@ export const FAQ: React.FC = () => {
     <div className="relative min-h-screen bg-body text-gray-text pb-32 transition-colors duration-300">
       
       {/* Editorial Hero */}
-      <section className="relative z-10 w-full max-w-[1440px] mx-auto px-6 pt-16 pb-24 lg:pt-24">
+      <section className="relative z-10 w-full max-w-[1440px] mx-auto px-6 py-24 lg:py-32">
         <div className="grid lg:grid-cols-12 gap-12 items-end">
           <div className="lg:col-span-8">
             <motion.div 
@@ -57,13 +57,13 @@ export const FAQ: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1] }}
             >
-              <h1 className="h1-hero mb-10">
-                Untangle your <br />
-                <span className="font-serif italic text-green">thoughts.</span>
+              <h1 className="text-mk-display font-display tracking-tight text-gray-text mb-10">
+                Frequently <br />
+                <span className="font-serif italic text-green">Asked Questions</span>
               </h1>
               
-              <p className="body-editorial max-w-2xl">
-                Racing thoughts and mental clutter shouldn't be your default state. Journaling is the first step toward clarity.
+              <p className="text-mk-body font-serif text-gray-light max-w-2xl">
+                Everything you need to know about Sanctuary, the science of journaling, and how we protect your privacy.
               </p>
             </motion.div>
           </div>
@@ -88,8 +88,8 @@ export const FAQ: React.FC = () => {
         <section className="mb-48">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 mb-20">
             <div>
-              <h2 className="text-[40px] md:text-[64px] font-display tracking-tight text-gray-text leading-none mb-4">The journey</h2>
-              <p className="text-[16px] md:text-[18px] text-gray-light font-serif italic">A practice of healing, one reflection at a time.</p>
+              <h2 className="text-mk-h2 font-display text-gray-text mb-4">The journey</h2>
+              <p className="text-mk-body font-serif italic text-gray-light">A practice of healing, one reflection at a time.</p>
             </div>
             <div className="h-[1px] flex-grow bg-border hidden lg:block mb-6 mx-12 opacity-50" />
           </div>
@@ -138,7 +138,7 @@ export const FAQ: React.FC = () => {
                     <item.icon size={24} weight="light" />
                   </div>
                   <h3 className="text-[24px] font-display text-gray-text mb-4 leading-tight">{item.title}</h3>
-                  <p className="text-[15px] font-medium text-gray-light leading-relaxed">
+                  <p className="text-mk-body font-serif text-gray-light">
                     {item.desc}
                   </p>
                 </div>
@@ -147,12 +147,11 @@ export const FAQ: React.FC = () => {
           </div>
         </section>
 
-        {/* The Toolkit: Bento Grid */}
         <section className="mb-48">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 mb-20">
             <div className="max-w-3xl">
-              <h2 className="text-[40px] md:text-[64px] font-display tracking-tight text-gray-text leading-none mb-6">The toolkit</h2>
-              <p className="text-[18px] text-gray-light font-serif italic leading-relaxed">
+              <h2 className="text-mk-h2 font-display text-gray-text mb-6">The toolkit</h2>
+              <p className="text-mk-body font-serif italic text-gray-light">
                 Essential tools designed to support your journey. High-fidelity utility without the noise.
               </p>
             </div>
@@ -168,10 +167,10 @@ export const FAQ: React.FC = () => {
                 </div>
                 <div>
                   <h4 className="text-[28px] font-display text-gray-text mb-4">It's 100% private</h4>
-                  <p className="text-[16px] text-gray-light font-medium leading-relaxed mb-6">
+                  <p className="text-mk-body font-serif text-gray-light mb-6">
                     We can't read your notes. Your data is stored securely on Supabase and encrypted in your local sanctuary. You own your thoughts.
                   </p>
-                  <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-green">
+                  <div className="label-caps !text-green flex items-center gap-2">
                     <CheckCircle size={16} weight="fill" /> Secure & Offline-first
                   </div>
                 </div>
@@ -184,7 +183,7 @@ export const FAQ: React.FC = () => {
                 <Heart size={32} weight="light" className="text-green mb-10" />
                 <div>
                   <h4 className="text-[22px] font-display text-gray-text mb-3">Visual patterns</h4>
-                  <p className="text-[14px] text-gray-light font-medium leading-relaxed">
+                  <p className="text-mk-body font-serif text-gray-light">
                     Spot emotional rhythms over time with intuitive mood mapping.
                   </p>
                 </div>
@@ -197,7 +196,7 @@ export const FAQ: React.FC = () => {
                 <Calendar size={32} weight="light" className="text-green mb-10" />
                 <div>
                   <h4 className="text-[22px] font-display text-gray-text mb-3">Store what matters</h4>
-                  <p className="text-[14px] text-gray-light font-medium leading-relaxed">
+                  <p className="text-mk-body font-serif text-gray-light">
                     Infinite attachments for images, tasks, and reflections.
                   </p>
                 </div>
@@ -216,15 +215,15 @@ export const FAQ: React.FC = () => {
                   </div>
                   <div>
                     <h4 className="text-[28px] font-display text-gray-text mb-4">Sanctuary intelligence</h4>
-                    <p className="text-[16px] text-gray-light font-medium leading-relaxed mb-8">
+                    <p className="text-mk-body font-serif text-gray-light mb-8">
                       We use Google Gemini to process reflections without ever storing your data for training. The "Life Wiki" identifies patterns so you can see your narrative evolve.
                     </p>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="p-4 rounded-2xl bg-white/5 border border-border">
-                        <span className="text-[12px] font-bold text-gray-text">Private AI</span>
+                        <span className="label-caps">Private AI</span>
                       </div>
                       <div className="p-4 rounded-2xl bg-white/5 border border-border">
-                        <span className="text-[12px] font-bold text-gray-text">Theme Mapping</span>
+                        <span className="label-caps">Theme Mapping</span>
                       </div>
                     </div>
                   </div>
@@ -257,8 +256,8 @@ export const FAQ: React.FC = () => {
                   <item.icon size={24} weight="light" />
                 </div>
                 <div>
-                  <h3 className="text-[18px] font-bold text-gray-text mb-2 uppercase tracking-widest">{item.title}</h3>
-                  <p className="text-[14px] font-medium leading-relaxed text-gray-light">
+                  <h3 className="label-caps mb-3">{item.title}</h3>
+                  <p className="text-mk-body font-serif text-gray-light">
                     {item.body}
                   </p>
                 </div>

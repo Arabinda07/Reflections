@@ -448,8 +448,8 @@ export const CreateNote: React.FC = () => {
               <div className="w-48 h-48 mx-auto mb-12 opacity-80">
                 <DotLottieReact src="/assets/lottie/loading2.json" autoplay loop />
               </div>
-              <h2 className="text-[32px] md:text-[44px] font-display text-gray-text tracking-tighter mb-4 animate-pulse">Take a breath.</h2>
-              <p className="text-[18px] font-serif italic text-gray-light max-w-sm mx-auto">Let the noise settle before you start.</p>
+              <h2 className="h2-section mb-4 animate-pulse">Take a breath.</h2>
+              <p className="body-editorial max-w-sm mx-auto">Let the noise settle before you start.</p>
             </div>
           </motion.div>
         )}
@@ -459,7 +459,7 @@ export const CreateNote: React.FC = () => {
       {/* ── Subtle Back Button ── */}
       <button 
         onClick={() => navigate(RoutePath.HOME)}
-        className={`fixed top-[88px] lg:top-6 left-4 lg:left-6 z-[80] h-12 w-12 rounded-full border border-border bg-white/50 dark:bg-black/20 backdrop-blur-xl flex items-center justify-center hover:bg-white dark:hover:bg-white/10 transition-all shadow-sm ${isDimmed ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
+        className={`fixed bottom-8 lg:bottom-auto lg:top-6 left-4 lg:left-6 z-[80] h-12 w-12 rounded-full border border-border bg-white/50 dark:bg-black/20 backdrop-blur-xl flex items-center justify-center hover:bg-white dark:hover:bg-white/10 transition-all shadow-sm ${isDimmed ? 'opacity-0 translate-y-8 lg:-translate-y-4' : 'opacity-100 translate-y-0'}`}
       >
         <ArrowLeft size={20} weight="bold" className="text-gray-text" />
       </button>
@@ -756,7 +756,13 @@ export const CreateNote: React.FC = () => {
                   {AMBIENT_TRACKS.map((track) => (
                     <button 
                       key={track.id} 
-                      onClick={() => playMusicTrack(track)} 
+                      onClick={() => {
+                        if (activeMusicTrack?.id === track.id) {
+                          stopMusic();
+                        } else {
+                          playMusicTrack(track);
+                        }
+                      }} 
                       className={`w-full p-4 rounded-2xl text-left text-[14px] font-bold flex items-center justify-between border-2 ${activeMusicTrack?.id === track.id ? 'border-green bg-green/10 text-green' : 'border-transparent hover:border-border text-gray-text'}`}
                     >
                       <span className="flex items-center gap-3">

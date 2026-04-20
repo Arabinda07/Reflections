@@ -45,7 +45,7 @@ export const Landing: React.FC = () => {
               variants={staggerContainer}
               initial="hidden"
               animate="show"
-              className="flex flex-col pointer-events-auto max-w-5xl h1-hero"
+              className="flex flex-col pointer-events-auto max-w-5xl text-mk-display font-display tracking-tight text-gray-text"
             >
               <motion.span variants={staggerLine}>
                 Your mind,
@@ -62,7 +62,7 @@ export const Landing: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.5 }}
-              className="body-editorial max-w-[44ch] pointer-events-auto"
+              className="text-mk-body font-serif text-gray-light max-w-[44ch] pointer-events-auto"
             >
               A private, distraction-free environment designed to help you untangle your mind and find clarity in the noise.
             </motion.p>

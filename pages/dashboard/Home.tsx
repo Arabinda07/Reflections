@@ -115,9 +115,9 @@ export const Home: React.FC = () => {
               transition={{ duration: entranceDuration + 0.2, ease: [0.32, 0.72, 0, 1] }}
               className="max-w-4xl"
             >
-              <h1 className="h1-hero !text-white drop-shadow-[0_8px_32px_rgba(0,0,0,0.3)] mb-12">
+              <h1 className="h1-hero drop-shadow-[0_8px_32px_rgba(0,0,0,0.3)] mb-12" style={{ color: '#FFFFFF' }}>
                 Welcome back, <br />
-                <span className="font-serif italic !text-green drop-shadow-none">{user?.name?.split(' ')[0] || 'Reflector'}</span>
+                <span className="font-serif italic text-green drop-shadow-none">{user?.name?.split(' ')[0] || 'Reflector'}</span>
               </h1>
             </motion.div>
           </div>
@@ -128,7 +128,7 @@ export const Home: React.FC = () => {
           
           {/* Panel 1: Stats & Overview (Asymmetrical 8/4 split base) */}
           <div className="lg:col-span-8 p-8 sm:p-16 border-b lg:border-b-0 lg:border-r border-border">
-            <div className="label-caps mb-16">Sanctuary Overview</div>
+            <div className="label-caps mb-16 opacity-50">Sanctuary Overview</div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
               <div 
@@ -143,15 +143,13 @@ export const Home: React.FC = () => {
                     <CaretRight size={24} weight="light" className="text-gray-nav opacity-20 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-700" />
                   </div>
                   <div>
-                    <h3 className="text-[12px] font-black uppercase tracking-[0.2em] text-gray-nav/50 mb-4">Total reflections</h3>
-                    <div className="flex items-baseline gap-4">
-                      <span className="text-[64px] font-display text-gray-text leading-none tracking-tighter">
-                        {isCountLoading ? '...' : noteCount ?? '0'}
-                      </span>
-                      <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-green/10 text-green text-[10px] font-black uppercase tracking-widest">
-                        <div className="w-1 h-1 rounded-full bg-green animate-pulse" />
-                        Syncing
-                      </div>
+                    <span className="text-[12px] font-black uppercase tracking-widest text-gray-nav/40">Total Reflections</span>
+                    <h2 className="text-[48px] font-display text-gray-text leading-none mt-2">
+                      {isCountLoading ? '...' : noteCount}
+                    </h2>
+                    <div className="flex items-center gap-2 px-3 py-1 mt-4 rounded-full bg-green/10 text-green text-[10px] font-black uppercase tracking-widest">
+                      <div className="w-1 h-1 rounded-full bg-green animate-pulse" />
+                      Syncing
                     </div>
                   </div>
                 </div>
