@@ -16,7 +16,6 @@ const mapToNote = (data: any): Note => ({
   tasks: data.tasks || [],
 });
 
-const NOTE_LIMIT = 50; // Increased limit for resilience
 
 export const noteService = {
   // Fetch all notes for the authenticated user
@@ -196,8 +195,20 @@ export const noteService = {
   getCount: async (): Promise<number> => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return 0;
-    const notes = await offlineStorage.getAllNotes(user.id);
-    return notes.length;
+
+    try {
+      const { count, error } = await supabase
+        .from('notes')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+      return count ?? 0;
+    } catch (err) {
+      console.warn('Supabase getCount failed, falling back to local Dexie:', err);
+      const notes = await offlineStorage.getAllNotes(user.id);
+      return notes.length;
+    }
   },
 
   getRecent: async (limit: number): Promise<Note[]> => {
@@ -212,18 +223,29 @@ export const noteService = {
   getMonthlyCount: async (): Promise<number> => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return 0;
-    
-    // Filter local notes by the current month
-    const notes = await offlineStorage.getAllNotes(user.id);
+
     const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
+    const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+    const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
 
-    const monthlyNotes = notes.filter(note => {
-      const noteDate = new Date(note.createdAt);
-      return noteDate.getMonth() === currentMonth && noteDate.getFullYear() === currentYear;
-    });
+    try {
+      const { count, error } = await supabase
+        .from('notes')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .gte('created_at', start.toISOString())
+        .lt('created_at', end.toISOString());
 
-    return monthlyNotes.length;
+      if (error) throw error;
+      return count ?? 0;
+    } catch (err) {
+      console.warn('Supabase getMonthlyCount failed, falling back to local Dexie:', err);
+      const notes = await offlineStorage.getAllNotes(user.id);
+      // Use UTC boundaries to match the Supabase path
+      return notes.filter(note => {
+        const noteDate = new Date(note.createdAt);
+        return noteDate >= start && noteDate < end;
+      }).length;
+    }
   }
 };

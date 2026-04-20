@@ -82,13 +82,17 @@ describe('noteService.getMonthlyCount', () => {
     };
     mockFrom.mockReturnValue(chain as any);
 
+    const now = new Date();
+    const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString();
+    const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1)).toISOString();
+
     const result = await noteService.getMonthlyCount();
 
     expect(mockFrom).toHaveBeenCalledWith('notes');
     expect(chain.select).toHaveBeenCalledWith('*', { count: 'exact', head: true });
     expect(chain.eq).toHaveBeenCalledWith('user_id', 'uid-1');
-    expect(chain.gte).toHaveBeenCalled();
-    expect(chain.lt).toHaveBeenCalled();
+    expect(chain.gte).toHaveBeenCalledWith('created_at', start);
+    expect(chain.lt).toHaveBeenCalledWith('created_at', end);
     expect(result).toBe(4);
   });
 
@@ -102,10 +106,9 @@ describe('noteService.getMonthlyCount', () => {
     mockFrom.mockReturnValue(chain as any);
 
     const now = new Date();
-    const thisMonth = now.getMonth();
-    const thisYear = now.getFullYear();
-    const inMonth = new Date(thisYear, thisMonth, 10).toISOString();
-    const outOfMonth = new Date(thisYear, thisMonth - 1, 10).toISOString();
+    // Use UTC boundaries to match the implementation
+    const inMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 10)).toISOString();
+    const outOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 10)).toISOString();
 
     mockGetAllNotes.mockResolvedValue([
       { id: 'a', createdAt: inMonth } as any,
