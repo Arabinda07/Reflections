@@ -14,9 +14,24 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Schibsted Grotesk"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        sans: ['"Geist"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
         serif: ['"Spectral"', 'serif'],
-        display: ['"Feather Bold"', '"Schibsted Grotesk"', 'sans-serif'],
+        display: ['"Feather Bold"', '"Geist"', 'sans-serif'],
+        mono: ['"Geist Mono"', 'monospace'],
+      },
+      fontSize: {
+        /* App UI Fixed Scale (1.25 ratio) */
+        'ui-xs': ['0.75rem', { lineHeight: '1.4' }],    /* 12px */
+        'ui-sm': ['0.875rem', { lineHeight: '1.4' }],   /* 14px */
+        'ui-base': ['1rem', { lineHeight: '1.5' }],     /* 16px */
+        'ui-lg': ['1.25rem', { lineHeight: '1.3' }],    /* 20px */
+        'ui-xl': ['1.563rem', { lineHeight: '1.2' }],   /* 25px */
+        /* Marketing Fluid Scale */
+        'mk-display': ['clamp(2.5rem, 5vw + 1rem, 4.5rem)', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
+        'mk-h1': ['clamp(2rem, 4vw + 1rem, 3.5rem)', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
+        'mk-h2': ['clamp(1.5rem, 3vw + 1rem, 2.5rem)', { lineHeight: '1.2', letterSpacing: '-0.01em' }],
+        'mk-h3': ['clamp(1.25rem, 2vw + 1rem, 1.75rem)', { lineHeight: '1.3' }],
+        'mk-body': ['clamp(1rem, 1vw + 0.875rem, 1.125rem)', { lineHeight: '1.6' }],
       },
       colors: {
         green: {
@@ -62,6 +77,9 @@ export default {
         'out-quart': 'cubic-bezier(0.25, 1, 0.5, 1)',
         'out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',
         'out-quint': 'cubic-bezier(0.22, 1, 0.36, 1)',
+        /* Custom Spring Physics for Impeccable Motion */
+        'spring-smooth': 'cubic-bezier(0.32, 0.72, 0, 1)',
+        'spring-bounce': 'cubic-bezier(0.34, 1.56, 0.64, 1)',
       },
     },
   },
