@@ -32,9 +32,11 @@ import {
   Target,
   Lightning,
   DotsThreeCircle,
-  PaperPlaneTilt
+  PaperPlaneTilt,
+  FloppyDisk
 } from '@phosphor-icons/react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { Magnetic } from '../../components/ui/Magnetic';
 import { useAmbientAudio, AMBIENT_TRACKS } from '../../hooks/useAmbientAudio';
 import { Button } from '../../components/ui/Button';
 import { Editor, EditorRef } from '../../components/ui/Editor';
@@ -427,31 +429,37 @@ export const CreateNote: React.FC = () => {
   const canReflect = wordCount >= 100;
   const isDimmed = isFlowing && !isTitleFocused;
 
-  if (loading || isBreathing) return (
-    <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-body px-6 text-center animate-in fade-in duration-700">
-      <motion.div 
-        animate={{ opacity: [0.4, 0.7, 0.4] }} 
-        transition={{ duration: 4, repeat: Infinity }} 
-        className="w-[400px] h-[400px] rounded-full bg-green/5 blur-3xl absolute" 
-      />
-      <div className="relative z-10">
-        <div className="w-48 h-48 mx-auto mb-12 opacity-80">
-          <DotLottieReact src="/assets/lottie/loading2.json" autoplay loop />
-        </div>
-        <h2 className="text-[32px] md:text-[44px] font-display text-gray-text tracking-tighter mb-4 animate-pulse">Take a breath.</h2>
-        <p className="text-[18px] font-serif italic text-gray-light max-w-sm mx-auto">Let the noise settle before you start.</p>
-      </div>
-    </div>
-  );
-
   return (
     <div className="relative h-[100dvh] bg-body transition-colors duration-700 ease-out-quart overflow-hidden flex">
+      <AnimatePresence>
+        {(loading || isBreathing) && (
+          <motion.div 
+            initial={{ opacity: 1 }} 
+            exit={{ opacity: 0 }} 
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="absolute inset-0 z-[200] flex flex-col items-center justify-center bg-body px-6 text-center"
+          >
+            <motion.div 
+              animate={{ opacity: [0.4, 0.7, 0.4] }} 
+              transition={{ duration: 4, repeat: Infinity }} 
+              className="w-[400px] h-[400px] rounded-full bg-green/5 blur-3xl absolute" 
+            />
+            <div className="relative z-10">
+              <div className="w-48 h-48 mx-auto mb-12 opacity-80">
+                <DotLottieReact src="/assets/lottie/loading2.json" autoplay loop />
+              </div>
+              <h2 className="text-[32px] md:text-[44px] font-display text-gray-text tracking-tighter mb-4 animate-pulse">Take a breath.</h2>
+              <p className="text-[18px] font-serif italic text-gray-light max-w-sm mx-auto">Let the noise settle before you start.</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div className="grain-overlay" />
 
       {/* ── Subtle Back Button ── */}
       <button 
         onClick={() => navigate(RoutePath.HOME)}
-        className={`fixed top-24 lg:top-6 left-4 lg:left-6 z-[80] h-12 w-12 rounded-full border border-border bg-white/50 dark:bg-black/20 backdrop-blur-xl flex items-center justify-center hover:bg-white dark:hover:bg-white/10 transition-all shadow-sm ${isDimmed ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
+        className={`fixed top-[88px] lg:top-6 left-4 lg:left-6 z-[80] h-12 w-12 rounded-full border border-border bg-white/50 dark:bg-black/20 backdrop-blur-xl flex items-center justify-center hover:bg-white dark:hover:bg-white/10 transition-all shadow-sm ${isDimmed ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
       >
         <ArrowLeft size={20} weight="bold" className="text-gray-text" />
       </button>
@@ -578,34 +586,38 @@ export const CreateNote: React.FC = () => {
         {/* Interchangeable Action FAB (Spark / Save) */}
         <AnimatePresence mode="wait">
           {!hasContent ? (
-            <motion.button
-              key="spark-fab"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={cycleSparkPrompt}
-              className="group relative h-16 w-16 rounded-full bg-white/80 dark:bg-panel-bg/80 backdrop-blur-3xl border border-white/20 shadow-[0_24px_40px_-10px_rgba(0,0,0,0.15)] flex items-center justify-center text-green transition-all"
-            >
-              <div className="absolute inset-2 rounded-full bg-green/5 group-hover:bg-green/10 transition-colors" />
-              <Target size={28} weight="fill" className={isGeneratingPrompts ? 'animate-pulse' : ''} />
-            </motion.button>
+            <Magnetic key="spark-mag" strength={20}>
+              <motion.button
+                key="spark-fab"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={cycleSparkPrompt}
+                className="group relative h-16 w-16 rounded-full bg-white/80 dark:bg-panel-bg/80 backdrop-blur-3xl border border-white/20 shadow-[0_24px_40px_-10px_rgba(0,0,0,0.15)] flex items-center justify-center text-green transition-all"
+              >
+                <div className="absolute inset-2 rounded-full bg-green/5 group-hover:bg-green/10 transition-colors" />
+                <Target size={28} weight="fill" className={isGeneratingPrompts ? 'animate-pulse' : ''} />
+              </motion.button>
+            </Magnetic>
           ) : (
-            <motion.button
-              key="save-fab"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleSave}
-              disabled={saving}
-              className="group relative h-16 w-16 rounded-full bg-green text-white shadow-[0_24px_40px_-10px_rgba(22,163,74,0.4)] flex items-center justify-center transition-all"
-            >
-              <div className="absolute inset-2 rounded-full bg-black/10 group-hover:scale-110 transition-transform duration-500 ease-out" />
-              {saving ? <CircleNotch size={28} className="animate-spin" /> : <PaperPlaneTilt size={26} weight="fill" className="relative z-10" />}
-            </motion.button>
+            <Magnetic key="save-mag" strength={20}>
+              <motion.button
+                key="save-fab"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleSave}
+                disabled={saving}
+                className="group relative h-16 w-16 rounded-full bg-green text-white shadow-[0_24px_40px_-10px_rgba(22,163,74,0.4)] flex items-center justify-center transition-all"
+              >
+                <div className="absolute inset-2 rounded-full bg-black/10 group-hover:scale-110 transition-transform duration-500 ease-out" />
+                {saving ? <CircleNotch size={28} className="animate-spin" /> : <FloppyDisk size={26} weight="fill" className="relative z-10" />}
+              </motion.button>
+            </Magnetic>
           )}
         </AnimatePresence>
       </div>

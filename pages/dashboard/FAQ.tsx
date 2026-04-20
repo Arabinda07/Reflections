@@ -271,18 +271,17 @@ export const FAQ: React.FC = () => {
 
       {/* Floating CTA Pill */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
         className="fixed bottom-8 right-8 z-[100]"
       >
-        <Magnetic strength={20}>
+        <Magnetic strength={30}>
           <button
             onClick={() => navigate(RoutePath.SIGNUP)}
-            className="group flex items-center justify-center w-16 h-16 rounded-full bg-green text-white shadow-[0_20px_50px_-12px_rgba(22,163,74,0.4)] transition-all duration-500 hover:scale-[1.1] active:scale-[0.95]"
-            title="Begin writing"
+            className="group flex items-center justify-center w-14 h-14 rounded-full bg-green text-white shadow-[0_16px_32px_-8px_rgba(22,163,74,0.5)] transition-transform duration-300 hover:scale-110 active:scale-95"
+            aria-label="Begin writing"
           >
-            <Feather size={32} weight="light" className="group-hover:rotate-12 transition-transform duration-500" />
-            <div className="absolute inset-0 rounded-full bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+            <PenNib size={24} weight="fill" className="group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
           </button>
         </Magnetic>
       </motion.div>

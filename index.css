@@ -150,6 +150,20 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 }
 
 @layer components {
+  /* Typography Standard */
+  .h1-hero {
+    @apply text-5xl md:text-7xl lg:text-[100px] font-display tracking-tight text-gray-text leading-[1.05];
+  }
+  .h2-section {
+    @apply text-4xl md:text-5xl font-display tracking-tight text-gray-text leading-tight;
+  }
+  .body-editorial {
+    @apply text-lg md:text-xl font-serif text-gray-light leading-relaxed;
+  }
+  .label-caps {
+    @apply text-[11px] font-black tracking-[0.2em] uppercase text-gray-nav;
+  }
+
   /* Double-Bezel Architecture (Nested Shells) */
   .bezel-outer {
     padding: 1px;

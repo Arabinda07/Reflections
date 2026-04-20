@@ -37,10 +37,10 @@ export const Landing: React.FC = () => {
       <div className="min-h-[100dvh] w-full relative">
 
         {/* ── Left panel: content ── */}
-        <div className="relative z-20 flex flex-col justify-between lg:justify-center gap-8 lg:gap-10 px-6 pt-20 pb-32 sm:px-12 sm:pt-28 sm:pb-32 lg:px-16 lg:py-16 xl:px-24 xl:py-20 lg:w-[60%] xl:w-[55%] pointer-events-none min-h-[100dvh]">
+        <div className="relative z-20 flex flex-col justify-between h-[100dvh] px-6 pt-20 pb-12 sm:px-12 sm:pt-28 sm:pb-12 lg:px-16 lg:pt-32 lg:pb-12 xl:px-24 pointer-events-none">
 
           {/* Hero headline — the one bold moment */}
-          <div className="flex flex-col gap-8 lg:gap-12">
+          <div className="flex flex-col gap-8 lg:gap-12 lg:w-[60%] xl:w-[55%]">
             <motion.div
               variants={staggerContainer}
               initial="hidden"
@@ -68,52 +68,49 @@ export const Landing: React.FC = () => {
             </motion.p>
           </div>
 
-          {/* Primary CTAs — Moved outside the top div to allow justify-between to work on mobile */}
+          {/* Primary CTAs — Aligned to bottom horizontally */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.6 }}
-            className="pointer-events-auto flex flex-col gap-8 mb-4 lg:mb-0 lg:mt-12"
+            className="pointer-events-auto flex flex-wrap items-center gap-x-8 gap-y-6"
           >
-            <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
-              <button
-                onClick={() => navigate(RoutePath.SIGNUP)}
-                className="group flex items-center gap-3 text-[18px] font-black text-gray-text hover:text-green transition-all duration-300"
-              >
-                Begin writing
-                <ArrowRight size={22} className="group-hover:translate-x-1.5 transition-transform duration-500 ease-out-expo" />
-              </button>
+            <button
+              onClick={() => navigate(RoutePath.SIGNUP)}
+              className="group flex items-center gap-3 text-[18px] font-black text-gray-text hover:text-green transition-all duration-300"
+            >
+              Begin writing
+              <ArrowRight size={22} className="group-hover:translate-x-1.5 transition-transform duration-500 ease-out-expo" />
+            </button>
 
-              <button
-                onClick={() => navigate(RoutePath.LOGIN)}
-                className="text-[15px] font-medium text-gray-nav hover:text-gray-text transition-colors duration-300"
-              >
-                Sign in
-              </button>
-            </div>
+            <button
+              onClick={() => navigate(RoutePath.LOGIN)}
+              className="text-[15px] font-medium text-gray-nav hover:text-gray-text transition-colors duration-300"
+            >
+              Sign in
+            </button>
 
-            {/* Tertiary links */}
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-              <button
-                onClick={() => navigate(RoutePath.FAQ)}
-                className="label-caps hover:text-gray-text transition-colors duration-300"
-              >
-                How it works
-              </button>
+            <div className="w-[1px] h-4 bg-border hidden sm:block opacity-50" />
 
-              {canInstall && !isInstalled && (
-                <motion.button
-                  onClick={triggerInstall}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 1.2, duration: 0.5 }}
-                  className="flex items-center gap-1.5 label-caps hover:text-gray-text transition-colors duration-300"
-                >
-                  <DownloadSimple size={14} weight="light" />
-                  Install app
-                </motion.button>
-              )}
-            </div>
+            <button
+              onClick={() => navigate(RoutePath.FAQ)}
+              className="label-caps hover:text-gray-text transition-colors duration-300"
+            >
+              How it works
+            </button>
+
+            {canInstall && !isInstalled && (
+              <motion.button
+                onClick={triggerInstall}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.2, duration: 0.5 }}
+                className="flex items-center gap-1.5 label-caps hover:text-gray-text transition-colors duration-300"
+              >
+                <DownloadSimple size={14} weight="light" />
+                Install app
+              </motion.button>
+            )}
           </motion.div>
         </div>
 
@@ -148,7 +145,7 @@ export const Landing: React.FC = () => {
 
           <button
             onClick={toggleMute}
-            className="absolute bottom-32 lg:bottom-8 right-8 z-30 p-3 rounded-full bg-black/40 text-white backdrop-blur-md hover:bg-black/60 transition-all duration-300 pointer-events-auto"
+            className="absolute bottom-10 lg:bottom-12 right-6 lg:right-16 z-30 p-3 rounded-full bg-black/40 text-white backdrop-blur-md hover:bg-black/60 transition-all duration-300 pointer-events-auto"
             aria-label={isMuted ? 'Unmute video' : 'Mute video'}
           >
             {isMuted ? <SpeakerSlash size={20} weight="bold" /> : <SpeakerHigh size={20} weight="bold" />}
