@@ -37,77 +37,51 @@ export const Landing: React.FC = () => {
       <div className="min-h-[100dvh] w-full relative">
 
         {/* ── Left panel: content ── */}
-        <div className="relative z-20 flex flex-col justify-between lg:justify-center gap-8 lg:gap-10 px-6 pt-20 pb-10 sm:px-12 sm:pt-28 sm:pb-14 lg:px-16 lg:py-16 xl:px-24 xl:py-20 lg:w-[60%] xl:w-[55%] pointer-events-none min-h-[100dvh]">
+        <div className="relative z-20 flex flex-col justify-between lg:justify-center gap-8 lg:gap-10 px-6 pt-20 pb-32 sm:px-12 sm:pt-28 sm:pb-32 lg:px-16 lg:py-16 xl:px-24 xl:py-20 lg:w-[60%] xl:w-[55%] pointer-events-none min-h-[100dvh]">
 
           {/* Hero headline — the one bold moment */}
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            animate="show"
-            className="mt-4 mb-4 lg:my-0 flex flex-col pointer-events-auto max-w-5xl"
-            style={{ lineHeight: 1.0 }}
-          >
-            <motion.span
-              variants={staggerLine}
-              className="font-display tracking-tighter text-gray-text"
-              style={{
-                fontSize: 'clamp(44px, 7.5vw, 132px)',
-                lineHeight: 1.0,
-              }}
+          <div className="flex flex-col gap-8 lg:gap-12">
+            <motion.div
+              variants={staggerContainer}
+              initial="hidden"
+              animate="show"
+              className="flex flex-col pointer-events-auto max-w-5xl h1-hero"
             >
-              Your mind,
-            </motion.span>
-            <motion.span
-              variants={staggerLine}
-              className="font-serif italic tracking-tight text-green"
-              style={{
-                fontSize: 'clamp(40px, 6.8vw, 118px)',
-                lineHeight: 1.08,
-              }}
-            >
-              beautifully
-            </motion.span>
-            <motion.span
-              variants={staggerLine}
-              className="font-display tracking-tighter text-gray-text"
-              style={{
-                fontSize: 'clamp(44px, 7.5vw, 132px)',
-                lineHeight: 1.0,
-              }}
-            >
-              organized.
-            </motion.span>
-          </motion.div>
+              <motion.span variants={staggerLine}>
+                Your mind,
+              </motion.span>
+              <motion.span variants={staggerLine} className="font-serif italic text-green" style={{ lineHeight: 1.1 }}>
+                beautifully
+              </motion.span>
+              <motion.span variants={staggerLine}>
+                organized.
+              </motion.span>
+            </motion.div>
 
-          {/* Sub-copy */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.5 }}
-            className="font-serif text-[17px] sm:text-[18px] leading-relaxed max-w-[44ch] text-gray-light pointer-events-auto"
-          >
-            A private space for your thoughts. AI-powered reflections, mood
-            tracking, and room to think clearly.
-          </motion.p>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.5 }}
+              className="body-editorial max-w-[44ch] pointer-events-auto"
+            >
+              A private, distraction-free environment designed to help you untangle your mind and find clarity in the noise.
+            </motion.p>
+          </div>
 
-          {/* Primary CTAs */}
+          {/* Primary CTAs — Moved outside the top div to allow justify-between to work on mobile */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.6 }}
-            className="pointer-events-auto mt-auto lg:mt-6"
+            className="pointer-events-auto flex flex-col gap-8 mb-4 lg:mb-0 lg:mt-12"
           >
-
-            {/* Primary CTAs */}
-            <div className="flex flex-wrap items-center gap-x-8 gap-y-4 mb-8">
+            <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
               <button
                 onClick={() => navigate(RoutePath.SIGNUP)}
-                className="group flex items-center gap-4 pl-6 pr-2 py-2 rounded-full bg-white/95 dark:bg-[#1E1E1E]/95 backdrop-blur-2xl border border-black/10 dark:border-white/10 text-[16px] font-bold text-gray-text shadow-xl transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:shadow-2xl active:scale-[0.98]"
+                className="group flex items-center gap-3 text-[18px] font-black text-gray-text hover:text-green transition-all duration-300"
               >
                 Begin writing
-                <div className="w-10 h-10 rounded-full bg-black/5 dark:bg-white/10 flex items-center justify-center transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-1 group-hover:-translate-y-[1px] group-hover:scale-105">
-                  <ArrowRight size={20} weight="bold" />
-                </div>
+                <ArrowRight size={22} className="group-hover:translate-x-1.5 transition-transform duration-500 ease-out-expo" />
               </button>
 
               <button
@@ -122,7 +96,7 @@ export const Landing: React.FC = () => {
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
               <button
                 onClick={() => navigate(RoutePath.FAQ)}
-                className="text-[11px] font-bold tracking-[3.5px] uppercase text-gray-nav hover:text-gray-text transition-colors duration-300"
+                className="label-caps hover:text-gray-text transition-colors duration-300"
               >
                 How it works
               </button>
@@ -133,9 +107,9 @@ export const Landing: React.FC = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 1.2, duration: 0.5 }}
-                  className="flex items-center gap-1.5 text-[11px] font-bold tracking-[3.5px] uppercase text-gray-nav hover:text-gray-text transition-colors duration-300"
+                  className="flex items-center gap-1.5 label-caps hover:text-gray-text transition-colors duration-300"
                 >
-                  <DownloadSimple size={14} weight="bold" />
+                  <DownloadSimple size={14} weight="light" />
                   Install app
                 </motion.button>
               )}
@@ -150,32 +124,21 @@ export const Landing: React.FC = () => {
           transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
           className="absolute inset-0 overflow-hidden pointer-events-none lg:pointer-events-auto"
         >
-          {/* Mobile-only soft gradient mask */}
-          <div className="absolute inset-x-0 top-0 h-[55%] z-10 lg:hidden bg-gradient-to-b from-body to-transparent pointer-events-none" aria-hidden="true" />
-          <div className="absolute inset-y-0 left-0 w-[50%] z-10 lg:hidden bg-gradient-to-r from-body to-transparent pointer-events-none" aria-hidden="true" />
-
-          {/* Gradient fades — seamlessly dissolve video into bg-body (Desktop) */}
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 z-10 pointer-events-none hidden lg:block"
-            style={{ background: `linear-gradient(to right, var(--bg-color) 0%, var(--bg-color) 45%, transparent 65%)` }}
-          />
-          <div
-            aria-hidden="true"
-            className="absolute inset-x-0 top-0 h-28 z-10 pointer-events-none hidden lg:block"
-            style={{ background: `linear-gradient(to bottom, var(--bg-color), transparent)` }}
-          />
-          <div
-            aria-hidden="true"
-            className="absolute inset-x-0 bottom-0 h-28 z-10 pointer-events-none hidden lg:block"
-            style={{ background: `linear-gradient(to top, var(--bg-color), transparent)` }}
+          {/* Subtle responsive masks */}
+          <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-b from-body via-body/60 to-transparent lg:hidden" />
+          <div 
+            className="absolute inset-0 z-10 hidden lg:block pointer-events-none"
+            style={{ 
+              background: `linear-gradient(to right, var(--bg-color) 0%, var(--bg-color) 40%, transparent 80%),
+                           linear-gradient(to bottom, var(--bg-color) 0%, transparent 15%, transparent 85%, var(--bg-color) 100%)` 
+            }}
           />
 
           <video
             ref={videoRef}
             src="/assets/videos/landing_video.mp4"
             className="absolute inset-0 w-full h-full object-cover object-[52%_center] lg:object-center bg-body"
-            style={{ opacity: 0.95 }}
+            style={{ opacity: 0.9 }}
             autoPlay
             loop
             muted={isMuted}
@@ -185,10 +148,10 @@ export const Landing: React.FC = () => {
 
           <button
             onClick={toggleMute}
-            className="absolute bottom-6 right-6 z-20 p-2.5 rounded-full backdrop-blur-md bg-black/20 text-gray-light hover:text-white transition-all duration-300 pointer-events-auto"
+            className="absolute bottom-32 lg:bottom-8 right-8 z-30 p-3 rounded-full bg-black/40 text-white backdrop-blur-md hover:bg-black/60 transition-all duration-300 pointer-events-auto"
             aria-label={isMuted ? 'Unmute video' : 'Mute video'}
           >
-            {isMuted ? <SpeakerSlash size={18} weight="bold" /> : <SpeakerHigh size={18} weight="bold" />}
+            {isMuted ? <SpeakerSlash size={20} weight="bold" /> : <SpeakerHigh size={20} weight="bold" />}
           </button>
         </motion.div>
 

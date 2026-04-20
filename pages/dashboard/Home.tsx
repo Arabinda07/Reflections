@@ -22,6 +22,7 @@ import { supabase } from '../../src/supabaseClient';
 import { RoutePath } from '../../types';
 import { Landing } from './Landing';
 import { AmbientMusicButton } from '../../components/ui/AmbientMusicButton';
+import { Magnetic } from '../../components/ui/Magnetic';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -96,55 +97,61 @@ export const Home: React.FC = () => {
       <div className="relative min-h-screen bg-body" {...((showOnboarding ? { "aria-hidden": "true" } : {}) as any)}>
         
         {/* Cinematic Hero */}
-        <section className="relative w-full h-[60vh] min-h-[500px] overflow-hidden">
-          <video
-            src="/assets/videos/user_hero.mp4"
+        <section className="relative w-full h-[70dvh] min-h-[500px] overflow-hidden">
+          <motion.video
+            initial={{ scale: 1.1, filter: 'blur(10px) brightness(0.8)' }}
+            animate={{ scale: 1.0, filter: 'blur(0px) brightness(1)' }}
+            transition={{ duration: 1.5, ease: [0.32, 0.72, 0, 1] }}
+            src="/assets/videos/field.mp4"
             autoPlay loop muted playsInline
-            className="absolute inset-0 w-full h-full object-cover object-center z-0 scale-105"
+            className="absolute inset-0 w-full h-full object-cover object-center z-0"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-body via-body/40 to-transparent z-10" />
+          <div className="absolute inset-0 bg-gradient-to-t from-body via-body/20 to-transparent z-10" />
           
-          <div className="relative z-20 h-full flex flex-col items-center justify-center text-center px-6">
+          <div className="relative z-20 h-full flex flex-col items-center justify-start pt-[15vh] text-center px-6">
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: entranceDuration, ease: [0.32, 0.72, 0, 1] }}
+              transition={{ duration: entranceDuration + 0.2, ease: [0.32, 0.72, 0, 1] }}
               className="max-w-4xl"
             >
-              <h1 className="font-display tracking-tighter leading-none drop-shadow-[0_4px_24px_rgba(0,0,0,0.5)] mb-12" style={{ color: '#ffffff', fontSize: 'clamp(40px, 7vw, 92px)' }}>
+              <h1 className="h1-hero !text-white drop-shadow-[0_8px_32px_rgba(0,0,0,0.3)] mb-12">
                 Welcome back, <br />
-                <span className="font-serif italic drop-shadow-[0_4px_24px_rgba(0,0,0,0.5)]" style={{ color: '#16a34a' }}>{user?.name?.split(' ')[0] || 'Reflector'}</span>
+                <span className="font-serif italic !text-green drop-shadow-none">{user?.name?.split(' ')[0] || 'Reflector'}</span>
               </h1>
             </motion.div>
           </div>
         </section>
 
         {/* Interlocking Bento Grid */}
-        <section className="grid grid-cols-1 lg:grid-cols-12 border-t-2 border-border">
+        <section className="grid grid-cols-1 lg:grid-cols-12 border-t border-border">
           
-          {/* Panel 1: Stats & Overview */}
-          <div className="lg:col-span-7 p-6 sm:p-12 border-b-2 lg:border-b-0 lg:border-r-2 border-border">
-            <div className="panel-label mb-10">Sanctuary Overview</div>
+          {/* Panel 1: Stats & Overview (Asymmetrical 8/4 split base) */}
+          <div className="lg:col-span-8 p-8 sm:p-16 border-b lg:border-b-0 lg:border-r border-border">
+            <div className="label-caps mb-16">Sanctuary Overview</div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
               <div 
                 onClick={() => navigate(RoutePath.NOTES)}
-                className="bezel-outer group cursor-pointer"
+                className="group cursor-pointer transition-all duration-700"
               >
-                <div className="bezel-inner p-8 flex flex-col justify-between min-h-[240px]">
-                  <div className="flex justify-between items-start">
-                    <div className="w-14 h-14 rounded-2xl bg-blue/5 text-blue flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                      <FolderOpen size={32} weight="duotone" />
+                <div className="flex flex-col justify-between min-h-[200px]">
+                  <div className="flex justify-between items-start mb-8">
+                    <div className="w-16 h-16 rounded-3xl bg-green/5 text-green flex items-center justify-center group-hover:scale-110 group-hover:bg-green group-hover:text-white transition-all duration-700 ease-spring-smooth">
+                      <FolderOpen size={32} weight="light" />
                     </div>
-                    <CaretRight size={20} weight="bold" className="text-gray-nav opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <CaretRight size={24} weight="light" className="text-gray-nav opacity-20 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-700" />
                   </div>
                   <div>
-                    <h3 className="text-[14px] font-black uppercase tracking-widest text-gray-nav mb-2">Total reflections</h3>
-                    <div className="flex items-baseline gap-3">
-                      <span className="text-[48px] font-display text-gray-text leading-none">
+                    <h3 className="text-[12px] font-black uppercase tracking-[0.2em] text-gray-nav/50 mb-4">Total reflections</h3>
+                    <div className="flex items-baseline gap-4">
+                      <span className="text-[64px] font-display text-gray-text leading-none tracking-tighter">
                         {isCountLoading ? '...' : noteCount ?? '0'}
                       </span>
-                      <span className="text-[12px] font-bold text-green">Cloud Active</span>
+                      <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-green/10 text-green text-[10px] font-black uppercase tracking-widest">
+                        <div className="w-1 h-1 rounded-full bg-green animate-pulse" />
+                        Syncing
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -152,61 +159,66 @@ export const Home: React.FC = () => {
 
               <div 
                 onClick={() => navigate(RoutePath.INSIGHTS)}
-                className="bezel-outer group cursor-pointer"
+                className="group cursor-pointer transition-all duration-700"
               >
-                <div className="bezel-inner p-8 flex flex-col justify-between min-h-[240px]">
-                  <div className="flex justify-between items-start">
-                    <div className="w-14 h-14 rounded-2xl bg-green/5 text-green flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                      <Brain size={32} weight="duotone" />
+                <div className="flex flex-col justify-between min-h-[200px]">
+                  <div className="flex justify-between items-start mb-8">
+                    <div className="w-16 h-16 rounded-3xl bg-green/5 text-green flex items-center justify-center group-hover:scale-110 group-hover:bg-green group-hover:text-white transition-all duration-700 ease-spring-smooth">
+                      <Brain size={32} weight="light" />
                     </div>
-                    <CaretRight size={20} weight="bold" className="text-gray-nav opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <CaretRight size={24} weight="light" className="text-gray-nav opacity-20 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-700" />
                   </div>
                   <div>
-                    <h3 className="text-[14px] font-black uppercase tracking-widest text-gray-nav mb-2">Patterns</h3>
-                    <p className="text-[15px] font-medium text-gray-light leading-snug">AI Librarian is analyzing your growth.</p>
+                    <h3 className="text-[12px] font-black uppercase tracking-[0.2em] text-gray-nav/50 mb-4">Patterns</h3>
+                    <p className="text-[18px] font-serif italic text-gray-light leading-snug">AI Librarian is analyzing your growth.</p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Panel 2: Daily Prompt */}
-          <div className="lg:col-span-5 p-6 sm:p-12 flex flex-col justify-center">
-            <div className="panel-label mb-10">Daily Mindfulness</div>
+          {/* Panel 2: Daily Prompt (Narrower Span) */}
+          <div className="lg:col-span-4 p-8 sm:p-16 flex flex-col justify-center bg-green/[0.02]">
+            <div className="label-caps mb-16">Daily Mindfulness</div>
             
-            <div className="bezel-outer group h-full">
-              <div className="bezel-inner p-10 flex flex-col gap-8 h-full">
+            <div className="h-full">
+              <div className="flex flex-col gap-10 h-full">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-blue/5 text-blue flex items-center justify-center">
-                      <Target size={24} weight="bold" />
+                    <div className="w-14 h-14 rounded-2xl bg-green/5 text-green flex items-center justify-center">
+                      <Target size={28} weight="light" />
                     </div>
-                    <span className="text-[13px] font-black uppercase tracking-widest text-gray-nav">Today's Focus</span>
+                    <span className="text-[12px] font-black uppercase tracking-[0.2em] text-gray-nav/50">Today's Focus</span>
                   </div>
                   <button 
                     onClick={refreshPrompt}
-                    className={`w-10 h-10 rounded-xl border border-border flex items-center justify-center text-gray-nav hover:text-blue hover:border-blue/30 transition-all ${isRefreshing ? 'opacity-50' : 'opacity-100'}`}
+                    className={`w-12 h-12 rounded-2xl border border-border flex items-center justify-center text-gray-nav hover:text-green hover:border-green/30 transition-all duration-500 ${isRefreshing ? 'opacity-50' : 'opacity-100'}`}
                   >
-                    <ArrowsClockwise size={20} className={isRefreshing ? 'animate-spin' : ''} />
+                    <ArrowsClockwise size={20} className={isRefreshing ? 'animate-spin' : ''} weight="light" />
                   </button>
                 </div>
 
                 <div className="flex-grow flex items-center">
                   <p 
-                    className="text-[22px] sm:text-[26px] text-gray-text font-serif italic leading-relaxed"
-                    style={{ opacity: isRefreshing ? 0 : 1, transition: 'opacity 0.3s ease' }}
+                    className="text-[20px] sm:text-[24px] text-gray-text font-serif italic leading-relaxed"
+                    style={{ opacity: isRefreshing ? 0 : 1, transition: 'opacity 0.5s ease' }}
                   >
                     "{dailyPrompt}"
                   </p>
                 </div>
 
-                <Button
-                  variant="primary"
-                  className="w-full h-14 rounded-2xl text-[16px] font-bold liquid-glass"
-                  onClick={() => handleCreateClick(dailyPrompt)}
-                >
-                  Start writing
-                </Button>
+                <Magnetic strength={25}>
+                  <Button
+                    variant="primary"
+                    className="group w-full h-16 rounded-2xl text-[18px] font-bold liquid-glass flex items-center justify-center gap-4 pl-10 pr-2"
+                    onClick={() => handleCreateClick(dailyPrompt)}
+                  >
+                    Start writing
+                    <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center transition-transform duration-700 group-hover:translate-x-1 group-hover:bg-white/30">
+                      <ArrowRight size={20} weight="light" />
+                    </div>
+                  </Button>
+                </Magnetic>
               </div>
             </div>
           </div>
@@ -220,25 +232,25 @@ export const Home: React.FC = () => {
           <div className="bezel-outer max-w-xl w-full">
             <div className="bezel-inner p-10 flex flex-col gap-10">
               <div className="flex justify-between items-start">
-                <h2 className="text-[36px] font-display tracking-tight text-gray-text leading-none">Your Sanctuary.</h2>
+                <h2 className="h2-section">Your Sanctuary.</h2>
                 <div className="w-12 h-12 rounded-full bg-green/10 text-green flex items-center justify-center">
-                  <Sparkle size={28} weight="fill" />
+                  <Sparkle size={28} weight="light" />
                 </div>
               </div>
 
               <div className="space-y-8">
                 {[
                   { icon: Brain, title: "AI Reflection", desc: "Compassionate mirrors for your thoughts.", color: "text-green" },
-                  { icon: Smiley, title: "Mood Tracking", desc: "Understand your emotional rhythms.", color: "text-blue" },
-                  { icon: Tag, title: "Smart Organization", desc: "Find clarity in the chaos.", color: "text-purple-500" }
+                  { icon: Smiley, title: "Mood Tracking", desc: "Understand your emotional rhythms.", color: "text-green" },
+                  { icon: Tag, title: "Smart Organization", desc: "Find clarity in the chaos.", color: "text-green" }
                 ].map((f, i) => (
                   <div key={i} className="flex gap-6">
                     <div className={`w-12 h-12 rounded-2xl bg-white/5 border border-border flex items-center justify-center shrink-0 ${f.color}`}>
-                      <f.icon size={24} weight="bold" />
+                      <f.icon size={24} weight="light" />
                     </div>
                     <div>
                       <h4 className="text-[16px] font-bold text-gray-text mb-1">{f.title}</h4>
-                      <p className="text-[14px] font-medium text-gray-light leading-relaxed">{f.desc}</p>
+                      <p className="body-standard text-gray-light">{f.desc}</p>
                     </div>
                   </div>
                 ))}

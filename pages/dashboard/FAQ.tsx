@@ -19,11 +19,13 @@ import {
   Image as ImageIcon, 
   Headphones, 
   Target, 
-  Microphone 
+  Microphone,
+  Feather
 } from '@phosphor-icons/react';
 
 import { RoutePath } from '../../types';
 import { Button } from '../../components/ui/Button';
+import { Magnetic } from '../../components/ui/Magnetic';
 
 const staggerContainer = {
   hidden: {},
@@ -38,16 +40,7 @@ const staggerItem = {
 export const FAQ: React.FC = () => {
   const navigate = useNavigate();
   const journeyRef = useRef<HTMLDivElement>(null);
-  const videoSectionRef = useRef<HTMLElement>(null);
   
-  const { scrollYProgress: videoScroll } = useScroll({
-    target: videoSectionRef,
-    offset: ["start end", "end start"]
-  });
-
-  const videoScale = useTransform(videoScroll, [0, 0.5, 1], [1.05, 1, 0.95]);
-  const videoOpacity = useTransform(videoScroll, [0, 0.2, 0.8, 1], [0.4, 1, 1, 0.4]);
-
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -56,7 +49,7 @@ export const FAQ: React.FC = () => {
     <div className="relative min-h-screen bg-body text-gray-text pb-32 transition-colors duration-300">
       
       {/* Editorial Hero */}
-      <section className="relative z-10 w-full max-w-[1440px] mx-auto px-6 pt-32 pb-24 lg:pt-48">
+      <section className="relative z-10 w-full max-w-[1440px] mx-auto px-6 pt-16 pb-24 lg:pt-24">
         <div className="grid lg:grid-cols-12 gap-12 items-end">
           <div className="lg:col-span-8">
             <motion.div 
@@ -64,17 +57,12 @@ export const FAQ: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1] }}
             >
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green/5 border border-green/10 text-green text-[11px] font-bold uppercase tracking-widest mb-8">
-                <Heart size={14} weight="fill" className="animate-pulse" />
-                <span>The Sanctuary Protocol</span>
-              </div>
-              
-              <h1 className="font-display tracking-tighter leading-[0.9] text-gray-text mb-10" style={{ fontSize: 'clamp(48px, 8vw, 110px)' }}>
+              <h1 className="h1-hero mb-10">
                 Untangle your <br />
                 <span className="font-serif italic text-green">thoughts.</span>
               </h1>
               
-              <p className="text-[20px] sm:text-[24px] font-serif leading-relaxed text-gray-light max-w-2xl">
+              <p className="body-editorial max-w-2xl">
                 Racing thoughts and mental clutter shouldn't be your default state. Journaling is the first step toward clarity.
               </p>
             </motion.div>
@@ -92,26 +80,7 @@ export const FAQ: React.FC = () => {
         </div>
       </section>
 
-      {/* Cinematic Showcase — Edge to Edge */}
-      <section ref={videoSectionRef} className="relative z-0 w-full mb-40 h-[60vh] md:h-[85vh] overflow-hidden bg-black flex items-center justify-center">
-        <motion.div 
-          style={{ scale: videoScale, opacity: videoOpacity }}
-          className="absolute inset-0 w-full h-full origin-center"
-        >
-          {/* Top and Bottom Gradient Fades for seamless integration */}
-          <div className="absolute inset-x-0 top-0 h-40 z-10 bg-gradient-to-b from-body to-transparent pointer-events-none" />
-          <div className="absolute inset-x-0 bottom-0 h-40 z-10 bg-gradient-to-t from-body to-transparent pointer-events-none" />
-          
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover object-center bg-body"
-            src="/assets/videos/twist.mp4"
-          />
-        </motion.div>
-      </section>
+
 
       <div className="relative z-10 w-full max-w-[1440px] mx-auto px-6" ref={journeyRef}>
 
@@ -139,7 +108,7 @@ export const FAQ: React.FC = () => {
                 title: "The daily spark",
                 desc: "Facing a blank page? Tap the spark for a gentle, context-aware prompt.",
                 gridSpan: "md:col-span-4 lg:col-span-5",
-                color: "bg-blue/5 text-blue"
+                color: "bg-green/5 text-green"
               },
               {
                 icon: Tag,
@@ -153,7 +122,7 @@ export const FAQ: React.FC = () => {
                 title: "Check your mood",
                 desc: "Name how you feel. It's the first step to understanding your own emotional patterns over time.",
                 gridSpan: "md:col-span-7 lg:col-span-7",
-                color: "bg-purple-500/5 text-purple-500"
+                color: "bg-green/5 text-green"
               }
             ].map((item, i) => (
               <motion.div 
@@ -166,7 +135,7 @@ export const FAQ: React.FC = () => {
               >
                 <div className="bezel-inner p-8 flex flex-col h-full min-h-[280px]">
                   <div className={`w-12 h-12 rounded-2xl ${item.color} flex items-center justify-center mb-10 group-hover:scale-110 transition-transform duration-500`}>
-                    <item.icon size={24} weight="bold" />
+                    <item.icon size={24} weight="light" />
                   </div>
                   <h3 className="text-[24px] font-display text-gray-text mb-4 leading-tight">{item.title}</h3>
                   <p className="text-[15px] font-medium text-gray-light leading-relaxed">
@@ -180,19 +149,22 @@ export const FAQ: React.FC = () => {
 
         {/* The Toolkit: Bento Grid */}
         <section className="mb-48">
-          <div className="text-center max-w-3xl mx-auto mb-20">
-            <h2 className="text-[40px] md:text-[64px] font-display tracking-tight text-gray-text leading-none mb-6">The toolkit</h2>
-            <p className="text-[18px] text-gray-light font-serif italic leading-relaxed">
-              Essential tools designed to support your journey. High-fidelity utility without the noise.
-            </p>
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 mb-20">
+            <div className="max-w-3xl">
+              <h2 className="text-[40px] md:text-[64px] font-display tracking-tight text-gray-text leading-none mb-6">The toolkit</h2>
+              <p className="text-[18px] text-gray-light font-serif italic leading-relaxed">
+                Essential tools designed to support your journey. High-fidelity utility without the noise.
+              </p>
+            </div>
+            <div className="h-[1px] flex-grow bg-border hidden lg:block mb-6 mx-12 opacity-50" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
             {/* Privacy Card - Large */}
             <div className="md:col-span-8 bezel-outer group">
               <div className="bezel-inner p-10 flex flex-col md:flex-row gap-10 items-center">
-                <div className="w-20 h-20 rounded-[28px] bg-blue/5 text-blue flex items-center justify-center shrink-0">
-                  <ShieldCheck size={40} weight="duotone" />
+                <div className="w-20 h-20 rounded-[32px] bg-green/5 text-green flex items-center justify-center shrink-0">
+                  <ShieldCheck size={40} weight="light" />
                 </div>
                 <div>
                   <h4 className="text-[28px] font-display text-gray-text mb-4">It's 100% private</h4>
@@ -209,7 +181,7 @@ export const FAQ: React.FC = () => {
             {/* Visual Patterns - Small */}
             <div className="md:col-span-4 bezel-outer group">
               <div className="bezel-inner p-10 flex flex-col justify-between">
-                <Heart size={32} weight="bold" className="text-green mb-10" />
+                <Heart size={32} weight="light" className="text-green mb-10" />
                 <div>
                   <h4 className="text-[22px] font-display text-gray-text mb-3">Visual patterns</h4>
                   <p className="text-[14px] text-gray-light font-medium leading-relaxed">
@@ -222,7 +194,7 @@ export const FAQ: React.FC = () => {
             {/* Storage - Small */}
             <div className="md:col-span-4 bezel-outer group">
               <div className="bezel-inner p-10 flex flex-col justify-between">
-                <Calendar size={32} weight="bold" className="text-purple-500 mb-10" />
+                <Calendar size={32} weight="light" className="text-green mb-10" />
                 <div>
                   <h4 className="text-[22px] font-display text-gray-text mb-3">Store what matters</h4>
                   <p className="text-[14px] text-gray-light font-medium leading-relaxed">
@@ -239,8 +211,8 @@ export const FAQ: React.FC = () => {
                 <div className="absolute top-0 right-0 w-64 h-64 bg-green/10 rounded-full blur-[80px] pointer-events-none" />
                 
                 <div className="relative z-10 flex flex-col md:flex-row gap-10">
-                  <div className="w-20 h-20 rounded-[28px] bg-green/5 text-green flex items-center justify-center shrink-0">
-                    <Brain size={40} weight="fill" className="animate-pulse" />
+                  <div className="w-20 h-20 rounded-[32px] bg-green/5 text-green flex items-center justify-center shrink-0">
+                    <Brain size={40} weight="light" className="animate-pulse" />
                   </div>
                   <div>
                     <h4 className="text-[28px] font-display text-gray-text mb-4">Sanctuary intelligence</h4>
@@ -281,8 +253,8 @@ export const FAQ: React.FC = () => {
                 transition={{ delay: i * 0.05 }}
                 className="flex flex-col gap-6"
               >
-                <div className="w-10 h-10 rounded-full border border-border flex items-center justify-center text-green">
-                  <item.icon size={20} weight="bold" />
+                <div className="w-12 h-12 rounded-2xl bg-green/5 border border-green/10 flex items-center justify-center text-green group-hover:scale-110 transition-transform duration-500">
+                  <item.icon size={24} weight="light" />
                 </div>
                 <div>
                   <h3 className="text-[18px] font-bold text-gray-text mb-2 uppercase tracking-widest">{item.title}</h3>
@@ -303,15 +275,16 @@ export const FAQ: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         className="fixed bottom-8 right-8 z-[100]"
       >
-        <button
-          onClick={() => navigate(RoutePath.SIGNUP)}
-          className="group flex items-center gap-4 pl-6 pr-2 py-2 rounded-full bg-white dark:bg-[#1E1E1E] border border-black/5 dark:border-white/5 text-[14px] font-bold text-gray-text shadow-xl backdrop-blur-xl transition-all duration-500 hover:scale-[1.02] active:scale-[0.98]"
-        >
-          Begin writing
-          <div className="w-10 h-10 rounded-full bg-green text-white flex items-center justify-center transition-transform duration-500 group-hover:rotate-12">
-            <ArrowRight size={18} weight="bold" />
-          </div>
-        </button>
+        <Magnetic strength={20}>
+          <button
+            onClick={() => navigate(RoutePath.SIGNUP)}
+            className="group flex items-center justify-center w-16 h-16 rounded-full bg-green text-white shadow-[0_20px_50px_-12px_rgba(22,163,74,0.4)] transition-all duration-500 hover:scale-[1.1] active:scale-[0.95]"
+            title="Begin writing"
+          >
+            <Feather size={32} weight="light" className="group-hover:rotate-12 transition-transform duration-500" />
+            <div className="absolute inset-0 rounded-full bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+          </button>
+        </Magnetic>
       </motion.div>
 
     </div>
