@@ -275,7 +275,7 @@ export const Insights: React.FC = () => {
               </div>
               <p className="font-display text-gray-text text-xl">Your wiki builds as you journal.</p>
               <p className="mt-2 text-gray-light text-[14px] max-w-sm mx-auto">
-                Write {FREE_AI_MINIMUM_NOTES - notes.length} more {FREE_AI_MINIMUM_NOTES - notes.length === 1 ? 'entry' : 'entries'} to unlock your personal Life Wiki.
+                Write {FREE_AI_MINIMUM_NOTES - notes.length} more {FREE_AI_MINIMUM_NOTES - notes.length === 1 ? 'entry' : 'entries'} to unlock your personal Life Wiki and 1 free deep AI reflection.
               </p>
               <Button
                 variant="ghost"
@@ -291,13 +291,13 @@ export const Insights: React.FC = () => {
                   <Sparkle size={18} weight="duotone" />
                </div>
                <p className="font-display text-gray-text text-xl">Your wiki is being built.</p>
-               <p className="mt-2 text-gray-light text-[14px] max-w-sm mx-auto">As you journal, the AI librarian will automatically identify and update recurring themes in your life here.</p>
+               <p className="mt-2 text-gray-light text-[14px] max-w-sm mx-auto">You've unlocked your Life Wiki and 1 free AI reflection. The AI librarian will automatically identify and update recurring themes here as you write.</p>
                <Button
                  variant="ghost"
                  className="mt-6 text-[11px] font-black"
                  onClick={() => navigate(RoutePath.CREATE_NOTE)}
                >
-                  Write your first entry
+                  Continue journaling
                </Button>
             </div>
           ) : (
