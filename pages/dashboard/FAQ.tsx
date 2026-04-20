@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { 
   Heart, 
-  Sparkle, 
   Brain, 
   ShieldCheck, 
   CloudSun, 
@@ -23,7 +22,6 @@ import {
   Microphone 
 } from '@phosphor-icons/react';
 
-import Spline from '@splinetool/react-spline';
 import { RoutePath } from '../../types';
 import { Button } from '../../components/ui/Button';
 
@@ -45,7 +43,7 @@ export const FAQ: React.FC = () => {
     offset: ["start end", "end start"]
   });
 
-  const splineScale = useTransform(journeyScroll, [0, 0.5, 1], [0.8, 1, 0.9]);
+  const videoScale = useTransform(journeyScroll, [0, 0.5, 1], [0.8, 1, 0.9]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -91,16 +89,24 @@ export const FAQ: React.FC = () => {
         </div>
       </section>
 
-      {/* Cinematic Spline Moment */}
+      {/* Cinematic Video Moment */}
       <section className="relative z-10 w-full px-6 mb-40 overflow-hidden">
         <motion.div 
-          style={{ scale: splineScale }}
-          className="w-full h-[50vh] min-h-[400px] rounded-[48px] overflow-hidden bg-white/5 dark:bg-white/2 relative group"
+          style={{ scale: videoScale }}
+          className="w-full h-[60vh] min-h-[450px] rounded-[48px] overflow-hidden bg-white/5 dark:bg-white/2 relative group shadow-2xl"
         >
-          <div className="absolute inset-0 z-0 flex items-center justify-center">
-            <Spline scene="/assets/spline/r_4_x_bot.spline" />
-          </div>
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover z-0"
+            src="/assets/videos/twist_compressed.mp4"
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-body/40 via-transparent to-body/40 pointer-events-none" />
+          <div className="absolute bottom-10 left-10 z-10">
+            <span className="text-[11px] font-black uppercase tracking-[0.3em] text-white/50">Atmospheric Simulation 01</span>
+          </div>
         </motion.div>
       </section>
 
@@ -116,34 +122,34 @@ export const FAQ: React.FC = () => {
             <div className="h-[1px] flex-grow bg-border hidden lg:block mb-6 mx-12 opacity-50" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
             {[
               {
                 icon: CloudSun,
                 title: "Morning or night",
                 desc: "Start your day with an intention or end it by clearing your head. Write whenever it fits your rhythm.",
-                span: "col-span-1",
+                gridSpan: "md:col-span-8 lg:col-span-7",
                 color: "bg-green/5 text-green"
               },
               {
                 icon: PenNib,
                 title: "The daily spark",
-                desc: "Facing a blank page? Tap the spark for a gentle, context-aware prompt to get the words moving.",
-                span: "col-span-1 md:col-span-2 lg:col-span-1",
+                desc: "Facing a blank page? Tap the spark for a gentle, context-aware prompt.",
+                gridSpan: "md:col-span-4 lg:col-span-5",
                 color: "bg-blue/5 text-blue"
               },
               {
                 icon: Tag,
                 title: "Focus on the flow",
-                desc: "Use Focus Mode to let the UI fade away. It’s just you and your thoughts, without the digital noise.",
-                span: "col-span-1",
+                desc: "Use Focus Mode to let the UI fade away. It’s just you and your thoughts.",
+                gridSpan: "md:col-span-5 lg:col-span-5",
                 color: "bg-green/5 text-green"
               },
               {
                 icon: Heart,
                 title: "Check your mood",
-                desc: "Name how you feel. It's the first step to understanding your own emotional patterns.",
-                span: "col-span-1",
+                desc: "Name how you feel. It's the first step to understanding your own emotional patterns over time.",
+                gridSpan: "md:col-span-7 lg:col-span-7",
                 color: "bg-purple-500/5 text-purple-500"
               }
             ].map((item, i) => (
@@ -153,7 +159,7 @@ export const FAQ: React.FC = () => {
                 initial="hidden"
                 whileInView="show"
                 viewport={{ once: true, margin: "-50px" }}
-                className={`${item.span} bezel-outer group`}
+                className={`${item.gridSpan} bezel-outer group`}
               >
                 <div className="bezel-inner p-8 flex flex-col h-full min-h-[280px]">
                   <div className={`w-12 h-12 rounded-2xl ${item.color} flex items-center justify-center mb-10 group-hover:scale-110 transition-transform duration-500`}>
@@ -231,7 +237,7 @@ export const FAQ: React.FC = () => {
                 
                 <div className="relative z-10 flex flex-col md:flex-row gap-10">
                   <div className="w-20 h-20 rounded-[28px] bg-green/5 text-green flex items-center justify-center shrink-0">
-                    <Sparkle size={40} weight="fill" className="animate-pulse" />
+                    <Brain size={40} weight="fill" className="animate-pulse" />
                   </div>
                   <div>
                     <h4 className="text-[28px] font-display text-gray-text mb-4">Sanctuary intelligence</h4>

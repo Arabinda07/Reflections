@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+﻿import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { 
@@ -27,8 +27,7 @@ import {
   SpeakerHigh, 
   CircleNotch,
   CaretRight,
-  Brain,
-  Wind
+  Brain
 } from '@phosphor-icons/react';
 import { useAmbientAudio, AMBIENT_TRACKS } from '../../hooks/useAmbientAudio';
 import { Button } from '../../components/ui/Button';
@@ -60,7 +59,6 @@ export const CreateNote: React.FC = () => {
   const { id } = useParams<{ id: string }>(); 
   const location = useLocation();
   const initialPrompt = location.state?.initialPrompt;
-  const isNewNote = !id;
   
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -69,23 +67,29 @@ export const CreateNote: React.FC = () => {
   const [tagInput, setTagInput] = useState('');
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isLimitReached, setIsLimitReached] = useState(false);
   const [activePlaceholder, setActivePlaceholder] = useState<string | null>(initialPrompt || null);
   const [isReflecting, setIsReflecting] = useState(false);
   const [aiReflection, setAiReflection] = useState<string | null>(null);
   const [dynamicPrompts, setDynamicPrompts] = useState<string[]>([]);
   const [isGeneratingPrompts, setIsGeneratingPrompts] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [newAttachments, setNewAttachments] = useState<File[]>([]);
+  const [existingAttachments, setExistingAttachments] = useState<NoteAttachment[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   
   // UI States
   const [isFocused, setIsFocused] = useState(false);
-  const [isFlowing, setIsFlowing] = useState(false); // Zen Mode
-  const [isBreathing, setIsBreathing] = useState(isNewNote); // Breathing Exercise on start
+  const [isFlowing, setIsFlowing] = useState(false);
+  const [isTasksOpen, setIsTasksOpen] = useState(false);
   const [isMoodOpen, setIsMoodOpen] = useState(false);
   const [isTagsOpen, setIsTagsOpen] = useState(false);
   const [isMusicOpen, setIsMusicOpen] = useState(false);
+  const [isAttachmentsOpen, setIsAttachmentsOpen] = useState(false);
   const [isWhispering, setIsWhispering] = useState(false);
   const [interimTranscript, setInterimTranscript] = useState('');
+  const [showObservation, setShowObservation] = useState(false);
+  const [observationText, setObservationText] = useState<string | null>(null);
   const [showPlane, setShowPlane] = useState(false);
 
   const { isPlaying: musicPlaying, activeTrack: activeMusicTrack, volume: musicVolume, playTrack: playMusicTrack, stopAll: stopMusic } = useAmbientAudio();
@@ -100,7 +104,7 @@ export const CreateNote: React.FC = () => {
     return () => { isUnmounted.current = true; };
   }, []);
 
-  // Flow State (Zen Mode) - Fades UI on inactivity
+  // Flow State (Zen Mode)
   useEffect(() => {
     const handleWake = () => {
       if (flowTimeoutRef.current) clearTimeout(flowTimeoutRef.current);
@@ -114,9 +118,7 @@ export const CreateNote: React.FC = () => {
       if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') {
         setIsFlowing(true);
         if (flowTimeoutRef.current) clearTimeout(flowTimeoutRef.current);
-        flowTimeoutRef.current = setTimeout(() => {
-          if (!isUnmounted.current) setIsFlowing(false);
-        }, 5000);
+        flowTimeoutRef.current = setTimeout(() => setIsFlowing(false), 5000);
       }
     };
 
@@ -147,6 +149,7 @@ export const CreateNote: React.FC = () => {
           setTags(note.tags || []);
           setTasks(note.tasks || []);
           setImagePreview(note.thumbnailUrl || null);
+          setExistingAttachments(note.attachments || []);
           setLoading(false);
         } else {
           navigate(RoutePath.HOME);
@@ -185,6 +188,7 @@ export const CreateNote: React.FC = () => {
       await noteService.update(noteId, {
         title, content, mood, tags, tasks,
         thumbnailUrl: finalThumbnailUrl || undefined,
+        attachments: existingAttachments // Simplified for now
       });
 
       // AI Ingestion
@@ -222,37 +226,19 @@ export const CreateNote: React.FC = () => {
       setIsWhispering(false);
       isWhisperingRef.current = false;
       recognitionRef.current?.stop();
-      setInterimTranscript('');
     } else {
       setIsWhispering(true);
       isWhisperingRef.current = true;
-      setInterimTranscript('');
       if (!recognitionRef.current) {
         recognitionRef.current = new SpeechRecognition();
         recognitionRef.current.continuous = true;
         recognitionRef.current.interimResults = true;
-        
         recognitionRef.current.onresult = (event: any) => {
-          let finalTranscript = '';
-          let currentInterim = '';
-          
+          let final = '';
           for (let i = event.resultIndex; i < event.results.length; ++i) {
-            if (event.results[i].isFinal) {
-              finalTranscript += event.results[i][0].transcript;
-            } else {
-              currentInterim += event.results[i][0].transcript;
-            }
+            if (event.results[i].isFinal) final += event.results[i][0].transcript;
           }
-          
-          if (finalTranscript) {
-            setContent(prev => {
-              const cleanPrev = prev === '<p><br></p>' ? '' : prev;
-              if (!cleanPrev) return `<p>${finalTranscript}</p>`;
-              if (cleanPrev.endsWith('</p>')) return cleanPrev.slice(0, -4) + ' ' + finalTranscript + '</p>';
-              return cleanPrev + ' ' + finalTranscript;
-            });
-          }
-          setInterimTranscript(currentInterim);
+          if (final) setContent(prev => prev.endsWith('</p>') ? prev.slice(0, -4) + ' ' + final + '</p>' : prev + ' ' + final);
         };
       }
       recognitionRef.current.start();
@@ -277,6 +263,7 @@ export const CreateNote: React.FC = () => {
       setAiReflection(reflection || "I'm here to listen. Your thoughts are valid.");
     } catch (error) {
       if (isUnmounted.current) return;
+      console.error("AI Reflection failed:", error);
       setAiReflection("I'm having trouble reflecting right now, but I'm still here for you.");
     } finally {
       if (!isUnmounted.current) setIsReflecting(false);
@@ -293,46 +280,7 @@ export const CreateNote: React.FC = () => {
     <div className="relative min-h-[100dvh] bg-body transition-all duration-700 ease-out-quart overflow-x-hidden">
       <div className="grain-overlay" />
 
-      {/* ── Initial Breathing Exercise Moment ── */}
-      <AnimatePresence>
-        {isBreathing && isNewNote && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, scale: 1.05 }}
-            className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-body px-6 text-center"
-          >
-            <motion.div
-              animate={{ 
-                scale: [1, 1.2, 1],
-                opacity: [0.3, 0.6, 0.3]
-              }}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-              className="w-64 h-64 rounded-full bg-green/10 blur-3xl absolute"
-            />
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.5, duration: 1.2 }}
-              className="relative z-10"
-            >
-              <Wind size={48} className="text-green mx-auto mb-10 animate-pulse" />
-              <h2 className="text-[32px] md:text-[44px] font-display text-gray-text tracking-tighter mb-4">Take a breath.</h2>
-              <p className="text-[18px] font-serif italic text-gray-light max-w-sm mx-auto mb-12">
-                Let the noise settle before you start. This space is yours.
-              </p>
-              <button 
-                onClick={() => setIsBreathing(false)}
-                className="px-10 py-4 rounded-full bg-green text-white font-bold text-[14px] shadow-xl hover:scale-105 active:scale-95 transition-all"
-              >
-                Begin Reflection
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ── Sanctuary Header ── */}
+      {/* ΓöÇΓöÇ Sanctuary Header ΓöÇΓöÇ */}
       <AnimatePresence>
         {!isFlowing && (
           <motion.header 
@@ -364,7 +312,7 @@ export const CreateNote: React.FC = () => {
                 disabled={saving || (!title && !content)}
                 className="group flex items-center gap-3 pl-5 pr-2 py-2 rounded-full bg-green text-white font-bold text-[14px] shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
               >
-                Save
+                Save Reflection
                 <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
                   {saving ? <CircleNotch size={18} className="animate-spin" /> : <FloppyDisk size={18} weight="bold" />}
                 </div>
@@ -374,8 +322,8 @@ export const CreateNote: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* ── Main Canvas ── */}
-      <main className={`relative z-10 pt-32 pb-40 px-6 lg:px-0 transition-all duration-1000 ${isFlowing ? 'opacity-30 blur-sm scale-[0.98]' : 'opacity-100 blur-0 scale-100'}`}>
+      {/* ΓöÇΓöÇ Main Canvas ΓöÇΓöÇ */}
+      <main className="relative z-10 pt-32 pb-40 px-6 lg:px-0">
         <div className="max-w-[82ch] mx-auto min-h-[60vh]">
           {/* Cover Image Moment */}
           <AnimatePresence>
@@ -384,28 +332,15 @@ export const CreateNote: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="relative w-full aspect-[21/9] rounded-[40px] overflow-hidden mb-12 bezel-outer group"
+                className="relative w-full aspect-[21/9] rounded-[40px] overflow-hidden mb-12 bezel-outer"
               >
                 <img src={imagePreview} alt="Cover" className="w-full h-full object-cover" />
                 <button 
                   onClick={() => setImagePreview(null)}
-                  className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/20 backdrop-blur-xl text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
+                  className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/20 backdrop-blur-xl text-white flex items-center justify-center hover:bg-black/40 transition-all"
                 >
                   <X size={20} weight="bold" />
                 </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Whisper Interim Transcript */}
-          <AnimatePresence>
-            {isWhispering && interimTranscript && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mb-8 p-4 rounded-2xl bg-red/5 border border-red/10 text-red font-serif italic text-[18px]"
-              >
-                {interimTranscript}...
               </motion.div>
             )}
           </AnimatePresence>
@@ -421,7 +356,7 @@ export const CreateNote: React.FC = () => {
         </div>
       </main>
 
-      {/* ── Fluid Island Bottom Toolbar ── */}
+      {/* ΓöÇΓöÇ Fluid Island Bottom Toolbar ΓöÇΓöÇ */}
       <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 w-full max-w-fit px-6">
         <motion.div 
           layout
@@ -448,23 +383,16 @@ export const CreateNote: React.FC = () => {
                     initial={{ opacity: 0, y: -20, scale: 0.9 }}
                     animate={{ opacity: 1, y: -80, scale: 1 }}
                     exit={{ opacity: 0, y: -20, scale: 0.9 }}
-                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 bezel-outer min-w-[280px]"
+                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 bezel-outer min-w-[200px]"
                   >
                     <div className="bezel-inner p-4 grid grid-cols-5 gap-2">
-                      {[
-                        { id: 'peaceful', color: 'bg-blue-400' },
-                        { id: 'happy', color: 'bg-yellow-400' },
-                        { id: 'neutral', color: 'bg-gray-400' },
-                        { id: 'sad', color: 'bg-indigo-400' },
-                        { id: 'stressed', color: 'bg-red-400' }
-                      ].map(m => (
+                      {['peaceful', 'happy', 'neutral', 'sad', 'stressed'].map(m => (
                         <button 
-                          key={m.id}
-                          onClick={() => { setMood(m.id); setIsMoodOpen(false); generateDynamicPrompts(m.id); }}
-                          className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${mood === m.id ? 'scale-110 ring-2 ring-green ring-offset-2' : 'hover:scale-105 opacity-60 hover:opacity-100'}`}
-                          title={m.id}
+                          key={m}
+                          onClick={() => { setMood(m); setIsMoodOpen(false); }}
+                          className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${mood === m ? 'bg-green text-white' : 'hover:bg-white/5 text-gray-nav'}`}
                         >
-                          <div className={`w-6 h-6 rounded-full ${m.color}`} />
+                          {m[0].toUpperCase()}
                         </button>
                       ))}
                     </div>
@@ -477,102 +405,26 @@ export const CreateNote: React.FC = () => {
 
             {/* Core Tools */}
             <div className="flex items-center gap-1">
-              {/* Tags */}
-              <div className="relative">
-                <button 
-                  onClick={() => { setIsTagsOpen(!isTagsOpen); setIsMoodOpen(false); setIsMusicOpen(false); }}
-                  className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${tags.length > 0 ? 'bg-blue/10 text-blue' : 'text-gray-nav hover:bg-white/5'}`}
-                >
-                  <TagIcon size={22} weight="bold" />
-                </button>
-                <AnimatePresence>
-                  {isTagsOpen && (
-                    <motion.div 
-                      initial={{ opacity: 0, y: -20 }}
-                      animate={{ opacity: 1, y: -80 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 bezel-outer min-w-[240px]"
-                    >
-                      <div className="bezel-inner p-4">
-                        <div className="flex flex-wrap gap-2 mb-3">
-                          {tags.map(t => (
-                            <span key={t} className="px-3 py-1 rounded-full bg-blue/10 text-blue text-[12px] font-bold flex items-center gap-2">
-                              {t} <X size={12} className="cursor-pointer" onClick={() => setTags(tags.filter(tag => tag !== t))} />
-                            </span>
-                          ))}
-                        </div>
-                        <input 
-                          type="text"
-                          placeholder="Add tag..."
-                          className="w-full bg-transparent border-none outline-none text-[14px] text-gray-text"
-                          onKeyDown={e => {
-                            if (e.key === 'Enter' && (e.target as any).value) {
-                              setTags([...tags, (e.target as any).value]);
-                              (e.target as any).value = '';
-                            }
-                          }}
-                        />
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+              <button 
+                onClick={() => { setIsTagsOpen(!isTagsOpen); setIsMoodOpen(false); setIsMusicOpen(false); }}
+                className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${tags.length > 0 ? 'bg-blue/10 text-blue' : 'text-gray-nav hover:bg-white/5'}`}
+              >
+                <TagIcon size={22} weight="bold" />
+              </button>
 
-              {/* Ambient Music */}
-              <div className="relative">
-                <button 
-                  onClick={() => { setIsMusicOpen(!isMusicOpen); setIsMoodOpen(false); setIsTagsOpen(false); }}
-                  className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${musicPlaying ? 'bg-purple-500/10 text-purple-500 animate-pulse' : 'text-gray-nav hover:bg-white/5'}`}
-                >
-                  <MusicNotes size={22} weight="bold" />
-                </button>
-                <AnimatePresence>
-                  {isMusicOpen && (
-                    <motion.div 
-                      initial={{ opacity: 0, y: -20 }}
-                      animate={{ opacity: 1, y: -80 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 bezel-outer min-w-[200px]"
-                    >
-                      <div className="bezel-inner p-3 flex flex-col gap-1">
-                        {Object.entries(AMBIENT_TRACKS).map(([id, track]) => (
-                          <button 
-                            key={id}
-                            onClick={() => playMusicTrack(id as any)}
-                            className={`w-full p-3 rounded-xl text-left text-[13px] font-bold flex items-center justify-between ${activeMusicTrack === id ? 'bg-purple-500 text-white' : 'hover:bg-white/5 text-gray-nav'}`}
-                          >
-                            {track.name}
-                            {activeMusicTrack === id && musicPlaying && <CircleNotch size={14} className="animate-spin" />}
-                          </button>
-                        ))}
-                        <button onClick={stopMusic} className="w-full p-3 rounded-xl text-left text-[13px] font-bold text-red hover:bg-red/5">Stop All</button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+              <button 
+                onClick={() => setIsMusicOpen(!isMusicOpen)}
+                className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${musicPlaying ? 'bg-purple-500/10 text-purple-500' : 'text-gray-nav hover:bg-white/5'}`}
+              >
+                <MusicNotes size={22} weight="bold" />
+              </button>
 
-              {/* Whisper Mode */}
               <button 
                 onClick={toggleWhisper}
                 className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${isWhispering ? 'bg-red/10 text-red animate-pulse' : 'text-gray-nav hover:bg-white/5'}`}
               >
                 {isWhispering ? <MicrophoneSlash size={22} weight="bold" /> : <Microphone size={22} weight="bold" />}
               </button>
-
-              {/* Cover Image (Hidden input trigger) */}
-              <label className="w-12 h-12 rounded-full flex items-center justify-center text-gray-nav hover:bg-white/5 cursor-pointer transition-all">
-                <ImageIcon size={22} weight="bold" />
-                <input 
-                  type="file" 
-                  className="hidden" 
-                  accept="image/*"
-                  onChange={e => {
-                    const file = e.target.files?.[0];
-                    if (file) setImagePreview(URL.createObjectURL(file));
-                  }}
-                />
-              </label>
             </div>
 
             <div className="w-[1px] h-6 bg-border mx-1" />
@@ -582,7 +434,6 @@ export const CreateNote: React.FC = () => {
               onClick={handleAiReflect}
               disabled={isReflecting}
               className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-green hover:scale-110 transition-all shadow-sm"
-              title="AI Reflection"
             >
               {isReflecting ? <CircleNotch size={20} className="animate-spin" /> : <Sparkle size={22} weight="fill" />}
             </button>
@@ -599,26 +450,24 @@ export const CreateNote: React.FC = () => {
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-body/60 backdrop-blur-xl"
           >
-            <div className="bezel-outer max-w-2xl w-full shadow-2xl">
+            <div className="bezel-outer max-w-2xl w-full">
               <div className="bezel-inner p-10">
                 <div className="flex justify-between items-start mb-8">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-green/5 text-green flex items-center justify-center">
                       <Brain size={28} weight="duotone" />
                     </div>
-                    <h3 className="text-[24px] font-display text-gray-text">Sanctuary Reflection</h3>
+                    <h3 className="text-[24px] font-display text-gray-text">AI Reflection</h3>
                   </div>
                   <button onClick={() => setAiReflection(null)} className="text-gray-nav hover:text-gray-text transition-all">
                     <X size={24} weight="bold" />
                   </button>
                 </div>
-                <div className="prose dark:prose-invert max-w-none">
-                  <p className="text-[20px] font-serif italic text-gray-light leading-relaxed mb-10">
-                    "{aiReflection}"
-                  </p>
-                </div>
+                <p className="text-[18px] font-serif italic text-gray-light leading-relaxed mb-10">
+                  {aiReflection}
+                </p>
                 <Button variant="primary" className="w-full h-14 rounded-2xl" onClick={() => setAiReflection(null)}>
-                  Keep Reflecting
+                  Close
                 </Button>
               </div>
             </div>

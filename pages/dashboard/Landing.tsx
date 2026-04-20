@@ -102,7 +102,7 @@ export const Landing: React.FC = () => {
             <div className="flex flex-wrap items-center gap-x-8 gap-y-4 mb-8">
               <button
                 onClick={() => navigate(RoutePath.SIGNUP)}
-                className="group flex items-center gap-4 pl-6 pr-2 py-2 rounded-full bg-white dark:bg-[#1E1E1E] border border-black/5 dark:border-white/5 text-[16px] font-bold text-gray-text shadow-sm transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:shadow-md hover:bg-gray-50 dark:hover:bg-[#252525] active:scale-[0.98]"
+                className="group flex items-center gap-4 pl-6 pr-2 py-2 rounded-full bg-white/95 dark:bg-[#1E1E1E]/95 backdrop-blur-2xl border border-black/10 dark:border-white/10 text-[16px] font-bold text-gray-text shadow-xl transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:shadow-2xl active:scale-[0.98]"
               >
                 Begin writing
                 <div className="w-10 h-10 rounded-full bg-black/5 dark:bg-white/10 flex items-center justify-center transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-1 group-hover:-translate-y-[1px] group-hover:scale-105">

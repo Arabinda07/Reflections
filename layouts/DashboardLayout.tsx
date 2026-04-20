@@ -15,7 +15,8 @@ import {
   Sun, 
   ArrowRight, 
   DownloadSimple, 
-  CaretRight 
+  CaretRight,
+  Leaf 
 } from '@phosphor-icons/react';
 import { RoutePath, Note } from '../types';
 import { noteService } from '../services/noteService';
@@ -93,10 +94,10 @@ export const DashboardLayout: React.FC = () => {
               className="flex items-center gap-2 cursor-pointer group"
               onClick={() => handleNavigation(RoutePath.HOME)}
             >
-              <div className="h-10 w-10 rounded-xl bg-green flex items-center justify-center text-white shadow-sm transition-all duration-300 group-hover:scale-105 group-hover:rotate-3">
-                <Sparkle size={24} weight="fill" />
+              <div className="h-10 w-10 rounded-xl bg-green flex items-center justify-center text-white shadow-sm transition-all duration-300 group-hover:scale-105 group-hover:-rotate-12">
+                <Leaf size={24} weight="fill" />
               </div>
-              <span className="font-display text-[20px] sm:text-[24px] text-green tracking-tight truncate max-w-[150px] sm:max-w-none">
+              <span className="font-serif italic text-[22px] sm:text-[26px] text-green tracking-tight truncate max-w-[150px] sm:max-w-none">
                 Reflections
               </span>
             </div>
@@ -195,9 +196,9 @@ export const DashboardLayout: React.FC = () => {
           <div className="relative flex flex-col p-8 pt-24 gap-6 h-full overflow-y-auto">
             <div className="flex items-center gap-3 mb-8">
               <div className="h-12 w-12 rounded-2xl bg-green flex items-center justify-center text-white shadow-sm">
-                <Sparkle size={28} weight="fill" />
+                <Leaf size={28} weight="fill" />
               </div>
-              <span className="font-display text-[28px] text-green">Reflections</span>
+              <span className="font-serif italic text-[28px] text-green">Reflections</span>
             </div>
 
             {isAuthenticated ? (
