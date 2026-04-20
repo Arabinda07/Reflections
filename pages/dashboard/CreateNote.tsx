@@ -12,6 +12,11 @@ import {
   FileText, 
   Sparkle, 
   Smiley, 
+  SmileyBlank,
+  SmileyMeh,
+  SmileySad,
+  SmileyAngry,
+  SmileyXEyes,
   Tag as TagIcon, 
   Check, 
   Plus, 
@@ -26,7 +31,8 @@ import {
   Wind,
   Target,
   Lightning,
-  DotsThreeCircle
+  DotsThreeCircle,
+  PaperPlaneTilt
 } from '@phosphor-icons/react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { useAmbientAudio, AMBIENT_TRACKS } from '../../hooks/useAmbientAudio';
@@ -44,6 +50,15 @@ import { DEFAULT_WELLNESS_PROMPTS, getCurrentWellnessPrompt, getNextWellnessProm
 import { aiService } from '../../services/aiService';
 import { aiClient } from '../../services/aiClient';
 import { getOrderedTasks, getTaskDrawerTriggerLabel } from './createNoteTasks';
+
+const MOOD_CONFIG: Record<string, { nav: string, modal: string, icon: any }> = {
+  happy: { nav: 'bg-golden/10 border-golden/20 text-golden', modal: 'border-golden bg-golden/10 text-golden', icon: Smiley },
+  calm: { nav: 'bg-blue/10 border-blue/20 text-blue', modal: 'border-blue bg-blue/10 text-blue', icon: SmileyBlank },
+  anxious: { nav: 'bg-orange/10 border-orange/20 text-orange', modal: 'border-orange bg-orange/10 text-orange', icon: SmileyMeh },
+  sad: { nav: 'bg-dark-blue/10 border-dark-blue/20 text-dark-blue', modal: 'border-dark-blue bg-dark-blue/10 text-dark-blue', icon: SmileySad },
+  angry: { nav: 'bg-red/10 border-red/20 text-red', modal: 'border-red bg-red/10 text-red', icon: SmileyAngry },
+  tired: { nav: 'bg-gray-light/10 border-gray-light/20 text-gray-text', modal: 'border-gray-light bg-gray-light/10 text-gray-text', icon: SmileyXEyes },
+};
 
 // --- Sub-Component: TaskRow ---
 interface TaskRowProps {
@@ -168,6 +183,7 @@ export const CreateNote: React.FC = () => {
   const [promptIndex, setPromptIndex] = useState(0);
 
   const { isPlaying: musicPlaying, activeTrack: activeMusicTrack, playTrack: playMusicTrack, stopAll: stopMusic } = useAmbientAudio();
+  const ActiveMoodIcon = mood ? MOOD_CONFIG[mood]?.icon || Smiley : Smiley;
   const recognitionRef = useRef<any>(null);
   const isWhisperingRef = useRef(false);
   const editorInstanceRef = useRef<EditorRef>(null);
@@ -429,13 +445,13 @@ export const CreateNote: React.FC = () => {
   );
 
   return (
-    <div className="relative h-[100dvh] bg-body transition-all duration-700 ease-out-quart overflow-hidden flex">
+    <div className="relative h-[100dvh] bg-body transition-colors duration-700 ease-out-quart overflow-hidden flex">
       <div className="grain-overlay" />
 
       {/* ── Subtle Back Button ── */}
       <button 
         onClick={() => navigate(RoutePath.HOME)}
-        className={`fixed top-6 left-6 z-[60] h-12 w-12 rounded-full border border-border bg-white/50 dark:bg-black/20 backdrop-blur-xl flex items-center justify-center hover:bg-white dark:hover:bg-white/10 transition-all shadow-sm ${isDimmed ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
+        className={`fixed top-24 lg:top-6 left-4 lg:left-6 z-[80] h-12 w-12 rounded-full border border-border bg-white/50 dark:bg-black/20 backdrop-blur-xl flex items-center justify-center hover:bg-white dark:hover:bg-white/10 transition-all shadow-sm ${isDimmed ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
       >
         <ArrowLeft size={20} weight="bold" className="text-gray-text" />
       </button>
@@ -447,8 +463,8 @@ export const CreateNote: React.FC = () => {
             <span className="text-[10px] font-black text-gray-nav tracking-widest uppercase opacity-40 ml-2">Personalize</span>
             
             {/* Options */}
-            <button onClick={() => setIsMoodOpen(true)} className={`w-full flex items-center justify-between p-4 rounded-[20px] transition-all border-2 ${mood ? 'bg-green/10 border-green/20 text-green' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border text-gray-text'}`}>
-              <div className="flex items-center gap-3"><Smiley size={20} weight={mood ? "fill" : "regular"} /><span className="text-[13px] font-bold">{mood ? mood : 'Mood'}</span></div>
+            <button onClick={() => setIsMoodOpen(true)} className={`w-full flex items-center justify-between p-4 rounded-[20px] transition-all border-2 ${mood ? MOOD_CONFIG[mood]?.nav || 'bg-green/10 border-green/20 text-green' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border text-gray-text'}`}>
+              <div className="flex items-center gap-3"><ActiveMoodIcon size={20} weight={mood ? "fill" : "regular"} /><span className="text-[13px] font-bold capitalize">{mood ? mood : 'Mood'}</span></div>
               <CaretRight size={14} className="opacity-40" />
             </button>
 
@@ -491,7 +507,7 @@ export const CreateNote: React.FC = () => {
 
       {/* ── Main Canvas ── */}
       <main className="flex-1 h-full overflow-y-auto relative pt-24 pb-40 px-6 sm:px-12 md:px-20 custom-scrollbar">
-        <div className={`max-w-[800px] mx-auto transition-all duration-1000 ease-[cubic-bezier(0.32,0.72,0,1)] ${isDimmed ? 'opacity-40 scale-[0.98]' : 'opacity-100'}`}>
+        <div className={`max-w-[800px] mx-auto transition-[opacity,transform] duration-1000 ease-[cubic-bezier(0.32,0.72,0,1)] ${isDimmed ? 'opacity-40 scale-[0.98]' : 'opacity-100'}`}>
           
           {/* Cover Image */}
           {imagePreview && (
@@ -588,7 +604,7 @@ export const CreateNote: React.FC = () => {
               className="group relative h-16 w-16 rounded-full bg-green text-white shadow-[0_24px_40px_-10px_rgba(22,163,74,0.4)] flex items-center justify-center transition-all"
             >
               <div className="absolute inset-2 rounded-full bg-black/10 group-hover:scale-110 transition-transform duration-500 ease-out" />
-              {saving ? <CircleNotch size={28} className="animate-spin" /> : <Lightning size={28} weight="fill" className="relative z-10" />}
+              {saving ? <CircleNotch size={28} className="animate-spin" /> : <PaperPlaneTilt size={26} weight="fill" className="relative z-10" />}
             </motion.button>
           )}
         </AnimatePresence>
@@ -614,11 +630,26 @@ export const CreateNote: React.FC = () => {
                 </div>
                 
                 <div className="grid grid-cols-2 gap-3">
-                  <button onClick={() => { setIsMobileOptionsOpen(false); setIsMoodOpen(true); }} className={`flex items-center gap-3 p-4 rounded-2xl border ${mood ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><Smiley size={24} weight={mood ? "fill" : "regular"} /><span className="text-[14px] font-bold">Mood</span></button>
+                  <button onClick={() => { setIsMobileOptionsOpen(false); setIsMoodOpen(true); }} className={`flex items-center gap-3 p-4 rounded-2xl border ${mood ? MOOD_CONFIG[mood]?.nav || 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><ActiveMoodIcon size={24} weight={mood ? "fill" : "regular"} /><span className="text-[14px] font-bold capitalize">{mood ? mood : 'Mood'}</span></button>
                   <button onClick={() => { setIsMobileOptionsOpen(false); setIsTagsOpen(true); }} className={`flex items-center gap-3 p-4 rounded-2xl border ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><TagIcon size={24} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-[14px] font-bold">Tags</span></button>
                   <button onClick={() => { setIsMobileOptionsOpen(false); setIsMusicOpen(true); }} className={`flex items-center gap-3 p-4 rounded-2xl border ${musicPlaying ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><Headphones size={24} weight={musicPlaying ? "fill" : "regular"} /><span className="text-[14px] font-bold">Sounds</span></button>
                   <button onClick={() => { setIsMobileOptionsOpen(false); setIsTasksOpen(true); }} className={`flex items-center gap-3 p-4 rounded-2xl border ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><ListChecks size={24} weight={tasks.some(t => !t.completed) ? "fill" : "regular"} /><span className="text-[14px] font-bold">Tasks</span></button>
                   <button onClick={toggleWhisper} className={`flex items-center gap-3 p-4 rounded-2xl border ${isWhispering ? 'bg-green/10 border-green/20 text-green animate-pulse' : 'border-border text-gray-text'}`}>{isWhispering ? <Microphone size={24} weight="fill" /> : <MicrophoneSlash size={24} weight="regular" />}<span className="text-[14px] font-bold">Whisper</span></button>
+                  
+                  <label className="flex items-center gap-3 p-4 rounded-2xl border border-border text-gray-text cursor-pointer hover:bg-black/5 dark:hover:bg-white/5">
+                    <Paperclip size={24} weight="regular" /><span className="text-[14px] font-bold">Files</span>
+                    <input type="file" multiple className="hidden" onChange={(e) => {
+                      if (e.target.files) setNewAttachments([...newAttachments, ...Array.from(e.target.files)]);
+                      setIsMobileOptionsOpen(false);
+                    }} />
+                  </label>
+                  <label className="flex items-center gap-3 p-4 rounded-2xl border border-border text-gray-text cursor-pointer hover:bg-black/5 dark:hover:bg-white/5">
+                    <ImageIcon size={24} weight="regular" /><span className="text-[14px] font-bold">Cover</span>
+                    <input type="file" className="hidden" accept="image/*" onChange={(e) => {
+                      if (e.target.files?.[0]) setImagePreview(URL.createObjectURL(e.target.files[0]));
+                      setIsMobileOptionsOpen(false);
+                    }} />
+                  </label>
                 </div>
               </motion.div>
             </div>
@@ -675,12 +706,27 @@ export const CreateNote: React.FC = () => {
                      <button onClick={() => setIsMoodOpen(false)} className="text-gray-nav hover:text-red transition-all"><X size={24} weight="bold" /></button>
                    </div>
                    <div className="grid grid-cols-3 gap-3">
-                      {['happy', 'calm', 'anxious', 'sad', 'angry', 'tired'].map(m => (
-                        <button key={m} onClick={() => { setMood(m); setIsMoodOpen(false); generateDynamicPrompts(m); }} className={`flex flex-col items-center p-4 rounded-2xl border-2 transition-all ${mood === m ? 'border-green bg-green/10 text-green' : 'border-border bg-white dark:bg-white/5 text-gray-text'}`}>
-                          <Smiley size={32} weight={mood === m ? "fill" : "regular"} className="mb-2" />
-                          <span className="text-[12px] font-bold capitalize">{m}</span>
-                        </button>
-                      ))}
+                      {['happy', 'calm', 'anxious', 'sad', 'angry', 'tired'].map(m => {
+                        const Icon = MOOD_CONFIG[m]?.icon || Smiley;
+                        return (
+                          <button 
+                            key={m} 
+                            onClick={() => { 
+                              if (mood === m) {
+                                setMood(undefined);
+                              } else {
+                                setMood(m); 
+                                generateDynamicPrompts(m);
+                              }
+                              setIsMoodOpen(false); 
+                            }} 
+                            className={`flex flex-col items-center p-4 rounded-2xl border-2 transition-all ${mood === m ? MOOD_CONFIG[m]?.modal || 'border-green bg-green/10 text-green' : 'border-border bg-white dark:bg-white/5 text-gray-text hover:border-border/60'}`}
+                          >
+                            <Icon size={32} weight={mood === m ? "fill" : "regular"} className="mb-2" />
+                            <span className="text-[12px] font-bold capitalize">{m}</span>
+                          </button>
+                        );
+                      })}
                    </div>
                  </div>
                </motion.div>
@@ -695,8 +741,18 @@ export const CreateNote: React.FC = () => {
                     <h3 className="text-[20px] font-display text-gray-text">Sounds</h3>
                     <button onClick={() => setIsMusicOpen(false)} className="text-gray-nav hover:text-red transition-all"><X size={24} weight="bold" /></button>
                   </div>
-                  {Object.entries(AMBIENT_TRACKS).map(([tid, track]) => (
-                    <button key={tid} onClick={() => playMusicTrack(tid as any)} className={`w-full p-4 rounded-2xl text-left text-[14px] font-bold flex items-center justify-between border-2 ${activeMusicTrack === tid ? 'border-green bg-green/10 text-green' : 'border-transparent hover:border-border text-gray-text'}`}>{track.name}{activeMusicTrack === tid && <CircleNotch size={16} className="animate-spin" />}</button>
+                  {AMBIENT_TRACKS.map((track) => (
+                    <button 
+                      key={track.id} 
+                      onClick={() => playMusicTrack(track)} 
+                      className={`w-full p-4 rounded-2xl text-left text-[14px] font-bold flex items-center justify-between border-2 ${activeMusicTrack?.id === track.id ? 'border-green bg-green/10 text-green' : 'border-transparent hover:border-border text-gray-text'}`}
+                    >
+                      <span className="flex items-center gap-3">
+                        <span className="text-[18px]">{track.emoji}</span>
+                        {track.label}
+                      </span>
+                      {activeMusicTrack?.id === track.id && <CircleNotch size={16} className="animate-spin" />}
+                    </button>
                   ))}
                   <button onClick={stopMusic} className="w-full p-4 mt-2 border-2 border-transparent text-red font-bold hover:bg-red/5 rounded-2xl">Stop All</button>
                 </div>

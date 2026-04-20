@@ -38,12 +38,15 @@ const staggerItem = {
 export const FAQ: React.FC = () => {
   const navigate = useNavigate();
   const journeyRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: journeyScroll } = useScroll({
-    target: journeyRef,
+  const videoSectionRef = useRef<HTMLElement>(null);
+  
+  const { scrollYProgress: videoScroll } = useScroll({
+    target: videoSectionRef,
     offset: ["start end", "end start"]
   });
 
-  const videoScale = useTransform(journeyScroll, [0, 0.5, 1], [0.8, 1, 0.9]);
+  const videoScale = useTransform(videoScroll, [0, 0.5, 1], [1.05, 1, 0.95]);
+  const videoOpacity = useTransform(videoScroll, [0, 0.2, 0.8, 1], [0.4, 1, 1, 0.4]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -89,28 +92,24 @@ export const FAQ: React.FC = () => {
         </div>
       </section>
 
-      {/* Cinematic Showcase — No Crop */}
-      <section className="relative z-10 w-full px-6 mb-40 flex justify-center overflow-hidden">
+      {/* Cinematic Showcase — Edge to Edge */}
+      <section ref={videoSectionRef} className="relative z-0 w-full mb-40 h-[60vh] md:h-[85vh] overflow-hidden bg-black flex items-center justify-center">
         <motion.div 
-          style={{ scale: videoScale }}
-          className="relative w-full max-w-[1200px] aspect-video bezel-outer shadow-[0_48px_100px_-20px_rgba(0,0,0,0.5)]"
+          style={{ scale: videoScale, opacity: videoOpacity }}
+          className="absolute inset-0 w-full h-full origin-center"
         >
-          {/* Decorative Glow */}
-          <div className="absolute inset-0 bg-white/5 blur-[120px] -z-10 scale-125 opacity-30" />
+          {/* Top and Bottom Gradient Fades for seamless integration */}
+          <div className="absolute inset-x-0 top-0 h-40 z-10 bg-gradient-to-b from-body to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-40 z-10 bg-gradient-to-t from-body to-transparent pointer-events-none" />
           
-          <div className="bezel-inner overflow-hidden bg-[#FBFBFB] dark:bg-[#FBFBFB]">
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="w-full h-full object-contain"
-              src="/assets/videos/twist.mp4"
-            />
-          </div>
-          
-          {/* Letterbox Frame Detail */}
-          <div className="absolute inset-0 pointer-events-none border border-white/5 rounded-[inherit]" />
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover object-center bg-body"
+            src="/assets/videos/twist.mp4"
+          />
         </motion.div>
       </section>
 
