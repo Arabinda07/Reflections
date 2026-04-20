@@ -37,10 +37,10 @@ export const Landing: React.FC = () => {
       <div className="min-h-[100dvh] w-full relative">
 
         {/* ── Left panel: content ── */}
-        <div className="relative z-20 flex flex-col justify-start lg:justify-center min-h-[100dvh] px-6 pt-[12vh] lg:pt-0 pb-24 sm:px-12 lg:px-16 xl:px-24 pointer-events-none">
+        <div className="relative z-20 flex flex-col justify-between min-h-[100dvh] px-6 pt-[18vh] lg:pt-[30vh] pb-10 lg:pb-12 sm:px-12 lg:px-16 xl:px-24 pointer-events-none">
 
-          {/* Container grouping all text and actions */}
-          <div className="flex flex-col gap-10 lg:gap-12 lg:w-[60%] xl:w-[55%]">
+          {/* Text section */}
+          <div className="flex flex-col gap-6 lg:gap-8 lg:w-[60%] xl:w-[55%]">
             
             {/* Hero headline & Paragraph */}
             <div className="flex flex-col gap-6 lg:gap-8">
@@ -70,6 +70,7 @@ export const Landing: React.FC = () => {
                 A private, distraction-free environment designed to help you untangle your mind and find clarity in the noise.
               </motion.p>
             </div>
+            </div>
 
             {/* Primary CTAs — Grouped naturally below text */}
             <motion.div
@@ -80,13 +81,13 @@ export const Landing: React.FC = () => {
             >
               <button
                 onClick={() => navigate(RoutePath.SIGNUP)}
-                className="group flex items-center justify-center sm:justify-start gap-3 w-full sm:w-auto text-[16px] sm:text-[18px] font-black text-white bg-green hover:bg-green-hover px-8 py-4 rounded-full shadow-[0_8px_24px_-8px_rgba(22,163,74,0.4)] transition-all duration-300 pointer-events-auto"
+                className="group flex items-center justify-center sm:justify-start gap-3 text-[16px] sm:text-[18px] font-black text-white bg-green hover:bg-green-hover px-8 py-4 rounded-full shadow-[0_8px_24px_-8px_rgba(22,163,74,0.4)] transition-all duration-300 pointer-events-auto"
               >
                 Begin writing
                 <ArrowRight size={22} className="group-hover:translate-x-1.5 transition-transform duration-500 ease-out-expo" />
               </button>
 
-              <div className="flex items-center gap-6 sm:gap-8 w-full sm:w-auto px-2 sm:px-0">
+              <div className="flex items-center gap-6 sm:gap-8 flex-wrap px-2 sm:px-0">
                 <button
                   onClick={() => navigate(RoutePath.LOGIN)}
                   className="text-[15px] font-medium text-gray-nav hover:text-gray-text transition-colors duration-300"
@@ -120,7 +121,6 @@ export const Landing: React.FC = () => {
                 )}
               </div>
             </motion.div>
-          </div>
         </div>
 
         {/* ── Background Video Layer ── */}
