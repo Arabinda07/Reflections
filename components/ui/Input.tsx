@@ -1,10 +1,10 @@
 import React from 'react';
-import { LucideIcon } from 'lucide-react';
+import { Icon as PhosphorIcon } from '@phosphor-icons/react';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
-  icon?: LucideIcon;
+  icon?: PhosphorIcon;
 }
 
 export const Input: React.FC<InputProps> = ({ label, error, icon: Icon, className = '', ...props }) => {
@@ -17,8 +17,9 @@ export const Input: React.FC<InputProps> = ({ label, error, icon: Icon, classNam
       )}
       <div className="relative">
         {Icon && (
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-nav z-10 pointer-events-none">
-            <Icon size={18} strokeWidth={2.5} />
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-nav z-10 pointer-events-none flex items-center justify-center">
+            <Icon size={20} weight="bold" />
+
           </div>
         )}
         <input

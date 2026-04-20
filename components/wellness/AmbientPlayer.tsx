@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'motion/react';
-import { Headphones, Pause, Play, X, Volume2, VolumeX } from 'lucide-react';
+import { Headphones, Pause, Play, X, SpeakerSlash } from '@phosphor-icons/react';
 import { Button } from '../ui/Button';
 
 interface AmbientPlayerProps {
@@ -204,7 +204,7 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
           className="flex h-full items-center gap-2 px-3 sm:px-4 py-2 flex-nowrap whitespace-nowrap"
           title="Choose ambient sound"
         >
-          <Headphones size={16} className="shrink-0" />
+          <Headphones size={16} weight="bold" className="shrink-0" />
           <span className="hidden sm:inline">{isPlaying ? AMBIENT_PRESETS.find(p => p.id === activePresetId)?.name || 'Ambient' : 'Ambient'}</span>
         </button>
         {isPlaying && (
@@ -218,7 +218,7 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
               className="p-1 text-gray-nav hover:text-red hover:bg-red/5 rounded-lg transition-all duration-300 ease-out-quart"
               title="Turn ambient sound off"
             >
-              <VolumeX size={14} />
+              <SpeakerSlash size={16} weight="bold" />
             </button>
           </div>
         )}
@@ -251,7 +251,7 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
                   >
                     <span className="flex items-center justify-between gap-3">
                       <span className="text-[12px] font-black">{preset.name}</span>
-                      {isPresetPlaying ? <Pause size={14} /> : <Play size={14} />}
+                      {isPresetPlaying ? <Pause size={14} weight="bold" /> : <Play size={14} weight="bold" />}
                     </span>
                   </button>
                 );
@@ -283,7 +283,7 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
                   className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border-2 border-border bg-gray-50 text-gray-nav dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
                   aria-label="Close ambient sound choices"
                 >
-                  <X size={16} />
+                  <X size={16} weight="bold" />
                 </button>
               </div>
 
@@ -305,7 +305,7 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
                     >
                       <span className="flex items-center justify-between gap-3">
                         <span className="text-[13px] font-black">{preset.name}</span>
-                        {isPresetPlaying ? <Pause size={16} /> : <Play size={16} />}
+                        {isPresetPlaying ? <Pause size={16} weight="bold" /> : <Play size={16} weight="bold" />}
                       </span>
                     </button>
                   );

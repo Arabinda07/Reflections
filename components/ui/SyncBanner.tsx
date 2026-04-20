@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CloudOff, CloudLightning } from 'lucide-react';
+import { CloudSlash, CloudCheck } from '@phosphor-icons/react';
 import { useNetworkState } from '../../hooks/useNetworkState';
 
 export const SyncBanner: React.FC = () => {
@@ -53,9 +53,9 @@ export const SyncBanner: React.FC = () => {
             style={{ WebkitBackdropFilter: 'blur(20px)' }}
           >
             {bannerMode === 'offline' ? (
-              <CloudOff size={18} className="shrink-0" />
+              <CloudSlash size={20} weight="bold" className="shrink-0" />
             ) : (
-              <CloudLightning size={18} className="shrink-0" />
+              <CloudCheck size={20} weight="bold" className="shrink-0" />
             )}
             
             <span className="font-sans text-[12px] font-bold tracking-wide">

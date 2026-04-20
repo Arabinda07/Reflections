@@ -1,6 +1,22 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, Search, Sparkles, User, Settings, LogOut, Loader2, FileText, X, LogIn, Moon, Sun, ArrowRight, Download } from 'lucide-react';
+import { 
+  List, 
+  MagnifyingGlass, 
+  Sparkle, 
+  User, 
+  Gear, 
+  SignOut, 
+  CircleNotch, 
+  FileText, 
+  X, 
+  SignIn, 
+  Moon, 
+  Sun, 
+  ArrowRight, 
+  DownloadSimple, 
+  CaretRight 
+} from '@phosphor-icons/react';
 import { RoutePath, Note } from '../types';
 import { noteService } from '../services/noteService';
 import { useAuth } from '../context/AuthContext';
@@ -64,7 +80,10 @@ export const DashboardLayout: React.FC = () => {
   const navItems = isAuthenticated ? authNavItems : guestNavItems;
 
   return (
-    <div className="min-h-screen flex flex-col bg-body font-sans selection:bg-green/30 selection:text-green-hover transition-colors duration-300">
+    <div className="min-h-screen flex flex-col bg-body font-sans selection:bg-green/30 selection:text-green transition-colors duration-300">
+      {/* Global Grain Texture */}
+      <div className="grain-overlay" />
+
       {/* Fixed Navbar */}
       <nav className="fixed top-0 left-0 right-0 h-[64px] border-b-2 border-border z-[100] flex justify-center liquid-glass">
         <div className="w-full max-w-[1440px] px-4 md:px-10 flex items-center justify-between">
@@ -74,8 +93,8 @@ export const DashboardLayout: React.FC = () => {
               className="flex items-center gap-2 cursor-pointer group"
               onClick={() => handleNavigation(RoutePath.HOME)}
             >
-              <div className="h-10 w-10 rounded-xl bg-green flex items-center justify-center text-white shadow-sm transition-all duration-300">
-                <Sparkles size={24} fill="currentColor" />
+              <div className="h-10 w-10 rounded-xl bg-green flex items-center justify-center text-white shadow-sm transition-all duration-300 group-hover:scale-105 group-hover:rotate-3">
+                <Sparkle size={24} weight="fill" />
               </div>
               <span className="font-display text-[20px] sm:text-[24px] text-green tracking-tight truncate max-w-[150px] sm:max-w-none">
                 Reflections
@@ -147,7 +166,7 @@ export const DashboardLayout: React.FC = () => {
               className="p-2 rounded-xl text-gray-nav hover:text-green hover:bg-green/5 transition-colors z-[110] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
               aria-label="Toggle menu"
             >
-              {isMobileMenuOpen ? <X className="text-gray-nav" size={24} /> : <Menu className="text-gray-nav" size={24} />}
+              {isMobileMenuOpen ? <X size={24} weight="bold" /> : <List size={24} weight="bold" />}
             </button>
           </div>
         </div>
@@ -176,7 +195,7 @@ export const DashboardLayout: React.FC = () => {
           <div className="relative flex flex-col p-8 pt-24 gap-6 h-full overflow-y-auto">
             <div className="flex items-center gap-3 mb-8">
               <div className="h-12 w-12 rounded-2xl bg-green flex items-center justify-center text-white shadow-sm">
-                <Sparkles size={28} fill="currentColor" />
+                <Sparkle size={28} weight="fill" />
               </div>
               <span className="font-display text-[28px] text-green">Reflections</span>
             </div>
@@ -191,7 +210,7 @@ export const DashboardLayout: React.FC = () => {
                       className="w-full p-6 text-left text-[24px] font-black text-gray-text border-b-2 border-border/50 hover:text-green transition-all duration-300 active:bg-green/5 rounded-2xl flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset"
                     >
                       <span>{item.label}</span>
-                      <ArrowRight className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <CaretRight weight="bold" className="opacity-0 group-hover:opacity-100 transition-opacity" />
                     </button>
                   ))}
                 </div>
@@ -205,7 +224,7 @@ export const DashboardLayout: React.FC = () => {
                       }}
                       className="w-full flex items-center justify-center gap-3 p-5 rounded-2xl border-2 border-green/30 bg-green/5 text-green font-black text-[14px] transition-all duration-300 hover:bg-green/10 active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
                     >
-                      <Download size={20} />
+                      <DownloadSimple size={20} weight="bold" />
                       Add to home screen
                     </button>
                   )}
@@ -236,7 +255,7 @@ export const DashboardLayout: React.FC = () => {
                     className="w-full p-6 text-left text-[24px] font-black text-gray-text border-b-2 border-border/50 hover:text-green transition-all duration-300 ease-out-quart active:bg-green/5 rounded-2xl flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset"
                   >
                     <span>{item.label}</span>
-                    <ArrowRight className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <CaretRight weight="bold" className="opacity-0 group-hover:opacity-100 transition-opacity" />
                   </button>
                 ))}
 

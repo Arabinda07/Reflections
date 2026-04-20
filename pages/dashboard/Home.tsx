@@ -1,4 +1,16 @@
-import { ArrowRight, Brain, FolderOpen, PlusCircle, RefreshCw, Smile, Sparkles, Tag, Target, UserPlus } from 'lucide-react';
+import { 
+  ArrowRight, 
+  Brain, 
+  FolderOpen, 
+  Plus, 
+  ArrowsClockwise, 
+  Smiley, 
+  Sparkle, 
+  Tag, 
+  Target, 
+  UserPlus, 
+  CaretRight 
+} from '@phosphor-icons/react';
 import { motion } from 'motion/react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -22,37 +34,27 @@ export const Home: React.FC = () => {
   const [dailyPrompt, setDailyPrompt] = useState(DEFAULT_WELLNESS_PROMPTS[0]);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Snappy duration for post-save landing, otherwise standard cinematic 700ms
-  const entranceDuration = isFromSave ? 0.3 : 0.7;
+  const entranceDuration = isFromSave ? 0.3 : 0.8;
 
   useEffect(() => {
-    // Randomize initial prompt
     setDailyPrompt(DEFAULT_WELLNESS_PROMPTS[Math.floor(Math.random() * DEFAULT_WELLNESS_PROMPTS.length)]);
+    const hasSeen = localStorage.getItem('hasSeenOnboarding');
+    if (!hasSeen) setShowOnboarding(true);
   }, []);
 
   const refreshPrompt = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (isRefreshing) return;
-
     setIsRefreshing(true);
     let next;
     do {
       next = DEFAULT_WELLNESS_PROMPTS[Math.floor(Math.random() * DEFAULT_WELLNESS_PROMPTS.length)];
     } while (next === dailyPrompt);
-
-    // Artificial delay to make it feel like it's "refreshing"
     setTimeout(() => {
       setDailyPrompt(next);
       setIsRefreshing(false);
     }, 600);
   };
-
-  useEffect(() => {
-    const hasSeen = localStorage.getItem('hasSeenOnboarding');
-    if (!hasSeen) {
-      setShowOnboarding(true);
-    }
-  }, []);
 
   const handleCloseOnboarding = () => {
     localStorage.setItem('hasSeenOnboarding', 'true');
@@ -67,208 +69,150 @@ export const Home: React.FC = () => {
           const count = await noteService.getCount();
           setNoteCount(count);
         } catch (error) {
-          console.error('Failed to fetch note count:', error);
           setNoteCount(0);
         } finally {
           setIsCountLoading(false);
         }
       }
     };
-
     fetchCount();
-
-    // Real-time subscription to update count automatically
-    const channel = supabase
-      .channel('note-count-updates')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'notes',
-        },
-        () => {
-          fetchCount();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+    const channel = supabase.channel('note-count-updates').on('postgres_changes', { event: '*', schema: 'public', table: 'notes' }, () => fetchCount()).subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user]);
 
   const handleCreateClick = (promptOrEvent?: string | React.MouseEvent) => {
-    if (isAuthenticated) {
-      if (typeof promptOrEvent === 'string') {
-        navigate(RoutePath.CREATE_NOTE, { state: { initialPrompt: promptOrEvent } });
-      } else {
-        navigate(RoutePath.CREATE_NOTE);
-      }
+    if (!isAuthenticated) return navigate(RoutePath.LOGIN);
+    if (typeof promptOrEvent === 'string') {
+      navigate(RoutePath.CREATE_NOTE, { state: { initialPrompt: promptOrEvent } });
     } else {
-      navigate(RoutePath.LOGIN);
+      navigate(RoutePath.CREATE_NOTE);
     }
   };
 
-  const handleViewAllClick = () => {
-    if (isAuthenticated) {
-      navigate(RoutePath.NOTES);
-    } else {
-      navigate(RoutePath.LOGIN);
-    }
-  };
-
-  if (!isAuthenticated) {
-    return <Landing />;
-  }
+  if (!isAuthenticated) return <Landing />;
 
   return (
     <>
-      <div className={`fade-in`} style={{ animationDuration: `${entranceDuration}s` }} {...((showOnboarding ? { inert: "" } : {}) as any)}>
-      {/* Hero Section - Cinematic Hero with 3D Float */}
-      <section className="relative flex flex-col items-center justify-start pt-0 pb-16 sm:pb-24 px-6 sm:px-10 overflow-hidden border-b-2 border-border min-h-[400px] sm:min-h-[500px]">
-        {/* Hero Video Background */}
-        <video
-          src="/assets/videos/user_hero.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover object-bottom z-0"
-        />
-
-        {/* Cinematic Overlay for Visibility */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/40 to-transparent z-0"></div>
-
-        {/* Floating Text Container */}
-        <motion.div
-          animate={{ 
-            y: [-5, 5, -5],
-            scale: isFromSave ? [1, 1.02, 1] : 1,
-            opacity: isFromSave ? [0, 1] : 1
-          }}
-          transition={{ 
-            y: { repeat: Infinity, duration: 4, ease: "easeInOut" },
-            scale: { duration: 1, ease: "easeOut" },
-            opacity: { duration: entranceDuration }
-          }}
-          className="relative z-10 flex flex-col gap-32 sm:gap-48 items-center text-center max-w-2xl w-full pt-[110px] sm:pt-[160px]"
-        >
-          <h1
-            className="font-display text-[36px] sm:text-[52px] lg:text-[64px] tracking-tighter leading-none px-2"
-            style={{ 
-              color: '#ffffff', 
-              textShadow: isFromSave ? '0 0 20px rgba(255,255,255,0.4), 0 4px 12px rgba(0,0,0,0.8)' : '0 4px 12px rgba(0,0,0,0.8)' 
-            }}
-          >
-            Welcome back, {user?.name?.split(' ')[0] || 'learner'}
-          </h1>
-          <Button
-            variant="primary"
-            size="lg"
-            className="h-[56px] sm:h-[64px] px-8 sm:px-12 text-[16px] sm:text-[18px] font-bold rounded-2xl shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart liquid-glass group"
-            onClick={() => handleCreateClick()}
-          >
-            <PlusCircle className="mr-3 group-hover:rotate-90 transition-transform duration-300" />
-            New entry
-          </Button>
-        </motion.div>
-      </section>
-
-      {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 border-t-2 border-border">
-
-        {/* Panel 1: Stats & Overview - Now Clickable */}
-        <div className="p-6 sm:p-10 border-b-2 border-border lg:border-r-2 border-border">
-          <div className="panel-label">Emotional Overview</div>
-          <div className="flex flex-col gap-6">
-            <div
-              className="flex flex-col gap-6 bg-white border-2 border-border rounded-[32px] p-8 shadow-sm hover:shadow-none hover:scale-[1.02] transition-all duration-300 ease-out-quart liquid-glass cursor-pointer group"
-              onClick={() => navigate(RoutePath.NOTES)}
+      <div className="relative min-h-screen bg-body" {...((showOnboarding ? { "aria-hidden": "true" } : {}) as any)}>
+        
+        {/* Cinematic Hero */}
+        <section className="relative w-full h-[60vh] min-h-[500px] overflow-hidden">
+          <video
+            src="/assets/videos/user_hero.mp4"
+            autoPlay loop muted playsInline
+            className="absolute inset-0 w-full h-full object-cover object-center z-0 scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-body via-body/40 to-transparent z-10" />
+          
+          <div className="relative z-20 h-full flex flex-col items-center justify-center text-center px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: entranceDuration, ease: [0.32, 0.72, 0, 1] }}
+              className="max-w-4xl"
             >
-              <div className="flex items-center justify-between">
-                <div className="h-14 w-14 rounded-2xl bg-blue/10 flex items-center justify-center text-blue shadow-sm group-hover:scale-110 transition-transform">
-                  <FolderOpen size={28} />
+              <h1 className="font-display tracking-tighter leading-none text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.5)] mb-12" style={{ fontSize: 'clamp(40px, 7vw, 92px)' }}>
+                Welcome back, <br />
+                <span className="font-serif italic text-green drop-shadow-[0_4px_24px_rgba(0,0,0,0.5)]">{user?.name?.split(' ')[0] || 'Reflector'}</span>
+              </h1>
+              
+              <button
+                onClick={() => handleCreateClick()}
+                className="group flex items-center gap-6 pl-8 pr-3 py-3 rounded-full bg-white dark:bg-[#1E1E1E] border border-black/5 dark:border-white/5 text-gray-text shadow-xl backdrop-blur-xl text-[18px] font-bold transition-all duration-700 hover:scale-[1.02] active:scale-[0.98] mx-auto"
+              >
+                Capture a thought
+                <div className="w-12 h-12 rounded-full bg-green text-white flex items-center justify-center transition-transform duration-700 group-hover:rotate-90">
+                  <Plus size={24} weight="bold" />
                 </div>
-                <div className="flex items-center gap-2 text-[11px] font-black text-blue tracking-wide opacity-0 group-hover:opacity-100 transition-opacity">
-                  View all <ArrowRight size={12} />
-                </div>
-              </div>
-              <div className="flex flex-col gap-2">
-                <h3 className="text-[14px] font-bold text-gray-nav">Total reflections</h3>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-[40px] font-display text-gray-text">
-                    {isCountLoading ? '...' : noteCount ?? '0'}
-                  </span>
-                  <span className="text-[12px] font-extrabold text-green">Synced with cloud</span>
-                </div>
-              </div>
-            </div>
+              </button>
+            </motion.div>
+          </div>
+        </section>
 
-            <div
-              className="flex flex-col gap-6 bg-white border-2 border-border rounded-[32px] p-8 shadow-sm hover:shadow-none hover:scale-[1.02] transition-all duration-300 ease-out-quart liquid-glass cursor-pointer group"
-              onClick={() => navigate(RoutePath.INSIGHTS)}
-            >
-              <div className="flex items-center justify-between">
-                <div className="h-14 w-14 rounded-2xl bg-green/10 flex items-center justify-center text-green shadow-sm group-hover:scale-110 transition-transform">
-                  <Brain size={28} />
-                </div>
-                <div className="flex items-center gap-2 text-[11px] font-black text-green tracking-wide opacity-0 group-hover:opacity-100 transition-opacity">
-                  Get insights <ArrowRight size={12} />
+        {/* Interlocking Bento Grid */}
+        <section className="grid grid-cols-1 lg:grid-cols-12 border-t-2 border-border">
+          
+          {/* Panel 1: Stats & Overview */}
+          <div className="lg:col-span-7 p-6 sm:p-12 border-b-2 lg:border-b-0 lg:border-r-2 border-border">
+            <div className="panel-label mb-10">Sanctuary Overview</div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div 
+                onClick={() => navigate(RoutePath.NOTES)}
+                className="bezel-outer group cursor-pointer"
+              >
+                <div className="bezel-inner p-8 flex flex-col justify-between min-h-[240px]">
+                  <div className="flex justify-between items-start">
+                    <div className="w-14 h-14 rounded-2xl bg-blue/5 text-blue flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                      <FolderOpen size={32} weight="duotone" />
+                    </div>
+                    <CaretRight size={20} weight="bold" className="text-gray-nav opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                  <div>
+                    <h3 className="text-[14px] font-black uppercase tracking-widest text-gray-nav mb-2">Total reflections</h3>
+                    <div className="flex items-baseline gap-3">
+                      <span className="text-[48px] font-display text-gray-text leading-none">
+                        {isCountLoading ? '...' : noteCount ?? '0'}
+                      </span>
+                      <span className="text-[12px] font-bold text-green">Cloud Active</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="flex flex-col gap-2">
-                <h3 className="text-[14px] font-bold text-gray-nav">Mental health insights</h3>
-                <p className="text-[15px] text-gray-light font-medium leading-relaxed">AI is ready to analyze your patterns and provide compassionate feedback.</p>
+
+              <div 
+                onClick={() => navigate(RoutePath.INSIGHTS)}
+                className="bezel-outer group cursor-pointer"
+              >
+                <div className="bezel-inner p-8 flex flex-col justify-between min-h-[240px]">
+                  <div className="flex justify-between items-start">
+                    <div className="w-14 h-14 rounded-2xl bg-green/5 text-green flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                      <Brain size={32} weight="duotone" />
+                    </div>
+                    <CaretRight size={20} weight="bold" className="text-gray-nav opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                  <div>
+                    <h3 className="text-[14px] font-black uppercase tracking-widest text-gray-nav mb-2">Patterns</h3>
+                    <p className="text-[15px] font-medium text-gray-light leading-snug">AI Librarian is analyzing your growth.</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Panel 2: Daily Mindfulness */}
-        <div className="p-6 sm:p-10 lg:border-l-2 border-border flex flex-col justify-center">
-          <div className="panel-label">Daily Mindfulness</div>
-          <div className="group relative overflow-hidden bg-white border-2 border-border rounded-[32px] p-8 shadow-sm liquid-glass flex flex-col gap-8">
-            <div className="relative z-10 flex flex-col gap-6">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue/10 text-blue border-2 border-border/30">
-                    <Target size={20} />
+          {/* Panel 2: Daily Prompt */}
+          <div className="lg:col-span-5 p-6 sm:p-12 flex flex-col justify-center">
+            <div className="panel-label mb-10">Daily Mindfulness</div>
+            
+            <div className="bezel-outer group h-full">
+              <div className="bezel-inner p-10 flex flex-col gap-8 h-full">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-blue/5 text-blue flex items-center justify-center">
+                      <Target size={24} weight="bold" />
+                    </div>
+                    <span className="text-[13px] font-black uppercase tracking-widest text-gray-nav">Today's Focus</span>
                   </div>
-                  <div className="flex flex-col">
-                    <h4 className="text-[13px] font-bold text-gray-nav tracking-tight">Today's focus</h4>
-                    <p className="text-[11px] text-gray-light font-bold lowercase opacity-70">A small nudge for today</p>
-                  </div>
+                  <button 
+                    onClick={refreshPrompt}
+                    className={`w-10 h-10 rounded-xl border border-border flex items-center justify-center text-gray-nav hover:text-blue hover:border-blue/30 transition-all ${isRefreshing ? 'opacity-50' : 'opacity-100'}`}
+                  >
+                    <ArrowsClockwise size={20} className={isRefreshing ? 'animate-spin' : ''} />
+                  </button>
                 </div>
-                <button
-                  onClick={refreshPrompt}
-                  className={`flex h-10 w-10 items-center justify-center rounded-2xl bg-white/50 border-2 border-border text-gray-nav shadow-sm hover:text-blue hover:border-blue/30 transition-all duration-300 ease-out-quart ${isRefreshing ? 'opacity-50' : 'opacity-100'}`}
-                  title="Refresh Prompt"
-                  disabled={isRefreshing}
-                >
-                  <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} />
-                </button>
-              </div>
 
-              <div className="py-2">
-                <p 
-                  className="text-[17px] sm:text-[18px] text-gray-text leading-relaxed font-italic"
-                  style={{ 
-                    fontFamily: 'var(--font-editor)',
-                    fontStyle: 'italic',
-                    opacity: isRefreshing ? 0 : 1,
-                    transition: 'opacity 0.3s ease'
-                  }}
-                >
-                  "{dailyPrompt}"
-                </p>
-              </div>
+                <div className="flex-grow flex items-center">
+                  <p 
+                    className="text-[22px] sm:text-[26px] text-gray-text font-serif italic leading-relaxed"
+                    style={{ opacity: isRefreshing ? 0 : 1, transition: 'opacity 0.3s ease' }}
+                  >
+                    "{dailyPrompt}"
+                  </p>
+                </div>
 
-              <div>
                 <Button
-                  variant="secondary"
-                  size="lg"
-                  className="w-full border-2 border-border bg-white text-blue font-extrabold shadow-sm sm:w-auto h-12 rounded-2xl active:scale-[0.98] transition-all"
+                  variant="primary"
+                  className="w-full h-14 rounded-2xl text-[16px] font-bold liquid-glass"
                   onClick={() => handleCreateClick(dailyPrompt)}
                 >
                   Start writing
@@ -276,89 +220,52 @@ export const Home: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        </section>
 
       </div>
 
-      {/* Onboarding Modal */}
+      {/* Onboarding Modal Refactor */}
       {showOnboarding && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-dark-blue/40 backdrop-blur-sm p-4 animate-in fade-in duration-300">
-          <div className="relative w-full max-w-lg space-y-6 rounded-[32px] border-2 border-border bg-white p-8 shadow-sm overflow-hidden liquid-glass">
-            <div className="absolute top-[-20%] right-[-10%] w-[200px] h-[200px] bg-green/10 blur-[60px] rounded-full pointer-events-none" />
-            <div className="absolute bottom-[-10%] left-[-10%] w-[200px] h-[200px] bg-blue/10 blur-[60px] rounded-full pointer-events-none" />
-
-            {/* Dark Mode Toggle for Onboarding */}
-            <button
-              onClick={() => {
-                if (document.documentElement.classList.contains('dark')) {
-                  document.documentElement.classList.remove('dark');
-                } else {
-                  document.documentElement.classList.add('dark');
-                }
-              }}
-              className="absolute top-6 right-6 p-2 rounded-xl text-gray-nav hover:text-green hover:bg-green/5 transition-colors z-20 border-2 border-border bg-white/50 backdrop-blur-md"
-              title="Toggle Dark Mode"
-            >
-              <Sparkles size={18} />
-            </button>
-
-            <div className="relative z-10 flex flex-col gap-8">
-              <h2 className="text-[32px] font-display text-gray-text">Welcome to Reflections</h2>
-              <p className="text-[15px] text-gray-light font-medium leading-relaxed">
-                Your intelligent companion for mental wellness and journaling. Here's what you can do:
-              </p>
-
-              <div className="flex flex-col gap-6">
-                <div className="flex gap-4">
-                  <div className="h-12 w-12 shrink-0 rounded-2xl bg-green/10 flex items-center justify-center text-green shadow-sm border-2 border-border">
-                    <Sparkles size={24} />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <h3 className="text-[16px] font-bold text-gray-text">Ai reflection</h3>
-                    <p className="text-[14px] text-gray-light font-medium leading-relaxed">
-                      Get personalized insights, compassionate feedback, and dynamic prompts based on your entries.
-                    </p>
-                  </div>
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-body/80 backdrop-blur-xl animate-in fade-in duration-500">
+          <div className="bezel-outer max-w-xl w-full">
+            <div className="bezel-inner p-10 flex flex-col gap-10">
+              <div className="flex justify-between items-start">
+                <h2 className="text-[36px] font-display tracking-tight text-gray-text leading-none">Your Sanctuary.</h2>
+                <div className="w-12 h-12 rounded-full bg-green/10 text-green flex items-center justify-center">
+                  <Sparkle size={28} weight="fill" />
                 </div>
+              </div>
 
-                <div className="flex gap-4">
-                  <div className="h-12 w-12 shrink-0 rounded-2xl bg-blue/10 flex items-center justify-center text-blue shadow-sm border-2 border-border">
-                    <Smile size={24} />
+              <div className="space-y-8">
+                {[
+                  { icon: Brain, title: "AI Reflection", desc: "Compassionate mirrors for your thoughts.", color: "text-green" },
+                  { icon: Smiley, title: "Mood Tracking", desc: "Understand your emotional rhythms.", color: "text-blue" },
+                  { icon: Tag, title: "Smart Organization", desc: "Find clarity in the chaos.", color: "text-purple-500" }
+                ].map((f, i) => (
+                  <div key={i} className="flex gap-6">
+                    <div className={`w-12 h-12 rounded-2xl bg-white/5 border border-border flex items-center justify-center shrink-0 ${f.color}`}>
+                      <f.icon size={24} weight="bold" />
+                    </div>
+                    <div>
+                      <h4 className="text-[16px] font-bold text-gray-text mb-1">{f.title}</h4>
+                      <p className="text-[14px] font-medium text-gray-light leading-relaxed">{f.desc}</p>
+                    </div>
                   </div>
-                  <div className="flex flex-col gap-1">
-                    <h3 className="text-[16px] font-bold text-gray-text">Mood tracking</h3>
-                    <p className="text-[14px] text-gray-light font-medium leading-relaxed">
-                      Log your emotions with each entry and visualize your mood trends over time on your calendar.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <div className="h-12 w-12 shrink-0 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-500 shadow-sm border-2 border-border">
-                    <Tag size={24} />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <h3 className="text-[16px] font-bold text-gray-text">Smart organization</h3>
-                    <p className="text-[14px] text-gray-light font-medium leading-relaxed">
-                      Add custom tags to your notes to easily filter and find your thoughts later.
-                    </p>
-                  </div>
-                </div>
+                ))}
               </div>
 
               <Button
                 variant="primary"
-                className="w-full h-[56px] text-[16px] font-bold rounded-xl shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart liquid-glass"
+                className="w-full h-16 rounded-2xl text-[18px] font-bold"
                 onClick={handleCloseOnboarding}
               >
-                Let's get started
+                Let's begin
               </Button>
             </div>
           </div>
         </div>
       )}
-      {/* Ambient Music — scroll-locked floating button */}
+
       <div style={{ position: 'fixed', bottom: '24px', right: '20px', zIndex: 8000 }}>
         <AmbientMusicButton />
       </div>

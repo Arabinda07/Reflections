@@ -134,7 +134,7 @@ body {
   color: var(--gray-text);
   background-color: var(--bg-color);
   font-weight: 400;
-  transition: background-color var(--transition-speed) var(--ease-out-expo), color var(--transition-speed) var(--ease-out-expo);
+  transition: background-color 0.8s cubic-bezier(0.32, 0.72, 0, 1), color 0.8s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 /* Impeccable Design: Strict Focus Rings */
@@ -150,6 +150,42 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 }
 
 @layer components {
+  /* Double-Bezel Architecture (Nested Shells) */
+  .bezel-outer {
+    padding: 1px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(0, 0, 0, 0.04));
+    border-radius: 32px;
+    box-shadow: 
+      0 12px 40px -12px rgba(0, 0, 0, 0.12),
+      0 2px 4px -1px rgba(0, 0, 0, 0.04);
+    transition: all 0.6s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .dark .bezel-outer {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.2));
+    box-shadow: 
+      0 20px 50px -12px rgba(0, 0, 0, 0.5),
+      0 4px 8px -2px rgba(0, 0, 0, 0.3);
+  }
+
+  .bezel-inner {
+    background: var(--panel-bg);
+    border-radius: 31px; /* R_outer - Padding */
+    border: 1.5px solid var(--border-color);
+    height: 100%;
+    width: 100%;
+  }
+
+  /* Grain Texture Utility */
+  .grain-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.045;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
   .liquid-glass {
     background: rgba(var(--panel-bg-rgb, 255, 255, 255), 0.01);
     background-blend-mode: luminosity;

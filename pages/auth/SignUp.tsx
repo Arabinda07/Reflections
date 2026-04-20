@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, UserPlus } from 'lucide-react';
+import { Envelope, Lock, User, UserPlus } from '@phosphor-icons/react';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { RoutePath } from '../../types';
@@ -77,16 +77,16 @@ export const SignUp: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-body p-6 transition-colors duration-300">
-      <div className="w-full max-w-[420px] bg-white border-2 border-border rounded-[32px] p-8 sm:p-10 shadow-sm liquid-glass dark:shadow-2xl">
-        <div className="flex flex-col items-center">
-          <div className="mb-6 h-[80px] w-[80px] flex items-center justify-center rounded-2xl bg-green text-white shadow-sm">
-             <UserPlus size={40} strokeWidth={2.5} />
+      <div className="w-full max-w-[420px] bezel-outer">
+        <div className="bezel-inner flex flex-col items-center p-8 sm:p-10">
+          <div className="mb-6 h-[80px] w-[80px] flex items-center justify-center rounded-2xl bg-green/10 text-green shadow-sm border border-border">
+             <UserPlus size={40} weight="duotone" />
           </div>
 
           <h1 className="font-display text-[32px] text-gray-text mb-2">
             Create account
           </h1>
-          <p className="text-[15px] font-bold text-gray-light text-center mb-8">
+          <p className="text-[15px] font-medium text-gray-light text-center mb-8">
             Start your journey to a clearer mind.
           </p>
         
@@ -108,7 +108,7 @@ export const SignUp: React.FC = () => {
               autoComplete="email" 
               required
               placeholder="Enter your email" 
-              icon={Mail}
+              icon={Envelope}
             />
             <Input 
               id="password" 
@@ -138,9 +138,9 @@ export const SignUp: React.FC = () => {
           </form>
 
           <div className="my-8 flex w-full items-center gap-4">
-            <div className="h-[2px] flex-1 bg-border" />
-            <span className="text-[13px] font-bold text-gray-nav">Or</span>
-            <div className="h-[2px] flex-1 bg-border" />
+            <div className="h-[1px] flex-1 bg-border" />
+            <span className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Or</span>
+            <div className="h-[1px] flex-1 bg-border" />
           </div>
 
           <Button 
@@ -148,10 +148,10 @@ export const SignUp: React.FC = () => {
             type="button"
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="w-full h-[52px] gap-3 border-2 border-border dark:border-white/10 dark:bg-white/5"
+            className="w-full h-[52px] gap-3"
           >
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="h-5 w-5" alt="Google" />
-            <span className="text-blue dark:text-sky-400 font-bold">Continue with Google</span>
+            <span className="font-bold text-gray-text">Continue with Google</span>
           </Button>
 
           <p className="mt-8 text-[15px] font-bold text-gray-light">

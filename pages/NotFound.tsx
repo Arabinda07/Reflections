@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from '@phosphor-icons/react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import errorData from '@/src/lottie/error-404.json';
 import { Button } from '../components/ui/Button';
@@ -23,7 +23,7 @@ export const NotFound: React.FC = () => {
         It's hiding in the quiet space between thoughts. Let's head back to the sanctuary.
       </p>
       <Button variant="primary" size="lg" onClick={() => navigate(RoutePath.HOME)} className="rounded-2xl border-2 border-border shadow-sm px-8 font-black">
-        <ArrowLeft size={18} className="mr-2" />
+        <ArrowLeft size={18} weight="bold" className="mr-2" />
         Return home
       </Button>
     </div>

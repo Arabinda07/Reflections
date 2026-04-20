@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { storageService } from '../../services/storageService';
-import { Loader2, ImageOff } from 'lucide-react';
+import { CircleNotch, Image as ImageSquare } from '@phosphor-icons/react';
 
 interface StorageImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   path?: string | null;
@@ -54,16 +54,16 @@ export const StorageImage: React.FC<StorageImageProps> = ({
 
   if (loading && showLoading) {
     return (
-      <div className={`flex items-center justify-center bg-slate-100 ${className}`}>
-        <Loader2 className="animate-spin text-slate-300" size={20} />
+      <div className={`flex items-center justify-center bg-gray-50/5 dark:bg-white/5 ${className}`}>
+        <CircleNotch className="animate-spin text-gray-nav" size={20} weight="bold" />
       </div>
     );
   }
 
   if (!src) {
      return (
-       <div className={`flex items-center justify-center bg-slate-100 text-slate-300 ${className}`}>
-         <ImageOff size={24} />
+       <div className={`flex items-center justify-center bg-gray-50/5 dark:bg-white/5 text-gray-nav ${className}`}>
+         <ImageSquare size={24} weight="duotone" />
        </div>
      );
   }
