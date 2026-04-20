@@ -11,8 +11,8 @@ import {
   UserPlus, 
   CaretRight 
 } from '@phosphor-icons/react';
-import { motion } from 'motion/react';
-import React, { useEffect, useState } from 'react';
+import { motion, animate } from 'motion/react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { useAuth } from '../../context/AuthContext';
@@ -30,6 +30,7 @@ export const Home: React.FC = () => {
   const isFromSave = location.state?.fromSave;
   const { isAuthenticated, user } = useAuth();
   const [noteCount, setNoteCount] = useState<number | null>(null);
+  const [displayCount, setDisplayCount] = useState<number | string>('...');
   const [isCountLoading, setIsCountLoading] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [dailyPrompt, setDailyPrompt] = useState(DEFAULT_WELLNESS_PROMPTS[0]);
@@ -43,7 +44,7 @@ export const Home: React.FC = () => {
     if (!hasSeen) setShowOnboarding(true);
   }, []);
 
-  const refreshPrompt = (e: React.MouseEvent) => {
+  const refreshPrompt = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     if (isRefreshing) return;
     setIsRefreshing(true);
@@ -55,7 +56,20 @@ export const Home: React.FC = () => {
       setDailyPrompt(next);
       setIsRefreshing(false);
     }, 600);
-  };
+  }, [dailyPrompt, isRefreshing]);
+
+  useEffect(() => {
+    if (noteCount !== null && typeof noteCount === 'number') {
+      const controls = animate(0, noteCount, {
+        duration: 2,
+        ease: [0.16, 1, 0.3, 1],
+        onUpdate(value) {
+          setDisplayCount(Math.round(value));
+        }
+      });
+      return () => controls.stop();
+    }
+  }, [noteCount]);
 
   const handleCloseOnboarding = () => {
     localStorage.setItem('hasSeenOnboarding', 'true');
@@ -101,9 +115,10 @@ export const Home: React.FC = () => {
           <motion.video
             initial={{ scale: 1.1, filter: 'blur(10px) brightness(0.8)' }}
             animate={{ scale: 1.0, filter: 'blur(0px) brightness(1)' }}
-            transition={{ duration: 1.5, ease: [0.32, 0.72, 0, 1] }}
+            transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
             src="/assets/videos/field.mp4"
-            autoPlay loop muted playsInline
+            poster="/assets/videos/field.png"
+            autoPlay loop muted playsInline preload="metadata"
             className="absolute inset-0 w-full h-full object-cover object-center z-0"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-body via-body/20 to-transparent z-10" />
@@ -112,7 +127,7 @@ export const Home: React.FC = () => {
             <motion.div
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: entranceDuration + 0.2, ease: [0.32, 0.72, 0, 1] }}
+              transition={{ duration: entranceDuration + 0.2, ease: [0.16, 1, 0.3, 1] }}
               className="max-w-4xl"
             >
               <h1 className="h1-hero drop-shadow-[0_8px_32px_rgba(0,0,0,0.3)] mb-12" style={{ color: '#FFFFFF' }}>
@@ -131,10 +146,11 @@ export const Home: React.FC = () => {
             <div className="label-caps mb-16 opacity-50">Sanctuary Overview</div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              <div 
-                onClick={() => navigate(RoutePath.NOTES)}
-                className="group cursor-pointer transition-all duration-700"
-              >
+              <Magnetic strength={10}>
+                <div 
+                  onClick={() => navigate(RoutePath.NOTES)}
+                  className="group cursor-pointer transition-all duration-700"
+                >
                 <div className="flex flex-col justify-between min-h-[200px]">
                   <div className="flex justify-between items-start mb-8">
                     <div className="w-16 h-16 rounded-3xl bg-green/5 text-green flex items-center justify-center group-hover:scale-110 group-hover:bg-green group-hover:text-white transition-all duration-700 ease-spring-smooth">
@@ -145,7 +161,7 @@ export const Home: React.FC = () => {
                   <div>
                     <span className="text-[12px] font-black uppercase tracking-widest text-gray-nav/40">Total Reflections</span>
                     <h2 className="text-[48px] font-display text-gray-text leading-none mt-2">
-                      {isCountLoading ? '...' : noteCount}
+                      {isCountLoading ? '...' : displayCount}
                     </h2>
                     <div className="flex items-center gap-2 px-3 py-1 mt-4 rounded-full bg-green/10 text-green text-[10px] font-black uppercase tracking-widest">
                       <div className="w-1 h-1 rounded-full bg-green animate-pulse" />
@@ -153,12 +169,14 @@ export const Home: React.FC = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+                </div>
+              </Magnetic>
 
-              <div 
-                onClick={() => navigate(RoutePath.INSIGHTS)}
-                className="group cursor-pointer transition-all duration-700"
-              >
+              <Magnetic strength={10}>
+                <div 
+                  onClick={() => navigate(RoutePath.INSIGHTS)}
+                  className="group cursor-pointer transition-all duration-700"
+                >
                 <div className="flex flex-col justify-between min-h-[200px]">
                   <div className="flex justify-between items-start mb-8">
                     <div className="w-16 h-16 rounded-3xl bg-green/5 text-green flex items-center justify-center group-hover:scale-110 group-hover:bg-green group-hover:text-white transition-all duration-700 ease-spring-smooth">
@@ -171,7 +189,8 @@ export const Home: React.FC = () => {
                     <p className="text-[18px] font-serif italic text-gray-light leading-snug">AI Librarian is analyzing your growth.</p>
                   </div>
                 </div>
-              </div>
+                </div>
+              </Magnetic>
             </div>
           </div>
 

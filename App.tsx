@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { PWAInstallProvider } from './context/PWAInstallContext';
@@ -29,9 +29,26 @@ const PageLoader = () => (
   </div>
 );
 
-// Wrapper to initialize hooks inside Context
+// Wrapper to initialize hooks inside Context and handle preloading
 const SyncWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   useSync();
+  
+  useEffect(() => {
+    // Optimistically preload critical routes after initial paint
+    const preloadRoutes = () => {
+      import('./pages/dashboard/Home');
+      import('./pages/dashboard/CreateNote');
+      import('./pages/dashboard/FAQ');
+    };
+    
+    // Defer preloading until the main thread is idle
+    if (window.requestIdleCallback) {
+      window.requestIdleCallback(preloadRoutes);
+    } else {
+      setTimeout(preloadRoutes, 2000);
+    }
+  }, []);
+
   return <>{children}</>;
 };
 

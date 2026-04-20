@@ -34,13 +34,20 @@ const staggerContainer = {
 
 const staggerItem = {
   hidden: { opacity: 0, y: 30 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.32, 0.72, 0, 1] } },
+  show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } },
 };
 
 export const FAQ: React.FC = () => {
   const navigate = useNavigate();
   const journeyRef = useRef<HTMLDivElement>(null);
   
+  const { scrollYProgress } = useScroll({
+    target: journeyRef,
+    offset: ["start end", "end start"]
+  });
+  const y1 = useTransform(scrollYProgress, [0, 1], [0, -30]);
+  const y2 = useTransform(scrollYProgress, [0, 1], [0, -60]);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -55,11 +62,11 @@ export const FAQ: React.FC = () => {
             <motion.div 
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1] }}
+              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
             >
               <h1 className="text-mk-display font-display tracking-tight text-gray-text mb-10">
                 Frequently <br />
-                <span className="font-serif italic text-green">Asked Questions</span>
+                <span className="font-serif italic text-green">Asked Questions.</span>
               </h1>
               
               <p className="text-mk-body font-serif text-gray-light max-w-2xl">
@@ -130,11 +137,12 @@ export const FAQ: React.FC = () => {
                 variants={staggerItem}
                 initial="hidden"
                 whileInView="show"
+                style={{ y: i % 2 === 0 ? y1 : y2 }}
                 viewport={{ once: true, margin: "-50px" }}
                 className={`${item.gridSpan} bezel-outer group`}
               >
-                <div className="bezel-inner p-8 flex flex-col h-full min-h-[280px]">
-                  <div className={`w-12 h-12 rounded-2xl ${item.color} flex items-center justify-center mb-10 group-hover:scale-110 transition-transform duration-500`}>
+                <div className="bezel-inner p-8 flex flex-col h-full min-h-[280px] transition-colors duration-500 hover:bg-green/[0.02]">
+                  <div className={`w-12 h-12 rounded-2xl ${item.color} flex items-center justify-center mb-10 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 ease-out-expo`}>
                     <item.icon size={24} weight="light" />
                   </div>
                   <h3 className="text-[24px] font-display text-gray-text mb-4 leading-tight">{item.title}</h3>
@@ -161,8 +169,8 @@ export const FAQ: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
             {/* Privacy Card - Large */}
             <div className="md:col-span-8 bezel-outer group">
-              <div className="bezel-inner p-10 flex flex-col md:flex-row gap-10 items-center">
-                <div className="w-20 h-20 rounded-[32px] bg-green/5 text-green flex items-center justify-center shrink-0">
+              <div className="bezel-inner p-10 flex flex-col md:flex-row gap-10 items-center transition-colors duration-500 hover:bg-green/[0.02]">
+                <div className="w-20 h-20 rounded-[32px] bg-green/5 text-green flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 ease-out-expo">
                   <ShieldCheck size={40} weight="light" />
                 </div>
                 <div>
@@ -179,8 +187,8 @@ export const FAQ: React.FC = () => {
 
             {/* Visual Patterns - Small */}
             <div className="md:col-span-4 bezel-outer group">
-              <div className="bezel-inner p-10 flex flex-col justify-between">
-                <Heart size={32} weight="light" className="text-green mb-10" />
+              <div className="bezel-inner p-10 flex flex-col justify-between transition-colors duration-500 hover:bg-green/[0.02]">
+                <Heart size={32} weight="light" className="text-green mb-10 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 origin-bottom-left ease-out-expo" />
                 <div>
                   <h4 className="text-[22px] font-display text-gray-text mb-3">Visual patterns</h4>
                   <p className="text-mk-body font-serif text-gray-light">
@@ -192,8 +200,8 @@ export const FAQ: React.FC = () => {
 
             {/* Storage - Small */}
             <div className="md:col-span-4 bezel-outer group">
-              <div className="bezel-inner p-10 flex flex-col justify-between">
-                <Calendar size={32} weight="light" className="text-green mb-10" />
+              <div className="bezel-inner p-10 flex flex-col justify-between transition-colors duration-500 hover:bg-green/[0.02]">
+                <Calendar size={32} weight="light" className="text-green mb-10 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 origin-bottom-left ease-out-expo" />
                 <div>
                   <h4 className="text-[22px] font-display text-gray-text mb-3">Store what matters</h4>
                   <p className="text-mk-body font-serif text-gray-light">
@@ -205,12 +213,12 @@ export const FAQ: React.FC = () => {
 
             {/* Sanctuary Intelligence - Large */}
             <div className="md:col-span-8 bezel-outer group">
-              <div className="bezel-inner p-10 overflow-hidden relative">
+              <div className="bezel-inner p-10 overflow-hidden relative transition-colors duration-500 hover:bg-green/[0.02]">
                 {/* Decorative light leak */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-green/10 rounded-full blur-[80px] pointer-events-none" />
+                <div className="absolute top-0 right-0 w-64 h-64 bg-green/10 rounded-full blur-[80px] pointer-events-none transition-transform duration-1000 group-hover:scale-150" />
                 
                 <div className="relative z-10 flex flex-col md:flex-row gap-10">
-                  <div className="w-20 h-20 rounded-[32px] bg-green/5 text-green flex items-center justify-center shrink-0">
+                  <div className="w-20 h-20 rounded-[32px] bg-green/5 text-green flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-500 ease-out-expo">
                     <Brain size={40} weight="light" className="animate-pulse" />
                   </div>
                   <div>
@@ -246,13 +254,13 @@ export const FAQ: React.FC = () => {
             ].map((item, i) => (
               <motion.div 
                 key={i}
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
-                className="flex flex-col gap-6"
+                transition={{ delay: i * 0.05, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className="flex flex-col gap-6 group cursor-default"
               >
-                <div className="w-12 h-12 rounded-2xl bg-green/5 border border-green/10 flex items-center justify-center text-green group-hover:scale-110 transition-transform duration-500">
+                <div className="w-12 h-12 rounded-2xl bg-green/5 border border-green/10 flex items-center justify-center text-green group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 ease-out-expo">
                   <item.icon size={24} weight="light" />
                 </div>
                 <div>

@@ -12,7 +12,7 @@ const staggerContainer = {
 
 const staggerLine = {
   hidden: { opacity: 0, y: 60, filter: 'blur(10px)' },
-  show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 1.2, ease: [0.32, 0.72, 0, 1] } },
+  show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] } },
 };
 
 export const Landing: React.FC = () => {
@@ -47,13 +47,13 @@ export const Landing: React.FC = () => {
               animate="show"
               className="flex flex-col pointer-events-auto max-w-5xl text-mk-display font-display tracking-tight text-gray-text"
             >
-              <motion.span variants={staggerLine}>
+              <motion.span variants={staggerLine} style={{ willChange: 'transform, opacity, filter' }}>
                 Your mind,
               </motion.span>
-              <motion.span variants={staggerLine} className="font-serif italic text-green" style={{ lineHeight: 1.1 }}>
+              <motion.span variants={staggerLine} className="font-serif italic text-green" style={{ lineHeight: 1.1, willChange: 'transform, opacity, filter' }}>
                 beautifully
               </motion.span>
-              <motion.span variants={staggerLine}>
+              <motion.span variants={staggerLine} style={{ willChange: 'transform, opacity, filter' }}>
                 organized.
               </motion.span>
             </motion.div>
@@ -134,13 +134,14 @@ export const Landing: React.FC = () => {
           <video
             ref={videoRef}
             src="/assets/videos/landing_video.mp4"
+            poster="/assets/videos/landing_video.png"
             className="absolute inset-0 w-full h-full object-cover object-[52%_center] lg:object-center bg-body"
             style={{ opacity: 0.9 }}
             autoPlay
             loop
             muted={isMuted}
             playsInline
-            preload="auto"
+            preload="metadata"
           />
 
           <button
