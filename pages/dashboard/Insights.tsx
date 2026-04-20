@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Sparkles, Brain, Calendar, CheckSquare, Heart, Lock, TrendingUp, Loader2, MessageSquare, Crown, Book, ChevronRight, Hash, X } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { RoutePath, Note, LifeTheme } from '../../types';
 import { noteService } from '../../services/noteService';
-import { supabase } from '../../src/supabaseClient';
 import { wikiService } from '../../services/wikiService';
 
 // Flat soft colors — no gradients
@@ -29,10 +29,6 @@ const MOOD_BG: Record<string, string> = {
 export const Insights: React.FC = () => {
   const navigate = useNavigate();
   const [notes, setNotes] = useState<Note[]>([]);
-  
-  // Freemium States
-  const [isPro, setIsPro] = useState(false);
-  const [reflectionsUsed, setReflectionsUsed] = useState(0);
   const [themes, setThemes] = useState<LifeTheme[]>([]);
   const [selectedTheme, setSelectedTheme] = useState<LifeTheme | null>(null);
 
@@ -40,20 +36,13 @@ export const Insights: React.FC = () => {
     const fetchData = async () => {
       
       try {
-        const [allNotes, userResponse, allThemes] = await Promise.all([
+        const [allNotes, allThemes] = await Promise.all([
           noteService.getAll(),
-          supabase.auth.getUser(),
           wikiService.getAllThemes()
         ]);
-        
+
         setNotes(allNotes);
         setThemes(allThemes);
-        
-        if (userResponse.data.user) {
-          const meta = userResponse.data.user.user_metadata || {};
-          setIsPro(meta.is_pro || false);
-          setReflectionsUsed(meta.reflections_used || 0);
-        }
       } catch (error) {
       }
     };
@@ -124,16 +113,6 @@ export const Insights: React.FC = () => {
       taskProgress: totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0
     };
   }, [notes]);
-
-  const handleGenerateReflection = async () => {
-    // Note: We are migrating towards incremental background ingestion.
-    // For now, this button can act as a "Force Sync" or a trigger for a global audit
-    // but the actual Wiki is populated primarily through Note Saves.
-    navigate(RoutePath.CREATE_NOTE); // Encourage writing to grow the wiki
-  };
-
-
-
 
   return (
       <div className="mx-auto max-w-[1000px] pb-32 px-4 md:px-10">
