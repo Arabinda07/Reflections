@@ -34,22 +34,15 @@ export const MyNotes: React.FC = () => {
   const tagFilter = queryParams.get('tag');
 
   const fetchNotes = async () => {
-    // Minimum cinematic display time for the sanctuary loader
-    // If coming from a save, we skip the 2.5s floor for a snappier experience (0.5s floor)
-    const isFromSave = location.state?.fromSave;
-    const minTimePromise = new Promise(resolve => setTimeout(resolve, isFromSave ? 500 : 2500));
     try {
-      const [data] = await Promise.all([
-        noteService.getAll(),
-        minTimePromise
-      ]);
+      const data = await noteService.getAll();
       setNotes(data);
     } catch (error) {
       console.error("Failed to fetch notes", error);
     } finally {
       setLoading(false);
-      // Synchronize with LoadingState exit animation
-      setTimeout(() => setIsContentVisible(true), 400);
+      // Let animation play, or just set it to true immediately
+      setIsContentVisible(true);
     }
   };
 

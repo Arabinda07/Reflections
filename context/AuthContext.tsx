@@ -29,16 +29,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
   const [minTimeReached, setMinTimeReached] = useState(false);
 
-  // Minimum duration for the startup animation
+  // Remove artificial delay for startup animation
   useEffect(() => {
-    if (!showStartup) {
-      setMinTimeReached(true);
-      return;
-    }
-    const timer = setTimeout(() => {
-      setMinTimeReached(true);
-    }, 3500);
-    return () => clearTimeout(timer);
+    setMinTimeReached(true);
   }, [showStartup]);
 
   useEffect(() => {
