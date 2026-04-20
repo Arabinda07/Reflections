@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Sparkles, Brain, Calendar, CheckSquare, Heart, Lock, TrendingUp, Loader2, MessageSquare, Crown, Book, ChevronRight, Hash, X } from 'lucide-react';
+import { ArrowLeft, Sparkles, Brain, Calendar, CheckSquare, Heart, TrendingUp, Book, ChevronRight, Hash, X } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { RoutePath, Note, LifeTheme } from '../../types';
 import { noteService } from '../../services/noteService';
@@ -44,6 +44,7 @@ export const Insights: React.FC = () => {
         setNotes(allNotes);
         setThemes(allThemes);
       } catch (error) {
+        console.error('[Insights] Failed to load data:', error);
       }
     };
     fetchData();
