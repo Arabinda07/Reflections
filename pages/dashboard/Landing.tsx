@@ -37,81 +37,90 @@ export const Landing: React.FC = () => {
       <div className="min-h-[100dvh] w-full relative">
 
         {/* ── Left panel: content ── */}
-        <div className="relative z-20 flex flex-col justify-between min-h-[100dvh] px-6 pt-[70px] pb-12 sm:px-12 sm:pt-[90px] sm:pb-12 lg:px-16 lg:pt-[110px] lg:pb-12 xl:px-24 pointer-events-none">
+        <div className="relative z-20 flex flex-col justify-start lg:justify-center min-h-[100dvh] px-6 pt-[12vh] lg:pt-0 pb-24 sm:px-12 lg:px-16 xl:px-24 pointer-events-none">
 
-          {/* Hero headline — the one bold moment */}
-          <div className="flex flex-col gap-8 lg:gap-12 lg:w-[60%] xl:w-[55%]">
+          {/* Container grouping all text and actions */}
+          <div className="flex flex-col gap-10 lg:gap-12 lg:w-[60%] xl:w-[55%]">
+            
+            {/* Hero headline & Paragraph */}
+            <div className="flex flex-col gap-6 lg:gap-8">
+              <motion.div
+                variants={staggerContainer}
+                initial="hidden"
+                animate="show"
+                className="flex flex-col pointer-events-auto max-w-5xl text-mk-display font-display tracking-tight text-gray-text"
+              >
+                <motion.span variants={staggerLine} style={{ willChange: 'transform, opacity, filter' }}>
+                  Your mind,
+                </motion.span>
+                <motion.span variants={staggerLine} className="font-serif italic text-green" style={{ lineHeight: 1.1, willChange: 'transform, opacity, filter' }}>
+                  beautifully
+                </motion.span>
+                <motion.span variants={staggerLine} style={{ willChange: 'transform, opacity, filter' }}>
+                  organized.
+                </motion.span>
+              </motion.div>
+
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.5 }}
+                className="text-mk-body font-serif text-gray-text drop-shadow-md max-w-[44ch] pointer-events-auto"
+              >
+                A private, distraction-free environment designed to help you untangle your mind and find clarity in the noise.
+              </motion.p>
+            </div>
+
+            {/* Primary CTAs — Grouped naturally below text */}
             <motion.div
-              variants={staggerContainer}
-              initial="hidden"
-              animate="show"
-              className="flex flex-col pointer-events-auto max-w-5xl text-mk-display font-display tracking-tight text-gray-text"
-            >
-              <motion.span variants={staggerLine} style={{ willChange: 'transform, opacity, filter' }}>
-                Your mind,
-              </motion.span>
-              <motion.span variants={staggerLine} className="font-serif italic text-green" style={{ lineHeight: 1.1, willChange: 'transform, opacity, filter' }}>
-                beautifully
-              </motion.span>
-              <motion.span variants={staggerLine} style={{ willChange: 'transform, opacity, filter' }}>
-                organized.
-              </motion.span>
-            </motion.div>
-
-            <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.5 }}
-              className="text-mk-body font-serif text-gray-text drop-shadow-md max-w-[44ch] pointer-events-auto"
+              transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.6 }}
+              className="pointer-events-auto flex flex-col items-start sm:flex-row sm:items-center sm:flex-wrap gap-x-8 gap-y-6"
             >
-              A private, distraction-free environment designed to help you untangle your mind and find clarity in the noise.
-            </motion.p>
-          </div>
-
-          {/* Primary CTAs — Aligned to bottom horizontally */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.6 }}
-            className="pointer-events-auto flex flex-col items-start sm:flex-row sm:items-center sm:flex-wrap gap-x-8 gap-y-6"
-          >
-            <button
-              onClick={() => navigate(RoutePath.SIGNUP)}
-              className="group flex items-center gap-3 text-[16px] sm:text-[18px] font-black text-white bg-green hover:bg-green-hover px-8 py-4 rounded-full shadow-[0_8px_24px_-8px_rgba(22,163,74,0.4)] transition-all duration-300 pointer-events-auto"
-            >
-              Begin writing
-              <ArrowRight size={22} className="group-hover:translate-x-1.5 transition-transform duration-500 ease-out-expo" />
-            </button>
-
-            <button
-              onClick={() => navigate(RoutePath.LOGIN)}
-              className="text-[15px] font-medium text-gray-nav hover:text-gray-text transition-colors duration-300"
-            >
-              Sign in
-            </button>
-
-            <div className="w-[1px] h-4 bg-border hidden sm:block opacity-50" />
-
-            <button
-              onClick={() => navigate(RoutePath.FAQ)}
-              className="label-caps hover:text-gray-text transition-colors duration-300"
-            >
-              How it works
-            </button>
-
-            {canInstall && !isInstalled && (
-              <motion.button
-                onClick={triggerInstall}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1.2, duration: 0.5 }}
-                className="flex items-center gap-1.5 label-caps hover:text-gray-text transition-colors duration-300"
+              <button
+                onClick={() => navigate(RoutePath.SIGNUP)}
+                className="group flex items-center justify-center sm:justify-start gap-3 w-full sm:w-auto text-[16px] sm:text-[18px] font-black text-white bg-green hover:bg-green-hover px-8 py-4 rounded-full shadow-[0_8px_24px_-8px_rgba(22,163,74,0.4)] transition-all duration-300 pointer-events-auto"
               >
-                <DownloadSimple size={14} weight="light" />
-                Install app
-              </motion.button>
-            )}
-          </motion.div>
+                Begin writing
+                <ArrowRight size={22} className="group-hover:translate-x-1.5 transition-transform duration-500 ease-out-expo" />
+              </button>
+
+              <div className="flex items-center gap-6 sm:gap-8 w-full sm:w-auto px-2 sm:px-0">
+                <button
+                  onClick={() => navigate(RoutePath.LOGIN)}
+                  className="text-[15px] font-medium text-gray-nav hover:text-gray-text transition-colors duration-300"
+                >
+                  Sign in
+                </button>
+
+                <div className="w-[1px] h-4 bg-border opacity-50" />
+
+                <button
+                  onClick={() => navigate(RoutePath.FAQ)}
+                  className="label-caps hover:text-gray-text transition-colors duration-300"
+                >
+                  How it works
+                </button>
+
+                {canInstall && !isInstalled && (
+                  <>
+                    <div className="w-[1px] h-4 bg-border opacity-50 hidden sm:block" />
+                    <motion.button
+                      onClick={triggerInstall}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 1.2, duration: 0.5 }}
+                      className="flex items-center gap-1.5 label-caps hover:text-gray-text transition-colors duration-300"
+                    >
+                      <DownloadSimple size={14} weight="light" />
+                      Install app
+                    </motion.button>
+                  </>
+                )}
+              </div>
+            </motion.div>
+          </div>
         </div>
 
         {/* ── Background Video Layer ── */}
