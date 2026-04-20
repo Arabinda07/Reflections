@@ -62,7 +62,7 @@ export const Landing: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.5 }}
-              className="text-mk-body font-serif text-gray-light max-w-[44ch] pointer-events-auto"
+              className="text-mk-body font-serif text-gray-text drop-shadow-md max-w-[44ch] pointer-events-auto"
             >
               A private, distraction-free environment designed to help you untangle your mind and find clarity in the noise.
             </motion.p>

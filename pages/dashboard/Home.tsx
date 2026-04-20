@@ -145,51 +145,53 @@ export const Home: React.FC = () => {
           <div className="lg:col-span-8 p-8 sm:p-16 border-b lg:border-b-0 lg:border-r border-border">
             <div className="label-caps mb-16 opacity-50">Sanctuary Overview</div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div className="flex flex-col gap-16">
               <Magnetic strength={10}>
-                <div 
+                <button 
                   onClick={() => navigate(RoutePath.NOTES)}
-                  className="group cursor-pointer transition-all duration-700"
+                  className="group w-full text-left transition-all duration-700 flex flex-col md:flex-row items-start md:items-end justify-between gap-8"
                 >
-                <div className="flex flex-col justify-between min-h-[200px]">
-                  <div className="flex justify-between items-start mb-8">
-                    <div className="w-16 h-16 rounded-3xl bg-green/5 text-green flex items-center justify-center group-hover:scale-110 group-hover:bg-green group-hover:text-white transition-all duration-700 ease-spring-smooth">
-                      <FolderOpen size={32} weight="light" />
-                    </div>
-                    <CaretRight size={24} weight="light" className="text-gray-nav opacity-20 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-700" />
-                  </div>
                   <div>
-                    <span className="text-[12px] font-black uppercase tracking-widest text-gray-nav/40">Total Reflections</span>
-                    <h2 className="text-[48px] font-display text-gray-text leading-none mt-2">
+                    <span className="text-[14px] font-medium text-gray-nav flex items-center gap-3 mb-4">
+                      <FolderOpen size={20} className="text-green" weight="light" />
+                      Reflections written
+                    </span>
+                    <h2 className="text-7xl md:text-8xl font-display text-gray-text leading-none tracking-tight group-hover:text-green transition-colors duration-500">
                       {isCountLoading ? '...' : displayCount}
                     </h2>
-                    <div className="flex items-center gap-2 px-3 py-1 mt-4 rounded-full bg-green/10 text-green text-[10px] font-black uppercase tracking-widest">
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-green/10 text-green text-[10px] font-black uppercase tracking-widest">
                       <div className="w-1 h-1 rounded-full bg-green animate-pulse" />
                       Syncing
                     </div>
+                    <div className="w-12 h-12 rounded-full border border-border flex items-center justify-center group-hover:bg-green group-hover:text-white group-hover:border-green transition-all duration-500">
+                      <CaretRight size={20} weight="light" />
+                    </div>
                   </div>
-                </div>
-                </div>
+                </button>
               </Magnetic>
 
+              <div className="h-[1px] w-full bg-border opacity-50" />
+
               <Magnetic strength={10}>
-                <div 
+                <button 
                   onClick={() => navigate(RoutePath.INSIGHTS)}
-                  className="group cursor-pointer transition-all duration-700"
+                  className="group w-full text-left transition-all duration-700 flex flex-col md:flex-row items-start md:items-center justify-between gap-8"
                 >
-                <div className="flex flex-col justify-between min-h-[200px]">
-                  <div className="flex justify-between items-start mb-8">
-                    <div className="w-16 h-16 rounded-3xl bg-green/5 text-green flex items-center justify-center group-hover:scale-110 group-hover:bg-green group-hover:text-white transition-all duration-700 ease-spring-smooth">
-                      <Brain size={32} weight="light" />
-                    </div>
-                    <CaretRight size={24} weight="light" className="text-gray-nav opacity-20 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-700" />
-                  </div>
                   <div>
-                    <h3 className="text-[12px] font-black uppercase tracking-[0.2em] text-gray-nav/50 mb-4">Patterns</h3>
-                    <p className="text-[18px] font-serif italic text-gray-light leading-snug">AI Librarian is analyzing your growth.</p>
+                    <span className="text-[14px] font-medium text-gray-nav flex items-center gap-3 mb-4">
+                      <Brain size={20} className="text-green" weight="light" />
+                      Patterns discovered
+                    </span>
+                    <p className="text-2xl md:text-3xl font-serif italic text-gray-light max-w-sm leading-snug group-hover:text-gray-text transition-colors duration-500">
+                      AI Librarian is analyzing your growth.
+                    </p>
                   </div>
-                </div>
-                </div>
+                  <div className="w-12 h-12 rounded-full border border-border flex items-center justify-center group-hover:bg-green group-hover:text-white group-hover:border-green transition-all duration-500 shrink-0">
+                    <CaretRight size={20} weight="light" />
+                  </div>
+                </button>
               </Magnetic>
             </div>
           </div>
@@ -227,7 +229,7 @@ export const Home: React.FC = () => {
                 <Magnetic strength={25}>
                   <Button
                     variant="primary"
-                    className="group w-full h-16 rounded-2xl text-[18px] font-bold liquid-glass flex items-center justify-center gap-4 pl-10 pr-2"
+                    className="group w-full h-16 rounded-2xl text-[18px] font-bold bg-white dark:bg-white/5 border border-border flex items-center justify-center gap-4 pl-10 pr-2"
                     onClick={() => handleCreateClick(dailyPrompt)}
                   >
                     Start writing

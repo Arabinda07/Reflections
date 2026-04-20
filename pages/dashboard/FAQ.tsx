@@ -139,14 +139,14 @@ export const FAQ: React.FC = () => {
                 whileInView="show"
                 style={{ y: i % 2 === 0 ? y1 : y2 }}
                 viewport={{ once: true, margin: "-50px" }}
-                className={`${item.gridSpan} bezel-outer group`}
+                className={`${item.gridSpan} group border-t border-border pt-10`}
               >
-                <div className="bezel-inner p-8 flex flex-col h-full min-h-[280px] transition-colors duration-500 hover:bg-green/[0.02]">
+                <div className="flex flex-col h-full min-h-[280px] transition-colors duration-500">
                   <div className={`w-12 h-12 rounded-2xl ${item.color} flex items-center justify-center mb-10 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 ease-out-expo`}>
                     <item.icon size={24} weight="light" />
                   </div>
                   <h3 className="text-[24px] font-display text-gray-text mb-4 leading-tight">{item.title}</h3>
-                  <p className="text-mk-body font-serif text-gray-light">
+                  <p className="text-mk-body font-serif text-gray-light max-w-sm">
                     {item.desc}
                   </p>
                 </div>
