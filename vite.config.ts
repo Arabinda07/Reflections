@@ -15,28 +15,44 @@ export default defineConfig(({ mode }) => {
           registerType: 'autoUpdate',
           includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
           manifest: {
-            name: 'Reflections',
+            name: 'Reflections – Mindful Notes',
             short_name: 'Reflections',
-            description: 'Your mind, beautifully organized.',
+            description: 'Your private, AI-powered mindful journal. Track your mood, write freely, and find calm.',
             theme_color: '#ffffff',
             background_color: '#ffffff',
             display: 'standalone',
+            start_url: '/',
+            scope: '/',
+            orientation: 'portrait-primary',
+            lang: 'en',
+            categories: ['health', 'lifestyle', 'productivity'],
             icons: [
               {
                 src: 'icons/icon-192.png',
                 sizes: '192x192',
-                type: 'image/png'
+                type: 'image/png',
+                purpose: 'any'
               },
               {
                 src: 'icons/icon-512.png',
                 sizes: '512x512',
-                type: 'image/png'
+                type: 'image/png',
+                purpose: 'any'
               },
               {
                 src: 'icons/icon-maskable-512.png',
                 sizes: '512x512',
                 type: 'image/png',
                 purpose: 'maskable'
+              }
+            ],
+            shortcuts: [
+              {
+                name: 'New Entry',
+                short_name: 'Write',
+                description: 'Start a new journal entry',
+                url: '/#/create-note',
+                icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }]
               }
             ]
           },
