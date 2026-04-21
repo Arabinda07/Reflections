@@ -229,7 +229,7 @@ export const SingleNote: React.FC = () => {
               disabled={isDeleting}
               className={`border border-border rounded-full text-blue shadow-sm active:scale-[0.98] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] bg-white ${isMobile ? 'w-12 px-0' : ''}`}
             >
-              <PencilSimple className={`${isMobile ? '' : 'mr-2'} h-5 w-5`} weight="bold" />
+              <PencilSimple size={20} weight="bold" className={isMobile ? "" : "mr-2"} />
               {!isMobile && "Edit"}
             </Button>
             <Button 
@@ -240,7 +240,7 @@ export const SingleNote: React.FC = () => {
               disabled={isDeleting}
               className={`border border-border rounded-full text-red shadow-sm active:scale-[0.98] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-red/5 hover:border-red/30 bg-white ${isMobile ? 'w-12 px-0' : ''}`}
             >
-              <Trash className={`${isMobile ? '' : 'mr-2'} h-5 w-5`} weight="bold" />
+              <Trash size={20} weight="bold" className={isMobile ? "" : "mr-2"} />
               {!isMobile && "Delete"}
             </Button>
           </div>
