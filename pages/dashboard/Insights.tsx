@@ -6,7 +6,10 @@ import { Button } from '../../components/ui/Button';
 import { RoutePath, Note, LifeTheme } from '../../types';
 import { noteService } from '../../services/noteService';
 import { wikiService } from '../../services/wikiService';
-import { FREE_AI_MINIMUM_NOTES } from '../../services/wellnessPolicy';
+import { aiService } from '../../services/aiService';
+import { profileService } from '../../services/profileService';
+import { FREE_AI_MINIMUM_NOTES, getAiReflectionGate } from '../../services/wellnessPolicy';
+import { AiReflectionGate, WellnessAccess } from '../../types';
 
 // Flat soft colors — no gradients
 const MOOD_COLORS: Record<string, string> = {
@@ -32,18 +35,29 @@ export const Insights: React.FC = () => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [themes, setThemes] = useState<LifeTheme[]>([]);
   const [selectedTheme, setSelectedTheme] = useState<LifeTheme | null>(null);
+  const [access, setAccess] = useState<WellnessAccess | null>(null);
+  const [isRefreshingWiki, setIsRefreshingWiki] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
       
       try {
-        const [allNotes, allThemes] = await Promise.all([
+        const [allNotes, allThemes, accessData] = await Promise.all([
           noteService.getAll(),
-          wikiService.getAllThemes()
+          wikiService.getAllThemes(),
+          profileService.getWellnessAccess()
         ]);
 
         setNotes(allNotes);
         setThemes(allThemes);
+        setAccess(accessData);
       } catch (error) {
         console.error('[Insights] Failed to load data:', error);
       }
@@ -51,6 +65,31 @@ export const Insights: React.FC = () => {
     fetchData();
     console.info("[Reflections] Insights Page v2 - No Animations");
   }, []);
+
+  const gate = useMemo(() => {
+    if (!access) return null;
+    return getAiReflectionGate(access, notes.length, notes.length >= FREE_AI_MINIMUM_NOTES);
+  }, [access, notes.length]);
+
+  const handleRefreshWiki = async () => {
+    if (!gate?.canReflect) return;
+    
+    setIsRefreshingWiki(true);
+    try {
+      await aiService.refreshWikiSummaries();
+      if (access?.planTier !== 'pro') {
+        await profileService.incrementFreeAiReflections();
+        const newAccess = await profileService.getWellnessAccess();
+        setAccess(newAccess);
+      }
+      const allThemes = await wikiService.getAllThemes();
+      setThemes(allThemes);
+    } catch (error) {
+      console.error('[Insights] Failed to refresh wiki:', error);
+    } finally {
+      setIsRefreshingWiki(false);
+    }
+  };
 
   // Soft Aggregation Engine
   const stats = useMemo(() => {
@@ -119,7 +158,7 @@ export const Insights: React.FC = () => {
         <div className="flex items-center gap-3">
            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-bold text-[12px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green">
              <ArrowLeft className="mr-2 h-4 w-4" weight="bold" />
-             Back
+             {!isMobile && "Back"}
            </Button>
            <div className="h-4 w-[1px] bg-border"></div>
            <span className="text-[11px] uppercase tracking-widest font-black text-gray-nav">Stats & insights</span>
@@ -268,13 +307,13 @@ export const Insights: React.FC = () => {
             </div>
           </div>
 
-          {notes.length < FREE_AI_MINIMUM_NOTES ? (
+          {notes.length === 0 ? (
             <div className="text-center py-20 border border-dashed border-border rounded-[24px] bg-gray-50/5">
                <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 border border-border text-gray-nav shadow-sm mb-4">
                   <Sparkle size={18} weight="duotone" />
                </div>
                <p className="font-display text-gray-text text-xl">Your wiki is being built.</p>
-               <p className="mt-2 text-gray-light text-[14px] max-w-sm mx-auto">As you journal, the AI librarian will automatically identify and update recurring themes in your life here.</p>
+               <p className="mt-2 text-gray-light text-[14px] max-w-sm mx-auto">Write your first reflection to start building your personal library of growth.</p>
                <Button
                  variant="ghost"
                  className="mt-6 text-[11px] font-black"
@@ -283,51 +322,109 @@ export const Insights: React.FC = () => {
                   Write your first entry
                </Button>
             </div>
+          ) : notes.length < FREE_AI_MINIMUM_NOTES ? (
+            <div className="text-center py-20 border border-dashed border-border rounded-[24px] bg-gray-50/5">
+               <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 border border-border text-gray-nav shadow-sm mb-4">
+                  <Sparkle size={18} weight="duotone" />
+               </div>
+               <p className="font-display text-gray-text text-xl">Your wiki is being built on less than 3 entries.</p>
+            </div>
           ) : themes.length === 0 ? (
             <div className="text-center py-20 border border-dashed border-border rounded-[24px] bg-gray-50/5">
                <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 border border-border text-gray-nav shadow-sm mb-4">
                   <Sparkle size={18} weight="duotone" />
                </div>
-               <p className="font-display text-gray-text text-xl">Your wiki is being built.</p>
-               <p className="mt-2 text-gray-light text-[14px] max-w-sm mx-auto">You've unlocked your Life Wiki and 1 free AI reflection. The AI librarian will automatically identify and update recurring themes here as you write.</p>
-               <Button
-                 variant="ghost"
-                 className="mt-6 text-[11px] font-black"
-                 onClick={() => navigate(RoutePath.CREATE_NOTE)}
-               >
-                  Continue journaling
-               </Button>
+               <p className="font-display text-gray-text text-xl">Unlock your Life Wiki insights.</p>
+               <p className="mt-2 text-gray-light text-[14px] max-w-sm mx-auto mb-8">You've unlocked your Life Wiki and 1 free AI reflection. Generate your insights to see recurring themes in your life.</p>
+               
+               {gate?.requiresUpgrade ? (
+                 <div className="flex flex-col items-center gap-4">
+                    <p className="text-[12px] font-black text-orange uppercase tracking-widest">Free limit reached</p>
+                    <Button
+                      variant="primary"
+                      className="rounded-2xl px-10 h-14 font-black shadow-lg shadow-green/20"
+                      onClick={() => navigate(RoutePath.ACCOUNT)}
+                    >
+                       Upgrade to Premium
+                    </Button>
+                 </div>
+               ) : (
+                 <Button
+                   variant="primary"
+                   className="rounded-2xl px-10 h-14 font-black shadow-lg shadow-green/20"
+                   onClick={handleRefreshWiki}
+                   isLoading={isRefreshingWiki}
+                   disabled={isRefreshingWiki || !gate?.canReflect}
+                 >
+                    {isRefreshingWiki ? "Synthesizing..." : "Get Insights"}
+                 </Button>
+               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {themes.map(theme => (
-                <div
-                  key={theme.id}
-                  onClick={() => setSelectedTheme(theme)}
-                  className="group cursor-pointer bezel-outer hover:shadow-none transition-all duration-300 ease-out-quart flex flex-col justify-between h-[180px]"
-                >
-                  <div className="bezel-inner p-6 h-full flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Life theme</span>
-                        <Hash size={14} weight="bold" className="text-gray-light opacity-50" />
-                      </div>
-                      <h3 className="text-xl font-display text-gray-text line-clamp-2 leading-tight group-hover:text-green transition-colors">
-                        {theme.title}
-                      </h3>
+            <div className="space-y-8">
+              {gate?.requiresUpgrade && (
+                 <div className="p-6 rounded-[24px] bg-orange/5 border border-orange/10 flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div className="flex items-center gap-4">
+                       <div className="h-10 w-10 rounded-xl bg-white border border-orange/20 text-orange flex items-center justify-center">
+                          <Warning weight="fill" size={20} />
+                       </div>
+                       <div>
+                          <p className="text-[14px] font-bold text-gray-text">You've used your free insight.</p>
+                          <p className="text-[12px] font-medium text-gray-light">Upgrade to keep your Life Wiki updated as you write.</p>
+                       </div>
                     </div>
-                    
-                    <div className="flex items-center justify-between mt-4">
-                      <span className="text-[11px] font-medium text-gray-light">
-                        Updated {new Date(theme.updatedAt).toLocaleDateString()}
-                      </span>
-                      <div className="h-8 w-8 rounded-full bg-white/5 border border-border flex items-center justify-center group-hover:bg-green group-hover:text-white group-hover:border-green transition-all duration-300 ease-out-quart">
-                        <CaretRight size={16} weight="bold" />
+                    <Button size="sm" variant="primary" className="rounded-xl px-6 h-11 font-black" onClick={() => navigate(RoutePath.ACCOUNT)}>
+                       Upgrade to Pro
+                    </Button>
+                 </div>
+              )}
+
+              {!gate?.requiresUpgrade && themes.length > 0 && (
+                <div className="flex justify-center mb-8">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-[11px] font-black text-blue hover:text-blue/80"
+                    onClick={handleRefreshWiki}
+                    isLoading={isRefreshingWiki}
+                    disabled={isRefreshingWiki || !gate?.canReflect}
+                  >
+                    <Sparkle size={14} weight="fill" className="mr-2" />
+                    {isRefreshingWiki ? "Updating Wiki..." : "Refresh Insights"}
+                  </Button>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {themes.map(theme => (
+                  <div
+                    key={theme.id}
+                    onClick={() => setSelectedTheme(theme)}
+                    className="group cursor-pointer bezel-outer hover:shadow-none transition-all duration-300 ease-out-quart flex flex-col justify-between h-[180px]"
+                  >
+                    <div className="bezel-inner p-6 h-full flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Life theme</span>
+                          <Hash size={14} weight="bold" className="text-gray-light opacity-50" />
+                        </div>
+                        <h3 className="text-xl font-display text-gray-text line-clamp-2 leading-tight group-hover:text-green transition-colors">
+                          {theme.title}
+                        </h3>
+                      </div>
+                      
+                      <div className="flex items-center justify-between mt-4">
+                        <span className="text-[11px] font-medium text-gray-light">
+                          Updated {new Date(theme.updatedAt).toLocaleDateString()}
+                        </span>
+                        <div className="h-8 w-8 rounded-full bg-white/5 border border-border flex items-center justify-center group-hover:bg-green group-hover:text-white group-hover:border-green transition-all duration-300 ease-out-quart">
+                          <CaretRight size={16} weight="bold" />
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           )}
         </div>

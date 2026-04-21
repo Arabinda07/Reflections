@@ -25,6 +25,8 @@ import { RoutePath } from '../../types';
 import { storageService } from '../../services/storageService';
 import { StorageImage } from '../../components/ui/StorageImage';
 import { useAuth } from '../../context/AuthContext';
+import { profileService } from '../../services/profileService';
+import { WellnessAccess } from '../../types';
 
 export const Account: React.FC = () => {
   const navigate = useNavigate();
@@ -32,6 +34,14 @@ export const Account: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [fetching, setFetching] = useState(true);
+  const [access, setAccess] = useState<WellnessAccess | null>(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   const [userId, setUserId] = useState('');
   const [email, setEmail] = useState('');
@@ -61,6 +71,9 @@ export const Account: React.FC = () => {
           displayName: fullUser.user_metadata?.display_name || '',
           timezone: fullUser.user_metadata?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone
         });
+
+        const accessData = await profileService.getWellnessAccess();
+        setAccess(accessData);
       } catch (err) {
         console.error(err);
       } finally {
@@ -187,6 +200,43 @@ export const Account: React.FC = () => {
                 </div>
               </div>
             </div>
+            
+            {/* Membership Section */}
+            <div className="p-10 space-y-10 border-t border-border/30">
+               <div className="flex items-center gap-4 mb-4">
+                 <Sparkle size={28} weight="duotone" className="text-green" />
+                 <h3 className="font-display text-[24px] text-gray-text tracking-tight">Membership</h3>
+               </div>
+               
+               <div className="bezel-outer bg-green/5 !rounded-[24px]">
+                 <div className="bezel-inner !p-8 !rounded-[23px] flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div className="flex items-center gap-6">
+                       <div className={`h-16 w-16 rounded-3xl flex items-center justify-center ${access?.planTier === 'pro' ? 'bg-green text-white' : 'bg-white border border-border text-gray-nav'}`}>
+                          <Check size={32} weight="bold" />
+                       </div>
+                       <div>
+                          <p className="text-[11px] font-black uppercase tracking-widest text-green mb-1">Current Plan</p>
+                          <h4 className="text-[22px] font-display text-gray-text capitalize">{access?.planTier || 'Free'} Plan</h4>
+                          <p className="text-[13px] font-medium text-gray-light">
+                             {access?.planTier === 'pro' 
+                               ? 'You have unlimited access to all AI features.' 
+                               : `You've used ${access?.freeAiReflectionsUsed || 0} of 1 free AI insight.`}
+                          </p>
+                       </div>
+                    </div>
+                    
+                    {access?.planTier !== 'pro' && (
+                      <Button 
+                        variant="primary" 
+                        className="h-14 px-10 rounded-2xl font-black shadow-lg shadow-green/20"
+                        onClick={() => alert("Premium upgrade flow coming soon!")}
+                      >
+                         Upgrade to Pro
+                      </Button>
+                    )}
+                 </div>
+               </div>
+            </div>
 
             {/* Security Section */}
             <div className="p-10 space-y-10">
@@ -232,30 +282,38 @@ export const Account: React.FC = () => {
             </div>
 
             {/* Actions Toolbar */}
-            <div className="p-8 flex items-center justify-between sticky bottom-0 bg-body/95 backdrop-blur-xl border-t border-border/50">
+            <div className={`p-8 flex items-center justify-between sticky bottom-0 bg-body/95 backdrop-blur-xl border-t border-border/50 z-[100] ${isMobile ? 'pb-[calc(2rem + env(safe-area-inset-bottom))]' : ''}`}>
               <button 
                 type="button"
                 onClick={handleSignOut}
                 className="flex items-center gap-2 text-gray-nav hover:text-red transition-all font-bold text-[14px]"
               >
                 <SignOut size={20} weight="bold" />
-                Sign out
+                {!isMobile && "Sign out"}
               </button>
               <div className="flex items-center gap-4">
                 <Button 
                   type="button" 
                   variant="secondary" 
-                  onClick={() => navigate(RoutePath.HOME)}
-                  className="h-12 px-8 rounded-xl border border-border font-bold text-[14px]"
+                  onClick={() => navigate(-1)}
+                  className={`h-12 rounded-xl border border-border font-bold text-[14px] ${isMobile ? 'w-12 px-0 flex items-center justify-center' : 'px-8'}`}
                 >
-                  Cancel
+                  {isMobile ? <X size={20} weight="bold" /> : 'Cancel'}
                 </Button>
                 <Button 
                   type="submit" 
                   disabled={loading || isSaved}
-                  className={`h-12 px-10 rounded-xl font-bold text-[14px] shadow-lg transition-all ${isSaved ? 'bg-green text-white' : ''}`}
+                  className={`h-12 rounded-xl font-bold text-[14px] shadow-lg transition-all ${isSaved ? 'bg-green text-white' : ''} ${isMobile ? 'w-12 px-0 flex items-center justify-center' : 'px-10'}`}
                 >
-                  {loading ? <CircleNotch size={20} className="animate-spin" /> : isSaved ? <Check size={20} weight="bold" /> : 'Save Changes'}
+                  {loading ? (
+                    <CircleNotch size={20} className="animate-spin" />
+                  ) : isSaved ? (
+                    <Check size={20} weight="bold" />
+                  ) : isMobile ? (
+                    <FloppyDisk size={20} weight="bold" />
+                  ) : (
+                    'Save Changes'
+                  )}
                 </Button>
               </div>
             </div>

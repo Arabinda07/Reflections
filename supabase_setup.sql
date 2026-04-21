@@ -36,6 +36,7 @@ create table if not exists profiles (
   full_name text,
   avatar_url text,
   plan text default 'free', -- 'free' or 'pro'
+  free_ai_reflections_used int default 0,
   updated_at timestamp with time zone default timezone('utc'::text, now())
 );
 

@@ -218,8 +218,8 @@ export const SingleNote: React.FC = () => {
         {/* Sticky Header */}
         <div className="flex items-center justify-between sticky top-4 bg-white/80 backdrop-blur-xl py-3 px-4 sm:px-6 rounded-full border border-border shadow-sm z-10 mb-8">
           <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.NOTES)} className="-ml-2 text-gray-nav hover:text-gray-text font-bold text-[12px]">
-            <ArrowLeft className="mr-2 h-4 w-4" weight="bold" />
-            Back
+            <ArrowLeft className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} weight="bold" />
+            {!isMobile && "Back"}
           </Button>
           <div className="flex gap-2 items-center">
             <Button 
@@ -227,10 +227,10 @@ export const SingleNote: React.FC = () => {
               size="sm" 
               onClick={handleEdit}
               disabled={isDeleting}
-              className="border border-border rounded-full text-blue shadow-sm active:scale-[0.98] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] bg-white"
+              className={`border border-border rounded-full text-blue shadow-sm active:scale-[0.98] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] bg-white ${isMobile ? 'w-10 px-0' : ''}`}
             >
-              <PencilSimple className="mr-2 h-3.5 w-3.5" weight="bold" />
-              Edit
+              <PencilSimple className={`${isMobile ? '' : 'mr-2'} h-3.5 w-3.5`} weight="bold" />
+              {!isMobile && "Edit"}
             </Button>
             <Button 
               variant="secondary" 
@@ -238,10 +238,10 @@ export const SingleNote: React.FC = () => {
               onClick={initiateDelete} 
               isLoading={isDeleting}
               disabled={isDeleting}
-              className="border border-border rounded-full text-red shadow-sm active:scale-[0.98] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-red/5 hover:border-red/30 bg-white"
+              className={`border border-border rounded-full text-red shadow-sm active:scale-[0.98] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-red/5 hover:border-red/30 bg-white ${isMobile ? 'w-10 px-0' : ''}`}
             >
-              <Trash className="mr-2 h-3.5 w-3.5" weight="bold" />
-              Delete
+              <Trash className={`${isMobile ? '' : 'mr-2'} h-3.5 w-3.5`} weight="bold" />
+              {!isMobile && "Delete"}
             </Button>
           </div>
         </div>
