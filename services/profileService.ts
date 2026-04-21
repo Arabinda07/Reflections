@@ -8,7 +8,7 @@ export const profileService = {
 
     const { data, error } = await supabase
       .from('profiles')
-      .select('plan, free_ai_reflections_used')
+      .select('plan, free_ai_reflections_used, free_wiki_insights_used')
       .eq('id', user.id)
       .single();
 
@@ -18,14 +18,16 @@ export const profileService = {
       return {
         userId: user.id,
         planTier: 'free',
-        freeAiReflectionsUsed: 0
+        freeAiReflectionsUsed: 0,
+        freeWikiInsightsUsed: 0,
       };
     }
 
     return {
       userId: user.id,
       planTier: (data.plan as PlanTier) || 'free',
-      freeAiReflectionsUsed: data.free_ai_reflections_used || 0
+      freeAiReflectionsUsed: data.free_ai_reflections_used || 0,
+      freeWikiInsightsUsed: data.free_wiki_insights_used || 0,
     };
   },
 
@@ -45,6 +47,26 @@ export const profileService = {
     const { error } = await supabase
       .from('profiles')
       .update({ free_ai_reflections_used: currentCount + 1 })
+      .eq('id', user.id);
+
+    if (error) throw error;
+  },
+
+  incrementFreeWikiInsights: async (): Promise<void> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    const { data } = await supabase
+      .from('profiles')
+      .select('free_wiki_insights_used')
+      .eq('id', user.id)
+      .single();
+
+    const currentCount = data?.free_wiki_insights_used || 0;
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({ free_wiki_insights_used: currentCount + 1 })
       .eq('id', user.id);
 
     if (error) throw error;

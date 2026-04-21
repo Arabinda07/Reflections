@@ -9,6 +9,7 @@ import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../src/supabaseClient';
 import {
   consumeGoogleAuthError,
+  consumePendingGoogleAuthRedirectPath,
   resolvePostAuthRedirectPath,
   startGoogleOAuthFlow,
 } from '../../src/auth/googleOAuth';
@@ -36,7 +37,7 @@ export const SignIn: React.FC = () => {
       return;
     }
 
-    navigate(postLoginPath, { replace: true });
+    navigate(consumePendingGoogleAuthRedirectPath(RoutePath.LOGIN) || postLoginPath, { replace: true });
   }, [isAuthenticated, isInitialCheckDone, navigate, postLoginPath]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -70,13 +71,15 @@ export const SignIn: React.FC = () => {
   const handleGoogleLogin = async () => {
     setError(null);
     setLoading(true);
-    await startGoogleOAuthFlow({
+    const launchError = await startGoogleOAuthFlow({
       sourcePath: RoutePath.LOGIN,
       redirectPath: postLoginPath,
-      onSuccess: () => navigate(postLoginPath, { replace: true }),
-      onError: (message) => setError(message),
-      onComplete: () => setLoading(false),
     });
+
+    if (launchError) {
+      setError(launchError);
+      setLoading(false);
+    }
   };
 
   return (

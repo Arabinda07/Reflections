@@ -1,6 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { RoutePath } from '../../types';
-import { resolvePostAuthRedirectPath, startGoogleOAuthFlow } from './googleOAuth';
+import {
+  consumeGoogleAuthError,
+  consumeNativeGoogleOAuthCallback,
+  consumePendingGoogleAuthRedirectPath,
+  resolvePostAuthRedirectPath,
+  startGoogleOAuthFlow,
+} from './googleOAuth';
 import { supabase } from '../supabaseClient';
 
 vi.mock('@capacitor/core', () => ({
@@ -13,7 +19,6 @@ vi.mock('../supabaseClient', () => ({
   supabase: {
     auth: {
       signInWithOAuth: vi.fn(),
-      getSession: vi.fn(),
       exchangeCodeForSession: vi.fn(),
       setSession: vi.fn(),
     },
@@ -21,6 +26,8 @@ vi.mock('../supabaseClient', () => ({
 }));
 
 const mockSignInWithOAuth = vi.mocked(supabase.auth.signInWithOAuth);
+const mockExchangeCodeForSession = vi.mocked(supabase.auth.exchangeCodeForSession);
+const mockSetSession = vi.mocked(supabase.auth.setSession);
 
 class SessionStorageMock {
   private readonly store = new Map<string, string>();
@@ -42,70 +49,145 @@ class SessionStorageMock {
   }
 }
 
-describe('googleOAuth', () => {
-  const sessionStorage = new SessionStorageMock();
-  const locationAssign = vi.fn();
-  const locationReplace = vi.fn();
-  const openWindow = vi.fn(() => null);
+const createWindow = (href = 'https://reflections-ebon.vercel.app/#/login') => ({
+  location: {
+    origin: 'https://reflections-ebon.vercel.app',
+    pathname: '/',
+    href,
+    replace: vi.fn(),
+  },
+  sessionStorage: new SessionStorageMock(),
+  matchMedia: vi.fn(() => ({ matches: true })),
+});
 
+const getSessionStorage = () => (globalThis as any).window.sessionStorage as SessionStorageMock;
+
+describe('googleOAuth', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    sessionStorage.clear();
 
-    (globalThis as any).window = {
-      location: {
-        origin: 'https://reflections-ebon.vercel.app',
-        pathname: '/',
-        href: 'https://reflections-ebon.vercel.app/#/login',
-        assign: locationAssign,
-        replace: locationReplace,
-      },
-      sessionStorage,
-      matchMedia: vi.fn(() => ({ matches: true })),
-      open: openWindow,
-      screenX: 0,
-      screenY: 0,
-      outerWidth: 1440,
-      outerHeight: 900,
-      setInterval,
-      clearInterval,
-    };
+    (globalThis as any).window = createWindow();
 
     mockSignInWithOAuth.mockResolvedValue({
       data: { url: 'https://accounts.google.com/o/oauth2/v2/auth' },
       error: null,
     } as any);
+    mockExchangeCodeForSession.mockResolvedValue({
+      data: { session: {} },
+      error: null,
+    } as any);
+    mockSetSession.mockResolvedValue({
+      data: { session: {} },
+      error: null,
+    } as any);
   });
 
-  it('uses same-window redirect flow even on desktop-like browsers', async () => {
+  it('stores the source route and a safe redirect before launching Supabase OAuth', async () => {
     await startGoogleOAuthFlow({
       sourcePath: RoutePath.LOGIN,
-      onSuccess: vi.fn(),
-      onError: vi.fn(),
-      onComplete: vi.fn(),
+      redirectPath: '/notes?tab=recent#focus',
     });
 
-    expect(mockSignInWithOAuth).toHaveBeenCalledTimes(1);
-    expect(mockSignInWithOAuth.mock.calls[0][0].options).not.toHaveProperty('skipBrowserRedirect');
-    expect(openWindow).not.toHaveBeenCalled();
-    expect(locationAssign).not.toHaveBeenCalled();
+    const sessionStorage = getSessionStorage();
+
+    expect(sessionStorage.getItem('reflections.pending-google-auth-path')).toBe(RoutePath.LOGIN);
+    expect(sessionStorage.getItem('reflections.pending-google-auth-redirect-path')).toBe('/notes?tab=recent#focus');
+    expect(mockSignInWithOAuth).toHaveBeenCalledWith({
+      provider: 'google',
+      options: {
+        redirectTo: 'https://reflections-ebon.vercel.app/#/login',
+      },
+    });
   });
 
-  it('remembers the intended post-login route for the OAuth round-trip', async () => {
-    await startGoogleOAuthFlow({
-      sourcePath: RoutePath.LOGIN,
-      redirectPath: RoutePath.NOTES,
-      onSuccess: vi.fn(),
-      onError: vi.fn(),
-      onComplete: vi.fn(),
+  it('cleans up stored intent when Supabase refuses to launch Google OAuth', async () => {
+    mockSignInWithOAuth.mockResolvedValueOnce({
+      data: { url: null },
+      error: { message: 'Google is unavailable right now.' },
     } as any);
 
-    expect(sessionStorage.getItem('reflections.pending-google-auth-redirect-path')).toBe(RoutePath.NOTES);
+    const result = await startGoogleOAuthFlow({
+      sourcePath: RoutePath.SIGNUP,
+      redirectPath: 'https://evil.example.com/phish',
+    });
+
+    const sessionStorage = getSessionStorage();
+
+    expect(result).toBe('Google is unavailable right now.');
+    expect(sessionStorage.getItem('reflections.pending-google-auth-path')).toBeNull();
+    expect(sessionStorage.getItem('reflections.pending-google-auth-redirect-path')).toBeNull();
   });
 
-  it('defaults post-login redirects to the user notes home when no protected route was requested', () => {
+  it('defaults post-auth redirects to notes when the requested path is unsafe', () => {
     expect(resolvePostAuthRedirectPath(undefined)).toBe(RoutePath.NOTES);
-    expect(resolvePostAuthRedirectPath(null)).toBe(RoutePath.NOTES);
     expect(resolvePostAuthRedirectPath({ pathname: RoutePath.LOGIN })).toBe(RoutePath.NOTES);
+    expect(resolvePostAuthRedirectPath({ pathname: 'https://evil.example.com' })).toBe(RoutePath.NOTES);
+  });
+
+  it('consumes a matching stored Google auth error and clears the pending state', () => {
+    const sessionStorage = getSessionStorage();
+    sessionStorage.setItem('reflections.pending-google-auth-path', RoutePath.LOGIN);
+    sessionStorage.setItem('reflections.pending-google-auth-redirect-path', RoutePath.NOTES);
+    sessionStorage.setItem('reflections.google-auth-error', 'Google access was denied.');
+
+    expect(consumeGoogleAuthError(RoutePath.LOGIN)).toBe('Google access was denied.');
+    expect(sessionStorage.getItem('reflections.pending-google-auth-path')).toBeNull();
+    expect(sessionStorage.getItem('reflections.pending-google-auth-redirect-path')).toBeNull();
+    expect(sessionStorage.getItem('reflections.google-auth-error')).toBeNull();
+  });
+
+  it('reads Google callback errors from the current URL on the matching auth route', () => {
+    (globalThis as any).window = createWindow(
+      'https://reflections-ebon.vercel.app/?error_description=Account%20is%20not%20allowed#/signup',
+    );
+
+    const sessionStorage = getSessionStorage();
+    sessionStorage.setItem('reflections.pending-google-auth-path', RoutePath.SIGNUP);
+    sessionStorage.setItem('reflections.pending-google-auth-redirect-path', RoutePath.NOTES);
+
+    expect(consumeGoogleAuthError(RoutePath.SIGNUP)).toBe('Account is not allowed');
+    expect(sessionStorage.getItem('reflections.pending-google-auth-path')).toBeNull();
+    expect(sessionStorage.getItem('reflections.pending-google-auth-redirect-path')).toBeNull();
+  });
+
+  it('returns the stored redirect for the matching auth route after session completion and clears it', () => {
+    const sessionStorage = getSessionStorage();
+    sessionStorage.setItem('reflections.pending-google-auth-path', RoutePath.LOGIN);
+    sessionStorage.setItem('reflections.pending-google-auth-redirect-path', '/notes?view=week');
+
+    expect(consumePendingGoogleAuthRedirectPath(RoutePath.LOGIN)).toBe('/notes?view=week');
+    expect(sessionStorage.getItem('reflections.pending-google-auth-path')).toBeNull();
+    expect(sessionStorage.getItem('reflections.pending-google-auth-redirect-path')).toBeNull();
+  });
+
+  it('does not consume a redirect when no Google auth flow is pending', () => {
+    const sessionStorage = getSessionStorage();
+
+    expect(consumePendingGoogleAuthRedirectPath(RoutePath.LOGIN)).toBeNull();
+    expect(sessionStorage.getItem('reflections.pending-google-auth-path')).toBeNull();
+    expect(sessionStorage.getItem('reflections.pending-google-auth-redirect-path')).toBeNull();
+  });
+
+  it('exchanges the native callback code for a session', async () => {
+    const result = await consumeNativeGoogleOAuthCallback(
+      'https://reflections-ebon.vercel.app/?code=oauth-code',
+    );
+
+    expect(result).toEqual({ handled: true, success: true });
+    expect(mockExchangeCodeForSession).toHaveBeenCalledWith('oauth-code');
+  });
+
+  it('returns native callback errors without attempting a session exchange', async () => {
+    const result = await consumeNativeGoogleOAuthCallback(
+      'https://reflections-ebon.vercel.app/?error=access_denied',
+    );
+
+    expect(result).toEqual({
+      handled: true,
+      success: false,
+      error: 'access_denied',
+    });
+    expect(mockExchangeCodeForSession).not.toHaveBeenCalled();
+    expect(mockSetSession).not.toHaveBeenCalled();
   });
 });

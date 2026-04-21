@@ -37,6 +37,7 @@ create table if not exists profiles (
   avatar_url text,
   plan text default 'free', -- 'free' or 'pro'
   free_ai_reflections_used int default 0,
+  free_wiki_insights_used int default 0,
   updated_at timestamp with time zone default timezone('utc'::text, now())
 );
 
@@ -108,8 +109,6 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
-
-END $$;
 
 -- 8. Function to delete all data for the current user
 create or replace function delete_user_data()

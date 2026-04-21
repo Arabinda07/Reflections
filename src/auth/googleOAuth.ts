@@ -89,7 +89,12 @@ export const rememberPendingGoogleAuth = ({
   }
 
   window.sessionStorage.setItem(PENDING_GOOGLE_AUTH_PATH_KEY, sourcePath);
-  window.sessionStorage.setItem(PENDING_GOOGLE_AUTH_REDIRECT_PATH_KEY, redirectPath);
+  window.sessionStorage.setItem(
+    PENDING_GOOGLE_AUTH_REDIRECT_PATH_KEY,
+    redirectPath.startsWith('/')
+      ? resolvePostAuthRedirectPath(new URL(redirectPath, window.location.origin))
+      : RoutePath.NOTES,
+  );
   window.sessionStorage.removeItem(GOOGLE_AUTH_ERROR_KEY);
 };
 
@@ -103,13 +108,17 @@ export const clearPendingGoogleAuth = () => {
   window.sessionStorage.removeItem(GOOGLE_AUTH_ERROR_KEY);
 };
 
-export const getPendingGoogleAuthPath = (): GoogleAuthSourcePath => {
+export const getPendingGoogleAuthPath = (): GoogleAuthSourcePath | null => {
   if (!hasWindow()) {
-    return RoutePath.LOGIN;
+    return null;
   }
 
   const value = window.sessionStorage.getItem(PENDING_GOOGLE_AUTH_PATH_KEY);
-  return value === RoutePath.SIGNUP ? RoutePath.SIGNUP : RoutePath.LOGIN;
+  if (value === RoutePath.LOGIN || value === RoutePath.SIGNUP) {
+    return value;
+  }
+
+  return null;
 };
 
 export const getPendingGoogleAuthRedirectPath = () => {
@@ -118,6 +127,21 @@ export const getPendingGoogleAuthRedirectPath = () => {
   }
 
   return window.sessionStorage.getItem(PENDING_GOOGLE_AUTH_REDIRECT_PATH_KEY) || RoutePath.NOTES;
+};
+
+export const consumePendingGoogleAuthRedirectPath = (sourcePath: GoogleAuthSourcePath) => {
+  if (!hasWindow()) {
+    return null;
+  }
+
+  const pendingPath = getPendingGoogleAuthPath();
+  if (pendingPath !== sourcePath) {
+    return null;
+  }
+
+  const redirectPath = getPendingGoogleAuthRedirectPath();
+  clearPendingGoogleAuth();
+  return redirectPath;
 };
 
 export const stashGoogleAuthError = (message: string) => {
@@ -134,14 +158,19 @@ export const consumeGoogleAuthError = (sourcePath: GoogleAuthSourcePath) => {
   }
 
   const pendingPath = getPendingGoogleAuthPath();
-  const message = window.sessionStorage.getItem(GOOGLE_AUTH_ERROR_KEY);
-
-  if (!message || pendingPath !== sourcePath) {
+  if (pendingPath !== sourcePath) {
     return null;
   }
 
-  window.sessionStorage.removeItem(PENDING_GOOGLE_AUTH_PATH_KEY);
-  window.sessionStorage.removeItem(GOOGLE_AUTH_ERROR_KEY);
+  const message =
+    window.sessionStorage.getItem(GOOGLE_AUTH_ERROR_KEY) ||
+    getGoogleOAuthCallbackError(window.location.href);
+
+  if (!message) {
+    return null;
+  }
+
+  clearPendingGoogleAuth();
   return message;
 };
 
@@ -171,11 +200,13 @@ export const redirectToAppRoute = (path: string) => {
   window.location.replace(`${baseUrl}${hash}`);
 };
 
-const launchGoogleOAuth = async () => {
+const launchGoogleOAuth = async (sourcePath: GoogleAuthSourcePath) => {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: getGoogleOAuthRedirectTo(),
+      redirectTo: Capacitor.isNativePlatform()
+        ? getGoogleOAuthRedirectTo()
+        : `${window.location.origin}/#${sourcePath}`,
     },
   });
 
@@ -189,32 +220,27 @@ const launchGoogleOAuth = async () => {
 export const startGoogleOAuthFlow = async ({
   sourcePath,
   redirectPath = RoutePath.NOTES,
-  onSuccess,
-  onError,
-  onComplete,
 }: {
   sourcePath: GoogleAuthSourcePath;
   redirectPath?: string;
-  onSuccess: () => void;
-  onError: (message: string) => void;
-  onComplete: () => void;
 }) => {
   rememberPendingGoogleAuth({ sourcePath, redirectPath });
 
   try {
-    const launchResult = await launchGoogleOAuth();
+    const launchResult = await launchGoogleOAuth(sourcePath);
 
     if (!launchResult.ok) {
       clearPendingGoogleAuth();
-      onError(launchResult.message);
-      onComplete();
-      return;
+      return launchResult.message;
     }
   } catch (error) {
     clearPendingGoogleAuth();
-    onError(error instanceof Error ? error.message : 'An unexpected error occurred during Google login.');
-    onComplete();
+    return error instanceof Error
+      ? error.message
+      : 'An unexpected error occurred during Google login.';
   }
+
+  return null;
 };
 
 export const consumeNativeGoogleOAuthCallback = async (

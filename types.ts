@@ -61,6 +61,7 @@ export interface WellnessAccess {
   userId: string;
   planTier: PlanTier;
   freeAiReflectionsUsed: number;
+  freeWikiInsightsUsed: number;
 }
 
 export interface NoteUsage {
@@ -74,6 +75,13 @@ export interface AiReflectionGate {
   canReflect: boolean;
   reason?: 'needs_more_notes' | 'sample_used' | 'missing_content';
   remainingFreeSamples: number;
+  requiresUpgrade: boolean;
+}
+
+export interface WikiInsightsGate {
+  canGenerate: boolean;
+  reason?: 'needs_more_entries' | 'free_limit_reached';
+  remainingFreeGenerations: number;
   requiresUpgrade: boolean;
 }
 

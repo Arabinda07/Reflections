@@ -11,14 +11,9 @@ import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { App as CapacitorApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
-import { supabase } from './src/supabaseClient';
 import {
-  clearPendingGoogleAuth,
   consumeNativeGoogleOAuthCallback,
-  getGoogleOAuthCallbackError,
-  getPendingGoogleAuthRedirectPath,
   getPendingGoogleAuthPath,
-  isGoogleOAuthCallbackUrl,
   redirectToAppRoute,
   stashGoogleAuthError,
 } from './src/auth/googleOAuth';
@@ -67,67 +62,8 @@ const SyncWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 function App() {
   useEffect(() => {
     let isActive = true;
-    let isResolved = false;
-    let timer: number | undefined;
-    let authSubscription: { unsubscribe: () => void } | null = null;
     let nativeUrlListenerPromise: Promise<{ remove: () => Promise<void> }> | null = null;
     let lastHandledNativeUrl: string | null = null;
-
-    const finalizeSuccess = () => {
-      if (!isActive || isResolved) {
-        return;
-      }
-
-      isResolved = true;
-      const redirectPath = getPendingGoogleAuthRedirectPath();
-      clearPendingGoogleAuth();
-      redirectToAppRoute(redirectPath);
-    };
-
-    const finalizeError = (message: string) => {
-      if (!isActive || isResolved) {
-        return;
-      }
-
-      isResolved = true;
-      stashGoogleAuthError(message);
-      redirectToAppRoute(getPendingGoogleAuthPath());
-    };
-
-    const watchCurrentWindowOAuthCallback = () => {
-      const currentUrl = window.location.href;
-
-      if (!isGoogleOAuthCallbackUrl(currentUrl)) {
-        return;
-      }
-
-      const callbackError = getGoogleOAuthCallbackError(currentUrl);
-      if (callbackError) {
-        finalizeError(callbackError);
-        return;
-      }
-
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-        if (event === 'SIGNED_IN') {
-          finalizeSuccess();
-        }
-      });
-
-      authSubscription = subscription;
-      timer = window.setTimeout(async () => {
-        const { data: { session } } = await supabase.auth.getSession();
-
-        if (!isActive || isResolved) {
-          return;
-        }
-
-        if (session) {
-          finalizeSuccess();
-        } else {
-          finalizeError('Google sign in did not complete. Please try again.');
-        }
-      }, 4000);
-    };
 
     const handleNativeOAuthUrl = async (url: string) => {
       if (!url || url === lastHandledNativeUrl) {
@@ -142,14 +78,11 @@ function App() {
       }
 
       if ('error' in result) {
-        finalizeError(result.error);
-        return;
+        stashGoogleAuthError(result.error);
       }
 
-      finalizeSuccess();
+      redirectToAppRoute(getPendingGoogleAuthPath() || RoutePath.LOGIN);
     };
-
-    watchCurrentWindowOAuthCallback();
 
     if (Capacitor.isNativePlatform()) {
       nativeUrlListenerPromise = CapacitorApp.addListener('appUrlOpen', ({ url }) => {
@@ -165,12 +98,6 @@ function App() {
 
     return () => {
       isActive = false;
-
-      if (timer) {
-        clearTimeout(timer);
-      }
-
-      authSubscription?.unsubscribe();
       void nativeUrlListenerPromise?.then((listener) => listener.remove());
     };
   }, []);
