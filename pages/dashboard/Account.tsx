@@ -289,32 +289,23 @@ export const Account: React.FC = () => {
                 onClick={handleSignOut}
                 className="flex items-center gap-2 text-gray-nav hover:text-red transition-all font-bold text-[13px] uppercase tracking-widest"
               >
-                <SignOut size={20} weight="bold" />
-                {!isMobile && "Sign out"}
+                Sign out
               </button>
               <div className="flex items-center gap-4">
                 <Button 
                   type="button" 
                   variant="secondary" 
                   onClick={() => navigate(-1)}
-                  className={`h-12 rounded-xl border border-border font-bold text-[14px] bg-white text-gray-text hover:bg-gray-50 transition-all ${isMobile ? 'w-12 px-0 flex items-center justify-center' : 'px-8'}`}
+                  className="h-12 rounded-xl border border-border font-bold text-[14px] bg-white text-gray-text hover:bg-gray-50 transition-all px-6 sm:px-8"
                 >
-                  {isMobile ? <X size={20} weight="bold" /> : 'Cancel'}
+                  Cancel
                 </Button>
                 <Button 
                   type="submit" 
                   disabled={loading || isSaved}
-                  className={`h-12 rounded-xl font-bold text-[14px] bg-green text-white hover:bg-green/90 shadow-lg shadow-green/10 transition-all active:scale-[0.98] ${isSaved ? 'bg-green text-white' : ''} ${isMobile ? 'w-12 px-0 flex items-center justify-center' : 'px-10'}`}
+                  className={`h-12 rounded-xl font-bold text-[14px] bg-green text-white hover:bg-green/90 shadow-lg shadow-green/10 transition-all active:scale-[0.98] ${isSaved ? 'bg-green text-white' : ''} px-6 sm:px-10`}
                 >
-                  {loading ? (
-                    <CircleNotch size={20} className="animate-spin" />
-                  ) : isSaved ? (
-                    <Check size={20} weight="bold" />
-                  ) : isMobile ? (
-                    <FloppyDisk size={20} weight="bold" />
-                  ) : (
-                    'Save Changes'
-                  )}
+                  {loading ? 'Saving...' : isSaved ? 'Saved!' : 'Save Changes'}
                 </Button>
               </div>
             </div>

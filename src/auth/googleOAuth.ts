@@ -206,7 +206,7 @@ const launchGoogleOAuth = async (sourcePath: GoogleAuthSourcePath) => {
     options: {
       redirectTo: Capacitor.isNativePlatform()
         ? getGoogleOAuthRedirectTo()
-        : `${window.location.origin}/#${sourcePath}`,
+        : `${window.location.origin}/`,
     },
   });
 

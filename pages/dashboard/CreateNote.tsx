@@ -527,7 +527,7 @@ export const CreateNote: React.FC = () => {
       )}
 
       {/* ── Main Canvas ── */}
-      <main className="flex-1 h-full overflow-y-auto relative pt-24 pb-40 px-6 sm:px-12 md:px-20 custom-scrollbar">
+      <main className="flex-1 w-full relative pt-24 pb-40 px-6 sm:px-12 md:px-20">
         <div className={`max-w-[800px] mx-auto transition-[opacity,transform] duration-1000 ease-[cubic-bezier(0.32,0.72,0,1)] ${isDimmed ? 'opacity-40 scale-[0.98]' : 'opacity-100'}`}>
           
           {/* Cover Image */}

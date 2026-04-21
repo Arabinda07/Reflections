@@ -213,7 +213,7 @@ export const SingleNote: React.FC = () => {
             layout
             className="flex-1 flex flex-col min-w-0 lg:pl-[180px]"
           >
-            <div className="overflow-y-auto h-full px-4 md:px-0 pt-4 custom-scrollbar">
+            <div className="w-full px-4 md:px-0 pt-4">
               <div className="mx-auto max-w-3xl space-y-6 animate-in fade-in duration-500 pb-20 relative px-4">
         {/* Sticky Header */}
         <div className="flex items-center justify-between sticky top-4 bg-white/80 backdrop-blur-xl py-3 px-4 sm:px-6 rounded-full border border-border shadow-sm z-10 mb-8">
