@@ -239,7 +239,7 @@ export const Home: React.FC = () => {
 
             <Button
               variant="primary"
-              className="mt-16 h-14 rounded-xl text-[15px] font-bold bg-gray-text text-white hover:bg-black transition-all"
+              className="mt-16 h-14 rounded-xl text-[15px] font-bold bg-green text-white hover:bg-green/90 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-green/20"
               onClick={() => handleCreateClick(dailyPrompt)}
               aria-label="Start a new reflection with this prompt"
             >
