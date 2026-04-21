@@ -143,12 +143,11 @@ export const Home: React.FC = () => {
           
           {/* Main Stats Panel */}
           <div className="lg:col-span-8 p-10 sm:p-16 border-b lg:border-b-0 lg:border-r border-border">
-            <div className="label-caps mb-12">Sanctuary Overview</div>
-            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 sm:gap-16">
               <button 
                 onClick={() => navigate(RoutePath.NOTES)}
                 className="group flex flex-col items-start gap-6"
+                aria-label="View all reflections"
               >
                 <div className="flex items-center gap-2 text-gray-nav">
                   <FolderOpen size={18} weight="bold" className="text-green" />
@@ -167,6 +166,7 @@ export const Home: React.FC = () => {
               <button 
                 onClick={() => navigate(RoutePath.INSIGHTS)}
                 className="group flex flex-col items-start gap-6"
+                aria-label="View AI insights"
               >
                 <div className="flex items-center gap-2 text-gray-nav">
                   <Brain size={18} weight="bold" className="text-green" />
@@ -188,19 +188,20 @@ export const Home: React.FC = () => {
           <div className="lg:col-span-4 p-10 sm:p-16 flex flex-col justify-between bg-panel-bg">
             <div>
               <div className="flex items-center justify-between mb-12">
-                <div className="label-caps">Daily Focus</div>
+                <div className="flex items-center gap-2 text-gray-nav">
+                  <Target size={18} weight="bold" className="text-green" />
+                  <span className="text-[12px] font-bold uppercase tracking-tight">Daily Focus</span>
+                </div>
                 <button 
                   onClick={refreshPrompt}
                   className={`p-2 text-gray-nav hover:text-green transition-colors ${isRefreshing ? 'animate-spin' : ''}`}
+                  aria-label="Refresh daily focus prompt"
                 >
                   <ArrowsClockwise size={20} weight="bold" />
                 </button>
               </div>
 
               <div className="space-y-6">
-                <div className="w-12 h-12 rounded-xl bg-white border border-border flex items-center justify-center text-green shadow-sm">
-                  <Target size={24} weight="bold" />
-                </div>
                 <p 
                   className="text-2xl text-gray-text font-serif italic leading-relaxed"
                   style={{ opacity: isRefreshing ? 0 : 1, transition: 'opacity 0.4s ease' }}
@@ -214,6 +215,7 @@ export const Home: React.FC = () => {
               variant="primary"
               className="mt-10 h-14 rounded-xl text-[15px] font-bold bg-gray-text text-white hover:bg-black transition-all"
               onClick={() => handleCreateClick(dailyPrompt)}
+              aria-label="Start a new reflection with this prompt"
             >
               Start Reflection
               <Plus size={18} weight="bold" className="ml-2" />

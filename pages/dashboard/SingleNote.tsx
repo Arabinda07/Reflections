@@ -102,12 +102,12 @@ export const SingleNote: React.FC = () => {
 
   const getMoodIcon = (mood?: string) => {
     switch (mood) {
-      case 'happy': return <Smiley size={16} weight="fill" className="text-yellow-500" />;
-      case 'calm': return <Sun size={16} weight="fill" className="text-emerald-500" />;
-      case 'anxious': return <Cloud size={16} weight="fill" className="text-blue-500" />;
-      case 'sad': return <SmileySad size={16} weight="fill" className="text-indigo-500" />;
-      case 'angry': return <Lightning size={16} weight="fill" className="text-rose-500" />;
-      case 'tired': return <Moon size={16} weight="fill" className="text-slate-500" />;
+      case 'happy': return <Smiley size={16} weight="fill" className="text-orange" />;
+      case 'calm': return <Sun size={16} weight="fill" className="text-green" />;
+      case 'anxious': return <Cloud size={16} weight="fill" className="text-blue" />;
+      case 'sad': return <SmileySad size={16} weight="fill" className="text-blue" />;
+      case 'angry': return <Lightning size={16} weight="fill" className="text-red" />;
+      case 'tired': return <Moon size={16} weight="fill" className="text-gray-nav" />;
       default: return null;
     }
   };
@@ -217,7 +217,7 @@ export const SingleNote: React.FC = () => {
               <div className="mx-auto max-w-3xl space-y-6 animate-in fade-in duration-500 pb-20 relative px-4">
         {/* Sticky Header */}
         <div className="flex items-center justify-between sticky top-4 bg-white/80 backdrop-blur-xl py-3 px-4 sm:px-6 rounded-full border border-border shadow-sm z-10 mb-8">
-          <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.NOTES)} className="-ml-2 text-gray-nav hover:text-gray-text font-bold text-[12px]">
+          <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.NOTES)} className="-ml-2 text-gray-nav hover:text-gray-text font-bold text-[12px]" aria-label="Go back to my reflections">
             <ArrowLeft className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} weight="bold" />
             {!isMobile && "Back"}
           </Button>
@@ -228,6 +228,7 @@ export const SingleNote: React.FC = () => {
               onClick={handleEdit}
               disabled={isDeleting}
               className={`border border-border rounded-full text-blue shadow-sm active:scale-[0.98] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] bg-white ${isMobile ? 'w-12 px-0' : ''}`}
+              aria-label="Edit this reflection"
             >
               <PencilSimple size={20} weight="bold" className={isMobile ? "" : "mr-2"} />
               {!isMobile && "Edit"}
@@ -239,6 +240,7 @@ export const SingleNote: React.FC = () => {
               isLoading={isDeleting}
               disabled={isDeleting}
               className={`border border-border rounded-full text-red shadow-sm active:scale-[0.98] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-red/5 hover:border-red/30 bg-white ${isMobile ? 'w-12 px-0' : ''}`}
+              aria-label="Delete this reflection"
             >
               <Trash size={20} weight="bold" className={isMobile ? "" : "mr-2"} />
               {!isMobile && "Delete"}
