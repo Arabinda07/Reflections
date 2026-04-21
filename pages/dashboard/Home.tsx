@@ -35,11 +35,22 @@ export const Home: React.FC = () => {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [dailyPrompt, setDailyPrompt] = useState(DEFAULT_WELLNESS_PROMPTS[0]);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [quote, setQuote] = useState({ text: "", author: "" });
 
   const entranceDuration = isFromSave ? 0.3 : 0.8;
 
+  const WISDOM_QUOTES = [
+    { text: "The soul usually knows what to do to heal itself. The challenge is to silence the mind.", author: "Caroline Myss" },
+    { text: "Within you, there is a stillness and a sanctuary to which you can retreat at any time.", author: "Hermann Hesse" },
+    { text: "Your vision will become clear only when you can look into your own heart.", author: "Carl Jung" },
+    { text: "The wound is the place where the Light enters you.", author: "Rumi" },
+    { text: "Quiet the mind, and the soul will speak.", author: "Ma Jaya Sati Bhagavati" },
+    { text: "Everything in the universe is within you. Ask all from yourself.", author: "Rumi" }
+  ];
+
   useEffect(() => {
     setDailyPrompt(DEFAULT_WELLNESS_PROMPTS[Math.floor(Math.random() * DEFAULT_WELLNESS_PROMPTS.length)]);
+    setQuote(WISDOM_QUOTES[Math.floor(Math.random() * WISDOM_QUOTES.length)]);
     const hasSeen = localStorage.getItem('hasSeenOnboarding');
     if (!hasSeen) setShowOnboarding(true);
   }, []);
@@ -138,59 +149,74 @@ export const Home: React.FC = () => {
           </div>
         </section>
 
-        {/* Simplified Bento Grid */}
-        <section className="grid grid-cols-1 lg:grid-cols-12 border-t border-border bg-white dark:bg-transparent">
+        {/* Balanced 3-Panel Bento Grid */}
+        <section className="grid grid-cols-1 lg:grid-cols-3 border-t border-border bg-white dark:bg-transparent min-h-[450px]">
           
-          {/* Main Stats Panel */}
-          <div className="lg:col-span-8 p-10 sm:p-16 border-b lg:border-b-0 lg:border-r border-border">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 sm:gap-16">
-              <button 
-                onClick={() => navigate(RoutePath.NOTES)}
-                className="group flex flex-col items-start gap-6"
-                aria-label="View all reflections"
-              >
-                <div className="flex items-center gap-2 text-gray-nav">
-                  <FolderOpen size={18} weight="bold" className="text-green" />
-                  <span className="text-[12px] font-bold uppercase tracking-tight">Reflections</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <h2 className="text-5xl md:text-6xl font-display text-gray-text group-hover:text-green transition-colors">
-                    {isCountLoading ? '...' : displayCount}
-                  </h2>
-                  <div className="w-10 h-10 rounded-full border border-border flex items-center justify-center group-hover:bg-green group-hover:text-white transition-all">
-                    <ArrowRight size={18} weight="bold" />
-                  </div>
-                </div>
-              </button>
+          {/* Panel 1: Overview */}
+          <div className="p-10 sm:p-14 border-b lg:border-b-0 lg:border-r border-border flex flex-col justify-between">
+            <div className="flex items-center gap-2 text-gray-nav mb-12">
+              <FolderOpen size={18} weight="bold" className="text-green" />
+              <span className="text-[11px] font-black uppercase tracking-widest opacity-60">Sanctuary Overview</span>
+            </div>
+            
+            <button 
+              onClick={() => navigate(RoutePath.NOTES)}
+              className="group flex flex-col items-start gap-4 mb-12"
+              aria-label="View all reflections"
+            >
+              <h2 className="text-5xl md:text-7xl font-display text-gray-text group-hover:text-green transition-colors tracking-tighter">
+                {isCountLoading ? '...' : displayCount}
+              </h2>
+              <p className="text-[13px] font-bold text-gray-nav uppercase tracking-tight">Reflections Archieved</p>
+            </button>
 
-              <button 
-                onClick={() => navigate(RoutePath.INSIGHTS)}
-                className="group flex flex-col items-start gap-6"
-                aria-label="View AI insights"
-              >
-                <div className="flex items-center gap-2 text-gray-nav">
-                  <Brain size={18} weight="bold" className="text-green" />
-                  <span className="text-[12px] font-bold uppercase tracking-tight">AI Insights</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <p className="text-xl font-serif italic text-gray-light group-hover:text-gray-text transition-colors leading-snug max-w-[240px]">
-                    Analysis is ongoing as your narrative evolves.
-                  </p>
-                  <div className="w-10 h-10 rounded-full border border-border flex items-center justify-center group-hover:bg-green group-hover:text-white transition-all shrink-0">
-                    <ArrowRight size={18} weight="bold" />
-                  </div>
-                </div>
-              </button>
+            <button 
+              onClick={() => navigate(RoutePath.INSIGHTS)}
+              className="group flex flex-col items-start gap-4 p-6 rounded-2xl bg-panel-bg border border-border hover:border-green/30 transition-all text-left"
+              aria-label="View AI insights"
+            >
+              <div className="flex items-center gap-2 text-gray-nav mb-2">
+                <Brain size={16} weight="bold" className="text-green" />
+                <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Librarian's Note</span>
+              </div>
+              <p className="text-2xl font-serif italic text-gray-light group-hover:text-gray-text transition-colors leading-relaxed">
+                Analysis is ongoing as your narrative evolves.
+              </p>
+            </button>
+          </div>
+
+          {/* Panel 2: Daily Wisdom (Quote) - DELIGHT */}
+          <div className="p-10 sm:p-14 border-b lg:border-b-0 lg:border-r border-border flex flex-col justify-between bg-white">
+            <div className="flex items-center gap-2 text-gray-nav mb-12">
+              <Sparkle size={18} weight="bold" className="text-orange" />
+              <span className="text-[11px] font-black uppercase tracking-widest opacity-60">Daily Wisdom</span>
+            </div>
+
+            <div className="space-y-8">
+              <p className="text-3xl font-serif italic text-gray-text leading-relaxed relative">
+                <span className="absolute -left-6 -top-4 text-6xl text-orange/10 font-serif">"</span>
+                {quote.text}
+              </p>
+              <div className="flex items-center gap-4">
+                <div className="h-px w-8 bg-orange/20" />
+                <p className="text-[13px] font-bold text-gray-nav uppercase tracking-widest">{quote.author}</p>
+              </div>
+            </div>
+
+            <div className="mt-12 pt-8 border-t border-border/50">
+              <p className="text-[11px] text-gray-nav leading-relaxed italic opacity-60">
+                A moment of stillness before you begin your session.
+              </p>
             </div>
           </div>
 
-          {/* Daily Action Panel */}
-          <div className="lg:col-span-4 p-10 sm:p-16 flex flex-col justify-between bg-panel-bg">
+          {/* Panel 3: Daily Focus (Action) */}
+          <div className="p-10 sm:p-14 flex flex-col justify-between bg-panel-bg">
             <div>
               <div className="flex items-center justify-between mb-12">
                 <div className="flex items-center gap-2 text-gray-nav">
                   <Target size={18} weight="bold" className="text-green" />
-                  <span className="text-[12px] font-bold uppercase tracking-tight">Daily Focus</span>
+                  <span className="text-[11px] font-black uppercase tracking-widest opacity-60">Daily Focus</span>
                 </div>
                 <button 
                   onClick={refreshPrompt}
@@ -211,15 +237,17 @@ export const Home: React.FC = () => {
               </div>
             </div>
 
-            <Button
-              variant="primary"
-              className="mt-10 h-14 rounded-xl text-[15px] font-bold bg-gray-text text-white hover:bg-black transition-all"
-              onClick={() => handleCreateClick(dailyPrompt)}
-              aria-label="Start a new reflection with this prompt"
-            >
-              Start Reflection
-              <Plus size={18} weight="bold" className="ml-2" />
-            </Button>
+            <Magnetic distance={0.15}>
+              <Button
+                variant="primary"
+                className="mt-10 w-full h-16 rounded-2xl text-[16px] font-bold bg-gray-text text-white hover:bg-black transition-all shadow-xl shadow-black/5"
+                onClick={() => handleCreateClick(dailyPrompt)}
+                aria-label="Start a new reflection with this prompt"
+              >
+                Start Reflection
+                <Plus size={18} weight="bold" className="ml-3" />
+              </Button>
+            </Magnetic>
           </div>
         </section>
 

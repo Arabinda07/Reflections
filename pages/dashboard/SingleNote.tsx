@@ -218,7 +218,7 @@ export const SingleNote: React.FC = () => {
         {/* Sticky Header */}
         <div className="flex items-center justify-between sticky top-4 bg-white/80 backdrop-blur-xl py-3 px-4 sm:px-6 rounded-full border border-border shadow-sm z-10 mb-8">
           <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.NOTES)} className="-ml-2 text-gray-nav hover:text-gray-text font-bold text-[12px]" aria-label="Go back to my reflections">
-            <ArrowLeft className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} weight="bold" />
+            <ArrowLeft className={`${isMobile ? '' : 'mr-2'} h-5 w-5 shrink-0`} weight="bold" />
             {!isMobile && "Back"}
           </Button>
           <div className="flex gap-2 items-center">
@@ -227,10 +227,10 @@ export const SingleNote: React.FC = () => {
               size="md" 
               onClick={handleEdit}
               disabled={isDeleting}
-              className={`border border-border rounded-full text-blue shadow-sm active:scale-[0.98] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] bg-white ${isMobile ? 'w-12 px-0' : ''}`}
+              className={`border-border rounded-full shadow-sm active:scale-[0.98] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${isMobile ? 'w-12 px-0' : 'text-blue'}`}
               aria-label="Edit this reflection"
             >
-              <PencilSimple size={20} weight="bold" className={isMobile ? "" : "mr-2"} />
+              <PencilSimple weight="bold" className={`h-5 w-5 shrink-0 ${isMobile ? 'text-blue' : 'mr-2'}`} />
               {!isMobile && "Edit"}
             </Button>
             <Button 
@@ -239,10 +239,10 @@ export const SingleNote: React.FC = () => {
               onClick={initiateDelete} 
               isLoading={isDeleting}
               disabled={isDeleting}
-              className={`border border-border rounded-full text-red shadow-sm active:scale-[0.98] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-red/5 hover:border-red/30 bg-white ${isMobile ? 'w-12 px-0' : ''}`}
+              className={`border-border rounded-full shadow-sm active:scale-[0.98] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-red/5 hover:border-red/30 ${isMobile ? 'w-12 px-0' : 'text-red'}`}
               aria-label="Delete this reflection"
             >
-              <Trash size={20} weight="bold" className={isMobile ? "" : "mr-2"} />
+              <Trash weight="bold" className={`h-5 w-5 shrink-0 ${isMobile ? 'text-red' : 'mr-2'}`} />
               {!isMobile && "Delete"}
             </Button>
           </div>
