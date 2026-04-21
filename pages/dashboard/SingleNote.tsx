@@ -224,23 +224,23 @@ export const SingleNote: React.FC = () => {
           <div className="flex gap-2 items-center">
             <Button 
               variant="secondary" 
-              size="sm" 
+              size="md" 
               onClick={handleEdit}
               disabled={isDeleting}
-              className={`border border-border rounded-full text-blue shadow-sm active:scale-[0.98] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] bg-white ${isMobile ? 'w-10 px-0' : ''}`}
+              className={`border border-border rounded-full text-blue shadow-sm active:scale-[0.98] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] bg-white ${isMobile ? 'w-12 px-0' : ''}`}
             >
-              <PencilSimple className={`${isMobile ? '' : 'mr-2'} h-3.5 w-3.5`} weight="bold" />
+              <PencilSimple className={`${isMobile ? '' : 'mr-2'} h-5 w-5`} weight="bold" />
               {!isMobile && "Edit"}
             </Button>
             <Button 
               variant="secondary" 
-              size="sm" 
+              size="md" 
               onClick={initiateDelete} 
               isLoading={isDeleting}
               disabled={isDeleting}
-              className={`border border-border rounded-full text-red shadow-sm active:scale-[0.98] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-red/5 hover:border-red/30 bg-white ${isMobile ? 'w-10 px-0' : ''}`}
+              className={`border border-border rounded-full text-red shadow-sm active:scale-[0.98] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] hover:bg-red/5 hover:border-red/30 bg-white ${isMobile ? 'w-12 px-0' : ''}`}
             >
-              <Trash className={`${isMobile ? '' : 'mr-2'} h-3.5 w-3.5`} weight="bold" />
+              <Trash className={`${isMobile ? '' : 'mr-2'} h-5 w-5`} weight="bold" />
               {!isMobile && "Delete"}
             </Button>
           </div>
