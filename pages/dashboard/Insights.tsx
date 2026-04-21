@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Sparkle, Brain, Calendar, CheckSquare, Heart, TrendUp, Book, CaretRight, Hash, X } from '@phosphor-icons/react';
+import { ArrowLeft, Sparkle, Brain, Calendar, CheckSquare, Heart, TrendUp, Book, CaretRight, Hash, X, Warning } from '@phosphor-icons/react';
 import { Button } from '../../components/ui/Button';
 import { RoutePath, Note, LifeTheme } from '../../types';
 import { noteService } from '../../services/noteService';

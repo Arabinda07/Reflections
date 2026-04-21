@@ -131,6 +131,10 @@
   --black-rgb: 0 0 0;
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
   color: var(--gray-text);

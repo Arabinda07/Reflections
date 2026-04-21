@@ -139,7 +139,7 @@ export const Account: React.FC = () => {
     <div className="relative w-full max-w-4xl mx-auto pb-32 pt-12 px-6">
       <header className="mb-16 text-center lg:text-left">
         <h1 className="font-display text-3xl md:text-4xl tracking-tighter text-gray-text lowercase leading-none mb-4">Personal Sanctuary</h1>
-        <p className="text-[15px] font-bold uppercase tracking-tight text-gray-light opacity-60">Manage your reflections and personal data.</p>
+        <p className="text-[16px] font-medium text-gray-light opacity-80 mt-2">Manage your reflections and personal data.</p>
       </header>
 
       <div className="border border-border rounded-[32px] bg-white overflow-hidden mb-16">
@@ -289,23 +289,26 @@ export const Account: React.FC = () => {
                 onClick={handleSignOut}
                 className="flex items-center gap-2 text-gray-nav hover:text-red transition-all font-bold text-[13px] uppercase tracking-widest"
               >
-                Sign out
+                <SignOut size={20} weight="bold" />
+                <span className="hidden sm:inline">Sign out</span>
               </button>
               <div className="flex items-center gap-4">
                 <Button 
                   type="button" 
                   variant="secondary" 
                   onClick={() => navigate(-1)}
-                  className="h-12 rounded-xl border border-border font-bold text-[14px] bg-white text-gray-text hover:bg-gray-50 transition-all px-6 sm:px-8"
+                  className="h-12 rounded-xl border border-border font-bold text-[14px] bg-white text-gray-text hover:bg-gray-50 transition-all px-4 sm:px-8 flex items-center justify-center"
                 >
-                  Cancel
+                  <X size={18} weight="bold" className="sm:mr-2" />
+                  <span className="hidden sm:inline">Cancel</span>
                 </Button>
                 <Button 
                   type="submit" 
                   disabled={loading || isSaved}
-                  className={`h-12 rounded-xl font-bold text-[14px] bg-green text-white hover:bg-green/90 shadow-lg shadow-green/10 transition-all active:scale-[0.98] ${isSaved ? 'bg-green text-white' : ''} px-6 sm:px-10`}
+                  className={`h-12 rounded-xl font-bold text-[14px] bg-green text-white hover:bg-green/90 shadow-lg shadow-green/10 transition-all active:scale-[0.98] ${isSaved ? 'bg-green text-white' : ''} px-4 sm:px-10 flex items-center justify-center`}
                 >
-                  {loading ? 'Saving...' : isSaved ? 'Saved!' : 'Save Changes'}
+                  {loading ? <CircleNotch size={18} className="animate-spin sm:mr-2" /> : isSaved ? <Check size={18} weight="bold" className="sm:mr-2" /> : <FloppyDisk size={18} weight="bold" className="sm:mr-2" />}
+                  <span className="hidden sm:inline">{loading ? 'Saving...' : isSaved ? 'Saved!' : 'Save Changes'}</span>
                 </Button>
               </div>
             </div>

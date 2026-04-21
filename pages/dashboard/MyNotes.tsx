@@ -136,11 +136,11 @@ export const MyNotes: React.FC = () => {
       <LoadingState isVisible={loading} message="gathering your thoughts..." />
       {isContentVisible && (
         <div className="space-y-10 animate-in fade-in duration-700 pb-12 px-4 md:px-10">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-border pb-10 gap-6">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-border pb-10 pt-4 md:pt-8 gap-6">
             <div>
               <h1 className="font-display text-3xl md:text-4xl text-gray-text lowercase tracking-tight">Reflection Library</h1>
-              <p className="text-gray-light mt-2 text-[15px] font-bold uppercase tracking-tight opacity-60">
-                Your accumulated knowledge & narrative.
+              <p className="text-gray-light mt-2 text-[16px] font-medium opacity-80">
+                Your accumulated knowledge and narrative.
               </p>
               {tagFilter && (
                 <div className="mt-4 flex items-center gap-2">

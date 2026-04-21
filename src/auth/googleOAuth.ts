@@ -53,7 +53,7 @@ export const getGoogleOAuthRedirectTo = () => {
 
 export const resolvePostAuthRedirectPath = (value?: unknown) => {
   if (typeof value !== 'object' || value === null) {
-    return RoutePath.NOTES;
+    return RoutePath.HOME;
   }
 
   const candidate = value as {
@@ -65,10 +65,10 @@ export const resolvePostAuthRedirectPath = (value?: unknown) => {
   const pathname =
     typeof candidate.pathname === 'string' && candidate.pathname.startsWith('/')
       ? candidate.pathname
-      : RoutePath.NOTES;
+      : RoutePath.HOME;
 
   if (pathname === RoutePath.LOGIN || pathname === RoutePath.SIGNUP) {
-    return RoutePath.NOTES;
+    return RoutePath.HOME;
   }
 
   const search = typeof candidate.search === 'string' ? candidate.search : '';
@@ -79,7 +79,7 @@ export const resolvePostAuthRedirectPath = (value?: unknown) => {
 
 export const rememberPendingGoogleAuth = ({
   sourcePath,
-  redirectPath = RoutePath.NOTES,
+  redirectPath = RoutePath.HOME,
 }: {
   sourcePath: GoogleAuthSourcePath;
   redirectPath?: string;
@@ -93,7 +93,7 @@ export const rememberPendingGoogleAuth = ({
     PENDING_GOOGLE_AUTH_REDIRECT_PATH_KEY,
     redirectPath.startsWith('/')
       ? resolvePostAuthRedirectPath(new URL(redirectPath, window.location.origin))
-      : RoutePath.NOTES,
+      : RoutePath.HOME,
   );
   window.sessionStorage.removeItem(GOOGLE_AUTH_ERROR_KEY);
 };
@@ -123,10 +123,10 @@ export const getPendingGoogleAuthPath = (): GoogleAuthSourcePath | null => {
 
 export const getPendingGoogleAuthRedirectPath = () => {
   if (!hasWindow()) {
-    return RoutePath.NOTES;
+    return RoutePath.HOME;
   }
 
-  return window.sessionStorage.getItem(PENDING_GOOGLE_AUTH_REDIRECT_PATH_KEY) || RoutePath.NOTES;
+  return window.sessionStorage.getItem(PENDING_GOOGLE_AUTH_REDIRECT_PATH_KEY) || RoutePath.HOME;
 };
 
 export const consumePendingGoogleAuthRedirectPath = (sourcePath: GoogleAuthSourcePath) => {
@@ -219,7 +219,7 @@ const launchGoogleOAuth = async (sourcePath: GoogleAuthSourcePath) => {
 
 export const startGoogleOAuthFlow = async ({
   sourcePath,
-  redirectPath = RoutePath.NOTES,
+  redirectPath = RoutePath.HOME,
 }: {
   sourcePath: GoogleAuthSourcePath;
   redirectPath?: string;
