@@ -301,7 +301,7 @@ export const MyNotes: React.FC = () => {
                       <button 
                         onClick={(e) => initiateDelete(e, note.id)}
                         disabled={isDeleting && noteIdToDelete === note.id}
-                        className="absolute top-4 left-4 z-20 h-9 w-9 flex items-center justify-center rounded-xl bg-white/90 dark:bg-black/50 backdrop-blur-md border border-border/50 text-gray-text dark:text-white hover:text-red hover:border-red/30 shadow-sm active:scale-95 transition-all duration-300"
+                        className="absolute top-4 left-4 z-20 h-9 w-9 flex items-center justify-center rounded-xl bg-white/90 dark:bg-black/50 backdrop-blur-md border border-border/50 text-gray-text hover:text-red hover:border-red/30 shadow-sm active:scale-95 transition-all duration-300"
                       >
                         {isDeleting && noteIdToDelete === note.id ? (
                           <CircleNotch size={16} weight="bold" className="animate-spin text-red" />
@@ -311,7 +311,7 @@ export const MyNotes: React.FC = () => {
                       </button>
                       
                       <div className="absolute top-4 right-4 z-20 flex flex-col items-end gap-2">
-                           <div className="flex items-center gap-2 rounded-full bg-white/90 dark:bg-black/50 backdrop-blur-md border border-border/50 px-3 py-1 text-[11px] font-bold text-gray-text dark:text-white shadow-sm">
+                           <div className="flex items-center gap-2 rounded-full bg-white/90 dark:bg-black/50 backdrop-blur-md border border-border/50 px-3 py-1 text-[11px] font-bold text-gray-text shadow-sm">
                               <div className="flex items-center gap-1.5 border-r border-border/30 pr-2 mr-0.5">
                                 <CalendarIcon size={12} weight="bold" />
                                 <span>{new Date(note.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
