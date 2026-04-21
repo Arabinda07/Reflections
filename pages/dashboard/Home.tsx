@@ -153,7 +153,7 @@ export const Home: React.FC = () => {
         <section className="grid grid-cols-1 lg:grid-cols-3 border-t border-border bg-white dark:bg-transparent min-h-[500px]">
           
           {/* Panel 1: Overview */}
-          <div className="p-10 sm:p-16 border-b lg:border-b-0 lg:border-r border-border flex flex-col justify-between h-full">
+          <div className="p-10 sm:p-16 border-b lg:border-b-0 lg:border-r border-border flex flex-col justify-between h-full bg-white/50">
             <div>
               <div className="flex items-center gap-2 text-gray-nav mb-12">
                 <FolderOpen size={18} weight="bold" className="text-green" />
@@ -162,7 +162,7 @@ export const Home: React.FC = () => {
               
               <button 
                 onClick={() => navigate(RoutePath.NOTES)}
-                className="group flex flex-col items-start gap-4 mb-16"
+                className="group flex flex-col items-start gap-4 mb-16 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300"
                 aria-label="View all reflections"
               >
                 <h2 className="text-5xl md:text-7xl font-display text-gray-text group-hover:text-green transition-colors tracking-tighter">
@@ -174,7 +174,7 @@ export const Home: React.FC = () => {
 
             <button 
               onClick={() => navigate(RoutePath.INSIGHTS)}
-              className="group flex flex-col items-start gap-5 p-8 rounded-3xl bg-panel-bg border border-border hover:border-green/30 transition-all text-left"
+              className="group flex flex-col items-start gap-5 p-8 rounded-3xl bg-panel-bg border border-border hover:border-green/30 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 text-left"
               aria-label="View AI insights"
             >
               <div className="flex items-center gap-2 text-gray-nav mb-2">
@@ -189,7 +189,7 @@ export const Home: React.FC = () => {
 
           {/* Panel 2: Daily Wisdom (Quote) */}
           <div className="p-10 sm:p-16 border-b lg:border-b-0 lg:border-r border-border flex flex-col justify-between bg-white h-full">
-            <div>
+            <div className="flex-grow">
               <div className="flex items-center gap-2 text-gray-nav mb-12">
                 <Sparkle size={18} weight="bold" className="text-orange" />
                 <span className="text-[11px] font-black uppercase tracking-widest opacity-60">Daily Wisdom</span>
@@ -206,8 +206,6 @@ export const Home: React.FC = () => {
                 </div>
               </div>
             </div>
-
-            <div className="hidden lg:block h-20" />
           </div>
 
           {/* Panel 3: Daily Focus (Action) */}

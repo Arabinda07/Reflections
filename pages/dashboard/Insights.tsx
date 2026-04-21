@@ -11,23 +11,23 @@ import { profileService } from '../../services/profileService';
 import { FREE_AI_MINIMUM_NOTES, getAiReflectionGate } from '../../services/wellnessPolicy';
 import { AiReflectionGate, WellnessAccess } from '../../types';
 
-// Flat soft colors — no gradients
+// Semantic OKLCH-based colors
 const MOOD_COLORS: Record<string, string> = {
-  happy:   '#f59e0b',
-  calm:    '#10b981',
-  anxious: '#60a5fa',
-  sad:     '#818cf8',
-  angry:   '#fb7185',
-  tired:   '#94a3b8',
+  happy:   '#f97316', // orange
+  calm:    '#10b981', // green
+  anxious: '#3b82f6', // blue
+  sad:     '#6366f1', // indigo
+  angry:   '#ef4444', // red
+  tired:   '#64748b', // slate
 };
 
 const MOOD_BG: Record<string, string> = {
-  happy:   '#fef3c7',
-  calm:    '#d1fae5',
-  anxious: '#dbeafe',
-  sad:     '#e0e7ff',
-  angry:   '#ffe4e6',
-  tired:   '#f1f5f9',
+  happy:   '#fff7ed',
+  calm:    '#f0fdf4',
+  anxious: '#eff6ff',
+  sad:     '#eef2ff',
+  angry:   '#fef2f2',
+  tired:   '#f8fafc',
 };
 
 export const Insights: React.FC = () => {
@@ -154,14 +154,14 @@ export const Insights: React.FC = () => {
 
   return (
       <div className="mx-auto max-w-[1000px] pb-32 px-4 md:px-10">
-      <nav className="sticky top-4 z-50 mb-16 flex items-center justify-between rounded-full border border-border bg-white/90 px-4 py-3 shadow-sm backdrop-blur-2xl transition-all duration-300 ease-out-quart">
+      <nav className="sticky top-4 z-50 mb-12 flex items-center justify-between rounded-full border border-border bg-white/80 backdrop-blur-xl px-4 py-3 shadow-sm transition-all duration-300">
         <div className="flex items-center gap-3">
-           <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-bold text-[12px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green">
-             <ArrowLeft className="mr-2 h-4 w-4" weight="bold" />
+           <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="text-gray-nav hover:text-gray-text font-bold text-[12px]">
+             <ArrowLeft className="mr-2 h-5 w-5 shrink-0" weight="bold" />
              {!isMobile && "Back"}
            </Button>
            <div className="h-4 w-[1px] bg-border"></div>
-           <span className="text-[11px] uppercase tracking-widest font-black text-gray-nav">Stats & insights</span>
+           <span className="text-[11px] uppercase tracking-widest font-black text-gray-nav opacity-60 px-2">Insights Gallery</span>
         </div>
       </nav>
 
@@ -286,63 +286,65 @@ export const Insights: React.FC = () => {
         </div>
       </div>
 
-      {/* LLM WIKI / LIFE THEME LIBRARY */}
-      <div className="bezel-outer mb-16">
-        <div className="bezel-inner p-8 overflow-hidden relative">
-          <div className="mb-10 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-            <div className="flex items-center gap-5">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[24px] bg-green/5 text-green border border-green/10 shadow-sm">
+      {/* LIFE THEME LIBRARY / WIKI */}
+      <div className="border border-border rounded-[32px] bg-white mb-16 overflow-hidden">
+        <div className="p-8 md:p-14 relative">
+          <div className="mb-12 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-center gap-6">
+              <div className="flex h-14 w-14 md:h-16 md:w-16 shrink-0 items-center justify-center rounded-2xl bg-green/5 text-green border border-green/10">
                 <Book size={28} weight="duotone" />
               </div>
               <div>
-                <h2 className="text-3xl font-display text-gray-text tracking-tight">Personal life wiki</h2>
-                <p className="text-[14px] text-gray-light font-medium">Compiled from {notes.length} reflections</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <div className="px-3 py-1 bg-blue/5 border border-blue/10 rounded-full text-[10px] font-black text-blue tracking-widest uppercase">
-                 Compounding insights
+                <h2 className="text-2xl md:text-3xl font-display text-gray-text tracking-tight">Personal life wiki</h2>
+                <p className="text-[13px] text-gray-light font-bold uppercase tracking-tight mt-1 opacity-60">
+                  Refined from {notes.length} reflections
+                </p>
               </div>
             </div>
           </div>
 
           {notes.length === 0 ? (
-            <div className="text-center py-20 border border-dashed border-border rounded-[24px] bg-gray-50/5">
-               <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 border border-border text-gray-nav shadow-sm mb-4">
-                  <Sparkle size={18} weight="duotone" />
+            <div className="text-center py-20 px-6 border border-dashed border-border rounded-[24px] bg-gray-50/5">
+               <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white border border-border text-gray-nav shadow-sm mb-6">
+                  <Sparkle size={18} weight="duotone" className="text-orange" />
                </div>
-               <p className="font-display text-gray-text text-xl">Your wiki is being built.</p>
-               <p className="mt-2 text-gray-light text-[14px] max-w-sm mx-auto">Write your first reflection to start building your personal library of growth.</p>
+               <p className="text-xl md:text-2xl font-serif italic text-gray-text leading-relaxed">
+                 Your sanctuary is being prepared.
+               </p>
+               <p className="mt-3 text-gray-light text-[14px] font-medium max-w-sm mx-auto">Write your first reflection to start building your personal library of growth.</p>
                <Button
                  variant="ghost"
-                 className="mt-6 text-[11px] font-black"
+                 className="mt-8 text-[11px] font-black uppercase tracking-widest text-blue"
                  onClick={() => navigate(RoutePath.CREATE_NOTE)}
                >
-                  Write your first entry
+                  Begin your first entry
                </Button>
             </div>
           ) : notes.length < FREE_AI_MINIMUM_NOTES ? (
-            <div className="text-center py-20 border border-dashed border-border rounded-[24px] bg-gray-50/5">
-               <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 border border-border text-gray-nav shadow-sm mb-4">
-                  <Sparkle size={18} weight="duotone" />
+            <div className="text-center py-20 px-6 border border-dashed border-border rounded-[24px] bg-gray-50/5">
+               <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white border border-border text-gray-nav shadow-sm mb-6">
+                  <Sparkle size={18} weight="duotone" className="text-orange" />
                </div>
-               <p className="font-display text-gray-text text-xl">Your wiki is being built on less than 3 entries.</p>
+               <p className="text-xl md:text-2xl font-serif italic text-gray-text leading-relaxed max-w-md mx-auto">
+                 Your wiki is evolving as you write your narrative.
+               </p>
+               <p className="mt-3 text-gray-light text-[13px] font-medium opacity-60">
+                 Synthesizing patterns requires at least 3 reflections.
+               </p>
             </div>
           ) : themes.length === 0 ? (
-            <div className="text-center py-20 border border-dashed border-border rounded-[24px] bg-gray-50/5">
-               <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 border border-border text-gray-nav shadow-sm mb-4">
-                  <Sparkle size={18} weight="duotone" />
+            <div className="text-center py-20 px-6 border border-dashed border-border rounded-[24px] bg-gray-50/5">
+               <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-white border border-border text-gray-nav shadow-sm mb-6">
+                  <Sparkle size={18} weight="duotone" className="text-orange" />
                </div>
-               <p className="font-display text-gray-text text-xl">Unlock your Life Wiki insights.</p>
-               <p className="mt-2 text-gray-light text-[14px] max-w-sm mx-auto mb-8">You've unlocked your Life Wiki and 1 free AI reflection. Generate your insights to see recurring themes in your life.</p>
+               <p className="text-xl md:text-2xl font-serif italic text-gray-text mb-8">Unlock your Life Wiki insights.</p>
                
                {gate?.requiresUpgrade ? (
                  <div className="flex flex-col items-center gap-4">
-                    <p className="text-[12px] font-black text-orange uppercase tracking-widest">Free limit reached</p>
+                    <p className="text-[11px] font-black text-orange uppercase tracking-widest">Free limit reached</p>
                     <Button
                       variant="primary"
-                      className="rounded-2xl px-10 h-14 font-black shadow-lg shadow-green/20"
+                      className="rounded-2xl px-12 h-14 font-bold bg-green text-white hover:bg-green/90 transition-all shadow-lg shadow-green/10"
                       onClick={() => navigate(RoutePath.ACCOUNT)}
                     >
                        Upgrade to Premium
@@ -351,12 +353,12 @@ export const Insights: React.FC = () => {
                ) : (
                  <Button
                    variant="primary"
-                   className="rounded-2xl px-10 h-14 font-black shadow-lg shadow-green/20"
+                   className="rounded-2xl px-12 h-14 font-bold bg-green text-white hover:bg-green/90 transition-all shadow-lg shadow-green/10"
                    onClick={handleRefreshWiki}
                    isLoading={isRefreshingWiki}
                    disabled={isRefreshingWiki || !gate?.canReflect}
                  >
-                    {isRefreshingWiki ? "Synthesizing..." : "Get Insights"}
+                    {isRefreshingWiki ? "Synthesizing..." : "Generate Insights"}
                  </Button>
                )}
             </div>
@@ -380,17 +382,17 @@ export const Insights: React.FC = () => {
               )}
 
               {!gate?.requiresUpgrade && themes.length > 0 && (
-                <div className="flex justify-center mb-8">
+                <div className="flex justify-center mb-10">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-[11px] font-black text-blue hover:text-blue/80"
+                    className="text-[11px] font-black text-blue hover:text-blue/80 uppercase tracking-widest"
                     onClick={handleRefreshWiki}
                     isLoading={isRefreshingWiki}
                     disabled={isRefreshingWiki || !gate?.canReflect}
                   >
                     <Sparkle size={14} weight="fill" className="mr-2" />
-                    {isRefreshingWiki ? "Updating Wiki..." : "Refresh Insights"}
+                    {isRefreshingWiki ? "Synthesizing..." : "Refresh Insights"}
                   </Button>
                 </div>
               )}
