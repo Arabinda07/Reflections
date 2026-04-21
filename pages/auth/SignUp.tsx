@@ -1,16 +1,40 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Envelope, Lock, User, UserPlus } from '@phosphor-icons/react';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { RoutePath } from '../../types';
+import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../src/supabaseClient';
+import {
+  consumeGoogleAuthError,
+  resolvePostAuthRedirectPath,
+  startGoogleOAuthFlow,
+} from '../../src/auth/googleOAuth';
 
 export const SignUp: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { isAuthenticated, isInitialCheckDone } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const postLoginPath = resolvePostAuthRedirectPath(location.state?.from);
+
+  useEffect(() => {
+    const flashError = consumeGoogleAuthError(RoutePath.SIGNUP);
+    if (flashError) {
+      setError(flashError);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isInitialCheckDone || !isAuthenticated) {
+      return;
+    }
+
+    navigate(postLoginPath, { replace: true });
+  }, [isAuthenticated, isInitialCheckDone, navigate, postLoginPath]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,7 +69,7 @@ export const SignUp: React.FC = () => {
         });
       } else if (data.session) {
         // Auto-login happened (email confirmation disabled)
-        navigate(RoutePath.HOME);
+        navigate(postLoginPath, { replace: true });
       }
     } catch (err) {
       console.error('Signup error:', err);
@@ -56,24 +80,15 @@ export const SignUp: React.FC = () => {
   };
 
   const handleGoogleLogin = async () => {
+    setError(null);
     setLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/`,
-        },
-      });
-
-      if (error) {
-        setError(error.message);
-        setLoading(false);
-      }
-    } catch (err) {
-      console.error("Google login error:", err);
-      setError("An unexpected error occurred during Google login.");
-      setLoading(false);
-    }
+    await startGoogleOAuthFlow({
+      sourcePath: RoutePath.SIGNUP,
+      redirectPath: postLoginPath,
+      onSuccess: () => navigate(postLoginPath, { replace: true }),
+      onError: (message) => setError(message),
+      onComplete: () => setLoading(false),
+    });
   };
 
   return (

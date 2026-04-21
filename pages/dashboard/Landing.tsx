@@ -37,18 +37,18 @@ export const Landing: React.FC = () => {
       <div className="min-h-[100dvh] w-full relative">
 
         {/* ── Left panel: content ── */}
-        <div className="relative z-20 flex flex-col justify-between min-h-[100dvh] px-6 pt-[18vh] lg:pt-[30vh] pb-10 lg:pb-12 sm:px-12 lg:px-16 xl:px-24 pointer-events-none">
+        <div className="relative z-20 flex min-h-[100dvh] flex-col justify-start px-6 pb-10 pt-[calc(env(safe-area-inset-top)+5.5rem)] sm:px-12 sm:pb-12 sm:pt-[calc(env(safe-area-inset-top)+6rem)] lg:justify-between lg:pt-[28vh] lg:pb-12 lg:px-16 xl:px-24 pointer-events-none">
 
           {/* Text section */}
-          <div className="flex flex-col gap-6 lg:gap-8 lg:w-[60%] xl:w-[55%]">
+          <div className="flex flex-col gap-5 sm:gap-6 lg:gap-8 lg:w-[60%] xl:w-[55%]">
             
             {/* Hero headline & Paragraph */}
-            <div className="flex flex-col gap-6 lg:gap-8">
+            <div className="flex flex-col gap-5 sm:gap-6 lg:gap-8">
               <motion.div
                 variants={staggerContainer}
                 initial="hidden"
                 animate="show"
-                className="flex flex-col pointer-events-auto max-w-5xl text-mk-display font-display tracking-tight text-gray-text"
+                className="pointer-events-auto flex max-w-[11ch] flex-col text-mk-display font-display tracking-[-0.03em] text-gray-text leading-[0.9] sm:max-w-[12ch] sm:leading-[0.94] lg:max-w-5xl lg:tracking-tight lg:leading-[0.98]"
               >
                 <motion.span variants={staggerLine} style={{ willChange: 'transform, opacity, filter' }}>
                   Your mind,
@@ -65,7 +65,7 @@ export const Landing: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.5 }}
-                className="text-mk-body font-serif text-gray-text drop-shadow-md max-w-[44ch] pointer-events-auto"
+                className="pointer-events-auto max-w-[33ch] font-serif text-[1rem] leading-[1.72] text-gray-text drop-shadow-[0_10px_30px_rgba(0,0,0,0.16)] sm:max-w-[38ch] sm:text-mk-body lg:max-w-[44ch]"
               >
                 A private, distraction-free environment designed to help you untangle your mind and find clarity in the noise.
               </motion.p>
@@ -77,7 +77,7 @@ export const Landing: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.6 }}
-              className="pointer-events-auto flex flex-col items-start sm:flex-row sm:items-center sm:flex-wrap gap-x-8 gap-y-6"
+              className="pointer-events-auto mt-8 flex flex-col items-start gap-x-8 gap-y-5 sm:mt-10 sm:flex-row sm:items-center sm:flex-wrap sm:gap-y-6 lg:mt-0"
             >
               <button
                 onClick={() => navigate(RoutePath.SIGNUP)}
@@ -131,7 +131,13 @@ export const Landing: React.FC = () => {
           className="absolute inset-0 overflow-hidden pointer-events-none lg:pointer-events-auto"
         >
           {/* Subtle responsive masks */}
-          <div className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-b from-body via-body/60 to-transparent lg:hidden" />
+          <div
+            className="absolute inset-0 z-10 pointer-events-none lg:hidden"
+            style={{
+              background: `linear-gradient(to bottom, var(--bg-color) 0%, rgb(var(--panel-bg-rgb) / 0.92) 18%, transparent 46%),
+                           linear-gradient(to right, var(--bg-color) 0%, rgb(var(--panel-bg-rgb) / 0.78) 34%, transparent 72%)`,
+            }}
+          />
           <div 
             className="absolute inset-0 z-10 hidden lg:block pointer-events-none"
             style={{ 
@@ -144,7 +150,7 @@ export const Landing: React.FC = () => {
             ref={videoRef}
             src="/assets/videos/landing_video.mp4"
             poster="/assets/videos/landing_video.png"
-            className="absolute inset-0 w-full h-full object-cover object-[52%_center] lg:object-center bg-body"
+            className="absolute inset-0 h-full w-full object-cover object-[70%_center] sm:object-[64%_center] lg:object-center bg-body"
             style={{ opacity: 0.9 }}
             autoPlay
             loop

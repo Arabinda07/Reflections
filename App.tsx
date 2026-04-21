@@ -1,5 +1,5 @@
 import React, { Suspense, lazy, useEffect } from 'react';
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { PWAInstallProvider } from './context/PWAInstallContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
@@ -9,7 +9,19 @@ import { RoutePath } from './types';
 import { useSync } from './hooks/useSync';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
+import { App as CapacitorApp } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
 import { supabase } from './src/supabaseClient';
+import {
+  clearPendingGoogleAuth,
+  consumeNativeGoogleOAuthCallback,
+  getGoogleOAuthCallbackError,
+  getPendingGoogleAuthRedirectPath,
+  getPendingGoogleAuthPath,
+  isGoogleOAuthCallbackUrl,
+  redirectToAppRoute,
+  stashGoogleAuthError,
+} from './src/auth/googleOAuth';
 
 // Lazy load non-critical routes to reduce initial bundle size
 const SignIn = lazy(() => import('./pages/auth/SignIn').then(m => ({ default: m.SignIn })));
@@ -54,33 +66,113 @@ const SyncWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 function App() {
   useEffect(() => {
-    // Detect if this is an OAuth popup callback
-    const isPopup = window.opener && window.opener !== window;
-    const hasAuthParams = window.location.hash.includes('access_token=') || 
-                         window.location.hash.includes('error=') ||
-                         window.location.search.includes('code=') ||
-                         window.location.search.includes('error=');
-    
-    if (isPopup && hasAuthParams) {
-      // Small delay fallback in case auth state doesn't trigger
-      let timer: number;
-      
-      // Subscribe to auth state changes to ensure session is saved before closing
+    let isActive = true;
+    let isResolved = false;
+    let timer: number | undefined;
+    let authSubscription: { unsubscribe: () => void } | null = null;
+    let nativeUrlListenerPromise: Promise<{ remove: () => Promise<void> }> | null = null;
+    let lastHandledNativeUrl: string | null = null;
+
+    const finalizeSuccess = () => {
+      if (!isActive || isResolved) {
+        return;
+      }
+
+      isResolved = true;
+      const redirectPath = getPendingGoogleAuthRedirectPath();
+      clearPendingGoogleAuth();
+      redirectToAppRoute(redirectPath);
+    };
+
+    const finalizeError = (message: string) => {
+      if (!isActive || isResolved) {
+        return;
+      }
+
+      isResolved = true;
+      stashGoogleAuthError(message);
+      redirectToAppRoute(getPendingGoogleAuthPath());
+    };
+
+    const watchCurrentWindowOAuthCallback = () => {
+      const currentUrl = window.location.href;
+
+      if (!isGoogleOAuthCallbackUrl(currentUrl)) {
+        return;
+      }
+
+      const callbackError = getGoogleOAuthCallbackError(currentUrl);
+      if (callbackError) {
+        finalizeError(callbackError);
+        return;
+      }
+
       const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
         if (event === 'SIGNED_IN') {
-          window.close();
+          finalizeSuccess();
         }
       });
-      
-      timer = window.setTimeout(() => {
-        window.close();
-      }, 2000);
-      
-      return () => {
-        clearTimeout(timer);
-        subscription.unsubscribe();
-      };
+
+      authSubscription = subscription;
+      timer = window.setTimeout(async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+
+        if (!isActive || isResolved) {
+          return;
+        }
+
+        if (session) {
+          finalizeSuccess();
+        } else {
+          finalizeError('Google sign in did not complete. Please try again.');
+        }
+      }, 4000);
+    };
+
+    const handleNativeOAuthUrl = async (url: string) => {
+      if (!url || url === lastHandledNativeUrl) {
+        return;
+      }
+
+      lastHandledNativeUrl = url;
+      const result = await consumeNativeGoogleOAuthCallback(url);
+
+      if (!isActive || !result.handled) {
+        return;
+      }
+
+      if ('error' in result) {
+        finalizeError(result.error);
+        return;
+      }
+
+      finalizeSuccess();
+    };
+
+    watchCurrentWindowOAuthCallback();
+
+    if (Capacitor.isNativePlatform()) {
+      nativeUrlListenerPromise = CapacitorApp.addListener('appUrlOpen', ({ url }) => {
+        void handleNativeOAuthUrl(url);
+      });
+
+      void CapacitorApp.getLaunchUrl().then((launchData) => {
+        if (launchData?.url) {
+          void handleNativeOAuthUrl(launchData.url);
+        }
+      });
     }
+
+    return () => {
+      isActive = false;
+
+      if (timer) {
+        clearTimeout(timer);
+      }
+
+      authSubscription?.unsubscribe();
+      void nativeUrlListenerPromise?.then((listener) => listener.remove());
+    };
   }, []);
 
   return (

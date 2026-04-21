@@ -1,20 +1,43 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Envelope, Lock, CheckCircle } from '@phosphor-icons/react';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { RoutePath } from '../../types';
+import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../src/supabaseClient';
+import {
+  consumeGoogleAuthError,
+  resolvePostAuthRedirectPath,
+  startGoogleOAuthFlow,
+} from '../../src/auth/googleOAuth';
 
 export const SignIn: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isAuthenticated, isInitialCheckDone } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const successMessage = location.state?.successMessage;
   const prefilledEmail = location.state?.email || '';
+  const postLoginPath = resolvePostAuthRedirectPath(location.state?.from);
+
+  useEffect(() => {
+    const flashError = consumeGoogleAuthError(RoutePath.LOGIN);
+    if (flashError) {
+      setError(flashError);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isInitialCheckDone || !isAuthenticated) {
+      return;
+    }
+
+    navigate(postLoginPath, { replace: true });
+  }, [isAuthenticated, isInitialCheckDone, navigate, postLoginPath]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +57,7 @@ export const SignIn: React.FC = () => {
       if (signInError) {
         setError(signInError.message);
       } else {
-        navigate(RoutePath.HOME);
+        navigate(postLoginPath, { replace: true });
       }
     } catch (err) {
       console.error('Login error:', err);
@@ -45,60 +68,15 @@ export const SignIn: React.FC = () => {
   };
 
   const handleGoogleLogin = async () => {
+    setError(null);
     setLoading(true);
-    try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          skipBrowserRedirect: true,
-          redirectTo: `${window.location.origin}/`,
-        },
-      });
-
-      if (error) {
-        setError(error.message);
-        setLoading(false);
-        return;
-      }
-
-      if (data?.url) {
-        // Open the OAuth URL in a popup window
-        const width = 500;
-        const height = 600;
-        const left = window.screenX + (window.outerWidth - width) / 2;
-        const top = window.screenY + (window.outerHeight - height) / 2;
-        
-        const popup = window.open(
-          data.url, 
-          'supabase-oauth-popup', 
-          `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no,scrollbars=yes,resizable=yes`
-        );
-
-        // Fallback: If popup is blocked by the browser, fallback to standard redirect
-        if (!popup) {
-          window.location.href = data.url;
-          return;
-        }
-
-        // Monitor the popup to detect when it closes
-        const checkPopup = setInterval(async () => {
-          if (popup.closed) {
-            clearInterval(checkPopup);
-            // After popup closes, double check the session (in case onAuthStateChange missed it)
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-              navigate(RoutePath.HOME);
-            } else {
-              setLoading(false);
-            }
-          }
-        }, 1000);
-      }
-    } catch (err: any) {
-      console.error("Google login error:", err);
-      setError(err.message || "An unexpected error occurred during Google login.");
-      setLoading(false);
-    }
+    await startGoogleOAuthFlow({
+      sourcePath: RoutePath.LOGIN,
+      redirectPath: postLoginPath,
+      onSuccess: () => navigate(postLoginPath, { replace: true }),
+      onError: (message) => setError(message),
+      onComplete: () => setLoading(false),
+    });
   };
 
   return (
