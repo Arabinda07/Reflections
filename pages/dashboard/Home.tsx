@@ -132,16 +132,22 @@ export const Home: React.FC = () => {
             autoPlay loop muted playsInline preload="metadata"
             className="absolute inset-0 w-full h-full object-cover object-center z-0"
           />
+          <div className="absolute inset-0 bg-black/30 z-10" />
           <div className="absolute inset-0 bg-gradient-to-t from-body via-transparent to-transparent z-10" />
           
-          <div className="relative z-20 h-full flex flex-col items-center justify-start pt-[15vh] text-center px-6">
+          <div className="relative z-20 h-full flex flex-col items-center justify-start pt-[10vh] text-center px-6">
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: entranceDuration, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ 
+                type: "spring",
+                stiffness: 100,
+                damping: 15,
+                duration: entranceDuration 
+              }}
               className="max-w-4xl"
             >
-              <h1 className="h1-hero drop-shadow-[0_8px_32px_rgba(0,0,0,0.3)] mb-12" style={{ color: '#FFFFFF' }}>
+              <h1 className="h1-hero drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)] drop-shadow-[0_8px_32px_rgba(0,0,0,0.3)] mb-12" style={{ color: '#FFFFFF' }}>
                 Welcome back, <br />
                 <span className="font-serif italic text-green drop-shadow-none">{user?.name?.split(' ')[0] || 'Reflector'}</span>
               </h1>
@@ -153,7 +159,7 @@ export const Home: React.FC = () => {
         <section className="grid grid-cols-1 lg:grid-cols-3 border-t border-border bg-white dark:bg-transparent min-h-[500px]">
           
           {/* Panel 1: Overview */}
-          <div className="p-10 sm:p-16 border-b lg:border-b-0 lg:border-r border-border flex flex-col justify-between h-full bg-white/50">
+          <div className="p-10 sm:p-16 border-b lg:border-b-0 lg:border-r border-border flex flex-col justify-between h-full bg-white/50 dark:bg-white/40">
             <div>
               <div className="flex items-center gap-2 text-gray-nav mb-12">
                 <FolderOpen size={18} weight="bold" className="text-green" />
@@ -188,7 +194,7 @@ export const Home: React.FC = () => {
           </div>
 
           {/* Panel 2: Daily Wisdom (Quote) */}
-          <div className="p-10 sm:p-16 border-b lg:border-b-0 lg:border-r border-border flex flex-col justify-between bg-white h-full">
+          <div className="p-10 sm:p-16 border-b lg:border-b-0 lg:border-r border-border flex flex-col justify-between h-full bg-white dark:bg-white/60">
             <div className="flex-grow">
               <div className="flex items-center gap-2 text-gray-nav mb-12">
                 <Sparkle size={18} weight="bold" className="text-orange" />
@@ -209,7 +215,7 @@ export const Home: React.FC = () => {
           </div>
 
           {/* Panel 3: Daily Focus (Action) */}
-          <div className="p-10 sm:p-16 flex flex-col justify-between bg-panel-bg h-full">
+          <div className="p-10 sm:p-16 flex flex-col justify-between h-full bg-white dark:bg-white/20">
             <div>
               <div className="flex items-center justify-between mb-12">
                 <div className="flex items-center gap-2 text-gray-nav">

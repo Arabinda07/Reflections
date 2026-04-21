@@ -275,48 +275,48 @@ export const DashboardLayout: React.FC = () => {
       {/* Main Content - Scrollable Region */}
       <SyncBanner />
       <main className="flex-1 overflow-y-auto relative custom-scrollbar flex flex-col">
-        <div className="w-full max-w-[1440px] mx-auto flex-1 flex flex-col">
+        <div className="w-full max-w-[1440px] mx-auto flex-1 flex flex-col px-4 md:px-10">
           <Outlet />
-          
-          {/* Global Footer - Anchored to bottom of scroll content */}
-          {!isSanctuaryRoute && (
-            <footer className="w-full border-t border-border py-8 mt-auto bg-white/50 dark:bg-black/20 backdrop-blur-sm">
-              <div className="max-w-[1440px] mx-auto px-4 md:px-10 flex flex-col sm:flex-row items-center justify-between gap-6">
-                <div className="flex items-center gap-8">
-                  <button 
-                    onClick={() => navigate(RoutePath.HOME)}
-                    className="text-[11px] font-black text-gray-nav hover:text-green transition-colors"
-                  >
-                    Home
-                  </button>
-                  <button 
-                    onClick={() => navigate(RoutePath.FAQ)}
-                    className="text-[11px] font-black text-gray-nav hover:text-green transition-colors"
-                  >
-                    FAQ
-                  </button>
-                  <button 
-                    onClick={() => navigate(RoutePath.PRIVACY)}
-                    className="text-[11px] font-black text-gray-nav hover:text-green transition-colors"
-                  >
-                    Privacy policy
-                  </button>
-                </div>
-
-                <div className="text-[11px] font-black text-gray-nav/50">
-                  © 2026 <a 
-                    href="https://arabinda07.github.io/" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="hover:text-green hover:underline transition-all duration-300"
-                  >
-                    Arabinda
-                  </a>
-                </div>
-              </div>
-            </footer>
-          )}
         </div>
+        
+        {/* Global Footer - Positioned for full-width background with centered content */}
+        {!isSanctuaryRoute && (
+          <footer className="w-full border-t border-border py-12 mt-auto bg-white/50 dark:bg-black/20 backdrop-blur-sm transition-all duration-300">
+            <div className="max-w-[1440px] mx-auto px-6 md:px-16 flex flex-col sm:flex-row items-center justify-between gap-8">
+              <div className="flex items-center gap-10">
+                <button 
+                  onClick={() => navigate(RoutePath.HOME)}
+                  className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-all"
+                >
+                  Home
+                </button>
+                <button 
+                  onClick={() => navigate(RoutePath.FAQ)}
+                  className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-all"
+                >
+                  FAQ
+                </button>
+                <button 
+                  onClick={() => navigate(RoutePath.PRIVACY)}
+                  className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-all"
+                >
+                  Privacy
+                </button>
+              </div>
+
+              <div className="text-[11px] font-black uppercase tracking-widest text-gray-nav/40">
+                © 2026 <a 
+                  href="https://arabinda07.github.io/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="hover:text-green transition-all duration-300"
+                >
+                  Arabinda
+                </a>
+              </div>
+            </div>
+          </footer>
+        )}
       </main>
     </div>
   );

@@ -138,12 +138,12 @@ export const Account: React.FC = () => {
   return (
     <div className="relative w-full max-w-4xl mx-auto pb-32 pt-12 px-6">
       <header className="mb-16 text-center lg:text-left">
-        <h1 className="font-display text-[48px] tracking-tighter text-gray-text leading-none mb-4">Account settings</h1>
-        <p className="text-[18px] font-serif italic text-gray-light">Manage your sanctuary and personal data.</p>
+        <h1 className="font-display text-3xl md:text-4xl tracking-tighter text-gray-text lowercase leading-none mb-4">Personal Sanctuary</h1>
+        <p className="text-[15px] font-bold uppercase tracking-tight text-gray-light opacity-60">Manage your reflections and personal data.</p>
       </header>
 
-      <div className="bezel-outer overflow-hidden">
-        <div className="bezel-inner">
+      <div className="border border-border rounded-[32px] bg-white overflow-hidden mb-16">
+        <div>
           <form onSubmit={handleSubmit} className="divide-y-2 divide-border/50">
             
             {/* Profile Section */}
@@ -209,19 +209,19 @@ export const Account: React.FC = () => {
                  <h3 className="font-display text-[24px] text-gray-text tracking-tight">Membership</h3>
                </div>
                
-               <div className="bezel-outer bg-green/5 !rounded-[24px]">
-                 <div className="bezel-inner !p-8 !rounded-[23px] flex flex-col md:flex-row items-center justify-between gap-8">
+               <div className="border border-border rounded-3xl bg-green/5 overflow-hidden">
+                 <div className="p-8 flex flex-col md:flex-row items-center justify-between gap-8">
                     <div className="flex items-center gap-6">
-                       <div className={`h-16 w-16 rounded-3xl flex items-center justify-center ${access?.planTier === 'pro' ? 'bg-green text-white' : 'bg-white border border-border text-gray-nav'}`}>
-                          <Check size={32} weight="bold" />
+                       <div className={`h-16 w-16 rounded-2xl flex items-center justify-center ${access?.planTier === 'pro' ? 'bg-green text-white' : 'bg-white border border-border text-gray-nav'}`}>
+                          {access?.planTier === 'pro' ? <ShieldCheck size={32} weight="bold" /> : <Sparkle size={32} weight="bold" />}
                        </div>
                        <div>
-                          <p className="text-[11px] font-black uppercase tracking-widest text-green mb-1">Current Plan</p>
+                          <p className="text-[11px] font-black uppercase tracking-widest text-green mb-1">Current Tier</p>
                           <h4 className="text-[22px] font-display text-gray-text capitalize">{access?.planTier || 'Free'} Plan</h4>
                           <p className="text-[13px] font-medium text-gray-light">
                              {access?.planTier === 'pro' 
-                               ? 'You have unlimited access to all AI features.' 
-                               : `You've used ${access?.freeAiReflectionsUsed || 0} of 1 free AI insight.`}
+                               ? 'Unlimited narrative synthesis enabled.' 
+                               : `Used ${access?.freeAiReflectionsUsed || 0} of 1 free AI insight.`}
                           </p>
                        </div>
                     </div>
@@ -229,7 +229,7 @@ export const Account: React.FC = () => {
                     {access?.planTier !== 'pro' && (
                       <Button 
                         variant="primary" 
-                        className="h-14 px-10 rounded-2xl font-black shadow-lg shadow-green/20"
+                        className="h-14 px-10 rounded-2xl font-bold bg-green text-white hover:bg-green/90 shadow-lg shadow-green/10 transition-all active:scale-[0.98]"
                         onClick={() => alert("Premium upgrade flow coming soon!")}
                       >
                          Upgrade to Pro
@@ -283,11 +283,11 @@ export const Account: React.FC = () => {
             </div>
 
             {/* Actions Toolbar */}
-            <div className={`p-8 flex items-center justify-between sticky bottom-0 bg-body/95 backdrop-blur-xl border-t border-border/50 z-[100] ${isMobile ? 'pb-[calc(2rem + env(safe-area-inset-bottom))]' : ''}`}>
+            <div className={`p-8 flex items-center justify-between sticky bottom-0 bg-white/80 backdrop-blur-xl border-t border-border z-[100] ${isMobile ? 'pb-[calc(2rem + env(safe-area-inset-bottom))]' : ''}`}>
               <button 
                 type="button"
                 onClick={handleSignOut}
-                className="flex items-center gap-2 text-gray-nav hover:text-red transition-all font-bold text-[14px]"
+                className="flex items-center gap-2 text-gray-nav hover:text-red transition-all font-bold text-[13px] uppercase tracking-widest"
               >
                 <SignOut size={20} weight="bold" />
                 {!isMobile && "Sign out"}
@@ -297,14 +297,14 @@ export const Account: React.FC = () => {
                   type="button" 
                   variant="secondary" 
                   onClick={() => navigate(-1)}
-                  className={`h-12 rounded-xl border border-border font-bold text-[14px] ${isMobile ? 'w-12 px-0 flex items-center justify-center' : 'px-8'}`}
+                  className={`h-12 rounded-xl border border-border font-bold text-[14px] bg-white text-gray-text hover:bg-gray-50 transition-all ${isMobile ? 'w-12 px-0 flex items-center justify-center' : 'px-8'}`}
                 >
                   {isMobile ? <X size={20} weight="bold" /> : 'Cancel'}
                 </Button>
                 <Button 
                   type="submit" 
                   disabled={loading || isSaved}
-                  className={`h-12 rounded-xl font-bold text-[14px] shadow-lg transition-all ${isSaved ? 'bg-green text-white' : ''} ${isMobile ? 'w-12 px-0 flex items-center justify-center' : 'px-10'}`}
+                  className={`h-12 rounded-xl font-bold text-[14px] bg-green text-white hover:bg-green/90 shadow-lg shadow-green/10 transition-all active:scale-[0.98] ${isSaved ? 'bg-green text-white' : ''} ${isMobile ? 'w-12 px-0 flex items-center justify-center' : 'px-10'}`}
                 >
                   {loading ? (
                     <CircleNotch size={20} className="animate-spin" />

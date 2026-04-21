@@ -96,12 +96,12 @@ export const MyNotes: React.FC = () => {
 
   const getMoodIcon = (mood?: string) => {
     switch (mood) {
-      case 'happy': return <Smiley size={14} weight="fill" className="text-yellow-500" />;
-      case 'calm': return <Sun size={14} weight="fill" className="text-emerald-500" />;
-      case 'anxious': return <Cloud size={14} weight="fill" className="text-blue-500" />;
-      case 'sad': return <SmileySad size={14} weight="fill" className="text-indigo-500" />;
-      case 'angry': return <Lightning size={14} weight="fill" className="text-rose-500" />;
-      case 'tired': return <Moon size={14} weight="fill" className="text-slate-500" />;
+      case 'happy':   return <Smiley size={14} weight="fill" className="text-orange" />;
+      case 'calm':    return <Sun size={14} weight="fill" className="text-green" />;
+      case 'anxious': return <Cloud size={14} weight="fill" className="text-blue" />;
+      case 'sad':     return <SmileySad size={14} weight="fill" className="text-indigo-500" />;
+      case 'angry':   return <Lightning size={14} weight="fill" className="text-red" />;
+      case 'tired':   return <Moon size={14} weight="fill" className="text-gray-light" />;
       default: return null;
     }
   };
@@ -136,11 +136,11 @@ export const MyNotes: React.FC = () => {
       <LoadingState isVisible={loading} message="gathering your thoughts..." />
       {isContentVisible && (
         <div className="space-y-10 animate-in fade-in duration-700 pb-12 px-4 md:px-10">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-border pb-8 gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-border pb-10 gap-6">
             <div>
-              <h1 className="font-display text-[40px] text-gray-text lowercase">my notes</h1>
-              <p className="text-gray-light mt-2 text-[17px] font-medium">
-                Manage your personal knowledge base.
+              <h1 className="font-display text-3xl md:text-4xl text-gray-text lowercase tracking-tight">Reflection Library</h1>
+              <p className="text-gray-light mt-2 text-[15px] font-bold uppercase tracking-tight opacity-60">
+                Your accumulated knowledge & narrative.
               </p>
               {tagFilter && (
                 <div className="mt-4 flex items-center gap-2">
@@ -172,17 +172,17 @@ export const MyNotes: React.FC = () => {
               )}
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex bezel-outer p-1 shadow-sm">
+              <div className="flex border border-border rounded-xl p-1 bg-white dark:bg-white/5 shadow-sm">
                 <button 
                   onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-lg transition-all duration-300 ease-out-quart ${viewMode === 'grid' ? 'bg-blue/10 text-blue' : 'text-gray-nav hover:bg-white/5'}`}
+                  className={`p-2 rounded-lg transition-all duration-300 ${viewMode === 'grid' ? 'bg-blue/10 text-blue' : 'text-gray-nav hover:text-gray-text'}`}
                   title="Grid View"
                 >
                   <SquaresFour size={20} weight="bold" />
                 </button>
                 <button 
                   onClick={() => setViewMode('calendar')}
-                  className={`p-2 rounded-lg transition-all duration-300 ease-out-quart ${viewMode === 'calendar' ? 'bg-blue/10 text-blue' : 'text-gray-nav hover:bg-white/5'}`}
+                  className={`p-2 rounded-lg transition-all duration-300 ${viewMode === 'calendar' ? 'bg-blue/10 text-blue' : 'text-gray-nav hover:text-gray-text'}`}
                   title="Calendar View"
                 >
                   <CalendarIcon size={20} weight="bold" />
@@ -191,10 +191,10 @@ export const MyNotes: React.FC = () => {
               <Button 
                 onClick={() => navigate(RoutePath.CREATE_NOTE)} 
                 variant="primary"
-                className="h-[48px] px-8 text-[15px] font-bold rounded-full shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart"
+                className="h-[48px] px-8 text-[14px] font-bold rounded-2xl bg-green text-white hover:bg-green/90 shadow-lg shadow-green/10 active:scale-[0.98] transition-all duration-300"
               >
                 <Plus className="mr-2 h-5 w-5" weight="bold" />
-                Create note
+                Create entry
               </Button>
             </div>
           </div>
@@ -278,10 +278,10 @@ export const MyNotes: React.FC = () => {
                 <div 
                   key={note.id} 
                   onClick={() => navigate(RoutePath.NOTE_DETAIL.replace(':id', note.id))}
-                  className="bezel-outer group cursor-pointer flex flex-col overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:border-blue/30 hover:scale-[1.02]"
+                  className="group cursor-pointer flex flex-col overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] border border-border rounded-3xl bg-white hover:border-green/30 hover:scale-[1.01] active:scale-[0.99] hover:shadow-xl hover:shadow-black/5"
                   style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
                 >
-                  <div className="bezel-inner flex flex-col h-full !p-0">
+                  <div className="flex flex-col h-full !p-0">
                     <div className="relative h-44 w-full overflow-hidden border-b border-border">
                       {note.thumbnailUrl ? (
                          <>
@@ -368,12 +368,12 @@ export const MyNotes: React.FC = () => {
           {!loading && filteredNotes.length === 0 && (
               <div className="bezel-outer">
                 <div className="bezel-inner flex h-80 flex-col items-center justify-center text-center px-4 border-dashed">
-                   <div className="h-16 w-16 bg-white/5 rounded-2xl flex items-center justify-center shadow-sm border border-border mb-6">
+                   <div className="h-16 w-16 bg-white border border-border rounded-2xl flex items-center justify-center shadow-sm mb-8">
                        <FileText size={28} weight="duotone" className="text-gray-nav" />
                    </div>
-                    <h3 className="font-display text-[24px] text-gray-text">Your personal sanctuary awaits.</h3>
-                    <p className="text-gray-light mb-8 max-w-sm font-medium">
-                      {tagFilter ? `We couldn't find any reflections with "${tagFilter}".` : "Begin your journey of reflection. Every entry is a step toward clarity."}
+                    <h3 className="text-xl md:text-2xl font-serif italic text-gray-text leading-relaxed">Your personal sanctuary is being prepared.</h3>
+                    <p className="text-gray-light mt-3 mb-8 max-w-sm font-medium text-[14px] opacity-60">
+                      {tagFilter ? `We couldn't find any reflections with "${tagFilter}".` : "Every entry is a step toward clarity. Begin your journey of reflection."}
                     </p>
                    {tagFilter ? (
                      <Button 
@@ -387,7 +387,7 @@ export const MyNotes: React.FC = () => {
                       <Button 
                          onClick={() => navigate(RoutePath.CREATE_NOTE)} 
                          variant="primary" 
-                         className="h-[48px] px-8 text-[15px] font-bold rounded-full shadow-sm active:scale-95 transition-all duration-300"
+                         className="h-[52px] px-10 text-[15px] font-bold rounded-2xl bg-green text-white hover:bg-green/90 shadow-lg shadow-green/10 active:scale-[0.98] transition-all duration-300"
                       >
                          Log a reflection
                       </Button>
