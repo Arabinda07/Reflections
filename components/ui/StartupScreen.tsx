@@ -52,15 +52,7 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
                 delay: 0.6, 
                 ease: [0.22, 1, 0.36, 1] 
               }}
-              style={{
-                fontFamily: '"Schibsted Grotesk", sans-serif',
-                fontSize: '20px',
-                letterSpacing: '-0.02em',
-                textTransform: 'lowercase',
-                fontWeight: 700,
-                color: 'rgba(255, 255, 255, 0.9)',
-                textShadow: '0 2px 8px rgba(0,0,0,0.2)'
-              }}
+              className="overlay-feedback-wordmark text-white/90 [text-shadow:0_2px_8px_rgba(0,0,0,0.2)]"
             >
               reflections
             </motion.span>
@@ -73,11 +65,7 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
                 delay: 1.3, 
                 ease: "easeOut" 
               }}
-              style={{ 
-                height: '2px', 
-                borderRadius: '9999px', 
-                backgroundColor: 'rgba(88,204,2,0.6)' 
-              }} 
+              className="overlay-feedback-divider bg-green/60"
             />
           </div>
 

@@ -106,6 +106,7 @@ export enum RoutePath {
   ACCOUNT = '/account',
   LOGIN = '/login',
   SIGNUP = '/signup',
+  RESET_PASSWORD = '/reset-password',
   INSIGHTS = '/insights',
   FAQ = '/faq',
   PRIVACY = '/privacy',

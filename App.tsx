@@ -21,6 +21,7 @@ import {
 // Lazy load non-critical routes to reduce initial bundle size
 const SignIn = lazy(() => import('./pages/auth/SignIn').then(m => ({ default: m.SignIn })));
 const SignUp = lazy(() => import('./pages/auth/SignUp').then(m => ({ default: m.SignUp })));
+const ResetPassword = lazy(() => import('./pages/auth/ResetPassword').then(m => ({ default: m.ResetPassword })));
 const MyNotes = lazy(() => import('./pages/dashboard/MyNotes').then(m => ({ default: m.MyNotes })));
 const CreateNote = lazy(() => import('./pages/dashboard/CreateNote').then(m => ({ default: m.CreateNote })));
 const SingleNote = lazy(() => import('./pages/dashboard/SingleNote').then(m => ({ default: m.SingleNote })));
@@ -121,6 +122,7 @@ function App() {
                   {/* Public Auth Routes - Guest only effectively via navigation logic */}
                   <Route path={RoutePath.LOGIN} element={<SignIn />} />
                   <Route path={RoutePath.SIGNUP} element={<SignUp />} />
+                  <Route path={RoutePath.RESET_PASSWORD} element={<ResetPassword />} />
                   
                   {/* Protected Routes - Redirect to Login if Guest */}
                   <Route path={RoutePath.NOTES} element={<ProtectedRoute><MyNotes /></ProtectedRoute>} />

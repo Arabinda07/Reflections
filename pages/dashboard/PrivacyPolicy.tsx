@@ -1,134 +1,124 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { RoutePath } from '../../types';
 import { Sparkle, Shield, Lock, Database, Envelope, ArrowLeft } from '@phosphor-icons/react';
+import { Button } from '../../components/ui/Button';
+import { PageContainer } from '../../components/ui/PageContainer';
+import { SectionHeader } from '../../components/ui/SectionHeader';
+import { Surface } from '../../components/ui/Surface';
+
+const sections = [
+  {
+    icon: <Database size={22} weight="duotone" />,
+    title: 'What we store',
+    tone: 'green',
+    body: [
+      'Your account identity includes your email address and the profile details you choose to add.',
+      'Your writing data includes notes, moods, tags, tasks, and attachments. Those stay tied to your authenticated account.',
+      'Storage runs on Supabase with row-level security so entries are scoped to you rather than exposed as shared application data.',
+    ],
+  },
+  {
+    icon: <Lock size={22} weight="duotone" />,
+    title: 'How AI touches your writing',
+    tone: 'green',
+    body: [
+      'AI features are used only when you ask for them, such as a reflection or a Life Wiki refresh.',
+      'We do not use your notes to train models. The product is designed to support your writing, not harvest it.',
+      'Generated insights are meant to stay private and personal, not become a marketing or advertising asset.',
+    ],
+  },
+  {
+    icon: <Shield size={22} weight="duotone" />,
+    title: 'Security posture',
+    tone: 'green',
+    body: [
+      'Data is encrypted in transit and at rest through the Supabase and cloud infrastructure underneath the product.',
+      'Row-level security is the core boundary: your reflections are scoped to your own authenticated session.',
+      'We continue tightening privacy and deletion tooling as the product matures, and we try to be explicit about what is live versus what is still manual.',
+    ],
+  },
+  {
+    icon: <Sparkle size={22} weight="duotone" />,
+    title: 'Your rights',
+    tone: 'green',
+    body: [
+      'You can create, update, and delete your writing inside the app.',
+      'When self-serve deletion or export is not available yet, requests are handled manually through the contact channel below instead of pretending the tooling is finished.',
+      'If we make material privacy changes, we will update this page and communicate them in-product.',
+    ],
+  },
+];
 
 export const PrivacyPolicy: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-body px-4 py-12 sm:px-6">
-      <div className="mx-auto max-w-3xl">
-
-        {/* Back button */}
-        <button
-          onClick={() => navigate(-1)}
-          className="mb-10 flex items-center gap-2 text-[12px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-colors"
-        >
-          <ArrowLeft size={16} weight="bold" />
+    <PageContainer size="narrow" className="py-12 sm:py-16">
+      <div className="space-y-10">
+        <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="-ml-2 text-gray-nav hover:text-green">
+          <ArrowLeft size={16} weight="bold" className="mr-2" />
           Back
-        </button>
+        </Button>
 
-        {/* Header */}
-        <div className="mb-12">
-          <h1 className="font-display text-[40px] sm:text-[56px] tracking-tight text-gray-text drop-shadow-sm mb-4">
-            Privacy policy
-          </h1>
-          <p className="text-[13px] font-black uppercase tracking-widest text-gray-nav">
-            Last updated: April 16, 2026
-          </p>
-        </div>
+        <SectionHeader
+          eyebrow="Privacy"
+          title="A calmer privacy policy"
+          description="Reflections is built around the idea that your writing belongs to you. This page explains the current product reality without dressing it up as something more finished than it is."
+          icon={
+            <div className="icon-block icon-block-lg">
+              <Shield size={32} weight="duotone" />
+            </div>
+          }
+        />
 
-        {/* Intro */}
-        <div className="bezel-outer mb-12">
-          <div className="bezel-inner p-8">
+        <Surface variant="bezel">
+          <div className="p-8 sm:p-10">
             <p className="text-[17px] font-medium text-gray-text leading-relaxed">
-              Reflections operates on a principle of radical data ownership. We facilitate a high-integrity journaling environment where your thoughts remain your exclusive property. Our governance framework ensures that we do not monetize, share, or exploit your personal reflections.
+              We do not think of your reflections as inventory. They are private writing, and the product is meant to help you return to them safely. That principle shapes how we store data, when AI is allowed to touch it, and how we talk about deletion and export when those flows are still evolving.
             </p>
           </div>
+        </Surface>
+
+        <div className="space-y-6">
+          {sections.map((section) => (
+            <Surface key={section.title} variant="flat" className="overflow-hidden">
+              <div className="p-7 sm:p-8">
+                <div className="mb-5 flex items-center gap-4">
+                  <div className="icon-block icon-block-sm">{section.icon}</div>
+                  <h2 className="text-[20px] font-display text-gray-text">{section.title}</h2>
+                </div>
+                <div className="space-y-4 text-[15px] font-medium leading-relaxed text-gray-light">
+                  {section.body.map((paragraph) => (
+                    <p key={paragraph}>{paragraph}</p>
+                  ))}
+                </div>
+              </div>
+            </Surface>
+          ))}
         </div>
 
-        <div className="space-y-10 text-gray-text">
-
-          <section>
-            <div className="flex items-center gap-4 mb-6">
-              <div className="h-12 w-12 rounded-2xl bg-white/5 flex items-center justify-center text-blue border border-border shadow-sm">
-                <Database size={24} weight="duotone" />
+        <Surface variant="bezel">
+          <div className="p-8 sm:p-10">
+            <div className="mb-4 flex items-center gap-4">
+              <div className="icon-block icon-block-sm">
+                <Envelope size={20} weight="duotone" />
               </div>
-              <h2 className="text-[18px] font-display text-gray-text">Data acquisitions</h2>
+              <h2 className="text-[20px] font-display text-gray-text">Contact</h2>
             </div>
-            <div className="pl-16 space-y-4 text-[15px] font-medium leading-relaxed text-gray-light">
-              <p><strong className="text-gray-text">Identity:</strong> Email and display name, utilized exclusively for secure authentication and account recovery.</p>
-              <p><strong className="text-gray-text">Content:</strong> Notes, mood data, and media attachments. All content is stored on encrypted clusters with Row-Level Security (RLS) ensuring access is restricted to your authenticated session.</p>
-              <p><strong className="text-gray-text">Persistence:</strong> Supabase Cloud (GDPR-compliant) manages secure storage for text and binary media without administrative oversight into content records.</p>
-            </div>
-          </section>
 
-          <section>
-            <div className="flex items-center gap-4 mb-6">
-              <div className="h-12 w-12 rounded-2xl bg-white/5 flex items-center justify-center text-green border border-border shadow-sm">
-                <Lock size={24} weight="duotone" />
-              </div>
-              <h2 className="text-[18px] font-display text-gray-text">Secure synthesis (Ai)</h2>
-            </div>
-            <div className="pl-16 space-y-4 text-[15px] font-medium leading-relaxed text-gray-light">
-              <p><strong className="text-gray-text">Processing:</strong> We leverage Google Gemini for Reflections and Life Wiki synthesis. Data is processed ephemerally; we maintain a zero-retention policy for content handled via these feature ports.</p>
-              <p><strong className="text-gray-text">Commitment:</strong> We never train AI models on user data. Your reflections are processed in a secure, non-training environment to generate personal insights requested by you.</p>
-              <p><strong className="text-gray-text">Non-Exploitation:</strong> We strictly prohibit data harvesting for advertising or outside monetization. We are your data custodians, not its owners.</p>
-            </div>
-          </section>
-
-          <section>
-            <div className="flex items-center gap-4 mb-6">
-              <div className="h-12 w-12 rounded-2xl bg-white/5 flex items-center justify-center text-yellow-500 border border-border shadow-sm">
-                <Shield size={24} weight="duotone" />
-              </div>
-              <h2 className="text-[18px] font-display text-gray-text">Security infrastructure</h2>
-            </div>
-            <div className="pl-16 space-y-4 text-[15px] font-medium leading-relaxed text-gray-light">
-              <p>Data residency is maintained on <strong className="text-gray-text">Supabase</strong> (AWS architecture), utilizing industry-standard encryption for data in transit (TLS) and at rest (AES-256).</p>
-              <p>Architecture level security is enforced via Row-Level Security (RLS), meaning your entries are cryptographically isolated and inaccessible to any unauthorized entity, including our administrators.</p>
-            </div>
-          </section>
-
-          <section>
-            <div className="flex items-center gap-4 mb-6">
-              <div className="h-12 w-12 rounded-2xl bg-white/5 flex items-center justify-center text-red border border-border shadow-sm">
-                <Shield size={24} weight="fill" />
-              </div>
-              <h2 className="text-[18px] font-display text-gray-text">Subject rights</h2>
-            </div>
-            <div className="pl-16 space-y-4 text-[15px] font-medium leading-relaxed text-gray-light">
-              <p><strong className="text-gray-text">Autonomy:</strong> You maintain full CRUD (Create, Read, Update, Delete) rights over your data. Account termination results in the immediate and permanent purging of all associated content records.</p>
-              <p><strong className="text-gray-text">Portability:</strong> While we finalize automated export tools, data portability requests are handled manually via the contact channel below.</p>
-            </div>
-          </section>
-
-          <section>
-            <div className="flex items-center gap-4 mb-6">
-              <div className="h-12 w-12 rounded-2xl bg-white/5 flex items-center justify-center text-blue border border-border shadow-sm">
-                <Envelope size={24} weight="duotone" />
-              </div>
-              <h2 className="text-[18px] font-display text-gray-text">Inquiry channel</h2>
-            </div>
-            <div className="pl-16 space-y-4 text-[15px] font-medium leading-relaxed text-gray-light">
-              <p>Directed inquiries regarding this governance framework or data deletion protocols may be submitted to:</p>
-              <a
-                href="mailto:robinsaha@gmail.com"
-                className="inline-flex items-center gap-2 text-green font-bold hover:underline tracking-tight"
-              >
-                robinsaha@gmail.com
-              </a>
-            </div>
-          </section>
-
-          {/* Governance Footer */}
-          <section className="bezel-outer">
-            <div className="bezel-inner p-8">
-              <h2 className="text-[13px] font-black uppercase tracking-widest text-gray-nav mb-4">Governance & policy updates</h2>
-              <p className="text-[14px] font-medium text-gray-text leading-relaxed">
-                Reflections is designed for individuals aged 13 and above. If we implement significant changes to this framework, we will provide advanced notice via the application interface. This document remains the definitive standard for our data relationship.
-              </p>
-            </div>
-          </section>
-
-        </div>
-
-        {/* Footer */}
-        <div className="mt-16 pt-8 border-t border-border text-center">
-        </div>
+            <p className="text-[15px] font-medium leading-relaxed text-gray-light">
+              If you need help with data deletion, export, or privacy questions, email us directly:
+            </p>
+            <a
+              href="mailto:robinsaha@gmail.com"
+              className="mt-4 inline-flex items-center gap-2 text-green font-bold hover:underline tracking-tight"
+            >
+              <Envelope size={16} weight="bold" />
+              robinsaha@gmail.com
+            </a>
+          </div>
+        </Surface>
       </div>
-    </div>
+    </PageContainer>
   );
 };
-
