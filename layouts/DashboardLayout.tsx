@@ -1,6 +1,6 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { 
   List, 
   X, 
@@ -136,9 +136,10 @@ export const DashboardLayout: React.FC = () => {
         <div className="w-full max-w-[1440px] px-4 md:px-10 h-14 flex items-center justify-between">
           {/* Left Side */}
           <div className="flex items-center gap-4">
-            <div 
-              className="flex items-center gap-2 cursor-pointer group"
-              onClick={() => handleNavigation(RoutePath.HOME)}
+            <Link 
+              to={RoutePath.HOME}
+              className="flex items-center gap-2 group"
+              aria-label="Reflections — go to home"
             >
               <div className="h-10 w-10 rounded-xl bg-green flex items-center justify-center text-white shadow-sm transition-all duration-300 group-hover:scale-105 group-hover:-rotate-12">
                 <Leaf size={24} weight="fill" />
@@ -146,7 +147,7 @@ export const DashboardLayout: React.FC = () => {
               <span className="font-serif italic text-[22px] sm:text-[26px] text-green tracking-tight truncate max-w-[150px] sm:max-w-none">
                 Reflections
               </span>
-            </div>
+            </Link>
           </div>
 
           {/* Right Side - Desktop Nav */}
@@ -162,6 +163,7 @@ export const DashboardLayout: React.FC = () => {
               <button
                 key={item.label}
                 onClick={() => navigate(item.path)}
+                aria-current={location.pathname === item.path ? 'page' : undefined}
                 className="px-4 py-2 text-[13px] font-extrabold text-gray-nav hover:text-green hover:bg-green/5 rounded-xl transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-1"
               >
                 {item.label}
@@ -277,7 +279,7 @@ export const DashboardLayout: React.FC = () => {
                         <button
                           key={item.label}
                           onClick={() => handleNavigation(item.path)}
-                          className="w-full p-6 text-left text-[24px] font-black text-gray-text border-b-2 border-border/50 hover:text-green transition-all duration-300 active:bg-green/5 rounded-2xl flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset"
+                          className="w-full p-6 text-left text-[24px] font-black text-gray-text hover:text-green transition-all duration-300 active:bg-green/5 rounded-2xl flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset"
                         >
                           <span>{item.label}</span>
                           <CaretRight weight="bold" className="opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -322,7 +324,7 @@ export const DashboardLayout: React.FC = () => {
                       <button
                         key={item.label}
                         onClick={() => handleNavigation(item.path)}
-                        className="w-full p-6 text-left text-[24px] font-black text-gray-text border-b-2 border-border/50 hover:text-green transition-all duration-300 ease-out-quart active:bg-green/5 rounded-2xl flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset"
+                        className="w-full p-6 text-left text-[24px] font-black text-gray-text hover:text-green transition-all duration-300 ease-out-quart active:bg-green/5 rounded-2xl flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset"
                       >
                         <span>{item.label}</span>
                         <CaretRight weight="bold" className="opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -347,26 +349,26 @@ export const DashboardLayout: React.FC = () => {
         {!isWritingRoute && (
           <footer className="mt-auto w-full border-t border-border bg-[rgba(var(--panel-bg-rgb),0.72)] py-12 backdrop-blur-sm transition-all duration-300">
             <div className="max-w-[1440px] mx-auto px-6 md:px-16 flex flex-col sm:flex-row items-center justify-between gap-8">
-              <div className="flex items-center gap-10">
-                <button 
-                  onClick={() => navigate(RoutePath.HOME)}
+              <nav aria-label="Footer navigation" className="flex items-center gap-10">
+                <Link 
+                  to={RoutePath.HOME}
                   className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-all"
                 >
                   Home
-                </button>
-                <button 
-                  onClick={() => navigate(RoutePath.FAQ)}
+                </Link>
+                <Link 
+                  to={RoutePath.FAQ}
                   className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-all"
                 >
                   FAQ
-                </button>
-                <button 
-                  onClick={() => navigate(RoutePath.PRIVACY)}
+                </Link>
+                <Link 
+                  to={RoutePath.PRIVACY}
                   className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-all"
                 >
                   Privacy
-                </button>
-              </div>
+                </Link>
+              </nav>
 
               <div className="text-[11px] font-black uppercase tracking-widest text-gray-nav/40">
                 © 2026 <a 

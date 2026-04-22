@@ -26,8 +26,6 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
           transition={{ delay: 0.35, duration: 0.5 }}
           className="overlay-feedback-copy -mt-3"
         >
-          <span className="overlay-feedback-wordmark">reflections</span>
-          <span className="overlay-feedback-divider" />
           <p className="overlay-feedback-message">{message}</p>
         </motion.div>
       </div>

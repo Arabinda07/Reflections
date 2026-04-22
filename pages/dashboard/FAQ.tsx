@@ -218,7 +218,7 @@ export const FAQ: React.FC = () => {
                 
                 <div className="relative z-10 flex flex-col md:flex-row gap-10">
                   <div className="w-20 h-20 rounded-[32px] bg-green/5 text-green flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-500 ease-out-expo">
-                    <Brain size={40} weight="light" className="animate-pulse" />
+                    <Brain size={40} weight="light" />
                   </div>
                   <div>
                     <h4 className="text-[28px] font-display text-gray-text mb-4">Optional reflection support</h4>

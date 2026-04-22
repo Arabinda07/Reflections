@@ -22,7 +22,15 @@ import { supabase } from '../../src/supabaseClient';
 import { RoutePath } from '../../types';
 import { Landing } from './Landing';
 import { AmbientMusicButton } from '../../components/ui/AmbientMusicButton';
-import { Magnetic } from '../../components/ui/Magnetic';
+
+const WISDOM_QUOTES = [
+  { text: 'The soul usually knows what to do to heal itself. The challenge is to silence the mind.', author: 'Caroline Myss' },
+  { text: 'Within you, there is a stillness and a sanctuary to which you can retreat at any time.', author: 'Hermann Hesse' },
+  { text: 'Your vision will become clear only when you can look into your own heart.', author: 'Carl Jung' },
+  { text: 'The wound is the place where the Light enters you.', author: 'Rumi' },
+  { text: 'Quiet the mind, and the soul will speak.', author: 'Ma Jaya Sati Bhagavati' },
+  { text: 'Everything in the universe is within you. Ask all from yourself.', author: 'Rumi' },
+];
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -38,15 +46,6 @@ export const Home: React.FC = () => {
   const [quote, setQuote] = useState({ text: "", author: "" });
 
   const entranceDuration = isFromSave ? 0.3 : 0.8;
-
-  const WISDOM_QUOTES = [
-    { text: "The soul usually knows what to do to heal itself. The challenge is to silence the mind.", author: "Caroline Myss" },
-    { text: "Within you, there is a stillness and a sanctuary to which you can retreat at any time.", author: "Hermann Hesse" },
-    { text: "Your vision will become clear only when you can look into your own heart.", author: "Carl Jung" },
-    { text: "The wound is the place where the Light enters you.", author: "Rumi" },
-    { text: "Quiet the mind, and the soul will speak.", author: "Ma Jaya Sati Bhagavati" },
-    { text: "Everything in the universe is within you. Ask all from yourself.", author: "Rumi" }
-  ];
 
   useEffect(() => {
     setDailyPrompt(DEFAULT_WELLNESS_PROMPTS[Math.floor(Math.random() * DEFAULT_WELLNESS_PROMPTS.length)]);
@@ -86,6 +85,19 @@ export const Home: React.FC = () => {
     localStorage.setItem('hasSeenOnboarding', 'true');
     setShowOnboarding(false);
   };
+
+  useEffect(() => {
+    if (!showOnboarding) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        handleCloseOnboarding();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showOnboarding]);
 
   useEffect(() => {
     const fetchCount = async () => {
@@ -132,7 +144,7 @@ export const Home: React.FC = () => {
             autoPlay loop muted playsInline preload="metadata"
             className="absolute inset-0 w-full h-full object-cover object-center z-0"
           />
-          <div className="absolute inset-0 bg-black/30 z-10" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(14,28,18,0.18),rgba(14,28,18,0.3))] z-10" />
           <div className="absolute inset-0 bg-gradient-to-t from-body via-transparent to-transparent z-10" />
           
           <div className="relative z-20 h-full flex flex-col items-center justify-start pt-[10vh] text-center px-6">
@@ -147,7 +159,7 @@ export const Home: React.FC = () => {
               }}
               className="max-w-4xl"
             >
-              <h1 className="h1-hero drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)] drop-shadow-[0_8px_32px_rgba(0,0,0,0.3)] mb-12" style={{ color: '#FFFFFF' }}>
+              <h1 className="h1-hero mb-12 text-[rgb(255,255,255)] drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)] drop-shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
                 Welcome back, <br />
                 <span className="font-serif italic text-green drop-shadow-none">{user?.name?.split(' ')[0] || 'Reflector'}</span>
               </h1>
@@ -159,7 +171,7 @@ export const Home: React.FC = () => {
         <section className="grid grid-cols-1 lg:grid-cols-3 border-t border-border bg-white dark:bg-transparent min-h-[500px]">
           
           {/* Panel 1: Overview */}
-          <div className="p-10 sm:p-16 border-b lg:border-b-0 lg:border-r border-border flex flex-col justify-between h-full bg-white/50 dark:bg-white/40">
+          <div className="p-10 sm:p-16 border-b lg:border-b-0 lg:border-r border-border flex flex-col justify-between h-full bg-white/50 dark:bg-white/12">
             <div>
               <div className="flex items-center gap-2 text-gray-nav mb-12">
                 <FolderOpen size={18} weight="bold" className="text-green" />
@@ -194,7 +206,7 @@ export const Home: React.FC = () => {
           </div>
 
           {/* Panel 2: Daily Wisdom (Quote) */}
-          <div className="p-10 sm:p-16 border-b lg:border-b-0 lg:border-r border-border flex flex-col justify-between h-full bg-white dark:bg-white/60">
+          <div className="p-10 sm:p-16 border-b lg:border-b-0 lg:border-r border-border flex flex-col justify-between h-full bg-white dark:bg-white/14">
             <div className="flex-grow">
               <div className="flex items-center gap-2 text-gray-nav mb-12">
                 <Sparkle size={18} weight="bold" className="text-orange" />
@@ -257,11 +269,16 @@ export const Home: React.FC = () => {
 
       {/* Simplified Onboarding */}
       {showOnboarding && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-body/80 backdrop-blur-xl animate-in fade-in duration-500">
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-body/80 backdrop-blur-xl animate-in fade-in duration-500"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="home-onboarding-title"
+        >
           <div className="bezel-outer max-w-lg w-full bg-white shadow-2xl">
             <div className="bezel-inner p-10 flex flex-col gap-10">
               <div className="flex justify-between items-center border-b border-border pb-6">
-                <h2 className="text-2xl font-display text-gray-text">Welcome to Reflections.</h2>
+                <h2 id="home-onboarding-title" className="text-2xl font-display text-gray-text">Welcome to Reflections.</h2>
                 <Sparkle size={24} className="text-green" weight="fill" />
               </div>
 
@@ -272,7 +289,7 @@ export const Home: React.FC = () => {
                   { icon: Tag, title: "Life Wiki themes", desc: "Refresh a broader pattern view when you're ready." }
                 ].map((f, i) => (
                   <div key={i} className="flex gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-gray-50 border border-border flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-lg border border-green/10 bg-green/5 flex items-center justify-center shrink-0">
                       <f.icon size={18} weight="bold" className="text-gray-nav" />
                     </div>
                     <div>

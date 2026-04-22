@@ -29,21 +29,21 @@ import { profileService } from '../../services/profileService';
 import { FREE_WIKI_MINIMUM_ENTRIES, getWikiInsightsGate } from '../../services/wellnessPolicy';
 
 const MOOD_COLORS: Record<string, string> = {
-  happy: '#f97316',
-  calm: '#10b981',
-  anxious: '#3b82f6',
-  sad: '#6366f1',
-  angry: '#ef4444',
-  tired: '#64748b',
+  happy: 'var(--orange)',
+  calm: 'var(--green)',
+  anxious: 'var(--blue)',
+  sad: 'var(--dark-blue)',
+  angry: 'var(--red)',
+  tired: 'var(--gray-light)',
 };
 
 const MOOD_BG: Record<string, string> = {
-  happy: '#fff7ed',
-  calm: '#f0fdf4',
-  anxious: '#eff6ff',
-  sad: '#eef2ff',
-  angry: '#fef2f2',
-  tired: '#f8fafc',
+  happy: 'oklch(from var(--orange) l c h / 0.12)',
+  calm: 'oklch(from var(--green) l c h / 0.12)',
+  anxious: 'oklch(from var(--blue) l c h / 0.12)',
+  sad: 'oklch(from var(--dark-blue) l c h / 0.12)',
+  angry: 'oklch(from var(--red) l c h / 0.12)',
+  tired: 'oklch(from var(--gray-light) l c h / 0.18)',
 };
 
 export const Insights: React.FC = () => {
@@ -165,6 +165,15 @@ export const Insights: React.FC = () => {
       taskProgress: totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0,
     };
   }, [notes]);
+
+  const selectedThemeParagraphs = useMemo(() => {
+    if (!selectedTheme) return [];
+
+    return selectedTheme.content
+      .split(/\n{2,}/)
+      .map((paragraph) => paragraph.trim())
+      .filter(Boolean);
+  }, [selectedTheme]);
 
   return (
     <>
@@ -301,8 +310,8 @@ export const Insights: React.FC = () => {
                   {stats.moodData.map((entry) => {
                     const maxValue = stats.moodData[0].value;
                     const percent = Math.round((entry.value / maxValue) * 100);
-                    const color = MOOD_COLORS[entry.name] || '#94a3b8';
-                    const background = MOOD_BG[entry.name] || '#f1f5f9';
+                    const color = MOOD_COLORS[entry.name] || 'var(--gray-light)';
+                    const background = MOOD_BG[entry.name] || 'oklch(from var(--gray-light) l c h / 0.14)';
 
                     return (
                       <div key={entry.name} className="flex items-center gap-4">
@@ -508,10 +517,13 @@ export const Insights: React.FC = () => {
         }
       >
         {selectedTheme ? (
-          <div
-            className="prose prose-slate max-w-none text-gray-text leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: selectedTheme.content.replace(/\n\n/g, '<br/><br/>') }}
-          />
+          <div className="prose prose-slate max-w-none text-gray-text leading-relaxed">
+            {selectedThemeParagraphs.map((paragraph, index) => (
+              <p key={`${selectedTheme.id}-${index}`} className="whitespace-pre-line">
+                {paragraph}
+              </p>
+            ))}
+          </div>
         ) : null}
       </ModalSheet>
     </>

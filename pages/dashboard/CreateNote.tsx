@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useBlocker } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   ArrowLeft, 
@@ -8,8 +9,6 @@ import {
   X, 
   CalendarBlank, 
   Paperclip, 
-  FileText, 
-  Sparkle, 
   Smiley, 
   SmileySad,
   Sun,
@@ -27,22 +26,20 @@ import {
   CircleNotch,
   CaretRight,
   Brain,
-  Wind,
   Target,
-  Lightning,
   DotsThreeCircle,
-  PaperPlaneTilt
 } from '@phosphor-icons/react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { Magnetic } from '../../components/ui/Magnetic';
 import { useAmbientAudio, AMBIENT_TRACKS } from '../../hooks/useAmbientAudio';
+import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
+import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
 import { Editor, EditorRef } from '../../components/ui/Editor';
 import { noteService } from '../../services/noteService';
 import { storageService } from '../../services/storageService';
 import { RoutePath, NoteAttachment, Task } from '../../types';
 import { supabase } from '../../src/supabaseClient';
-import { StorageImage } from '../../components/ui/StorageImage';
 import { CompanionObservation } from '../../components/ui/CompanionObservation';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { OverlayFeedback } from '../../components/ui/OverlayFeedback';
@@ -52,6 +49,12 @@ import { DEFAULT_WELLNESS_PROMPTS, getCurrentWellnessPrompt, getNextWellnessProm
 import { aiClient } from '../../services/aiClient';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { getOrderedTasks, getTaskDrawerTriggerLabel } from './createNoteTasks';
+import {
+  buildCreateNoteDraftSnapshot,
+  CREATE_NOTE_SAVE_VISUAL_FLOOR_MS,
+  CREATE_NOTE_UNSUPPORTED_WHISPER_MESSAGE,
+  hasUnsavedCreateNoteChanges,
+} from './createNoteDraftState';
 
 const MOOD_CONFIG: Record<string, { nav: string, modal: string, icon: any }> = {
   happy: { nav: 'bg-golden/10 border-golden/20 text-golden', modal: 'border-golden bg-golden/10 text-golden', icon: Smiley },
@@ -143,7 +146,6 @@ export const CreateNote: React.FC = () => {
   const { id } = useParams<{ id: string }>(); 
   const location = useLocation();
   const initialPrompt = location.state?.initialPrompt;
-  const isNewNote = !id;
   
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -152,7 +154,6 @@ export const CreateNote: React.FC = () => {
   const [tagInput, setTagInput] = useState('');
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [isLimitReached, setIsLimitReached] = useState(false);
   const [activePlaceholder, setActivePlaceholder] = useState<string | null>(
     initialPrompt || getCurrentWellnessPrompt(0, DEFAULT_WELLNESS_PROMPTS),
   );
@@ -179,10 +180,24 @@ export const CreateNote: React.FC = () => {
   
   const [isWhispering, setIsWhispering] = useState(false);
   const [interimTranscript, setInterimTranscript] = useState('');
+  const [whisperFeedback, setWhisperFeedback] = useState<string | null>(null);
   const [showObservation, setShowObservation] = useState(false);
   const [observationText, setObservationText] = useState<string | null>(null);
   const [showPlane, setShowPlane] = useState(false);
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const [promptIndex, setPromptIndex] = useState(0);
+  const [baselineDraftSnapshot, setBaselineDraftSnapshot] = useState(() =>
+    buildCreateNoteDraftSnapshot({
+      title: '',
+      content: '',
+      mood: undefined,
+      tags: [],
+      tasks: [],
+      imagePreview: null,
+      existingAttachments: [],
+      newAttachments: [],
+    }),
+  );
 
   const { isPlaying: musicPlaying, activeTrack: activeMusicTrack, playTrack: playMusicTrack, stopAll: stopMusic } = useAmbientAudio();
   const ActiveMoodIcon = mood ? MOOD_CONFIG[mood]?.icon || Smiley : Smiley;
@@ -191,6 +206,29 @@ export const CreateNote: React.FC = () => {
   const editorInstanceRef = useRef<EditorRef>(null);
   const flowTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isUnmounted = useRef(false);
+  const allowNavigationRef = useRef(false);
+  const currentDraftSnapshot = buildCreateNoteDraftSnapshot({
+    title,
+    content,
+    mood,
+    tags,
+    tasks,
+    imagePreview,
+    existingAttachments,
+    newAttachments,
+  });
+  const hasUnsavedChanges = !loading && hasUnsavedCreateNoteChanges(currentDraftSnapshot, baselineDraftSnapshot);
+  const blocker = useBlocker(() => hasUnsavedChanges && !saving && !allowNavigationRef.current);
+  const navigateWithBypass = useCallback(
+    (to: string, options?: { replace?: boolean; state?: unknown }) => {
+      allowNavigationRef.current = true;
+      navigate(to, options);
+      window.setTimeout(() => {
+        allowNavigationRef.current = false;
+      }, 0);
+    },
+    [navigate],
+  );
 
   useEffect(() => {
     isUnmounted.current = false;
@@ -246,11 +284,33 @@ export const CreateNote: React.FC = () => {
     const fetchNote = async () => {
       try {
         if (!id) {
+          setBaselineDraftSnapshot(
+            buildCreateNoteDraftSnapshot({
+              title: '',
+              content: '',
+              mood: undefined,
+              tags: [],
+              tasks: [],
+              imagePreview: null,
+              existingAttachments: [],
+              newAttachments: [],
+            }),
+          );
           setLoading(false);
           return;
         }
         const note = await noteService.getById(id);
         if (note && !isUnmounted.current) {
+          const initialDraftSnapshot = buildCreateNoteDraftSnapshot({
+            title: note.title,
+            content: note.content,
+            mood: note.mood,
+            tags: note.tags || [],
+            tasks: note.tasks || [],
+            imagePreview: note.thumbnailUrl || null,
+            existingAttachments: note.attachments || [],
+            newAttachments: [],
+          });
           setTitle(note.title);
           setContent(note.content);
           setMood(note.mood);
@@ -258,6 +318,7 @@ export const CreateNote: React.FC = () => {
           setTasks(note.tasks || []);
           setImagePreview(note.thumbnailUrl || null);
           setExistingAttachments(note.attachments || []);
+          setBaselineDraftSnapshot(initialDraftSnapshot);
           setLoading(false);
         } else {
           navigate(RoutePath.HOME);
@@ -267,22 +328,61 @@ export const CreateNote: React.FC = () => {
       }
     };
     fetchNote();
-  }, [id]);
+  }, [id, navigate]);
+
+  useEffect(() => {
+    if (blocker.state === 'blocked') {
+      setShowLeaveDialog(true);
+      return;
+    }
+
+    if (blocker.state === 'unblocked') {
+      setShowLeaveDialog(false);
+    }
+  }, [blocker.state]);
+
+  useEffect(() => {
+    if (!whisperFeedback) return;
+
+    const timer = window.setTimeout(() => {
+      setWhisperFeedback(null);
+    }, 5000);
+
+    return () => window.clearTimeout(timer);
+  }, [whisperFeedback]);
+
+  useEffect(() => {
+    if (!hasUnsavedChanges || saving) return;
+
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (allowNavigationRef.current) return;
+      event.preventDefault();
+      event.returnValue = '';
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges, saving]);
 
   // --- NUCLEAR SAVE LOGIC ---
   const handleSave = async () => {
-    if (!title.trim() && !content.trim()) return;
+    if (!currentDraftSnapshot.title && !currentDraftSnapshot.content) return;
+
     setSaving(true);
     setShowPlane(true);
+    setWhisperFeedback(null);
 
-    const nuclearTimer = setTimeout(() => {
+    const nuclearTimer = window.setTimeout(() => {
       if (!isUnmounted.current) {
+        setSaving(false);
         setShowPlane(false);
-        navigate(RoutePath.HOME);
+        navigateWithBypass(RoutePath.HOME);
       }
     }, 5000);
 
-    const visualFloor = new Promise<void>(resolve => setTimeout(resolve, 1500));
+    const visualFloor = new Promise<void>((resolve) =>
+      window.setTimeout(resolve, CREATE_NOTE_SAVE_VISUAL_FLOOR_MS),
+    );
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -293,6 +393,17 @@ export const CreateNote: React.FC = () => {
         const newNote = await noteService.create({ title, content, tags, mood, tasks });
         noteId = newNote.id;
       }
+
+      const uploadedAttachments = await Promise.all(
+        newAttachments.map(async (file) => ({
+          id: crypto.randomUUID(),
+          name: file.name,
+          path: await storageService.uploadFile(file, user.id, 'notes', noteId),
+          size: file.size,
+          type: file.type,
+        })),
+      );
+      const mergedAttachments = [...existingAttachments, ...uploadedAttachments];
 
       let finalThumbnailUrl = imagePreview;
       if (imagePreview?.startsWith('blob:')) {
@@ -305,11 +416,29 @@ export const CreateNote: React.FC = () => {
       await noteService.update(noteId, {
         title, content, mood, tags, tasks,
         thumbnailUrl: finalThumbnailUrl || undefined,
-        attachments: existingAttachments
+        attachments: mergedAttachments
+      });
+
+      const savedDraftSnapshot = buildCreateNoteDraftSnapshot({
+        title,
+        content,
+        mood,
+        tags,
+        tasks,
+        imagePreview: finalThumbnailUrl || null,
+        existingAttachments: mergedAttachments,
+        newAttachments: [],
       });
       
       await visualFloor;
       clearTimeout(nuclearTimer);
+      if (isUnmounted.current) return;
+
+      setExistingAttachments(mergedAttachments);
+      setNewAttachments([]);
+      setImagePreview(finalThumbnailUrl || null);
+      setBaselineDraftSnapshot(savedDraftSnapshot);
+      setSaving(false);
       setShowPlane(false);
 
       const [totalCount, recentNotes] = await Promise.all([
@@ -328,13 +457,15 @@ export const CreateNote: React.FC = () => {
         setShowObservation(true);
         observationService.markObservationShown();
       } else {
-        navigate(RoutePath.HOME, { state: { fromSave: true } });
+        navigateWithBypass(RoutePath.HOME, { state: { fromSave: true } });
       }
 
     } catch (err) {
       clearTimeout(nuclearTimer);
-      setSaving(false);
-      setShowPlane(false);
+      if (!isUnmounted.current) {
+        setSaving(false);
+        setShowPlane(false);
+      }
     }
   };
 
@@ -346,7 +477,12 @@ export const CreateNote: React.FC = () => {
 
   const toggleWhisper = () => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) return alert("Browser doesn't support speech recognition.");
+    if (!SpeechRecognition) {
+      setWhisperFeedback(CREATE_NOTE_UNSUPPORTED_WHISPER_MESSAGE);
+      return;
+    }
+
+    setWhisperFeedback(null);
 
     if (isWhispering) {
       setIsWhispering(false);
@@ -401,10 +537,22 @@ export const CreateNote: React.FC = () => {
     }
   };
 
-  const hasContent = Boolean(content && content !== '<p><br></p>');
-  const wordCount = content.replace(/<[^>]*>/g, '').trim().split(/\s+/).filter(Boolean).length;
+  const hasContent = Boolean(currentDraftSnapshot.content);
+  const wordCount = currentDraftSnapshot.content.replace(/<[^>]*>/g, '').trim().split(/\s+/).filter(Boolean).length;
   const canReflect = wordCount >= 100;
   const isDimmed = isFlowing && !isTitleFocused;
+  const handleStayOnDraft = () => {
+    setShowLeaveDialog(false);
+    if (blocker.state === 'blocked') {
+      blocker.reset();
+    }
+  };
+  const handleLeaveDraft = () => {
+    setShowLeaveDialog(false);
+    if (blocker.state === 'blocked') {
+      blocker.proceed();
+    }
+  };
 
   return (
     <div className="relative flex-1 flex min-h-0 bg-body transition-colors duration-700 ease-out-quart overflow-hidden">
@@ -488,7 +636,9 @@ export const CreateNote: React.FC = () => {
               <label className="flex flex-col items-center justify-center p-4 rounded-[20px] bg-transparent hover:bg-white dark:hover:bg-white/5 text-gray-text transition-all cursor-pointer">
                 <Paperclip size={20} className="mb-2" /><span className="text-[10px] font-bold uppercase">Files</span>
                 <input type="file" multiple className="hidden" onChange={(e) => {
-                  if (e.target.files) setNewAttachments([...newAttachments, ...Array.from(e.target.files)]);
+                  if (e.target.files) {
+                    setNewAttachments((current) => [...current, ...Array.from(e.target.files || [])]);
+                  }
                 }} />
               </label>
               <label className="flex flex-col items-center justify-center p-4 rounded-[20px] bg-transparent hover:bg-white dark:hover:bg-white/5 text-gray-text transition-all cursor-pointer">
@@ -532,6 +682,17 @@ export const CreateNote: React.FC = () => {
                </button>
             )}
           </div>
+
+          {whisperFeedback ? (
+            <div className="mb-6">
+              <Alert
+                variant="info"
+                title="Whisper needs a supported browser"
+                description={whisperFeedback}
+                icon={<MicrophoneSlash size={18} weight="fill" />}
+              />
+            </div>
+          ) : null}
 
           {/* Title as H1 */}
           <input
@@ -638,7 +799,9 @@ export const CreateNote: React.FC = () => {
           <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-border p-4 text-gray-text transition-colors hover:border-green/20 hover:bg-green/5">
             <Paperclip size={24} weight="regular" /><span className="text-[14px] font-bold">Files</span>
             <input type="file" multiple className="hidden" onChange={(e) => {
-              if (e.target.files) setNewAttachments([...newAttachments, ...Array.from(e.target.files)]);
+              if (e.target.files) {
+                setNewAttachments((current) => [...current, ...Array.from(e.target.files || [])]);
+              }
               setIsMobileOptionsOpen(false);
             }} />
           </label>
@@ -800,7 +963,16 @@ export const CreateNote: React.FC = () => {
         </div>
       </ModalSheet>
 
-      <CompanionObservation isVisible={showObservation} text={observationText || ""} onComplete={() => { setShowObservation(false); navigate(RoutePath.HOME); }} />
+      <ConfirmationDialog
+        isOpen={showLeaveDialog}
+        onClose={handleStayOnDraft}
+        onConfirm={handleLeaveDraft}
+        title="Leave this draft?"
+        description="You have unsaved changes in this reflection. If you leave now, this draft will be lost."
+        confirmLabel="Leave without saving"
+        cancelLabel="Keep writing"
+      />
+      <CompanionObservation isVisible={showObservation} text={observationText || ""} onComplete={() => { setShowObservation(false); navigateWithBypass(RoutePath.HOME, { state: { fromSave: true } }); }} />
       <PaperPlaneToast isVisible={showPlane} onAnimationComplete={() => {}} />
     </div>
   );

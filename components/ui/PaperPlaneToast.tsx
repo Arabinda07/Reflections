@@ -49,7 +49,7 @@ export const PaperPlaneToast: React.FC<PaperPlaneToastProps> = ({
 
         <div className="flex flex-col gap-1">
           <span className="overlay-feedback-title">Saving reflection</span>
-          <span className="overlay-feedback-wordmark">Sending to sanctuary</span>
+          <span className="overlay-feedback-message">Sending to sanctuary</span>
         </div>
       </motion.div>
     </OverlayFeedback>

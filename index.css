@@ -1221,8 +1221,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   .ql-snow .ql-color.ql-expanded .ql-picker-options .ql-picker-item,
   .ql-snow .ql-background.ql-expanded .ql-picker-options .ql-picker-item,
   .ql-snow .ql-color-picker.ql-expanded .ql-picker-options .ql-picker-item {
-    width: 28px !important;
-    height: 28px !important;
+    width: 44px !important;
+    height: 44px !important;
     border-radius: 50% !important;
   }
 }
