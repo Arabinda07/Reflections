@@ -43,7 +43,7 @@ const sections = [
     tone: 'green',
     body: [
       'You can create, update, and delete your writing inside the app.',
-      'When self-serve deletion or export is not available yet, requests are handled manually through the contact channel below instead of pretending the tooling is finished.',
+      'You can also remove saved writing and profile data from the account screen. Full sign-in account closure is still handled through the contact channel below.',
       'If we make material privacy changes, we will update this page and communicate them in-product.',
     ],
   },

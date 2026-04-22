@@ -1,6 +1,6 @@
 import React from 'react';
-import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
+import { OverlayFeedback } from './OverlayFeedback';
 
 interface StartupScreenProps {
   isVisible: boolean;
@@ -15,62 +15,60 @@ interface StartupScreenProps {
  */
 export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
   return (
-    <AnimatePresence>
-      {isVisible && (
-        <motion.div
-          initial={{ opacity: 1 }}
-          exit={{ opacity: 0, scale: 1.05 }}
-          transition={{ 
-            duration: 0.8, 
-            ease: [0.43, 0.13, 0.23, 0.96] // Premium liquid ease
-          }}
-          className="fixed inset-0 z-[10000] flex flex-col items-center justify-center bg-white"
-          style={{ touchAction: 'none' }}
-        >
-          {/* Main Cinematic Video Container */}
-          <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
-            {/* Subtle backlight glow */}
-            <div className="absolute inset-0 bg-green/5 blur-3xl rounded-full scale-75 animate-pulse z-10" />
-            
-            <video 
-              src="/assets/videos/sanctuary.mp4"
-              autoPlay 
-              loop 
-              muted 
-              playsInline
-              className="absolute inset-0 w-full h-full object-cover z-0"
-            />
-          </div>
+    <OverlayFeedback isVisible={isVisible} overlayClassName="overlay-feedback--screen">
+      <AnimatePresence>
+        {isVisible && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0, scale: 1.05 }}
+            transition={{
+              duration: 0.8,
+              ease: [0.43, 0.13, 0.23, 0.96],
+            }}
+            className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-body"
+            style={{ touchAction: 'none' }}
+          >
+            <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+              <div className="absolute inset-0 z-10 scale-75 rounded-full bg-green/5 blur-3xl animate-pulse" />
 
-          {/* Brand Wordmark — premium staggered reveal */}
-          <div className="absolute bottom-14 flex flex-col items-center gap-2 z-20">
-            <motion.span
-              initial={{ opacity: 0, y: 15, filter: 'blur(10px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              transition={{ 
-                duration: 1.2, 
-                delay: 0.6, 
-                ease: [0.22, 1, 0.36, 1] 
-              }}
-              className="overlay-feedback-wordmark text-white/90 [text-shadow:0_2px_8px_rgba(0,0,0,0.2)]"
-            >
-              reflections
-            </motion.span>
-            
-            <motion.div 
-              initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 32, opacity: 1 }}
-              transition={{ 
-                duration: 0.8, 
-                delay: 1.3, 
-                ease: "easeOut" 
-              }}
-              className="overlay-feedback-divider bg-green/60"
-            />
-          </div>
+              <video
+                src="/assets/videos/sanctuary.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="absolute inset-0 z-0 h-full w-full object-cover"
+              />
+            </div>
 
-        </motion.div>
-      )}
-    </AnimatePresence>
+            <div className="absolute bottom-14 z-20 flex flex-col items-center gap-2">
+              <motion.span
+                initial={{ opacity: 0, y: 15, filter: 'blur(10px)' }}
+                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                transition={{
+                  duration: 1.2,
+                  delay: 0.6,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+                className="overlay-feedback-wordmark text-white/90 [text-shadow:0_2px_8px_rgba(0,0,0,0.2)]"
+              >
+                reflections
+              </motion.span>
+
+              <motion.div
+                initial={{ width: 0, opacity: 0 }}
+                animate={{ width: 32, opacity: 1 }}
+                transition={{
+                  duration: 0.8,
+                  delay: 1.3,
+                  ease: 'easeOut',
+                }}
+                className="overlay-feedback-divider bg-green/60"
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </OverlayFeedback>
   );
 };

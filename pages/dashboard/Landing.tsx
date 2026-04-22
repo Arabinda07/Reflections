@@ -161,7 +161,7 @@ export const Landing: React.FC = () => {
 
           <button
             onClick={toggleMute}
-            className="absolute bottom-10 lg:bottom-12 right-6 lg:right-16 z-30 p-3 rounded-full bg-black/40 text-white backdrop-blur-md hover:bg-black/60 transition-all duration-300 pointer-events-auto"
+            className="absolute bottom-10 right-6 z-30 rounded-full border border-white/15 bg-[rgba(var(--panel-bg-rgb),0.42)] p-3 text-white backdrop-blur-md transition-all duration-300 hover:bg-[rgba(var(--panel-bg-rgb),0.58)] pointer-events-auto lg:bottom-12 lg:right-16"
             aria-label={isMuted ? 'Unmute video' : 'Mute video'}
           >
             {isMuted ? <SpeakerSlash size={20} weight="bold" /> : <SpeakerHigh size={20} weight="bold" />}

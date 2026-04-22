@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { createPortal } from 'react-dom';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -45,11 +44,13 @@ import { RoutePath, NoteAttachment, Task } from '../../types';
 import { supabase } from '../../src/supabaseClient';
 import { StorageImage } from '../../components/ui/StorageImage';
 import { CompanionObservation } from '../../components/ui/CompanionObservation';
+import { ModalSheet } from '../../components/ui/ModalSheet';
+import { OverlayFeedback } from '../../components/ui/OverlayFeedback';
 import { PaperPlaneToast } from '../../components/ui/PaperPlaneToast';
 import { observationService } from '../../services/observationService';
 import { DEFAULT_WELLNESS_PROMPTS, getCurrentWellnessPrompt, getNextWellnessPromptState } from '../../services/wellnessPrompts';
-import { aiService } from '../../services/aiService';
 import { aiClient } from '../../services/aiClient';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { getOrderedTasks, getTaskDrawerTriggerLabel } from './createNoteTasks';
 
 const MOOD_CONFIG: Record<string, { nav: string, modal: string, icon: any }> = {
@@ -88,7 +89,7 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
   return (
     <motion.div
       layout
-      className={`group relative flex items-center gap-3 p-3 rounded-2xl transition-all duration-300 hover:bg-black/5 dark:hover:bg-white/5 ${task.completed ? 'opacity-60' : ''}`}
+      className={`group relative flex items-center gap-3 rounded-2xl p-3 transition-all duration-300 hover:bg-green/5 dark:hover:bg-white/5 ${task.completed ? 'opacity-60' : ''}`}
     >
       <AnimatePresence>
         {rippleKey > 0 && task.completed && (
@@ -152,18 +153,18 @@ export const CreateNote: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isLimitReached, setIsLimitReached] = useState(false);
-  const [activePlaceholder, setActivePlaceholder] = useState<string | null>(initialPrompt || null);
+  const [activePlaceholder, setActivePlaceholder] = useState<string | null>(
+    initialPrompt || getCurrentWellnessPrompt(0, DEFAULT_WELLNESS_PROMPTS),
+  );
   const [isReflecting, setIsReflecting] = useState(false);
   const [aiReflection, setAiReflection] = useState<string | null>(null);
-  const [dynamicPrompts, setDynamicPrompts] = useState<string[]>([]);
-  const [isGeneratingPrompts, setIsGeneratingPrompts] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [newAttachments, setNewAttachments] = useState<File[]>([]);
   const [existingAttachments, setExistingAttachments] = useState<NoteAttachment[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   
   // UI States
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+  const isMobile = useMediaQuery('(max-width: 1023px)');
   const [isFocused, setIsFocused] = useState(false);
   const [isTitleFocused, setIsTitleFocused] = useState(false);
   const [isFlowing, setIsFlowing] = useState(false);
@@ -193,11 +194,8 @@ export const CreateNote: React.FC = () => {
 
   useEffect(() => {
     isUnmounted.current = false;
-    const handleResize = () => setIsMobile(window.innerWidth < 1024);
-    window.addEventListener('resize', handleResize);
     return () => { 
       isUnmounted.current = true; 
-      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
@@ -248,7 +246,6 @@ export const CreateNote: React.FC = () => {
     const fetchNote = async () => {
       try {
         if (!id) {
-          generateDynamicPrompts();
           setLoading(false);
           return;
         }
@@ -261,7 +258,6 @@ export const CreateNote: React.FC = () => {
           setTasks(note.tasks || []);
           setImagePreview(note.thumbnailUrl || null);
           setExistingAttachments(note.attachments || []);
-          generateDynamicPrompts(note.mood);
           setLoading(false);
         } else {
           navigate(RoutePath.HOME);
@@ -311,8 +307,6 @@ export const CreateNote: React.FC = () => {
         thumbnailUrl: finalThumbnailUrl || undefined,
         attachments: existingAttachments
       });
-
-      aiService.processNoteIntoWiki({ id: noteId, title, content, tags, mood, tasks } as any).catch(() => {});
       
       await visualFloor;
       clearTimeout(nuclearTimer);
@@ -344,24 +338,8 @@ export const CreateNote: React.FC = () => {
     }
   };
 
-  const generateDynamicPrompts = async (m?: string) => {
-    setIsGeneratingPrompts(true);
-    try {
-      const pastNotes = await noteService.getRecent(3);
-      const result = await aiClient.requestJson<string[]>('prompts', {
-        note: { title, content, mood: m || mood },
-        recentNotes: pastNotes.filter(n => n.id !== id).map(n => ({ title: n.title, mood: n.mood, content: n.content }))
-      });
-      setDynamicPrompts(result);
-    } catch (err) {
-      setDynamicPrompts(DEFAULT_WELLNESS_PROMPTS.slice(0, 4));
-    } finally {
-      setIsGeneratingPrompts(false);
-    }
-  };
-
   const cycleSparkPrompt = () => {
-    const nextState = getNextWellnessPromptState(promptIndex, dynamicPrompts);
+    const nextState = getNextWellnessPromptState(promptIndex, DEFAULT_WELLNESS_PROMPTS);
     setPromptIndex(nextState.nextIndex);
     setActivePlaceholder(nextState.prompt);
   };
@@ -415,9 +393,9 @@ export const CreateNote: React.FC = () => {
         wikiPages: [],
         indexPage: null,
       });
-      if (!isUnmounted.current) setAiReflection(reflection || "I'm here to listen.");
+      if (!isUnmounted.current) setAiReflection(reflection || "I'm here with you.");
     } catch (error) {
-      setAiReflection("I'm having trouble reflecting right now.");
+      setAiReflection("I couldn't reflect on that right now. Try again in a moment.");
     } finally {
       if (!isUnmounted.current) setIsReflecting(false);
     }
@@ -430,36 +408,34 @@ export const CreateNote: React.FC = () => {
 
   return (
     <div className="relative flex-1 flex h-full bg-body transition-colors duration-700 ease-out-quart overflow-hidden">
-      <AnimatePresence>
-        {(loading || isBreathing) && (
-          <motion.div 
-            initial={{ opacity: 1 }} 
-            exit={{ opacity: 0 }} 
-            transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="absolute inset-0 z-[200] flex flex-col items-center justify-center bg-body px-6 text-center"
-          >
-            <motion.div 
-              animate={{ opacity: [0.4, 0.7, 0.4] }} 
-              transition={{ duration: 4, repeat: Infinity }} 
-              className="w-[400px] h-[400px] rounded-full bg-green/5 blur-3xl absolute" 
-            />
-            <div className="relative z-10">
-              <div className="w-48 h-48 mx-auto mb-12 opacity-80">
-                <DotLottieReact src="/assets/lottie/loading2.json" autoplay loop />
-              </div>
-              <h2 className="h2-section mb-4 animate-pulse">Take a breath.</h2>
-              <p className="body-editorial max-w-sm mx-auto">Let the noise settle before you start.</p>
+      <OverlayFeedback isVisible={loading || isBreathing} overlayClassName="overlay-feedback--screen">
+        <motion.div
+          initial={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8, ease: 'easeInOut' }}
+          className="relative flex flex-col items-center justify-center px-6 text-center"
+        >
+          <motion.div
+            animate={{ opacity: [0.4, 0.7, 0.4] }}
+            transition={{ duration: 4, repeat: Infinity }}
+            className="absolute h-[400px] w-[400px] rounded-full bg-green/5 blur-3xl"
+          />
+          <div className="relative z-10">
+            <div className="mx-auto mb-12 h-48 w-48 opacity-80">
+              <DotLottieReact src="/assets/lottie/loading2.json" autoplay loop />
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <h2 className="h2-section mb-4 animate-pulse">Take a breath.</h2>
+            <p className="body-editorial mx-auto max-w-sm">Let the noise settle before you start.</p>
+          </div>
+        </motion.div>
+      </OverlayFeedback>
       <div className="grain-overlay" />
 
       {/* ── Mobile Back Button ── */}
       {isMobile && (
         <button 
           onClick={() => navigate(RoutePath.NOTES)}
-          className={`fixed top-4 left-4 z-[80] h-10 w-10 rounded-full bg-white/80 dark:bg-black/80 backdrop-blur-xl border border-border flex items-center justify-center text-gray-text hover:bg-white transition-all shadow-sm ${isDimmed ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
+          className={`fixed left-4 top-4 z-[80] flex h-10 w-10 items-center justify-center rounded-[var(--radius-control)] border border-border bg-[rgba(var(--panel-bg-rgb),0.88)] text-gray-text shadow-sm backdrop-blur-xl transition-all hover:border-green/20 hover:text-green ${isDimmed ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
         >
           <ArrowLeft size={18} weight="bold" />
         </button>
@@ -475,7 +451,7 @@ export const CreateNote: React.FC = () => {
               onClick={() => navigate(RoutePath.NOTES)}
               className="flex items-center gap-2 text-gray-nav hover:text-gray-text text-[13px] font-bold mb-8 group transition-colors"
             >
-              <div className="h-8 w-8 rounded-full border border-border bg-white flex items-center justify-center group-hover:bg-gray-100 transition-colors">
+              <div className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-control)] border border-border bg-white transition-colors group-hover:border-green/20 group-hover:bg-green/5">
                 <ArrowLeft size={14} weight="bold" />
               </div>
               Back to Notes
@@ -534,7 +510,12 @@ export const CreateNote: React.FC = () => {
           {imagePreview && (
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative w-full aspect-[21/9] rounded-[2rem] overflow-hidden mb-12 bezel-outer group">
               <img src={imagePreview} alt="Cover" className="w-full h-full object-cover" />
-              <button onClick={() => setImagePreview(null)} className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/40 backdrop-blur-xl text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"><X size={20} weight="bold" /></button>
+              <button
+                onClick={() => setImagePreview(null)}
+                className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-[var(--radius-control)] border border-white/20 bg-[rgba(var(--panel-bg-rgb),0.78)] text-white opacity-0 shadow-sm backdrop-blur-xl transition-all group-hover:opacity-100"
+              >
+                <X size={20} weight="bold" />
+              </button>
             </motion.div>
           )}
 
@@ -545,9 +526,9 @@ export const CreateNote: React.FC = () => {
               {new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'long', day: 'numeric' })}
             </span>
             {canReflect && (
-               <button onClick={handleAiReflect} disabled={isReflecting} className="rounded-full bg-blue/10 text-blue px-3 py-1 text-[10px] uppercase tracking-[0.2em] font-bold flex items-center gap-2 hover:bg-blue/20 transition-all">
+               <button onClick={handleAiReflect} disabled={isReflecting} className="rounded-full bg-green/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-green transition-all hover:bg-green/20">
                  {isReflecting ? <CircleNotch size={12} className="animate-spin" /> : <Brain size={12} weight="bold" />}
-                 Reflect
+                 Reflect with AI
                </button>
             )}
           </div>
@@ -614,7 +595,7 @@ export const CreateNote: React.FC = () => {
                 className="group relative h-16 w-16 rounded-full bg-white/80 dark:bg-panel-bg/80 backdrop-blur-3xl border border-white/20 shadow-[0_24px_40px_-10px_rgba(0,0,0,0.15)] flex items-center justify-center text-green transition-all"
               >
                 <div className="absolute inset-2 rounded-full bg-green/5 group-hover:bg-green/10 transition-colors" />
-                <Target size={28} weight="fill" className={isGeneratingPrompts ? 'animate-pulse' : ''} />
+                <Target size={28} weight="fill" />
               </motion.button>
             </Magnetic>
           ) : (
@@ -638,175 +619,186 @@ export const CreateNote: React.FC = () => {
         </AnimatePresence>
       </div>
 
-      {/* ── Mobile Modal Expansion (Personalize) ── */}
-      {createPortal(
-        <AnimatePresence>
-          {isMobile && isMobileOptionsOpen && (
-            <div className="fixed inset-0 z-[100] flex flex-col justify-end p-4" style={{ paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))' }}>
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-body/80 backdrop-blur-xl" onClick={() => setIsMobileOptionsOpen(false)} />
-              
-              <motion.div 
-                initial={{ y: "100%", opacity: 0 }} 
-                animate={{ y: 0, opacity: 1 }} 
-                exit={{ y: "100%", opacity: 0 }}
-                transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                className="relative w-full bg-white dark:bg-panel-bg rounded-[2rem] p-6 shadow-2xl border border-border flex flex-col gap-4"
-              >
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-[10px] font-black tracking-widest uppercase opacity-40">Personalize</span>
-                  <button onClick={() => setIsMobileOptionsOpen(false)} className="text-gray-nav hover:text-red p-2"><X size={20} weight="bold" /></button>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-3">
-                  <button onClick={() => { setIsMobileOptionsOpen(false); setIsMoodOpen(true); }} className={`flex items-center gap-3 p-4 rounded-2xl border ${mood ? MOOD_CONFIG[mood]?.nav || 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><ActiveMoodIcon size={24} weight={mood ? "fill" : "regular"} /><span className="text-[14px] font-bold capitalize">{mood ? mood : 'Mood'}</span></button>
-                  <button onClick={() => { setIsMobileOptionsOpen(false); setIsTagsOpen(true); }} className={`flex items-center gap-3 p-4 rounded-2xl border ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><TagIcon size={24} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-[14px] font-bold">Tags</span></button>
-                  <button onClick={() => { setIsMobileOptionsOpen(false); setIsMusicOpen(true); }} className={`flex items-center gap-3 p-4 rounded-2xl border ${musicPlaying ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><Headphones size={24} weight={musicPlaying ? "fill" : "regular"} /><span className="text-[14px] font-bold">Sounds</span></button>
-                  <button onClick={() => { setIsMobileOptionsOpen(false); setIsTasksOpen(true); }} className={`flex items-center gap-3 p-4 rounded-2xl border ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><ListChecks size={24} weight={tasks.some(t => !t.completed) ? "fill" : "regular"} /><span className="text-[14px] font-bold">Tasks</span></button>
-                  <button onClick={toggleWhisper} className={`flex items-center gap-3 p-4 rounded-2xl border ${isWhispering ? 'bg-green/10 border-green/20 text-green animate-pulse' : 'border-border text-gray-text'}`}>{isWhispering ? <Microphone size={24} weight="fill" /> : <MicrophoneSlash size={24} weight="regular" />}<span className="text-[14px] font-bold">Whisper</span></button>
-                  
-                  <label className="flex items-center gap-3 p-4 rounded-2xl border border-border text-gray-text cursor-pointer hover:bg-black/5 dark:hover:bg-white/5">
-                    <Paperclip size={24} weight="regular" /><span className="text-[14px] font-bold">Files</span>
-                    <input type="file" multiple className="hidden" onChange={(e) => {
-                      if (e.target.files) setNewAttachments([...newAttachments, ...Array.from(e.target.files)]);
-                      setIsMobileOptionsOpen(false);
-                    }} />
-                  </label>
-                  <label className="flex items-center gap-3 p-4 rounded-2xl border border-border text-gray-text cursor-pointer hover:bg-black/5 dark:hover:bg-white/5">
-                    <ImageIcon size={24} weight="regular" /><span className="text-[14px] font-bold">Cover</span>
-                    <input type="file" className="hidden" accept="image/*" onChange={(e) => {
-                      if (e.target.files?.[0]) setImagePreview(URL.createObjectURL(e.target.files[0]));
-                      setIsMobileOptionsOpen(false);
-                    }} />
-                  </label>
-                </div>
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>,
-        document.body
-      )}
+      {/* ── Shared Sheets ── */}
+      <ModalSheet
+        isOpen={isMobile && isMobileOptionsOpen}
+        onClose={() => setIsMobileOptionsOpen(false)}
+        title="Personalize"
+        description="Adjust the details around this reflection without leaving the page."
+        size="sm"
+        bodyClassName="pt-2"
+      >
+        <div className="grid grid-cols-2 gap-3">
+          <button onClick={() => { setIsMobileOptionsOpen(false); setIsMoodOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${mood ? MOOD_CONFIG[mood]?.nav || 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><ActiveMoodIcon size={24} weight={mood ? "fill" : "regular"} /><span className="text-[14px] font-bold capitalize">{mood ? mood : 'Mood'}</span></button>
+          <button onClick={() => { setIsMobileOptionsOpen(false); setIsTagsOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><TagIcon size={24} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-[14px] font-bold">Tags</span></button>
+          <button onClick={() => { setIsMobileOptionsOpen(false); setIsMusicOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${musicPlaying ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><Headphones size={24} weight={musicPlaying ? "fill" : "regular"} /><span className="text-[14px] font-bold">Sounds</span></button>
+          <button onClick={() => { setIsMobileOptionsOpen(false); setIsTasksOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><ListChecks size={24} weight={tasks.some(t => !t.completed) ? "fill" : "regular"} /><span className="text-[14px] font-bold">Tasks</span></button>
+          <button onClick={toggleWhisper} className={`flex items-center gap-3 rounded-2xl border p-4 ${isWhispering ? 'bg-green/10 border-green/20 text-green animate-pulse' : 'border-border text-gray-text'}`}>{isWhispering ? <Microphone size={24} weight="fill" /> : <MicrophoneSlash size={24} weight="regular" />}<span className="text-[14px] font-bold">Whisper</span></button>
 
-      {/* ── Sub-Modals (Mood, Tags, Tasks, Music, Reflection) ── */}
-      {/* ... keeping these identical to previous implementation, just ensuring they use green instead of blue ... */}
-      {createPortal(
-        <AnimatePresence>
-          {isTasksOpen && (
-            <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={() => setIsTasksOpen(false)} />
-              <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative w-full max-w-[420px] bg-white dark:bg-panel-bg bezel-outer shadow-2xl flex flex-col max-h-[80vh]">
-                <div className="bezel-inner p-8 flex flex-col h-full">
-                  <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center gap-3"><ListChecks size={24} weight="bold" className="text-green" /><span className="text-[18px] font-display text-gray-text">Tasks</span></div>
-                    <button onClick={() => setIsTasksOpen(false)} className="text-gray-nav hover:text-red transition-all"><X size={24} weight="bold" /></button>
-                  </div>
-                  <div className="flex-1 overflow-y-auto space-y-2 mb-8">
-                    {getOrderedTasks(tasks).map(t => <TaskRow key={t.id} task={t} updateTask={(tid, updates) => setTasks(tasks.map(x => x.id === tid ? {...x, ...updates} : x))} toggleTask={tid => setTasks(tasks.map(x => x.id === tid ? {...x, completed: !x.completed} : x))} removeTask={tid => setTasks(tasks.filter(x => x.id !== tid))} />)}
-                  </div>
-                  <Button onClick={() => setTasks([...tasks, { id: Math.random().toString(36).substr(2, 9), text: '', completed: false }])} className="w-full h-14 rounded-2xl bg-green text-white font-bold"><Plus size={20} weight="bold" className="mr-2" /> Add Task</Button>
-                </div>
-              </motion.div>
-            </div>
-          )}
-          {isTagsOpen && (
-            <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={() => setIsTagsOpen(false)} />
-              <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="relative w-full max-w-[380px] bezel-outer">
-                <div className="bezel-inner p-8">
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-[20px] font-display text-gray-text">Tags</h3>
-                    <button onClick={() => setIsTagsOpen(false)} className="text-gray-nav hover:text-red transition-all"><X size={24} weight="bold" /></button>
-                  </div>
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {tags.map(t => <span key={t} className="px-3 py-1.5 rounded-xl bg-green/10 text-green text-[12px] font-bold flex items-center gap-2">#{t}<X size={12} className="cursor-pointer" onClick={() => setTags(tags.filter(x => x !== t))} /></span>)}
-                  </div>
-                  <input type="text" placeholder="Add tag (Press Enter)..." className="w-full bg-transparent border-none outline-none font-bold text-[14px]" onKeyDown={e => { if (e.key === 'Enter' && (e.target as any).value) { setTags([...tags, (e.target as any).value]); (e.target as any).value = ''; } }} />
-                </div>
-              </motion.div>
-            </div>
-          )}
-          {isMoodOpen && (
-             <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
-               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={() => setIsMoodOpen(false)} />
-               <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="relative w-full max-w-[380px] bezel-outer">
-                 <div className="bezel-inner p-8">
-                   <div className="flex items-center justify-between mb-6">
-                     <h3 className="text-[20px] font-display text-gray-text">Mood</h3>
-                     <button onClick={() => setIsMoodOpen(false)} className="text-gray-nav hover:text-red transition-all"><X size={24} weight="bold" /></button>
-                   </div>
-                   <div className="grid grid-cols-3 gap-3">
-                      {['happy', 'calm', 'anxious', 'sad', 'angry', 'tired'].map(m => {
-                        const Icon = MOOD_CONFIG[m]?.icon || Smiley;
-                        return (
-                          <button 
-                            key={m} 
-                            onClick={() => { 
-                              if (mood === m) {
-                                setMood(undefined);
-                              } else {
-                                setMood(m); 
-                                generateDynamicPrompts(m);
-                              }
-                              setIsMoodOpen(false); 
-                            }} 
-                            className={`flex flex-col items-center p-4 rounded-2xl border-2 transition-all ${mood === m ? MOOD_CONFIG[m]?.modal || 'border-green bg-green/10 text-green' : 'border-border bg-white dark:bg-white/5 text-gray-text hover:border-border/60'}`}
-                          >
-                            <Icon size={32} weight={mood === m ? "fill" : "regular"} className="mb-2" />
-                            <span className="text-[12px] font-bold capitalize">{m}</span>
-                          </button>
-                        );
-                      })}
-                   </div>
-                 </div>
-               </motion.div>
-             </div>
-          )}
-          {isMusicOpen && (
-            <div className="fixed inset-0 z-[110] flex items-center justify-center p-6">
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={() => setIsMusicOpen(false)} />
-              <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="relative w-full max-w-[340px] bezel-outer">
-                <div className="bezel-inner p-6 space-y-2">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-[20px] font-display text-gray-text">Sounds</h3>
-                    <button onClick={() => setIsMusicOpen(false)} className="text-gray-nav hover:text-red transition-all"><X size={24} weight="bold" /></button>
-                  </div>
-                  {AMBIENT_TRACKS.map((track) => (
-                    <button 
-                      key={track.id} 
-                      onClick={() => {
-                        if (activeMusicTrack?.id === track.id) {
-                          stopMusic();
-                        } else {
-                          playMusicTrack(track);
-                        }
-                      }} 
-                      className={`w-full p-4 rounded-2xl text-left text-[14px] font-bold flex items-center justify-between border-2 ${activeMusicTrack?.id === track.id ? 'border-green bg-green/10 text-green' : 'border-transparent hover:border-border text-gray-text'}`}
-                    >
-                      <span className="flex items-center gap-3">
-                        <span className="text-[18px]">{track.emoji}</span>
-                        {track.label}
-                      </span>
-                      {activeMusicTrack?.id === track.id && <CircleNotch size={16} className="animate-spin" />}
-                    </button>
-                  ))}
-                  <button onClick={stopMusic} className="w-full p-4 mt-2 border-2 border-transparent text-red font-bold hover:bg-red/5 rounded-2xl">Stop All</button>
-                </div>
-              </motion.div>
-            </div>
-          )}
-          {aiReflection && (
-            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-body/60 backdrop-blur-xl">
-              <div className="bezel-outer max-w-2xl w-full shadow-2xl">
-                <div className="bezel-inner p-10">
-                  <div className="flex justify-between items-start mb-8"><div className="flex items-center gap-4"><Brain size={32} weight="duotone" className="text-green" /><h3 className="text-[24px] font-display text-gray-text">Reflection</h3></div><button onClick={() => setAiReflection(null)}><X size={24} weight="bold" className="text-gray-nav" /></button></div>
-                  <p className="text-[20px] font-serif italic text-gray-light leading-relaxed mb-10">"{aiReflection}"</p>
-                  <Button variant="primary" className="w-full h-14 rounded-2xl" onClick={() => setAiReflection(null)}>Keep Writing</Button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>,
-        document.body
-      )}
+          <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-border p-4 text-gray-text transition-colors hover:border-green/20 hover:bg-green/5">
+            <Paperclip size={24} weight="regular" /><span className="text-[14px] font-bold">Files</span>
+            <input type="file" multiple className="hidden" onChange={(e) => {
+              if (e.target.files) setNewAttachments([...newAttachments, ...Array.from(e.target.files)]);
+              setIsMobileOptionsOpen(false);
+            }} />
+          </label>
+          <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-border p-4 text-gray-text transition-colors hover:border-green/20 hover:bg-green/5">
+            <ImageIcon size={24} weight="regular" /><span className="text-[14px] font-bold">Cover</span>
+            <input type="file" className="hidden" accept="image/*" onChange={(e) => {
+              if (e.target.files?.[0]) setImagePreview(URL.createObjectURL(e.target.files[0]));
+              setIsMobileOptionsOpen(false);
+            }} />
+          </label>
+        </div>
+      </ModalSheet>
+
+      <ModalSheet
+        isOpen={isTasksOpen}
+        onClose={() => setIsTasksOpen(false)}
+        title="Tasks"
+        description="Keep the next small promises close to your reflection."
+        icon={<ListChecks size={24} weight="bold" className="text-green" />}
+        size="md"
+        bodyClassName="max-h-[72vh] pt-2"
+      >
+        <div className="flex flex-col gap-6">
+          <div className="space-y-2 overflow-y-auto">
+            {getOrderedTasks(tasks).map((task) => (
+              <TaskRow
+                key={task.id}
+                task={task}
+                updateTask={(taskId, updates) => setTasks(tasks.map((item) => item.id === taskId ? { ...item, ...updates } : item))}
+                toggleTask={(taskId) => setTasks(tasks.map((item) => item.id === taskId ? { ...item, completed: !item.completed } : item))}
+                removeTask={(taskId) => setTasks(tasks.filter((item) => item.id !== taskId))}
+              />
+            ))}
+          </div>
+
+          <Button onClick={() => setTasks([...tasks, { id: Math.random().toString(36).substr(2, 9), text: '', completed: false }])} className="h-14 w-full rounded-2xl bg-green text-white font-bold">
+            <Plus size={20} weight="bold" className="mr-2" /> Add Task
+          </Button>
+        </div>
+      </ModalSheet>
+
+      <ModalSheet
+        isOpen={isTagsOpen}
+        onClose={() => setIsTagsOpen(false)}
+        title="Tags"
+        description="Add a few words to anchor what this reflection is about."
+        size="sm"
+        bodyClassName="pt-2"
+      >
+        <div className="space-y-5">
+          <div className="flex flex-wrap gap-2">
+            {tags.map((tag) => (
+              <span key={tag} className="flex items-center gap-2 rounded-xl bg-green/10 px-3 py-1.5 text-[12px] font-bold text-green">
+                #{tag}
+                <button type="button" onClick={() => setTags(tags.filter((item) => item !== tag))} className="text-green/70 hover:text-red">
+                  <X size={12} />
+                </button>
+              </span>
+            ))}
+          </div>
+
+          <input
+            type="text"
+            value={tagInput}
+            placeholder="Add tag and press Enter"
+            className="w-full rounded-[var(--radius-control)] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-gray-text outline-none transition-[border-color,box-shadow] focus:border-green focus:ring-4 focus:ring-green/10 dark:bg-[var(--panel-bg)]"
+            onChange={(event) => setTagInput(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && tagInput.trim()) {
+                event.preventDefault();
+                setTags([...tags, tagInput.trim()]);
+                setTagInput('');
+              }
+            }}
+          />
+        </div>
+      </ModalSheet>
+
+      <ModalSheet
+        isOpen={isMoodOpen}
+        onClose={() => setIsMoodOpen(false)}
+        title="Mood"
+        description="Name how this moment feels before you keep writing."
+        size="sm"
+        bodyClassName="pt-2"
+      >
+        <div className="grid grid-cols-3 gap-3">
+          {['happy', 'calm', 'anxious', 'sad', 'angry', 'tired'].map((entry) => {
+            const Icon = MOOD_CONFIG[entry]?.icon || Smiley;
+
+            return (
+              <button
+                key={entry}
+                onClick={() => {
+                  if (mood === entry) {
+                    setMood(undefined);
+                  } else {
+                    setMood(entry);
+                  }
+                  setIsMoodOpen(false);
+                }}
+                className={`flex flex-col items-center rounded-2xl border-2 p-4 transition-all ${mood === entry ? MOOD_CONFIG[entry]?.modal || 'border-green bg-green/10 text-green' : 'border-border bg-white text-gray-text hover:border-border/60 dark:bg-white/5'}`}
+              >
+                <Icon size={32} weight={mood === entry ? 'fill' : 'regular'} className="mb-2" />
+                <span className="text-[12px] font-bold capitalize">{entry}</span>
+              </button>
+            );
+          })}
+        </div>
+      </ModalSheet>
+
+      <ModalSheet
+        isOpen={isMusicOpen}
+        onClose={() => setIsMusicOpen(false)}
+        title="Sounds"
+        description={musicPlaying && activeMusicTrack ? `${activeMusicTrack.label} is playing in the background.` : 'Choose a soft soundscape for this reflection.'}
+        size="sm"
+        bodyClassName="pt-2"
+      >
+        <div className="space-y-2">
+          {AMBIENT_TRACKS.map((track) => (
+            <button
+              key={track.id}
+              onClick={() => {
+                if (activeMusicTrack?.id === track.id) {
+                  stopMusic();
+                } else {
+                  playMusicTrack(track);
+                }
+              }}
+              className={`flex w-full items-center justify-between rounded-2xl border-2 p-4 text-left text-[14px] font-bold ${activeMusicTrack?.id === track.id ? 'border-green bg-green/10 text-green' : 'border-transparent text-gray-text hover:border-border hover:bg-green/5'}`}
+            >
+              <span className="flex items-center gap-3">
+                <span className="text-[18px]">{track.emoji}</span>
+                {track.label}
+              </span>
+              {activeMusicTrack?.id === track.id && <CircleNotch size={16} className="animate-spin" />}
+            </button>
+          ))}
+
+          <button onClick={stopMusic} className="mt-2 w-full rounded-2xl border-2 border-transparent p-4 font-bold text-red transition-colors hover:bg-red/5">Stop All</button>
+        </div>
+      </ModalSheet>
+
+      <ModalSheet
+        isOpen={Boolean(aiReflection)}
+        onClose={() => setAiReflection(null)}
+        title="AI reflection"
+        description="On demand only. Nothing is sent until you ask for it."
+        icon={<Brain size={24} weight="duotone" className="text-green" />}
+        size="lg"
+        bodyClassName="pt-4"
+      >
+        <div className="space-y-8">
+          <p className="text-[20px] leading-relaxed text-gray-light font-serif italic">"{aiReflection}"</p>
+          <Button variant="primary" className="h-14 w-full rounded-2xl" onClick={() => setAiReflection(null)}>
+            Back to writing
+          </Button>
+        </div>
+      </ModalSheet>
 
       <CompanionObservation isVisible={showObservation} text={observationText || ""} onComplete={() => { setShowObservation(false); navigate(RoutePath.HOME); }} />
       <PaperPlaneToast isVisible={showPlane} onAnimationComplete={() => {}} />

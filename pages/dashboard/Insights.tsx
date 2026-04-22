@@ -26,7 +26,7 @@ import { noteService } from '../../services/noteService';
 import { wikiService } from '../../services/wikiService';
 import { aiService } from '../../services/aiService';
 import { profileService } from '../../services/profileService';
-import { FREE_AI_MINIMUM_NOTES, getAiReflectionGate } from '../../services/wellnessPolicy';
+import { FREE_WIKI_MINIMUM_ENTRIES, getWikiInsightsGate } from '../../services/wellnessPolicy';
 
 const MOOD_COLORS: Record<string, string> = {
   happy: '#f97316',
@@ -76,22 +76,31 @@ export const Insights: React.FC = () => {
 
   const gate = useMemo(() => {
     if (!access) return null;
-    return getAiReflectionGate(access, notes.length, notes.length >= FREE_AI_MINIMUM_NOTES);
+    return getWikiInsightsGate(access, notes.length);
   }, [access, notes.length]);
 
   const handleRefreshWiki = async () => {
-    if (!gate?.canReflect) return;
+    if (!gate?.canGenerate) return;
 
     setIsRefreshingWiki(true);
     try {
-      await aiService.refreshWikiSummaries();
+      let claimedFreeRefresh = false;
+
       if (access?.planTier !== 'pro') {
-        await profileService.incrementFreeAiReflections();
-        const newAccess = await profileService.getWellnessAccess();
-        setAccess(newAccess);
+        claimedFreeRefresh = await profileService.incrementFreeWikiInsights();
+
+        if (!claimedFreeRefresh) {
+          const newAccess = await profileService.getWellnessAccess();
+          setAccess(newAccess);
+          return;
+        }
       }
+
+      await aiService.refreshWikiSummaries();
       const allThemes = await wikiService.getAllThemes();
+      const newAccess = await profileService.getWellnessAccess();
       setThemes(allThemes);
+      setAccess(newAccess);
     } catch (error) {
       console.error('[Insights] Failed to refresh wiki:', error);
     } finally {
@@ -184,10 +193,10 @@ export const Insights: React.FC = () => {
                 className="text-[11px] font-black text-green hover:text-green-hover uppercase tracking-widest"
                 onClick={handleRefreshWiki}
                 isLoading={isRefreshingWiki}
-                disabled={isRefreshingWiki || !gate?.canReflect}
+                disabled={isRefreshingWiki || !gate?.canGenerate}
               >
                 <Sparkle size={14} weight="fill" className="mr-2" />
-                {isRefreshingWiki ? 'Synthesizing...' : 'Refresh insights'}
+                {isRefreshingWiki ? 'Refreshing...' : 'Refresh with AI'}
               </Button>
             ) : null}
           </div>
@@ -195,7 +204,7 @@ export const Insights: React.FC = () => {
           <SectionHeader
             eyebrow="Monthly wellness journey"
             title="A quieter look at the patterns in your writing."
-            description="These surfaces are here to help you notice your rhythm, not to turn reflection into a scoreboard."
+            description="These surfaces help you notice your rhythm without turning reflection into a scoreboard. The Life Wiki only changes when you explicitly refresh it."
             icon={
               <div className="icon-block icon-block-lg">
                 <Brain size={34} weight="duotone" />
@@ -356,10 +365,10 @@ export const Insights: React.FC = () => {
           <Surface variant="flat" className="overflow-hidden">
             <div className="p-8 md:p-12 space-y-8">
               <SectionHeader
-                eyebrow="Personal life wiki"
+                eyebrow="Optional life wiki"
                 title="Themes that keep resurfacing."
                 titleAs="h2"
-                description={`Built from ${notes.length} reflections and refreshed only when you choose it.`}
+                description={`Built from ${notes.length} reflections. Nothing is synthesized until you choose to refresh it.`}
                 icon={
                   <div className="icon-block icon-block-md">
                     <Book size={26} weight="duotone" />
@@ -371,11 +380,11 @@ export const Insights: React.FC = () => {
                 <Alert
                   variant="warning"
                   icon={<Warning size={20} weight="fill" />}
-                  title="You have used your free insight."
-                  description="Upgrade to Pro when you want your Life Wiki to keep evolving alongside new reflections."
+                  title="You have used your free Life Wiki refresh."
+                  description="You can still read what is already here. Upgrade when you want to keep refreshing it with AI."
                   actions={
                     <Button size="sm" variant="primary" className="font-black" onClick={() => navigate(RoutePath.ACCOUNT)}>
-                      Upgrade to Pro
+                      See Pro options
                     </Button>
                   }
                 />
@@ -385,40 +394,40 @@ export const Insights: React.FC = () => {
                 <EmptyState
                   surface="none"
                   icon={<Sparkle size={18} weight="duotone" className="text-orange" />}
-                  title="Your sanctuary is ready when your first reflection arrives."
-                  description="Write your first note and this space will begin collecting the themes beneath it."
+                  title="This space is ready when your first reflection arrives."
+                  description="Write your first note and this space will stay quiet until you choose to build the Life Wiki."
                   action={
                     <Button variant="ghost" className="text-[11px] font-black uppercase tracking-widest text-green" onClick={() => navigate(RoutePath.CREATE_NOTE)}>
                       Begin your first entry
                     </Button>
                   }
                 />
-              ) : notes.length < FREE_AI_MINIMUM_NOTES ? (
+              ) : notes.length < FREE_WIKI_MINIMUM_ENTRIES ? (
                 <EmptyState
                   surface="none"
                   icon={<Sparkle size={18} weight="duotone" className="text-orange" />}
                   title="Your wiki is still gathering enough signal."
-                  description="Reflections needs at least 3 entries before it can synthesize stable themes."
+                  description={`Write ${FREE_WIKI_MINIMUM_ENTRIES - notes.length} more ${FREE_WIKI_MINIMUM_ENTRIES - notes.length === 1 ? 'entry' : 'entries'} before the Life Wiki can say anything useful.`}
                 />
               ) : themes.length === 0 ? (
                 <EmptyState
                   surface="none"
                   icon={<Sparkle size={18} weight="duotone" className="text-orange" />}
-                  title="Unlock your life wiki when you’re ready."
+                  title="Build your Life Wiki when you’re ready."
                   description="This stays on demand. Nothing is generated until you ask for it."
                   action={
                     gate?.requiresUpgrade ? (
                       <Button variant="primary" onClick={() => navigate(RoutePath.ACCOUNT)}>
-                        Upgrade to Pro
+                        See Pro options
                       </Button>
                     ) : (
                       <Button
                         variant="primary"
                         onClick={handleRefreshWiki}
                         isLoading={isRefreshingWiki}
-                        disabled={isRefreshingWiki || !gate?.canReflect}
+                        disabled={isRefreshingWiki || !gate?.canGenerate}
                       >
-                        {isRefreshingWiki ? 'Synthesizing...' : 'Generate insights'}
+                        {isRefreshingWiki ? 'Refreshing...' : 'Refresh with AI'}
                       </Button>
                     )
                   }

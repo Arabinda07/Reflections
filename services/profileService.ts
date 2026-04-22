@@ -1,10 +1,15 @@
 import { supabase } from '../src/supabaseClient';
 import { PlanTier, WellnessAccess } from '../types';
 
+const getAuthenticatedUser = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+  return user;
+};
+
 export const profileService = {
   getWellnessAccess: async (): Promise<WellnessAccess> => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
+    const user = await getAuthenticatedUser();
 
     const { data, error } = await supabase
       .from('profiles')
@@ -32,8 +37,7 @@ export const profileService = {
   },
 
   incrementFreeAiReflections: async (): Promise<void> => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
+    const user = await getAuthenticatedUser();
 
     // Fetch current count first
     const { data } = await supabase
@@ -52,22 +56,29 @@ export const profileService = {
     if (error) throw error;
   },
 
-  incrementFreeWikiInsights: async (): Promise<void> => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
+  incrementFreeWikiInsights: async (): Promise<boolean> => {
+    const user = await getAuthenticatedUser();
 
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('profiles')
-      .select('free_wiki_insights_used')
+      .update({ free_wiki_insights_used: 1 })
       .eq('id', user.id)
-      .single();
+      .eq('free_wiki_insights_used', 0)
+      .select('id')
+      .limit(1);
 
-    const currentCount = data?.free_wiki_insights_used || 0;
+    if (error) throw error;
+    return (data?.length ?? 0) === 1;
+  },
+
+  releaseClaimedFreeWikiInsight: async (): Promise<void> => {
+    const user = await getAuthenticatedUser();
 
     const { error } = await supabase
       .from('profiles')
-      .update({ free_wiki_insights_used: currentCount + 1 })
-      .eq('id', user.id);
+      .update({ free_wiki_insights_used: 0 })
+      .eq('id', user.id)
+      .eq('free_wiki_insights_used', 1);
 
     if (error) throw error;
   }

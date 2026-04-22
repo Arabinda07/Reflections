@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import { ModalSheet } from './ModalSheet';
 import { useAmbientAudio, AMBIENT_TRACKS } from '../../hooks/useAmbientAudio';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 function useDarkMode(): boolean {
   const [isDark, setIsDark] = useState(
@@ -24,8 +24,6 @@ function useDarkMode(): boolean {
 
   return isDark;
 }
-
-const isMobileWindow = () => window.innerWidth < 640;
 
 const WaveformBars: React.FC<{ color: string }> = ({ color }) => {
   const bars = [
@@ -60,8 +58,8 @@ export const AmbientMusicButton: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [showHint, setShowHint] = useState(false);
-  const [popupRight, setPopupRight] = useState(20);
   const isDark = useDarkMode();
+  const isMobile = useMediaQuery('(max-width: 639px)');
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const popupRef = useRef<HTMLDivElement | null>(null);
 
@@ -84,7 +82,7 @@ export const AmbientMusicButton: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!isOpen || isMobileWindow()) return;
+    if (!isOpen || isMobile) return;
 
     const handleClick = (event: MouseEvent) => {
       const target = event.target as Node;
@@ -98,13 +96,9 @@ export const AmbientMusicButton: React.FC = () => {
 
     document.addEventListener('click', handleClick);
     return () => document.removeEventListener('click', handleClick);
-  }, [isOpen]);
+  }, [isMobile, isOpen]);
 
   const openPicker = useCallback(() => {
-    if (buttonRef.current && !isMobileWindow()) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      setPopupRight(window.innerWidth - rect.right);
-    }
     setIsOpen(true);
   }, []);
 
@@ -139,6 +133,7 @@ export const AmbientMusicButton: React.FC = () => {
     ? `0 0 22px -4px ${accentColor}80`
     : '0 4px 16px -4px rgba(0,0,0,0.28)';
   const iconStroke = isPlaying ? accentColor : isHovered ? '#58cc02' : '#ffffff';
+  const idleIconStroke = isDark ? '#fafaf9' : '#1f2937';
 
   const pickerBg = isDark ? 'rgba(24,24,27,0.98)' : 'rgba(255,255,255,0.97)';
   const pickerBorder = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(229,229,229,0.9)';
@@ -209,8 +204,8 @@ export const AmbientMusicButton: React.FC = () => {
   };
 
   const desktopPopup =
-    !isMobileWindow() && isOpen
-      ? createPortal(
+    !isMobile && isOpen
+      ? (
           <AnimatePresence>
             <motion.div
               ref={popupRef}
@@ -219,11 +214,9 @@ export const AmbientMusicButton: React.FC = () => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
               transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-              className="audio-popup min-w-[220px] fixed z-[99999]"
+              className="audio-popup absolute bottom-[4.75rem] right-0 z-[200] min-w-[220px]"
               style={
                 {
-                  bottom: 90,
-                  right: popupRight,
                   '--audio-picker-bg': pickerBg,
                   '--audio-picker-border': pickerBorder,
                   '--audio-picker-shadow': pickerShadow,
@@ -244,8 +237,7 @@ export const AmbientMusicButton: React.FC = () => {
 
               <div className="audio-track-list">{AMBIENT_TRACKS.map((track) => renderTrackRow(track, true))}</div>
             </motion.div>
-          </AnimatePresence>,
-          document.body,
+          </AnimatePresence>
         )
       : null;
 
@@ -254,7 +246,7 @@ export const AmbientMusicButton: React.FC = () => {
       {desktopPopup}
 
       <ModalSheet
-        isOpen={isMobileWindow() && isOpen}
+        isOpen={isMobile && isOpen}
         onClose={() => setIsOpen(false)}
         title="Ambient sounds"
         description={
@@ -297,10 +289,14 @@ export const AmbientMusicButton: React.FC = () => {
           className="audio-floating-button"
           style={
             {
-              '--audio-button-bg': isPlaying ? `${accentColor}22` : 'rgba(26,26,26,0.76)',
+              '--audio-button-bg': isPlaying
+                ? `${accentColor}22`
+                : isDark
+                  ? 'rgba(39,39,42,0.86)'
+                  : 'rgba(255,255,255,0.84)',
               '--audio-button-border': isPlaying ? `${accentColor}88` : 'rgba(255,255,255,0.18)',
               '--audio-button-shadow': buttonGlow,
-              '--audio-icon-stroke': iconStroke,
+              '--audio-icon-stroke': isPlaying ? iconStroke : isHovered ? '#58cc02' : idleIconStroke,
             } as React.CSSProperties
           }
         >

@@ -85,14 +85,14 @@ export const ResetPassword: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-body p-6 transition-colors duration-300">
+    <div className="flex min-h-[100dvh] items-center justify-center bg-body p-6 transition-colors duration-300">
       <div className="w-full max-w-[460px]">
         <Surface variant="bezel">
           <div className="p-8 sm:p-10 space-y-6">
             <SectionHeader
               eyebrow="Recovery"
               title="Create a new password"
-              description="This keeps your account private without leaving the sanctuary aesthetic behind."
+              description="Choose a new password and step back into your writing without friction."
               icon={
                 <div className="icon-block icon-block-md">
                   <LockKey size={24} weight="duotone" />

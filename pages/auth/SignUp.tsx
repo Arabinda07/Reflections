@@ -93,14 +93,14 @@ export const SignUp: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-body p-6 transition-colors duration-300">
+    <div className="flex min-h-[100dvh] items-center justify-center bg-body p-6 transition-colors duration-300">
       <div className="w-full max-w-[460px]">
         <Surface variant="bezel">
           <div className="p-8 sm:p-10 space-y-6">
             <SectionHeader
               eyebrow="Start gently"
               title="Create account"
-              description="Set up your space without dropping into generic signup-screen styling."
+              description="Create your private writing space. Optional AI stays optional until you ask for it."
               icon={
                 <div className="icon-block icon-block-md">
                   <UserPlus size={24} weight="duotone" />

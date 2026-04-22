@@ -70,7 +70,7 @@ export const FAQ: React.FC = () => {
               </h1>
               
               <p className="text-mk-body font-serif text-gray-light max-w-2xl">
-                Everything you need to know about Sanctuary, the science of journaling, and how we protect your privacy.
+                Everything you need to know about Reflections, the science of journaling, and how we protect your privacy.
               </p>
             </motion.div>
           </div>
@@ -113,7 +113,7 @@ export const FAQ: React.FC = () => {
               {
                 icon: PenNib,
                 title: "The daily spark",
-                desc: "Facing a blank page? Tap the spark for a gentle, context-aware prompt.",
+                desc: "Facing a blank page? Tap the spark for a gentle writing prompt whenever you want a nudge.",
                 gridSpan: "md:col-span-4 lg:col-span-5",
                 color: "bg-green/5 text-green"
               },
@@ -175,7 +175,7 @@ export const FAQ: React.FC = () => {
                 <div>
                   <h4 className="text-[28px] font-display text-gray-text mb-4">It's 100% private</h4>
                   <p className="text-mk-body font-serif text-gray-light mb-6">
-                    We can't read your notes. Your data is stored securely on Supabase and encrypted in your local sanctuary. You own your thoughts.
+                    We can't read your notes. Your data is stored securely on Supabase and encrypted in your private writing space. You own your thoughts.
                   </p>
                   <div className="label-caps !text-green flex items-center gap-2">
                     <CheckCircle size={16} weight="fill" /> Secure & Offline-first
@@ -210,7 +210,7 @@ export const FAQ: React.FC = () => {
               </div>
             </div>
 
-            {/* Sanctuary Intelligence - Large */}
+            {/* Guided Support - Large */}
             <div className="md:col-span-8 bezel-outer group">
               <div className="bezel-inner p-10 overflow-hidden relative transition-colors duration-500 hover:bg-green/[0.02]">
                 {/* Decorative light leak */}
@@ -221,16 +221,16 @@ export const FAQ: React.FC = () => {
                     <Brain size={40} weight="light" className="animate-pulse" />
                   </div>
                   <div>
-                    <h4 className="text-[28px] font-display text-gray-text mb-4">Sanctuary intelligence</h4>
+                    <h4 className="text-[28px] font-display text-gray-text mb-4">Optional reflection support</h4>
                     <p className="text-mk-body font-serif text-gray-light mb-8">
-                      We use Google Gemini to process reflections without ever storing your data for training. The "Life Wiki" identifies patterns so you can see your narrative evolve.
+                      When you choose it, Reflections can generate a reflection or refresh the Life Wiki. Nothing runs in the background, and your notes are not used to train models.
                     </p>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="p-4 rounded-2xl bg-white/5 border border-border">
-                        <span className="label-caps">Private AI</span>
+                        <span className="label-caps">On demand only</span>
                       </div>
                       <div className="p-4 rounded-2xl bg-white/5 border border-border">
-                        <span className="label-caps">Theme Mapping</span>
+                        <span className="label-caps">Private by design</span>
                       </div>
                     </div>
                   </div>
@@ -246,10 +246,10 @@ export const FAQ: React.FC = () => {
             {[
               { icon: Headphones, title: 'Ambient sound', body: 'Generative sounds to quiet the room. Cross-fade between moods.' },
               { icon: Microphone, title: 'Whisper mode', body: 'Speak your thoughts directly. Instant, private transcription.' },
-              { icon: Target, title: 'Contextual sparks', body: 'Prompts that understand your history and guide your present.' },
+              { icon: Target, title: 'Writing sparks', body: 'Cycle through gentle prompts whenever you want help starting.' },
               { icon: ImageIcon, title: 'Visual covers', body: 'Set the tone of your entries with atmospheric cinematic imagery.' },
               { icon: Checks, title: 'Embedded tasks', body: 'Track intentions and follow-ups directly inside your prose.' },
-              { icon: Compass, title: 'Insights engine', body: 'Deep analytics on your resilience and growth patterns.' }
+              { icon: Compass, title: 'Life Wiki refresh', body: 'Refresh a broader pattern summary only when you ask for it.' }
             ].map((item, i) => (
               <motion.div 
                 key={i}

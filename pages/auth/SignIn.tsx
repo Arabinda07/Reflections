@@ -113,14 +113,14 @@ export const SignIn: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-body p-6 transition-colors duration-300">
+    <div className="flex min-h-[100dvh] items-center justify-center bg-body p-6 transition-colors duration-300">
       <div className="w-full max-w-[460px]">
         <Surface variant="bezel">
           <div className="p-8 sm:p-10 space-y-6">
             <SectionHeader
               eyebrow="Welcome back"
               title="Sign in"
-              description="Return to your writing sanctuary without the interface suddenly changing personality."
+              description="Come back to your writing space with the same calm flow you left."
               icon={
                 <div className="icon-block icon-block-md">
                   <Lock size={24} weight="duotone" />

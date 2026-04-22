@@ -15,9 +15,9 @@ export default defineConfig(({ mode }) => {
           registerType: 'autoUpdate',
           includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
           manifest: {
-            name: 'Reflections – Mindful Notes',
+            name: 'Reflections',
             short_name: 'Reflections',
-            description: 'Your private, AI-powered mindful journal. Track your mood, write freely, and find calm.',
+            description: 'A private writing-first journal with optional AI support when you ask for it.',
             theme_color: '#ffffff',
             background_color: '#ffffff',
             display: 'standalone',

@@ -19,7 +19,6 @@ import {
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Alert } from '../../components/ui/Alert';
-import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
 import { MetadataPill } from '../../components/ui/MetadataPill';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { PageContainer } from '../../components/ui/PageContainer';
@@ -28,7 +27,9 @@ import { StorageImage } from '../../components/ui/StorageImage';
 import { Surface } from '../../components/ui/Surface';
 import { supabase } from '../../src/supabaseClient';
 import { RoutePath, WellnessAccess } from '../../types';
+import { noteService } from '../../services/noteService';
 import { storageService } from '../../services/storageService';
+import { offlineStorage } from '../../services/offlineStorage';
 import { useAuth } from '../../context/AuthContext';
 import { profileService } from '../../services/profileService';
 
@@ -56,6 +57,7 @@ export const Account: React.FC = () => {
   const [feedback, setFeedback] = useState<FeedbackState>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showUpgradeSheet, setShowUpgradeSheet] = useState(false);
+  const [isDeletingData, setIsDeletingData] = useState(false);
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -117,10 +119,10 @@ export const Account: React.FC = () => {
 
   const membershipCopy = useMemo(() => {
     if (access?.planTier === 'pro') {
-      return 'Unlimited notes, AI reflections, and Life Wiki refreshes are available.';
+      return 'Unlimited note writing plus on-demand AI reflections and Life Wiki refreshes are available.';
     }
 
-    return `Used ${access?.freeAiReflectionsUsed || 0} of 1 free AI insight so far.`;
+    return `The free plan includes one AI reflection and one Life Wiki refresh after you have enough writing to support them.`;
   }, [access]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -145,7 +147,7 @@ export const Account: React.FC = () => {
       setFeedback({
         variant: 'success',
         title: 'Profile photo updated.',
-        description: 'Your sanctuary now carries your new avatar.',
+        description: 'Your profile photo is now up to date.',
       });
     } catch (err) {
       console.error(err);
@@ -221,28 +223,76 @@ export const Account: React.FC = () => {
 
   const handleUpgradeRequest = () => {
     openSupportDraft(
-      'Reflections Pro interest',
-      `Hi,\n\nI would like to be notified when Reflections Pro is available for ${email || 'my account'}.\n\nThanks.`,
+      'Reflections Pro waitlist',
+      `Hi,\n\nPlease add ${email || 'my account'} to the Reflections Pro waitlist.\n\nThanks.`,
     );
     setShowUpgradeSheet(false);
     setFeedback({
       variant: 'info',
-      title: 'Your email app was opened.',
-      description: 'Once Pro billing is live, this path can become a full checkout flow.',
+      title: 'Draft ready.',
+      description: 'Send it when you want to join the Pro waitlist.',
     });
   };
 
-  const handleDeleteRequest = () => {
+  const handleAccountClosureRequest = () => {
     openSupportDraft(
-      'Reflections account deletion request',
-      `Hi,\n\nI want to request account deletion for ${email || 'my account'}.\n\nPlease let me know when the deletion has been completed.\n\nThanks.`,
+      'Reflections account closure request',
+      `Hi,\n\nPlease close the sign-in account for ${email || 'my account'} after any saved data has been removed.\n\nThanks.`,
     );
     setShowDeleteConfirm(false);
     setFeedback({
       variant: 'warning',
-      title: 'Deletion request draft opened.',
-      description: 'Account deletion is currently handled manually so nothing is removed until that request is processed.',
+      title: 'Closure request draft ready.',
+      description: 'Send it when you want the sign-in account itself closed as well.',
     });
+  };
+
+  const handleDeleteSavedData = async () => {
+    if (!userId) return;
+
+    setIsDeletingData(true);
+    setFeedback(null);
+
+    try {
+      const notes = await noteService.getAll();
+      const storedPaths = Array.from(
+        new Set(
+          [
+            avatarPath,
+            ...notes.flatMap((note) => [
+              note.thumbnailUrl,
+              ...(note.attachments || []).map((attachment) => attachment.path),
+            ]),
+          ].filter((path): path is string => Boolean(path && !path.startsWith('blob:'))),
+        ),
+      );
+
+      await storageService.deleteFiles(storedPaths);
+
+      const { error } = await supabase.rpc('delete_user_data');
+      if (error) throw error;
+
+      await offlineStorage.clearUserData(userId);
+      setShowDeleteConfirm(false);
+
+      await supabase.auth.signOut();
+      navigate(RoutePath.LOGIN, {
+        replace: true,
+        state: {
+          successMessage:
+            `Your saved reflections and profile data were deleted. If you also want the sign-in account closed, email ${SUPPORT_EMAIL}.`,
+        },
+      });
+    } catch (err) {
+      console.error(err);
+      setFeedback({
+        variant: 'error',
+        title: 'We could not delete your saved data.',
+        description: 'We stopped before closing your session because file cleanup or data deletion did not finish safely. Please try again or email support.',
+      });
+    } finally {
+      setIsDeletingData(false);
+    }
   };
 
   if (fetching) {
@@ -259,8 +309,8 @@ export const Account: React.FC = () => {
         <div className="space-y-8">
           <SectionHeader
             eyebrow="Account"
-            title="Your sanctuary settings"
-            description="Keep your profile, access, and privacy details grounded in the same calm system as the rest of the product."
+            title="Your account settings"
+            description="Keep your profile, access, and privacy details in step with the same calm product experience."
             icon={
               <div className="icon-block icon-block-lg">
                 <User size={34} weight="duotone" />
@@ -380,12 +430,13 @@ export const Account: React.FC = () => {
 
                     <div className="mt-6 flex flex-wrap gap-2">
                       <MetadataPill tone="green">{access?.planTier === 'pro' ? 'Active' : 'Free tier'}</MetadataPill>
-                      <MetadataPill>{access?.freeAiReflectionsUsed || 0} insight used</MetadataPill>
+                      <MetadataPill>{access?.freeAiReflectionsUsed || 0}/1 AI reflection used</MetadataPill>
+                      <MetadataPill>{access?.freeWikiInsightsUsed || 0}/1 Life Wiki refresh used</MetadataPill>
                     </div>
 
                     {access?.planTier !== 'pro' ? (
                       <Button type="button" variant="primary" className="mt-6 w-full" onClick={() => setShowUpgradeSheet(true)}>
-                        Upgrade to Pro
+                        Join Pro waitlist
                       </Button>
                     ) : null}
                   </div>
@@ -438,14 +489,14 @@ export const Account: React.FC = () => {
                 <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                   <div className="space-y-2">
                     <p className="text-[11px] font-black uppercase tracking-widest text-red">Danger zone</p>
-                    <h3 className="text-[24px] font-display text-red">Delete account</h3>
+                    <h3 className="text-[24px] font-display text-red">Delete saved data</h3>
                     <p className="max-w-xl text-[14px] font-medium leading-relaxed text-gray-light">
-                      Deletion requests are still handled manually so nothing disappears until you explicitly send the request.
+                      Delete your notes, moods, tags, tasks, and saved profile data here. If you also want the sign-in account closed, the sheet below gives you that request path too.
                     </p>
                   </div>
 
                   <Button type="button" variant="danger" className="px-8" onClick={() => setShowDeleteConfirm(true)}>
-                    Delete account
+                    Delete data
                   </Button>
                 </div>
               </div>
@@ -489,8 +540,8 @@ export const Account: React.FC = () => {
       <ModalSheet
         isOpen={showUpgradeSheet}
         onClose={() => setShowUpgradeSheet(false)}
-        title="Reflections Pro"
-        description="Checkout is not live yet, but you can register interest instead of hitting a dead button."
+        title="Join the Pro waitlist"
+        description="Billing is not open yet, but you can register your interest from here today."
         icon={<Sparkle size={20} weight="duotone" />}
         size="md"
         footer={
@@ -499,42 +550,65 @@ export const Account: React.FC = () => {
               Maybe later
             </Button>
             <Button variant="primary" onClick={handleUpgradeRequest}>
-              Email me about Pro
+              Join the Pro waitlist
             </Button>
           </div>
         }
       >
         <div className="space-y-4">
           <p className="text-[14px] font-medium leading-relaxed text-gray-light">
-            Pro is intended to unlock unlimited notes, AI reflections, and Life Wiki refreshes without turning the app into a hard sell.
+            Pro is meant to unlock unlimited notes plus on-demand AI reflections and Life Wiki refreshes without turning the product into a hard sell.
           </p>
           <div className="grid gap-3 sm:grid-cols-2">
             <Surface variant="flat" className="overflow-hidden">
               <div className="p-4">
                 <p className="text-[11px] font-black uppercase tracking-widest text-green">Includes</p>
-                <p className="mt-2 text-[14px] font-medium text-gray-light">Unlimited note writing and AI-supported reflections.</p>
+                <p className="mt-2 text-[14px] font-medium text-gray-light">Unlimited note writing and optional AI reflections when you ask for them.</p>
               </div>
             </Surface>
             <Surface variant="flat" className="overflow-hidden">
               <div className="p-4">
                 <p className="text-[11px] font-black uppercase tracking-widest text-green">Also includes</p>
-                <p className="mt-2 text-[14px] font-medium text-gray-light">Ongoing Life Wiki refreshes and future wellness insights.</p>
+                <p className="mt-2 text-[14px] font-medium text-gray-light">Ongoing Life Wiki refreshes and future pattern surfaces as they launch.</p>
               </div>
             </Surface>
           </div>
+          <p className="text-[13px] font-medium text-gray-light">
+            Prefer email directly? Write to <a href={`mailto:${SUPPORT_EMAIL}`} className="font-bold text-green hover:underline">{SUPPORT_EMAIL}</a>.
+          </p>
         </div>
       </ModalSheet>
 
-      <ConfirmationDialog
+      <ModalSheet
         isOpen={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
-        onConfirm={handleDeleteRequest}
-        title="Request account deletion?"
-        description="We will open an email draft so you can explicitly request deletion. Nothing is removed until that request is sent and processed."
-        confirmLabel="Open deletion request"
-        cancelLabel="Keep my account"
-        variant="danger"
-      />
+        title="Delete your saved data"
+        description="You can erase stored writing and profile data here. Full sign-in account closure still needs a support request."
+        icon={<Trash size={20} weight="duotone" />}
+        size="md"
+        footer={
+          <div className="flex flex-col gap-3">
+            <Button variant="danger" onClick={handleDeleteSavedData} isLoading={isDeletingData}>
+              Delete saved data now
+            </Button>
+            <Button variant="secondary" onClick={handleAccountClosureRequest} disabled={isDeletingData}>
+              Request full account closure
+            </Button>
+            <Button variant="ghost" onClick={() => setShowDeleteConfirm(false)} disabled={isDeletingData}>
+              Keep everything
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4 text-[14px] font-medium leading-relaxed text-gray-light">
+          <p>
+            This removes your saved notes, moods, tags, tasks, and profile row from the app database. It also removes stored attachments and avatar files before we close your session.
+          </p>
+          <p>
+            If you want the sign-in account itself closed too, use the support request button here after deleting the saved data.
+          </p>
+        </div>
+      </ModalSheet>
     </>
   );
 };

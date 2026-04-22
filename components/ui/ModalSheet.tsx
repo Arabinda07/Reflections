@@ -44,16 +44,43 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
   const titleId = useId();
   const descriptionId = useId();
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!isOpen) return;
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+    previousFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         onClose();
+        return;
+      }
+
+      if (event.key === 'Tab' && panelRef.current) {
+        const focusableElements = panelRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        );
+
+        if (focusableElements.length === 0) {
+          event.preventDefault();
+          return;
+        }
+
+        const first = focusableElements[0];
+        const last = focusableElements[focusableElements.length - 1];
+        const activeElement = document.activeElement;
+
+        if (event.shiftKey && activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
       }
     };
 
@@ -67,6 +94,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
       document.body.style.overflow = previousOverflow;
       window.removeEventListener('keydown', handleKeyDown);
       window.clearTimeout(focusTimer);
+      previousFocusRef.current?.focus();
     };
   }, [isOpen, onClose]);
 
@@ -95,6 +123,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
             >
               <div className="surface-bezel">
                 <div
+                  ref={panelRef}
                   className={`surface-bezel-inner modal-sheet-panel ${panelClassName}`.trim()}
                   role="dialog"
                   aria-modal="true"

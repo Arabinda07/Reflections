@@ -60,6 +60,10 @@ export const offlineStorage = {
     }
   },
 
+  async clearUserData(userId: string): Promise<void> {
+    await db.notes.where('userId').equals(userId).delete();
+  },
+
   // Legacy compatibility methods (if used by other parts of the app during transition)
   async getQueuedOperations(): Promise<any[]> {
     const pending = await this.getPendingOperations();

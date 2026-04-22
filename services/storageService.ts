@@ -43,7 +43,10 @@ export const storageService = {
       .from('app-files')
       .remove([path]);
       
-    if (error) console.error('Error deleting file:', error);
+    if (error) {
+      console.error('Error deleting file:', error);
+      throw error;
+    }
   },
 
   async deleteFiles(paths: string[]): Promise<void> {
@@ -55,6 +58,9 @@ export const storageService = {
       .from('app-files')
       .remove(validPaths);
       
-    if (error) console.error('Error deleting files:', error);
+    if (error) {
+      console.error('Error deleting files:', error);
+      throw error;
+    }
   }
 };

@@ -34,7 +34,7 @@ const NotFound = lazy(() => import('./pages/NotFound').then(m => ({ default: m.N
 // Loading fallback for Suspense
 const PageLoader = () => (
   <div className="flex-1 flex items-center justify-center min-h-[50vh]">
-    <div className="w-8 h-8 rounded-full border-2 border-border border-t-blue animate-spin" />
+    <div className="h-8 w-8 rounded-full border-2 border-border border-t-green animate-spin" />
   </div>
 );
 

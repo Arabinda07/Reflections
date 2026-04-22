@@ -163,7 +163,7 @@ export const Home: React.FC = () => {
             <div>
               <div className="flex items-center gap-2 text-gray-nav mb-12">
                 <FolderOpen size={18} weight="bold" className="text-green" />
-                <span className="text-[11px] font-black uppercase tracking-widest opacity-60">Sanctuary Overview</span>
+                <span className="text-[11px] font-black uppercase tracking-widest opacity-60">Reflections Overview</span>
               </div>
               
               <button 
@@ -181,14 +181,14 @@ export const Home: React.FC = () => {
             <button 
               onClick={() => navigate(RoutePath.INSIGHTS)}
               className="group flex flex-col items-start gap-5 p-8 rounded-3xl bg-panel-bg border border-border hover:border-green/30 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 text-left"
-              aria-label="View AI insights"
+              aria-label="View writing patterns"
             >
               <div className="flex items-center gap-2 text-gray-nav mb-2">
                 <Brain size={16} weight="bold" className="text-green" />
                 <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Librarian's Note</span>
               </div>
               <p className="text-xl md:text-2xl font-serif italic text-gray-light group-hover:text-gray-text transition-colors leading-relaxed">
-                Analysis is ongoing as your narrative evolves.
+                Patterns stay here quietly until you ask Reflections to build them.
               </p>
             </button>
           </div>
@@ -261,15 +261,15 @@ export const Home: React.FC = () => {
           <div className="bezel-outer max-w-lg w-full bg-white shadow-2xl">
             <div className="bezel-inner p-10 flex flex-col gap-10">
               <div className="flex justify-between items-center border-b border-border pb-6">
-                <h2 className="text-2xl font-display text-gray-text">Welcome to Sanctuary.</h2>
+                <h2 className="text-2xl font-display text-gray-text">Welcome to Reflections.</h2>
                 <Sparkle size={24} className="text-green" weight="fill" />
               </div>
 
               <div className="space-y-6">
                 {[
-                  { icon: Brain, title: "AI Reflection", desc: "Compassionate mirrors for your thoughts." },
+                  { icon: Brain, title: "Guided reflection", desc: "Ask for a gentle mirror back only when you want one." },
                   { icon: Smiley, title: "Mood Tracking", desc: "Understand your emotional rhythms." },
-                  { icon: Tag, title: "Smart Organization", desc: "Find clarity in the chaos." }
+                  { icon: Tag, title: "Life Wiki themes", desc: "Refresh a broader pattern view when you're ready." }
                 ].map((f, i) => (
                   <div key={i} className="flex gap-4">
                     <div className="w-10 h-10 rounded-lg bg-gray-50 border border-border flex items-center justify-center shrink-0">
@@ -288,7 +288,7 @@ export const Home: React.FC = () => {
                 className="w-full h-14 rounded-xl text-[15px] font-bold bg-gray-text text-white"
                 onClick={handleCloseOnboarding}
               >
-                Enter Sanctuary
+                Begin in Reflections
               </Button>
             </div>
           </div>
