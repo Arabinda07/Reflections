@@ -1,17 +1,25 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { Sparkles, ArrowRight, Volume2, VolumeX, Download } from 'lucide-react';
-import { Button } from '../../components/ui/Button';
+import { ArrowRight, DownloadSimple, SpeakerHigh, SpeakerSlash } from '@phosphor-icons/react';
 import { RoutePath } from '../../types';
 import { usePWAInstall } from '../../context/PWAInstallContext';
 
+const staggerContainer = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.11, delayChildren: 0.05 } },
+};
+
+const staggerLine = {
+  hidden: { opacity: 0, y: 60, filter: 'blur(10px)' },
+  show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] } },
+};
+
 export const Landing: React.FC = () => {
   const navigate = useNavigate();
-  const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [isMuted, setIsMuted] = useState(true);
   const { canInstall, isInstalled, triggerInstall } = usePWAInstall();
-
 
   const toggleMute = () => {
     if (videoRef.current) {
@@ -21,135 +29,133 @@ export const Landing: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-body selection:bg-green/30 selection:text-green-hover transition-colors duration-300">
-      {/* Ambient Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-green/5 blur-[120px] rounded-full animate-pulse" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-blue/5 blur-[120px] rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
-      </div>
+    <div className="relative min-h-[100dvh] overflow-hidden selection:bg-green/20 selection:text-green bg-body text-gray-text transition-colors duration-300">
+      {/* Grain overlay utility */}
+      <div className="grain-overlay" />
 
-      <div className="relative z-10 flex flex-col items-center px-4 sm:px-6 py-16 sm:py-20 md:py-32">
-        {/* Hero Text At Top */}
-        <div className="text-center max-w-4xl mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green/10 border-2 border-green/20 text-green text-[12px] font-black mb-8 animate-in slide-in-from-bottom-4 duration-500">
-            <Sparkles size={14} />
-            <span>The future of journaling</span>
-          </div>
-          
-          <h1 className="text-5xl sm:text-6xl md:text-8xl font-display text-gray-text leading-tight md:leading-[1.1] mb-8 tracking-tighter animate-in slide-in-from-bottom-6 duration-700 drop-shadow-sm transition-all">
-            Your mind, <br />
-            <span className="text-green drop-shadow-md">beautifully</span> <br />
-            organized.
-          </h1>
-        </div>
+      {/* Full-bleed layered container */}
+      <div className="min-h-[100dvh] w-full relative">
 
-        {/* Video Section */}
-        <motion.div 
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.2 }}
-          className="w-full max-w-6xl mb-16 flex flex-col items-center"
-        >
-          <p className="text-[14px] font-black text-gray-nav mb-6">Experience the sanctuary</p>
-          <div className="relative w-full group">
-            {/* Persistent breathing glow that intensifies on hover */}
-            <div className="absolute -inset-4 bg-gray-200 rounded-[48px] blur-2xl opacity-50 animate-pulse group-hover:opacity-100 transition-opacity duration-1000" />
-            <div className="relative aspect-video rounded-[24px] sm:rounded-[40px] border-2 border-border bg-white/50 backdrop-blur-xl shadow-sm overflow-hidden liquid-glass p-2 sm:p-4">
-              <div className="w-full h-full rounded-[16px] sm:rounded-[32px] overflow-hidden border-2 border-white/20 relative">
-                <video 
-                  ref={videoRef}
-                  src="/assets/videos/landing_video.mp4"
-                  className="w-full h-full object-cover bg-black/5"
-                  autoPlay
-                  loop
-                  muted={isMuted}
-                  playsInline
-                />
-                
-                {/* Custom Mute Button */}
-                <button
-                  onClick={toggleMute}
-                  className="absolute bottom-4 right-4 p-3 bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full text-white transition-all duration-300 ease-out-quart z-10"
-                  aria-label={isMuted ? "Unmute video" : "Mute video"}
-                >
-                  {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
-                </button>
-              </div>
+        {/* ── Left panel: content ── */}
+        <div className="relative z-20 flex min-h-[100dvh] flex-col justify-start px-6 pb-10 pt-[calc(env(safe-area-inset-top)+var(--header-height)+1rem)] sm:px-12 sm:pb-12 sm:pt-[calc(env(safe-area-inset-top)+var(--header-height)+1.5rem)] lg:justify-between lg:pt-[28vh] lg:pb-12 lg:px-16 xl:px-24 pointer-events-none">
+
+          {/* Text section */}
+          <div className="flex flex-col gap-5 sm:gap-6 lg:gap-8 lg:w-[60%] xl:w-[55%]">
+            
+            {/* Hero headline & Paragraph */}
+            <div className="flex flex-col gap-5 sm:gap-6 lg:gap-8">
+              <motion.div
+                variants={staggerContainer}
+                initial="hidden"
+                animate="show"
+                className="pointer-events-auto flex max-w-[11ch] flex-col text-mk-display font-display tracking-[-0.03em] text-gray-text leading-[0.9] sm:max-w-[12ch] sm:leading-[0.94] lg:max-w-5xl lg:tracking-tight lg:leading-[0.98]"
+              >
+                <motion.span variants={staggerLine} style={{ willChange: 'transform, opacity, filter' }}>
+                  Your mind,
+                </motion.span>
+                <motion.span variants={staggerLine} className="font-serif italic text-green" style={{ lineHeight: 1.1, willChange: 'transform, opacity, filter' }}>
+                  beautifully
+                </motion.span>
+                <motion.span variants={staggerLine} style={{ willChange: 'transform, opacity, filter' }}>
+                  organized.
+                </motion.span>
+              </motion.div>
+
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.5 }}
+                className="pointer-events-auto max-w-[33ch] font-serif text-[1rem] leading-[1.72] text-gray-text drop-shadow-[0_10px_30px_rgba(0,0,0,0.16)] sm:max-w-[38ch] sm:text-mk-body lg:max-w-[44ch]"
+              >
+                A private, distraction-free environment designed to help you untangle your mind and find clarity in the noise.
+              </motion.p>
             </div>
-          </div>
-        </motion.div>
+            </div>
 
-        {/* Call to Action Below Video */}
-        <motion.div 
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-center max-w-4xl mb-32 px-4"
-        >
-          <p className="text-[16px] sm:text-[18px] md:text-[24px] text-gray-light font-medium leading-relaxed max-w-2xl mx-auto mb-8 sm:mb-10">
-            A sanctuary for your thoughts. AI-powered reflections, mood tracking, and a clean space to breathe.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
-            <Button 
-              variant="primary" 
-              size="lg" 
-              className="w-full sm:w-auto h-16 sm:h-20 px-8 sm:px-12 text-[16px] sm:text-[20px] font-bold rounded-[20px] sm:rounded-[24px] shadow-sm liquid-glass group"
-              onClick={() => navigate(RoutePath.SIGNUP)}
-            >
-              <span>Enter sanctuary</span>
-              <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button 
-              variant="secondary" 
-              size="lg" 
-              className="w-full sm:w-auto h-16 sm:h-20 px-8 sm:px-12 text-[16px] sm:text-[20px] font-bold rounded-[20px] sm:rounded-[24px] border-2 border-border text-blue shadow-sm liquid-glass"
-              onClick={() => navigate(RoutePath.LOGIN)}
-            >
-              Sign in
-            </Button>
-          </div>
-          
-
-
-          <div className="mt-8 flex justify-center">
-             <Button 
-               variant="ghost" 
-               size="sm" 
-               className="text-[14px] font-bold text-gray-nav hover:text-blue hover:bg-blue/5 border-2 border-transparent hover:border-blue/10 rounded-full px-6 py-3 transition-all duration-300 ease-out-quart flex items-center gap-2"
-               onClick={() => navigate(RoutePath.FAQ)}
-             >
-               <Sparkles size={16} />
-               <span>Explore how it works (FAQ)</span>
-             </Button>
-          </div>
-
-          {/* PWA Install Button — moved below FAQ */}
-          {canInstall && !isInstalled && (
+            {/* Primary CTAs — Grouped naturally below text */}
             <motion.div
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-              className="mt-6 flex flex-col items-center gap-2"
+              transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.6 }}
+              className="pointer-events-auto mt-8 flex flex-col items-start gap-x-8 gap-y-5 sm:mt-10 sm:flex-row sm:items-center sm:flex-wrap sm:gap-y-6 lg:mt-0"
             >
               <button
-                onClick={triggerInstall}
-                className="group relative inline-flex items-center gap-2 px-8 h-[56px] rounded-2xl bg-green text-white font-extrabold text-[15px] shadow-sm transition-all duration-300 active:brightness-95 overflow-hidden"
+                onClick={() => navigate(RoutePath.SIGNUP)}
+                className="group flex items-center justify-center gap-3 rounded-[var(--radius-control)] border border-green/20 bg-green px-8 py-4 text-[16px] font-black text-white shadow-[0_18px_40px_-28px_rgba(22,163,74,0.45)] transition-all duration-300 hover:bg-green-hover sm:justify-start sm:text-[18px] pointer-events-auto"
               >
-                <Download size={16} />
-                Install app — free
+                Begin writing
+                <ArrowRight size={22} className="group-hover:translate-x-1.5 transition-transform duration-500 ease-out-expo" />
               </button>
-              <p className="text-[11px] font-bold text-gray-nav">
-                No app store needed · Works offline
-              </p>
-            </motion.div>
-          )}
-        </motion.div>
 
+              <div className="flex items-center gap-6 sm:gap-8 flex-wrap px-2 sm:px-0">
+                <button
+                  onClick={() => navigate(RoutePath.LOGIN)}
+                  className="text-[15px] font-medium text-gray-nav hover:text-gray-text transition-colors duration-300"
+                >
+                  Sign in
+                </button>
+
+                <div className="w-[1px] h-4 bg-border opacity-50" />
+
+                <button
+                  onClick={() => navigate(RoutePath.FAQ)}
+                  className="label-caps hover:text-gray-text transition-colors duration-300"
+                >
+                  How it works
+                </button>
+
+                {canInstall && !isInstalled && (
+                  <>
+                    <div className="w-[1px] h-4 bg-border opacity-50 hidden sm:block" />
+                    <motion.button
+                      onClick={triggerInstall}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 1.2, duration: 0.5 }}
+                      className="flex items-center gap-1.5 label-caps hover:text-gray-text transition-colors duration-300"
+                    >
+                      <DownloadSimple size={14} weight="light" />
+                      Install app
+                    </motion.button>
+                  </>
+                )}
+              </div>
+            </motion.div>
+        </div>
+
+        {/* ── Background Video Layer ── */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+          className="absolute inset-0 overflow-hidden pointer-events-none lg:pointer-events-auto"
+        >
+          {/* Subtle responsive masks */}
+          <div className="video-mask video-mask--mobile lg:hidden" />
+          <div className="video-mask video-mask--desktop hidden lg:block" />
+
+          <video
+            ref={videoRef}
+            src="/assets/videos/landing_video.mp4"
+            poster="/assets/videos/landing_video.png"
+            className="absolute inset-0 h-full w-full object-cover object-[70%_center] bg-body opacity-90 sm:object-[64%_center] lg:object-center"
+            autoPlay
+            loop
+            muted={isMuted}
+            playsInline
+            preload="metadata"
+          />
+
+          <button
+            onClick={toggleMute}
+            className="surface-floating surface-floating--media absolute bottom-10 right-6 z-30 rounded-[var(--radius-control)] p-3 pointer-events-auto lg:bottom-12 lg:right-16"
+            aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+          >
+            {isMuted ? <SpeakerSlash size={20} weight="bold" /> : <SpeakerHigh size={20} weight="bold" />}
+          </button>
+        </motion.div>
 
       </div>
     </div>
   );
 };
-

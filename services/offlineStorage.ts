@@ -1,17 +1,11 @@
 import { db, LocalNote } from './db';
-import { SyncOperation } from './offlineStorage';
-
-/**
- * offlineStorage.ts (Dexie Edition)
- * 
- * Re-engineered to use Dexie for high-performance offline persistence.
- * Manages both the notes table and the query engine for sync operations.
- */
-
-// Preserve existing SyncOperation interface for backward compatibility with sync logic if needed,
-// but we'll primarily use the syncStatus field on the notes themselves for a more robust "Source of Truth".
-export { type SyncOperation };
-
+export interface SyncOperation {
+  id?: number;
+  action: 'create' | 'update' | 'delete';
+  entityId: string;
+  data: any;
+  timestamp: number;
+}
 export const offlineStorage = {
   // --- Note Operations ---
 
@@ -64,6 +58,10 @@ export const offlineStorage = {
     } else {
       await db.notes.update(id, { syncStatus: 'synced' });
     }
+  },
+
+  async clearUserData(userId: string): Promise<void> {
+    await db.notes.where('userId').equals(userId).delete();
   },
 
   // Legacy compatibility methods (if used by other parts of the app during transition)

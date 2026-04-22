@@ -1,19 +1,41 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { createPortal } from 'react-dom';
+import React, { Suspense, lazy, useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Plus, FileText, ArrowUpRight, Calendar as CalendarIcon, Search, Smile, Meh, Frown, Sun, Cloud, Moon, Zap, Trash2, Loader2, LayoutGrid, Calendar, Tag, X } from 'lucide-react';
-import { Button } from '../../components/ui/Button';
-import { Note, RoutePath } from '../../types';
-import { noteService } from '../../services/noteService';
-import { StorageImage } from '../../components/ui/StorageImage';
-import { useAuth } from '../../context/AuthContext';
-import ReactCalendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css';
-import './Calendar.css';
+import {
+  Plus,
+  FileText,
+  ArrowUpRight,
+  Calendar as CalendarIcon,
+  Smiley,
+  SmileySad,
+  Sun,
+  Cloud,
+  Moon,
+  Lightning,
+  Trash,
+  CircleNotch,
+  SquaresFour,
+  Tag,
+  X,
+} from '@phosphor-icons/react';
 import { format, isSameDay } from 'date-fns';
-import { LoadingState } from '../../components/ui/LoadingState';
+import { Button } from '../../components/ui/Button';
+import { Chip } from '../../components/ui/Chip';
+import { EmptyState } from '../../components/ui/EmptyState';
 import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
+import { LoadingState } from '../../components/ui/LoadingState';
+import { MetadataPill } from '../../components/ui/MetadataPill';
+import { PageContainer } from '../../components/ui/PageContainer';
+import { SectionHeader } from '../../components/ui/SectionHeader';
+import { StorageImage } from '../../components/ui/StorageImage';
+import { Surface } from '../../components/ui/Surface';
+import { useAuth } from '../../context/AuthContext';
+import { noteService } from '../../services/noteService';
+import { Note, RoutePath } from '../../types';
+import { buildNotePreviewText } from './noteContent';
 
+const MyNotesCalendar = lazy(() =>
+  import('./MyNotesCalendar').then((module) => ({ default: module.MyNotesCalendar })),
+);
 
 export const MyNotes: React.FC = () => {
   const navigate = useNavigate();
@@ -26,49 +48,35 @@ export const MyNotes: React.FC = () => {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [noteIdToDelete, setNoteIdToDelete] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'calendar'>('grid');
-
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  
 
   const queryParams = new URLSearchParams(location.search);
   const tagFilter = queryParams.get('tag');
 
-  const fetchNotes = async () => {
-    // Minimum cinematic display time for the sanctuary loader
-    // If coming from a save, we skip the 2.5s floor for a snappier experience (0.5s floor)
-    const isFromSave = location.state?.fromSave;
-    const minTimePromise = new Promise(resolve => setTimeout(resolve, isFromSave ? 500 : 2500));
-    try {
-      const [data] = await Promise.all([
-        noteService.getAll(),
-        minTimePromise
-      ]);
-      setNotes(data);
-    } catch (error) {
-      console.error("Failed to fetch notes", error);
-    } finally {
-      setLoading(false);
-      // Synchronize with LoadingState exit animation
-      setTimeout(() => setIsContentVisible(true), 400);
-    }
-  };
-
   useEffect(() => {
+    const fetchNotes = async () => {
+      try {
+        const data = await noteService.getAll();
+        setNotes(data);
+      } catch (error) {
+        console.error('Failed to fetch notes', error);
+      } finally {
+        setLoading(false);
+        setIsContentVisible(true);
+      }
+    };
+
     fetchNotes();
   }, []);
 
-  const filteredNotes = tagFilter 
-    ? notes.filter(note => note.tags?.includes(tagFilter))
-    : notes;
-
-  const allTags = Array.from(new Set(notes.flatMap(n => n.tags || [])));
-
-  const notesOnSelectedDate = filteredNotes.filter(note => 
-    isSameDay(new Date(note.updatedAt), selectedDate)
+  const filteredNotes = tagFilter ? notes.filter((note) => note.tags?.includes(tagFilter)) : notes;
+  const allTags = Array.from(new Set(notes.flatMap((note) => note.tags || [])));
+  const notesOnSelectedDate = filteredNotes.filter((note) =>
+    isSameDay(new Date(note.updatedAt), selectedDate),
   );
 
-  const initiateDelete = (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
+  const initiateDelete = (event: React.MouseEvent, id: string) => {
+    event.stopPropagation();
     setNoteIdToDelete(id);
     setIsConfirmOpen(true);
   };
@@ -79,328 +87,314 @@ export const MyNotes: React.FC = () => {
     setIsDeleting(true);
     try {
       await noteService.delete(noteIdToDelete);
-      setNotes(prev => prev.filter(n => n.id !== noteIdToDelete));
+      setNotes((previous) => previous.filter((note) => note.id !== noteIdToDelete));
       setIsConfirmOpen(false);
     } catch (error) {
-      console.error("Failed to delete note:", error);
+      console.error('Failed to delete note:', error);
     } finally {
       setIsDeleting(false);
       setNoteIdToDelete(null);
     }
   };
 
-
   const getPreviewText = (html: string) => {
-    if (!html || html === '<p><br></p>') return "No content available";
-    const tmp = document.createElement("DIV");
-    tmp.innerHTML = html;
-    const text = tmp.textContent || tmp.innerText || "";
-    if (text.length > 100) {
-      return text.substring(0, 100) + "...";
-    }
-    return text || "No content available";
+    return buildNotePreviewText(html);
   };
 
   const getMoodIcon = (mood?: string) => {
     switch (mood) {
-      case 'happy': return <Smile size={14} className="text-yellow-500" />;
-      case 'calm': return <Sun size={14} className="text-emerald-500" />;
-      case 'anxious': return <Cloud size={14} className="text-blue-500" />;
-      case 'sad': return <Frown size={14} className="text-indigo-500" />;
-      case 'angry': return <Zap size={14} className="text-rose-500" />;
-      case 'tired': return <Moon size={14} className="text-slate-500" />;
-      default: return null;
+      case 'happy':
+        return <Smiley size={14} weight="fill" className="text-orange" />;
+      case 'calm':
+        return <Sun size={14} weight="fill" className="text-green" />;
+      case 'anxious':
+        return <Cloud size={14} weight="fill" className="text-blue" />;
+      case 'sad':
+        return <SmileySad size={14} weight="fill" className="text-blue" />;
+      case 'angry':
+        return <Lightning size={14} weight="fill" className="text-red" />;
+      case 'tired':
+        return <Moon size={14} weight="fill" className="text-gray-light" />;
+      default:
+        return null;
     }
   };
 
-  const tileContent = ({ date, view }: { date: Date, view: string }) => {
-    if (view === 'month') {
-      const dayNotes = filteredNotes.filter(note => isSameDay(new Date(note.updatedAt), date));
-      if (dayNotes.length > 0) {
-        return (
-          <div className="flex justify-center mt-1">
-            <div className="flex -space-x-1">
-              {dayNotes.slice(0, 3).map((note, idx) => (
-                <div key={note.id} className="flex items-center justify-center">
-                  {note.mood ? (
-                    <div className="scale-75 origin-center">{getMoodIcon(note.mood)}</div>
-                  ) : (
-                    <div className={`h-1.5 w-1.5 rounded-full ${idx === 0 ? 'bg-blue' : idx === 1 ? 'bg-green' : 'bg-purple-500'}`} />
-                  )}
-                </div>
-              ))}
-              {dayNotes.length > 3 && <div className="h-1.5 w-1.5 rounded-full bg-gray-300 ml-1" />}
+  const tileContent = ({ date, view }: { date: Date; view: string }) => {
+    if (view !== 'month') return null;
+
+    const dayNotes = filteredNotes.filter((note) => isSameDay(new Date(note.updatedAt), date));
+    if (dayNotes.length === 0) return null;
+
+    return (
+      <div className="mt-1 flex justify-center">
+        <div className="flex -space-x-1">
+          {dayNotes.slice(0, 3).map((note, index) => (
+            <div key={note.id} className="flex items-center justify-center">
+              {note.mood ? (
+                <div className="scale-75 origin-center">{getMoodIcon(note.mood)}</div>
+              ) : (
+                <div
+                  className={`h-1.5 w-1.5 rounded-full ${
+                    index === 0 ? 'bg-green' : index === 1 ? 'bg-blue' : 'bg-orange'
+                  }`}
+                />
+              )}
+            </div>
+          ))}
+          {dayNotes.length > 3 ? <div className="h-1.5 w-1.5 rounded-full bg-gray-300 ml-1" /> : null}
+        </div>
+      </div>
+    );
+  };
+
+  const renderNoteCard = (note: Note, index: number) => (
+    <Surface
+      key={note.id}
+      variant="flat"
+      className="group cursor-pointer overflow-hidden hover:border-green/25 hover:shadow-xl hover:shadow-black/5 transition-all duration-500"
+    >
+      <div
+        onClick={() => navigate(RoutePath.NOTE_DETAIL.replace(':id', note.id))}
+        className="flex h-full flex-col"
+        style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
+      >
+        <div className="relative h-44 w-full overflow-hidden border-b border-border">
+          {note.thumbnailUrl ? (
+            <>
+              <div className="absolute inset-0 bg-green/0 transition-colors duration-500 group-hover:bg-green/5 z-10" />
+              <StorageImage
+                path={note.thumbnailUrl}
+                alt={note.title}
+                className="h-full w-full object-cover transition-transform duration-700 ease-out will-change-transform group-hover:scale-105"
+              />
+            </>
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-gray-50/5 dark:bg-white/5">
+              <FileText className="text-border transition-colors group-hover:text-green/30" size={48} weight="duotone" />
+            </div>
+          )}
+
+          <button
+            onClick={(event) => initiateDelete(event, note.id)}
+            disabled={isDeleting && noteIdToDelete === note.id}
+            className="absolute left-4 top-4 z-20 inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] border border-border/60 bg-white/90 text-gray-text shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-red/30 hover:text-red"
+            aria-label={`Delete ${note.title}`}
+          >
+            {isDeleting && noteIdToDelete === note.id ? (
+              <CircleNotch size={16} weight="bold" className="animate-spin text-red" />
+            ) : (
+              <Trash size={16} weight="bold" />
+            )}
+          </button>
+
+          <div className="absolute right-4 top-4 z-20 flex flex-wrap justify-end gap-2">
+            <MetadataPill icon={<CalendarIcon size={12} weight="bold" />}>
+              {new Date(note.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+            </MetadataPill>
+            {note.mood ? (
+              <MetadataPill icon={getMoodIcon(note.mood)} tone="green">
+                <span className="capitalize">{note.mood}</span>
+              </MetadataPill>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="flex flex-1 flex-col p-6">
+          <div className="mb-3 flex flex-wrap gap-2">
+            {note.tags?.map((tag) => (
+              <Chip key={tag} as="span" active className="text-[10px]">
+                #{tag}
+              </Chip>
+            ))}
+          </div>
+
+          <h3 className="mb-2 text-[18px] font-bold tracking-tight text-gray-text leading-snug transition-colors group-hover:text-green">
+            {note.title}
+          </h3>
+
+          <p className="mb-5 text-[14px] font-medium leading-relaxed text-gray-light line-clamp-3">
+            {getPreviewText(note.content)}
+          </p>
+
+          <div className="mt-auto flex items-center justify-between border-t border-border pt-4">
+            <div className="flex items-center gap-2">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-green text-[10px] font-extrabold text-white shadow-sm">
+                {user?.name?.charAt(0) || 'U'}
+              </div>
+              <span className="text-[12px] font-bold text-gray-nav">
+                Edited {format(new Date(note.updatedAt), 'MMM d')}
+              </span>
+            </div>
+
+            <div className="flex items-center text-[12px] font-bold text-green transition-all duration-300 group-hover:opacity-70">
+              <span>Open</span>
+              <ArrowUpRight
+                size={14}
+                weight="bold"
+                className="ml-1 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              />
             </div>
           </div>
-        );
-      }
-    }
-    return null;
-  };
+        </div>
+      </div>
+    </Surface>
+  );
 
   return (
     <>
       <LoadingState isVisible={loading} message="gathering your thoughts..." />
-      {isContentVisible && (
-        <div className="space-y-10 animate-in fade-in duration-700 pb-12 px-4 md:px-10">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-border pb-8 gap-4">
-            <div>
-              <h1 className="font-display text-[40px] text-gray-text lowercase">my notes</h1>
-              <p className="text-gray-light mt-2 text-[17px] font-medium">
-                Manage your personal knowledge base.
-              </p>
-              {tagFilter && (
-                <div className="mt-4 flex items-center gap-2">
-                  <span className="text-[13px] font-bold text-gray-nav">Filtering by tag:</span>
-                  <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue/5 border-2 border-blue/10 text-blue text-[12px] font-bold">
-                    <Tag size={12} />
-                    {tagFilter}
-                    <button 
-                      onClick={() => navigate(RoutePath.NOTES)}
-                      className="ml-1 hover:text-red transition-colors"
-                    >
-                      <X size={12} />
-                    </button>
-                  </span>
-                </div>
-              )}
-              {!tagFilter && allTags.length > 0 && (
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {allTags.map(tag => (
-                    <button 
-                      key={tag}
-                      onClick={() => navigate(`${RoutePath.NOTES}?tag=${encodeURIComponent(tag as string)}`)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-50 border border-border text-[12px] font-bold text-gray-nav hover:text-blue hover:border-blue/30 transition-all duration-300 active:brightness-95 shadow-sm"
-                    >
-                      <Tag size={12} /> {tag}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="flex bg-white dark:bg-panel-bg border-2 border-border rounded-xl p-1 shadow-sm">
-                <button 
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-lg transition-all duration-300 ease-out-quart ${viewMode === 'grid' ? 'bg-blue/10 text-blue' : 'text-gray-nav hover:bg-gray-50'}`}
-                  title="Grid View"
-                >
-                  <LayoutGrid size={20} />
-                </button>
-                <button 
-                  onClick={() => setViewMode('calendar')}
-                  className={`p-2 rounded-lg transition-all duration-300 ease-out-quart ${viewMode === 'calendar' ? 'bg-blue/10 text-blue' : 'text-gray-nav hover:bg-gray-50'}`}
-                  title="Calendar View"
-                >
-                  <CalendarIcon size={20} />
-                </button>
-              </div>
-              <Button 
-                onClick={() => navigate(RoutePath.CREATE_NOTE)} 
-                variant="primary"
-                className="h-[48px] px-8 text-[15px] font-bold rounded-xl shadow-sm active:scale-[0.98] transition-all duration-300 ease-out-quart"
-              >
-                <Plus className="mr-2 h-5 w-5" />
-                Create note
-              </Button>
-            </div>
-          </div>
 
-          {viewMode === 'calendar' ? (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in slide-in-from-bottom-4 duration-500">
-              <div className="lg:col-span-7 xl:col-span-8">
-                <div className="bg-white dark:bg-panel-bg border-2 border-border rounded-[32px] p-6 sm:p-8 shadow-sm liquid-glass">
-                  <ReactCalendar 
-                    onChange={(val) => setSelectedDate(val as Date)} 
-                    value={selectedDate}
-                    tileContent={tileContent}
-                    className="w-full border-none font-sans"
-                  />
+      {isContentVisible ? (
+        <PageContainer className="pb-14 pt-4 md:pt-8">
+          <div className="space-y-10 animate-in fade-in duration-700">
+            <SectionHeader
+              title="Saved reflections"
+              description={
+                tagFilter
+                  ? `Showing reflections tagged "${tagFilter}".`
+                  : 'Cards or calendar — pick how you want to look through them.'
+              }
+              actions={
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex items-center gap-2">
+                    <Chip
+                      active={viewMode === 'grid'}
+                      icon={<SquaresFour size={16} weight="bold" />}
+                      onClick={() => setViewMode('grid')}
+                      title="Grid view"
+                    >
+                      Grid
+                    </Chip>
+                    <Chip
+                      active={viewMode === 'calendar'}
+                      icon={<CalendarIcon size={16} weight="bold" />}
+                      onClick={() => setViewMode('calendar')}
+                      title="Calendar view"
+                    >
+                      Calendar
+                    </Chip>
+                  </div>
+
+                  <Button onClick={() => navigate(RoutePath.CREATE_NOTE)} variant="primary" className="px-6">
+                    <Plus className="mr-2 h-5 w-5" weight="bold" />
+                    Create entry
+                  </Button>
                 </div>
+              }
+            />
+
+            {tagFilter ? (
+              <div className="flex flex-wrap items-center gap-2">
+                <Chip as="span" active icon={<Tag size={12} weight="bold" />}>
+                  {tagFilter}
+                </Chip>
+                <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.NOTES)} className="text-red">
+                  <X size={12} weight="bold" className="mr-1" />
+                  Clear filter
+                </Button>
               </div>
-              <div className="lg:col-span-5 xl:col-span-4 space-y-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-[14px] font-black text-gray-text flex items-center gap-2">
-                    <CalendarIcon size={18} className="text-blue" />
-                    {format(selectedDate, 'MMMM do, yyyy')}
-                  </h3>
-                  <span className="text-[11px] font-bold text-gray-nav bg-border px-2 py-1 rounded-lg">
-                    {notesOnSelectedDate.length} {notesOnSelectedDate.length === 1 ? 'Note' : 'Notes'}
-                  </span>
-                </div>
-                
-                <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-                  {notesOnSelectedDate.length > 0 ? (
-                    notesOnSelectedDate.map(note => (
-                      <div 
-                        key={note.id}
-                        onClick={() => navigate(RoutePath.NOTE_DETAIL.replace(':id', note.id))}
-                        className="group cursor-pointer p-5 rounded-2xl bg-white dark:bg-panel-bg border-2 border-border shadow-sm hover:shadow-none transition-all duration-300"
-                      >
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-bold text-gray-text group-hover:text-blue transition-colors truncate pr-4">{note.title}</h4>
-                          {getMoodIcon(note.mood)}
+            ) : allTags.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {allTags.map((tag) => (
+                  <Chip
+                    key={tag}
+                    icon={<Tag size={12} weight="bold" />}
+                    onClick={() => navigate(`${RoutePath.NOTES}?tag=${encodeURIComponent(tag as string)}`)}
+                  >
+                    {tag}
+                  </Chip>
+                ))}
+              </div>
+            ) : null}
+
+            {viewMode === 'calendar' ? (
+              <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+                <div className="lg:col-span-7 xl:col-span-8">
+                  <Surface variant="bezel" innerClassName="p-6 sm:p-8">
+                    <Suspense
+                      fallback={
+                        <div className="flex h-[420px] items-center justify-center text-green">
+                          <CircleNotch size={24} weight="bold" className="animate-spin" />
                         </div>
-                        <p className="text-[13px] text-gray-light line-clamp-2 font-medium mb-3">
-                          {getPreviewText(note.content)}
-                        </p>
-                        {note.tags && note.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-1.5">
-                            {note.tags.slice(0, 2).map(tag => (
-                              <span key={tag} className="text-[10px] font-bold text-blue bg-blue/5 px-2 py-0.5 rounded-lg border border-blue/10 liquid-glass">#{tag}</span>
-                            ))}
-                            {note.tags.length > 2 && <span className="text-[10px] font-bold text-gray-nav liquid-glass px-2 py-0.5 rounded-lg border border-border">+{note.tags.length - 2}</span>}
-                          </div>
-                        )}
-                      </div>
-                    ))
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-12 text-center bg-white dark:bg-panel-bg rounded-[32px] border-2 border-dashed border-border">
-                      <div className="h-12 w-12 rounded-xl bg-white dark:bg-panel-bg border-2 border-border flex items-center justify-center text-gray-nav/30 mb-4">
-                        <FileText size={24} />
-                      </div>
-                      <p className="text-[14px] font-bold text-gray-nav">No entries for this day</p>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="mt-2 text-blue text-[11px]"
-                        onClick={() => navigate(RoutePath.CREATE_NOTE)}
-                      >
-                        Create one now
-                      </Button>
-                    </div>
-                  )}
+                      }
+                    >
+                      <MyNotesCalendar
+                        onSelectDate={(value) => setSelectedDate(value)}
+                        selectedDate={selectedDate}
+                        tileContent={tileContent}
+                      />
+                    </Suspense>
+                  </Surface>
+                </div>
+
+                <div className="space-y-5 lg:col-span-5 xl:col-span-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <h3 className="text-[14px] font-black text-gray-text flex items-center gap-2">
+                      <CalendarIcon size={18} weight="bold" className="text-green" />
+                      {format(selectedDate, 'MMMM do, yyyy')}
+                    </h3>
+                    <MetadataPill tone="green">
+                      {notesOnSelectedDate.length} {notesOnSelectedDate.length === 1 ? 'Note' : 'Notes'}
+                    </MetadataPill>
+                  </div>
+
+                  <div className="space-y-4 max-h-[640px] overflow-y-auto pr-1 wellness-scroll">
+                    {notesOnSelectedDate.length > 0 ? (
+                      notesOnSelectedDate.map((note, index) => renderNoteCard(note, index))
+                    ) : (
+                      <EmptyState
+                        surface="flat"
+                        icon={<FileText size={22} weight="duotone" />}
+                        title="No entries for this day"
+                        description="Choose another date or add a fresh reflection here."
+                        action={
+                          <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.CREATE_NOTE)} className="text-green">
+                            Create one now
+                          </Button>
+                        }
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ) : (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-8">
-              {filteredNotes.map((note, index) => (
-                <div 
-                  key={note.id} 
-                  onClick={() => navigate(RoutePath.NOTE_DETAIL.replace(':id', note.id))}
-                  className="group cursor-pointer flex flex-col overflow-hidden rounded-2xl bg-white dark:bg-panel-bg border-2 border-border shadow-sm transition-all duration-500 ease-out-expo hover:border-blue/30"
-                  style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
-                >
-                  <div className="relative h-44 w-full overflow-hidden bg-white dark:bg-panel-bg border-b-2 border-border">
-                    {note.thumbnailUrl ? (
-                       <>
-                        <div className="absolute inset-0 bg-blue/0 transition-colors duration-500 group-hover:bg-blue/5 z-10" />
-                        <StorageImage 
-                            path={note.thumbnailUrl} 
-                            alt={note.title} 
-                            className="h-full w-full object-cover transition-transform duration-700 ease-out will-change-transform group-hover:scale-105" 
-                        />
-                       </>
-                    ) : (
-                       <div className="h-full w-full bg-white dark:bg-panel-bg flex items-center justify-center">
-                          <FileText className="text-border transition-colors group-hover:text-blue/30" size={48} strokeWidth={1} />
-                       </div>
-                    )}
-                    
-                    <button 
-                      onClick={(e) => initiateDelete(e, note.id)}
-                      disabled={isDeleting && noteIdToDelete === note.id}
-                      className="absolute top-4 left-4 z-20 h-9 w-9 flex items-center justify-center rounded-xl bg-white dark:bg-panel-bg border-2 border-border text-gray-nav hover:text-red hover:border-red/30 shadow-sm active:brightness-95 transition-all duration-300"
-                    >
-                      {isDeleting && noteIdToDelete === note.id ? (
-                        <Loader2 size={16} className="animate-spin text-red" />
-                      ) : (
-                        <Trash2 size={16} />
-                      )}
-                    </button>
-                    
-                    <div className="absolute top-4 right-4 z-20 flex flex-col items-end gap-2">
-                         <div className="flex items-center gap-2 rounded-xl bg-white dark:bg-panel-bg border-2 border-border px-3 py-1 text-[11px] font-bold text-gray-nav shadow-sm">
-                            <div className="flex items-center gap-1.5 border-r-2 border-border pr-2 mr-0.5">
-                              <CalendarIcon size={12} className="text-gray-nav" />
-                              <span>{new Date(note.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
-                            </div>
-                            {note.mood ? (
-                              <div className="flex items-center gap-1">
-                                {getMoodIcon(note.mood)}
-                                <span className="capitalize text-gray-text">{note.mood}</span>
-                              </div>
-                            ) : (
-                              <span className="text-[10px] opacity-40 italic">No Mood</span>
-                            )}
-                         </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex flex-1 flex-col p-6">
-                    <div className="flex flex-wrap gap-1.5 mb-3">
-                      {note.tags?.map(tag => (
-                        <span key={tag} className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-blue/5 border border-blue/10 text-blue text-[10px] font-black">
-                          <Tag size={8} />
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-
-                    <h3 className="mb-2 text-[18px] font-bold tracking-tight text-gray-text leading-snug group-hover:text-blue transition-colors">
-                      {note.title}
-                    </h3>
-                    
-                    <p className="text-gray-light line-clamp-3 leading-relaxed text-[14px] mb-5 font-medium">
-                      {getPreviewText(note.content) || <span className="italic opacity-50">Empty note</span>}
-                    </p>
-
-                    <div className="mt-auto flex items-center justify-between border-t-2 border-border pt-4">
-                       <div className="flex items-center gap-2">
-                          <div className="h-6 w-6 rounded-full bg-blue flex items-center justify-center text-[10px] font-extrabold text-white shadow-sm">
-                            {user?.name?.charAt(0) || 'U'}
-                          </div>
-                          <span className="text-[12px] font-bold text-gray-nav">Edited {format(new Date(note.updatedAt), 'MMM d')}</span>
-                       </div>
-                       <div className="flex items-center text-[12px] font-bold text-blue group-hover:opacity-70 transition-all duration-300">
-                          <span>Open</span>
-                          <ArrowUpRight size={14} className="ml-1 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                       </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-          
-          {!loading && filteredNotes.length === 0 && (
-              <div className="flex h-80 flex-col items-center justify-center rounded-[32px] border-2 border-dashed border-border bg-white dark:bg-panel-bg text-center px-4">
-                 <div className="h-16 w-16 bg-white dark:bg-panel-bg rounded-2xl flex items-center justify-center shadow-sm border-2 border-border mb-6">
-                     <FileText size={28} className="text-gray-nav" />
-                 </div>
-                  <h3 className="font-display text-[24px] text-gray-text">Your personal sanctuary awaits.</h3>
-                  <p className="text-gray-light mb-8 max-w-sm font-medium">
-                    {tagFilter ? `We couldn't find any reflections with "${tagFilter}".` : "Begin your journey of reflection. Every entry is a step toward clarity."}
-                  </p>
-                 {tagFilter ? (
-                   <Button 
-                      onClick={() => navigate(RoutePath.NOTES)} 
-                      variant="secondary" 
-                      className="h-[48px] px-8 text-[15px] font-bold rounded-xl border-2 border-border text-gray-text shadow-sm active:brightness-95 transition-all duration-300"
-                    >
+            ) : filteredNotes.length > 0 ? (
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-8">
+                {filteredNotes.map((note, index) => renderNoteCard(note, index))}
+              </div>
+            ) : (
+              <EmptyState
+                surface="bezel"
+                icon={<FileText size={28} weight="duotone" />}
+                title={tagFilter ? `No reflections with “${tagFilter}” yet.` : 'Your library is ready when you are.'}
+                description={
+                  tagFilter
+                    ? 'Clear the filter to return to your full reflection library.'
+                    : 'Every entry becomes part of the narrative you can return to later.'
+                }
+                action={
+                  tagFilter ? (
+                    <Button onClick={() => navigate(RoutePath.NOTES)} variant="secondary">
                       Clear filter
                     </Button>
-                 ) : (
-                    <Button 
-                       onClick={() => navigate(RoutePath.CREATE_NOTE)} 
-                       variant="primary" 
-                       className="h-[48px] px-8 text-[15px] font-bold rounded-xl shadow-sm active:brightness-95 transition-all duration-300"
-                    >
-                       Log a reflection
+                  ) : (
+                    <Button onClick={() => navigate(RoutePath.CREATE_NOTE)} variant="primary">
+                      Log a reflection
                     </Button>
-                 )}
-              </div>
-          )}
-        </div>
-      )}
+                  )
+                }
+              />
+            )}
+          </div>
+        </PageContainer>
+      ) : null}
 
-      {/* Confirmation Dialog */}
       <ConfirmationDialog
         isOpen={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
         onConfirm={performDelete}
-
+        title="Delete this reflection?"
+        description="This entry will be removed from your library permanently."
         confirmLabel={isDeleting ? 'Deleting...' : 'Delete note'}
         isConfirming={isDeleting}
         variant="danger"
@@ -408,6 +402,3 @@ export const MyNotes: React.FC = () => {
     </>
   );
 };
-
-
-

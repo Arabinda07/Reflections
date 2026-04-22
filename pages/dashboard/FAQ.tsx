@@ -1,169 +1,151 @@
 import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
+import { motion, useScroll, useTransform } from 'motion/react';
 import { 
-  Heart, Sparkles, Brain, Shield, Cloud, Sun, Moon, Zap, 
-  PenTool, Tags, Calendar as CalendarIcon, CheckSquare,
-  Lock, ArrowRight, BookOpen, Compass, CheckCircle2, Paperclip, Image as ImageIcon, Headphones, Target, Mic
-} from 'lucide-react';
+  Heart, 
+  Brain, 
+  ShieldCheck, 
+  CloudSun, 
+  PenNib, 
+  Tag, 
+  Calendar, 
+  Checks, 
+  LockKey, 
+  ArrowRight, 
+  BookOpen, 
+  Compass, 
+  CheckCircle, 
+  Paperclip, 
+  Image as ImageIcon, 
+  Headphones, 
+  Target, 
+  Microphone,
+  Feather
+} from '@phosphor-icons/react';
 
-import Spline from '@splinetool/react-spline';
 import { RoutePath } from '../../types';
 import { Button } from '../../components/ui/Button';
+import { Magnetic } from '../../components/ui/Magnetic';
+
+const staggerContainer = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.1, delayChildren: 0.05 } },
+};
+
+const staggerItem = {
+  hidden: { opacity: 0, y: 30 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } },
+};
 
 export const FAQ: React.FC = () => {
   const navigate = useNavigate();
   const journeyRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: mainScroll } = useScroll();
-  const { scrollYProgress: journeyScroll } = useScroll({
+  
+  const { scrollYProgress } = useScroll({
     target: journeyRef,
-    offset: ["start center", "end center"]
+    offset: ["start end", "end start"]
   });
-
-  const scrollFillWidth = useTransform(journeyScroll, [0, 1], ["0%", "100%"]);
-  // Show floating pill after scrolling down 30% of the page
-  const showPill = useTransform(mainScroll, [0, 0.3], [0, 1]);
-  // Use state to conditionally render pill avoiding AnimatePresence unmount issues if preferred, 
-  // but useTransform is cleaner for opacity.
-
-  const yBase = useTransform(mainScroll, [0, 1], [0, -150]);
+  const y1 = useTransform(scrollYProgress, [0, 1], [0, -30]);
+  const y2 = useTransform(scrollYProgress, [0, 1], [0, -60]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-body selection:bg-green/30 selection:text-green-hover pb-32 transition-colors duration-300">
+    <div className="relative min-h-full bg-body text-gray-text pb-32 transition-colors duration-300">
       
-      {/* Ambient Background Elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-green/5 blur-[120px] rounded-full animate-pulse" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-blue/5 blur-[120px] rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
-      </div>
-
-      <div className="relative z-10 w-full max-w-[1440px] mx-auto px-4 md:px-6 pt-24 pb-16">
-        {/* =========================================
-            PHASE 1: THE HERO TEXT
-            ========================================= */}
-        <section className="flex flex-col">
-          <div className="w-full text-center max-w-4xl mx-auto">
+      {/* Editorial Hero */}
+      <section className="relative z-10 w-full max-w-[1440px] mx-auto px-6 py-24 lg:py-32">
+        <div className="grid lg:grid-cols-12 gap-12 items-end">
+          <div className="lg:col-span-8">
             <motion.div 
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green/10 border-2 border-green/20 text-green text-[12px] font-black mb-8 shadow-sm">
-                <Heart size={14} className="animate-pulse" />
-                <span>Your mental health sanctuary</span>
-              </div>
-              
-              <h1 className="text-5xl sm:text-6xl md:text-8xl font-display text-gray-text leading-tight md:leading-[0.9] mb-8 tracking-tighter drop-shadow-sm">
+              <h1 className="text-mk-display font-display tracking-tight text-gray-text mb-10">
                 Untangle your <br />
-                <span className="text-green drop-shadow-md">thoughts.</span>
+                <span className="font-serif italic text-green">thoughts.</span>
               </h1>
               
-              <p className="text-[18px] sm:text-[22px] text-gray-light font-medium leading-relaxed max-w-3xl mx-auto mb-6">
-                We live in an overwhelming, fast-paced world. Racing thoughts, anxiety, stress accumulate until our minds feel loud and cluttered. 
-              </p>
-              <p className="text-[18px] sm:text-[20px] text-gray-text font-semibold leading-relaxed max-w-2xl mx-auto">
-                Get what's in your head out on the page. Journaling is about giving yourself room to breathe. Use this app to clear the mental clutter.
+              <p className="text-mk-body font-serif text-gray-light max-w-2xl">
+                Racing thoughts and mental clutter shouldn't be your default state. Journaling is the first step toward clarity.
               </p>
             </motion.div>
           </div>
-        </section>
-      </div>
-
-      <div className="relative z-10 w-full max-w-[1440px] mx-auto px-4 md:px-6 mb-32">
-        {/* =========================================
-            PHASE 2: THE SPLINE BLOCK
-            ========================================= */}
-        <motion.section 
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1.2, ease: "easeOut" }}
-          className="relative w-full h-[60vh] min-h-[500px] max-h-[700px] flex items-center justify-center group"
-        >
-          <div className="absolute inset-0 pointer-events-auto z-0 flex items-center justify-center origin-center transition-transform duration-1000 group-hover:scale-105">
-            <Spline scene="/assets/spline/r_4_x_bot.spline" />
+          <div className="lg:col-span-4 hidden lg:block">
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6, duration: 1 }}
+              className="text-[14px] font-medium leading-relaxed text-gray-nav border-l border-border pl-6"
+            >
+              We live in a world designed to distract. Reflections is designed to ground you. A private space to breathe, reflect, and grow.
+            </motion.p>
           </div>
-        </motion.section>
-      </div>
-
-      <div className="relative z-10 w-full max-w-[1440px] mx-auto px-4 md:px-6">
+        </div>
+      </section>
 
 
-        {/* =========================================
-            PHASE 2: THE HOW (The User Journey)
-            ========================================= */}
-        <section className="mb-40 max-w-7xl mx-auto" ref={journeyRef}>
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-6xl font-display text-gray-text mb-6 tracking-tight">The journey</h2>
-            <p className="text-[18px] text-gray-light font-medium max-w-2xl mx-auto">
-              Healing doesn't happen overnight. It's a practice. Here is how you seamlessly embed this sanctuary into your daily life.
-            </p>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative pt-4">
-            
-            {/* Visual connecting lines for desktop */}
-            <div className="hidden lg:block absolute top-[44px] left-[10%] right-[10%] h-[4px] bg-border rounded-full z-0 overflow-hidden">
-              <motion.div 
-                className="h-full bg-gradient-to-r from-green via-blue to-purple-500 rounded-full"
-                style={{ width: scrollFillWidth }}
-              />
+      <div className="relative z-10 w-full max-w-[1440px] mx-auto px-6" ref={journeyRef}>
+
+        {/* Asymmetrical Bento: The Journey */}
+        <section className="mb-48">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 mb-20">
+            <div>
+              <h2 className="text-mk-h2 font-display text-gray-text mb-4">The journey</h2>
+              <p className="text-mk-body font-serif italic text-gray-light">A practice of healing, one reflection at a time.</p>
             </div>
+            <div className="h-[1px] flex-grow bg-border hidden lg:block mb-6 mx-12 opacity-50" />
+          </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
             {[
               {
-                step: "01",
-                icon: Cloud,
-                color: "green",
+                icon: CloudSun,
                 title: "Morning or night",
-                desc: "Start your day with an intention or end it by clearing your head. Write whenever it fits your schedule."
+                desc: "Start your day with an intention or end it by clearing your head. Write whenever it fits your rhythm.",
+                gridSpan: "md:col-span-8 lg:col-span-7",
+                color: "bg-green/5 text-green"
               },
               {
-                step: "02",
-                icon: PenTool,
-                color: "blue",
-                title: "Daily spark",
-                desc: "Facing a blank page? Tap the spark in the editor for a gentle, context-aware prompt to get the words moving."
+                icon: PenNib,
+                title: "The daily spark",
+                desc: "Facing a blank page? Tap the spark for a gentle writing prompt whenever you want a nudge.",
+                gridSpan: "md:col-span-4 lg:col-span-5",
+                color: "bg-green/5 text-green"
               },
               {
-                step: "03",
-                icon: Tags,
-                color: "green",
+                icon: Tag,
                 title: "Focus on the flow",
-                desc: "Use Focus Mode to let the UI fade away. It’s just you and your thoughts, without the digital noise."
+                desc: "Use Focus Mode to let the UI fade away. It’s just you and your thoughts.",
+                gridSpan: "md:col-span-5 lg:col-span-5",
+                color: "bg-green/5 text-green"
               },
               {
-                step: "04",
                 icon: Heart,
-                color: "purple-500",
                 title: "Check your mood",
-                desc: "Name how you feel. It sounds simple, but it's the first step to understanding your own patterns."
+                desc: "Name how you feel. It's the first step to understanding your own emotional patterns over time.",
+                gridSpan: "md:col-span-7 lg:col-span-7",
+                color: "bg-green/5 text-green"
               }
             ].map((item, i) => (
               <motion.div 
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                key={i} 
-                className="relative z-10 flex flex-col items-center group"
+                key={i}
+                variants={staggerItem}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, margin: "-50px" }}
+                className={`${item.gridSpan} group border-t border-border pt-10`}
               >
-                {/* Step Connector Node */}
-                <div className="bg-body p-2 rounded-full mb-6">
-                  <div className={`h-20 w-20 rounded-full border-4 border-white dark:border-[#1E1E1E] bg-${item.color}/10 text-${item.color} flex items-center justify-center font-black shadow-lg shadow-${item.color}/20 ring-1 ring-border group-hover:scale-[1.08] transition-all duration-300 liquid-glass`}>
-                    <item.icon size={28} />
+                <div className="flex flex-col h-full min-h-[280px] transition-colors duration-500">
+                  <div className={`w-12 h-12 rounded-2xl ${item.color} flex items-center justify-center mb-10 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 ease-out-expo`}>
+                    <item.icon size={24} weight="light" />
                   </div>
-                </div>
-
-                {/* Card */}
-                <div className="w-full p-8 rounded-[32px] border-2 border-border bg-white dark:bg-[#1E1E1E] shadow-sm flex-1 flex flex-col text-center hover:border-border/80 transition-colors">
-                  <span className={`text-[12px] font-black text-${item.color} mb-3`}>Step {item.step}</span>
-                  <h3 className="text-[22px] font-display text-gray-text mb-4 leading-tight">{item.title}</h3>
-                  <p className="text-[15px] font-medium text-gray-light leading-relaxed flex-1">
+                  <h3 className="text-[24px] font-display text-gray-text mb-4 leading-tight">{item.title}</h3>
+                  <p className="text-mk-body font-serif text-gray-light max-w-sm">
                     {item.desc}
                   </p>
                 </div>
@@ -172,208 +154,143 @@ export const FAQ: React.FC = () => {
           </div>
         </section>
 
-
-        {/* =========================================
-            PHASE 3: THE WHAT (The Toolkit & Premium)
-            ========================================= */}
-        <section className="mb-20 max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-6xl font-display text-gray-text mb-6 tracking-tight">The toolkit</h2>
-            <p className="text-[18px] text-gray-light font-medium max-w-2xl mx-auto">
-              A breakdown of the features designed to support your journey. Essential free tools today, and powerful premium horizon upgrades coming soon.
-            </p>
+        <section className="mb-48">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 mb-20">
+            <div className="max-w-3xl">
+              <h2 className="text-mk-h2 font-display text-gray-text mb-6">The toolkit</h2>
+              <p className="text-mk-body font-serif italic text-gray-light">
+                Essential tools designed to support your journey. High-fidelity utility without the noise.
+              </p>
+            </div>
+            <div className="h-[1px] flex-grow bg-border hidden lg:block mb-6 mx-12 opacity-50" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            
-            {/* Free Tiers */}
-            <div className="col-span-1 p-8 rounded-[32px] border-2 border-border bg-white dark:bg-[#1E1E1E] shadow-sm hover:shadow-lg transition-all duration-300 ease-out-quart flex flex-col group liquid-glass">
-              <div className="h-12 w-12 rounded-xl bg-blue/10 text-blue flex items-center justify-center mb-6 group-hover:bg-blue group-hover:text-white transition-colors duration-300">
-                <Shield size={24} />
-              </div>
-              <h4 className="text-[20px] font-display text-gray-text mb-3">It's 100% private</h4>
-              <p className="text-[14px] text-gray-light font-medium leading-relaxed mb-6 flex-1">
-                We can't read your notes. Your data is stored securely on Supabase and belongs only to you.
-              </p>
-              <div className="pt-4 border-t border-border flex items-center gap-2 text-[10px] font-black text-gray-nav">
-                <CheckCircle2 size={14} className="text-green" /> Totally secure
-              </div>
-            </div>
-
-            <div className="col-span-1 p-8 rounded-[32px] border-2 border-border bg-white dark:bg-[#1E1E1E] shadow-sm hover:shadow-lg transition-all duration-300 ease-out-quart flex flex-col group liquid-glass">
-              <div className="h-12 w-12 rounded-xl bg-green/10 text-green flex items-center justify-center mb-6 group-hover:bg-green group-hover:text-white transition-colors duration-300">
-                <Heart size={24} />
-              </div>
-              <h4 className="text-[20px] font-display text-gray-text mb-3">Visual patterns</h4>
-              <p className="text-[14px] text-gray-light font-medium leading-relaxed mb-6 flex-1">
-                See how your mood changes over the week or month. It's a simple way to spot rhythms you might miss.
-              </p>
-              <div className="pt-4 border-t border-border flex items-center gap-2 text-[10px] font-black text-gray-nav">
-                <CheckCircle2 size={14} className="text-green" /> Built-in tracking
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+            {/* Privacy Card - Large */}
+            <div className="md:col-span-8 bezel-outer group">
+              <div className="bezel-inner p-10 flex flex-col md:flex-row gap-10 items-center transition-colors duration-500 hover:bg-green/[0.02]">
+                <div className="w-20 h-20 rounded-[32px] bg-green/5 text-green flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 ease-out-expo">
+                  <ShieldCheck size={40} weight="light" />
+                </div>
+                <div>
+                  <h4 className="text-[28px] font-display text-gray-text mb-4">It's 100% private</h4>
+                  <p className="text-mk-body font-serif text-gray-light mb-6">
+                    We can't read your notes. Your data is stored securely on Supabase and encrypted in your private writing space. You own your thoughts.
+                  </p>
+                  <div className="label-caps !text-green flex items-center gap-2">
+                    <CheckCircle size={16} weight="fill" /> Secure & Offline-first
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="col-span-1 p-8 rounded-[32px] border-2 border-border bg-white dark:bg-[#1E1E1E] shadow-sm hover:shadow-lg transition-all duration-300 ease-out-quart flex flex-col group liquid-glass">
-              <div className="h-12 w-12 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center mb-6 group-hover:bg-purple-500 group-hover:text-white transition-colors duration-300">
-                <CalendarIcon size={24} />
-              </div>
-              <h4 className="text-[20px] font-display text-gray-text mb-3">Store what matters</h4>
-              <p className="text-[14px] text-gray-light font-medium leading-relaxed mb-6 flex-1">
-                Attach images, files, or tasks directly to your notes to keep your reflections complete.
-              </p>
-              <div className="pt-4 border-t border-border flex items-center gap-2 text-[10px] font-black text-gray-nav">
-                <CheckCircle2 size={14} className="text-green" /> No storage limits
+            {/* Visual Patterns - Small */}
+            <div className="md:col-span-4 bezel-outer group">
+              <div className="bezel-inner p-10 flex flex-col justify-between transition-colors duration-500 hover:bg-green/[0.02]">
+                <Heart size={32} weight="light" className="text-green mb-10 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 origin-bottom-left ease-out-expo" />
+                <div>
+                  <h4 className="text-[22px] font-display text-gray-text mb-3">Visual patterns</h4>
+                  <p className="text-mk-body font-serif text-gray-light">
+                    Spot emotional rhythms over time with intuitive mood mapping.
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Premium / Horizon - Soft Light Leak Aura */}
-            <div className="md:col-span-2 lg:col-span-3 mt-6 relative rounded-[40px] p-0 group overflow-hidden border-2 border-white/20 dark:border-[#2a2a2a] bg-white/40 dark:bg-[#121212]/40 backdrop-blur-3xl shadow-sm transition-all duration-300 ease-out-quart">
-              
-              {/* Soft Light Leak */}
-              <div className="absolute -top-32 -right-32 w-96 h-96 bg-blue/10 dark:bg-blue/5 rounded-full blur-[80px] pointer-events-none transition-opacity duration-1000 group-hover:opacity-80"></div>
-              <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-green/10 dark:bg-green/5 rounded-full blur-[80px] pointer-events-none transition-opacity duration-1000 group-hover:opacity-80"></div>
-              
-              {/* Content Wrapper */}
-              <div className="relative h-full w-full p-10 rounded-[40px] z-10">
+            {/* Storage - Small */}
+            <div className="md:col-span-4 bezel-outer group">
+              <div className="bezel-inner p-10 flex flex-col justify-between transition-colors duration-500 hover:bg-green/[0.02]">
+                <Calendar size={32} weight="light" className="text-green mb-10 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 origin-bottom-left ease-out-expo" />
+                <div>
+                  <h4 className="text-[22px] font-display text-gray-text mb-3">Store what matters</h4>
+                  <p className="text-mk-body font-serif text-gray-light">
+                    Infinite attachments for images, tasks, and reflections.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Guided Support - Large */}
+            <div className="md:col-span-8 bezel-outer group">
+              <div className="bezel-inner p-10 overflow-hidden relative transition-colors duration-500 hover:bg-green/[0.02]">
+                {/* Decorative light leak */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-green/10 rounded-full blur-[80px] pointer-events-none transition-transform duration-1000 group-hover:scale-150" />
                 
-                <div className="flex items-center gap-4 mb-8 relative z-10">
-                  <div className="h-14 w-14 rounded-2xl bg-blue/5 dark:bg-blue/10 text-blue flex items-center justify-center shadow-sm border border-blue/10 dark:border-blue/20">
-                    <Sparkles size={26} opacity={0.9} />
+                <div className="relative z-10 flex flex-col md:flex-row gap-10">
+                  <div className="w-20 h-20 rounded-[32px] bg-green/5 text-green flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-500 ease-out-expo">
+                    <Brain size={40} weight="light" />
                   </div>
                   <div>
-                    <h3 className="text-[28px] font-display text-gray-text">Sanctuary intelligence</h3>
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/70 dark:bg-white/5 border border-white/50 dark:border-white/10 text-gray-text text-[10px] font-black mt-1 shadow-sm backdrop-blur-sm">
-                      <Shield size={12} className="text-blue opacity-80" /> Private & secure
+                    <h4 className="text-[28px] font-display text-gray-text mb-4">Optional reflection support</h4>
+                    <p className="text-mk-body font-serif text-gray-light mb-8">
+                      When you choose it, Reflections can generate a reflection or refresh the Life Wiki. Nothing runs in the background, and your notes are not used to train models.
+                    </p>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-4 rounded-2xl bg-white/5 border border-border">
+                        <span className="label-caps">On demand only</span>
+                      </div>
+                      <div className="p-4 rounded-2xl bg-white/5 border border-border">
+                        <span className="label-caps">Private by design</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10 w-full">
-                  <div className="bg-white/40 dark:bg-white/5 p-6 rounded-3xl border border-white/20 dark:border-white/10 backdrop-blur-md">
-                    <h4 className="text-[18px] font-bold text-gray-text mb-3 flex items-center gap-2">
-                       Smart Reflections
-                    </h4>
-                    <p className="text-[15px] text-gray-light font-medium leading-relaxed">
-                      Detailed mirrors of your growth. We use Google Gemini to process reflections, but we never store your data for training. Your notes stay yours.
-                    </p>
-                  </div>
-                  <div className="bg-white/40 dark:bg-white/5 p-6 rounded-3xl border border-white/20 dark:border-white/10 backdrop-blur-md">
-                    <h4 className="text-[18px] font-bold text-gray-text mb-3 flex items-center gap-2">
-                      The Life Wiki
-                    </h4>
-                    <p className="text-[15px] text-gray-light font-medium leading-relaxed">
-                      A compounding library of your recurring themes. The AI librarian identifies patterns in the background so you can see your life's narrative evolve.
-                    </p>
-                  </div>
-                </div>
               </div>
             </div>
-
           </div>
         </section>
 
-        <section className="mb-24 max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-6xl font-display text-gray-text mb-6 tracking-tight">Using the sanctuary</h2>
-            <p className="text-[18px] text-gray-light font-medium max-w-3xl mx-auto leading-relaxed">
-              The best rituals are gentle and repeatable. These small tools are here to make your notes easier to return to, easier to understand later, and softer to live inside while you write.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {/* Feature Grid: Detail List */}
+        <section className="mb-24">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-16">
             {[
-              {
-                icon: ImageIcon,
-                title: 'Cover images',
-                tone: 'text-blue bg-blue/10',
-                body: 'Covers make your journal easier to scan and recognize later. Match the atmospheric tension or the literal view of your day.'
-              },
-              {
-                icon: Paperclip,
-                title: 'Attachments',
-                tone: 'text-green bg-green/10',
-                body: 'Attach photos or documents that belong to the story you are processing. Keeps the context all in one place.'
-              },
-              {
-                icon: Tags,
-                title: 'Tags',
-                tone: 'text-purple-500 bg-purple-500/10',
-                body: 'Use simple, recurring themes (Work, Home, Health) to see the bigger picture of your journey.'
-              },
-              {
-                icon: CheckSquare,
-                title: 'Tasks',
-                tone: 'text-orange bg-orange/10',
-                body: 'Capture follow-up actions like \'Drink water\' or \'Check in with family\' directly inside your notes for better follow-through.'
-              },
-              {
-                icon: Headphones,
-                title: 'Ambient sound',
-                tone: 'text-blue bg-blue/10',
-                body: 'Choose from a library of generative sounds to quiet the room. Tap once to select, and again to turn it off.'
-              },
-              {
-                icon: Mic,
-                title: 'Whisper mode',
-                tone: 'text-blue bg-blue/10',
-                body: 'For days when typing feels heavy. Speak your thoughts directly into the editor and have them transcribed instantly.'
-              },
-              {
-                icon: Target,
-                title: 'Daily spark',
-                tone: 'text-green bg-green/10',
-                body: 'Context-aware mindfulness prompts that help you find a starting point on days when the page feels blank.'
-              },
-              {
-                icon: Brain,
-                title: 'Ai reflection',
-                tone: 'text-blue bg-blue/10',
-                body: 'Get a mirror of your thoughts. Use it after writing to help notice patterns you might miss while in the flow.'
-              },
-              {
-                icon: BookOpen,
-                title: 'Insights',
-                tone: 'text-green bg-green/10',
-                body: 'Visit the Insights page to see your long-term moods, themes, and resilience over time.'
-              }
-            ].map((item, index) => (
-              <motion.div
-                key={item.title}
-                initial={{ opacity: 0, y: 30 }}
+              { icon: Headphones, title: 'Ambient sound', body: 'Generative sounds to quiet the room. Cross-fade between moods.' },
+              { icon: Microphone, title: 'Whisper mode', body: 'Speak your thoughts directly. Instant, private transcription.' },
+              { icon: Target, title: 'Writing sparks', body: 'Cycle through gentle prompts whenever you want help starting.' },
+              { icon: ImageIcon, title: 'Visual covers', body: 'Set the tone of your entries with atmospheric cinematic imagery.' },
+              { icon: Checks, title: 'Embedded tasks', body: 'Track intentions and follow-ups directly inside your prose.' },
+              { icon: Compass, title: 'Life Wiki refresh', body: 'Refresh a broader pattern summary only when you ask for it.' }
+            ].map((item, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.45, delay: index * 0.05 }}
-                className="rounded-[32px] border-2 border-border bg-white p-8 shadow-sm liquid-glass"
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                className="flex flex-col gap-6 group cursor-default"
               >
-                <div className={`mb-6 flex h-12 w-12 items-center justify-center rounded-2xl ${item.tone}`}>
-                  <item.icon size={22} />
+                <div className="w-12 h-12 rounded-2xl bg-green/5 border border-green/10 flex items-center justify-center text-green group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 ease-out-expo">
+                  <item.icon size={24} weight="light" />
                 </div>
-                <h3 className="mb-3 text-[22px] font-display text-gray-text">{item.title}</h3>
-                <p className="text-[15px] font-medium leading-relaxed text-gray-light">
-                  {item.body}
-                </p>
+                <div>
+                  <h3 className="label-caps mb-3">{item.title}</h3>
+                  <p className="text-mk-body font-serif text-gray-light">
+                    {item.body}
+                  </p>
+                </div>
               </motion.div>
             ))}
           </div>
         </section>
 
-
-
       </div>
 
-      {/* Floating Action Pill */}
+      {/* Floating CTA Pill */}
       <motion.div
-        style={{ opacity: showPill }}
-        className="fixed bottom-6 right-6 z-[100]"
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="fixed z-[100]"
+        style={{ bottom: 'calc(2rem + env(safe-area-inset-bottom))', right: '2rem' }}
       >
-        <Button 
-          variant="primary"
-          onClick={() => navigate(RoutePath.SIGNUP)}
-          className="h-10 px-5 text-[11px] sm:text-[12px] font-black rounded-full shadow-lg liquid-glass opacity-90 hover:opacity-100 transition-opacity hover:scale-[1.02] hover:shadow-xl flex items-center gap-2 group"
-        >
-          <Sparkles size={14} className="group-hover:rotate-12 transition-transform" />
-          <span>Start journaling</span>
-        </Button>
+        <Magnetic strength={30}>
+          <button
+            onClick={() => navigate(RoutePath.SIGNUP)}
+            className="group flex items-center justify-center w-14 h-14 rounded-full bg-green text-white shadow-[0_16px_32px_-8px_rgba(22,163,74,0.5)] transition-transform duration-300 hover:scale-110 active:scale-95"
+            aria-label="Begin writing"
+          >
+            <PenNib size={24} weight="fill" className="group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
+          </button>
+        </Magnetic>
       </motion.div>
 
     </div>

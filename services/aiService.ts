@@ -5,8 +5,8 @@ import { aiClient } from './aiClient';
 
 export const aiService = {
   /**
-   * The ingest flow runs after a note save and keeps the user's freeform
-   * themes current without touching the browser bundle with Gemini.
+   * The ingest flow can be used when the user explicitly chooses to build
+   * or update Life Wiki themes from a note.
    */
   processNoteIntoWiki: async (newNote: Note): Promise<void> => {
     const userThemes = await wikiService.getUserThemes();

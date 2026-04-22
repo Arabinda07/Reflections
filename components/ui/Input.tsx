@@ -1,10 +1,10 @@
 import React from 'react';
-import { LucideIcon } from 'lucide-react';
+import { Icon as PhosphorIcon } from '@phosphor-icons/react';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
-  icon?: LucideIcon;
+  icon?: PhosphorIcon;
 }
 
 export const Input: React.FC<InputProps> = ({ label, error, icon: Icon, className = '', ...props }) => {
@@ -17,14 +17,15 @@ export const Input: React.FC<InputProps> = ({ label, error, icon: Icon, classNam
       )}
       <div className="relative">
         {Icon && (
-          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-nav z-10 pointer-events-none">
-            <Icon size={18} strokeWidth={2.5} />
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-nav z-10 pointer-events-none flex items-center justify-center">
+            <Icon size={20} weight="bold" />
+
           </div>
         )}
         <input
-          className={`w-full h-[48px] rounded-xl border-2 border-border bg-white px-4 text-[15px] font-semibold text-gray-text dark:text-zinc-100 dark:placeholder:text-zinc-500 placeholder:text-gray-nav placeholder:font-medium transition-all duration-200 focus:outline-none focus:border-blue disabled:cursor-not-allowed disabled:opacity-50 ${
-            Icon ? 'pl-11' : ''
-          } ${error ? 'border-red focus:border-red' : ''} ${className}`}
+          className={`w-full h-12 rounded-[var(--radius-control)] border border-border bg-white shadow-sm px-4 text-[15px] font-semibold text-gray-text placeholder:text-gray-nav placeholder:font-medium transition-[border-color,box-shadow,background-color] duration-200 focus:outline-none focus:border-green focus:ring-4 focus:ring-green/10 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[var(--panel-bg)] dark:text-zinc-100 dark:placeholder:text-zinc-500 ${
+            Icon ? 'pl-12' : ''
+          } ${error ? 'border-red focus:border-red focus:ring-red/10' : ''} ${className}`}
           {...props}
         />
       </div>

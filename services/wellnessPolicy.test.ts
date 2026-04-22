@@ -4,8 +4,9 @@ import {
   FREE_MONTHLY_NOTE_LIMIT,
   getAiReflectionGate,
   getMonthlyNoteUsage,
+  getWikiInsightsGate,
 } from './wellnessPolicy';
-import type { Note, WellnessAccess } from '../types';
+import type { Note, WellnessAccess, WikiInsightsGate } from '../types';
 
 const note = (id: string, createdAt: string): Note => ({
   id,
@@ -42,6 +43,7 @@ describe('wellnessPolicy', () => {
       userId: 'user-1',
       planTier: 'free',
       freeAiReflectionsUsed: 1,
+      freeWikiInsightsUsed: 0,
     };
 
     expect(getAiReflectionGate(access, 2, true)).toEqual({
@@ -64,11 +66,75 @@ describe('wellnessPolicy', () => {
       userId: 'user-1',
       planTier: 'free',
       freeAiReflectionsUsed: 0,
+      freeWikiInsightsUsed: 0,
     };
 
     expect(getAiReflectionGate(access, 3, true)).toEqual({
       canReflect: true,
       remainingFreeSamples: 1,
+      requiresUpgrade: false,
+    });
+  });
+
+  it('gates wiki generation below the minimum entry count', () => {
+    const access: WellnessAccess = {
+      userId: 'user-1',
+      planTier: 'free',
+      freeAiReflectionsUsed: 0,
+      freeWikiInsightsUsed: 0,
+    };
+
+    expect(getWikiInsightsGate(access, 2)).toEqual<WikiInsightsGate>({
+      canGenerate: false,
+      reason: 'needs_more_entries',
+      remainingFreeGenerations: 1,
+      requiresUpgrade: false,
+    });
+  });
+
+  it('allows one free wiki generation after enough entries', () => {
+    const access: WellnessAccess = {
+      userId: 'user-1',
+      planTier: 'free',
+      freeAiReflectionsUsed: 1,
+      freeWikiInsightsUsed: 0,
+    };
+
+    expect(getWikiInsightsGate(access, 3)).toEqual<WikiInsightsGate>({
+      canGenerate: true,
+      remainingFreeGenerations: 1,
+      requiresUpgrade: false,
+    });
+  });
+
+  it('gates wiki generation after the free generation is exhausted', () => {
+    const access: WellnessAccess = {
+      userId: 'user-1',
+      planTier: 'free',
+      freeAiReflectionsUsed: 0,
+      freeWikiInsightsUsed: 1,
+    };
+
+    expect(getWikiInsightsGate(access, 3)).toEqual<WikiInsightsGate>({
+      canGenerate: false,
+      reason: 'free_limit_reached',
+      remainingFreeGenerations: 0,
+      requiresUpgrade: true,
+    });
+  });
+
+  it('gates pro users below the minimum entry count', () => {
+    const access: WellnessAccess = {
+      userId: 'user-1',
+      planTier: 'pro',
+      freeAiReflectionsUsed: 1,
+      freeWikiInsightsUsed: 1,
+    };
+
+    expect(getWikiInsightsGate(access, 0)).toEqual<WikiInsightsGate>({
+      canGenerate: false,
+      reason: 'needs_more_entries',
+      remainingFreeGenerations: 0,
       requiresUpgrade: false,
     });
   });

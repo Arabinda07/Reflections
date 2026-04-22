@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'motion/react';
-import { Headphones, Pause, Play, X, Volume2, VolumeX } from 'lucide-react';
-import { Button } from '../ui/Button';
+import { Headphones, Pause, Play, SpeakerSlash } from '@phosphor-icons/react';
+import { ModalSheet } from '../ui/ModalSheet';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 interface AmbientPlayerProps {
   isEditorFocused: boolean;
@@ -22,7 +22,6 @@ type AmbientPreset = {
   id: string;
   name: string;
   description: string;
-  colorClass: string;
   baseFrequency: number;
   modulationFrequency: number;
   filterFrequency: number;
@@ -34,7 +33,6 @@ const AMBIENT_PRESETS: AmbientPreset[] = [
     id: 'morning-air',
     name: 'Morning Air',
     description: 'Light, slow, and barely there',
-    colorClass: 'border-emerald-200 bg-emerald-50/95 text-emerald-700 dark:border-emerald-400/25 dark:bg-emerald-400/12 dark:text-emerald-100',
     baseFrequency: 174,
     modulationFrequency: 0.07,
     filterFrequency: 520,
@@ -44,7 +42,6 @@ const AMBIENT_PRESETS: AmbientPreset[] = [
     id: 'soft-hum',
     name: 'Soft Hum',
     description: 'Warm focus without rhythm',
-    colorClass: 'border-sky-200 bg-sky-50/95 text-sky-700 dark:border-sky-400/25 dark:bg-sky-400/12 dark:text-sky-100',
     baseFrequency: 220,
     modulationFrequency: 0.05,
     filterFrequency: 430,
@@ -54,7 +51,6 @@ const AMBIENT_PRESETS: AmbientPreset[] = [
     id: 'quiet-tide',
     name: 'Quiet Tide',
     description: 'A slow breathing wash',
-    colorClass: 'border-teal-200 bg-teal-50/95 text-teal-700 dark:border-teal-400/25 dark:bg-teal-400/12 dark:text-teal-100',
     baseFrequency: 196,
     modulationFrequency: 0.04,
     filterFrequency: 360,
@@ -65,7 +61,7 @@ const AMBIENT_PRESETS: AmbientPreset[] = [
 export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activePresetId, setActivePresetId] = useState<string | null>(null);
-  const [isMobileLayout, setIsMobileLayout] = useState(false);
+  const isMobileLayout = useMediaQuery('(max-width: 639px)');
   const audioContextRef = useRef<AudioContext | null>(null);
   const activeNodesRef = useRef<Set<ActiveNodes>>(new Set());
   const containerRef = useRef<HTMLDivElement>(null);
@@ -168,15 +164,6 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
   }, []);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(max-width: 639px)');
-    const syncLayout = () => setIsMobileLayout(mediaQuery.matches);
-
-    syncLayout();
-    mediaQuery.addEventListener('change', syncLayout);
-    return () => mediaQuery.removeEventListener('change', syncLayout);
-  }, []);
-
-  useEffect(() => {
     return () => {
       activeNodesRef.current.forEach((nodes) => {
         if (nodes.stopTimeout) window.clearTimeout(nodes.stopTimeout);
@@ -204,7 +191,7 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
           className="flex h-full items-center gap-2 px-3 sm:px-4 py-2 flex-nowrap whitespace-nowrap"
           title="Choose ambient sound"
         >
-          <Headphones size={16} className="shrink-0" />
+          <Headphones size={16} weight="bold" className="shrink-0" />
           <span className="hidden sm:inline">{isPlaying ? AMBIENT_PRESETS.find(p => p.id === activePresetId)?.name || 'Ambient' : 'Ambient'}</span>
         </button>
         {isPlaying && (
@@ -218,7 +205,7 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
               className="p-1 text-gray-nav hover:text-red hover:bg-red/5 rounded-lg transition-all duration-300 ease-out-quart"
               title="Turn ambient sound off"
             >
-              <VolumeX size={14} />
+              <SpeakerSlash size={16} weight="bold" />
             </button>
           </div>
         )}
@@ -245,13 +232,13 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
                     }}
                     className={`w-full rounded-xl border-2 p-3 text-left transition-all duration-300 ease-out-quart ${
                       isPresetPlaying
-                        ? 'bg-slate-50 border-sky-100 text-blue shadow-sm dark:bg-white/10 dark:border-sky-400/30 dark:text-sky-100'
+                        ? 'border-green/25 bg-green/10 text-green shadow-sm dark:bg-green/12 dark:border-green/30 dark:text-green'
                         : 'border-transparent bg-gray-50/80 text-gray-text hover:border-border hover:bg-gray-100 dark:bg-white/5 dark:text-slate-300 dark:hover:border-white/10 dark:hover:bg-white/10'
                     }`}
                   >
                     <span className="flex items-center justify-between gap-3">
                       <span className="text-[12px] font-black">{preset.name}</span>
-                      {isPresetPlaying ? <Pause size={14} /> : <Play size={14} />}
+                      {isPresetPlaying ? <Pause size={14} weight="bold" /> : <Play size={14} weight="bold" />}
                     </span>
                   </button>
                 );
@@ -259,63 +246,45 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
             </div>
           </motion.div>
         )}
-
-        {isOpen && isMobileLayout && createPortal(
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[9999] flex items-end bg-slate-950/35 p-3 backdrop-blur-sm sm:hidden"
-            onClick={() => setIsOpen(false)}
-          >
-            <motion.div
-              initial={{ y: 30, opacity: 0.85 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 30, opacity: 0.85 }}
-              transition={{ duration: 0.22, ease: 'easeOut' }}
-              className="w-full chooser-popover max-h-[85vh] overflow-y-auto mb-4"
-              onClick={(event) => event.stopPropagation()}
-            >
-              <div className="mb-4 flex items-start justify-end">
-                <button
-                  type="button"
-                  onClick={() => setIsOpen(false)}
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border-2 border-border bg-gray-50 text-gray-nav dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
-                  aria-label="Close ambient sound choices"
-                >
-                  <X size={16} />
-                </button>
-              </div>
-
-              <div className="space-y-2">
-                {AMBIENT_PRESETS.map((preset) => {
-                  const isPresetPlaying = activePresetId === preset.id;
-                  return (
-                    <button
-                      key={preset.id}
-                      onClick={() => {
-                        playPreset(preset);
-                        setIsOpen(false);
-                      }}
-                      className={`w-full rounded-xl border-2 p-4 text-left transition-all duration-300 ease-out-quart ${
-                        isPresetPlaying
-                          ? 'bg-slate-50 border-sky-100 text-blue shadow-sm dark:bg-white/10 dark:border-sky-400/30 dark:text-sky-100'
-                          : 'border-transparent bg-gray-50/80 text-gray-text hover:border-border hover:bg-gray-100 dark:bg-white/5 dark:text-slate-300 dark:hover:border-white/10 dark:hover:bg-white/10'
-                      }`}
-                    >
-                      <span className="flex items-center justify-between gap-3">
-                        <span className="text-[13px] font-black">{preset.name}</span>
-                        {isPresetPlaying ? <Pause size={16} /> : <Play size={16} />}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </motion.div>
-          </motion.div>,
-          document.body
-        )}
       </AnimatePresence>
+
+      <ModalSheet
+        isOpen={isOpen && isMobileLayout}
+        onClose={() => setIsOpen(false)}
+        title="Ambient sounds"
+        description={
+          isPlaying
+            ? `${AMBIENT_PRESETS.find((preset) => preset.id === activePresetId)?.name || 'Ambient'} is playing.`
+            : 'Pick a gentle background texture for your writing session.'
+        }
+        size="sm"
+        bodyClassName="pt-2"
+      >
+        <div className="space-y-2">
+          {AMBIENT_PRESETS.map((preset) => {
+            const isPresetPlaying = activePresetId === preset.id;
+            return (
+              <button
+                key={preset.id}
+                onClick={() => {
+                  playPreset(preset);
+                  setIsOpen(false);
+                }}
+                className={`w-full rounded-xl border-2 p-4 text-left transition-all duration-300 ease-out-quart ${
+                  isPresetPlaying
+                    ? 'border-green/25 bg-green/10 text-green shadow-sm dark:bg-green/12 dark:border-green/30 dark:text-green'
+                    : 'border-transparent bg-gray-50/80 text-gray-text hover:border-border hover:bg-gray-100 dark:bg-white/5 dark:text-slate-300 dark:hover:border-white/10 dark:hover:bg-white/10'
+                }`}
+              >
+                <span className="flex items-center justify-between gap-3">
+                  <span className="text-[13px] font-black">{preset.name}</span>
+                  {isPresetPlaying ? <Pause size={16} weight="bold" /> : <Play size={16} weight="bold" />}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </ModalSheet>
     </div>
   );
 };
