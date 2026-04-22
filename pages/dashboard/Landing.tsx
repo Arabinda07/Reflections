@@ -37,7 +37,7 @@ export const Landing: React.FC = () => {
       <div className="min-h-[100dvh] w-full relative">
 
         {/* ── Left panel: content ── */}
-        <div className="relative z-20 flex min-h-[100dvh] flex-col justify-start px-6 pb-10 pt-[calc(env(safe-area-inset-top)+5.5rem)] sm:px-12 sm:pb-12 sm:pt-[calc(env(safe-area-inset-top)+6rem)] lg:justify-between lg:pt-[28vh] lg:pb-12 lg:px-16 xl:px-24 pointer-events-none">
+        <div className="relative z-20 flex min-h-[100dvh] flex-col justify-start px-6 pb-10 pt-[calc(env(safe-area-inset-top)+var(--header-height)+1rem)] sm:px-12 sm:pb-12 sm:pt-[calc(env(safe-area-inset-top)+var(--header-height)+1.5rem)] lg:justify-between lg:pt-[28vh] lg:pb-12 lg:px-16 xl:px-24 pointer-events-none">
 
           {/* Text section */}
           <div className="flex flex-col gap-5 sm:gap-6 lg:gap-8 lg:w-[60%] xl:w-[55%]">

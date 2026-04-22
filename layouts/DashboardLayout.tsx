@@ -122,7 +122,7 @@ export const DashboardLayout: React.FC = () => {
   const isLandingRoute = location.pathname === RoutePath.HOME && !isAuthenticated;
 
   return (
-    <div className="relative flex min-h-[100dvh] flex-col overflow-hidden bg-body font-sans selection:bg-green/30 selection:text-green transition-colors duration-300">
+    <div className="relative flex h-[100dvh] flex-col overflow-hidden bg-body font-sans selection:bg-green/30 selection:text-green transition-colors duration-300">
       <a href="#main-content" className="skip-link">
         Skip to content
       </a>
@@ -130,10 +130,10 @@ export const DashboardLayout: React.FC = () => {
       {/* Global Grain Texture */}
       <div className="grain-overlay pointer-events-none" />
 
-      {/* Navbar - Stationary Anchor (Floats on Landing) */}
+      {/* Navbar — flex-none keeps it outside the scroll container, no sticky needed */}
       {!isWritingRoute && (
-        <nav className={`z-[100] flex justify-center border-b-2 border-border transition-colors duration-500 ${isLandingRoute ? 'fixed left-0 right-0 top-0 bg-transparent pt-[env(safe-area-inset-top)]' : 'sticky top-0 flex-none bg-[rgba(var(--panel-bg-rgb),0.92)] backdrop-blur-xl pt-[env(safe-area-inset-top)]'}`}>
-        <div className="w-full max-w-[1440px] px-4 md:px-10 flex items-center justify-between">
+        <nav className={`z-[100] flex-none flex justify-center transition-colors duration-500 ${isLandingRoute ? 'fixed left-0 right-0 top-0 bg-transparent pt-[env(safe-area-inset-top)]' : 'bg-[rgba(var(--panel-bg-rgb),0.92)] backdrop-blur-xl border-b border-border pt-[env(safe-area-inset-top)]'}`}>
+        <div className="w-full max-w-[1440px] px-4 md:px-10 h-14 flex items-center justify-between">
           {/* Left Side */}
           <div className="flex items-center gap-4">
             <div 
@@ -336,10 +336,10 @@ export const DashboardLayout: React.FC = () => {
           )
         : null}
 
-      {/* Main Content - Scrollable Region */}
-      <SyncBanner />
+      {/* Main Content — sole scroll container in the shell */}
       <main id="main-content" tabIndex={-1} className="relative flex flex-1 min-h-0 flex-col overflow-y-auto custom-scrollbar">
-        <div className="w-full max-w-[1440px] mx-auto flex-1 flex flex-col">
+        <SyncBanner />
+        <div className="w-full flex-1 flex flex-col">
           <Outlet />
         </div>
         

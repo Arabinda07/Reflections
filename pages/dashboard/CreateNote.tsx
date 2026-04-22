@@ -11,11 +11,11 @@ import {
   FileText, 
   Sparkle, 
   Smiley, 
-  SmileyBlank,
-  SmileyMeh,
   SmileySad,
-  SmileyAngry,
-  SmileyXEyes,
+  Sun,
+  Cloud,
+  Lightning,
+  Moon,
   Tag as TagIcon, 
   Check, 
   Plus, 
@@ -55,11 +55,11 @@ import { getOrderedTasks, getTaskDrawerTriggerLabel } from './createNoteTasks';
 
 const MOOD_CONFIG: Record<string, { nav: string, modal: string, icon: any }> = {
   happy: { nav: 'bg-golden/10 border-golden/20 text-golden', modal: 'border-golden bg-golden/10 text-golden', icon: Smiley },
-  calm: { nav: 'bg-blue/10 border-blue/20 text-blue', modal: 'border-blue bg-blue/10 text-blue', icon: SmileyBlank },
-  anxious: { nav: 'bg-orange/10 border-orange/20 text-orange', modal: 'border-orange bg-orange/10 text-orange', icon: SmileyMeh },
+  calm: { nav: 'bg-green/10 border-green/20 text-green', modal: 'border-green bg-green/10 text-green', icon: Sun },
+  anxious: { nav: 'bg-blue/10 border-blue/20 text-blue', modal: 'border-blue bg-blue/10 text-blue', icon: Cloud },
   sad: { nav: 'bg-dark-blue/10 border-dark-blue/20 text-dark-blue', modal: 'border-dark-blue bg-dark-blue/10 text-dark-blue', icon: SmileySad },
-  angry: { nav: 'bg-red/10 border-red/20 text-red', modal: 'border-red bg-red/10 text-red', icon: SmileyAngry },
-  tired: { nav: 'bg-gray-light/10 border-gray-light/20 text-gray-text', modal: 'border-gray-light bg-gray-light/10 text-gray-text', icon: SmileyXEyes },
+  angry: { nav: 'bg-red/10 border-red/20 text-red', modal: 'border-red bg-red/10 text-red', icon: Lightning },
+  tired: { nav: 'bg-gray-light/10 border-gray-light/20 text-gray-text', modal: 'border-gray-light bg-gray-light/10 text-gray-text', icon: Moon },
 };
 
 // --- Sub-Component: TaskRow ---
@@ -407,7 +407,7 @@ export const CreateNote: React.FC = () => {
   const isDimmed = isFlowing && !isTitleFocused;
 
   return (
-    <div className="relative flex-1 flex h-full bg-body transition-colors duration-700 ease-out-quart overflow-hidden">
+    <div className="relative flex-1 flex min-h-0 bg-body transition-colors duration-700 ease-out-quart overflow-hidden">
       <OverlayFeedback isVisible={loading || isBreathing} overlayClassName="overlay-feedback--screen">
         <motion.div
           initial={{ opacity: 1 }}
@@ -443,7 +443,7 @@ export const CreateNote: React.FC = () => {
 
       {/* ── Desktop Sidebar ── */}
       {!isMobile && (
-        <aside className={`w-[240px] border-r-2 border-border flex flex-col h-full bg-white/50 dark:bg-panel-bg z-40 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isDimmed ? '-translate-x-full opacity-0' : 'translate-x-0 opacity-100'}`}>
+        <aside className={`w-[240px] border-r-2 border-border flex flex-col min-h-0 bg-white/50 dark:bg-panel-bg z-40 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isDimmed ? '-translate-x-full opacity-0' : 'translate-x-0 opacity-100'}`}>
           <div className="pt-8 px-6 pb-6 flex-1 overflow-y-auto custom-scrollbar space-y-4">
             
             {/* Desktop Back Button */}

@@ -330,13 +330,6 @@ export const SingleNote: React.FC = () => {
                     <span className="text-[11px] font-bold uppercase tracking-widest opacity-60">Open</span>
                   </button>
                 </div>
-
-                <div className="rounded-[var(--radius-panel)] border border-border bg-white/5 p-4">
-                  <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-gray-nav">
-                    <span className="h-1.5 w-1.5 rounded-full bg-green" />
-                    Writing stays at the center
-                  </p>
-                </div>
               </div>
             </Surface>
 

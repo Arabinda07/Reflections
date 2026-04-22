@@ -252,12 +252,11 @@ export const MyNotes: React.FC = () => {
         <PageContainer className="pb-14 pt-4 md:pt-8">
           <div className="space-y-10 animate-in fade-in duration-700">
             <SectionHeader
-              eyebrow="Reflection library"
-              title="Your notes, held in one calm place."
+              title="Saved reflections"
               description={
                 tagFilter
-                  ? `Filtering your library to reflections tagged with “${tagFilter}”.`
-                  : 'Browse your reflections as cards or settle into the monthly calendar view.'
+                  ? `Showing reflections tagged "${tagFilter}".`
+                  : 'Cards or calendar — pick how you want to look through them.'
               }
               actions={
                 <div className="flex flex-wrap items-center gap-3">

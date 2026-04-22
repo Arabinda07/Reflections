@@ -55,6 +55,9 @@
 }
 
 :root {
+  /* App Shell – single source of truth for header height */
+  --header-height: 3.5rem; /* 56px – comfortable mobile app-bar */
+
   /* Brand Hue = 135 (Classic Wellness Green) */
   --green: oklch(0.70 0.18 135);
   --green-hover: oklch(0.65 0.18 135);
@@ -765,6 +768,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 
   .overlay-feedback--screen {
     background: var(--bg-color);
+    padding: 0; /* Edge-to-edge for immersive/loading states */
   }
 
   .overlay-feedback--soft {

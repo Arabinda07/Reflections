@@ -61,9 +61,8 @@ export const PrivacyPolicy: React.FC = () => {
         </Button>
 
         <SectionHeader
-          eyebrow="Privacy"
-          title="A calmer privacy policy"
-          description="Reflections is built around the idea that your writing belongs to you. This page explains the current product reality without dressing it up as something more finished than it is."
+          title="How we handle your data"
+          description="What we store, how AI interacts with your writing, and what you can do about it."
           icon={
             <div className="icon-block icon-block-lg">
               <Shield size={32} weight="duotone" />

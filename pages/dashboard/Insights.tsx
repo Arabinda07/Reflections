@@ -202,9 +202,8 @@ export const Insights: React.FC = () => {
           </div>
 
           <SectionHeader
-            eyebrow="Monthly wellness journey"
-            title="A quieter look at the patterns in your writing."
-            description="These surfaces help you notice your rhythm without turning reflection into a scoreboard. The Life Wiki only changes when you explicitly refresh it."
+            title="Patterns in your writing"
+            description="Mood, rhythm, and recurring themes — refreshed only when you ask."
             icon={
               <div className="icon-block icon-block-lg">
                 <Brain size={34} weight="duotone" />
@@ -365,10 +364,9 @@ export const Insights: React.FC = () => {
           <Surface variant="flat" className="overflow-hidden">
             <div className="p-8 md:p-12 space-y-8">
               <SectionHeader
-                eyebrow="Optional life wiki"
-                title="Themes that keep resurfacing."
+                title="Themes that keep resurfacing"
                 titleAs="h2"
-                description={`Built from ${notes.length} reflections. Nothing is synthesized until you choose to refresh it.`}
+                description={`Built from ${notes.length} reflections. Nothing is generated until you ask.`}
                 icon={
                   <div className="icon-block icon-block-md">
                     <Book size={26} weight="duotone" />
@@ -403,12 +401,26 @@ export const Insights: React.FC = () => {
                   }
                 />
               ) : notes.length < FREE_WIKI_MINIMUM_ENTRIES ? (
-                <EmptyState
-                  surface="none"
-                  icon={<Sparkle size={18} weight="duotone" className="text-orange" />}
-                  title="Your wiki is still gathering enough signal."
-                  description={`Write ${FREE_WIKI_MINIMUM_ENTRIES - notes.length} more ${FREE_WIKI_MINIMUM_ENTRIES - notes.length === 1 ? 'entry' : 'entries'} before the Life Wiki can say anything useful.`}
-                />
+                <div className="flex flex-col items-center gap-6">
+                  {gate && !gate.requiresUpgrade && gate.canGenerate ? (
+                    <Button
+                      variant="primary"
+                      onClick={handleRefreshWiki}
+                      isLoading={isRefreshingWiki}
+                      disabled={isRefreshingWiki}
+                      className="px-8"
+                    >
+                      <Sparkle size={16} weight="fill" className="mr-2" />
+                      {isRefreshingWiki ? 'Building...' : 'Get Insights'}
+                    </Button>
+                  ) : null}
+                  <EmptyState
+                    surface="none"
+                    icon={<Sparkle size={18} weight="duotone" className="text-orange" />}
+                    title="Still gathering enough signal."
+                    description={`Write ${FREE_WIKI_MINIMUM_ENTRIES - notes.length} more ${FREE_WIKI_MINIMUM_ENTRIES - notes.length === 1 ? 'entry' : 'entries'} before the Life Wiki can say anything useful.`}
+                  />
+                </div>
               ) : themes.length === 0 ? (
                 <EmptyState
                   surface="none"

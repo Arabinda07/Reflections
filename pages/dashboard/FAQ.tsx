@@ -65,12 +65,12 @@ export const FAQ: React.FC = () => {
               transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
             >
               <h1 className="text-mk-display font-display tracking-tight text-gray-text mb-10">
-                Frequently <br />
-                <span className="font-serif italic text-green">Asked Questions.</span>
+                Untangle your <br />
+                <span className="font-serif italic text-green">thoughts.</span>
               </h1>
               
               <p className="text-mk-body font-serif text-gray-light max-w-2xl">
-                Everything you need to know about Reflections, the science of journaling, and how we protect your privacy.
+                Racing thoughts and mental clutter shouldn't be your default state. Journaling is the first step toward clarity.
               </p>
             </motion.div>
           </div>
