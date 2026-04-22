@@ -4,27 +4,6 @@ import { ModalSheet } from './ModalSheet';
 import { useAmbientAudio, AMBIENT_TRACKS } from '../../hooks/useAmbientAudio';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 
-function useDarkMode(): boolean {
-  const [isDark, setIsDark] = useState(
-    () => document.documentElement.classList.contains('dark'),
-  );
-
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      setIsDark(document.documentElement.classList.contains('dark'));
-    });
-
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
-    });
-
-    return () => observer.disconnect();
-  }, []);
-
-  return isDark;
-}
-
 const WaveformBars: React.FC<{ color: string }> = ({ color }) => {
   const bars = [
     { h: [6, 14, 6], dur: 0.55 },
@@ -58,7 +37,6 @@ export const AmbientMusicButton: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [showHint, setShowHint] = useState(false);
-  const isDark = useDarkMode();
   const isMobile = useMediaQuery('(max-width: 639px)');
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const popupRef = useRef<HTMLDivElement | null>(null);
@@ -128,21 +106,18 @@ export const AmbientMusicButton: React.FC = () => {
     openPicker();
   };
 
-  const accentColor = activeTrack?.color ?? '#58cc02';
+  const accentColor = activeTrack?.color ?? 'var(--green)';
   const buttonGlow = isPlaying
-    ? `0 0 22px -4px ${accentColor}80`
-    : '0 4px 16px -4px rgba(0,0,0,0.28)';
-  const iconStroke = isPlaying ? accentColor : isHovered ? '#58cc02' : '#ffffff';
-  const idleIconStroke = isDark ? '#fafaf9' : '#1f2937';
+    ? `0 0 22px -4px color-mix(in oklch, ${accentColor} 42%, transparent)`
+    : 'var(--floating-panel-shadow)';
+  const iconStroke = isPlaying ? accentColor : isHovered ? 'var(--green)' : 'var(--gray-text)';
 
-  const pickerBg = isDark ? 'rgba(24,24,27,0.98)' : 'rgba(255,255,255,0.97)';
-  const pickerBorder = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(229,229,229,0.9)';
-  const pickerShadow = isDark
-    ? '0 8px 32px -8px rgba(0,0,0,0.6), 0 2px 0 0 rgba(255,255,255,0.04)'
-    : '0 8px 32px -8px rgba(0,0,0,0.16), 0 2px 0 0 #E5E5E5';
-  const trackHoverBg = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.03)';
-  const trackBg = isDark ? '#27272a' : '#fafafa';
-  const trackBorder = isDark ? '#3f3f46' : '#f0f0f0';
+  const pickerBg = 'rgba(var(--panel-bg-rgb), 0.97)';
+  const pickerBorder = 'var(--floating-panel-border)';
+  const pickerShadow = 'var(--floating-panel-shadow-strong)';
+  const trackHoverBg = 'oklch(from var(--green) l c h / 0.06)';
+  const trackBg = 'rgba(var(--panel-bg-rgb), 0.76)';
+  const trackBorder = 'oklch(from var(--border-color) l c h / 0.72)';
 
   const renderTrackRow = (track: (typeof AMBIENT_TRACKS)[0], compact = false) => {
     const isActive = activeTrack?.id === track.id;
@@ -158,26 +133,24 @@ export const AmbientMusicButton: React.FC = () => {
         style={
           {
             '--audio-track-border': isActive
-              ? `${track.color}55`
+              ? `color-mix(in oklch, ${track.color} 35%, transparent)`
               : compact
                 ? pickerBorder
                 : trackBorder,
             '--audio-track-bg': isActive
-              ? `${track.color}12`
+              ? `color-mix(in oklch, ${track.color} 12%, transparent)`
               : compact
                 ? pickerBg
                 : trackBg,
             '--audio-track-hover': isActive
-              ? `${track.color}12`
+              ? `color-mix(in oklch, ${track.color} 12%, transparent)`
               : compact
                 ? trackHoverBg
-                : isDark
-                  ? '#333'
-                  : '#F4F4F5',
-            '--audio-track-active-border': `${track.color}55`,
-            '--audio-track-active-bg': `${track.color}12`,
-            '--audio-badge-bg': `${track.color}18`,
-            '--audio-badge-border': `${track.color}30`,
+                : 'rgba(var(--panel-bg-rgb), 0.92)',
+            '--audio-track-active-border': `color-mix(in oklch, ${track.color} 35%, transparent)`,
+            '--audio-track-active-bg': `color-mix(in oklch, ${track.color} 12%, transparent)`,
+            '--audio-badge-bg': `color-mix(in oklch, ${track.color} 18%, transparent)`,
+            '--audio-badge-border': `color-mix(in oklch, ${track.color} 26%, transparent)`,
           } as React.CSSProperties
         }
       >
@@ -196,7 +169,7 @@ export const AmbientMusicButton: React.FC = () => {
         ) : (
           <span
             className="h-[7px] w-[7px] rounded-full shrink-0"
-            style={{ backgroundColor: `${track.color}70` }}
+            style={{ backgroundColor: `color-mix(in oklch, ${track.color} 55%, transparent)` }}
           />
         )}
       </button>
@@ -290,13 +263,13 @@ export const AmbientMusicButton: React.FC = () => {
           style={
             {
               '--audio-button-bg': isPlaying
-                ? `${accentColor}22`
-                : isDark
-                  ? 'rgba(39,39,42,0.86)'
-                  : 'rgba(255,255,255,0.84)',
-              '--audio-button-border': isPlaying ? `${accentColor}88` : 'rgba(255,255,255,0.18)',
+                ? `color-mix(in oklch, ${accentColor} 18%, rgba(var(--panel-bg-rgb), 0.82))`
+                : 'rgba(var(--panel-bg-rgb), 0.84)',
+              '--audio-button-border': isPlaying
+                ? `color-mix(in oklch, ${accentColor} 44%, transparent)`
+                : 'var(--floating-panel-border)',
               '--audio-button-shadow': buttonGlow,
-              '--audio-icon-stroke': isPlaying ? iconStroke : isHovered ? '#58cc02' : idleIconStroke,
+              '--audio-icon-stroke': iconStroke,
             } as React.CSSProperties
           }
         >

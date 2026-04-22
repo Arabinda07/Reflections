@@ -1,5 +1,5 @@
 import React, { Suspense, lazy, useEffect } from 'react';
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import { Route, RouterProvider, createHashRouter, createRoutesFromElements } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { PWAInstallProvider } from './context/PWAInstallContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
@@ -36,6 +36,71 @@ const PageLoader = () => (
   <div className="flex-1 flex items-center justify-center min-h-[50vh]">
     <div className="h-8 w-8 rounded-full border-2 border-border border-t-green animate-spin" />
   </div>
+);
+
+const router = createHashRouter(
+  createRoutesFromElements(
+    <Route element={<DashboardLayout />}>
+      <Route path={RoutePath.HOME} element={<Home />} />
+      <Route path={RoutePath.FAQ} element={<FAQ />} />
+      <Route path={RoutePath.PRIVACY} element={<PrivacyPolicy />} />
+
+      <Route path={RoutePath.LOGIN} element={<SignIn />} />
+      <Route path={RoutePath.SIGNUP} element={<SignUp />} />
+      <Route path={RoutePath.RESET_PASSWORD} element={<ResetPassword />} />
+
+      <Route
+        path={RoutePath.NOTES}
+        element={
+          <ProtectedRoute>
+            <MyNotes />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={RoutePath.CREATE_NOTE}
+        element={
+          <ProtectedRoute>
+            <CreateNote />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={RoutePath.EDIT_NOTE}
+        element={
+          <ProtectedRoute>
+            <CreateNote />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={RoutePath.NOTE_DETAIL}
+        element={
+          <ProtectedRoute>
+            <SingleNote />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={RoutePath.ACCOUNT}
+        element={
+          <ProtectedRoute>
+            <Account />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={RoutePath.INSIGHTS}
+        element={
+          <ProtectedRoute>
+            <Insights />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route path="*" element={<NotFound />} />
+    </Route>,
+  ),
 );
 
 // Wrapper to initialize hooks inside Context and handle preloading
@@ -108,37 +173,11 @@ function App() {
       <AuthProvider>
         <Analytics />
         <SpeedInsights />
-        <Router>
-          <SyncWrapper>
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
-                {/* Dashboard Layout (Shared by Guest and Auth users) */}
-                <Route element={<DashboardLayout />}>
-                  {/* Public Home Page (Handles both Guest and Auth states internally) */}
-                  <Route path={RoutePath.HOME} element={<Home />} />
-                  <Route path={RoutePath.FAQ} element={<FAQ />} />
-                  <Route path={RoutePath.PRIVACY} element={<PrivacyPolicy />} />
-                  
-                  {/* Public Auth Routes - Guest only effectively via navigation logic */}
-                  <Route path={RoutePath.LOGIN} element={<SignIn />} />
-                  <Route path={RoutePath.SIGNUP} element={<SignUp />} />
-                  <Route path={RoutePath.RESET_PASSWORD} element={<ResetPassword />} />
-                  
-                  {/* Protected Routes - Redirect to Login if Guest */}
-                  <Route path={RoutePath.NOTES} element={<ProtectedRoute><MyNotes /></ProtectedRoute>} />
-                  <Route path={RoutePath.CREATE_NOTE} element={<ProtectedRoute><CreateNote /></ProtectedRoute>} />
-                  <Route path={RoutePath.EDIT_NOTE} element={<ProtectedRoute><CreateNote /></ProtectedRoute>} />
-                  <Route path={RoutePath.NOTE_DETAIL} element={<ProtectedRoute><SingleNote /></ProtectedRoute>} />
-                  <Route path={RoutePath.ACCOUNT} element={<ProtectedRoute><Account /></ProtectedRoute>} />
-                  <Route path={RoutePath.INSIGHTS} element={<ProtectedRoute><Insights /></ProtectedRoute>} />
-                  
-                  {/* Fallback inside layout */}
-                  <Route path="*" element={<NotFound />} />
-                </Route>
-              </Routes>
-            </Suspense>
-          </SyncWrapper>
-        </Router>
+        <SyncWrapper>
+          <Suspense fallback={<PageLoader />}>
+            <RouterProvider router={router} />
+          </Suspense>
+        </SyncWrapper>
       </AuthProvider>
     </PWAInstallProvider>
   );

@@ -28,23 +28,22 @@ import { aiService } from '../../services/aiService';
 import { profileService } from '../../services/profileService';
 import { FREE_WIKI_MINIMUM_ENTRIES, getWikiInsightsGate } from '../../services/wellnessPolicy';
 
-const MOOD_COLORS: Record<string, string> = {
-  happy: 'var(--orange)',
-  calm: 'var(--green)',
-  anxious: 'var(--blue)',
-  sad: 'var(--dark-blue)',
-  angry: 'var(--red)',
-  tired: 'var(--gray-light)',
+const MOOD_TONE_CLASSES: Record<string, { label: string; track: string; fill: string }> = {
+  happy: { label: 'text-orange', track: 'bg-orange/10', fill: 'bg-orange' },
+  calm: { label: 'text-green', track: 'bg-green/10', fill: 'bg-green' },
+  anxious: { label: 'text-blue', track: 'bg-blue/10', fill: 'bg-blue' },
+  sad: { label: 'text-dark-blue', track: 'bg-dark-blue/10', fill: 'bg-dark-blue' },
+  angry: { label: 'text-red', track: 'bg-red/10', fill: 'bg-red' },
+  tired: { label: 'text-gray-light', track: 'bg-gray-light/20', fill: 'bg-gray-light' },
 };
 
-const MOOD_BG: Record<string, string> = {
-  happy: 'oklch(from var(--orange) l c h / 0.12)',
-  calm: 'oklch(from var(--green) l c h / 0.12)',
-  anxious: 'oklch(from var(--blue) l c h / 0.12)',
-  sad: 'oklch(from var(--dark-blue) l c h / 0.12)',
-  angry: 'oklch(from var(--red) l c h / 0.12)',
-  tired: 'oklch(from var(--gray-light) l c h / 0.18)',
+const DEFAULT_MOOD_TONE = {
+  label: 'text-gray-light',
+  track: 'bg-gray-light/20',
+  fill: 'bg-gray-light',
 };
+
+const TAG_TONE_CLASSES = ['text-green', 'text-blue', 'text-orange', 'text-gray-text'];
 
 export const Insights: React.FC = () => {
   const navigate = useNavigate();
@@ -310,21 +309,17 @@ export const Insights: React.FC = () => {
                   {stats.moodData.map((entry) => {
                     const maxValue = stats.moodData[0].value;
                     const percent = Math.round((entry.value / maxValue) * 100);
-                    const color = MOOD_COLORS[entry.name] || 'var(--gray-light)';
-                    const background = MOOD_BG[entry.name] || 'oklch(from var(--gray-light) l c h / 0.14)';
+                    const tone = MOOD_TONE_CLASSES[entry.name] || DEFAULT_MOOD_TONE;
 
                     return (
                       <div key={entry.name} className="flex items-center gap-4">
-                        <span
-                          className="w-16 shrink-0 text-[11px] font-black capitalize tracking-widest"
-                          style={{ color }}
-                        >
+                        <span className={`w-16 shrink-0 text-[11px] font-black capitalize tracking-widest ${tone.label}`}>
                           {entry.name}
                         </span>
-                        <div className="relative h-8 flex-1 overflow-hidden rounded-full" style={{ background }}>
+                        <div className={`relative h-8 flex-1 overflow-hidden rounded-full ${tone.track}`}>
                           <div
-                            className="absolute inset-y-0 left-0 rounded-full"
-                            style={{ backgroundColor: color, width: `${percent}%` }}
+                            className={`absolute inset-y-0 left-0 rounded-full ${tone.fill}`}
+                            style={{ width: `${percent}%` }}
                           />
                         </div>
                         <span className="w-6 shrink-0 text-right text-[12px] font-extrabold text-gray-nav">
@@ -350,15 +345,13 @@ export const Insights: React.FC = () => {
                 <div className="flex flex-wrap items-center gap-3">
                   {stats.topTags.map(([tag, count], index) => {
                     const scale = Math.min(1.75, Math.max(0.92, count / 2.4));
-                    const colors = ['var(--green)', 'var(--blue)', 'var(--orange)', 'var(--gray-text)'];
                     return (
                       <span
                         key={tag}
-                        className="font-display lowercase"
+                        className={`font-display lowercase ${TAG_TONE_CLASSES[index % TAG_TONE_CLASSES.length]}`}
                         style={{
                           fontSize: `${scale}rem`,
                           lineHeight: '1',
-                          color: colors[index % colors.length],
                         }}
                       >
                         #{tag}

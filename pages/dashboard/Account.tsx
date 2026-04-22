@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Sparkle,
@@ -58,6 +58,7 @@ export const Account: React.FC = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showUpgradeSheet, setShowUpgradeSheet] = useState(false);
   const [isDeletingData, setIsDeletingData] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement | null>(null);
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -341,11 +342,13 @@ export const Account: React.FC = () => {
             <form onSubmit={handleSubmit} className="divide-y divide-border/70">
               <div className="grid gap-10 p-8 lg:grid-cols-[180px_minmax(0,1fr)] lg:p-10">
                 <div className="flex flex-col items-center gap-4">
-                  <div
-                    className="relative group cursor-pointer"
-                    onClick={() => document.getElementById('avatar-upload')?.click()}
+                  <button
+                    type="button"
+                    className="relative group"
+                    onClick={() => avatarInputRef.current?.click()}
+                    aria-label="Upload a new profile photo"
                   >
-                    <div className="h-32 w-32 overflow-hidden rounded-full border-4 border-white bg-white/5 shadow-xl">
+                    <div className="h-32 w-32 overflow-hidden rounded-full border-4 border-white bg-white/5 shadow-[0_20px_42px_-28px_rgba(15,23,42,0.42)]">
                       {avatarPath ? (
                         <StorageImage path={avatarPath} alt="Profile" className="h-full w-full object-cover" />
                       ) : (
@@ -354,17 +357,18 @@ export const Account: React.FC = () => {
                         </div>
                       )}
                     </div>
-                    <div className="absolute bottom-1 right-1 flex h-10 w-10 items-center justify-center rounded-full border-4 border-white bg-green text-white shadow-lg transition-transform group-hover:scale-110">
+                    <div className="absolute bottom-1 right-1 flex h-11 w-11 items-center justify-center rounded-full border-4 border-white bg-green text-white shadow-[0_18px_36px_-24px_rgba(22,163,74,0.45)] transition-transform group-hover:scale-105">
                       <Camera size={18} weight="bold" />
                     </div>
-                    <input
-                      id="avatar-upload"
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleAvatarChange}
-                    />
-                  </div>
+                  </button>
+                  <input
+                    id="avatar-upload"
+                    ref={avatarInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleAvatarChange}
+                  />
 
                   {lastSignIn ? (
                     <MetadataPill tone="green">
@@ -507,17 +511,29 @@ export const Account: React.FC = () => {
                     type="button"
                     onClick={handleSignOut}
                     className="flex items-center gap-2 text-[13px] font-bold uppercase tracking-widest text-gray-nav transition-colors hover:text-red"
+                    aria-label="Sign out of your account"
                   >
                     <SignOut size={20} weight="bold" />
                     <span className="hidden sm:inline">Sign out</span>
                   </button>
 
                   <div className="flex items-center gap-3">
-                    <Button type="button" variant="secondary" onClick={() => navigate(-1)} className="px-4 sm:px-6">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => navigate(-1)}
+                      className="px-4 sm:px-6"
+                      aria-label="Discard account changes"
+                    >
                       <X size={18} weight="bold" className="sm:mr-2" />
                       <span className="hidden sm:inline">Cancel</span>
                     </Button>
-                    <Button type="submit" disabled={loading || isSaved} className="px-4 sm:px-8">
+                    <Button
+                      type="submit"
+                      disabled={loading || isSaved}
+                      className="px-4 sm:px-8"
+                      aria-label="Save account changes"
+                    >
                       {loading ? (
                         <CircleNotch size={18} className="animate-spin sm:mr-2" />
                       ) : isSaved ? (

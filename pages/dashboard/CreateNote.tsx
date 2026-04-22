@@ -583,7 +583,7 @@ export const CreateNote: React.FC = () => {
       {isMobile && (
         <button 
           onClick={() => navigate(RoutePath.NOTES)}
-          className={`fixed left-4 top-4 z-[80] flex h-10 w-10 items-center justify-center rounded-[var(--radius-control)] border border-border bg-[rgba(var(--panel-bg-rgb),0.88)] text-gray-text shadow-sm backdrop-blur-xl transition-all hover:border-green/20 hover:text-green ${isDimmed ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
+          className={`surface-floating fixed left-4 top-4 z-[80] flex h-10 w-10 items-center justify-center rounded-[var(--radius-control)] transition-all hover:text-green ${isDimmed ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
         >
           <ArrowLeft size={18} weight="bold" />
         </button>
@@ -662,7 +662,7 @@ export const CreateNote: React.FC = () => {
               <img src={imagePreview} alt="Cover" className="w-full h-full object-cover" />
               <button
                 onClick={() => setImagePreview(null)}
-                className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-[var(--radius-control)] border border-white/20 bg-[rgba(var(--panel-bg-rgb),0.78)] text-white opacity-0 shadow-sm backdrop-blur-xl transition-all group-hover:opacity-100"
+                className="surface-floating surface-floating--media absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-[var(--radius-control)] opacity-0 transition-all group-hover:opacity-100"
               >
                 <X size={20} weight="bold" />
               </button>
@@ -735,7 +735,7 @@ export const CreateNote: React.FC = () => {
         {isMobile && (
           <button 
             onClick={() => setIsMobileOptionsOpen(true)}
-            className="group relative h-16 w-16 rounded-full bg-white/80 dark:bg-panel-bg/80 backdrop-blur-3xl border border-white/20 shadow-[0_24px_40px_-10px_rgba(0,0,0,0.15)] flex items-center justify-center text-gray-text hover:text-green transition-all"
+            className="surface-floating group relative flex h-16 w-16 items-center justify-center rounded-full hover:text-green"
           >
             <DotsThreeCircle size={28} weight="fill" className="opacity-80" />
           </button>
@@ -753,7 +753,7 @@ export const CreateNote: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={cycleSparkPrompt}
-                className="group relative h-16 w-16 rounded-full bg-white/80 dark:bg-panel-bg/80 backdrop-blur-3xl border border-white/20 shadow-[0_24px_40px_-10px_rgba(0,0,0,0.15)] flex items-center justify-center text-green transition-all"
+                className="surface-floating group relative flex h-16 w-16 items-center justify-center rounded-full text-green"
               >
                 <div className="absolute inset-2 rounded-full bg-green/5 group-hover:bg-green/10 transition-colors" />
                 <Target size={28} weight="fill" />
@@ -772,7 +772,7 @@ export const CreateNote: React.FC = () => {
                 disabled={saving}
                 className="group relative h-16 w-16 rounded-full bg-green text-white shadow-[0_24px_40px_-10px_rgba(22,163,74,0.4)] flex items-center justify-center transition-all"
               >
-                <div className="absolute inset-2 rounded-full bg-black/10 group-hover:scale-110 transition-transform duration-500 ease-out" />
+                <div className="absolute inset-2 rounded-full bg-white/12 group-hover:scale-110 transition-transform duration-500 ease-out" />
                 {saving ? <CircleNotch size={28} className="animate-spin" /> : <FloppyDisk size={26} weight="fill" className="relative z-10" />}
               </motion.button>
             </Magnetic>

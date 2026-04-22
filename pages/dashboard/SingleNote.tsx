@@ -36,6 +36,7 @@ import { Surface } from '../../components/ui/Surface';
 import { noteService } from '../../services/noteService';
 import { storageService } from '../../services/storageService';
 import { Note, RoutePath, Task } from '../../types';
+import { sanitizeNoteHtml } from './noteContent';
 
 const MOOD_OPTIONS = ['happy', 'calm', 'anxious', 'sad', 'angry', 'tired'] as const;
 
@@ -80,6 +81,7 @@ export const SingleNote: React.FC = () => {
     () => note?.tasks?.filter((task) => !task.completed).length ?? 0,
     [note?.tasks],
   );
+  const sanitizedContent = useMemo(() => sanitizeNoteHtml(note?.content ?? ''), [note?.content]);
 
   const persistNote = async (updates: Partial<Note>) => {
     if (!note || !id) return;
@@ -159,7 +161,7 @@ export const SingleNote: React.FC = () => {
     if (!taskDraft.trim()) return;
 
     const nextTask: Task = {
-      id: Math.random().toString(36).slice(2, 11),
+      id: crypto.randomUUID(),
       text: taskDraft.trim(),
       completed: false,
     };
@@ -201,9 +203,27 @@ export const SingleNote: React.FC = () => {
   };
 
   const downloadAttachment = async (path: string) => {
-    const url = await storageService.getSignedUrl(path);
-    if (url) {
-      window.open(url, '_blank');
+    setError(null);
+    const popup = window.open('', '_blank', 'noopener,noreferrer');
+
+    try {
+      const url = await storageService.getSignedUrl(path);
+
+      if (!url) {
+        throw new Error('Missing attachment URL');
+      }
+
+      if (popup) {
+        popup.opener = null;
+        popup.location.href = url;
+        return;
+      }
+
+      window.location.assign(url);
+    } catch (err) {
+      popup?.close();
+      console.error('Failed to open attachment', err);
+      setError('This attachment could not be opened right now. Please try again.');
     }
   };
 
@@ -383,7 +403,7 @@ export const SingleNote: React.FC = () => {
 
                   <div
                     className="prose prose-zinc prose-lg max-w-prose mx-auto text-gray-text leading-loose font-sans"
-                    dangerouslySetInnerHTML={{ __html: note.content }}
+                    dangerouslySetInnerHTML={{ __html: sanitizedContent }}
                   />
 
                   {note.attachments && note.attachments.length > 0 ? (
@@ -411,6 +431,7 @@ export const SingleNote: React.FC = () => {
                                 onClick={() => downloadAttachment(attachment.path)}
                                 className="rounded-[var(--radius-control)] border border-transparent p-2 text-gray-nav transition-colors hover:border-green/20 hover:bg-green/10 hover:text-green"
                                 title="Download attachment"
+                                aria-label={`Download ${attachment.name}`}
                               >
                                 <Download size={16} weight="bold" />
                               </button>

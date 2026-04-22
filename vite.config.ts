@@ -3,6 +3,19 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
+const vendorChunk = (id: string) => {
+  if (!id.includes('node_modules')) return undefined;
+
+  if (id.includes('react-calendar') || id.includes('date-fns')) return 'vendor-calendar';
+  if (id.includes('quill')) return 'vendor-editor';
+  if (id.includes('@supabase') || id.includes('dexie') || id.includes('idb-keyval')) return 'vendor-data';
+  if (id.includes('motion') || id.includes('@lottiefiles/dotlottie-react')) return 'vendor-motion';
+  if (id.includes('@phosphor-icons')) return 'vendor-icons';
+  if (id.includes('@google/genai') || id.includes('@splinetool/runtime')) return 'vendor-ai';
+
+  return 'vendor-react';
+};
+
 export default defineConfig(({ mode }) => {
     return {
       server: {
@@ -57,8 +70,8 @@ export default defineConfig(({ mode }) => {
             ]
           },
           workbox: {
-            maximumFileSizeToCacheInBytes: 50 * 1024 * 1024, // 50 MiB
-            globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,mp4,ogg,m4a,json,spline,splinecode}'],
+            maximumFileSizeToCacheInBytes: 2 * 1024 * 1024,
+            globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
             runtimeCaching: [
               {
                 urlPattern: /^https:\/\/.*\.supabase\.co\/auth\/.*/i,
@@ -116,6 +129,13 @@ export default defineConfig(({ mode }) => {
           }
         })
       ],
+      build: {
+        rollupOptions: {
+          output: {
+            manualChunks: vendorChunk,
+          },
+        },
+      },
       resolve: {
         alias: {
           '@': path.resolve(__dirname, '.'),

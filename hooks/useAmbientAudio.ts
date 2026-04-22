@@ -15,28 +15,28 @@ export const AMBIENT_TRACKS: AmbientTrack[] = [
     label: 'Bonfire',
     emoji: '🪵',
     url: '/assets/audio/bonfire.ogg',
-    color: '#fb923c',
+    color: 'var(--track-bonfire)',
   },
   {
     id: 'jungle',
     label: 'Jungle',
     emoji: '🌿',
     url: '/assets/audio/jungle.ogg',
-    color: '#4ade80',
+    color: 'var(--track-jungle)',
   },
   {
     id: 'thunderstorm',
     label: 'Thunderstorm',
     emoji: '⛈️',
     url: '/assets/audio/thunderstorm.ogg',
-    color: '#818cf8',
+    color: 'var(--track-thunderstorm)',
   },
   {
     id: 'water_wind',
     label: 'Water & Wind',
     emoji: '🌊',
     url: '/assets/audio/water_wind.ogg',
-    color: '#34d399',
+    color: 'var(--track-water-wind)',
   },
 ];
 
@@ -87,4 +87,3 @@ export function useAmbientAudio() {
 
   return { isPlaying, activeId, activeTrack, volume, playTrack, stopAll, setVolume };
 }
-

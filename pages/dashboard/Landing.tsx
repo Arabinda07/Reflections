@@ -81,7 +81,7 @@ export const Landing: React.FC = () => {
             >
               <button
                 onClick={() => navigate(RoutePath.SIGNUP)}
-                className="group flex items-center justify-center sm:justify-start gap-3 text-[16px] sm:text-[18px] font-black text-white bg-green hover:bg-green-hover px-8 py-4 rounded-full shadow-[0_8px_24px_-8px_rgba(22,163,74,0.4)] transition-all duration-300 pointer-events-auto"
+                className="group flex items-center justify-center gap-3 rounded-[var(--radius-control)] border border-green/20 bg-green px-8 py-4 text-[16px] font-black text-white shadow-[0_18px_40px_-28px_rgba(22,163,74,0.45)] transition-all duration-300 hover:bg-green-hover sm:justify-start sm:text-[18px] pointer-events-auto"
               >
                 Begin writing
                 <ArrowRight size={22} className="group-hover:translate-x-1.5 transition-transform duration-500 ease-out-expo" />
@@ -131,27 +131,14 @@ export const Landing: React.FC = () => {
           className="absolute inset-0 overflow-hidden pointer-events-none lg:pointer-events-auto"
         >
           {/* Subtle responsive masks */}
-          <div
-            className="absolute inset-0 z-10 pointer-events-none lg:hidden"
-            style={{
-              background: `linear-gradient(to bottom, var(--bg-color) 0%, rgb(var(--panel-bg-rgb) / 0.92) 18%, transparent 46%),
-                           linear-gradient(to right, var(--bg-color) 0%, rgb(var(--panel-bg-rgb) / 0.78) 34%, transparent 72%)`,
-            }}
-          />
-          <div 
-            className="absolute inset-0 z-10 hidden lg:block pointer-events-none"
-            style={{ 
-              background: `linear-gradient(to right, var(--bg-color) 0%, var(--bg-color) 40%, transparent 80%),
-                           linear-gradient(to bottom, var(--bg-color) 0%, transparent 15%, transparent 85%, var(--bg-color) 100%)` 
-            }}
-          />
+          <div className="video-mask video-mask--mobile lg:hidden" />
+          <div className="video-mask video-mask--desktop hidden lg:block" />
 
           <video
             ref={videoRef}
             src="/assets/videos/landing_video.mp4"
             poster="/assets/videos/landing_video.png"
-            className="absolute inset-0 h-full w-full object-cover object-[70%_center] sm:object-[64%_center] lg:object-center bg-body"
-            style={{ opacity: 0.9 }}
+            className="absolute inset-0 h-full w-full object-cover object-[70%_center] bg-body opacity-90 sm:object-[64%_center] lg:object-center"
             autoPlay
             loop
             muted={isMuted}
@@ -161,7 +148,7 @@ export const Landing: React.FC = () => {
 
           <button
             onClick={toggleMute}
-            className="absolute bottom-10 right-6 z-30 rounded-full border border-white/15 bg-[rgba(var(--panel-bg-rgb),0.42)] p-3 text-white backdrop-blur-md transition-all duration-300 hover:bg-[rgba(var(--panel-bg-rgb),0.58)] pointer-events-auto lg:bottom-12 lg:right-16"
+            className="surface-floating surface-floating--media absolute bottom-10 right-6 z-30 rounded-[var(--radius-control)] p-3 pointer-events-auto lg:bottom-12 lg:right-16"
             aria-label={isMuted ? 'Unmute video' : 'Mute video'}
           >
             {isMuted ? <SpeakerSlash size={20} weight="bold" /> : <SpeakerHigh size={20} weight="bold" />}

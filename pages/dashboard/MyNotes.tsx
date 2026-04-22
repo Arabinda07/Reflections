@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, lazy, useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Plus,
@@ -17,10 +17,7 @@ import {
   Tag,
   X,
 } from '@phosphor-icons/react';
-import ReactCalendar from 'react-calendar';
 import { format, isSameDay } from 'date-fns';
-import 'react-calendar/dist/Calendar.css';
-import './Calendar.css';
 import { Button } from '../../components/ui/Button';
 import { Chip } from '../../components/ui/Chip';
 import { EmptyState } from '../../components/ui/EmptyState';
@@ -34,6 +31,11 @@ import { Surface } from '../../components/ui/Surface';
 import { useAuth } from '../../context/AuthContext';
 import { noteService } from '../../services/noteService';
 import { Note, RoutePath } from '../../types';
+import { buildNotePreviewText } from './noteContent';
+
+const MyNotesCalendar = lazy(() =>
+  import('./MyNotesCalendar').then((module) => ({ default: module.MyNotesCalendar })),
+);
 
 export const MyNotes: React.FC = () => {
   const navigate = useNavigate();
@@ -96,13 +98,7 @@ export const MyNotes: React.FC = () => {
   };
 
   const getPreviewText = (html: string) => {
-    if (!html || html === '<p><br></p>') return 'No content available';
-
-    const temp = document.createElement('div');
-    temp.innerHTML = html;
-    const text = temp.textContent || temp.innerText || '';
-
-    return text.length > 110 ? `${text.slice(0, 110)}...` : text || 'No content available';
+    return buildNotePreviewText(html);
   };
 
   const getMoodIcon = (mood?: string) => {
@@ -182,7 +178,8 @@ export const MyNotes: React.FC = () => {
           <button
             onClick={(event) => initiateDelete(event, note.id)}
             disabled={isDeleting && noteIdToDelete === note.id}
-            className="absolute left-4 top-4 z-20 inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-control)] border border-border/60 bg-white/90 text-gray-text shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-red/30 hover:text-red"
+            className="absolute left-4 top-4 z-20 inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] border border-border/60 bg-white/90 text-gray-text shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-red/30 hover:text-red"
+            aria-label={`Delete ${note.title}`}
           >
             {isDeleting && noteIdToDelete === note.id ? (
               <CircleNotch size={16} weight="bold" className="animate-spin text-red" />
@@ -315,12 +312,19 @@ export const MyNotes: React.FC = () => {
               <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
                 <div className="lg:col-span-7 xl:col-span-8">
                   <Surface variant="bezel" innerClassName="p-6 sm:p-8">
-                    <ReactCalendar
-                      onChange={(value) => setSelectedDate(value as Date)}
-                      value={selectedDate}
-                      tileContent={tileContent}
-                      className="w-full border-none font-sans"
-                    />
+                    <Suspense
+                      fallback={
+                        <div className="flex h-[420px] items-center justify-center text-green">
+                          <CircleNotch size={24} weight="bold" className="animate-spin" />
+                        </div>
+                      }
+                    >
+                      <MyNotesCalendar
+                        onSelectDate={(value) => setSelectedDate(value)}
+                        selectedDate={selectedDate}
+                        tileContent={tileContent}
+                      />
+                    </Suspense>
                   </Surface>
                 </div>
 

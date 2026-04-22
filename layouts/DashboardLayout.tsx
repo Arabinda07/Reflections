@@ -229,7 +229,7 @@ export const DashboardLayout: React.FC = () => {
         ? createPortal(
             <div className="fixed inset-0 z-[105] md:hidden animate-in fade-in duration-500">
               <div
-                className="absolute inset-0 bg-[rgba(var(--panel-bg-rgb),0.82)] backdrop-blur-2xl"
+                className="absolute inset-0 screen-scrim screen-scrim--strong"
                 onClick={() => setIsMobileMenuOpen(false)}
               />
 
@@ -259,7 +259,7 @@ export const DashboardLayout: React.FC = () => {
                 <button
                   ref={mobileMenuCloseRef}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="absolute right-4 top-4 z-[110] rounded-2xl border-2 border-border bg-[rgba(var(--panel-bg-rgb),0.94)] p-3 text-gray-nav shadow-sm transition-all duration-300 ease-out-expo hover:bg-green/6 hover:text-green active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
+                  className="surface-floating surface-floating--strong absolute right-4 top-4 z-[110] rounded-2xl p-3 text-gray-nav transition-all duration-300 ease-out-expo hover:text-green active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
                   aria-label="Close menu"
                 >
                   <X size={24} />
