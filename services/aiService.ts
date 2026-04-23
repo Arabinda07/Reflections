@@ -1,7 +1,117 @@
-import { Note, LifeTheme } from '../types';
+import type { LifeTheme, Note } from '../types';
 import { wikiService } from './wikiService';
-import { WikiPageType } from './wikiTypes';
+import { type WikiPageType } from './wikiTypes';
 import { aiClient } from './aiClient';
+
+export type WikiRefreshSource = 'themes' | 'notes' | 'none';
+
+export interface WikiRefreshResult {
+  pageCount: number;
+  source: WikiRefreshSource;
+}
+
+const WIKI_PAGE_CONFIGS: { pageType: WikiPageType; title: string; instruction: string }[] = [
+  {
+    pageType: 'mood_patterns',
+    title: 'Mood Patterns',
+    instruction: `Extract and synthesise the recurring emotional states and triggers visible across the source material below.
+Focus on: what emotions come up repeatedly, what situations tend to cause them, and any shifts over time.
+Format: short paragraphs + bullet points. Max 300 words.`,
+  },
+  {
+    pageType: 'recurring_themes',
+    title: 'Recurring Themes',
+    instruction: `Identify the topics and concerns this person keeps returning to across the source material below.
+Focus on: what subjects appear repeatedly, which ones seem unresolved, which ones show growth.
+Format: short paragraphs + bullet points. Max 300 words.`,
+  },
+  {
+    pageType: 'self_model',
+    title: 'Self Model',
+    instruction: `Build a concise picture of how this person sees themselves — their values, beliefs, and identity as revealed through the source material below.
+Focus on: how they describe themselves, what they care about, and any contradictions in self-perception.
+Format: short paragraphs. Max 300 words. Write in third person ("They...").`,
+  },
+  {
+    pageType: 'timeline',
+    title: 'Timeline',
+    instruction: `Extract the key moments, turning points, and shifts mentioned across the source material below.
+List them chronologically where possible.
+Format: bullet list, each item with approximate context. Max 300 words.`,
+  },
+];
+
+const stripHtml = (value = '') =>
+  value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+
+const buildThemeCorpus = (themes: LifeTheme[]) =>
+  themes
+    .map((theme) => `## ${theme.title}\n${theme.content}`)
+    .join('\n\n---\n\n');
+
+const noteHasSignal = (note: Note) =>
+  Boolean(
+    stripHtml(note.title) ||
+      stripHtml(note.content) ||
+      note.mood ||
+      note.tags?.length ||
+      note.tasks?.length,
+  );
+
+const buildNotesCorpus = (notes: Note[]) =>
+  notes
+    .filter(noteHasSignal)
+    .sort((left, right) => new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime())
+    .map((note) => {
+      const plainTitle = stripHtml(note.title) || 'Untitled reflection';
+      const plainContent = stripHtml(note.content);
+      const metadata = [
+        `Date: ${new Date(note.createdAt).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        })}`,
+        note.mood ? `Mood: ${note.mood}` : null,
+        note.tags?.length ? `Tags: ${note.tags.join(', ')}` : null,
+        note.tasks?.length
+          ? `Tasks: ${note.tasks
+              .map((task) => `${task.completed ? '[done]' : '[open]'} ${task.text}`)
+              .join('; ')}`
+          : null,
+      ]
+        .filter(Boolean)
+        .join('\n');
+
+      return `## ${plainTitle}\n${metadata}\n\nEntry:\n${plainContent || 'No written body yet.'}`;
+    })
+    .join('\n\n---\n\n');
+
+const refreshStructuredWikiPages = async (allThemeContent: string): Promise<number> => {
+  let pageCount = 0;
+
+  for (const config of WIKI_PAGE_CONFIGS) {
+    try {
+      const content = await aiClient.requestText('wikiPage', {
+        title: config.title,
+        instruction: config.instruction,
+        allThemeContent,
+      });
+
+      if (content) {
+        await wikiService.upsertWikiPage(config.pageType, config.title, content.trim());
+        pageCount += 1;
+      }
+    } catch (error) {
+      console.error(`[aiService] Failed to refresh wiki page: ${config.pageType}`, error);
+    }
+  }
+
+  if (pageCount > 0) {
+    await aiService._rebuildIndex();
+  }
+
+  return pageCount;
+};
 
 export const aiService = {
   /**
@@ -32,7 +142,7 @@ export const aiService = {
       if (decision.action === 'create' && decision.newThemeTitle) {
         const newTheme = await wikiService.createTheme(
           decision.newThemeTitle,
-          'Initializing...'
+          'Initializing...',
         );
         targetThemeId = newTheme.id;
       }
@@ -88,64 +198,40 @@ export const aiService = {
   },
 
   /**
-   * Rebuilds the structured wiki pages from the user's freeform themes.
+   * Rebuilds the structured wiki pages from either freeform themes or, when
+   * needed, directly from the user's notes.
    */
-  refreshWikiSummaries: async (): Promise<void> => {
+  refreshWikiOnDemand: async (notes: Note[]): Promise<WikiRefreshResult> => {
     const userThemes = await wikiService.getUserThemes();
-    if (userThemes.length === 0) return;
 
-    const allThemeContent = userThemes
-      .map((theme) => `## ${theme.title}\n${theme.content}`)
-      .join('\n\n---\n\n');
-
-    const pageConfigs: { pageType: WikiPageType; title: string; instruction: string }[] = [
-      {
-        pageType: 'mood_patterns',
-        title: 'Mood Patterns',
-        instruction: `Extract and synthesise the recurring emotional states and triggers visible across all life themes.
-Focus on: what emotions come up repeatedly, what situations tend to cause them, and any shifts over time.
-Format: short paragraphs + bullet points. Max 300 words.`,
-      },
-      {
-        pageType: 'recurring_themes',
-        title: 'Recurring Themes',
-        instruction: `Identify the topics and concerns this person keeps returning to across all their life themes.
-Focus on: what subjects appear repeatedly, which ones seem unresolved, which ones show growth.
-Format: short paragraphs + bullet points. Max 300 words.`,
-      },
-      {
-        pageType: 'self_model',
-        title: 'Self Model',
-        instruction: `Build a concise picture of how this person sees themselves — their values, beliefs, and identity as revealed through their writing.
-Focus on: how they describe themselves, what they care about, and any contradictions in self-perception.
-Format: short paragraphs. Max 300 words. Write in third person ("They...").`,
-      },
-      {
-        pageType: 'timeline',
-        title: 'Timeline',
-        instruction: `Extract the key moments, turning points, and shifts mentioned across all life themes.
-List them chronologically where possible.
-Format: bullet list, each item with approximate context. Max 300 words.`,
-      },
-    ];
-
-    for (const config of pageConfigs) {
-      try {
-        const content = await aiClient.requestText('wikiPage', {
-          title: config.title,
-          instruction: config.instruction,
-          allThemeContent,
-        });
-
-        if (content) {
-          await wikiService.upsertWikiPage(config.pageType, config.title, content.trim());
-        }
-      } catch (error) {
-        console.error(`[aiService] Failed to refresh wiki page: ${config.pageType}`, error);
-      }
+    if (userThemes.length > 0) {
+      const pageCount = await refreshStructuredWikiPages(buildThemeCorpus(userThemes));
+      return {
+        pageCount,
+        source: pageCount > 0 ? 'themes' : 'none',
+      };
     }
 
-    await aiService._rebuildIndex();
+    const notesCorpus = buildNotesCorpus(notes);
+    if (!notesCorpus.trim()) {
+      return {
+        pageCount: 0,
+        source: 'none',
+      };
+    }
+
+    const pageCount = await refreshStructuredWikiPages(notesCorpus);
+    return {
+      pageCount,
+      source: pageCount > 0 ? 'notes' : 'none',
+    };
+  },
+
+  /**
+   * Preserves the older theme-first API for any existing callers.
+   */
+  refreshWikiSummaries: async (): Promise<void> => {
+    await aiService.refreshWikiOnDemand([]);
   },
 
   /**

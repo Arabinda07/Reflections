@@ -168,6 +168,7 @@ export const CreateNote: React.FC = () => {
   const isMobile = useMediaQuery('(max-width: 1023px)');
   const [isFocused, setIsFocused] = useState(false);
   const [isTitleFocused, setIsTitleFocused] = useState(false);
+  const [isFocusModeEnabled, setIsFocusModeEnabled] = useState(false);
   const [isFlowing, setIsFlowing] = useState(false);
   const [isBreathing, setIsBreathing] = useState(true); 
   const [isMobileOptionsOpen, setIsMobileOptionsOpen] = useState(false);
@@ -243,12 +244,17 @@ export const CreateNote: React.FC = () => {
       const timer = setTimeout(() => {
         if (!isUnmounted.current) {
           setIsBreathing(false);
-          editorInstanceRef.current?.focus();
         }
       }, 3200); 
       return () => clearTimeout(timer);
     }
   }, [loading, isBreathing]);
+
+  useEffect(() => {
+    if (isFocusModeEnabled) return;
+    if (flowTimeoutRef.current) clearTimeout(flowTimeoutRef.current);
+    if (isFlowing) setIsFlowing(false);
+  }, [isFlowing, isFocusModeEnabled]);
 
   // Flow Logic (Zen Mode)
   useEffect(() => {
@@ -257,6 +263,7 @@ export const CreateNote: React.FC = () => {
       if (isFlowing) setIsFlowing(false);
     };
     const handleKeydown = (e: KeyboardEvent) => {
+      if (!isFocusModeEnabled) return;
       if (!isFocused && !isTitleFocused) return;
       if (e.key === 'Escape') return handleWake();
       if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') {
@@ -270,6 +277,7 @@ export const CreateNote: React.FC = () => {
         }
       }
     };
+    if (!isFocusModeEnabled) return;
     window.addEventListener('keydown', handleKeydown);
     window.addEventListener('mousemove', handleWake);
     window.addEventListener('touchstart', handleWake, { passive: true });
@@ -278,7 +286,7 @@ export const CreateNote: React.FC = () => {
       window.removeEventListener('mousemove', handleWake);
       window.removeEventListener('touchstart', handleWake);
     };
-  }, [isFocused, isTitleFocused, isFlowing, isMobile]);
+  }, [isFocusModeEnabled, isFocused, isTitleFocused, isFlowing, isMobile]);
 
   useEffect(() => {
     const fetchNote = async () => {
@@ -540,7 +548,7 @@ export const CreateNote: React.FC = () => {
   const hasContent = Boolean(currentDraftSnapshot.content);
   const wordCount = currentDraftSnapshot.content.replace(/<[^>]*>/g, '').trim().split(/\s+/).filter(Boolean).length;
   const canReflect = wordCount >= 100;
-  const isDimmed = isFlowing && !isTitleFocused;
+  const isFocusModeActive = isFocusModeEnabled && isFlowing && !isTitleFocused;
   const showEntryExperience = loading || isBreathing;
   const handleStayOnDraft = () => {
     setShowLeaveDialog(false);
@@ -585,15 +593,29 @@ export const CreateNote: React.FC = () => {
       {isMobile && (
         <button 
           onClick={() => navigate(RoutePath.NOTES)}
-          className={`surface-floating fixed left-4 top-4 z-[80] flex h-10 w-10 items-center justify-center rounded-[var(--radius-control)] transition-all hover:text-green ${isDimmed ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
+          className={`surface-floating fixed left-4 top-4 z-[80] flex h-10 w-10 items-center justify-center rounded-[var(--radius-control)] transition-all hover:text-green ${isFocusModeActive ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
         >
           <ArrowLeft size={18} weight="bold" />
         </button>
       )}
 
+      {isFocusModeActive ? (
+        <button
+          type="button"
+          onClick={() => {
+            setIsFlowing(false);
+            setIsFocusModeEnabled(false);
+          }}
+          className="surface-floating fixed right-4 top-4 z-[85] inline-flex items-center gap-2 rounded-full px-4 py-2 text-[11px] font-black uppercase tracking-[0.18em] text-green hover:text-green"
+        >
+          <X size={12} weight="bold" />
+          Exit focus
+        </button>
+      ) : null}
+
       {/* ── Desktop Sidebar ── */}
       {!isMobile && (
-        <aside className={`w-[240px] border-r-2 border-border flex flex-col min-h-0 bg-white/50 dark:bg-panel-bg z-40 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isDimmed ? '-translate-x-full opacity-0' : 'translate-x-0 opacity-100'}`}>
+        <aside className={`w-[240px] border-r-2 border-border flex flex-col min-h-0 bg-white/50 dark:bg-panel-bg z-40 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isFocusModeActive ? '-translate-x-full opacity-0' : 'translate-x-0 opacity-100'}`}>
           <div className="pt-8 px-6 pb-6 flex-1 overflow-y-auto custom-scrollbar space-y-4">
             
             {/* Desktop Back Button */}
@@ -656,7 +678,7 @@ export const CreateNote: React.FC = () => {
 
       {/* ── Main Canvas ── */}
       <main className="flex-1 w-full relative pt-24 pb-40 px-6 sm:px-12 md:px-20">
-        <div className={`max-w-[800px] mx-auto transition-[opacity,transform] duration-1000 ease-[cubic-bezier(0.32,0.72,0,1)] ${isDimmed ? 'opacity-40 scale-[0.98]' : 'opacity-100'}`}>
+        <div className="max-w-[800px] mx-auto">
           
           {/* Cover Image */}
           {imagePreview && (
@@ -672,13 +694,33 @@ export const CreateNote: React.FC = () => {
           )}
 
           {/* Eyebrow Date */}
-          <div className="mb-6 flex items-center gap-2">
+          <div className="mb-6 flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-green/10 text-green px-3 py-1 text-[10px] uppercase tracking-[0.2em] font-bold flex items-center gap-2">
               <CalendarBlank size={12} weight="bold" />
               {new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'long', day: 'numeric' })}
             </span>
+            <button
+              type="button"
+              onClick={() => {
+                setIsFocusModeEnabled((current) => {
+                  const next = !current;
+                  if (!next) {
+                    setIsFlowing(false);
+                  }
+                  return next;
+                });
+              }}
+              className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] transition-colors ${
+                isFocusModeEnabled
+                  ? 'bg-green text-white'
+                  : 'bg-white/70 text-gray-text hover:bg-green/10 hover:text-green dark:bg-white/10'
+              }`}
+            >
+              <Target size={12} weight={isFocusModeEnabled ? 'fill' : 'bold'} />
+              Focus mode
+            </button>
             {canReflect && (
-               <button onClick={handleAiReflect} disabled={isReflecting} className="rounded-full bg-green/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-green transition-all hover:bg-green/20">
+               <button onClick={handleAiReflect} disabled={isReflecting} className="inline-flex items-center gap-2 rounded-full bg-green/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-green transition-all hover:bg-green/20">
                  {isReflecting ? <CircleNotch size={12} className="animate-spin" /> : <Brain size={12} weight="bold" />}
                  Reflect with AI
                </button>
@@ -719,7 +761,12 @@ export const CreateNote: React.FC = () => {
             ref={editorInstanceRef} 
             value={content} 
             onChange={setContent} 
-            onFocusChange={setIsFocused} 
+            onFocusChange={(nextIsFocused) => {
+              setIsFocused(nextIsFocused);
+              if (!nextIsFocused) {
+                setIsFlowing(false);
+              }
+            }}
             placeholder={activePlaceholder || "What's on your mind?"} 
             hideToolbar={isMobile}
             className="text-[20px] md:text-[22px] font-serif leading-[1.8] text-gray-text/90" 
@@ -729,7 +776,7 @@ export const CreateNote: React.FC = () => {
 
       {/* ── Floating Actions ── */}
       <div 
-        className={`fixed z-50 flex gap-4 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isDimmed ? 'opacity-0 translate-y-8' : 'opacity-100 translate-y-0'} ${isMobile ? 'left-6 right-6 justify-between' : 'flex-col'}`}
+        className={`fixed z-50 flex gap-4 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isFocusModeActive ? 'opacity-0 translate-y-8' : 'opacity-100 translate-y-0'} ${isMobile ? 'left-6 right-6 justify-between' : 'flex-col'}`}
         style={{ bottom: isMobile ? 'calc(2rem + env(safe-area-inset-bottom))' : '2.5rem', right: isMobile ? undefined : '2.5rem' }}
       >
         

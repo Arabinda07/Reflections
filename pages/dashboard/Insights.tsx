@@ -45,6 +45,12 @@ const DEFAULT_MOOD_TONE = {
 
 const TAG_TONE_CLASSES = ['text-green', 'text-blue', 'text-orange', 'text-gray-text'];
 
+type RefreshFeedback = {
+  variant: 'warning' | 'error';
+  title: string;
+  description: string;
+};
+
 export const Insights: React.FC = () => {
   const navigate = useNavigate();
   const [notes, setNotes] = useState<Note[]>([]);
@@ -52,6 +58,7 @@ export const Insights: React.FC = () => {
   const [selectedTheme, setSelectedTheme] = useState<LifeTheme | null>(null);
   const [access, setAccess] = useState<WellnessAccess | null>(null);
   const [isRefreshingWiki, setIsRefreshingWiki] = useState(false);
+  const [refreshFeedback, setRefreshFeedback] = useState<RefreshFeedback | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -82,9 +89,9 @@ export const Insights: React.FC = () => {
     if (!gate?.canGenerate) return;
 
     setIsRefreshingWiki(true);
+    setRefreshFeedback(null);
+    let claimedFreeRefresh = false;
     try {
-      let claimedFreeRefresh = false;
-
       if (access?.planTier !== 'pro') {
         claimedFreeRefresh = await profileService.incrementFreeWikiInsights();
 
@@ -95,12 +102,37 @@ export const Insights: React.FC = () => {
         }
       }
 
-      await aiService.refreshWikiSummaries();
-      const allThemes = await wikiService.getAllThemes();
-      const newAccess = await profileService.getWellnessAccess();
+      const refreshResult = await aiService.refreshWikiOnDemand(notes);
+
+      if (claimedFreeRefresh && (refreshResult.source === 'none' || refreshResult.pageCount === 0)) {
+        await profileService.releaseClaimedFreeWikiInsight();
+        claimedFreeRefresh = false;
+        setRefreshFeedback({
+          variant: 'warning',
+          title: 'Nothing could be built yet',
+          description: 'The Life Wiki did not find enough usable signal this time. Add a little more detail to your reflections and try again.',
+        });
+      }
+
+      const [allThemes, newAccess] = await Promise.all([
+        wikiService.getAllThemes(),
+        profileService.getWellnessAccess(),
+      ]);
       setThemes(allThemes);
       setAccess(newAccess);
     } catch (error) {
+      if (claimedFreeRefresh) {
+        await profileService.releaseClaimedFreeWikiInsight().catch((refundError) => {
+          console.error('[Insights] Failed to refund wiki refresh claim:', refundError);
+        });
+      }
+      const newAccess = await profileService.getWellnessAccess().catch(() => access);
+      setAccess(newAccess || null);
+      setRefreshFeedback({
+        variant: 'error',
+        title: 'Refresh failed',
+        description: "I couldn't refresh the Life Wiki just now. Please try again in a moment.",
+      });
       console.error('[Insights] Failed to refresh wiki:', error);
     } finally {
       setIsRefreshingWiki(false);
@@ -387,6 +419,15 @@ export const Insights: React.FC = () => {
                       See Pro options
                     </Button>
                   }
+                />
+              ) : null}
+
+              {refreshFeedback ? (
+                <Alert
+                  variant={refreshFeedback.variant}
+                  icon={<Warning size={20} weight="fill" />}
+                  title={refreshFeedback.title}
+                  description={refreshFeedback.description}
                 />
               ) : null}
 
