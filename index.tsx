@@ -1,26 +1,22 @@
-import * as Sentry from '@sentry/react';
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App';
+import "./src/instrument"; // ← MUST be first — Sentry init before any other code
 
-const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
-if (SENTRY_DSN) {
-  Sentry.init({
-    dsn: SENTRY_DSN,
-    environment: import.meta.env.MODE,
-    // Keep it lean — no performance tracing for v1
-    tracesSampleRate: 0,
-  });
-}
+import { reactErrorHandler } from "@sentry/react";
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import App from "./App";
 
-const rootElement = document.getElementById('root');
+const rootElement = document.getElementById("root");
 if (!rootElement) {
   throw new Error("Could not find root element to mount to");
 }
 
-const root = ReactDOM.createRoot(rootElement);
-root.render(
-  <React.StrictMode>
+createRoot(rootElement, {
+  // React 19 error handlers — route uncaught/caught/recoverable errors to Sentry
+  onUncaughtError: reactErrorHandler(),
+  onCaughtError: reactErrorHandler(),
+  onRecoverableError: reactErrorHandler(),
+}).render(
+  <StrictMode>
     <App />
-  </React.StrictMode>
+  </StrictMode>
 );

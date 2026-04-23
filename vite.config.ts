@@ -2,6 +2,7 @@ import path from 'path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { sentryVitePlugin } from '@sentry/vite-plugin';
 
 const vendorChunk = (id: string) => {
   if (!id.includes('node_modules')) return undefined;
@@ -16,6 +17,7 @@ const vendorChunk = (id: string) => {
   if (id.includes('motion') || id.includes('@lottiefiles/dotlottie-react')) return 'vendor-motion';
   if (id.includes('@phosphor-icons')) return 'vendor-icons';
   if (id.includes('@google/genai') || id.includes('@splinetool/runtime')) return 'vendor-ai';
+  if (id.includes('@sentry')) return 'vendor-sentry';
 
   return 'vendor-react';
 };
@@ -131,9 +133,17 @@ export default defineConfig(({ mode }) => {
               },
             ],
           }
-        })
+        }),
+        // Source map upload — only runs when SENTRY_AUTH_TOKEN is set (CI/CD)
+        sentryVitePlugin({
+          org: process.env.SENTRY_ORG,
+          project: process.env.SENTRY_PROJECT,
+          authToken: process.env.SENTRY_AUTH_TOKEN,
+          disable: !process.env.SENTRY_AUTH_TOKEN,
+        }),
       ],
       build: {
+        sourcemap: 'hidden',
         rollupOptions: {
           output: {
             manualChunks: vendorChunk,
