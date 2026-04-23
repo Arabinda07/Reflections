@@ -76,10 +76,10 @@ export const HomeAuthenticated: React.FC = () => {
           ];
       }
 
-      window.setTimeout(() => {
-        setDailyPrompt(nextPrompt);
+      setDailyPrompt(nextPrompt);
+      window.requestAnimationFrame(() => {
         setIsRefreshing(false);
-      }, 600);
+      });
     },
     [dailyPrompt, isRefreshing],
   );
@@ -193,7 +193,7 @@ export const HomeAuthenticated: React.FC = () => {
             >
               <h1 className="h1-hero hero-ink mb-12">
                 Welcome back, <br />
-                <span className="font-serif italic text-green drop-shadow-none">
+                <span className="font-serif italic hero-ink-accent">
                   {user?.name?.split(' ')[0] || 'Reflector'}
                 </span>
               </h1>

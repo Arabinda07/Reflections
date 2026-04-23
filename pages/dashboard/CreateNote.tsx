@@ -43,6 +43,7 @@ import { supabase } from '../../src/supabaseClient';
 import { CompanionObservation } from '../../components/ui/CompanionObservation';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { PaperPlaneToast } from '../../components/ui/PaperPlaneToast';
+import { InlineLoadingBadge } from '../../components/ui/InlineLoadingBadge';
 import { observationService } from '../../services/observationService';
 import { DEFAULT_WELLNESS_PROMPTS, getCurrentWellnessPrompt, getNextWellnessPromptState } from '../../services/wellnessPrompts';
 import { aiClient } from '../../services/aiClient';
@@ -182,6 +183,7 @@ export const CreateNote: React.FC = () => {
   const [isWhispering, setIsWhispering] = useState(false);
   const [interimTranscript, setInterimTranscript] = useState('');
   const [whisperFeedback, setWhisperFeedback] = useState<string | null>(null);
+  const [pendingTrackId, setPendingTrackId] = useState<string | null>(null);
   const [showObservation, setShowObservation] = useState(false);
   const [observationText, setObservationText] = useState<string | null>(null);
   const [showPlane, setShowPlane] = useState(false);
@@ -483,6 +485,32 @@ export const CreateNote: React.FC = () => {
     setActivePlaceholder(nextState.prompt);
   };
 
+  const handleStopMusic = useCallback(() => {
+    setPendingTrackId(null);
+    stopMusic();
+  }, [stopMusic]);
+
+  const handleTrackSelect = useCallback(
+    async (track: (typeof AMBIENT_TRACKS)[number]) => {
+      if (pendingTrackId) return;
+
+      if (activeMusicTrack?.id === track.id) {
+        handleStopMusic();
+        return;
+      }
+
+      setPendingTrackId(track.id);
+      try {
+        await playMusicTrack(track);
+      } finally {
+        if (!isUnmounted.current) {
+          setPendingTrackId((current) => (current === track.id ? null : current));
+        }
+      }
+    },
+    [activeMusicTrack?.id, handleStopMusic, pendingTrackId, playMusicTrack],
+  );
+
   const toggleWhisper = () => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -720,9 +748,11 @@ export const CreateNote: React.FC = () => {
               Focus mode
             </button>
             {canReflect && (
-               <button onClick={handleAiReflect} disabled={isReflecting} className="inline-flex items-center gap-2 rounded-full bg-green/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-green transition-all hover:bg-green/20">
-                 {isReflecting ? <CircleNotch size={12} className="animate-spin" /> : <Brain size={12} weight="bold" />}
-                 Reflect with AI
+               <button onClick={handleAiReflect} disabled={isReflecting} className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-green/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-green transition-all hover:bg-green/20">
+                 <span className="inline-flex h-3 w-3 shrink-0 items-center justify-center">
+                   {isReflecting ? <CircleNotch size={12} className="animate-spin" /> : <Brain size={12} weight="bold" />}
+                 </span>
+                 <span className="leading-none">Reflect with AI</span>
                </button>
             )}
           </div>
@@ -975,23 +1005,30 @@ export const CreateNote: React.FC = () => {
             <button
               key={track.id}
               onClick={() => {
-                if (activeMusicTrack?.id === track.id) {
-                  stopMusic();
-                } else {
-                  playMusicTrack(track);
-                }
+                void handleTrackSelect(track);
               }}
-              className={`flex w-full items-center justify-between rounded-2xl border-2 p-4 text-left text-[14px] font-bold ${activeMusicTrack?.id === track.id ? 'border-green bg-green/10 text-green' : 'border-transparent text-gray-text hover:border-border hover:bg-green/5'}`}
+              disabled={pendingTrackId !== null && pendingTrackId !== track.id}
+              className={`flex w-full items-center justify-between rounded-2xl border-2 p-4 text-left text-[14px] font-bold transition-opacity ${activeMusicTrack?.id === track.id || pendingTrackId === track.id ? 'border-green bg-green/10 text-green' : 'border-transparent text-gray-text hover:border-border hover:bg-green/5'} ${pendingTrackId !== null && pendingTrackId !== track.id ? 'opacity-60' : ''}`}
             >
               <span className="flex items-center gap-3">
                 <span className="text-[18px]">{track.emoji}</span>
                 {track.label}
               </span>
-              {activeMusicTrack?.id === track.id && <CircleNotch size={16} className="animate-spin" />}
+
+              {pendingTrackId === track.id ? (
+                <InlineLoadingBadge label="Starting..." className="shrink-0" />
+              ) : null}
+
+              {activeMusicTrack?.id === track.id && pendingTrackId !== track.id ? (
+                <span className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-green">
+                  <Check size={14} weight="bold" />
+                  <span className="leading-none">Playing</span>
+                </span>
+              ) : null}
             </button>
           ))}
 
-          <button onClick={stopMusic} className="mt-2 w-full rounded-2xl border-2 border-transparent p-4 font-bold text-red transition-colors hover:bg-red/5">Stop All</button>
+          <button onClick={handleStopMusic} className="mt-2 w-full rounded-2xl border-2 border-transparent p-4 font-bold text-red transition-colors hover:bg-red/5">Stop All</button>
         </div>
       </ModalSheet>
 

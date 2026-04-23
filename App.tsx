@@ -10,14 +10,6 @@ import { RoutePath } from './types';
 import { useSync } from './hooks/useSync';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
-import { App as CapacitorApp } from '@capacitor/app';
-import { Capacitor } from '@capacitor/core';
-import {
-  consumeNativeGoogleOAuthCallback,
-  getPendingGoogleAuthPath,
-  redirectToAppRoute,
-  stashGoogleAuthError,
-} from './src/auth/googleOAuth';
 
 // Lazy load non-critical routes to reduce initial bundle size
 const SignIn = lazy(() => import('./pages/auth/SignIn').then(m => ({ default: m.SignIn })));
@@ -104,24 +96,9 @@ const router = createHashRouter(
   ),
 );
 
-// Wrapper to initialize hooks inside Context and handle preloading
+// Wrapper to initialize hooks inside Context
 const SyncWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   useSync();
-  
-  useEffect(() => {
-    // Optimistically preload critical routes after initial paint
-    const preloadRoutes = () => {
-      import('./pages/dashboard/CreateNote');
-      import('./pages/dashboard/FAQ');
-    };
-    
-    // Defer preloading until the main thread is idle
-    if (window.requestIdleCallback) {
-      window.requestIdleCallback(preloadRoutes);
-    } else {
-      setTimeout(preloadRoutes, 2000);
-    }
-  }, []);
 
   return <>{children}</>;
 };
@@ -129,43 +106,61 @@ const SyncWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 function App() {
   useEffect(() => {
     let isActive = true;
-    let nativeUrlListenerPromise: Promise<{ remove: () => Promise<void> }> | null = null;
+    let removeNativeUrlListener: (() => Promise<void>) | null = null;
     let lastHandledNativeUrl: string | null = null;
-
-    const handleNativeOAuthUrl = async (url: string) => {
-      if (!url || url === lastHandledNativeUrl) {
+    
+    const setupNativeOAuth = async () => {
+      const { Capacitor } = await import('@capacitor/core');
+      if (!isActive || !Capacitor.isNativePlatform()) {
         return;
       }
 
-      lastHandledNativeUrl = url;
-      const result = await consumeNativeGoogleOAuthCallback(url);
+      const [{ App: CapacitorApp }, googleOAuth] = await Promise.all([
+        import('@capacitor/app'),
+        import('./src/auth/googleOAuth'),
+      ]);
 
-      if (!isActive || !result.handled) {
+      if (!isActive) {
         return;
       }
 
-      if ('error' in result) {
-        stashGoogleAuthError(result.error);
-      }
+      const handleNativeOAuthUrl = async (url: string) => {
+        if (!url || url === lastHandledNativeUrl) {
+          return;
+        }
 
-      redirectToAppRoute(getPendingGoogleAuthPath() || RoutePath.LOGIN);
-    };
+        lastHandledNativeUrl = url;
+        const result = await googleOAuth.consumeNativeGoogleOAuthCallback(url);
 
-    if (Capacitor.isNativePlatform()) {
-      nativeUrlListenerPromise = CapacitorApp.addListener('appUrlOpen', ({ url }) => {
+        if (!isActive || !result.handled) {
+          return;
+        }
+
+        if ('error' in result) {
+          googleOAuth.stashGoogleAuthError(result.error);
+        }
+
+        googleOAuth.redirectToAppRoute(
+          googleOAuth.getPendingGoogleAuthPath() || RoutePath.LOGIN,
+        );
+      };
+
+      const listener = await CapacitorApp.addListener('appUrlOpen', ({ url }) => {
         void handleNativeOAuthUrl(url);
       });
+      removeNativeUrlListener = () => listener.remove();
 
-      void CapacitorApp.getLaunchUrl().then((launchData) => {
-        if (launchData?.url) {
-          void handleNativeOAuthUrl(launchData.url);
-        }
-      });
-    }
+      const launchData = await CapacitorApp.getLaunchUrl();
+      if (launchData?.url) {
+        await handleNativeOAuthUrl(launchData.url);
+      }
+    };
+
+    void setupNativeOAuth();
 
     return () => {
       isActive = false;
-      void nativeUrlListenerPromise?.then((listener) => listener.remove());
+      void removeNativeUrlListener?.();
     };
   }, []);
 

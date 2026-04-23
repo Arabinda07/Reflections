@@ -314,6 +314,11 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
     text-shadow: var(--hero-shadow);
   }
 
+  .hero-ink-accent {
+    color: color-mix(in oklch, var(--hero-ink) 38%, var(--green) 62%);
+    text-shadow: var(--hero-shadow);
+  }
+
   .landing-nav-scrim {
     background: linear-gradient(
       to bottom,

@@ -6,6 +6,10 @@ import { VitePWA } from 'vite-plugin-pwa';
 const vendorChunk = (id: string) => {
   if (!id.includes('node_modules')) return undefined;
 
+  if (/[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/.test(id)) return 'vendor-core';
+  if (id.includes('react-router')) return 'vendor-routing';
+  if (id.includes('@capacitor')) return 'vendor-native';
+  if (id.includes('@vercel')) return 'vendor-observability';
   if (id.includes('react-calendar') || id.includes('date-fns')) return 'vendor-calendar';
   if (id.includes('quill')) return 'vendor-editor';
   if (id.includes('@supabase') || id.includes('dexie') || id.includes('idb-keyval')) return 'vendor-data';
