@@ -63,11 +63,6 @@ export const PrivacyPolicy: React.FC = () => {
         <SectionHeader
           title="Privacy"
           description="How we handle your data, how AI interacts with your writing, and how you stay in control."
-          icon={
-            <div className="icon-block icon-block-lg">
-              <Shield size={32} weight="duotone" />
-            </div>
-          }
         />
 
         <Surface variant="bezel">
