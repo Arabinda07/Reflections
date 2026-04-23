@@ -86,6 +86,23 @@ const buildNotesCorpus = (notes: Note[]) =>
     })
     .join('\n\n---\n\n');
 
+const getReflectionFallbackMessage = (error: unknown) => {
+  if (error instanceof Error) {
+    if (error.message.includes('GEMINI_API_KEY is not configured')) {
+      return "AI reflections aren't configured on this environment yet. Add GEMINI_API_KEY and try again.";
+    }
+
+    if (
+      error.message.includes('Unauthorized') ||
+      error.message.includes('User not authenticated')
+    ) {
+      return 'Your session expired before the reflection could run. Sign in again and try once more.';
+    }
+  }
+
+  return "I wasn't able to generate a reflection right now. Please try again.";
+};
+
 const refreshStructuredWikiPages = async (allThemeContent: string): Promise<number> => {
   let pageCount = 0;
 
@@ -181,10 +198,12 @@ export const aiService = {
    * wiki pages plus the note itself.
    */
   generateReflection: async (note: Note): Promise<string> => {
-    const wikiPages = await wikiService.getAllWikiPages();
-    const indexPage = await wikiService.getWikiPage('index');
-
     try {
+      const [wikiPages, indexPage] = await Promise.all([
+        wikiService.getAllWikiPages(),
+        wikiService.getWikiPage('index'),
+      ]);
+
       return await aiClient.requestText('reflection', {
         note,
         wikiPages,
@@ -193,7 +212,7 @@ export const aiService = {
       });
     } catch (error) {
       console.error('[aiService] Reflection error:', error);
-      return "I wasn't able to generate a reflection right now. Please try again.";
+      return getReflectionFallbackMessage(error);
     }
   },
 

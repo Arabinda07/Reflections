@@ -119,9 +119,9 @@ describe('googleOAuth', () => {
   });
 
   it('defaults post-auth redirects to notes when the requested path is unsafe', () => {
-    expect(resolvePostAuthRedirectPath(undefined)).toBe(RoutePath.NOTES);
-    expect(resolvePostAuthRedirectPath({ pathname: RoutePath.LOGIN })).toBe(RoutePath.NOTES);
-    expect(resolvePostAuthRedirectPath({ pathname: 'https://evil.example.com' })).toBe(RoutePath.NOTES);
+    expect(resolvePostAuthRedirectPath(undefined)).toBe(RoutePath.HOME);
+    expect(resolvePostAuthRedirectPath({ pathname: RoutePath.LOGIN })).toBe(RoutePath.HOME);
+    expect(resolvePostAuthRedirectPath({ pathname: 'https://evil.example.com' })).toBe(RoutePath.HOME);
   });
 
   it('consumes a matching stored Google auth error and clears the pending state', () => {

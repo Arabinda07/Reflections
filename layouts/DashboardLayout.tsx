@@ -371,6 +371,12 @@ export const DashboardLayout: React.FC = () => {
                 >
                   Privacy
                 </Link>
+                <Link 
+                  to={RoutePath.TERMS}
+                  className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-all"
+                >
+                  Terms
+                </Link>
               </nav>
 
               <div className="text-[11px] font-black uppercase tracking-widest text-gray-nav/40">

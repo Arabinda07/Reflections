@@ -18,13 +18,16 @@ type AiRequest = {
 const GEMINI_MODEL = 'gemini-3-flash-preview';
 const INGEST_MODEL = 'gemini-2.5-flash';
 const MAX_BODY_BYTES = 250_000;
-const SUPABASE_URL = 'https://keordfflghzaicfqsqio.supabase.co';
-const SUPABASE_PUBLIC_KEY = 'sb_publishable_UjYXWQ7PZe6kO1m8HUVdSA_8GeD3KNj';
+const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLIC_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const getGemini = () => {
-  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY;
+  const apiKey =
+    process.env.GEMINI_API_KEY ||
+    process.env.GOOGLE_GEMINI_API_KEY ||
+    process.env.VITE_GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error('GEMINI_API_KEY is not configured');
   }

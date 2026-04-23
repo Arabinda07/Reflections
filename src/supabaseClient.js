@@ -1,10 +1,16 @@
 import { createClient } from "@supabase/supabase-js";
 
-// PASTE YOUR SUPABASE URL AND PUBLIC KEY HERE
-const SUPABASE_URL = "https://keordfflghzaicfqsqio.supabase.co";
-const SUPABASE_PUBLIC_KEY = "sb_publishable_UjYXWQ7PZe6kO1m8HUVdSA_8GeD3KNj";
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLIC_KEY, {
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  throw new Error(
+    "Missing Supabase environment variables. " +
+    "Copy .env.example to .env and fill in your project credentials."
+  );
+}
+
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
     flowType: "pkce",
     detectSessionInUrl: true,

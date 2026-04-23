@@ -18,10 +18,10 @@ android {
     }
     signingConfigs {
         release {
-            storeFile file("C:/Users/Arabinda/Keystores/reflections-release.jks")
-            storePassword "Reflections@2026"
-            keyAlias "reflections"
-            keyPassword "Reflections@2026"
+            storeFile file(findProperty("REFLECTIONS_STORE_FILE") ?: "")
+            storePassword findProperty("REFLECTIONS_STORE_PASSWORD") ?: ""
+            keyAlias findProperty("REFLECTIONS_KEY_ALIAS") ?: ""
+            keyPassword findProperty("REFLECTIONS_KEY_PASSWORD") ?: ""
         }
     }
     buildTypes {

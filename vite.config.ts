@@ -68,7 +68,7 @@ export default defineConfig(({ mode }) => {
                 name: 'New Entry',
                 short_name: 'Write',
                 description: 'Start a new journal entry',
-                url: '/#/create-note',
+                url: '/#/notes/new',
                 icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }]
               }
             ]

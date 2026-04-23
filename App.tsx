@@ -22,6 +22,7 @@ const Account = lazy(() => import('./pages/dashboard/Account').then(m => ({ defa
 const Insights = lazy(() => import('./pages/dashboard/Insights').then(m => ({ default: m.Insights })));
 const FAQ = lazy(() => import('./pages/dashboard/FAQ').then(m => ({ default: m.FAQ })));
 const PrivacyPolicy = lazy(() => import('./pages/dashboard/PrivacyPolicy').then(m => ({ default: m.PrivacyPolicy })));
+const TermsOfService = lazy(() => import('./pages/dashboard/TermsOfService').then(m => ({ default: m.TermsOfService })));
 const NotFound = lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })));
 
 // Loading fallback for Suspense
@@ -37,6 +38,7 @@ const router = createHashRouter(
       <Route path={RoutePath.HOME} element={<Home />} />
       <Route path={RoutePath.FAQ} element={<FAQ />} />
       <Route path={RoutePath.PRIVACY} element={<PrivacyPolicy />} />
+      <Route path={RoutePath.TERMS} element={<TermsOfService />} />
 
       <Route path={RoutePath.LOGIN} element={<SignIn />} />
       <Route path={RoutePath.SIGNUP} element={<SignUp />} />

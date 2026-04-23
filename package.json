@@ -1,7 +1,7 @@
 {
   "name": "reflections-by-arabinda",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -23,6 +23,7 @@
     "@google/genai": "^1.49.0",
     "@lottiefiles/dotlottie-react": "^0.19.0",
     "@phosphor-icons/react": "^2.1.10",
+    "@sentry/react": "^10.49.0",
     "@splinetool/runtime": "^1.12.81",
     "@supabase/supabase-js": "2.39.3",
     "@vercel/analytics": "^2.0.1",

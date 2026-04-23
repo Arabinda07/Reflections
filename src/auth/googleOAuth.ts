@@ -41,14 +41,14 @@ const parseAuthParams = (urlString: string) => {
     };
 };
 
-export const getGoogleOAuthRedirectTo = () => {
+export const getGoogleOAuthRedirectTo = (sourcePath: GoogleAuthSourcePath) => {
   if (!hasWindow()) {
     return NATIVE_GOOGLE_AUTH_REDIRECT_URL;
   }
 
   return Capacitor.isNativePlatform()
     ? NATIVE_GOOGLE_AUTH_REDIRECT_URL
-    : `${window.location.origin}/`;
+    : `${window.location.origin}/#${sourcePath}`;
 };
 
 export const resolvePostAuthRedirectPath = (value?: unknown) => {
@@ -204,9 +204,7 @@ const launchGoogleOAuth = async (sourcePath: GoogleAuthSourcePath) => {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: Capacitor.isNativePlatform()
-        ? getGoogleOAuthRedirectTo()
-        : `${window.location.origin}/`,
+      redirectTo: getGoogleOAuthRedirectTo(sourcePath),
     },
   });
 

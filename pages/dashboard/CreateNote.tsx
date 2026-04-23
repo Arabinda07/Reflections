@@ -46,7 +46,7 @@ import { PaperPlaneToast } from '../../components/ui/PaperPlaneToast';
 import { InlineLoadingBadge } from '../../components/ui/InlineLoadingBadge';
 import { observationService } from '../../services/observationService';
 import { DEFAULT_WELLNESS_PROMPTS, getCurrentWellnessPrompt, getNextWellnessPromptState } from '../../services/wellnessPrompts';
-import { aiClient } from '../../services/aiClient';
+import { aiService } from '../../services/aiService';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { getOrderedTasks, getTaskDrawerTriggerLabel } from './createNoteTasks';
 import {
@@ -558,15 +558,20 @@ export const CreateNote: React.FC = () => {
     setIsReflecting(true);
     setAiReflection(null);
     try {
-      const pastNotes = await noteService.getAll();
-      const reflection = await aiClient.requestText('reflection', {
-        note: { title, content, mood, createdAt: new Date().toISOString() },
-        recentNotes: pastNotes.filter(n => n.id !== id).slice(0, 5).map(n => ({ title: n.title, mood: n.mood, content: n.content })),
-        wikiPages: [],
-        indexPage: null,
+      const now = new Date().toISOString();
+      const reflection = await aiService.generateReflection({
+        id: id || 'draft-reflection-preview',
+        title,
+        content,
+        mood,
+        createdAt: now,
+        updatedAt: now,
+        tags,
+        tasks,
+        attachments: [],
       });
       if (!isUnmounted.current) setAiReflection(reflection || "I'm here with you.");
-    } catch (error) {
+    } catch {
       setAiReflection("I couldn't reflect on that right now. Try again in a moment.");
     } finally {
       if (!isUnmounted.current) setIsReflecting(false);

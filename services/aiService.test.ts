@@ -14,6 +14,7 @@ vi.mock('./wikiService', () => ({
   wikiService: {
     getUserThemes: vi.fn(),
     getAllWikiPages: vi.fn(),
+    getWikiPage: vi.fn(),
     upsertWikiPage: vi.fn(),
   },
 }));
@@ -48,6 +49,7 @@ describe('aiService.refreshWikiOnDemand', () => {
     vi.clearAllMocks();
 
     vi.mocked(wikiService.getAllWikiPages).mockResolvedValue([]);
+    vi.mocked(wikiService.getWikiPage).mockResolvedValue(null);
     vi.mocked(wikiService.upsertWikiPage).mockImplementation(async (pageType, title, content) =>
       baseTheme({
         id: `${pageType}-page`,
@@ -115,6 +117,26 @@ describe('aiService.refreshWikiOnDemand', () => {
       expect.objectContaining({
         allThemeContent: expect.not.stringContaining('<p>'),
       }),
+    );
+  });
+});
+
+describe('aiService.generateReflection', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(wikiService.getAllWikiPages).mockResolvedValue([]);
+    vi.mocked(wikiService.getWikiPage).mockResolvedValue(null);
+  });
+
+  it('returns a setup hint when the Gemini key is missing', async () => {
+    vi.mocked(aiClient.requestText).mockRejectedValueOnce(
+      new Error('GEMINI_API_KEY is not configured'),
+    );
+
+    const result = await aiService.generateReflection(baseNote());
+
+    expect(result).toBe(
+      "AI reflections aren't configured on this environment yet. Add GEMINI_API_KEY and try again.",
     );
   });
 });
