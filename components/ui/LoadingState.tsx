@@ -1,5 +1,6 @@
 import React from 'react';
-import { CircleNotch } from '@phosphor-icons/react';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import loadingAnimation from '@/src/lottie/loading.json';
 import { OverlayFeedback } from './OverlayFeedback';
 
 interface LoadingStateProps {
@@ -14,12 +15,12 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
   return (
     <OverlayFeedback isVisible={isVisible} overlayClassName="overlay-feedback--screen">
       <div className="flex flex-col items-center justify-center text-center">
-        <div className="flex h-20 w-20 items-center justify-center rounded-[2rem] border border-border bg-[rgba(var(--panel-bg-rgb),0.94)] shadow-[0_24px_48px_-32px_rgba(0,0,0,0.35)]">
-          <CircleNotch size={28} className="animate-spin text-green" weight="bold" />
+        <div className="flex h-48 w-48 items-center justify-center">
+          <DotLottieReact data={loadingAnimation} autoplay loop />
         </div>
 
-        <div className="overlay-feedback-copy mt-5">
-          <p className="overlay-feedback-message">{message}</p>
+        <div className="overlay-feedback-copy -mt-1">
+          <p className="body-editorial max-w-sm">{message}</p>
         </div>
       </div>
     </OverlayFeedback>

@@ -6,6 +6,7 @@ import 'quill/dist/quill.snow.css';
 interface EditorProps {
   value: string;
   onChange: (value: string) => void;
+  onFocusChange?: (isFocused: boolean) => void;
   placeholder?: string;
   className?: string;
   hideToolbar?: boolean;
@@ -17,7 +18,7 @@ export interface EditorRef {
 
 // Quill is now imported locally
 
-export const Editor = forwardRef<EditorRef, EditorProps>(({ value, onChange, placeholder, className = '', hideToolbar = false }, ref) => {
+export const Editor = forwardRef<EditorRef, EditorProps>(({ value, onChange, onFocusChange, placeholder, className = '', hideToolbar = false }, ref) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const quillInstance = useRef<any>(null);
 
@@ -53,15 +54,26 @@ export const Editor = forwardRef<EditorRef, EditorProps>(({ value, onChange, pla
       });
 
       // Handle changes
-      quillInstance.current.on('text-change', () => {
+      const handleTextChange = () => {
         const html = quillInstance.current.root.innerHTML;
         onChange(html === '<p><br></p>' ? '' : html);
-      });
+      };
+      const handleSelectionChange = (range: unknown) => {
+        onFocusChange?.(Boolean(range));
+      };
+
+      quillInstance.current.on('text-change', handleTextChange);
+      quillInstance.current.on('selection-change', handleSelectionChange);
       
       // Initial value
       if (value) {
          quillInstance.current.root.innerHTML = value;
       }
+
+      return () => {
+        quillInstance.current?.off('text-change', handleTextChange);
+        quillInstance.current?.off('selection-change', handleSelectionChange);
+      };
     }
   }, []);
 

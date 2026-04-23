@@ -120,6 +120,9 @@ export const DashboardLayout: React.FC = () => {
     location.pathname.includes('/edit') ||
     (location.pathname.startsWith('/notes/') && location.pathname !== '/notes/');
   const isLandingRoute = location.pathname === RoutePath.HOME && !isAuthenticated;
+  const landingControlClass = isLandingRoute
+    ? 'surface-floating surface-floating--media'
+    : 'text-gray-nav hover:text-green hover:bg-green/5';
 
   return (
     <div className="relative flex h-[100dvh] flex-col overflow-hidden bg-body font-sans selection:bg-green/30 selection:text-green transition-colors duration-300">
@@ -132,7 +135,7 @@ export const DashboardLayout: React.FC = () => {
 
       {/* Navbar — flex-none keeps it outside the scroll container, no sticky needed */}
       {!isWritingRoute && (
-        <nav className={`z-[100] flex-none flex justify-center transition-colors duration-500 ${isLandingRoute ? 'fixed left-0 right-0 top-0 bg-transparent pt-[env(safe-area-inset-top)]' : 'bg-[rgba(var(--panel-bg-rgb),0.92)] backdrop-blur-xl border-b border-border pt-[env(safe-area-inset-top)]'}`}>
+        <nav className={`z-[100] flex-none flex justify-center transition-colors duration-500 ${isLandingRoute ? 'landing-nav-scrim fixed left-0 right-0 top-0 pt-[env(safe-area-inset-top)]' : 'bg-[rgba(var(--panel-bg-rgb),0.92)] backdrop-blur-xl border-b border-border pt-[env(safe-area-inset-top)]'}`}>
         <div className="w-full max-w-[1440px] px-4 md:px-10 h-14 flex items-center justify-between">
           {/* Left Side */}
           <div className="flex items-center gap-4">
@@ -154,7 +157,7 @@ export const DashboardLayout: React.FC = () => {
           <div className="hidden md:flex items-center gap-2">
             <button 
               onClick={toggleDarkMode}
-              className="p-2 rounded-xl text-gray-nav hover:text-green hover:bg-green/5 transition-colors"
+              className={`p-2 rounded-xl transition-colors ${landingControlClass}`}
               title="Toggle Dark Mode"
             >
               {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
@@ -205,14 +208,14 @@ export const DashboardLayout: React.FC = () => {
           <div className="md:hidden flex items-center gap-2">
             <button 
               onClick={toggleDarkMode}
-              className="p-2 rounded-xl text-gray-nav hover:text-green hover:bg-green/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+              className={`p-2 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green ${landingControlClass}`}
               title="Toggle Dark Mode"
             >
               {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
             </button>
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 rounded-xl text-gray-nav hover:text-green hover:bg-green/5 transition-colors z-[110] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+              className={`p-2 rounded-xl transition-colors z-[110] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green ${landingControlClass}`}
               aria-label="Toggle menu"
               aria-expanded={isMobileMenuOpen}
               aria-controls={mobileMenuId}

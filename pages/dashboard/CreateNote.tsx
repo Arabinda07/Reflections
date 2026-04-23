@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useBlocker } from 'react-router';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   ArrowLeft, 
@@ -29,7 +30,6 @@ import {
   Target,
   DotsThreeCircle,
 } from '@phosphor-icons/react';
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { Magnetic } from '../../components/ui/Magnetic';
 import { useAmbientAudio, AMBIENT_TRACKS } from '../../hooks/useAmbientAudio';
 import { Alert } from '../../components/ui/Alert';
@@ -42,7 +42,6 @@ import { RoutePath, NoteAttachment, Task } from '../../types';
 import { supabase } from '../../src/supabaseClient';
 import { CompanionObservation } from '../../components/ui/CompanionObservation';
 import { ModalSheet } from '../../components/ui/ModalSheet';
-import { OverlayFeedback } from '../../components/ui/OverlayFeedback';
 import { PaperPlaneToast } from '../../components/ui/PaperPlaneToast';
 import { observationService } from '../../services/observationService';
 import { DEFAULT_WELLNESS_PROMPTS, getCurrentWellnessPrompt, getNextWellnessPromptState } from '../../services/wellnessPrompts';
@@ -55,6 +54,7 @@ import {
   CREATE_NOTE_UNSUPPORTED_WHISPER_MESSAGE,
   hasUnsavedCreateNoteChanges,
 } from './createNoteDraftState';
+import trailLoadingAnimation from '@/src/lottie/trail-loading.json';
 
 const MOOD_CONFIG: Record<string, { nav: string, modal: string, icon: any }> = {
   happy: { nav: 'bg-golden/10 border-golden/20 text-golden', modal: 'border-golden bg-golden/10 text-golden', icon: Smiley },
@@ -541,6 +541,7 @@ export const CreateNote: React.FC = () => {
   const wordCount = currentDraftSnapshot.content.replace(/<[^>]*>/g, '').trim().split(/\s+/).filter(Boolean).length;
   const canReflect = wordCount >= 100;
   const isDimmed = isFlowing && !isTitleFocused;
+  const showEntryExperience = loading || isBreathing;
   const handleStayOnDraft = () => {
     setShowLeaveDialog(false);
     if (blocker.state === 'blocked') {
@@ -554,29 +555,30 @@ export const CreateNote: React.FC = () => {
     }
   };
 
+  if (showEntryExperience) {
+    return (
+      <div className="relative flex min-h-[100dvh] flex-1 items-center justify-center overflow-hidden bg-body px-6 text-center">
+        <div className="grain-overlay" />
+
+        <motion.div
+          initial={{ opacity: 0.72, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+          className="relative z-10 flex max-w-md flex-col items-center"
+        >
+          <div className="mb-8 h-48 w-48 max-w-full" aria-hidden="true">
+            <DotLottieReact data={trailLoadingAnimation} autoplay loop />
+          </div>
+
+          <h2 className="h2-section mb-4">Take a breath.</h2>
+          <p className="body-editorial max-w-sm">Let the noise settle before you start.</p>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative flex-1 flex min-h-0 bg-body transition-colors duration-700 ease-out-quart overflow-hidden">
-      <OverlayFeedback isVisible={loading || isBreathing} overlayClassName="overlay-feedback--screen">
-        <motion.div
-          initial={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.8, ease: 'easeInOut' }}
-          className="relative flex flex-col items-center justify-center px-6 text-center"
-        >
-          <motion.div
-            animate={{ opacity: [0.4, 0.7, 0.4] }}
-            transition={{ duration: 4, repeat: Infinity }}
-            className="absolute h-[400px] w-[400px] rounded-full bg-green/5 blur-3xl"
-          />
-          <div className="relative z-10">
-            <div className="mx-auto mb-12 h-48 w-48 opacity-80">
-              <DotLottieReact src="/assets/lottie/loading2.json" autoplay loop />
-            </div>
-            <h2 className="h2-section mb-4 animate-pulse">Take a breath.</h2>
-            <p className="body-editorial mx-auto max-w-sm">Let the noise settle before you start.</p>
-          </div>
-        </motion.div>
-      </OverlayFeedback>
       <div className="grain-overlay" />
 
       {/* ── Mobile Back Button ── */}
@@ -715,7 +717,7 @@ export const CreateNote: React.FC = () => {
 
           <Editor 
             ref={editorInstanceRef} 
-            content={content} 
+            value={content} 
             onChange={setContent} 
             onFocusChange={setIsFocused} 
             placeholder={activePlaceholder || "What's on your mind?"} 

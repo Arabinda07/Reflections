@@ -5,6 +5,7 @@ import { PWAInstallProvider } from './context/PWAInstallContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { DashboardLayout } from './layouts/DashboardLayout';
 import { Home } from './pages/dashboard/Home';
+import { RouteErrorBoundary } from './pages/RouteErrorBoundary';
 import { RoutePath } from './types';
 import { useSync } from './hooks/useSync';
 import { Analytics } from '@vercel/analytics/react';
@@ -40,7 +41,7 @@ const PageLoader = () => (
 
 const router = createHashRouter(
   createRoutesFromElements(
-    <Route element={<DashboardLayout />}>
+    <Route element={<DashboardLayout />} errorElement={<RouteErrorBoundary />}>
       <Route path={RoutePath.HOME} element={<Home />} />
       <Route path={RoutePath.FAQ} element={<FAQ />} />
       <Route path={RoutePath.PRIVACY} element={<PrivacyPolicy />} />

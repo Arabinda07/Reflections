@@ -314,6 +314,17 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
     text-shadow: var(--hero-shadow);
   }
 
+  .landing-nav-scrim {
+    background: linear-gradient(
+      to bottom,
+      rgba(var(--panel-bg-rgb), 0.94) 0%,
+      rgba(var(--panel-bg-rgb), 0.72) 56%,
+      rgba(var(--panel-bg-rgb), 0) 100%
+    );
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
   .screen-scrim {
     background: var(--screen-scrim-soft);
     backdrop-filter: blur(20px);
@@ -370,8 +381,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 
   .video-mask--mobile {
     background:
-      linear-gradient(to bottom, var(--bg-color) 0%, rgba(var(--panel-bg-rgb), 0.92) 18%, transparent 46%),
-      linear-gradient(to right, var(--bg-color) 0%, rgba(var(--panel-bg-rgb), 0.78) 34%, transparent 72%);
+      linear-gradient(to bottom, rgba(var(--panel-bg-rgb), 0.96) 0%, rgba(var(--panel-bg-rgb), 0.84) 18%, rgba(var(--panel-bg-rgb), 0.24) 40%, transparent 60%),
+      linear-gradient(to right, rgba(var(--panel-bg-rgb), 0.94) 0%, rgba(var(--panel-bg-rgb), 0.72) 28%, rgba(var(--panel-bg-rgb), 0.18) 56%, transparent 76%),
+      linear-gradient(to top, rgba(var(--panel-bg-rgb), 0.56) 0%, transparent 24%);
   }
 
   .video-mask--desktop {

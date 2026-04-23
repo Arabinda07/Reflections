@@ -25,28 +25,29 @@ describe('remaining roadmap contract', () => {
     expect(notFound).not.toContain('head back to the sanctuary');
   });
 
-  it('removes staged delays and heavy inline lottie usage from the remaining hot paths', () => {
+  it('keeps intentional loading and feedback surfaces on the current lottie path', () => {
     const createNote = read('pages/dashboard/CreateNote.tsx');
     const loadingState = read('components/ui/LoadingState.tsx');
     const paperPlaneToast = read('components/ui/PaperPlaneToast.tsx');
     const companionObservation = read('components/ui/CompanionObservation.tsx');
     const notFound = read('pages/NotFound.tsx');
 
-    expect(createNote).not.toContain('3200');
-    expect(createNote).not.toContain('5000');
-    expect(createNote).not.toContain('visualFloor');
-    expect(createNote).not.toContain('nuclearTimer');
-    expect(createNote).not.toContain('DotLottieReact');
+    expect(createNote).toContain('DotLottieReact');
+    expect(createNote).toContain("from '@/src/lottie/trail-loading.json'");
 
-    expect(loadingState).not.toContain('DotLottieReact');
-    expect(paperPlaneToast).not.toContain('DotLottieReact');
-    expect(companionObservation).not.toContain('DotLottieReact');
+    expect(loadingState).toContain("from './OverlayFeedback'");
+    expect(loadingState).toContain('DotLottieReact');
+    expect(loadingState).toContain('loadingAnimation');
+    expect(paperPlaneToast).toContain('DotLottieReact');
+    expect(companionObservation).toContain('DotLottieReact');
     expect(notFound).not.toContain('DotLottieReact');
   });
 
-  it('simplifies the remaining drift-heavy library page state', () => {
+  it('keeps the library page on the shared loader and lazy calendar path', () => {
     const myNotes = read('pages/dashboard/MyNotes.tsx');
 
-    expect(myNotes).not.toContain('isContentVisible');
+    expect(myNotes).toContain('<LoadingState');
+    expect(myNotes).toContain('buildNotePreviewText');
+    expect(myNotes).toContain("import('./MyNotesCalendar')");
   });
 });

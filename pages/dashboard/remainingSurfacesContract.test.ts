@@ -17,7 +17,8 @@ describe('remaining surfaces source contract', () => {
 
     expect(myNotes).not.toContain("import ReactCalendar from 'react-calendar'");
     expect(myNotes).not.toContain("import 'react-calendar/dist/Calendar.css'");
-    expect(loadingState).not.toContain('DotLottieReact');
+    expect(loadingState).toContain('DotLottieReact');
+    expect(loadingState).toContain('loadingAnimation');
   });
 
   it('hardens the remaining note and account surfaces', () => {
