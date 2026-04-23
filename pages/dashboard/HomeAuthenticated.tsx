@@ -279,7 +279,7 @@ export const HomeAuthenticated: React.FC = () => {
                 </div>
                 <button
                   onClick={refreshPrompt}
-                  className={`p-2 text-gray-nav hover:text-green transition-colors ${
+                  className={`flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] text-gray-nav transition-colors hover:text-green ${
                     isRefreshing ? 'animate-spin' : ''
                   }`}
                   aria-label="Refresh daily focus prompt"

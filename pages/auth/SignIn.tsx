@@ -176,7 +176,7 @@ export const SignIn: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleForgotPassword}
-                  className="text-[13px] font-bold text-green hover:opacity-70"
+                  className="inline-flex min-h-11 items-center rounded-[var(--radius-control)] px-3 text-[13px] font-bold text-green hover:opacity-70"
                 >
                   Forgot password?
                 </button>

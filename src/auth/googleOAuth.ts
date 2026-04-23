@@ -5,7 +5,8 @@ import { supabase } from '../supabaseClient';
 const PENDING_GOOGLE_AUTH_PATH_KEY = 'reflections.pending-google-auth-path';
 const PENDING_GOOGLE_AUTH_REDIRECT_PATH_KEY = 'reflections.pending-google-auth-redirect-path';
 const GOOGLE_AUTH_ERROR_KEY = 'reflections.google-auth-error';
-const NATIVE_GOOGLE_AUTH_REDIRECT_URL = 'https://reflections-ebon.vercel.app/';
+// Native apps should return through an app link, not back into the public web origin.
+const NATIVE_GOOGLE_AUTH_REDIRECT_URL = 'com.arabinda.reflections://auth/callback';
 
 type GoogleAuthSourcePath = RoutePath.LOGIN | RoutePath.SIGNUP;
 

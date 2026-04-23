@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { Capacitor } from '@capacitor/core';
 import { RoutePath } from '../../types';
 import {
   consumeGoogleAuthError,
@@ -28,6 +29,7 @@ vi.mock('../supabaseClient', () => ({
 const mockSignInWithOAuth = vi.mocked(supabase.auth.signInWithOAuth);
 const mockExchangeCodeForSession = vi.mocked(supabase.auth.exchangeCodeForSession);
 const mockSetSession = vi.mocked(supabase.auth.setSession);
+const mockIsNativePlatform = vi.mocked(Capacitor.isNativePlatform);
 
 class SessionStorageMock {
   private readonly store = new Map<string, string>();
@@ -67,6 +69,7 @@ describe('googleOAuth', () => {
     vi.clearAllMocks();
 
     (globalThis as any).window = createWindow();
+    mockIsNativePlatform.mockReturnValue(false);
 
     mockSignInWithOAuth.mockResolvedValue({
       data: { url: 'https://accounts.google.com/o/oauth2/v2/auth' },
@@ -116,6 +119,22 @@ describe('googleOAuth', () => {
     expect(result).toBe('Google is unavailable right now.');
     expect(sessionStorage.getItem('reflections.pending-google-auth-path')).toBeNull();
     expect(sessionStorage.getItem('reflections.pending-google-auth-redirect-path')).toBeNull();
+  });
+
+  it('uses the native app callback when Google OAuth launches inside Capacitor', async () => {
+    mockIsNativePlatform.mockReturnValue(true);
+
+    await startGoogleOAuthFlow({
+      sourcePath: RoutePath.LOGIN,
+      redirectPath: RoutePath.NOTES,
+    });
+
+    expect(mockSignInWithOAuth).toHaveBeenCalledWith({
+      provider: 'google',
+      options: {
+        redirectTo: 'com.arabinda.reflections://auth/callback',
+      },
+    });
   });
 
   it('defaults post-auth redirects to notes when the requested path is unsafe', () => {
@@ -189,5 +208,14 @@ describe('googleOAuth', () => {
     });
     expect(mockExchangeCodeForSession).not.toHaveBeenCalled();
     expect(mockSetSession).not.toHaveBeenCalled();
+  });
+
+  it('accepts the app callback scheme when exchanging the native Google session', async () => {
+    const result = await consumeNativeGoogleOAuthCallback(
+      'com.arabinda.reflections://auth/callback?code=oauth-code',
+    );
+
+    expect(result).toEqual({ handled: true, success: true });
+    expect(mockExchangeCodeForSession).toHaveBeenCalledWith('oauth-code');
   });
 });

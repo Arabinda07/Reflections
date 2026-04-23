@@ -29,6 +29,16 @@
                 <data android:scheme="https" android:host="reflections-ebon.vercel.app" />
             </intent-filter>
 
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="com.arabinda.reflections"
+                    android:host="auth"
+                    android:pathPrefix="/callback" />
+            </intent-filter>
+
         </activity>
 
         <provider

@@ -130,12 +130,9 @@ export const DashboardLayout: React.FC = () => {
         Skip to content
       </a>
 
-      {/* Global Grain Texture */}
-      <div className="grain-overlay pointer-events-none" />
-
       {/* Navbar — flex-none keeps it outside the scroll container, no sticky needed */}
       {!isWritingRoute && (
-        <nav className={`z-[100] flex-none flex justify-center transition-colors duration-500 ${isLandingRoute ? 'landing-nav-scrim fixed left-0 right-0 top-0 pt-[env(safe-area-inset-top)]' : 'bg-[rgba(var(--panel-bg-rgb),0.92)] backdrop-blur-xl border-b border-border pt-[env(safe-area-inset-top)]'}`}>
+        <nav className={`z-[100] flex-none flex justify-center transition-colors duration-500 ${isLandingRoute ? 'landing-nav-scrim fixed left-0 right-0 top-0 pt-[env(safe-area-inset-top)]' : 'border-b border-border/80 bg-[rgba(var(--panel-bg-rgb),0.9)] pt-[env(safe-area-inset-top)]'}`}>
         <div className="w-full max-w-[1440px] px-4 md:px-10 h-14 flex items-center justify-between">
           {/* Left Side */}
           <div className="flex items-center gap-4">
@@ -350,7 +347,7 @@ export const DashboardLayout: React.FC = () => {
         
         {/* Global Footer - Positioned for full-width background with centered content */}
         {!isWritingRoute && (
-          <footer className="mt-auto w-full border-t border-border bg-[rgba(var(--panel-bg-rgb),0.72)] py-12 backdrop-blur-sm transition-all duration-300">
+          <footer className="mt-auto w-full border-t border-border bg-[rgba(var(--panel-bg-rgb),0.82)] py-12 transition-all duration-300">
             <div className="max-w-[1440px] mx-auto px-6 md:px-16 flex flex-col sm:flex-row items-center justify-between gap-8">
               <nav aria-label="Footer navigation" className="flex items-center gap-10">
                 <Link 

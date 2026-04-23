@@ -167,8 +167,8 @@ export const FAQ: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
             {/* Privacy Card - Large */}
-            <div className="md:col-span-8 bezel-outer group">
-              <div className="bezel-inner p-10 flex flex-col md:flex-row gap-10 items-center transition-colors duration-500 hover:bg-green/[0.02]">
+            <div className="md:col-span-8 surface-flat group overflow-hidden">
+              <div className="p-10 flex flex-col md:flex-row gap-10 items-center transition-colors duration-500 hover:bg-green/[0.02]">
                 <div className="w-20 h-20 rounded-[32px] bg-green/5 text-green flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 ease-out-expo">
                   <ShieldCheck size={40} weight="light" />
                 </div>
@@ -185,8 +185,8 @@ export const FAQ: React.FC = () => {
             </div>
 
             {/* Visual Patterns - Small */}
-            <div className="md:col-span-4 bezel-outer group">
-              <div className="bezel-inner p-10 flex flex-col justify-between transition-colors duration-500 hover:bg-green/[0.02]">
+            <div className="md:col-span-4 surface-flat group overflow-hidden">
+              <div className="p-10 flex flex-col justify-between transition-colors duration-500 hover:bg-green/[0.02]">
                 <Heart size={32} weight="light" className="text-green mb-10 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 origin-bottom-left ease-out-expo" />
                 <div>
                   <h4 className="text-[22px] font-display text-gray-text mb-3">Notice the rhythm</h4>
@@ -198,8 +198,8 @@ export const FAQ: React.FC = () => {
             </div>
 
             {/* Storage - Small */}
-            <div className="md:col-span-4 bezel-outer group">
-              <div className="bezel-inner p-10 flex flex-col justify-between transition-colors duration-500 hover:bg-green/[0.02]">
+            <div className="md:col-span-4 surface-flat group overflow-hidden">
+              <div className="p-10 flex flex-col justify-between transition-colors duration-500 hover:bg-green/[0.02]">
                 <Calendar size={32} weight="light" className="text-green mb-10 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 origin-bottom-left ease-out-expo" />
                 <div>
                   <h4 className="text-[22px] font-display text-gray-text mb-3">Keep what matters</h4>
@@ -211,8 +211,8 @@ export const FAQ: React.FC = () => {
             </div>
 
             {/* Guided Support - Large */}
-            <div className="md:col-span-8 bezel-outer group">
-              <div className="bezel-inner p-10 overflow-hidden relative transition-colors duration-500 hover:bg-green/[0.02]">
+            <div className="md:col-span-8 surface-flat group overflow-hidden">
+              <div className="relative overflow-hidden p-10 transition-colors duration-500 hover:bg-green/[0.02]">
                 {/* Decorative light leak */}
                 <div className="absolute top-0 right-0 w-64 h-64 bg-green/10 rounded-full blur-[80px] pointer-events-none transition-transform duration-1000 group-hover:scale-150" />
                 

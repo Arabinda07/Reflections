@@ -604,8 +604,6 @@ export const CreateNote: React.FC = () => {
   if (showEntryExperience) {
     return (
       <div className="relative flex min-h-[100dvh] flex-1 items-center justify-center overflow-hidden bg-body px-6 text-center">
-        <div className="grain-overlay" />
-
         <motion.div
           initial={{ opacity: 0.72, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -625,8 +623,6 @@ export const CreateNote: React.FC = () => {
 
   return (
     <div className="relative flex-1 flex min-h-0 bg-body transition-colors duration-700 ease-out-quart overflow-hidden">
-      <div className="grain-overlay" />
-
       {/* ── Mobile Back Button ── */}
       {isMobile && (
         <button 
@@ -720,7 +716,7 @@ export const CreateNote: React.FC = () => {
           
           {/* Cover Image */}
           {imagePreview && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative w-full aspect-[21/9] rounded-[2rem] overflow-hidden mb-12 bezel-outer group">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="surface-flat group relative mb-12 w-full aspect-[21/9] overflow-hidden rounded-[2rem]">
               <img src={imagePreview} alt="Cover" className="w-full h-full object-cover" />
               <button
                 onClick={() => setImagePreview(null)}

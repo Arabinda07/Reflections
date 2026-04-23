@@ -30,9 +30,6 @@ export const Landing: React.FC = () => {
 
   return (
     <div className="relative min-h-[100dvh] overflow-hidden selection:bg-green/20 selection:text-green bg-body text-gray-text transition-colors duration-300">
-      {/* Grain overlay utility */}
-      <div className="grain-overlay" />
-
       {/* Full-bleed layered container */}
       <div className="min-h-[100dvh] w-full relative">
 
@@ -61,7 +58,7 @@ export const Landing: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.5 }}
-              className="pointer-events-auto max-w-[33ch] font-serif text-[1rem] leading-[1.72] text-gray-text drop-shadow-[0_10px_30px_rgba(0,0,0,0.16)] sm:max-w-[38ch] sm:text-mk-body lg:max-w-[44ch]"
+              className="pointer-events-auto max-w-[33ch] font-serif text-[1rem] leading-[1.72] text-gray-text sm:max-w-[38ch] sm:text-mk-body lg:max-w-[44ch]"
             >
               A private, distraction-free environment designed to help you untangle your mind and find clarity in the noise.
             </motion.p>
@@ -84,7 +81,7 @@ export const Landing: React.FC = () => {
             <div className="flex flex-wrap items-center gap-x-6 gap-y-4 px-2 sm:justify-end sm:px-0">
               <button
                 onClick={() => navigate(RoutePath.LOGIN)}
-                className="text-[15px] font-medium text-gray-nav hover:text-gray-text transition-colors duration-300"
+                className="inline-flex min-h-11 items-center rounded-[var(--radius-control)] px-3 text-[15px] font-medium text-gray-nav transition-colors duration-300 hover:text-gray-text"
               >
                 Sign in
               </button>
@@ -93,7 +90,7 @@ export const Landing: React.FC = () => {
 
               <button
                 onClick={() => navigate(RoutePath.FAQ)}
-                className="label-caps hover:text-gray-text transition-colors duration-300"
+                className="label-caps inline-flex min-h-11 items-center rounded-[var(--radius-control)] px-3 transition-colors duration-300 hover:text-gray-text"
               >
                 How it works
               </button>
@@ -106,7 +103,7 @@ export const Landing: React.FC = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 1.2, duration: 0.5 }}
-                    className="flex items-center gap-1.5 label-caps hover:text-gray-text transition-colors duration-300"
+                    className="label-caps inline-flex min-h-11 items-center gap-1.5 rounded-[var(--radius-control)] px-3 transition-colors duration-300 hover:text-gray-text"
                   >
                     <DownloadSimple size={14} weight="light" />
                     Install app
