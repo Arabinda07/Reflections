@@ -243,7 +243,11 @@ export const MyNotes: React.FC = () => {
 
   return (
     <>
-      <LoadingState isVisible={loading} message="gathering your thoughts..." />
+      <LoadingState
+        isVisible={loading}
+        title="Gathering your thoughts..."
+        message="A moment while we prepare your reflection library."
+      />
 
       {isContentVisible ? (
         <PageContainer className="pb-14 pt-4 md:pt-8">

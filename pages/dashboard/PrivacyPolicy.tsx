@@ -9,42 +9,42 @@ import { Surface } from '../../components/ui/Surface';
 const sections = [
   {
     icon: <Database size={22} weight="duotone" />,
-    title: 'What we store',
+    title: 'What we keep',
     tone: 'green',
     body: [
-      'Your account identity includes your email address and the profile details you choose to add.',
-      'Your writing data includes notes, moods, tags, tasks, and attachments. Those stay tied to your authenticated account.',
-      'Storage runs on Supabase with row-level security so entries are scoped to you rather than exposed as shared application data.',
+      'We save your email address and any profile details you share.',
+      'Your reflections—including notes, moods, and attachments—are tied securely to your account.',
+      'Everything is stored using professional-grade security (Supabase RLS), meaning only you can access your data.',
     ],
   },
   {
     icon: <Lock size={22} weight="duotone" />,
-    title: 'How AI touches your writing',
+    title: 'How AI works here',
     tone: 'green',
     body: [
-      'AI features are used only when you ask for them, such as a reflection or a Life Wiki refresh.',
-      'We do not use your notes to train models. The product is designed to support your writing, not harvest it.',
-      'Generated insights are meant to stay private and personal, not become a marketing or advertising asset.',
+      'AI features only run when you explicitly ask for them, like when you want a summary or a prompt.',
+      'We do not use your personal notes to train AI models. Your thoughts are yours, not training data.',
+      'Any insights generated are private to you. We don\'t use them for marketing or tracking.',
     ],
   },
   {
     icon: <Shield size={22} weight="duotone" />,
-    title: 'Security posture',
+    title: 'Security',
     tone: 'green',
     body: [
-      'Data is encrypted in transit and at rest through the Supabase and cloud infrastructure underneath the product.',
-      'Row-level security is the core boundary: your reflections are scoped to your own authenticated session.',
-      'We continue tightening privacy and deletion tooling as the product matures, and we try to be explicit about what is live versus what is still manual.',
+      'Your data is encrypted while it moves and while it sits in our database.',
+      'We use "Row Level Security," which is a technical way of saying your notes are locked to your specific login.',
+      'As the app grows, we\'ll keep improving our privacy tools. We will always be clear about what we can and can\'t do.',
     ],
   },
   {
     icon: <Sparkle size={22} weight="duotone" />,
-    title: 'Your rights',
+    title: 'Your control',
     tone: 'green',
     body: [
-      'You can create, update, and delete your writing inside the app.',
-      'You can also remove saved writing and profile data from the account screen. Full sign-in account closure is still handled through the contact channel below.',
-      'If we make material privacy changes, we will update this page and communicate them in-product.',
+      'You can edit or delete your writing whenever you want.',
+      'If you want to close your account or delete everything at once, just reach out to us below.',
+      'If we ever change how we handle privacy, we\'ll tell you right away in the app.',
     ],
   },
 ];
@@ -61,8 +61,8 @@ export const PrivacyPolicy: React.FC = () => {
         </Button>
 
         <SectionHeader
-          title="How we handle your data"
-          description="What we store, how AI interacts with your writing, and what you can do about it."
+          title="Privacy"
+          description="How we handle your data, how AI interacts with your writing, and how you stay in control."
           icon={
             <div className="icon-block icon-block-lg">
               <Shield size={32} weight="duotone" />
@@ -73,7 +73,7 @@ export const PrivacyPolicy: React.FC = () => {
         <Surface variant="bezel">
           <div className="p-8 sm:p-10">
             <p className="text-[17px] font-medium text-gray-text leading-relaxed">
-              We do not think of your reflections as inventory. They are private writing, and the product is meant to help you return to them safely. That principle shapes how we store data, when AI is allowed to touch it, and how we talk about deletion and export when those flows are still evolving.
+              We don't think of your reflections as data points or inventory. They are your private thoughts, and our job is to keep them safe. This principle guides everything we build—from how we store your notes to how we integrate AI.
             </p>
           </div>
         </Surface>
@@ -102,11 +102,11 @@ export const PrivacyPolicy: React.FC = () => {
               <div className="icon-block icon-block-sm">
                 <Envelope size={20} weight="duotone" />
               </div>
-              <h2 className="text-[20px] font-display text-gray-text">Contact</h2>
+              <h2 className="text-[20px] font-display text-gray-text">Questions</h2>
             </div>
 
             <p className="text-[15px] font-medium leading-relaxed text-gray-light">
-              If you need help with data deletion, export, or privacy questions, email us directly:
+              If you have questions about your data or want to delete your account, email us directly:
             </p>
             <a
               href="mailto:robinsaha@gmail.com"

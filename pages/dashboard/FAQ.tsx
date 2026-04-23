@@ -95,8 +95,8 @@ export const FAQ: React.FC = () => {
         <section className="mb-48">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 mb-20">
             <div>
-              <h2 className="text-mk-h2 font-display text-gray-text mb-4">The journey</h2>
-              <p className="text-mk-body font-serif italic text-gray-light">A practice of healing, one reflection at a time.</p>
+              <h2 className="text-mk-h2 font-display text-gray-text mb-4">The practice</h2>
+              <p className="text-mk-body font-serif italic text-gray-light">A space to heal, one reflection at a time.</p>
             </div>
             <div className="h-[1px] flex-grow bg-border hidden lg:block mb-6 mx-12 opacity-50" />
           </div>
@@ -106,28 +106,28 @@ export const FAQ: React.FC = () => {
               {
                 icon: CloudSun,
                 title: "Morning or night",
-                desc: "Start your day with an intention or end it by clearing your head. Write whenever it fits your rhythm.",
+                desc: "Set an intention for the day or clear your head before sleep. Write whenever you find your rhythm.",
                 gridSpan: "md:col-span-8 lg:col-span-7",
                 color: "bg-green/5 text-green"
               },
               {
                 icon: PenNib,
                 title: "The daily spark",
-                desc: "Facing a blank page? Tap the spark for a gentle writing prompt whenever you want a nudge.",
+                desc: "If you're staring at a blank page, tap the spark. It's a gentle nudge to help you get started.",
                 gridSpan: "md:col-span-4 lg:col-span-5",
                 color: "bg-green/5 text-green"
               },
               {
                 icon: Tag,
-                title: "Focus on the flow",
-                desc: "Use Focus Mode to let the UI fade away. It’s just you and your thoughts.",
+                title: "Just you and the page",
+                desc: "Focus Mode lets the interface fade away. No distractions, just your thoughts.",
                 gridSpan: "md:col-span-5 lg:col-span-5",
                 color: "bg-green/5 text-green"
               },
               {
                 icon: Heart,
-                title: "Check your mood",
-                desc: "Name how you feel. It's the first step to understanding your own emotional patterns over time.",
+                title: "Naming the feeling",
+                desc: "Check in with your mood. It's how you start noticing the patterns in your emotional life.",
                 gridSpan: "md:col-span-7 lg:col-span-7",
                 color: "bg-green/5 text-green"
               }
@@ -157,9 +157,9 @@ export const FAQ: React.FC = () => {
         <section className="mb-48">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 mb-20">
             <div className="max-w-3xl">
-              <h2 className="text-mk-h2 font-display text-gray-text mb-6">The toolkit</h2>
+              <h2 className="text-mk-h2 font-display text-gray-text mb-6">The details</h2>
               <p className="text-mk-body font-serif italic text-gray-light">
-                Essential tools designed to support your journey. High-fidelity utility without the noise.
+                Tools built to support you without getting in the way.
               </p>
             </div>
             <div className="h-[1px] flex-grow bg-border hidden lg:block mb-6 mx-12 opacity-50" />
@@ -175,7 +175,7 @@ export const FAQ: React.FC = () => {
                 <div>
                   <h4 className="text-[28px] font-display text-gray-text mb-4">It's 100% private</h4>
                   <p className="text-mk-body font-serif text-gray-light mb-6">
-                    We can't read your notes. Your data is stored securely on Supabase and encrypted in your private writing space. You own your thoughts.
+                    We can't read your notes. They are stored securely and encrypted in your private space. You own your thoughts, period.
                   </p>
                   <div className="label-caps !text-green flex items-center gap-2">
                     <CheckCircle size={16} weight="fill" /> Secure & Offline-first
@@ -189,9 +189,9 @@ export const FAQ: React.FC = () => {
               <div className="bezel-inner p-10 flex flex-col justify-between transition-colors duration-500 hover:bg-green/[0.02]">
                 <Heart size={32} weight="light" className="text-green mb-10 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500 origin-bottom-left ease-out-expo" />
                 <div>
-                  <h4 className="text-[22px] font-display text-gray-text mb-3">Visual patterns</h4>
+                  <h4 className="text-[22px] font-display text-gray-text mb-3">Notice the rhythm</h4>
                   <p className="text-mk-body font-serif text-gray-light">
-                    Spot emotional rhythms over time with intuitive mood mapping.
+                    See how your feelings shift over time with simple mood mapping.
                   </p>
                 </div>
               </div>
@@ -202,9 +202,9 @@ export const FAQ: React.FC = () => {
               <div className="bezel-inner p-10 flex flex-col justify-between transition-colors duration-500 hover:bg-green/[0.02]">
                 <Calendar size={32} weight="light" className="text-green mb-10 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500 origin-bottom-left ease-out-expo" />
                 <div>
-                  <h4 className="text-[22px] font-display text-gray-text mb-3">Store what matters</h4>
+                  <h4 className="text-[22px] font-display text-gray-text mb-3">Keep what matters</h4>
                   <p className="text-mk-body font-serif text-gray-light">
-                    Infinite attachments for images, tasks, and reflections.
+                    Attach images, tasks, and notes as you need them.
                   </p>
                 </div>
               </div>
@@ -221,9 +221,9 @@ export const FAQ: React.FC = () => {
                     <Brain size={40} weight="light" />
                   </div>
                   <div>
-                    <h4 className="text-[28px] font-display text-gray-text mb-4">Optional reflection support</h4>
+                    <h4 className="text-[28px] font-display text-gray-text mb-4">Optional AI support</h4>
                     <p className="text-mk-body font-serif text-gray-light mb-8">
-                      When you choose it, Reflections can generate a reflection or refresh the Life Wiki. Nothing runs in the background, and your notes are not used to train models.
+                      If you want it, Reflections can help summarize patterns or refresh your Life Wiki. It never runs in the background, and we don't use your data to train models.
                     </p>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="p-4 rounded-2xl bg-white/5 border border-border">
@@ -244,12 +244,12 @@ export const FAQ: React.FC = () => {
         <section className="mb-24">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-16">
             {[
-              { icon: Headphones, title: 'Ambient sound', body: 'Generative sounds to quiet the room. Cross-fade between moods.' },
-              { icon: Microphone, title: 'Whisper mode', body: 'Speak your thoughts directly. Instant, private transcription.' },
-              { icon: Target, title: 'Writing sparks', body: 'Cycle through gentle prompts whenever you want help starting.' },
-              { icon: ImageIcon, title: 'Visual covers', body: 'Set the tone of your entries with atmospheric cinematic imagery.' },
-              { icon: Checks, title: 'Embedded tasks', body: 'Track intentions and follow-ups directly inside your prose.' },
-              { icon: Compass, title: 'Life Wiki refresh', body: 'Refresh a broader pattern summary only when you ask for it.' }
+              { icon: Headphones, title: 'Ambient sound', body: 'Soundscapes to help you focus. Quiet the room as you write.' },
+              { icon: Microphone, title: 'Whisper mode', body: 'Speak your thoughts. Fast, private transcription when you need it.' },
+              { icon: Target, title: 'Writing sparks', body: 'Gentle prompts for those days when you aren\'t sure where to start.' },
+              { icon: ImageIcon, title: 'Visual covers', body: 'Add atmospheric imagery to set the mood of your entries.' },
+              { icon: Checks, title: 'Embedded tasks', body: 'Keep track of follow-ups and intentions right inside your prose.' },
+              { icon: Compass, title: 'Life Wiki', body: 'A high-level summary of your world, updated only when you ask.' }
             ].map((item, i) => (
               <motion.div 
                 key={i}

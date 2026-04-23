@@ -38,10 +38,9 @@ export const CompanionObservation: React.FC<CompanionObservationProps> = ({
           transition={{ delay: 0.75, duration: 0.8 }}
           className="overlay-feedback-copy max-w-md"
         >
-          <span className="overlay-feedback-title">A gentle note</span>
-          <p className="text-[20px] md:text-[24px] font-display text-gray-text lowercase leading-relaxed tracking-tight">
-            {text}
-          </p>
+          <span className="label-caps mb-4 block">A gentle note</span>
+          <h2 className="h2-section mb-6 lowercase">{text}</h2>
+          <div className="overlay-feedback-divider mx-auto opacity-50" />
         </motion.div>
       </div>
     </OverlayFeedback>

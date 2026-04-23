@@ -75,7 +75,7 @@ export const Landing: React.FC = () => {
           >
             <button
               onClick={() => navigate(RoutePath.SIGNUP)}
-              className="group flex w-full items-center justify-center gap-3 rounded-[var(--radius-control)] border border-green/20 bg-green px-8 py-4 text-[16px] font-black text-white shadow-[0_18px_40px_-28px_rgba(22,163,74,0.45)] transition-all duration-300 hover:bg-green-hover sm:w-auto sm:justify-start sm:text-[18px]"
+              className="group flex w-fit items-center justify-start gap-3 rounded-[var(--radius-control)] border border-green/20 bg-green px-8 py-4 text-[16px] font-black text-white shadow-[0_18px_40px_-28px_rgba(22,163,74,0.45)] transition-all duration-300 hover:bg-green-hover sm:w-auto sm:justify-start sm:text-[18px]"
             >
               Begin writing
               <ArrowRight size={22} className="group-hover:translate-x-1.5 transition-transform duration-500 ease-out-expo" />
@@ -132,7 +132,7 @@ export const Landing: React.FC = () => {
             ref={videoRef}
             src="/assets/videos/landing_video.mp4"
             poster="/assets/videos/landing_video.png"
-            className="absolute inset-0 h-full w-full object-cover object-[70%_center] bg-body opacity-90 sm:object-[64%_center] lg:object-center"
+            className="absolute inset-0 h-full w-full object-cover object-[48%_center] bg-body opacity-90 sm:object-[64%_center] lg:object-center"
             autoPlay
             loop
             muted={isMuted}

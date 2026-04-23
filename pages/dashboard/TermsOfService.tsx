@@ -9,38 +9,38 @@ import { Surface } from '../../components/ui/Surface';
 const sections = [
   {
     icon: <Handshake size={22} weight="duotone" />,
-    title: 'What you agree to',
+    title: 'The basics',
     body: [
-      'By using Reflections you agree to these terms. If you do not agree, please do not create an account.',
-      'You must be at least 13 years old to use this service. If you are under 18, you confirm that a parent or guardian has reviewed these terms.',
-      'You are responsible for keeping your login credentials secure. We cannot recover accounts compromised by shared or leaked passwords.',
+      'By using Reflections, you agree to these terms. If they don\'t work for you, please don\'t create an account.',
+      'You must be at least 13 years old. If you\'re under 18, please make sure a parent or guardian has looked these over.',
+      'You are responsible for your login details. We can\'t recover accounts if a password was shared or leaked.',
     ],
   },
   {
     icon: <Shield size={22} weight="duotone" />,
-    title: 'Your content',
+    title: 'Your writing',
     body: [
-      'Everything you write in Reflections belongs to you. We do not claim ownership of your notes, moods, tags, or any other content you create.',
-      'You grant us a limited license to store, sync, and display your content back to you as part of the service. We will not share, sell, or use your content for any other purpose.',
-      'AI-generated reflections and insights are created for your personal use. They are not professional advice — medical, legal, or otherwise.',
+      'Everything you write in Reflections belongs to you. We don\'t claim ownership of your notes or any of your content.',
+      'You allow us to store and sync your content so we can show it back to you. We won\'t share, sell, or use it for anything else.',
+      'AI insights are for your personal use. They aren\'t professional medical or legal advice.',
     ],
   },
   {
     icon: <Warning size={22} weight="duotone" />,
-    title: 'Acceptable use',
+    title: 'Rules',
     body: [
-      'Do not use Reflections to store or transmit content that is illegal, harmful, or violates the rights of others.',
-      'Do not attempt to interfere with the service, reverse-engineer the application, or access other users\u2019 data.',
-      'We reserve the right to suspend accounts that violate these guidelines, though we will try to communicate before taking action.',
+      'Don\'t use Reflections for anything illegal or harmful.',
+      'Please don\'t try to break the service or access other people\'s data.',
+      'We might suspend accounts that violate these rules, but we\'ll try to talk to you first.',
     ],
   },
   {
     icon: <Sparkle size={22} weight="duotone" />,
-    title: 'Service and availability',
+    title: 'The service',
     body: [
-      'Reflections is provided as-is. We work to keep the service running and your data safe, but we cannot guarantee uninterrupted availability.',
-      'We may update, modify, or discontinue features as the product evolves. We will communicate significant changes in advance when possible.',
-      'The free tier has usage limits, such as a monthly note cap and limited AI reflections. These limits may change as we learn how the product is used.',
+      'We work hard to keep your data safe and the app running, but we provide Reflections "as-is" without guarantees.',
+      'We may change or remove features as the app evolves. We\'ll let you know about big changes ahead of time.',
+      'The free version has limits on notes and AI use. These might shift as we see how people use the app.',
     ],
   },
 ];
@@ -57,8 +57,8 @@ export const TermsOfService: React.FC = () => {
         </Button>
 
         <SectionHeader
-          title="Terms of Service"
-          description="The basics of using Reflections — what you agree to, what we promise, and how to reach us."
+          title="Terms"
+          description="The basics of using Reflections—what you agree to, what we promise, and how to reach us."
           icon={
             <div className="icon-block icon-block-lg">
               <Handshake size={32} weight="duotone" />
@@ -69,7 +69,7 @@ export const TermsOfService: React.FC = () => {
         <Surface variant="bezel">
           <div className="p-8 sm:p-10">
             <p className="text-[17px] font-medium text-gray-text leading-relaxed">
-              Reflections is a personal journaling tool. These terms exist to set fair expectations between you and the people building it — not to create legal leverage. We want to be straightforward about how the product works and what each side is responsible for.
+              Reflections is a tool for your personal thoughts. These terms are here to set clear expectations between you and the team building it. We want to be upfront about how things work and what we're both responsible for.
             </p>
           </div>
         </Surface>
@@ -102,7 +102,7 @@ export const TermsOfService: React.FC = () => {
             </div>
 
             <p className="text-[15px] font-medium leading-relaxed text-gray-light">
-              If anything here is unclear or you have concerns, reach out directly:
+              If anything here is confusing or you have concerns, reach out:
             </p>
             <a
               href="mailto:robinsaha@gmail.com"
