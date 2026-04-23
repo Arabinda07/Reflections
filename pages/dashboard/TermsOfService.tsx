@@ -59,11 +59,6 @@ export const TermsOfService: React.FC = () => {
         <SectionHeader
           title="Terms"
           description="The basics of using Reflections—what you agree to, what we promise, and how to reach us."
-          icon={
-            <div className="icon-block icon-block-lg">
-              <Handshake size={32} weight="duotone" />
-            </div>
-          }
         />
 
         <Surface variant="bezel">
