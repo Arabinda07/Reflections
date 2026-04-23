@@ -209,6 +209,8 @@ export const CreateNote: React.FC = () => {
   const editorInstanceRef = useRef<EditorRef>(null);
   const flowTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isUnmounted = useRef(false);
+  const lastFocusToggleRef = useRef<number>(0);
+
   const allowNavigationRef = useRef(false);
   const currentDraftSnapshot = buildCreateNoteDraftSnapshot({
     title,
@@ -261,6 +263,9 @@ export const CreateNote: React.FC = () => {
   // Flow Logic (Zen Mode)
   useEffect(() => {
     const handleWake = () => {
+      // Grace period of 1s after toggling Focus Mode to prevent immediate wake from the click movement
+      if (Date.now() - lastFocusToggleRef.current < 1000) return;
+      
       if (flowTimeoutRef.current) clearTimeout(flowTimeoutRef.current);
       if (isFlowing) setIsFlowing(false);
     };
@@ -739,6 +744,10 @@ export const CreateNote: React.FC = () => {
                   const next = !current;
                   if (!next) {
                     setIsFlowing(false);
+                  } else {
+                    // Activate immediately when enabling
+                    setIsFlowing(true);
+                    lastFocusToggleRef.current = Date.now();
                   }
                   return next;
                 });
