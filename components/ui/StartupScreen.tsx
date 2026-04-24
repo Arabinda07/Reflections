@@ -22,7 +22,7 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
             initial={{ opacity: 1 }}
             exit={{ opacity: 0, scale: 1.05 }}
             transition={{
-              duration: 0.8,
+              duration: 0.26,
               ease: [0.43, 0.13, 0.23, 0.96],
             }}
             className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-body"
@@ -46,8 +46,8 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
                 initial={{ opacity: 0, y: 15, filter: 'blur(10px)' }}
                 animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                 transition={{
-                  duration: 1.2,
-                  delay: 0.6,
+                  duration: 0.55,
+                  delay: 0.12,
                   ease: [0.22, 1, 0.36, 1],
                 }}
                 className="overlay-feedback-wordmark text-white/90 [text-shadow:0_2px_8px_rgba(0,0,0,0.2)]"
@@ -59,8 +59,8 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
                 initial={{ width: 0, opacity: 0 }}
                 animate={{ width: 32, opacity: 1 }}
                 transition={{
-                  duration: 0.8,
-                  delay: 1.3,
+                  duration: 0.35,
+                  delay: 0.3,
                   ease: 'easeOut',
                 }}
                 className="overlay-feedback-divider bg-green/60"

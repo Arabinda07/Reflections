@@ -4,6 +4,8 @@ import { supabase } from '../src/supabaseClient';
 import { Session } from '@supabase/supabase-js';
 import { useAuthStore } from '../hooks/useAuthStore';
 import { StartupScreen } from '../components/ui/StartupScreen';
+import { identifyAnalyticsUser, resetAnalyticsUser } from '../src/analytics/events';
+import { NATIVE_STARTUP_FADE_MS, NATIVE_STARTUP_MIN_MS } from '../src/native/appLaunch';
 
 interface AuthContextType {
   user: User | null;
@@ -29,12 +31,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
   const [minTimeReached, setMinTimeReached] = useState(false);
 
-  // Ensure the startup animation plays for at least 2.5 seconds
+  // Keep the in-app launch moment visible long enough to feel intentional without stalling.
   useEffect(() => {
     if (showStartup) {
       const timer = setTimeout(() => {
         setMinTimeReached(true);
-      }, 2500);
+      }, NATIVE_STARTUP_MIN_MS);
       return () => clearTimeout(timer);
     }
   }, [showStartup]);
@@ -86,13 +88,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, [setUser, setHydrated]);
 
+  useEffect(() => {
+    if (loading || !isHydrated) {
+      return;
+    }
+
+    if (user) {
+      identifyAnalyticsUser(user);
+      return;
+    }
+
+    resetAnalyticsUser();
+  }, [user, loading, isHydrated]);
+
   // Hide startup screen
   useEffect(() => {
     if (!loading && minTimeReached && showStartup && isHydrated) {
       const fadeOutTimer = setTimeout(() => {
         setShowStartup(false);
         sessionStorage.setItem('startup_shown', 'true');
-      }, 800);
+      }, NATIVE_STARTUP_FADE_MS);
       return () => clearTimeout(fadeOutTimer);
     }
   }, [loading, minTimeReached, showStartup, isHydrated]);
@@ -111,7 +126,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         style={{ 
           opacity: showStartup ? 0 : 1, 
           visibility: showStartup ? 'hidden' : 'visible',
-          transition: 'opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), visibility 1.2s'
+          transition: `opacity ${NATIVE_STARTUP_FADE_MS}ms cubic-bezier(0.32, 0.72, 0, 1), visibility ${NATIVE_STARTUP_FADE_MS}ms`
         }}
       >
         {children}

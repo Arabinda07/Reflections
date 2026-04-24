@@ -30,6 +30,8 @@ dist-ssr
 # Capacitor native projects — contain signing credentials, never commit
 android/
 ios/
+!scripts/android/
+!scripts/android/generate_android_assets.py
 
 # Keystores — never commit these
 *.jks

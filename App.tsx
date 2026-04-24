@@ -1,4 +1,8 @@
 import React, { Suspense, lazy, useEffect } from 'react';
+import { App as CapacitorApp } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
+import { SplashScreen } from '@capacitor/splash-screen';
+import { StatusBar, Style } from '@capacitor/status-bar';
 import { Route, RouterProvider, createHashRouter, createRoutesFromElements } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { PWAInstallProvider } from './context/PWAInstallContext';
@@ -10,6 +14,10 @@ import { RoutePath } from './types';
 import { useSync } from './hooks/useSync';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
+import {
+  trackGoogleAuthFailed,
+  trackGoogleAuthSucceeded,
+} from './src/analytics/events';
 
 // Lazy load non-critical routes to reduce initial bundle size
 const SignIn = lazy(() => import('./pages/auth/SignIn').then(m => ({ default: m.SignIn })));
@@ -108,19 +116,53 @@ const SyncWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 function App() {
   useEffect(() => {
     let isActive = true;
+
+    const applyNativeChrome = async () => {
+      if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'android') {
+        return;
+      }
+
+      try {
+        await StatusBar.setOverlaysWebView({ overlay: false });
+        await StatusBar.setStyle({ style: Style.Dark });
+        await StatusBar.setBackgroundColor({ color: '#121212' });
+        await StatusBar.show();
+      } catch (error) {
+        console.warn('[native] Failed to align the Android status bar.', error);
+      }
+
+      try {
+        await new Promise<void>((resolve) => {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => resolve());
+          });
+        });
+
+        if (!isActive) return;
+        await SplashScreen.hide();
+      } catch (error) {
+        console.warn('[native] Failed to hide the Android splash screen.', error);
+      }
+    };
+
+    void applyNativeChrome();
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let isActive = true;
     let removeNativeUrlListener: (() => Promise<void>) | null = null;
     let lastHandledNativeUrl: string | null = null;
     
     const setupNativeOAuth = async () => {
-      const { Capacitor } = await import('@capacitor/core');
       if (!isActive || !Capacitor.isNativePlatform()) {
         return;
       }
 
-      const [{ App: CapacitorApp }, googleOAuth] = await Promise.all([
-        import('@capacitor/app'),
-        import('./src/auth/googleOAuth'),
-      ]);
+      const googleOAuth = await import('./src/auth/googleOAuth');
 
       if (!isActive) {
         return;
@@ -132,6 +174,8 @@ function App() {
         }
 
         lastHandledNativeUrl = url;
+        const pendingSourcePath = googleOAuth.getPendingGoogleAuthPath() || RoutePath.LOGIN;
+        const pendingRedirectPath = googleOAuth.getPendingGoogleAuthRedirectPath();
         const result = await googleOAuth.consumeNativeGoogleOAuthCallback(url);
 
         if (!isActive || !result.handled) {
@@ -139,11 +183,22 @@ function App() {
         }
 
         if ('error' in result) {
+          trackGoogleAuthFailed({
+            sourcePath: pendingSourcePath,
+            isNative: true,
+            errorCode: result.error,
+          });
           googleOAuth.stashGoogleAuthError(result.error);
+        } else {
+          trackGoogleAuthSucceeded({
+            sourcePath: pendingSourcePath,
+            redirectPath: pendingRedirectPath,
+            isNative: true,
+          });
         }
 
         googleOAuth.redirectToAppRoute(
-          googleOAuth.getPendingGoogleAuthPath() || RoutePath.LOGIN,
+          pendingSourcePath,
         );
       };
 

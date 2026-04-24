@@ -13,8 +13,11 @@ import {
 import { RoutePath } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { usePWAInstall } from '../context/PWAInstallContext';
+import { AnalyticsRouteTracker } from '../src/analytics/AnalyticsRouteTracker';
 import { Button } from '../components/ui/Button';
 import { SyncBanner } from '../components/ui/SyncBanner';
+import { registerAndroidBackAction } from '../src/native/androidBack';
+import { useAndroidBackHandler } from '../src/native/useAndroidBackHandler';
 
 export const DashboardLayout: React.FC = () => {
   const navigate = useNavigate();
@@ -32,6 +35,7 @@ export const DashboardLayout: React.FC = () => {
     return document.documentElement.classList.contains('dark');
   });
 
+  useAndroidBackHandler();
 
 
   useEffect(() => {
@@ -93,6 +97,15 @@ export const DashboardLayout: React.FC = () => {
     };
   }, [isMobileMenuOpen]);
 
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+
+    return registerAndroidBackAction(() => {
+      setIsMobileMenuOpen(false);
+      return true;
+    });
+  }, [isMobileMenuOpen]);
+
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };
@@ -126,6 +139,7 @@ export const DashboardLayout: React.FC = () => {
 
   return (
     <div className="relative flex h-[100dvh] flex-col overflow-hidden bg-body font-sans selection:bg-green/30 selection:text-green transition-colors duration-300">
+      <AnalyticsRouteTracker />
       <a href="#main-content" className="skip-link">
         Skip to content
       </a>

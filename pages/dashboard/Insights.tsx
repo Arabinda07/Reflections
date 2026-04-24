@@ -27,6 +27,7 @@ import { wikiService } from '../../services/wikiService';
 import { aiService } from '../../services/aiService';
 import { profileService } from '../../services/profileService';
 import { FREE_WIKI_MINIMUM_ENTRIES, getWikiInsightsGate } from '../../services/wellnessPolicy';
+import { trackLifeWikiRefreshed } from '../../src/analytics/events';
 
 const MOOD_TONE_CLASSES: Record<string, { label: string; track: string; fill: string }> = {
   happy: { label: 'text-orange', track: 'bg-orange/10', fill: 'bg-orange' },
@@ -111,6 +112,16 @@ export const Insights: React.FC = () => {
           variant: 'warning',
           title: 'Nothing could be built yet',
           description: 'The Life Wiki did not find enough usable signal this time. Add a little more detail to your reflections and try again.',
+        });
+      }
+
+      if (refreshResult.pageCount > 0) {
+        trackLifeWikiRefreshed({
+          planTier: access?.planTier || 'free',
+          entryCount: notes.length,
+          pageCount: refreshResult.pageCount,
+          source: refreshResult.source,
+          usedFreeRefresh: claimedFreeRefresh,
         });
       }
 

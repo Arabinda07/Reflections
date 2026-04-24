@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Envelope, Lock, User, UserPlus } from '@phosphor-icons/react';
@@ -9,6 +10,10 @@ import { Surface } from '../../components/ui/Surface';
 import { RoutePath } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { supabase } from '../../src/supabaseClient';
+import {
+  trackGoogleAuthFailed,
+  trackGoogleAuthStarted,
+} from '../../src/analytics/events';
 import {
   consumeGoogleAuthError,
   consumePendingGoogleAuthRedirectPath,
@@ -79,14 +84,25 @@ export const SignUp: React.FC = () => {
   };
 
   const handleGoogleLogin = async () => {
+    const isNative = Capacitor.isNativePlatform();
     setError(null);
     setLoading(true);
+    trackGoogleAuthStarted({
+      sourcePath: RoutePath.SIGNUP,
+      redirectPath: postLoginPath,
+      isNative,
+    });
     const launchError = await startGoogleOAuthFlow({
       sourcePath: RoutePath.SIGNUP,
       redirectPath: postLoginPath,
     });
 
     if (launchError) {
+      trackGoogleAuthFailed({
+        sourcePath: RoutePath.SIGNUP,
+        isNative,
+        errorCode: launchError,
+      });
       setError(launchError);
       setLoading(false);
     }

@@ -11,17 +11,22 @@ const config: CapacitorConfig = {
     androidScheme: 'https',
   },
   plugins: {
+    App: {
+      disableBackButtonHandler: true,
+    },
     SplashScreen: {
-      launchShowDuration: 2000,
-      launchAutoHide: true,
+      launchShowDuration: 0,
+      launchAutoHide: false,
+      launchFadeOutDuration: 150,
       backgroundColor: '#121212',
       androidSplashResourceName: 'splash',
       androidScaleType: 'CENTER_CROP',
       showSpinner: false,
-      splashFullScreen: true,
-      splashImmersive: true,
+      splashFullScreen: false,
+      splashImmersive: false,
     },
     StatusBar: {
+      overlaysWebView: false,
       style: 'DARK',
       backgroundColor: '#121212',
     },

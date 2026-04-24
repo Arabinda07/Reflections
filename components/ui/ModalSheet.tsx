@@ -2,6 +2,7 @@ import React, { useEffect, useId, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import { X } from '@phosphor-icons/react';
+import { registerAndroidBackAction } from '../../src/native/androidBack';
 
 interface ModalSheetProps {
   isOpen: boolean;
@@ -46,6 +47,15 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    return registerAndroidBackAction(() => {
+      onClose();
+      return true;
+    });
+  }, [isOpen, onClose]);
 
   useEffect(() => {
     if (!isOpen) return;

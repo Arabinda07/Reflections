@@ -1,8 +1,10 @@
 import "./src/instrument"; // ← MUST be first — Sentry init before any other code
 
+import { PostHogProvider } from "@posthog/react";
 import { reactErrorHandler } from "@sentry/react";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { getPostHogBootstrapConfig } from "./src/analytics/posthogBootstrap";
 import { getMissingClientEnvNames } from "./src/bootstrapEnv";
 
 const rootElement = document.getElementById("root");
@@ -53,10 +55,20 @@ const bootstrapApp = async () => {
 
   try {
     const { default: App } = await import('./App');
+    const posthogConfig = getPostHogBootstrapConfig({
+      VITE_PUBLIC_POSTHOG_PROJECT_TOKEN: import.meta.env.VITE_PUBLIC_POSTHOG_PROJECT_TOKEN,
+      VITE_PUBLIC_POSTHOG_HOST: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
+    });
 
     root.render(
       <StrictMode>
-        <App />
+        {posthogConfig ? (
+          <PostHogProvider apiKey={posthogConfig.apiKey} options={posthogConfig.options}>
+            <App />
+          </PostHogProvider>
+        ) : (
+          <App />
+        )}
       </StrictMode>,
     );
   } catch (error) {
