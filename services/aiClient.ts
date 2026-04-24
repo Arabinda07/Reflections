@@ -7,7 +7,8 @@ export type AiAction =
   | 'ingestDecision'
   | 'ingestSynthesis'
   | 'wikiPage'
-  | 'index';
+  | 'index'
+  | 'companionQuery';
 
 type AiResponse<T> = {
   ok: true;

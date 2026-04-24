@@ -33,11 +33,11 @@ Focus on: how they describe themselves, what they care about, and any contradict
 Format: short paragraphs. Max 300 words. Write in third person ("They...").`,
   },
   {
-    pageType: 'timeline',
-    title: 'Timeline',
-    instruction: `Extract the key moments, turning points, and shifts mentioned across the source material below.
-List them chronologically where possible.
-Format: bullet list, each item with approximate context. Max 300 words.`,
+    pageType: 'eras',
+    title: 'Eras',
+    instruction: `Identify the distinct life chapters, transitions, and time-boxed periods visible across the source material below.
+Each era should be defined by a project, place, relationship, or mindset shift.
+Format: short narrative paragraphs with approximate time context. Max 300 words.`,
   },
 ];
 
@@ -278,6 +278,31 @@ export const aiService = {
       }
     } catch (error) {
       console.error('[aiService] Index rebuild error:', error);
+    }
+  },
+
+  /**
+   * Send a question to the Companion, grounded in wiki content.
+   */
+  companionQuery: async (question: string): Promise<string> => {
+    try {
+      const allPages = await wikiService.getAll();
+      const wikiPages = allPages
+        .filter((p: LifeTheme) => p.state === 'active')
+        .map((p: LifeTheme) => ({
+          title: p.title,
+          content: p.content,
+        }));
+
+      const content = await aiClient.call<string>('companionQuery', {
+        question,
+        wikiPages,
+      });
+
+      return content || "I don't have enough in your Sanctuary to answer that. Keep writing — the picture will fill in.";
+    } catch (error) {
+      console.error('[aiService] Companion query error:', error);
+      return "Something went wrong while I was thinking. Try again in a moment.";
     }
   },
 };

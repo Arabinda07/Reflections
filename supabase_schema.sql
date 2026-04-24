@@ -243,7 +243,86 @@ $$ language plpgsql security definer;
 
 
 -- ─────────────────────────────────────────────
--- 7. MIGRATION HELPERS
+-- 6d. Delete sanctuary data only (Nuclear Option)
+-- ─────────────────────────────────────────────
+create or replace function delete_sanctuary_data()
+returns void as $$
+begin
+  delete from public.wiki_links
+    where source_page_id in (select id from public.life_themes where user_id = auth.uid());
+  delete from public.wiki_absorb_log where user_id = auth.uid();
+  delete from public.theme_citations
+    where theme_id in (select id from public.life_themes where user_id = auth.uid());
+  delete from public.life_themes where user_id = auth.uid();
+  update public.profiles set smart_mode_enabled = false where id = auth.uid();
+end;
+$$ language plpgsql security definer;
+
+
+-- ─────────────────────────────────────────────
+-- 7. WIKI LINKS (Article ↔ Article interlinking)
+-- ─────────────────────────────────────────────
+
+create table if not exists wiki_links (
+  id uuid default gen_random_uuid() primary key,
+  source_page_id uuid references life_themes(id) on delete cascade not null,
+  target_page_id uuid references life_themes(id) on delete cascade not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  unique(source_page_id, target_page_id)
+);
+
+alter table wiki_links enable row level security;
+
+drop policy if exists "Users can view own wiki links" on wiki_links;
+create policy "Users can view own wiki links"
+  on wiki_links for select
+  using (exists (select 1 from life_themes where life_themes.id = wiki_links.source_page_id and life_themes.user_id = auth.uid()));
+
+drop policy if exists "Users can insert own wiki links" on wiki_links;
+create policy "Users can insert own wiki links"
+  on wiki_links for insert
+  with check (exists (select 1 from life_themes where life_themes.id = wiki_links.source_page_id and life_themes.user_id = auth.uid()));
+
+drop policy if exists "Users can delete own wiki links" on wiki_links;
+create policy "Users can delete own wiki links"
+  on wiki_links for delete
+  using (exists (select 1 from life_themes where life_themes.id = wiki_links.source_page_id and life_themes.user_id = auth.uid()));
+
+
+-- ─────────────────────────────────────────────
+-- 8. WIKI ABSORB LOG (Note ingest tracking)
+-- ─────────────────────────────────────────────
+
+create table if not exists wiki_absorb_log (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) on delete cascade not null,
+  note_id uuid references notes(id) on delete cascade not null,
+  content_hash text not null,
+  absorbed_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  unique(user_id, note_id)
+);
+
+alter table wiki_absorb_log enable row level security;
+
+drop policy if exists "Users can view own absorb log" on wiki_absorb_log;
+create policy "Users can view own absorb log"
+  on wiki_absorb_log for select using (auth.uid() = user_id);
+
+drop policy if exists "Users can insert own absorb log" on wiki_absorb_log;
+create policy "Users can insert own absorb log"
+  on wiki_absorb_log for insert with check (auth.uid() = user_id);
+
+drop policy if exists "Users can update own absorb log" on wiki_absorb_log;
+create policy "Users can update own absorb log"
+  on wiki_absorb_log for update using (auth.uid() = user_id);
+
+drop policy if exists "Users can delete own absorb log" on wiki_absorb_log;
+create policy "Users can delete own absorb log"
+  on wiki_absorb_log for delete using (auth.uid() = user_id);
+
+
+-- ─────────────────────────────────────────────
+-- 9. MIGRATION HELPERS
 -- ─────────────────────────────────────────────
 -- If tables already exist but are missing columns,
 -- these will add them safely.
@@ -265,4 +344,18 @@ begin
   ) then
     alter table life_themes add column page_type text default 'theme';
   end if;
+
+  -- Add smart_mode_enabled to profiles if missing
+  if not exists (
+    select 1 from information_schema.columns
+    where table_name = 'profiles' and column_name = 'smart_mode_enabled'
+  ) then
+    alter table profiles add column smart_mode_enabled boolean default false;
+  end if;
+
+  -- Extend page_type constraint
+  alter table life_themes drop constraint if exists life_themes_page_type_check;
+  alter table life_themes add constraint life_themes_page_type_check
+    check (page_type in ('theme','people','patterns','philosophies','eras','decisions','mood_patterns','recurring_themes','self_model','timeline','index'));
 end $$;
+

@@ -108,7 +108,15 @@ export enum RoutePath {
   SIGNUP = '/signup',
   RESET_PASSWORD = '/reset-password',
   INSIGHTS = '/insights',
+  SANCTUARY = '/sanctuary',
+  SANCTUARY_ARTICLE = '/sanctuary/article/:id',
   FAQ = '/faq',
   PRIVACY = '/privacy',
   TERMS = '/terms',
+}
+
+export interface SmartModeProfile {
+  smartModeEnabled: boolean;
+  razorpayCustomerId?: string;
+  planExpiresAt?: string;
 }

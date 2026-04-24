@@ -8,7 +8,8 @@ type AiAction =
   | 'ingestDecision'
   | 'ingestSynthesis'
   | 'wikiPage'
-  | 'index';
+  | 'index'
+  | 'companionQuery';
 
 type AiRequest = {
   action?: AiAction;
@@ -280,6 +281,25 @@ const handleIndex = async (payload: any) => {
   return generateText(prompt, INGEST_MODEL);
 };
 
+const handleCompanionQuery = async (payload: any) => {
+  const question = String(payload?.question || '');
+  const wikiPages = Array.isArray(payload?.wikiPages) ? payload.wikiPages : [];
+
+  const wikiContext = wikiPages
+    .map((page: any) => `### ${page.title}\n${page.content}`)
+    .join('\n\n---\n\n');
+
+  const prompt = buildPrompt([
+    'You are the Companion — the voice of the user\'s personal Sanctuary wiki.',
+    'GROUNDING RULE: You have ZERO knowledge outside of the wiki content below. If the answer is not in the wiki, say: "I don\'t have enough in your Sanctuary to answer that. Keep writing — the picture will fill in."',
+    `WIKI CONTENT:\n${wikiContext || '(The Sanctuary is empty. No wiki pages exist yet.)'}`,
+    `USER QUESTION: ${question}`,
+    'Instructions:\n- Answer in 2-3 short paragraphs.\n- Reference wiki pages using [[Page Title]] format.\n- Use a warm, perceptive tone. Be direct and human.\n- Never fabricate information not present in the wiki content above.',
+  ]);
+
+  return generateText(prompt);
+};
+
 const handlers: Record<AiAction, (payload: any) => Promise<any>> = {
   prompts: handlePrompts,
   reflection: handleReflection,
@@ -288,6 +308,7 @@ const handlers: Record<AiAction, (payload: any) => Promise<any>> = {
   ingestSynthesis: handleIngestSynthesis,
   wikiPage: handleWikiPage,
   index: handleIndex,
+  companionQuery: handleCompanionQuery,
 };
 
 export default async function handler(req: any, res: any) {

@@ -46,6 +46,7 @@ import { PaperPlaneToast } from '../../components/ui/PaperPlaneToast';
 import { InlineLoadingBadge } from '../../components/ui/InlineLoadingBadge';
 import { observationService } from '../../services/observationService';
 import { trackNoteSaved } from '../../src/analytics/events';
+import { profileService } from '../../services/profileService';
 import { DEFAULT_WELLNESS_PROMPTS, getCurrentWellnessPrompt, getNextWellnessPromptState } from '../../services/wellnessPrompts';
 import { aiService } from '../../services/aiService';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
@@ -462,6 +463,24 @@ export const CreateNote: React.FC = () => {
         tagCount: tags.length,
         taskCount: tasks.length,
       });
+
+      // Smart Mode: auto-ingest into Sanctuary (fire-and-forget)
+      profileService.getSmartModeEnabled().then((enabled) => {
+        if (enabled && noteId) {
+          const now = new Date().toISOString();
+          aiService.processNoteIntoWiki({
+            id: noteId,
+            title,
+            content,
+            mood,
+            createdAt: now,
+            updatedAt: now,
+            tags,
+            tasks,
+            attachments: mergedAttachments,
+          }).catch((err) => console.error('[CreateNote] Auto-ingest failed:', err));
+        }
+      }).catch(() => { /* Smart mode check failed — skip ingest silently */ });
 
       const [totalCount, recentNotes] = await Promise.all([
         noteService.getCount(),

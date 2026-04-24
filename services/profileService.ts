@@ -81,5 +81,33 @@ export const profileService = {
       .eq('free_wiki_insights_used', 1);
 
     if (error) throw error;
-  }
+  },
+
+  getSmartModeEnabled: async (): Promise<boolean> => {
+    const user = await getAuthenticatedUser();
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('smart_mode_enabled')
+      .eq('id', user.id)
+      .single();
+
+    if (error) {
+      console.error('[profileService] Error fetching smart mode:', error);
+      return false;
+    }
+
+    return data?.smart_mode_enabled ?? false;
+  },
+
+  setSmartModeEnabled: async (enabled: boolean): Promise<void> => {
+    const user = await getAuthenticatedUser();
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({ smart_mode_enabled: enabled })
+      .eq('id', user.id);
+
+    if (error) throw error;
+  },
 };
