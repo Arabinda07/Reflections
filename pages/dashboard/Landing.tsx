@@ -72,7 +72,7 @@ export const Landing: React.FC = () => {
           >
             <button
               onClick={() => navigate(RoutePath.SIGNUP)}
-              className="group flex w-fit items-center justify-start gap-3 rounded-xl border border-green/20 bg-green px-8 py-4 text-[16px] font-black text-white shadow-sm transition-all duration-300 hover:bg-green-hover hover:shadow-md active:scale-95 sm:w-auto sm:justify-start sm:text-[18px]"
+              className="group flex w-fit items-center justify-start gap-3 rounded-[var(--radius-control)] border border-green/20 bg-green px-8 py-4 text-[16px] font-black text-white shadow-[0_12px_32px_-12px_rgba(22,163,74,0.35)] transition-all duration-300 hover:bg-green-hover hover:shadow-lg active:scale-95 sm:w-auto sm:justify-start sm:text-[18px]"
             >
               Begin writing
               <ArrowRight size={22} className="group-hover:translate-x-1.5 transition-transform duration-500 ease-out-expo" />
@@ -81,7 +81,7 @@ export const Landing: React.FC = () => {
             <div className="flex flex-wrap items-center gap-x-6 gap-y-4 px-2 sm:justify-end sm:px-0">
               <button
                 onClick={() => navigate(RoutePath.LOGIN)}
-                className="inline-flex min-h-11 items-center rounded-xl border border-border bg-white px-5 text-[15px] font-bold text-gray-text shadow-sm transition-all duration-300 hover:bg-gray-50 hover:shadow-md active:scale-95"
+                className="inline-flex min-h-11 items-center rounded-[var(--radius-control)] border-[1.5px] border-border bg-surface px-5 text-[15px] font-bold text-gray-text transition-all duration-300 hover:bg-white hover:shadow-sm active:scale-95"
               >
                 Sign in
               </button>
@@ -90,7 +90,7 @@ export const Landing: React.FC = () => {
 
               <button
                 onClick={() => navigate(RoutePath.FAQ)}
-                className="label-caps inline-flex min-h-11 items-center rounded-xl border border-border bg-white px-5 text-gray-text shadow-sm transition-all duration-300 hover:bg-gray-50 hover:shadow-md active:scale-95"
+                className="label-caps inline-flex min-h-11 items-center rounded-[var(--radius-control)] border-[1.5px] border-border bg-surface px-5 text-gray-text transition-all duration-300 hover:bg-white hover:shadow-sm active:scale-95"
               >
                 How it works
               </button>
@@ -103,7 +103,7 @@ export const Landing: React.FC = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 1.2, duration: 0.5 }}
-                    className="label-caps inline-flex min-h-11 items-center gap-2 rounded-xl border border-border bg-white px-5 text-gray-text shadow-sm transition-all duration-300 hover:bg-gray-50 hover:shadow-md active:scale-95"
+                    className="label-caps inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] border-[1.5px] border-border bg-surface px-5 text-gray-text transition-all duration-300 hover:bg-white hover:shadow-sm active:scale-95"
                   >
                     <DownloadSimple size={14} weight="bold" />
                     Install app
@@ -141,7 +141,7 @@ export const Landing: React.FC = () => {
 
           <button
             onClick={toggleMute}
-            className="absolute bottom-10 right-6 z-30 flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-white text-gray-text shadow-sm transition-all duration-300 hover:bg-gray-50 hover:shadow-md active:scale-95 lg:bottom-12 lg:right-16"
+            className="absolute bottom-10 right-6 z-30 flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] border-[1.5px] border-border bg-surface text-gray-text transition-all duration-300 hover:bg-white hover:shadow-sm active:scale-95 lg:bottom-12 lg:right-16"
             aria-label={isMuted ? 'Unmute video' : 'Mute video'}
           >
             {isMuted ? <SpeakerSlash size={20} weight="bold" /> : <SpeakerHigh size={20} weight="bold" />}
