@@ -31,7 +31,7 @@ describe('visual parity contract', () => {
   it('reframes the mobile landing video to preserve the subject on the left edge', () => {
     const landing = read('pages/dashboard/Landing.tsx');
 
-    expect(landing).toContain('object-[70%_center]');
+    expect(landing).toContain('object-[48%_center]');
     expect(landing).toContain('sm:object-[64%_center]');
     expect(landing).not.toContain('object-[82%_center]');
   });

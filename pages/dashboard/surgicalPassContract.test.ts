@@ -44,7 +44,7 @@ describe('surgical route and landing contract', () => {
 
     expect(landing).toContain('pb-[calc(env(safe-area-inset-bottom)+1.75rem)]');
     expect(landing).toContain('mt-auto');
-    expect(landing).toContain('object-[70%_center]');
+    expect(landing).toContain('object-[48%_center]');
     expect(landing).toContain('sm:object-[64%_center]');
     expect(layout).toContain('landing-nav-scrim');
   });

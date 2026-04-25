@@ -96,7 +96,7 @@ export default defineConfig(({ mode }) => {
                 handler: 'NetworkOnly',
               },
               {
-                urlPattern: /.*\.mp4$/,
+                urlPattern: /.*\.(mp4|webm)$/,
                 handler: 'CacheFirst',
                 options: {
                   cacheName: 'app-videos',
