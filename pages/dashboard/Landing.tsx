@@ -81,16 +81,16 @@ export const Landing: React.FC = () => {
             <div className="flex flex-wrap items-center gap-x-6 gap-y-4 px-2 sm:justify-end sm:px-0">
               <button
                 onClick={() => navigate(RoutePath.LOGIN)}
-                className="inline-flex min-h-11 items-center rounded-[var(--radius-control)] px-3 text-[15px] font-medium text-gray-nav transition-colors duration-300 hover:text-gray-text"
+                className="surface-floating inline-flex min-h-11 items-center rounded-[var(--radius-control)] px-5 text-[15px] font-bold shadow-sm transition-all duration-300 hover:shadow-md"
               >
                 Sign in
               </button>
 
-              <div className="h-4 w-[1px] bg-border opacity-50" />
+              <div className="hidden h-4 w-[1px] bg-border opacity-50 sm:block" />
 
               <button
                 onClick={() => navigate(RoutePath.FAQ)}
-                className="label-caps inline-flex min-h-11 items-center rounded-[var(--radius-control)] px-3 transition-colors duration-300 hover:text-gray-text"
+                className="label-caps surface-floating inline-flex min-h-11 items-center rounded-[var(--radius-control)] px-5 shadow-sm transition-all duration-300 hover:text-gray-text hover:shadow-md"
               >
                 How it works
               </button>
@@ -103,9 +103,9 @@ export const Landing: React.FC = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 1.2, duration: 0.5 }}
-                    className="label-caps inline-flex min-h-11 items-center gap-1.5 rounded-[var(--radius-control)] px-3 transition-colors duration-300 hover:text-gray-text"
+                    className="label-caps surface-floating inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] px-5 shadow-sm transition-all duration-300 hover:text-gray-text hover:shadow-md"
                   >
-                    <DownloadSimple size={14} weight="light" />
+                    <DownloadSimple size={14} weight="bold" />
                     Install app
                   </motion.button>
                 </>
