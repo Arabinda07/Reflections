@@ -34,14 +34,14 @@ export const Landing: React.FC = () => {
       <div className="min-h-[100dvh] w-full relative">
 
         {/* ── Left panel: content ── */}
-        <div className="relative z-20 flex min-h-[100dvh] flex-col px-6 pb-[calc(env(safe-area-inset-bottom)+1.75rem)] pt-[calc(env(safe-area-inset-top)+var(--header-height)+1.5rem)] sm:px-12 sm:pb-[calc(env(safe-area-inset-bottom)+2rem)] sm:pt-[calc(env(safe-area-inset-top)+var(--header-height)+2rem)] lg:justify-between lg:pt-[28vh] lg:pb-12 lg:px-16 xl:px-24 pointer-events-none">
+        <div className="relative z-20 flex min-h-[100dvh] flex-col px-6 pb-10 pt-[calc(env(safe-area-inset-top)+var(--header-height)+1.5rem)] sm:px-12 sm:pb-10 sm:pt-[calc(env(safe-area-inset-top)+var(--header-height)+2rem)] lg:justify-between lg:pt-[28vh] lg:pb-12 lg:px-16 xl:px-24 pointer-events-none">
 
           <div className="flex flex-col gap-6 lg:w-[60%] lg:gap-8 xl:w-[55%]">
             <motion.div
               variants={staggerContainer}
               initial="hidden"
               animate="show"
-              className="pointer-events-auto flex max-w-[11ch] flex-col text-mk-display font-display tracking-[-0.03em] text-gray-text leading-[0.9] sm:max-w-[12ch] sm:leading-[0.94] lg:max-w-5xl lg:tracking-tight lg:leading-[0.98]"
+              className="pointer-events-auto flex max-w-[11ch] flex-col text-mk-display font-display tracking-[-0.04em] text-gray-text leading-[0.92] sm:max-w-[12ch] sm:leading-[0.94] lg:max-w-5xl lg:leading-[0.96]"
             >
               <motion.span variants={staggerLine} style={{ willChange: 'transform, opacity, filter' }}>
                 Your mind,
@@ -58,7 +58,7 @@ export const Landing: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.5 }}
-              className="pointer-events-auto max-w-[33ch] font-serif text-[1rem] leading-[1.72] text-gray-text sm:max-w-[38ch] sm:text-mk-body lg:max-w-[44ch]"
+              className="pointer-events-auto max-w-[33ch] font-serif text-[1rem] leading-relaxed text-gray-light sm:max-w-[38ch] sm:text-mk-body lg:max-w-[44ch] tracking-tight"
             >
               A private place to put words down, notice what returns, and leave the noise outside.
             </motion.p>
