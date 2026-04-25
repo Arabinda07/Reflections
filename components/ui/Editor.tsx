@@ -100,7 +100,7 @@ export const Editor = forwardRef<EditorRef, EditorProps>(({ value, onChange, onF
   }, [placeholder]);
 
   return (
-    <div className={`prose prose-zinc max-w-none ${className} duolingo-editor`}>
+    <div className={`prose prose-zinc max-w-none ${className} note-editor`}>
       <div ref={editorRef} className="border-none" />
     </div>
   );

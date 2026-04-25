@@ -56,21 +56,20 @@
 
 :root {
   /* App Shell – single source of truth for header height */
-  --header-height: 3.5rem; /* 56px – comfortable mobile app-bar */
+  --header-height: 3.5rem;
+  /* 56px – comfortable mobile app-bar */
 
-  /* Brand Hue = 142 (quiet botanical green, dark enough for readable accents) */
-  /* CONTRAST FIX: L=0.50 yielded ~4.44:1 — 0.06 below WCAG AA 4.5:1.
-     Minimal fix: L=0.47 → ~4.95:1. Barely perceptible shift; chroma lifted to 0.18
-     to compensate for any perceived dulling at lower L. Duolingo's #58CC02 ≈ L=0.77 —
-     their green is used as button bg with dark text, not as text colour itself. */
-  --green: oklch(0.47 0.18 142);
-  --green-hover: oklch(0.41 0.16 142);
-  --green-shadow: oklch(0.35 0.14 142);
-  
+  /* Brand Hue = 135 (Cool botanical green, aligned with tinted neutrals) */
+  /* CONTRAST FIX: L=0.47 achieves ~4.95:1 on light bg (passes WCAG AA 4.5:1).
+     Chroma 0.18 sits at the 'calm ceiling' for high-end wellness brands. */
+  --green: oklch(0.47 0.18 135);
+  --green-hover: oklch(0.41 0.16 135);
+  --green-shadow: oklch(0.35 0.14 135);
+
   --dark-blue: oklch(0.25 0.05 260);
   --blue: oklch(0.54 0.16 245);
   --blue-shadow: oklch(0.40 0.16 245);
-  
+
   /* Tinted Neutrals (Strict Chroma 0.01 leaning toward hue 135) */
   --gray-text: oklch(0.25 0.01 135);
   /* CONTRAST FIX: L=0.55 → ~3.4:1 on near-white bg. Darkened to L=0.43 → ~5.0:1. */
@@ -78,7 +77,7 @@
   --border-color: oklch(0.92 0.01 135);
   /* CONTRAST FIX: L=0.60 → ~2.9:1 on near-white bg. Darkened to L=0.46 → ~4.6:1. */
   --nav-text: oklch(0.46 0.01 135);
-  
+
   --footer-green: oklch(0.72 0.18 135);
   /* CONTRAST FIX: orange/red/blue are used as text in pills and alert panels.
      Darkened each to achieve ≥4.5:1 on their tinted panel backgrounds.
@@ -89,7 +88,7 @@
   --red-shadow: oklch(0.45 0.18 20);
   --orange: oklch(0.57 0.16 50);
   --golden: oklch(0.85 0.15 80);
-  
+
   --bg-color: oklch(0.99 0.01 135);
   --panel-bg: oklch(0.98 0.01 135);
   --panel-bg-rgb: 247 248 246;
@@ -98,11 +97,9 @@
   --hero-shadow:
     0 10px 30px rgba(20, 24, 19, 0.22),
     0 24px 60px rgba(20, 24, 19, 0.12);
-  --hero-scrim: linear-gradient(
-    180deg,
-    oklch(0.28 0.02 135 / 0.12),
-    oklch(0.24 0.02 135 / 0.28)
-  );
+  --hero-scrim: linear-gradient(180deg,
+      oklch(0.28 0.02 135 / 0.12),
+      oklch(0.24 0.02 135 / 0.28));
   --screen-scrim-soft: rgba(var(--panel-bg-rgb), 0.72);
   --screen-scrim-strong: rgba(var(--panel-bg-rgb), 0.84);
   --floating-panel-bg: rgba(var(--panel-bg-rgb), 0.82);
@@ -126,26 +123,44 @@
   --track-water-wind: oklch(0.77 0.12 195);
 
   /* Phased Typography Scale (1.25 Ratio / 18px Base) */
-  --text-base: 1.125rem;    /* 18px */
-  --text-lg: 1.406rem;      /* ~22.5px */
-  --text-xl: 1.758rem;      /* ~28px */
-  --text-2xl: 2.197rem;     /* ~35px */
-  --text-3xl: 2.746rem;     /* ~44px */
-  --text-sm: 0.9rem;        /* ~14.4px */
-  --text-xs: 0.72rem;       /* ~11.5px */
+  --text-base: 1.125rem;
+  /* 18px */
+  --text-lg: 1.406rem;
+  /* ~22.5px */
+  --text-xl: 1.758rem;
+  /* ~28px */
+  --text-2xl: 2.197rem;
+  /* ~35px */
+  --text-3xl: 2.746rem;
+  /* ~44px */
+  --text-sm: 0.9rem;
+  /* ~14.4px */
+  --text-xs: 0.72rem;
+  /* ~11.5px */
 
   /* 4pt Spatial Scale Variables */
-  --space-05: 0.125rem; /* 2px */
-  --space-1: 0.25rem;   /* 4px */
-  --space-2: 0.5rem;    /* 8px */
-  --space-3: 0.75rem;   /* 12px */
-  --space-4: 1rem;      /* 16px */
-  --space-5: 1.25rem;   /* 20px */
-  --space-6: 1.5rem;    /* 24px */
-  --space-8: 2rem;      /* 32px */
-  --space-10: 2.5rem;   /* 40px */
-  --space-12: 3rem;     /* 48px */
-  --space-16: 4rem;     /* 64px */
+  --space-05: 0.125rem;
+  /* 2px */
+  --space-1: 0.25rem;
+  /* 4px */
+  --space-2: 0.5rem;
+  /* 8px */
+  --space-3: 0.75rem;
+  /* 12px */
+  --space-4: 1rem;
+  /* 16px */
+  --space-5: 1.25rem;
+  /* 20px */
+  --space-6: 1.5rem;
+  /* 24px */
+  --space-8: 2rem;
+  /* 32px */
+  --space-10: 2.5rem;
+  /* 40px */
+  --space-12: 3rem;
+  /* 48px */
+  --space-16: 4rem;
+  /* 64px */
 
   /* Shared Radius Scale */
   --radius-chip: 0.75rem;
@@ -156,28 +171,35 @@
   /* Natural Physics: Out-Quart (Exponential) Easing */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --transition-speed: 350ms;
+
+  /* System Hardening Tokens */
+  --scrollbar-thumb: rgba(148, 163, 184, 0.4);
+  --scrollbar-thumb-hover: rgba(148, 163, 184, 0.55);
+  --chip-shadow: #E5E5E5;
 }
 
 .dark {
-  /* CONTRAST FIX: original L=0.62 → ~4.72:1 on dark bg. Already passes AA.
-     Nudged to L=0.63 for a comfortable buffer. */
-  --green: oklch(0.63 0.17 135);
-  --green-hover: oklch(0.69 0.17 135);
-  --green-shadow: oklch(0.42 0.17 135);
-  
+  /* PERCEPTUAL ADJUSTMENT: Hue nudged +3° warmer (135 -> 138) in dark mode
+     to counteract the cooling effect of dark backgrounds and maintain brand temperature. */
+  --green: oklch(0.68 0.15 138);
+  --green-hover: oklch(0.74 0.17 138);
+  --green-shadow: oklch(0.45 0.14 138);
+
+  /* CONTRAST FIX: original L=0.62 → ~4.72:1 on dark bg. Already passes AA. */
+
   --dark-blue: oklch(0.85 0.05 260);
   /* CONTRAST FIX: dark mode blue L=0.60 → ~4.1:1 on dark bg. Lightened to L=0.67 → ~5.2:1 ✓ */
   --blue: oklch(0.67 0.15 245);
   --blue-shadow: oklch(0.44 0.15 245);
   /* CONTRAST FIX: dark mode red L=0.58 → ~3.9:1 on dark bg. Lightened to L=0.67 → ~5.2:1 ✓ */
   --red: oklch(0.67 0.18 20);
-  
+
   /* Tinted Neutrals - Dark Mode (Chroma 0.02 leaning toward hue 135) */
   --gray-text: oklch(0.85 0.02 135);
   --gray-light: oklch(0.65 0.02 135);
   --border-color: oklch(0.25 0.02 135);
   --nav-text: oklch(0.70 0.02 135);
-  
+
   /* Pure black #000 explicitly banned, utilizing dark gray base */
   --bg-color: oklch(0.18 0.012 135);
   --panel-bg: oklch(0.22 0.012 135);
@@ -187,15 +209,17 @@
   --hero-shadow:
     0 12px 32px rgba(3, 5, 4, 0.42),
     0 30px 72px rgba(3, 5, 4, 0.2);
-  --hero-scrim: linear-gradient(
-    180deg,
-    oklch(0.13 0.02 135 / 0.22),
-    oklch(0.1 0.02 135 / 0.48)
-  );
+  --hero-scrim: linear-gradient(180deg,
+      oklch(0.13 0.02 135 / 0.22),
+      oklch(0.1 0.02 135 / 0.48));
   --screen-scrim-soft: rgba(var(--panel-bg-rgb), 0.72);
   --screen-scrim-strong: rgba(var(--panel-bg-rgb), 0.86);
   --floating-panel-media-border: rgba(255, 255, 255, 0.12);
   --ambient-hint-shadow: 0 18px 24px -18px rgba(0, 0, 0, 0.42);
+
+  /* System Hardening Tokens - Dark Mode */
+  --chip-shadow: rgba(0, 0, 0, 0.3);
+  --popover-bg: #1E1E1E;
 }
 
 html {
@@ -208,7 +232,8 @@ body {
   background-color: var(--bg-color);
   font-weight: 400;
   transition: background-color 0.8s cubic-bezier(0.32, 0.72, 0, 1), color 0.8s cubic-bezier(0.32, 0.72, 0, 1);
-  overscroll-behavior-y: none; /* PWA: Prevents native pull-to-refresh bounce */
+  overscroll-behavior-y: none;
+  /* PWA: Prevents native pull-to-refresh bounce */
 }
 
 .sr-only {
@@ -250,27 +275,43 @@ body {
 
 /* Impeccable Design: Strict Focus Rings */
 /* Replaces invisible mouse-hover dependency for Keyboard users */
-button:focus, a:focus, input:focus, textarea:focus, select:focus {
+button:focus,
+a:focus,
+input:focus,
+textarea:focus,
+select:focus {
   outline: none;
 }
-button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, [role="button"]:focus-visible, [tabindex="0"]:focus-visible {
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[role="button"]:focus-visible,
+[tabindex="0"]:focus-visible {
   outline: 2px solid var(--green);
   outline-offset: 4px;
-  border-radius: 4px; /* Strict geometric focus for clarity */
+  border-radius: 4px;
+  /* Strict geometric focus for clarity */
   box-shadow: 0 0 0 4px oklch(from var(--green) l c h / 0.1);
 }
 
 @layer components {
+
   /* Typography Standard */
   .h1-hero {
     @apply text-5xl md:text-7xl lg:text-[100px] font-display tracking-tight text-gray-text leading-[1.05];
   }
+
   .h2-section {
     @apply text-4xl md:text-5xl font-display tracking-tight text-gray-text leading-tight;
   }
+
   .body-editorial {
     @apply text-lg md:text-xl font-serif text-gray-light leading-relaxed;
   }
+
   .label-caps {
     @apply text-[11px] font-black tracking-[0.2em] uppercase text-gray-nav;
   }
@@ -281,7 +322,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
     padding: 1px;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(0, 0, 0, 0.04));
     border-radius: var(--radius-shell);
-    box-shadow: 
+    box-shadow:
       0 10px 28px -18px rgba(0, 0, 0, 0.1),
       0 1px 2px rgba(0, 0, 0, 0.04);
     transition: all 0.6s cubic-bezier(0.32, 0.72, 0, 1);
@@ -290,7 +331,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   .dark .surface-bezel,
   .dark .bezel-outer {
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.2));
-    box-shadow: 
+    box-shadow:
       0 16px 36px -22px rgba(0, 0, 0, 0.42),
       0 2px 6px -2px rgba(0, 0, 0, 0.24);
   }
@@ -335,12 +376,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   }
 
   .landing-nav-scrim {
-    background: linear-gradient(
-      to bottom,
-      rgba(var(--panel-bg-rgb), 0.94) 0%,
-      rgba(var(--panel-bg-rgb), 0.72) 56%,
-      rgba(var(--panel-bg-rgb), 0) 100%
-    );
+    background: linear-gradient(to bottom,
+        rgba(var(--panel-bg-rgb), 0.94) 0%,
+        rgba(var(--panel-bg-rgb), 0.72) 56%,
+        rgba(var(--panel-bg-rgb), 0) 100%);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
   }
@@ -919,7 +958,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 
   .overlay-feedback--screen {
     background: var(--bg-color);
-    padding: 0; /* Edge-to-edge for immersive/loading states */
+    padding: 0;
+    /* Edge-to-edge for immersive/loading states */
   }
 
   .overlay-feedback--soft {
@@ -1139,7 +1179,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 
   .wellness-scroll {
     scrollbar-width: thin;
-    scrollbar-color: rgba(148, 163, 184, 0.55) transparent;
+    scrollbar-color: var(--scrollbar-thumb-hover) transparent;
   }
 
   .wellness-scroll::-webkit-scrollbar {
@@ -1151,14 +1191,14 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   }
 
   .wellness-scroll::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.4);
+    background: var(--scrollbar-thumb);
     border-radius: 999px;
     border: 2px solid transparent;
     background-clip: padding-box;
   }
 
   .wellness-scroll::-webkit-scrollbar-thumb:hover {
-    background: rgba(148, 163, 184, 0.55);
+    background: var(--scrollbar-thumb-hover);
     border: 2px solid transparent;
     background-clip: padding-box;
   }
@@ -1216,7 +1256,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   }
 
   /* Wrapper div rendered by our Editor component */
-  .duolingo-editor {
+  .note-editor {
     border: none !important;
     outline: none !important;
     box-shadow: none !important;
@@ -1225,7 +1265,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   }
 
   /* Focus state — kill the browser default blue focus ring too */
-  .duolingo-editor:focus-within,
+  .note-editor:focus-within,
   .ql-container:focus-within {
     border: none !important;
     outline: none !important;
@@ -1293,13 +1333,15 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
   }
 
   .chooser-chip.active {
-    @apply text-green shadow-[0_2px_0_0_#E5E5E5] dark:bg-white/10 dark:border-white/20 dark:text-white dark:shadow-[0_2px_0_0_rgba(0_0_0_/_0.3)];
+    @apply text-green dark:bg-white/10 dark:border-white/20 dark:text-white;
     background-color: oklch(from var(--green) l c h / 0.05);
     border-color: oklch(from var(--green) l c h / 0.3);
+    box-shadow: 0 2px 0 0 var(--chip-shadow);
   }
 
   .chooser-popover {
-    @apply p-5 rounded-3xl z-[100] border border-white/40 shadow-[0_8px_30px_rgb(0_0_0_/_0.12)] bg-white dark:bg-[#1E1E1E] dark:shadow-[0_8px_30px_rgba(0_0_0_/_0.5)] dark:border-white/10;
+    @apply p-5 rounded-3xl z-[100] border border-white/40 shadow-[0_8px_30px_rgb(0_0_0_/_0.12)] bg-white dark:shadow-[0_8px_30px_rgba(0_0_0_/_0.5)] dark:border-white/10;
+    background-color: var(--popover-bg, #ffffff);
   }
 }
 
