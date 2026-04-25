@@ -152,6 +152,8 @@ export const FAQ: React.FC = () => {
               </motion.div>
             ))}
           </div>
+        </section>
+
         {/* Cinematic Visual Break */}
         <section className="mb-48 overflow-hidden rounded-[var(--radius-shell)] border border-border">
           <div className="relative aspect-[16/10] sm:aspect-[21/9] w-full bg-green/5">
