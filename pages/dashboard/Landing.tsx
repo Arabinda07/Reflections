@@ -129,7 +129,7 @@ export const Landing: React.FC = () => {
             ref={videoRef}
             src="/assets/videos/landing_video.mp4"
             poster="/assets/videos/landing_video.png"
-            className="absolute inset-0 h-full w-full object-cover object-[70%_center] bg-body opacity-90 sm:object-[64%_center] lg:object-center"
+            className="absolute inset-0 h-full w-full object-cover object-[48%_center] bg-body opacity-90 sm:object-[64%_center] lg:object-center"
             autoPlay
             loop
             muted={isMuted}
