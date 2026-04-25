@@ -47,6 +47,7 @@ describe('remaining roadmap contract', () => {
     const myNotes = read('pages/dashboard/MyNotes.tsx');
 
     expect(myNotes).toContain('<LoadingState');
+    expect(myNotes).not.toContain('isContentVisible');
     expect(myNotes).toContain('buildNotePreviewText');
     expect(myNotes).toContain("import('./MyNotesCalendar')");
   });

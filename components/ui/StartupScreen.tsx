@@ -31,7 +31,7 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
             style={{ touchAction: 'none' }}
           >
             <div className="absolute inset-0 flex items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_center,oklch(from_var(--green)_0.26_0.04_h_/_0.32),var(--bg-color)_58%)]">
-              <div className="absolute inset-0 z-10 scale-75 rounded-full bg-green/5 blur-3xl animate-pulse" />
+              <div className="absolute inset-0 z-10 bg-[linear-gradient(180deg,rgba(0,0,0,0.18),transparent_36%,rgba(0,0,0,0.2))]" />
 
               <video
                 src="/assets/videos/sanctuary.mp4"

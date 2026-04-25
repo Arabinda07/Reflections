@@ -24,11 +24,13 @@ describe('surgical route and landing contract', () => {
     }
   });
 
-  it('gates CreateNote until the entry experience is finished', () => {
+  it('keeps CreateNote entry feedback tied to real loading only', () => {
     const createNote = read('pages/dashboard/CreateNote.tsx');
 
-    expect(createNote).toContain('const showEntryExperience = loading || isBreathing;');
+    expect(createNote).toContain('const showEntryExperience = loading;');
     expect(createNote).toContain('if (showEntryExperience) {');
+    expect(createNote).not.toContain('const [isBreathing');
+    expect(createNote).not.toContain('setIsBreathing');
     expect(createNote).not.toContain('<OverlayFeedback isVisible={loading || isBreathing}');
     expect(createNote).toContain('DotLottieReact');
     expect(createNote).toContain("from '@/src/lottie/trail-loading.json'");

@@ -11,13 +11,21 @@ const vendorChunk = (id: string) => {
   if (id.includes('react-router')) return 'vendor-routing';
   if (id.includes('@capacitor')) return 'vendor-native';
   if (id.includes('@vercel')) return 'vendor-observability';
-  if (id.includes('react-calendar') || id.includes('date-fns')) return 'vendor-calendar';
+  if (
+    id.includes('react-calendar') ||
+    id.includes('date-fns') ||
+    id.includes('@wojtekmaj/date-utils') ||
+    id.includes('get-user-locale')
+  ) return 'vendor-calendar';
   if (id.includes('quill')) return 'vendor-editor';
   if (id.includes('@supabase') || id.includes('dexie') || id.includes('idb-keyval')) return 'vendor-data';
-  if (id.includes('motion') || id.includes('@lottiefiles/dotlottie-react')) return 'vendor-motion';
+  if (id.includes('@lottiefiles')) return 'vendor-lottie';
+  if (id.includes('motion')) return 'vendor-motion';
   if (id.includes('@phosphor-icons')) return 'vendor-icons';
   if (id.includes('@google/genai') || id.includes('@splinetool/runtime')) return 'vendor-ai';
   if (id.includes('@sentry')) return 'vendor-sentry';
+  if (id.includes('posthog-js') || id.includes('@posthog') || id.includes('iceberg-js')) return 'vendor-analytics';
+  if (id.includes('zustand')) return 'vendor-state';
 
   return 'vendor-react';
 };

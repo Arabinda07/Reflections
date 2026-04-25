@@ -43,7 +43,6 @@ export const MyNotes: React.FC = () => {
   const { user } = useAuth();
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isContentVisible, setIsContentVisible] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [noteIdToDelete, setNoteIdToDelete] = useState<string | null>(null);
@@ -62,7 +61,6 @@ export const MyNotes: React.FC = () => {
         console.error('Failed to fetch notes', error);
       } finally {
         setLoading(false);
-        setIsContentVisible(true);
       }
     };
 
@@ -249,9 +247,9 @@ export const MyNotes: React.FC = () => {
         message="A moment while we prepare your reflection library."
       />
 
-      {isContentVisible ? (
+      {!loading ? (
         <PageContainer className="pb-14 pt-4 md:pt-8">
-          <div className="space-y-10 animate-in fade-in duration-700">
+          <div className="space-y-10 animate-in fade-in duration-500">
             <SectionHeader
               title="Saved reflections"
               description={

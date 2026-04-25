@@ -1,6 +1,6 @@
 import type { NoteAttachment, Task } from '../../types';
 
-export const CREATE_NOTE_SAVE_VISUAL_FLOOR_MS = 600;
+export const CREATE_NOTE_SAVE_VISUAL_FLOOR_MS = 0;
 export const CREATE_NOTE_UNSUPPORTED_WHISPER_MESSAGE =
   "Whisper isn't available in this browser yet. You can keep writing normally or try Chrome on Android.";
 

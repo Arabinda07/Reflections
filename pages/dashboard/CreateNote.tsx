@@ -189,7 +189,6 @@ export const CreateNote: React.FC = () => {
   const [isTitleFocused, setIsTitleFocused] = useState(false);
   const [isFocusModeEnabled, setIsFocusModeEnabled] = useState(false);
   const [isFlowing, setIsFlowing] = useState(false);
-  const [isBreathing, setIsBreathing] = useState(true); 
   const [isMobileOptionsOpen, setIsMobileOptionsOpen] = useState(false);
 
   // Sub-modal states
@@ -259,18 +258,6 @@ export const CreateNote: React.FC = () => {
       isUnmounted.current = true; 
     };
   }, []);
-
-  // Auto-transition from Breathing to Editor
-  useEffect(() => {
-    if (!loading && isBreathing) {
-      const timer = setTimeout(() => {
-        if (!isUnmounted.current) {
-          setIsBreathing(false);
-        }
-      }, 3200); 
-      return () => clearTimeout(timer);
-    }
-  }, [loading, isBreathing]);
 
   useEffect(() => {
     if (isFocusModeEnabled) return;
@@ -413,9 +400,12 @@ export const CreateNote: React.FC = () => {
       }
     }, 5000);
 
-    const visualFloor = new Promise<void>((resolve) =>
-      window.setTimeout(resolve, CREATE_NOTE_SAVE_VISUAL_FLOOR_MS),
-    );
+    const visualFloor =
+      CREATE_NOTE_SAVE_VISUAL_FLOOR_MS > 0
+        ? new Promise<void>((resolve) =>
+            window.setTimeout(resolve, CREATE_NOTE_SAVE_VISUAL_FLOOR_MS),
+          )
+        : Promise.resolve();
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -611,7 +601,7 @@ export const CreateNote: React.FC = () => {
   const wordCount = currentDraftSnapshot.content.replace(/<[^>]*>/g, '').trim().split(/\s+/).filter(Boolean).length;
   const canReflect = wordCount >= 100;
   const isFocusModeActive = isFocusModeEnabled && isFlowing && !isTitleFocused;
-  const showEntryExperience = loading || isBreathing;
+  const showEntryExperience = loading;
   const handleStayOnDraft = () => {
     setShowLeaveDialog(false);
     if (blocker.state === 'blocked') {
@@ -653,6 +643,7 @@ export const CreateNote: React.FC = () => {
           onClick={handleMobileBack}
           className={`surface-floating fixed left-4 z-[80] flex h-10 w-10 items-center justify-center rounded-[var(--radius-control)] transition-all hover:text-green ${isFocusModeActive ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
           style={{ top: NATIVE_TOP_CONTROL_OFFSET }}
+          aria-label="Back to notes"
         >
           <ArrowLeft size={18} weight="bold" />
         </button>
@@ -750,6 +741,7 @@ export const CreateNote: React.FC = () => {
               <button
                 onClick={() => setImagePreview(null)}
                 className="surface-floating surface-floating--media absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-[var(--radius-control)] opacity-0 transition-all group-hover:opacity-100"
+                aria-label="Remove cover image"
               >
                 <X size={20} weight="bold" />
               </button>
@@ -854,6 +846,7 @@ export const CreateNote: React.FC = () => {
           <button 
             onClick={() => setIsMobileOptionsOpen(true)}
             className="surface-floating group relative flex h-16 w-16 items-center justify-center rounded-full hover:text-green"
+            aria-label="Open reflection options"
           >
             <DotsThreeCircle size={28} weight="fill" className="opacity-80" />
           </button>
@@ -872,6 +865,7 @@ export const CreateNote: React.FC = () => {
                 whileTap={{ scale: 0.95 }}
                 onClick={cycleSparkPrompt}
                 className="surface-floating group relative flex h-16 w-16 items-center justify-center rounded-full text-green"
+                aria-label="Show another writing prompt"
               >
                 <div className="absolute inset-2 rounded-full bg-green/5 group-hover:bg-green/10 transition-colors" />
                 <Target size={28} weight="fill" />
@@ -889,6 +883,7 @@ export const CreateNote: React.FC = () => {
                 onClick={handleSave}
                 disabled={saving}
                 className="group relative h-16 w-16 rounded-full bg-green text-white shadow-[0_24px_40px_-10px_rgba(22,163,74,0.4)] flex items-center justify-center transition-all"
+                aria-label="Save reflection"
               >
                 <div className="absolute inset-2 rounded-full bg-white/12 group-hover:scale-110 transition-transform duration-500 ease-out" />
                 {saving ? <CircleNotch size={28} className="animate-spin" /> : <FloppyDisk size={26} weight="fill" className="relative z-10" />}
@@ -974,7 +969,12 @@ export const CreateNote: React.FC = () => {
             {tags.map((tag) => (
               <span key={tag} className="flex items-center gap-2 rounded-xl bg-green/10 px-3 py-1.5 text-[12px] font-bold text-green">
                 #{tag}
-                <button type="button" onClick={() => setTags(tags.filter((item) => item !== tag))} className="text-green/70 hover:text-red">
+                <button
+                  type="button"
+                  onClick={() => setTags(tags.filter((item) => item !== tag))}
+                  className="text-green/70 hover:text-red"
+                  aria-label={`Remove ${tag} tag`}
+                >
                   <X size={12} />
                 </button>
               </span>

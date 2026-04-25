@@ -209,15 +209,32 @@ export const redirectToAppRoute = (path: string) => {
 };
 
 const launchGoogleOAuth = async (sourcePath: GoogleAuthSourcePath) => {
-  const { error } = await supabase.auth.signInWithOAuth({
+  const isNative = hasWindow() && Capacitor.isNativePlatform();
+  const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
       redirectTo: getGoogleOAuthRedirectTo(sourcePath),
+      ...(isNative ? { skipBrowserRedirect: true } : {}),
     },
   });
 
   if (error) {
     return { ok: false as const, message: error.message };
+  }
+
+  if (isNative) {
+    if (!data.url) {
+      return {
+        ok: false as const,
+        message: 'Google sign in could not be opened. Please try again.',
+      };
+    }
+
+    const { Browser } = await import('@capacitor/browser');
+    await Browser.open({
+      url: data.url,
+      presentationStyle: 'fullscreen',
+    });
   }
 
   return { ok: true as const };

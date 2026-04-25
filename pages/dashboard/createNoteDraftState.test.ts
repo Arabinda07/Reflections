@@ -68,8 +68,11 @@ describe('createNoteDraftState', () => {
     expect(hasUnsavedCreateNoteChanges(current, baseline)).toBe(true);
   });
 
-  it('locks in the calmer save timing and whisper fallback copy', () => {
-    expect(CREATE_NOTE_SAVE_VISUAL_FLOOR_MS).toBe(600);
+  it('keeps save feedback tied to real work instead of an artificial visual floor', () => {
+    expect(CREATE_NOTE_SAVE_VISUAL_FLOOR_MS).toBe(0);
+  });
+
+  it('locks in the whisper fallback copy', () => {
     expect(CREATE_NOTE_UNSUPPORTED_WHISPER_MESSAGE).toBe(
       "Whisper isn't available in this browser yet. You can keep writing normally or try Chrome on Android.",
     );

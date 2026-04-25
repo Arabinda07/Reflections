@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
 import { RoutePath } from '../../types';
 import {
   consumeGoogleAuthError,
@@ -17,6 +18,12 @@ vi.mock('@capacitor/core', () => ({
   },
 }));
 
+vi.mock('@capacitor/browser', () => ({
+  Browser: {
+    open: vi.fn(),
+  },
+}));
+
 vi.mock('../supabaseClient', () => ({
   supabase: {
     auth: {
@@ -31,6 +38,7 @@ const mockSignInWithOAuth = vi.mocked(supabase.auth.signInWithOAuth);
 const mockExchangeCodeForSession = vi.mocked(supabase.auth.exchangeCodeForSession);
 const mockSetSession = vi.mocked(supabase.auth.setSession);
 const mockIsNativePlatform = vi.mocked(Capacitor.isNativePlatform);
+const mockBrowserOpen = vi.mocked(Browser.open);
 
 class SessionStorageMock {
   private readonly store = new Map<string, string>();
@@ -84,6 +92,7 @@ describe('googleOAuth', () => {
       data: { session: {} },
       error: null,
     } as any);
+    mockBrowserOpen.mockResolvedValue(undefined);
   });
 
   it('stores the source route and a safe redirect before launching Supabase OAuth', async () => {
@@ -134,7 +143,29 @@ describe('googleOAuth', () => {
       provider: 'google',
       options: {
         redirectTo: 'com.arabinda.reflections://auth/callback',
+        skipBrowserRedirect: true,
       },
+    });
+  });
+
+  it('opens native Google OAuth in a Custom Tab instead of redirecting the WebView', async () => {
+    mockIsNativePlatform.mockReturnValue(true);
+
+    await startGoogleOAuthFlow({
+      sourcePath: RoutePath.LOGIN,
+      redirectPath: RoutePath.NOTES,
+    });
+
+    expect(mockSignInWithOAuth).toHaveBeenCalledWith({
+      provider: 'google',
+      options: {
+        redirectTo: 'com.arabinda.reflections://auth/callback',
+        skipBrowserRedirect: true,
+      },
+    });
+    expect(mockBrowserOpen).toHaveBeenCalledWith({
+      url: 'https://accounts.google.com/o/oauth2/v2/auth',
+      presentationStyle: 'fullscreen',
     });
   });
 

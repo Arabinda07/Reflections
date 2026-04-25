@@ -10,6 +10,7 @@ import { RoutePath } from './types';
 import { useSync } from './hooks/useSync';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
+import { trackGoogleAuthFailed, trackGoogleAuthSucceeded } from './src/analytics/events';
 
 // Lazy load non-critical routes to reduce initial bundle size
 const SignIn = lazy(() => import('./pages/auth/SignIn').then(m => ({ default: m.SignIn })));
@@ -149,7 +150,7 @@ function App() {
 
       const { App: CapacitorApp } = await import('@capacitor/app');
       const googleOAuth = await import('./src/auth/googleOAuth');
-      const { trackGoogleAuthFailed, trackGoogleAuthSucceeded } = await import('./src/analytics/events');
+      const { Browser } = await import('@capacitor/browser');
 
       if (!isActive) {
         return;
@@ -182,6 +183,8 @@ function App() {
             isNative: true,
           });
         }
+
+        void Browser.close().catch(() => undefined);
 
         const completionPath =
           'error' in result

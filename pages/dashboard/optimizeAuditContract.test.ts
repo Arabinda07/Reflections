@@ -25,6 +25,9 @@ describe('optimize audit contract', () => {
     expect(vite).toContain("return 'vendor-routing'");
     expect(vite).toContain("return 'vendor-native'");
     expect(vite).toContain("return 'vendor-observability'");
+    expect(vite).toContain("return 'vendor-analytics'");
+    expect(vite).toContain("return 'vendor-lottie'");
+    expect(vite).toContain("return 'vendor-state'");
   });
 
   it('removes perception-slow waits from the authenticated home prompt refresh', () => {
@@ -32,6 +35,18 @@ describe('optimize audit contract', () => {
 
     expect(homeAuthenticated).not.toContain('window.setTimeout(() => {');
     expect(homeAuthenticated).not.toContain('}, 600);');
+  });
+
+  it('keeps note routes free of artificial page and save delays', () => {
+    const createNote = read('pages/dashboard/CreateNote.tsx');
+    const createNoteDraftState = read('pages/dashboard/createNoteDraftState.ts');
+    const myNotes = read('pages/dashboard/MyNotes.tsx');
+
+    expect(createNote).not.toContain('const [isBreathing');
+    expect(createNote).not.toContain('setIsBreathing');
+    expect(createNote).toContain('const showEntryExperience = loading;');
+    expect(createNoteDraftState).toContain('CREATE_NOTE_SAVE_VISUAL_FLOOR_MS = 0');
+    expect(myNotes).not.toContain('isContentVisible');
   });
 
   it('drops dead public media that still bloats the shipped build', () => {
