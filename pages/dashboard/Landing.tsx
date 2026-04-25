@@ -58,7 +58,7 @@ export const Landing: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.5 }}
-              className="pointer-events-auto max-w-[33ch] font-serif text-[1rem] leading-relaxed text-gray-light sm:max-w-[38ch] sm:text-mk-body lg:max-w-[44ch] tracking-tight"
+              className="pointer-events-auto max-w-[33ch] font-serif text-[1rem] leading-relaxed text-gray-text sm:max-w-[38ch] sm:text-mk-body lg:max-w-[44ch] tracking-tight"
             >
               A private place to put words down, notice what returns, and leave the noise outside.
             </motion.p>
