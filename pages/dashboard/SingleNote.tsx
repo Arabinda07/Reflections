@@ -291,8 +291,8 @@ export const SingleNote: React.FC = () => {
             />
           ) : null}
 
-          <div className="grid gap-8 lg:grid-cols-[240px_minmax(0,1fr)]">
-            <Surface variant="flat" className="self-start lg:sticky lg:top-28">
+          <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-8">
+            <Surface variant="flat" className="hidden self-start lg:sticky lg:top-28 lg:block">
               <div className="flex flex-col gap-6 p-5">
                 <div className="space-y-3">
                   <span className="text-[10px] font-black tracking-widest uppercase text-green/80">

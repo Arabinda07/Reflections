@@ -58,10 +58,10 @@
   /* App Shell – single source of truth for header height */
   --header-height: 3.5rem; /* 56px – comfortable mobile app-bar */
 
-  /* Brand Hue = 135 (Classic Wellness Green) */
-  --green: oklch(0.70 0.18 135);
-  --green-hover: oklch(0.65 0.18 135);
-  --green-shadow: oklch(0.55 0.18 135);
+  /* Brand Hue = 142 (quiet botanical green, dark enough for readable accents) */
+  --green: oklch(0.50 0.16 142);
+  --green-hover: oklch(0.44 0.14 142);
+  --green-shadow: oklch(0.38 0.13 142);
   
   --dark-blue: oklch(0.25 0.05 260);
   --blue: oklch(0.65 0.15 245);
@@ -524,7 +524,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 
   .sticky-bar {
     position: sticky;
-    top: 1rem;
+    top: calc(1rem + env(safe-area-inset-top));
     z-index: 50;
     display: flex;
     align-items: center;

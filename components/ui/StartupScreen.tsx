@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { OverlayFeedback } from './OverlayFeedback';
 
@@ -14,6 +14,8 @@ interface StartupScreenProps {
  * Hardened with Portals to ensure it occupies the entire viewport.
  */
 export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
+  const [isVideoReady, setIsVideoReady] = useState(false);
+
   return (
     <OverlayFeedback isVisible={isVisible} overlayClassName="overlay-feedback--screen">
       <AnimatePresence>
@@ -28,7 +30,7 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
             className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-body"
             style={{ touchAction: 'none' }}
           >
-            <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+            <div className="absolute inset-0 flex items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_center,oklch(from_var(--green)_0.26_0.04_h_/_0.32),var(--bg-color)_58%)]">
               <div className="absolute inset-0 z-10 scale-75 rounded-full bg-green/5 blur-3xl animate-pulse" />
 
               <video
@@ -37,7 +39,12 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
                 loop
                 muted
                 playsInline
-                className="absolute inset-0 z-0 h-full w-full object-cover"
+                preload="auto"
+                aria-hidden="true"
+                onLoadedData={() => setIsVideoReady(true)}
+                className={`absolute inset-0 z-0 h-full w-full object-cover transition-opacity duration-500 ${
+                  isVideoReady ? 'opacity-85' : 'opacity-0'
+                }`}
               />
             </div>
 
