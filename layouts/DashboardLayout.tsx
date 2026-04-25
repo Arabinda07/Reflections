@@ -17,6 +17,7 @@ import { AnalyticsRouteTracker } from '../src/analytics/AnalyticsRouteTracker';
 import { Button } from '../components/ui/Button';
 import { SyncBanner } from '../components/ui/SyncBanner';
 import { registerAndroidBackAction } from '../src/native/androidBack';
+import { NATIVE_PAGE_TOP_PADDING, NATIVE_TOP_CONTROL_OFFSET } from '../src/native/safeArea';
 import { useAndroidBackHandler } from '../src/native/useAndroidBackHandler';
 
 export const DashboardLayout: React.FC = () => {
@@ -260,7 +261,8 @@ export const DashboardLayout: React.FC = () => {
                 aria-modal="true"
                 aria-labelledby={mobileMenuTitleId}
                 aria-describedby={mobileMenuDescriptionId}
-                className="relative flex h-full flex-col gap-6 overflow-y-auto p-8 pt-24"
+                className="relative flex h-full flex-col gap-6 overflow-y-auto p-8"
+                style={{ paddingTop: NATIVE_PAGE_TOP_PADDING }}
               >
                 <h2 id={mobileMenuTitleId} className="sr-only">
                   Navigation menu
@@ -273,7 +275,8 @@ export const DashboardLayout: React.FC = () => {
                 <button
                   ref={mobileMenuCloseRef}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="surface-floating surface-floating--strong absolute right-4 top-4 z-[110] rounded-2xl p-3 text-gray-nav transition-all duration-300 ease-out-expo hover:text-green active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
+                  className="surface-floating surface-floating--strong absolute right-4 z-[110] rounded-2xl p-3 text-gray-nav transition-all duration-300 ease-out-expo hover:text-green active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
+                  style={{ top: NATIVE_TOP_CONTROL_OFFSET }}
                   aria-label="Close menu"
                 >
                   <X size={24} />
@@ -361,7 +364,7 @@ export const DashboardLayout: React.FC = () => {
         
         {/* Global Footer - Positioned for full-width background with centered content */}
         {!isWritingRoute && (
-          <footer className="mt-auto w-full border-t border-border bg-[rgba(var(--panel-bg-rgb),0.82)] py-12 transition-all duration-300">
+          <footer className="screen-scrim screen-scrim--strong mt-auto w-full border-t border-border py-12 transition-all duration-300">
             <div className="max-w-[1440px] mx-auto px-6 md:px-16 flex flex-col sm:flex-row items-center justify-between gap-8">
               <nav aria-label="Footer navigation" className="flex items-center gap-10">
                 <Link 

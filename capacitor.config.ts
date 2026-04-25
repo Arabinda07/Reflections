@@ -14,17 +14,6 @@ const config: CapacitorConfig = {
     App: {
       disableBackButtonHandler: true,
     },
-    SplashScreen: {
-      launchShowDuration: 0,
-      launchAutoHide: false,
-      launchFadeOutDuration: 150,
-      backgroundColor: '#121212',
-      androidSplashResourceName: 'splash',
-      androidScaleType: 'CENTER_CROP',
-      showSpinner: false,
-      splashFullScreen: false,
-      splashImmersive: false,
-    },
     StatusBar: {
       overlaysWebView: false,
       style: 'DARK',

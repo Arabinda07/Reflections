@@ -50,6 +50,8 @@ import { DEFAULT_WELLNESS_PROMPTS, getCurrentWellnessPrompt, getNextWellnessProm
 import { aiService } from '../../services/aiService';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { getOrderedTasks, getTaskDrawerTriggerLabel } from './createNoteTasks';
+import { canNavigateBackInApp } from '../../src/native/androidBack';
+import { NATIVE_PAGE_TOP_PADDING, NATIVE_TOP_CONTROL_OFFSET } from '../../src/native/safeArea';
 import {
   buildCreateNoteDraftSnapshot,
   CREATE_NOTE_SAVE_VISUAL_FLOOR_MS,
@@ -168,6 +170,21 @@ export const CreateNote: React.FC = () => {
   
   // UI States
   const isMobile = useMediaQuery('(max-width: 1023px)');
+
+  const handleMobileBack = useCallback(() => {
+    if (
+      typeof window !== 'undefined' &&
+      canNavigateBackInApp(
+        window.history.state as { idx?: unknown } | null,
+        window.history.length,
+      )
+    ) {
+      navigate(-1);
+      return;
+    }
+
+    navigate(RoutePath.NOTES);
+  }, [navigate]);
   const [isFocused, setIsFocused] = useState(false);
   const [isTitleFocused, setIsTitleFocused] = useState(false);
   const [isFocusModeEnabled, setIsFocusModeEnabled] = useState(false);
@@ -633,8 +650,9 @@ export const CreateNote: React.FC = () => {
       {/* ── Mobile Back Button ── */}
       {isMobile && (
         <button 
-          onClick={() => navigate(RoutePath.NOTES)}
-          className={`surface-floating fixed left-4 top-4 z-[80] flex h-10 w-10 items-center justify-center rounded-[var(--radius-control)] transition-all hover:text-green ${isFocusModeActive ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
+          onClick={handleMobileBack}
+          className={`surface-floating fixed left-4 z-[80] flex h-10 w-10 items-center justify-center rounded-[var(--radius-control)] transition-all hover:text-green ${isFocusModeActive ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
+          style={{ top: NATIVE_TOP_CONTROL_OFFSET }}
         >
           <ArrowLeft size={18} weight="bold" />
         </button>
@@ -647,7 +665,8 @@ export const CreateNote: React.FC = () => {
             setIsFlowing(false);
             setIsFocusModeEnabled(false);
           }}
-          className="surface-floating fixed right-4 top-4 z-[85] inline-flex items-center gap-2 rounded-full px-4 py-2 text-[11px] font-black uppercase tracking-[0.18em] text-green hover:text-green"
+          className="surface-floating fixed right-4 z-[85] inline-flex items-center gap-2 rounded-full px-4 py-2 text-[11px] font-black uppercase tracking-[0.18em] text-green hover:text-green"
+          style={{ top: NATIVE_TOP_CONTROL_OFFSET }}
         >
           <X size={12} weight="bold" />
           Exit focus
@@ -718,7 +737,10 @@ export const CreateNote: React.FC = () => {
       )}
 
       {/* ── Main Canvas ── */}
-      <main className="flex-1 w-full relative pt-24 pb-40 px-6 sm:px-12 md:px-20">
+      <main
+        className="relative flex-1 w-full pb-40 px-6 sm:px-12 md:px-20"
+        style={{ paddingTop: NATIVE_PAGE_TOP_PADDING }}
+      >
         <div className="max-w-[800px] mx-auto">
           
           {/* Cover Image */}

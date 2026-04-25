@@ -4,6 +4,7 @@ import { Capacitor } from '@capacitor/core';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   androidBackActionRegistry,
+  canNavigateBackInApp,
   isTopLevelAndroidRoute,
   resolveAndroidBackOutcome,
 } from './androidBack';
@@ -26,8 +27,16 @@ export const useAndroidBackHandler = () => {
 
       const listener = await App.addListener('backButton', async () => {
         const now = Date.now();
+        const canNavigateBack =
+          typeof window !== 'undefined'
+            ? canNavigateBackInApp(
+                window.history.state as { idx?: unknown } | null,
+                window.history.length,
+              )
+            : false;
         const baseInput = {
           isTopLevelRoute: isTopLevelAndroidRoute(location.pathname),
+          canNavigateBack,
           now,
           lastExitPromptAt: lastExitPromptAtRef.current,
         };

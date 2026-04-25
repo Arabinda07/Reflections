@@ -1,8 +1,4 @@
 import React, { Suspense, lazy, useEffect } from 'react';
-import { App as CapacitorApp } from '@capacitor/app';
-import { Capacitor } from '@capacitor/core';
-import { SplashScreen } from '@capacitor/splash-screen';
-import { StatusBar, Style } from '@capacitor/status-bar';
 import { Route, RouterProvider, createHashRouter, createRoutesFromElements } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { PWAInstallProvider } from './context/PWAInstallContext';
@@ -14,10 +10,6 @@ import { RoutePath } from './types';
 import { useSync } from './hooks/useSync';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
-import {
-  trackGoogleAuthFailed,
-  trackGoogleAuthSucceeded,
-} from './src/analytics/events';
 
 // Lazy load non-critical routes to reduce initial bundle size
 const SignIn = lazy(() => import('./pages/auth/SignIn').then(m => ({ default: m.SignIn })));
@@ -118,9 +110,13 @@ function App() {
     let isActive = true;
 
     const applyNativeChrome = async () => {
-      if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'android') {
+      const { Capacitor } = await import('@capacitor/core');
+
+      if (!isActive || !Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'android') {
         return;
       }
+
+      const { StatusBar, Style } = await import('@capacitor/status-bar');
 
       try {
         await StatusBar.setOverlaysWebView({ overlay: false });
@@ -129,19 +125,6 @@ function App() {
         await StatusBar.show();
       } catch (error) {
         console.warn('[native] Failed to align the Android status bar.', error);
-      }
-
-      try {
-        await new Promise<void>((resolve) => {
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => resolve());
-          });
-        });
-
-        if (!isActive) return;
-        await SplashScreen.hide();
-      } catch (error) {
-        console.warn('[native] Failed to hide the Android splash screen.', error);
       }
     };
 
@@ -158,11 +141,15 @@ function App() {
     let lastHandledNativeUrl: string | null = null;
     
     const setupNativeOAuth = async () => {
+      const { Capacitor } = await import('@capacitor/core');
+
       if (!isActive || !Capacitor.isNativePlatform()) {
         return;
       }
 
+      const { App: CapacitorApp } = await import('@capacitor/app');
       const googleOAuth = await import('./src/auth/googleOAuth');
+      const { trackGoogleAuthFailed, trackGoogleAuthSucceeded } = await import('./src/analytics/events');
 
       if (!isActive) {
         return;
@@ -175,7 +162,6 @@ function App() {
 
         lastHandledNativeUrl = url;
         const pendingSourcePath = googleOAuth.getPendingGoogleAuthPath() || RoutePath.LOGIN;
-        const pendingRedirectPath = googleOAuth.getPendingGoogleAuthRedirectPath();
         const result = await googleOAuth.consumeNativeGoogleOAuthCallback(url);
 
         if (!isActive || !result.handled) {
@@ -192,14 +178,17 @@ function App() {
         } else {
           trackGoogleAuthSucceeded({
             sourcePath: pendingSourcePath,
-            redirectPath: pendingRedirectPath,
+            redirectPath: RoutePath.HOME,
             isNative: true,
           });
         }
 
-        googleOAuth.redirectToAppRoute(
-          pendingSourcePath,
-        );
+        const completionPath =
+          'error' in result
+            ? pendingSourcePath
+            : googleOAuth.consumeNativeGoogleAuthSuccessRedirectPath(pendingSourcePath);
+
+        googleOAuth.redirectToAppRoute(completionPath);
       };
 
       const listener = await CapacitorApp.addListener('appUrlOpen', ({ url }) => {

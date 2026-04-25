@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  canNavigateBackInApp,
   createAndroidBackActionRegistry,
   isTopLevelAndroidRoute,
   resolveAndroidBackOutcome,
@@ -52,6 +53,7 @@ describe('resolveAndroidBackOutcome', () => {
       resolveAndroidBackOutcome({
         hasRegisteredAction: false,
         isTopLevelRoute: true,
+        canNavigateBack: false,
         now: 1000,
         lastExitPromptAt: null,
       }),
@@ -64,10 +66,23 @@ describe('resolveAndroidBackOutcome', () => {
       resolveAndroidBackOutcome({
         hasRegisteredAction: false,
         isTopLevelRoute: true,
+        canNavigateBack: false,
         now: 2500,
         lastExitPromptAt: 1000,
       }),
     ).toEqual({ type: 'exit-app' });
+  });
+
+  it('navigates back from a top-level route when the in-app history can still pop', () => {
+    expect(
+      resolveAndroidBackOutcome({
+        hasRegisteredAction: false,
+        isTopLevelRoute: true,
+        canNavigateBack: true,
+        now: 1000,
+        lastExitPromptAt: null,
+      }),
+    ).toEqual({ type: 'navigate-back' });
   });
 });
 
@@ -84,5 +99,17 @@ describe('isTopLevelAndroidRoute', () => {
     expect(isTopLevelAndroidRoute('/terms')).toBe(true);
     expect(isTopLevelAndroidRoute('/notes/new')).toBe(false);
     expect(isTopLevelAndroidRoute('/notes/123')).toBe(false);
+  });
+});
+
+describe('canNavigateBackInApp', () => {
+  it('prefers the router history index when it is available', () => {
+    expect(canNavigateBackInApp({ idx: 2 }, 1)).toBe(true);
+    expect(canNavigateBackInApp({ idx: 0 }, 5)).toBe(false);
+  });
+
+  it('falls back to the browser history length when router state is unavailable', () => {
+    expect(canNavigateBackInApp(undefined, 2)).toBe(true);
+    expect(canNavigateBackInApp(undefined, 1)).toBe(false);
   });
 });

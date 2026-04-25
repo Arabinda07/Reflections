@@ -4,6 +4,7 @@ import { RoutePath } from '../../types';
 import {
   consumeGoogleAuthError,
   consumeNativeGoogleOAuthCallback,
+  consumeNativeGoogleAuthSuccessRedirectPath,
   consumePendingGoogleAuthRedirectPath,
   resolvePostAuthRedirectPath,
   startGoogleOAuthFlow,
@@ -183,6 +184,16 @@ describe('googleOAuth', () => {
     const sessionStorage = getSessionStorage();
 
     expect(consumePendingGoogleAuthRedirectPath(RoutePath.LOGIN)).toBeNull();
+    expect(sessionStorage.getItem('reflections.pending-google-auth-path')).toBeNull();
+    expect(sessionStorage.getItem('reflections.pending-google-auth-redirect-path')).toBeNull();
+  });
+
+  it('sends a successful native Google return to home and clears the pending redirect state', () => {
+    const sessionStorage = getSessionStorage();
+    sessionStorage.setItem('reflections.pending-google-auth-path', RoutePath.LOGIN);
+    sessionStorage.setItem('reflections.pending-google-auth-redirect-path', '/notes/new');
+
+    expect(consumeNativeGoogleAuthSuccessRedirectPath(RoutePath.LOGIN)).toBe(RoutePath.HOME);
     expect(sessionStorage.getItem('reflections.pending-google-auth-path')).toBeNull();
     expect(sessionStorage.getItem('reflections.pending-google-auth-redirect-path')).toBeNull();
   });

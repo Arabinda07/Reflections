@@ -1,5 +1,30 @@
 apply plugin: 'com.android.application'
 
+import java.util.Properties
+
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('keystore.properties')
+
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.withInputStream { stream ->
+        keystoreProperties.load(stream)
+    }
+}
+
+def resolveSigningValue = { String key ->
+    def envValue = System.getenv(key)
+    if (envValue != null && !envValue.trim().isEmpty()) {
+        return envValue.trim()
+    }
+
+    def fileValue = keystoreProperties.getProperty(key)
+    if (fileValue != null && !fileValue.trim().isEmpty()) {
+        return fileValue.trim()
+    }
+
+    return ""
+}
+
 android {
     namespace = "com.arabinda.reflections"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -18,10 +43,14 @@ android {
     }
     signingConfigs {
         release {
-            storeFile file(findProperty("REFLECTIONS_STORE_FILE") ?: "")
-            storePassword findProperty("REFLECTIONS_STORE_PASSWORD") ?: ""
-            keyAlias findProperty("REFLECTIONS_KEY_ALIAS") ?: ""
-            keyPassword findProperty("REFLECTIONS_KEY_PASSWORD") ?: ""
+            def releaseStoreFile = resolveSigningValue("REFLECTIONS_STORE_FILE")
+            if (!releaseStoreFile.isEmpty()) {
+                storeFile file(releaseStoreFile)
+            }
+
+            storePassword resolveSigningValue("REFLECTIONS_STORE_PASSWORD")
+            keyAlias resolveSigningValue("REFLECTIONS_KEY_ALIAS")
+            keyPassword resolveSigningValue("REFLECTIONS_KEY_PASSWORD")
         }
     }
     buildTypes {

@@ -3,6 +3,7 @@ type AndroidBackAction = () => boolean | void | Promise<boolean | void>;
 interface AndroidBackOutcomeInput {
   hasRegisteredAction: boolean;
   isTopLevelRoute: boolean;
+  canNavigateBack?: boolean;
   now: number;
   lastExitPromptAt: number | null;
   promptWindowMs?: number;
@@ -68,9 +69,25 @@ export const registerAndroidBackAction = (action: AndroidBackAction) =>
 export const isTopLevelAndroidRoute = (pathname: string) =>
   ANDROID_TOP_LEVEL_ROUTES.has(pathname);
 
+export const canNavigateBackInApp = (
+  historyState?: { idx?: unknown } | null,
+  historyLength?: number | null,
+) => {
+  if (typeof historyState?.idx === 'number') {
+    return historyState.idx > 0;
+  }
+
+  if (typeof historyLength === 'number') {
+    return historyLength > 1;
+  }
+
+  return false;
+};
+
 export const resolveAndroidBackOutcome = ({
   hasRegisteredAction,
   isTopLevelRoute,
+  canNavigateBack = false,
   now,
   lastExitPromptAt,
   promptWindowMs = DEFAULT_EXIT_PROMPT_WINDOW_MS,
@@ -79,7 +96,7 @@ export const resolveAndroidBackOutcome = ({
     return { type: 'registered-action' };
   }
 
-  if (!isTopLevelRoute) {
+  if (canNavigateBack || !isTopLevelRoute) {
     return { type: 'navigate-back' };
   }
 

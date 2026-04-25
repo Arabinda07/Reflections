@@ -145,6 +145,13 @@ export const consumePendingGoogleAuthRedirectPath = (sourcePath: GoogleAuthSourc
   return redirectPath;
 };
 
+export const consumeNativeGoogleAuthSuccessRedirectPath = (
+  sourcePath: GoogleAuthSourcePath,
+) => {
+  consumePendingGoogleAuthRedirectPath(sourcePath);
+  return RoutePath.HOME;
+};
+
 export const stashGoogleAuthError = (message: string) => {
   if (!hasWindow()) {
     return;
