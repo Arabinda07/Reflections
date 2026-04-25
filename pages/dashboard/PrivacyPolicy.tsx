@@ -104,11 +104,11 @@ export const PrivacyPolicy: React.FC = () => {
               If you have questions about your writing or want to delete your account, email us directly:
             </p>
             <a
-              href="mailto:robinsaha@gmail.com"
+              href="mailto:robinsaha434@gmail.com"
               className="mt-4 inline-flex items-center gap-2 text-green font-bold hover:underline tracking-tight"
             >
               <Envelope size={16} weight="bold" />
-              robinsaha@gmail.com
+              robinsaha434@gmail.com
             </a>
           </div>
         </Surface>

@@ -1,9 +1,9 @@
+import { ArrowRight, DownloadSimple, SpeakerHigh, SpeakerSlash } from '@phosphor-icons/react';
+import { motion } from 'motion/react';
 import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'motion/react';
-import { ArrowRight, DownloadSimple, SpeakerHigh, SpeakerSlash } from '@phosphor-icons/react';
-import { RoutePath } from '../../types';
 import { usePWAInstall } from '../../context/PWAInstallContext';
+import { RoutePath } from '../../types';
 
 const staggerContainer = {
   hidden: {},
@@ -44,13 +44,13 @@ export const Landing: React.FC = () => {
               className="pointer-events-auto flex max-w-[11ch] flex-col text-mk-display font-display tracking-[-0.03em] text-gray-text leading-[0.9] sm:max-w-[12ch] sm:leading-[0.94] lg:max-w-5xl lg:tracking-tight lg:leading-[0.98]"
             >
               <motion.span variants={staggerLine} style={{ willChange: 'transform, opacity, filter' }}>
-                A quiet
+                Your mind,
               </motion.span>
               <motion.span variants={staggerLine} className="font-serif italic text-green" style={{ lineHeight: 1.1, willChange: 'transform, opacity, filter' }}>
-                place
+                beautifully
               </motion.span>
               <motion.span variants={staggerLine} style={{ willChange: 'transform, opacity, filter' }}>
-                to write.
+                organized.
               </motion.span>
             </motion.div>
 

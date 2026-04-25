@@ -100,11 +100,11 @@ export const TermsOfService: React.FC = () => {
               If anything here is confusing or you have concerns, reach out:
             </p>
             <a
-              href="mailto:robinsaha@gmail.com"
+              href="mailto:robinsaha434@gmail.com"
               className="mt-4 inline-flex items-center gap-2 text-green font-bold hover:underline tracking-tight"
             >
               <Envelope size={16} weight="bold" />
-              robinsaha@gmail.com
+              robinsaha434@gmail.com
             </a>
 
             <p className="mt-6 text-[13px] font-semibold text-gray-nav/60">

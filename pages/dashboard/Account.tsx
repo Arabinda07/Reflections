@@ -33,7 +33,7 @@ import { offlineStorage } from '../../services/offlineStorage';
 import { useAuth } from '../../context/AuthContext';
 import { profileService } from '../../services/profileService';
 
-const SUPPORT_EMAIL = 'robinsaha@gmail.com';
+const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
 
 type FeedbackState =
   | {
