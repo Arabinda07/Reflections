@@ -152,6 +152,28 @@ export const FAQ: React.FC = () => {
               </motion.div>
             ))}
           </div>
+        {/* Cinematic Visual Break */}
+        <section className="mb-48 overflow-hidden rounded-[var(--radius-shell)] border border-border">
+          <div className="relative aspect-[16/10] sm:aspect-[21/9] w-full bg-green/5">
+            <motion.img
+              initial={{ scale: 1.1, opacity: 0 }}
+              whileInView={{ scale: 1, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
+              src="/assets/images/untangle.png"
+              alt="Lush green forest sanctuary with sunbeams"
+              className="h-full w-full object-cover"
+            />
+            {/* Scrim for legibility */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+            
+            <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end sm:bottom-10 sm:left-10 sm:right-10">
+              <div className="flex flex-col gap-1">
+                <span className="label-caps !text-white/90 drop-shadow-sm">Visual Sanctuary</span>
+                <span className="text-white/60 font-serif italic text-[14px] sm:text-[16px]">Quiet the mind, find the rhythm.</span>
+              </div>
+            </div>
+          </div>
         </section>
 
         <section className="mb-48">
