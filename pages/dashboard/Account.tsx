@@ -238,7 +238,7 @@ export const Account: React.FC = () => {
   const handleAccountClosureRequest = () => {
     openSupportDraft(
       'Reflections account closure request',
-      `Hi,\n\nPlease close the sign-in account for ${email || 'my account'} after any saved data has been removed.\n\nThanks.`,
+      `Hi,\n\nPlease close the sign-in account for ${email || 'my account'} after any saved writing has been removed.\n\nThanks.`,
     );
     setShowDeleteConfirm(false);
     setFeedback({
@@ -281,15 +281,15 @@ export const Account: React.FC = () => {
         replace: true,
         state: {
           successMessage:
-            `Your saved reflections and profile data were deleted. If you also want the sign-in account closed, email ${SUPPORT_EMAIL}.`,
+            `Your saved reflections and profile details were deleted. If you also want the sign-in account closed, email ${SUPPORT_EMAIL}.`,
         },
       });
     } catch (err) {
       console.error(err);
       setFeedback({
         variant: 'error',
-        title: 'We could not delete your saved data.',
-        description: 'We stopped before closing your session because file cleanup or data deletion did not finish safely. Please try again or email support.',
+        title: 'We could not delete your saved writing.',
+        description: 'We stopped before closing your session because file cleanup or deletion did not finish safely. Please try again or email support.',
       });
     } finally {
       setIsDeletingData(false);
@@ -493,14 +493,14 @@ export const Account: React.FC = () => {
                 <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                   <div className="space-y-2">
                     <p className="text-[11px] font-black uppercase tracking-widest text-red">Danger zone</p>
-                    <h3 className="text-[24px] font-display text-red">Delete saved data</h3>
+                    <h3 className="text-[24px] font-display text-red">Delete saved writing</h3>
                     <p className="max-w-xl text-[14px] font-medium leading-relaxed text-gray-light">
-                      Delete your notes, moods, tags, tasks, and saved profile data here. If you also want the sign-in account closed, the sheet below gives you that request path too.
+                      Delete your notes, moods, tags, tasks, and saved profile details here. If you also want the sign-in account closed, the sheet below gives you that request path too.
                     </p>
                   </div>
 
                   <Button type="button" variant="danger" className="px-8" onClick={() => setShowDeleteConfirm(true)}>
-                    Delete data
+                    Delete saved writing
                   </Button>
                 </div>
               </div>
@@ -573,7 +573,7 @@ export const Account: React.FC = () => {
       >
         <div className="space-y-4">
           <p className="text-[14px] font-medium leading-relaxed text-gray-light">
-            Pro is meant to unlock unlimited notes plus on-demand AI reflections and Life Wiki refreshes without turning the product into a hard sell.
+            Pro keeps your notes unlimited and includes AI reflections and Life Wiki refreshes whenever you ask. No hard sell.
           </p>
           <div className="grid gap-3 sm:grid-cols-2">
             <Surface variant="flat" className="overflow-hidden">
@@ -598,14 +598,14 @@ export const Account: React.FC = () => {
       <ModalSheet
         isOpen={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
-        title="Delete your saved data"
-        description="You can erase stored writing and profile data here. Full sign-in account closure still needs a support request."
+        title="Delete your saved writing"
+        description="You can erase stored writing and profile details here. Full sign-in account closure still needs a support request."
         icon={<Trash size={20} weight="duotone" />}
         size="md"
         footer={
           <div className="flex flex-col gap-3">
             <Button variant="danger" onClick={handleDeleteSavedData} isLoading={isDeletingData}>
-              Delete saved data now
+              Delete saved writing now
             </Button>
             <Button variant="secondary" onClick={handleAccountClosureRequest} disabled={isDeletingData}>
               Request full account closure
@@ -618,10 +618,10 @@ export const Account: React.FC = () => {
       >
         <div className="space-y-4 text-[14px] font-medium leading-relaxed text-gray-light">
           <p>
-            This removes your saved notes, moods, tags, tasks, and profile row from the app database. It also removes stored attachments and avatar files before we close your session.
+            This removes your saved notes, moods, tags, tasks, and profile row from the app. It also removes stored attachments and avatar files before we close your session.
           </p>
           <p>
-            If you want the sign-in account itself closed too, use the support request button here after deleting the saved data.
+            If you want the sign-in account itself closed too, use the support request button here after deleting the saved writing.
           </p>
         </div>
       </ModalSheet>

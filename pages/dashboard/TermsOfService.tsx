@@ -20,8 +20,8 @@ const sections = [
     icon: <Shield size={22} weight="duotone" />,
     title: 'Your writing',
     body: [
-      'Everything you write in Reflections belongs to you. We don\'t claim ownership of your notes or any of your content.',
-      'You allow us to store and sync your content so we can show it back to you. We won\'t share, sell, or use it for anything else.',
+      'Everything you write in Reflections belongs to you. We don\'t claim ownership of your notes or attachments.',
+      'You allow us to store and sync your notes so we can show them back to you. We won\'t share, sell, or use them for anything else.',
       'AI insights are for your personal use. They aren\'t professional medical or legal advice.',
     ],
   },
@@ -38,7 +38,7 @@ const sections = [
     icon: <Sparkle size={22} weight="duotone" />,
     title: 'The service',
     body: [
-      'We work hard to keep your data safe and the app running, but we provide Reflections "as-is" without guarantees.',
+      'We work hard to keep your writing safe and the app running, but we provide Reflections "as-is" without guarantees.',
       'We may change or remove features as the app evolves. We\'ll let you know about big changes ahead of time.',
       'The free version has limits on notes and AI use. These might shift as we see how people use the app.',
     ],

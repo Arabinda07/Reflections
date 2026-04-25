@@ -5,7 +5,6 @@ import {
   Sparkle,
   Brain,
   Calendar,
-  CheckSquare,
   Heart,
   TrendUp,
   Book,
@@ -159,8 +158,7 @@ export const Insights: React.FC = () => {
     const daysSet = new Set<string>();
     const moodCounts: Record<string, number> = {};
     const tagCounts: Record<string, number> = {};
-    let totalTasks = 0;
-    let completedTasks = 0;
+    let wordsWritten = 0;
 
     notes.forEach((note) => {
       const date = new Date(note.createdAt);
@@ -179,12 +177,8 @@ export const Insights: React.FC = () => {
         });
       }
 
-      if (note.tasks) {
-        note.tasks.forEach((task) => {
-          totalTasks += 1;
-          if (task.completed) completedTasks += 1;
-        });
-      }
+      const plainText = note.content.replace(/<[^>]*>/g, ' ').trim();
+      wordsWritten += plainText ? plainText.split(/\s+/).filter(Boolean).length : 0;
     });
 
     const topMood = Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'undefined';
@@ -202,9 +196,7 @@ export const Insights: React.FC = () => {
       topMood,
       moodData,
       topTags,
-      totalTasks,
-      completedTasks,
-      taskProgress: totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0,
+      wordsWritten,
     };
   }, [notes]);
 
@@ -284,8 +276,8 @@ export const Insights: React.FC = () => {
                     <MetadataPill icon={<Calendar size={13} weight="bold" />} tone="green">
                       {stats.totalNotes} total notes
                     </MetadataPill>
-                    <MetadataPill icon={<CheckSquare size={13} weight="bold" />} tone="green">
-                      {stats.completedTasks}/{stats.totalTasks || 0} tasks
+                    <MetadataPill icon={<Book size={13} weight="bold" />} tone="green">
+                      {stats.wordsWritten.toLocaleString()} words written
                     </MetadataPill>
                   </div>
                 </div>
@@ -302,9 +294,9 @@ export const Insights: React.FC = () => {
                     <p className="mt-2 text-[12px] font-medium text-gray-light">days you made space to write</p>
                   </div>
                   <div className="rounded-[var(--radius-panel)] border border-border bg-white/5 p-5">
-                    <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Action follow-through</p>
-                    <p className="mt-3 text-4xl font-display text-gray-text">{stats.taskProgress}%</p>
-                    <p className="mt-2 text-[12px] font-medium text-gray-light">of logged tasks completed</p>
+                    <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Words written</p>
+                    <p className="mt-3 text-4xl font-display text-gray-text">{stats.wordsWritten.toLocaleString()}</p>
+                    <p className="mt-2 text-[12px] font-medium text-gray-light">words saved across your notes</p>
                   </div>
                 </div>
               </div>
@@ -465,7 +457,7 @@ export const Insights: React.FC = () => {
                       className="px-8"
                     >
                       <Sparkle size={16} weight="fill" className="mr-2" />
-                      {isRefreshingWiki ? 'Building...' : 'Get Insights'}
+                      {isRefreshingWiki ? 'Building...' : 'Refresh with AI'}
                     </Button>
                   ) : null}
                   <EmptyState

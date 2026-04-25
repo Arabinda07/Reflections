@@ -14,7 +14,7 @@ const sections = [
     body: [
       'We save your email address and any profile details you share.',
       'Your reflections—including notes, moods, and attachments—are tied securely to your account.',
-      'Everything is stored using professional-grade security (Supabase RLS), meaning only you can access your data.',
+      'Your notes are private to your account. We use Supabase Row Level Security so saved writing is tied to your specific login.',
     ],
   },
   {
@@ -23,7 +23,7 @@ const sections = [
     tone: 'green',
     body: [
       'AI features only run when you explicitly ask for them, like when you want a summary or a prompt.',
-      'We do not use your personal notes to train AI models. Your thoughts are yours, not training data.',
+      'We do not use your personal notes to train AI models. Your thoughts are yours.',
       'Any insights generated are private to you. We don\'t use them for marketing or tracking.',
     ],
   },
@@ -62,13 +62,13 @@ export const PrivacyPolicy: React.FC = () => {
 
         <SectionHeader
           title="Privacy"
-          description="How we handle your data, how AI interacts with your writing, and how you stay in control."
+          description="How we handle your writing, how AI interacts with it, and how you stay in control."
         />
 
         <Surface variant="bezel">
           <div className="p-8 sm:p-10">
             <p className="text-[17px] font-medium text-gray-text leading-relaxed">
-              We don't think of your reflections as data points or inventory. They are your private thoughts, and our job is to keep them safe. This principle guides everything we build—from how we store your notes to how we integrate AI.
+              Your reflections are your private thoughts. Our job is to keep them safe and give you clear choices. That guides how we store your notes and when AI can touch them.
             </p>
           </div>
         </Surface>
@@ -101,7 +101,7 @@ export const PrivacyPolicy: React.FC = () => {
             </div>
 
             <p className="text-[15px] font-medium leading-relaxed text-gray-light">
-              If you have questions about your data or want to delete your account, email us directly:
+              If you have questions about your writing or want to delete your account, email us directly:
             </p>
             <a
               href="mailto:robinsaha@gmail.com"

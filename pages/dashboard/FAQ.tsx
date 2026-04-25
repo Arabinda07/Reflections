@@ -39,10 +39,10 @@ const staggerItem = {
 
 export const FAQ: React.FC = () => {
   const navigate = useNavigate();
-  const journeyRef = useRef<HTMLDivElement>(null);
+  const practiceRef = useRef<HTMLDivElement>(null);
   
   const { scrollYProgress } = useScroll({
-    target: journeyRef,
+    target: practiceRef,
     offset: ["start end", "end start"]
   });
   const y1 = useTransform(scrollYProgress, [0, 1], [0, -30]);
@@ -89,14 +89,14 @@ export const FAQ: React.FC = () => {
 
 
 
-      <div className="relative z-10 w-full max-w-[1440px] mx-auto px-6" ref={journeyRef}>
+      <div className="relative z-10 w-full max-w-[1440px] mx-auto px-6" ref={practiceRef}>
 
-        {/* Asymmetrical Bento: The Journey */}
+        {/* Asymmetrical Bento: The Practice */}
         <section className="mb-48">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 mb-20">
             <div>
               <h2 className="text-mk-h2 font-display text-gray-text mb-4">The practice</h2>
-              <p className="text-mk-body font-serif italic text-gray-light">A space to heal, one reflection at a time.</p>
+              <p className="text-mk-body font-serif italic text-gray-light">A space to write, one reflection at a time.</p>
             </div>
             <div className="h-[1px] flex-grow bg-border hidden lg:block mb-6 mx-12 opacity-50" />
           </div>
@@ -173,12 +173,12 @@ export const FAQ: React.FC = () => {
                   <ShieldCheck size={40} weight="light" />
                 </div>
                 <div>
-                  <h4 className="text-[28px] font-display text-gray-text mb-4">It's 100% private</h4>
+                  <h4 className="text-[28px] font-display text-gray-text mb-4">Private to your account</h4>
                   <p className="text-mk-body font-serif text-gray-light mb-6">
-                    We can't read your notes. They are stored securely and encrypted in your private space. You own your thoughts, period.
+                    Your notes stay tied to your login and are protected by account-level security. You own your writing, period.
                   </p>
                   <div className="label-caps !text-green flex items-center gap-2">
-                    <CheckCircle size={16} weight="fill" /> Secure & Offline-first
+                    <CheckCircle size={16} weight="fill" /> Account protected
                   </div>
                 </div>
               </div>
@@ -223,7 +223,7 @@ export const FAQ: React.FC = () => {
                   <div>
                     <h4 className="text-[28px] font-display text-gray-text mb-4">Optional AI support</h4>
                     <p className="text-mk-body font-serif text-gray-light mb-8">
-                      If you want it, Reflections can help summarize patterns or refresh your Life Wiki. It never runs in the background, and we don't use your data to train models.
+                      If you want it, Reflections can help summarize patterns or refresh your Life Wiki. It never runs in the background, and we don't use your notes to train AI models.
                     </p>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="p-4 rounded-2xl bg-white/5 border border-border">

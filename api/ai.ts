@@ -140,9 +140,9 @@ const handlePrompts = async (payload: any) => {
     `Context:\n${currentMood ? `The user is currently feeling ${currentMood}.` : 'The user has not specified a mood for this entry yet.'}`,
     noteContext
       ? `Here are their most recent entries for context:\n${noteContext}`
-      : 'The user is just starting their journey and has no past entries yet.',
+      : 'The user has no past entries yet.',
     `Current entry:\nTitle: ${note?.title || 'Untitled'}\nContent: ${stripHtml(String(note?.content || ''))}`,
-    'Instructions:\n1. Identify a recurring theme, unresolved tension, or pattern from these recent entries.\n2. Generate 4 brief, personalized journaling prompts.\n3. One prompt should be a gentle nudge, one should be a deep question, and two should relate to their specific recurring themes.\n4. Avoid flowery language. Be direct, human, and helpful.\n5. Return only a JSON array of strings.',
+    'Instructions:\n1. Identify a recurring theme, unresolved tension, or pattern from these recent entries.\n2. Generate 4 brief, personalized journaling prompts.\n3. One prompt should be a gentle nudge, one should invite a slower look, and two should relate to their specific recurring themes.\n4. Avoid flowery language. Be direct, human, and helpful.\n5. Return only a JSON array of strings.',
   ]);
 
   const data = await generateJson<unknown>(prompt, {
@@ -189,10 +189,10 @@ const handleReflection = async (payload: any) => {
     : '';
 
   const prompt = buildPrompt([
-    'You are a warm, perceptive journaling companion for the app Reflections.',
+    'You are a warm, careful reader for the app Reflections.',
     'Your tone is human, non-clinical, and quietly insightful.',
     indexPage?.content ? `Overview:\n${indexPage.content}` : '',
-    wikiContext ? `WHAT YOU KNOW ABOUT THIS PERSON\n${wikiContext}` : '',
+    wikiContext ? `PATTERNS THE NOTES SUGGEST\n${wikiContext}` : '',
     recentContext ? `RECENT ENTRIES\n${recentContext}` : '',
     `Now here is today's journal entry:\nTitle: ${note?.title || 'Untitled'}\nMood: ${note?.mood || 'Not noted'}\nContent:\n${stripHtml(String(note?.content || ''))}`,
     'Write a reflection of 3-4 short paragraphs. Open with something you genuinely noticed. Reference patterns only when it adds real insight. End with one open question. Output plain prose only.',
@@ -210,7 +210,7 @@ const handleIngestDecision = async (payload: any) => {
     .join('\n');
 
   const prompt = buildPrompt([
-    'You are a personal cognitive librarian.',
+    'You are a careful Life Wiki organizer for a journaling app.',
     'Decide whether this journal entry should integrate into an existing Life Theme, create a new one, or be skipped.',
     `Current Life Themes:\n${themeIndex || '(None yet - first entry)'}`,
     `New Journal Entry:\nTitle: ${note?.title || 'Untitled'}\nDate: ${note?.createdAt ? new Date(note.createdAt).toLocaleDateString() : 'Unknown'}\nContent: ${stripHtml(String(note?.content || ''))}\nMood: ${note?.mood || 'Not set'}`,

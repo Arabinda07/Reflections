@@ -1,4 +1,4 @@
-import type { MonthlyWellnessJourney, Note } from '../types';
+import type { MonthlyWellnessSummary, Note } from '../types';
 import { getMonthRange } from './wellnessPolicy';
 
 function stripHtml(html: string) {
@@ -28,7 +28,7 @@ function fallbackThemes(notes: Note[]) {
   return topEntries(countBy(words), 4).map(([theme]) => theme);
 }
 
-export function buildMonthlyWellnessJourney(notes: Note[], now = new Date()): MonthlyWellnessJourney {
+export function buildMonthlyWellnessSummary(notes: Note[], now = new Date()): MonthlyWellnessSummary {
   const { start, end } = getMonthRange(now);
   const monthNotes = notes.filter((note) => {
     const created = new Date(note.createdAt);

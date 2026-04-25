@@ -35,13 +35,13 @@ export const getInsightsWikiState = (
       return {
         kind: 'no_pages_can_generate',
         title: 'Your wiki is ready for insights',
-        ctaLabel: 'Get Insights',
+        ctaLabel: 'Refresh with AI',
       };
     }
     return {
       kind: 'no_pages_locked',
       title: 'Your wiki is ready for insights',
-      ctaLabel: 'Upgrade to Premium',
+      ctaLabel: 'See Pro options',
       ctaRoute: RoutePath.ACCOUNT,
     };
   }

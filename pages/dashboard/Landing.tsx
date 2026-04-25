@@ -44,13 +44,13 @@ export const Landing: React.FC = () => {
               className="pointer-events-auto flex max-w-[11ch] flex-col text-mk-display font-display tracking-[-0.03em] text-gray-text leading-[0.9] sm:max-w-[12ch] sm:leading-[0.94] lg:max-w-5xl lg:tracking-tight lg:leading-[0.98]"
             >
               <motion.span variants={staggerLine} style={{ willChange: 'transform, opacity, filter' }}>
-                Your mind,
+                A quiet
               </motion.span>
               <motion.span variants={staggerLine} className="font-serif italic text-green" style={{ lineHeight: 1.1, willChange: 'transform, opacity, filter' }}>
-                beautifully
+                place
               </motion.span>
               <motion.span variants={staggerLine} style={{ willChange: 'transform, opacity, filter' }}>
-                organized.
+                to write.
               </motion.span>
             </motion.div>
 
@@ -60,7 +60,7 @@ export const Landing: React.FC = () => {
               transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.5 }}
               className="pointer-events-auto max-w-[33ch] font-serif text-[1rem] leading-[1.72] text-gray-text sm:max-w-[38ch] sm:text-mk-body lg:max-w-[44ch]"
             >
-              A private, distraction-free environment designed to help you untangle your mind and find clarity in the noise.
+              A private place to put words down, notice what returns, and leave the noise outside.
             </motion.p>
           </div>
 

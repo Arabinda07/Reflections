@@ -20,22 +20,22 @@ import { DEFAULT_WELLNESS_PROMPTS } from '../../services/wellnessPrompts';
 import { supabase } from '../../src/supabaseClient';
 import { RoutePath } from '../../types';
 
-const WISDOM_QUOTES = [
+const WRITING_NOTES = [
   {
-    text: 'The soul usually knows what to do to heal itself. The challenge is to silence the mind.',
-    author: 'Caroline Myss',
+    text: 'Start with the sentence that keeps trying to get your attention.',
+    author: 'Reflections',
   },
   {
-    text: 'Within you, there is a stillness and a sanctuary to which you can retreat at any time.',
-    author: 'Hermann Hesse',
+    text: 'You do not need to explain the whole day. One true detail is enough.',
+    author: 'Reflections',
   },
   {
-    text: 'Your vision will become clear only when you can look into your own heart.',
-    author: 'Carl Jung',
+    text: 'Write what happened. Then write what stayed with you.',
+    author: 'Reflections',
   },
-  { text: 'The wound is the place where the Light enters you.', author: 'Rumi' },
-  { text: 'Quiet the mind, and the soul will speak.', author: 'Ma Jaya Sati Bhagavati' },
-  { text: 'Everything in the universe is within you. Ask all from yourself.', author: 'Rumi' },
+  { text: 'If the thought feels messy, put it down messy.', author: 'Reflections' },
+  { text: 'Notice the thing you keep circling. It may be asking for a name.', author: 'Reflections' },
+  { text: 'The page can hold more than one feeling at once.', author: 'Reflections' },
 ];
 
 export const HomeAuthenticated: React.FC = () => {
@@ -57,7 +57,7 @@ export const HomeAuthenticated: React.FC = () => {
     setDailyPrompt(
       DEFAULT_WELLNESS_PROMPTS[Math.floor(Math.random() * DEFAULT_WELLNESS_PROMPTS.length)],
     );
-    setQuote(WISDOM_QUOTES[Math.floor(Math.random() * WISDOM_QUOTES.length)]);
+    setQuote(WRITING_NOTES[Math.floor(Math.random() * WRITING_NOTES.length)]);
     const hasSeen = localStorage.getItem('hasSeenOnboarding');
     if (!hasSeen) setShowOnboarding(true);
   }, []);
@@ -247,7 +247,7 @@ export const HomeAuthenticated: React.FC = () => {
               <div className="flex items-center gap-2 text-gray-nav mb-12">
                 <Sparkle size={18} weight="bold" className="text-orange" />
                 <span className="text-[11px] font-black uppercase tracking-widest opacity-60">
-                  Daily Wisdom
+                  Writing note
                 </span>
               </div>
 

@@ -85,7 +85,7 @@ export interface WikiInsightsGate {
   requiresUpgrade: boolean;
 }
 
-export interface MonthlyWellnessJourney {
+export interface MonthlyWellnessSummary {
   monthLabel: string;
   noteCount: number;
   writingDays: number;

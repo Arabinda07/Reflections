@@ -29,7 +29,7 @@ describe('getInsightsWikiState', () => {
     expect(getInsightsWikiState(3, 0, freeGate)).toEqual({
       kind: 'no_pages_can_generate',
       title: 'Your wiki is ready for insights',
-      ctaLabel: 'Get Insights',
+      ctaLabel: 'Refresh with AI',
     });
   });
 
@@ -43,7 +43,7 @@ describe('getInsightsWikiState', () => {
     expect(getInsightsWikiState(3, 0, lockedGate)).toEqual({
       kind: 'no_pages_locked',
       title: 'Your wiki is ready for insights',
-      ctaLabel: 'Upgrade to Premium',
+      ctaLabel: 'See Pro options',
       ctaRoute: RoutePath.ACCOUNT,
     });
   });
