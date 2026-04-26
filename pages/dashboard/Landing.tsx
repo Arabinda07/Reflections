@@ -94,7 +94,7 @@ export const Landing: React.FC = () => {
               >
                 How it works
               </button>
-
+            </div>
           </motion.div>
 
           {/* Mute Button Extracted to Content Layer */}
@@ -106,6 +106,7 @@ export const Landing: React.FC = () => {
             {isMuted ? <SpeakerSlash size={20} weight="bold" /> : <SpeakerHigh size={20} weight="bold" />}
           </button>
         </div>
+      </div>
 
         {/* ── Background Video Layer ── */}
         <motion.div
