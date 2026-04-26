@@ -677,7 +677,7 @@ export const CreateNote: React.FC = () => {
 
       {/* ── Desktop Sidebar ── */}
       {!isMobile && (
-        <aside className={`w-[240px] border-r border-border/40 flex flex-col min-h-0 bg-white/50 dark:bg-panel-bg z-40 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isFocusModeActive ? '-translate-x-full opacity-0' : 'translate-x-0 opacity-100'}`}>
+        <aside className={`flex flex-col min-h-0 bg-white/50 dark:bg-panel-bg z-40 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] border-r border-border/40 ${isFocusModeActive ? 'w-0 opacity-0 -translate-x-full overflow-hidden border-r-0' : 'w-[240px] opacity-100 translate-x-0'}`}>
           <div className="pt-8 px-6 pb-6 flex-1 overflow-y-auto custom-scrollbar space-y-4">
             
             {/* Desktop Back Button */}
@@ -740,10 +740,10 @@ export const CreateNote: React.FC = () => {
 
       {/* ── Main Canvas ── */}
       <main
-        className="relative flex-1 w-full pb-40 px-6 sm:px-12 md:px-20"
+        className="relative flex-1 w-full pb-40 px-6 sm:px-12 md:px-16 lg:px-24 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]"
         style={{ paddingTop: NATIVE_PAGE_TOP_PADDING }}
       >
-        <div className="max-w-[800px] mx-auto">
+        <div className={`max-w-[800px] transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isFocusModeActive ? 'mx-auto' : 'mr-auto lg:ml-12 xl:ml-24'}`}>
           
           {/* Cover Image */}
           {imagePreview && (
