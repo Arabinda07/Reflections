@@ -65,6 +65,10 @@ export const PrivacyPolicy: React.FC = () => {
           description="How we handle your writing, how AI interacts with it, and how you stay in control."
         />
 
+        <p className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-nav/50 -mt-6 mb-10">
+          Last updated April 26, 2026
+        </p>
+
         <Surface variant="bezel">
           <div className="p-8 sm:p-10">
             <p className="text-[17px] font-medium text-gray-text leading-relaxed">
