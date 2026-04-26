@@ -104,7 +104,7 @@ export const Landing: React.FC = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-          className="absolute inset-0 overflow-hidden pointer-events-none lg:pointer-events-auto"
+          className="absolute inset-0 overflow-hidden pointer-events-none z-20"
         >
           {/* Subtle responsive masks */}
           <div className="video-mask video-mask--mobile lg:hidden" />
@@ -126,7 +126,7 @@ export const Landing: React.FC = () => {
 
           <button
             onClick={toggleMute}
-            className="absolute bottom-6 right-6 z-30 flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] border-[1.5px] border-border bg-surface text-gray-nav shadow-sm transition-all duration-300 hover:text-green hover:border-green/40 hover:scale-105 active:scale-95 lg:right-16 lg:bottom-12 group"
+            className="absolute bottom-6 right-6 z-30 flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] border-[1.5px] border-border bg-surface text-gray-nav shadow-sm transition-all duration-300 hover:text-green hover:border-green/40 hover:scale-105 active:scale-95 lg:right-16 lg:bottom-12 group pointer-events-auto"
             aria-label={isMuted ? 'Unmute video' : 'Mute video'}
           >
             {isMuted ? <SpeakerSlash size={20} weight="bold" /> : <SpeakerHigh size={20} weight="bold" />}

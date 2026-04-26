@@ -473,7 +473,7 @@ export const DashboardLayout: React.FC = () => {
       {/* Floating Bug Report Button */}
       <button
         onClick={() => setIsBugModalOpen(!isBugModalOpen)}
-        className={`fixed bottom-4 left-6 z-[110] flex h-11 w-11 items-center justify-center rounded-2xl border-[1.5px] transition-all duration-300 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/20 group shadow-sm ${
+        className={`fixed bottom-3 left-6 z-[110] flex h-11 w-11 items-center justify-center rounded-2xl border-[1.5px] transition-all duration-300 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/20 group shadow-sm ${
           isBugModalOpen 
             ? 'bg-green text-white border-green' 
             : 'bg-surface text-gray-nav border-border hover:text-green hover:border-green/40'
@@ -496,7 +496,7 @@ export const DashboardLayout: React.FC = () => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.95 }}
               transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-              className="fixed bottom-[72px] left-6 z-[105] w-[calc(100vw-48px)] sm:w-[380px] bg-[rgba(var(--panel-bg-rgb),0.98)] backdrop-blur-xl border border-border/40 rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.4)] overflow-hidden"
+              className="fixed bottom-[68px] left-6 z-[105] w-[calc(100vw-48px)] sm:w-[380px] bg-[rgba(var(--panel-bg-rgb),0.98)] backdrop-blur-xl border border-border/40 rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.4)] overflow-hidden"
             >
               <div className="p-6">
                 {!isSubmitted ? (
