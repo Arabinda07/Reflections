@@ -467,7 +467,7 @@ export const DashboardLayout: React.FC = () => {
       {/* Floating Bug Report Button */}
       <button
         onClick={() => setIsBugModalOpen(true)}
-        className="fixed bottom-6 right-6 z-[100] flex h-11 w-11 items-center justify-center rounded-2xl border-[1.5px] border-border bg-surface text-gray-nav shadow-sm transition-all duration-300 hover:text-green hover:border-green/40 hover:scale-105 active:scale-95 group"
+        className="fixed bottom-6 left-6 z-[100] flex h-11 w-11 items-center justify-center rounded-2xl border-[1.5px] border-border bg-surface text-gray-nav shadow-sm transition-all duration-300 hover:text-green hover:border-green/40 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/20 group"
         aria-label="Report a bug"
       >
         <Bug size={20} weight="duotone" className="transition-transform group-hover:rotate-12" />

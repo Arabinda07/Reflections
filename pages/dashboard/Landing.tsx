@@ -123,7 +123,7 @@ export const Landing: React.FC = () => {
 
           <button
             onClick={toggleMute}
-            className="surface-floating surface-floating--media absolute bottom-10 right-6 z-30 flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] text-gray-text transition-all duration-300 hover:shadow-sm active:scale-95 lg:bottom-12 lg:right-16"
+            className="absolute bottom-6 right-6 z-30 flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] border-[1.5px] border-border bg-surface text-gray-nav shadow-sm transition-all duration-300 hover:text-green hover:border-green/40 hover:scale-105 active:scale-95 lg:right-16 lg:bottom-12 group"
             aria-label={isMuted ? 'Unmute video' : 'Mute video'}
           >
             {isMuted ? <SpeakerSlash size={20} weight="bold" /> : <SpeakerHigh size={20} weight="bold" />}

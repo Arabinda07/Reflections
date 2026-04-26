@@ -287,7 +287,7 @@ export const HomeAuthenticated: React.FC = () => {
         </section>
 
         <section className="grid grid-cols-1 lg:grid-cols-3 border-t border-border bg-white dark:bg-transparent min-h-[500px]">
-          <div className="p-10 sm:p-16 border-b lg:border-b-0 lg:border-r border-border flex flex-col justify-between h-full bg-white/50 dark:bg-white/12">
+          <div className="p-8 sm:p-12 lg:p-16 border-b lg:border-b-0 lg:border-r border-border flex flex-col justify-between h-full bg-white/50 dark:bg-white/12">
             <div>
               <div className="flex items-center gap-2 text-gray-nav mb-12">
                 <FolderOpen size={18} weight="bold" className="text-green" />
@@ -310,80 +310,87 @@ export const HomeAuthenticated: React.FC = () => {
               </button>
             </div>
 
-              <button
-                onClick={() => navigate(RoutePath.INSIGHTS)}
-                className="group flex flex-col items-start gap-5 p-8 rounded-3xl bg-panel-bg border border-border hover:border-green/30 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 text-left"
-                aria-label="View writing patterns"
-              >
-                <div className="flex items-center gap-2 text-gray-nav mb-2">
-                  <Brain size={16} weight="bold" className="text-green" />
-                  <span className="text-[10px] font-black uppercase tracking-widest opacity-60">
-                    Librarian&apos;s Note
-                  </span>
-                </div>
-                <p className="text-xl md:text-2xl font-serif italic text-gray-light group-hover:text-gray-text transition-colors leading-relaxed">
-                  Patterns stay here quietly until you ask Reflections to build them.
-                </p>
-              </button>
+            <button
+              onClick={() => navigate(RoutePath.INSIGHTS)}
+              className="group flex flex-col items-start gap-5 p-7 sm:p-8 rounded-3xl bg-panel-bg border border-border hover:border-green/30 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 text-left"
+              aria-label="View writing patterns"
+            >
+              <div className="flex items-center gap-2 text-gray-nav mb-2">
+                <Brain size={16} weight="bold" className="text-green" />
+                <span className="text-[10px] font-black uppercase tracking-widest opacity-60">
+                  Librarian&apos;s Note
+                </span>
+              </div>
+              <p className="text-xl md:text-2xl font-serif italic text-gray-light group-hover:text-gray-text transition-colors leading-relaxed">
+                Patterns stay here quietly until you ask Reflections to build them.
+              </p>
+            </button>
+          </div>
+
+          {/* Intentions Drawer Card */}
+          <div className="p-8 sm:p-12 lg:p-16 border-b lg:border-b-0 lg:border-r border-border flex flex-col justify-start h-full bg-white dark:bg-white/14 overflow-hidden">
+            <div className="flex items-center justify-between mb-10">
+              <div className="flex items-center gap-2 text-gray-nav">
+                <ListChecks size={18} weight="bold" className="text-green" />
+                <span className="text-[11px] font-black uppercase tracking-[0.2em] opacity-60">
+                  Your Intentions
+                </span>
+              </div>
             </div>
 
-            {/* Intentions Drawer Card */}
-            <div className="p-10 sm:p-16 border-b lg:border-b-0 lg:border-r border-border flex flex-col justify-start h-full bg-white dark:bg-white/14 overflow-hidden">
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-2 text-gray-nav">
-                  <ListChecks size={18} weight="bold" className="text-green" />
-                  <span className="text-[11px] font-black uppercase tracking-widest opacity-60">
-                    Your Intentions
-                  </span>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <AnimatePresence mode="popLayout">
-                  {intentions.length > 0 ? (
-                    intentions.slice(0, 5).map((intention) => (
-                      <motion.div
-                        key={intention.id}
-                        layout
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        className="group flex items-center gap-3 p-3 rounded-2xl bg-panel-bg border border-border hover:border-green/20 transition-all cursor-pointer"
-                        onClick={() => handleToggleIntention(intention.noteId, intention.id)}
-                      >
-                        <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 border-green/30 group-hover:border-green transition-colors">
-                          <div className="h-2 w-2 rounded-full bg-green opacity-0 group-hover:opacity-100 transition-opacity" />
-                        </div>
-                        <span className="text-[14px] font-bold text-gray-text group-hover:text-green transition-colors line-clamp-1">
-                          {intention.text}
-                        </span>
-                      </motion.div>
-                    ))
-                  ) : (
-                    <motion.div 
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="py-12 text-center"
+            <div className="space-y-3">
+              <AnimatePresence mode="popLayout">
+                {intentions.length > 0 ? (
+                  intentions.slice(0, 5).map((intention) => (
+                    <motion.button
+                      key={intention.id}
+                      layout
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="group w-full flex items-start gap-4 p-4 rounded-2xl bg-panel-bg border border-border hover:border-green/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/20 transition-all text-left min-h-[52px]"
+                      onClick={() => handleToggleIntention(intention.noteId, intention.id)}
+                      aria-label={`Mark "${intention.text}" as finished`}
                     >
-                      <p className="text-[13px] font-bold text-gray-nav/40 uppercase tracking-widest">
-                        No active intentions
-                      </p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-                
-                {intentions.length > 5 && (
-                  <button 
-                    onClick={() => navigate(RoutePath.NOTES)}
-                    className="w-full text-center text-[11px] font-black uppercase tracking-[0.2em] text-gray-nav/60 hover:text-green transition-colors pt-4"
+                      <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 border-border group-hover:border-green transition-colors">
+                        <div className="h-2 w-2 rounded-full bg-green opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                      <span className="font-serif italic text-[17px] text-gray-text group-hover:text-green transition-colors line-clamp-2 leading-relaxed">
+                        {intention.text}
+                      </span>
+                    </motion.button>
+                  ))
+                ) : (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="py-16 text-center"
                   >
-                    + {intentions.length - 5} more in your notes
-                  </button>
+                    <div className="mb-4 flex justify-center">
+                      <div className="h-10 w-10 rounded-full border border-border flex items-center justify-center text-gray-nav/20">
+                        <CheckCircleIcon size={24} weight="duotone" />
+                      </div>
+                    </div>
+                    <p className="text-[11px] font-black text-gray-nav/30 uppercase tracking-[0.2em]">
+                      All intentions <br /> are settled
+                    </p>
+                  </motion.div>
                 )}
-              </div>
+              </AnimatePresence>
+              
+              {intentions.length > 5 && (
+                <button 
+                  onClick={() => navigate(RoutePath.NOTES)}
+                  className="w-full text-center text-[10px] font-black uppercase tracking-[0.25em] text-gray-nav/40 hover:text-green transition-colors pt-6"
+                >
+                  + {intentions.length - 5} more in your notes
+                </button>
+              )}
             </div>
+          </div>
 
-          <div className="p-10 sm:p-16 border-b lg:border-b-0 lg:border-r border-border flex flex-col justify-between h-full bg-white dark:bg-white/14">
+          <div className="p-8 sm:p-12 lg:p-16 border-b lg:border-b-0 lg:border-r border-border flex flex-col justify-between h-full bg-white dark:bg-white/14">
             <div className="flex-grow">
               <div className="flex items-center gap-2 text-gray-nav mb-12">
                 <Sparkle size={18} weight="bold" className="text-orange" />
@@ -409,7 +416,7 @@ export const HomeAuthenticated: React.FC = () => {
             </div>
           </div>
 
-          <div className="p-10 sm:p-16 flex flex-col justify-between h-full bg-white dark:bg-white/20">
+          <div className="p-8 sm:p-12 lg:p-16 flex flex-col justify-between h-full bg-white dark:bg-white/20">
             <div>
               <div className="flex items-center justify-between mb-12">
                 <div className="flex items-center gap-2 text-gray-nav">
