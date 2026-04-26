@@ -78,37 +78,32 @@ export const Landing: React.FC = () => {
               <ArrowRight size={22} className="group-hover:translate-x-1.5 transition-transform duration-500 ease-out-expo" />
             </button>
 
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-4 px-2 sm:justify-end sm:px-0">
+            <div className="flex flex-wrap items-center gap-x-8 gap-y-4 px-2 sm:justify-end sm:px-0">
               <button
                 onClick={() => navigate(RoutePath.LOGIN)}
-                className="inline-flex min-h-11 items-center rounded-[var(--radius-control)] border-[1.5px] border-border bg-surface px-5 text-[15px] font-bold text-gray-text transition-all duration-300 hover:bg-white hover:shadow-sm active:scale-95"
+                className="inline-flex items-center text-[15px] font-bold text-gray-text transition-all duration-300 hover:text-green active:scale-95"
               >
                 Sign in
               </button>
 
-              <div className="hidden h-4 w-[1px] bg-border opacity-50 sm:block" />
-
               <button
                 onClick={() => navigate(RoutePath.FAQ)}
-                className="label-caps inline-flex min-h-11 items-center rounded-[var(--radius-control)] border-[1.5px] border-border bg-surface px-5 text-gray-text transition-all duration-300 hover:bg-white hover:shadow-sm active:scale-95"
+                className="label-caps inline-flex items-center text-gray-text transition-all duration-300 hover:text-green active:scale-95"
               >
                 How it works
               </button>
 
               {canInstall && !isInstalled && (
-                <>
-                  <div className="hidden h-4 w-[1px] bg-border opacity-50 sm:block" />
-                  <motion.button
-                    onClick={triggerInstall}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 1.2, duration: 0.5 }}
-                    className="label-caps inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] border-[1.5px] border-border bg-surface px-5 text-gray-text transition-all duration-300 hover:bg-white hover:shadow-sm active:scale-95"
-                  >
-                    <DownloadSimple size={14} weight="bold" />
-                    Install app
-                  </motion.button>
-                </>
+                <motion.button
+                  onClick={triggerInstall}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.2, duration: 0.5 }}
+                  className="label-caps inline-flex items-center gap-2 text-gray-text transition-all duration-300 hover:text-green active:scale-95"
+                >
+                  <DownloadSimple size={14} weight="bold" />
+                  Install app
+                </motion.button>
               )}
             </div>
           </motion.div>
