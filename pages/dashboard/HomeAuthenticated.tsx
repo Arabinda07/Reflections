@@ -98,7 +98,6 @@ export const HomeAuthenticated: React.FC = () => {
   const location = useLocation();
   const isFromSave = location.state?.fromSave;
   const { user } = useAuth();
-  const [isNavigating, setIsNavigating] = useState(false);
   const [noteCount, setNoteCount] = useState<number | null>(null);
   const [displayCount, setDisplayCount] = useState<number | string>('...');
   const [isCountLoading, setIsCountLoading] = useState(false);
@@ -222,7 +221,6 @@ export const HomeAuthenticated: React.FC = () => {
   }, [user]);
 
   const handleCreateClick = (prompt?: string) => {
-    setIsNavigating(true);
     if (prompt) {
       navigate(RoutePath.CREATE_NOTE, { state: { initialPrompt: prompt } });
       return;
@@ -498,7 +496,6 @@ export const HomeAuthenticated: React.FC = () => {
               variant="primary"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              isLoading={isNavigating}
               className="mt-10 h-14 rounded-xl text-[15px] font-bold bg-green text-white hover:bg-green/90 transition-colors shadow-none"
               onClick={() => handleCreateClick(dailyPrompt)}
               aria-label="Start a new reflection with this prompt"

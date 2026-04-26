@@ -342,7 +342,9 @@ export const CreateNote: React.FC = () => {
           setImagePreview(note.thumbnailUrl || null);
           setExistingAttachments(note.attachments || []);
           setBaselineDraftSnapshot(initialDraftSnapshot);
-          setLoading(false);
+          setTimeout(() => {
+            if (!isUnmounted.current) setLoading(false);
+          }, 1200);
         } else {
           navigate(RoutePath.HOME);
         }
