@@ -78,7 +78,7 @@ export const Landing: React.FC = () => {
             >
               Begin writing
               <ArrowRight size={22} className="group-hover:translate-x-1.5 transition-transform duration-500 ease-out-expo" />
-            </button>
+            </motion.button>
 
             <div className="flex flex-wrap items-center gap-x-8 gap-y-4 px-2 sm:justify-end sm:px-0">
               <button
