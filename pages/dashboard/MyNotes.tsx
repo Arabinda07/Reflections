@@ -157,7 +157,7 @@ export const MyNotes: React.FC = () => {
         className="flex h-full flex-col"
         style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
       >
-        <div className="relative h-44 w-full overflow-hidden border-b border-border">
+        <div className="relative h-44 w-full overflow-hidden border-b border-border/40">
           {note.thumbnailUrl ? (
             <>
               <div className="absolute inset-0 bg-green/0 transition-colors duration-500 group-hover:bg-green/5 z-10" />
@@ -207,15 +207,15 @@ export const MyNotes: React.FC = () => {
             ))}
           </div>
 
-          <h3 className="mb-2 text-[18px] font-bold tracking-tight text-gray-text leading-snug transition-colors group-hover:text-green">
+          <h3 className="mb-2 text-[18px] font-bold tracking-[-0.01em] text-gray-text leading-snug transition-colors group-hover:text-green text-balance">
             {note.title}
           </h3>
 
-          <p className="mb-5 text-[14px] font-medium leading-relaxed text-gray-light line-clamp-3">
+          <p className="mb-5 text-[14px] font-medium leading-relaxed text-gray-light line-clamp-3 font-serif italic">
             {getPreviewText(note.content)}
           </p>
 
-          <div className="mt-auto flex items-center justify-between border-t border-border pt-4">
+          <div className="mt-auto flex items-center justify-between border-t border-border/40 pt-4">
             <div className="flex items-center gap-2">
               <div className="flex h-7 w-7 items-center justify-center rounded-full bg-green text-[10px] font-extrabold text-white shadow-sm">
                 {user?.name?.charAt(0) || 'U'}

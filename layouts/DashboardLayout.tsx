@@ -1,5 +1,6 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { motion, AnimatePresence } from 'motion/react';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import emailjs from '@emailjs/browser';
 import { 
@@ -471,73 +472,90 @@ export const DashboardLayout: React.FC = () => {
 
       {/* Floating Bug Report Button */}
       <button
-        onClick={() => setIsBugModalOpen(true)}
-        className="fixed bottom-4 left-6 z-[100] flex h-11 w-11 items-center justify-center rounded-2xl border-[1.5px] border-border bg-surface text-gray-nav shadow-sm transition-all duration-300 hover:text-green hover:border-green/40 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/20 group"
-        aria-label="Report a bug"
+        onClick={() => setIsBugModalOpen(!isBugModalOpen)}
+        className={`fixed bottom-4 left-6 z-[110] flex h-11 w-11 items-center justify-center rounded-2xl border-[1.5px] transition-all duration-300 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/20 group shadow-sm ${
+          isBugModalOpen 
+            ? 'bg-green text-white border-green' 
+            : 'bg-surface text-gray-nav border-border hover:text-green hover:border-green/40'
+        }`}
+        aria-label={isBugModalOpen ? "Close bug report" : "Report a bug"}
       >
-        <Bug size={20} weight="duotone" className="transition-transform group-hover:rotate-12" />
+        {isBugModalOpen ? (
+          <X size={20} weight="bold" />
+        ) : (
+          <Bug size={20} weight="duotone" className="transition-transform group-hover:rotate-12" />
+        )}
       </button>
 
-      {/* Bug Report Modal */}
-      <ModalSheet
-        isOpen={isBugModalOpen}
-        onClose={handleCloseBugModal}
-        title={isSubmitted ? "Thank you" : "Report a bug"}
-        description={isSubmitted ? "Your report has been sent. We'll look into it." : "Tell us what felt unclear or broken. Your feedback helps make Reflections better."}
-        icon={isSubmitted ? <CheckCircle size={28} weight="duotone" /> : <Bug size={28} weight="duotone" />}
-        size="md"
-      >
-        <div className="space-y-6 py-2">
-          {!isSubmitted ? (
-            <form onSubmit={handleBugSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <label htmlFor="bug-message" className="label-caps text-gray-light">Your report</label>
-                <textarea
-                  id="bug-message"
-                  autoFocus
-                  required
-                  placeholder="Describe what happened..."
-                  value={bugMessage}
-                  onChange={(e) => setBugMessage(e.target.value)}
-                  className="w-full min-h-[180px] p-6 rounded-[20px] border border-border/40 bg-panel-bg/50 text-gray-text font-serif text-[18px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-green/10 focus:border-green/30 transition-all resize-none placeholder:text-gray-nav/30"
-                />
-                {submitError && (
-                  <p className="text-[13px] font-semibold text-red animate-in fade-in slide-in-from-top-1 duration-300">
-                    {submitError}
-                  </p>
+      {/* Floating Bug Report Toast */}
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {isBugModalOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              className="fixed bottom-[72px] left-6 z-[105] w-[calc(100vw-48px)] sm:w-[380px] bg-[rgba(var(--panel-bg-rgb),0.98)] backdrop-blur-xl border border-border/40 rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.4)] overflow-hidden"
+            >
+              <div className="p-6">
+                {!isSubmitted ? (
+                  <form onSubmit={handleBugSubmit} className="space-y-5">
+                    <div className="flex items-center gap-2.5 mb-2">
+                      <div className="h-8 w-8 rounded-lg bg-green/10 text-green flex items-center justify-center">
+                        <Bug size={18} weight="duotone" />
+                      </div>
+                      <h3 className="label-caps !text-gray-text">Report a bug</h3>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <textarea
+                        id="bug-message"
+                        autoFocus
+                        required
+                        placeholder="Describe what happened..."
+                        value={bugMessage}
+                        onChange={(e) => setBugMessage(e.target.value)}
+                        className="w-full min-h-[160px] p-5 rounded-[20px] border border-border/40 bg-body/50 text-gray-text font-serif text-[17px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-green/10 focus:border-green/30 transition-all resize-none placeholder:text-gray-nav/30"
+                      />
+                      {submitError && (
+                        <p className="text-[12px] font-bold text-red animate-in fade-in slide-in-from-top-1">
+                          {submitError}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-1">
+                      <Button 
+                        type="submit" 
+                        variant="primary" 
+                        size="sm"
+                        isLoading={isSubmitting}
+                        disabled={!bugMessage.trim()}
+                        className="w-full h-11 rounded-xl"
+                      >
+                        Send report
+                        <PaperPlaneTilt size={16} weight="bold" className="ml-2" />
+                      </Button>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-6 text-center animate-in fade-in zoom-in duration-500">
+                    <div className="h-16 w-16 rounded-full bg-green/10 text-green flex items-center justify-center mb-5">
+                      <CheckCircle size={36} weight="fill" />
+                    </div>
+                    <h3 className="label-caps mb-2">Thank you</h3>
+                    <p className="font-serif italic text-[16px] text-gray-light leading-relaxed">
+                      We've received your report. <br /> Your feedback helps a lot.
+                    </p>
+                  </div>
                 )}
               </div>
-              <div className="flex justify-end gap-3 pt-2">
-                <Button 
-                  type="button" 
-                  variant="ghost" 
-                  onClick={() => setIsBugModalOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button 
-                  type="submit" 
-                  variant="primary" 
-                  isLoading={isSubmitting}
-                  disabled={!bugMessage.trim()}
-                >
-                  Send report
-                  <PaperPlaneTilt size={18} weight="bold" className="ml-2" />
-                </Button>
-              </div>
-            </form>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-8 text-center animate-in fade-in zoom-in duration-500">
-              <div className="h-20 w-20 rounded-full bg-green/10 text-green flex items-center justify-center mb-6">
-                <CheckCircle size={48} weight="fill" />
-              </div>
-              <p className="font-serif text-[18px] text-gray-text max-w-xs">
-                We've received your report and will look into it soon.
-              </p>
-            </div>
+            </motion.div>
           )}
-        </div>
-      </ModalSheet>
+        </AnimatePresence>,
+        document.body
+      )}
     </div>
   );
 };

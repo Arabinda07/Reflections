@@ -648,11 +648,11 @@ export const CreateNote: React.FC = () => {
       {isMobile && (
         <button 
           onClick={handleMobileBack}
-          className={`surface-floating fixed left-4 z-[80] flex h-10 w-10 items-center justify-center rounded-[var(--radius-control)] transition-all hover:text-green ${isFocusModeActive ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
+          className={`surface-floating fixed left-4 z-[80] flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] transition-all hover:text-green ${isFocusModeActive ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
           style={{ top: NATIVE_TOP_CONTROL_OFFSET }}
           aria-label="Back to notes"
         >
-          <ArrowLeft size={18} weight="bold" />
+          <ArrowLeft size={20} weight="bold" />
         </button>
       )}
 
@@ -673,7 +673,7 @@ export const CreateNote: React.FC = () => {
 
       {/* ── Desktop Sidebar ── */}
       {!isMobile && (
-        <aside className={`w-[240px] border-r-2 border-border flex flex-col min-h-0 bg-white/50 dark:bg-panel-bg z-40 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isFocusModeActive ? '-translate-x-full opacity-0' : 'translate-x-0 opacity-100'}`}>
+        <aside className={`w-[240px] border-r border-border/40 flex flex-col min-h-0 bg-white/50 dark:bg-panel-bg z-40 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isFocusModeActive ? '-translate-x-full opacity-0' : 'translate-x-0 opacity-100'}`}>
           <div className="pt-8 px-6 pb-6 flex-1 overflow-y-auto custom-scrollbar space-y-4">
             
             {/* Desktop Back Button */}
@@ -690,26 +690,26 @@ export const CreateNote: React.FC = () => {
             <span className="text-[10px] font-black text-gray-nav tracking-widest uppercase opacity-40 ml-2">Personalize</span>
             
             {/* Options */}
-            <button onClick={() => setIsMoodOpen(true)} className={`w-full flex items-center justify-between p-4 rounded-[20px] transition-all border-2 ${mood ? MOOD_CONFIG[mood]?.nav || 'bg-green/10 border-green/20 text-green' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border text-gray-text'}`}>
+            <button onClick={() => setIsMoodOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${mood ? MOOD_CONFIG[mood]?.nav || 'bg-green/10 border-green/20 text-green' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border/40 text-gray-text'}`}>
               <div className="flex items-center gap-3"><ActiveMoodIcon size={20} weight={mood ? "fill" : "regular"} /><span className="text-[13px] font-bold capitalize">{mood ? mood : 'Mood'}</span></div>
               <CaretRight size={14} className="opacity-40" />
             </button>
 
-            <button onClick={() => setIsTagsOpen(true)} className={`w-full flex items-center justify-between p-4 rounded-[20px] transition-all border-2 ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border text-gray-text'}`}>
+            <button onClick={() => setIsTagsOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border/40 text-gray-text'}`}>
               <div className="flex items-center gap-3"><TagIcon size={20} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-[13px] font-bold">{tags.length > 0 ? `${tags.length} Tags` : 'Tags'}</span></div>
               <CaretRight size={14} className="opacity-40" />
             </button>
 
-            <button onClick={() => setIsMusicOpen(true)} className={`w-full flex items-center justify-between p-4 rounded-[20px] transition-all border-2 ${musicPlaying ? 'bg-green/10 border-green/20 text-green' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border text-gray-text'}`}>
+            <button onClick={() => setIsMusicOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${musicPlaying ? 'bg-green/10 border-green/20 text-green' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border/40 text-gray-text'}`}>
               <div className="flex items-center gap-3"><Headphones size={20} weight={musicPlaying ? "fill" : "regular"} /><span className="text-[13px] font-bold">{musicPlaying && activeMusicTrack ? activeMusicTrack.emoji : 'Sounds'}</span></div>
               <CaretRight size={14} className="opacity-40" />
             </button>
 
-            <button onClick={toggleWhisper} className={`w-full flex items-center justify-between p-4 rounded-[20px] transition-all border-2 ${isWhispering ? 'bg-green/10 border-green/20 text-green animate-pulse' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border text-gray-text'}`}>
+            <button onClick={toggleWhisper} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${isWhispering ? 'bg-green/10 border-green/20 text-green animate-pulse' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border/40 text-gray-text'}`}>
               <div className="flex items-center gap-3">{isWhispering ? <Microphone size={20} weight="fill" /> : <MicrophoneSlash size={20} weight="regular" />}<span className="text-[13px] font-bold">Whisper</span></div>
             </button>
 
-            <button onClick={() => setIsTasksOpen(true)} className={`w-full flex items-center justify-between p-4 rounded-[20px] transition-all border-2 ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border text-gray-text'}`}>
+            <button onClick={() => setIsTasksOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border/40 text-gray-text'}`}>
               <div className="flex items-center gap-3"><ListChecks size={20} weight={tasks.some(t => !t.completed) ? "fill" : "regular"} /><span className="text-[13px] font-bold">{getTaskDrawerTriggerLabel(tasks).label}</span></div>
               <CaretRight size={14} className="opacity-40" />
             </button>

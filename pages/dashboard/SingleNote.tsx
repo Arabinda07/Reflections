@@ -362,13 +362,13 @@ export const SingleNote: React.FC = () => {
             <Surface variant="bezel" className="bg-white">
               <article>
                 {note.thumbnailUrl ? (
-                  <div className="h-64 w-full border-b border-border bg-white">
+                  <div className="h-64 w-full border-b border-border/40 bg-white">
                     <StorageImage path={note.thumbnailUrl} alt={note.title} className="h-full w-full object-cover" />
                   </div>
                 ) : null}
 
                 <div className="p-8 md:p-12">
-                  <h1 className="mb-6 text-4xl font-display text-gray-text">{note.title}</h1>
+                  <h1 className="h1-hero mb-8 !text-4xl">{note.title}</h1>
 
                   {note.tags && note.tags.length > 0 ? (
                     <div className="mb-6 flex flex-wrap gap-2">
@@ -386,7 +386,7 @@ export const SingleNote: React.FC = () => {
                     </div>
                   ) : null}
 
-                  <div className="mb-8 flex flex-wrap items-center gap-3 border-b border-border pb-6">
+                  <div className="mb-8 flex flex-wrap items-center gap-3 border-b border-border/40 pb-6">
                     <MetadataPill icon={<Calendar size={14} weight="bold" />}>
                       {new Date(note.createdAt).toLocaleDateString(undefined, {
                         year: 'numeric',
@@ -408,12 +408,12 @@ export const SingleNote: React.FC = () => {
                   </div>
 
                   <div
-                    className="prose prose-zinc prose-lg max-w-prose mx-auto text-gray-text leading-loose font-sans"
+                    className="prose prose-zinc prose-lg max-w-prose mx-auto text-gray-text leading-loose font-serif italic"
                     dangerouslySetInnerHTML={{ __html: sanitizedContent }}
                   />
 
                   {note.attachments && note.attachments.length > 0 ? (
-                    <div className="mt-12 border-t border-border pt-8">
+                    <div className="mt-12 border-t border-border/40 pt-8">
                       <h3 className="mb-4 flex items-center gap-2 text-[13px] font-extrabold text-gray-text">
                         <Paperclip size={16} weight="bold" className="text-gray-nav" />
                         Attachments
