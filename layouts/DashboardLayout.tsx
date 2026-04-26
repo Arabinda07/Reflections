@@ -499,7 +499,7 @@ export const DashboardLayout: React.FC = () => {
                   placeholder="Describe what happened..."
                   value={bugMessage}
                   onChange={(e) => setBugMessage(e.target.value)}
-                  className="w-full min-h-[160px] p-4 rounded-2xl border border-border bg-body/50 text-gray-text font-serif text-[17px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-green/20 focus:border-green/30 transition-all resize-none"
+                  className="w-full min-h-[180px] p-6 rounded-[20px] border border-border/40 bg-panel-bg/50 text-gray-text font-serif text-[18px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-green/10 focus:border-green/30 transition-all resize-none placeholder:text-gray-nav/30"
                 />
                 {submitError && (
                   <p className="text-[13px] font-semibold text-red animate-in fade-in slide-in-from-top-1 duration-300">
