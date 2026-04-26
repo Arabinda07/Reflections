@@ -227,6 +227,52 @@ export const SingleNote: React.FC = () => {
     }
   };
 
+  const renderTaskRow = (task: Task) => {
+    const taskLabel = task.text.trim() || 'untitled task';
+
+    return (
+      <div
+        key={task.id}
+        className={`flex items-center gap-3 rounded-[var(--radius-panel)] border px-4 py-4 transition-all ${
+          task.completed
+            ? 'border-green/20 bg-green/5'
+            : 'border-border bg-white/5 hover:border-green/20'
+        }`}
+      >
+        <button
+          type="button"
+          onClick={() => toggleTask(task.id)}
+          aria-label={task.completed ? `Mark "${taskLabel}" as open` : `Mark "${taskLabel}" as complete`}
+          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border-2 transition-all ${
+            task.completed ? 'border-green bg-green text-white' : 'border-border text-transparent'
+          }`}
+        >
+          <Check size={14} weight="bold" />
+        </button>
+
+        <input
+          type="text"
+          value={task.text}
+          onChange={(event) => setTaskTextLocal(task.id, event.target.value)}
+          onBlur={(event) => updateTaskText(task.id, event.target.value)}
+          aria-label={`Edit task: ${taskLabel}`}
+          className={`flex-1 bg-transparent text-[14px] font-bold outline-none ${
+            task.completed ? 'text-gray-nav line-through' : 'text-gray-text'
+          }`}
+        />
+
+        <button
+          type="button"
+          onClick={() => removeTask(task.id)}
+          aria-label={`Remove task: ${taskLabel}`}
+          className="rounded-[var(--radius-control)] p-2 text-gray-nav transition-colors hover:bg-red/5 hover:text-red"
+        >
+          <Trash size={14} weight="bold" />
+        </button>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <LoadingState
@@ -551,44 +597,7 @@ export const SingleNote: React.FC = () => {
       >
         {note.tasks && note.tasks.length > 0 ? (
           <div className="space-y-3">
-            {note.tasks.map((task) => (
-              <div
-                key={task.id}
-                className={`flex items-center gap-3 rounded-[var(--radius-panel)] border px-4 py-4 transition-all ${
-                  task.completed
-                    ? 'border-green/20 bg-green/5'
-                    : 'border-border bg-white/5 hover:border-green/20'
-                }`}
-              >
-                <button
-                  type="button"
-                  onClick={() => toggleTask(task.id)}
-                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border-2 transition-all ${
-                    task.completed ? 'border-green bg-green text-white' : 'border-border text-transparent'
-                  }`}
-                >
-                  <Check size={14} weight="bold" />
-                </button>
-
-                <input
-                  type="text"
-                  value={task.text}
-                  onChange={(event) => setTaskTextLocal(task.id, event.target.value)}
-                  onBlur={(event) => updateTaskText(task.id, event.target.value)}
-                  className={`flex-1 bg-transparent text-[14px] font-bold outline-none ${
-                    task.completed ? 'text-gray-nav line-through' : 'text-gray-text'
-                  }`}
-                />
-
-                <button
-                  type="button"
-                  onClick={() => removeTask(task.id)}
-                  className="rounded-[var(--radius-control)] p-2 text-gray-nav transition-colors hover:bg-red/5 hover:text-red"
-                >
-                  <Trash size={14} weight="bold" />
-                </button>
-              </div>
-            ))}
+            {note.tasks.map(renderTaskRow)}
           </div>
         ) : (
           <p className="text-[13px] font-medium text-gray-light">

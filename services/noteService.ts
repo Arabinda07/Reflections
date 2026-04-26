@@ -16,6 +16,20 @@ const mapToNote = (data: any): Note => ({
   tasks: data.tasks || [],
 });
 
+const mapToDbNote = (note: Note, userId: string) => ({
+  id: note.id,
+  user_id: userId,
+  title: note.title,
+  content: note.content,
+  thumbnail_url: note.thumbnailUrl,
+  tags: note.tags || [],
+  attachments: note.attachments || [],
+  tasks: note.tasks || [],
+  mood: note.mood,
+  created_at: note.createdAt,
+  updated_at: note.updatedAt,
+});
+
 export const noteService = {
   // Fetch all notes for the authenticated user
   getAll: async (): Promise<Note[]> => {
@@ -101,28 +115,19 @@ export const noteService = {
       syncStatus: 'pending_insert' 
     });
 
-    // 2. Attempt Supabase Background Sync
-    // We don't 'await' this for the UI, but we catch errors to leave it 'pending'
-    supabase.from('notes').insert({
-      id: tempId,
-      user_id: user.id,
-      title: note.title,
-      content: note.content,
-      thumbnail_url: note.thumbnailUrl,
-      tags: note.tags || [],
-      attachments: note.attachments || [],
-      tasks: note.tasks || [],
-      mood: note.mood,
-      created_at: now,
-      updated_at: now
-    }).then(({ error }) => {
+    // 2. Attempt Supabase sync before resolving so immediate follow-up updates
+    // cannot race ahead of the insert.
+    try {
+      const { error } = await supabase.from('notes').insert(mapToDbNote(newNote, user.id));
       if (!error) {
-        offlineStorage.markAsSynced(tempId);
+        await offlineStorage.markAsSynced(tempId);
         console.log('Note synced to Supabase (Create)');
       }
-    });
+    } catch (err) {
+      console.warn('Supabase create sync failed, leaving note pending:', err);
+    }
 
-    // 3. Resolve immediately
+    // 3. Return the local note. If sync failed, Dexie keeps it pending.
     return newNote;
   },
 
@@ -146,7 +151,7 @@ export const noteService = {
     // 2. Save to Dexie immediately
     await offlineStorage.saveNote(updatedNote);
 
-    // 3. Attempt Supabase Background Sync
+    // 3. Attempt Supabase Sync
     const dbUpdates: any = { updated_at: now };
     if (updates.title !== undefined) dbUpdates.title = updates.title;
     if (updates.content !== undefined) dbUpdates.content = updates.content;
@@ -156,16 +161,27 @@ export const noteService = {
     if (updates.mood !== undefined) dbUpdates.mood = updates.mood;
     if (updates.tasks !== undefined) dbUpdates.tasks = updates.tasks;
 
-    supabase.from('notes')
-      .update(dbUpdates)
-      .eq('id', id)
-      .eq('user_id', user.id)
-      .then(({ error }) => {
+    try {
+      if (updatedNote.syncStatus === 'pending_insert') {
+        const { error } = await supabase.from('notes').upsert(mapToDbNote(updatedNote, user.id));
         if (!error) {
-          offlineStorage.markAsSynced(id);
+          await offlineStorage.markAsSynced(id);
+          console.log('Note synced to Supabase (Upsert)');
+        }
+      } else {
+        const { error } = await supabase.from('notes')
+          .update(dbUpdates)
+          .eq('id', id)
+          .eq('user_id', user.id);
+
+        if (!error) {
+          await offlineStorage.markAsSynced(id);
           console.log('Note synced to Supabase (Update)');
         }
-      });
+      }
+    } catch (err) {
+      console.warn('Supabase update sync failed, leaving note pending:', err);
+    }
 
     return updatedNote;
   },

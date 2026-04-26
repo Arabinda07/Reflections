@@ -1,4 +1,4 @@
-import { Task } from '../types';
+import type { Task } from '../../types';
 
 /**
  * Extracts task items from note content.

@@ -82,6 +82,7 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
   const [showCompletedText, setShowCompletedText] = useState(task.completed);
   const [rippleKey, setRippleKey] = useState(0);
   const wasCompleted = useRef(task.completed);
+  const taskLabel = task.text.trim() || 'untitled task';
 
   useEffect(() => {
     if (task.completed) {
@@ -115,6 +116,7 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
       <button
         type="button"
         onClick={() => toggleTask(task.id)}
+        aria-label={task.completed ? `Mark "${taskLabel}" as open` : `Mark "${taskLabel}" as complete`}
         className={`relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border-2 transition-all duration-300 ${
           task.completed ? 'border-green bg-green text-white' : 'border-border text-transparent hover:border-green/50'
         }`}
@@ -130,6 +132,7 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
         onChange={(e) => updateTask(task.id, { text: e.target.value })}
         readOnly={task.completed}
         placeholder="What needs to be done?"
+        aria-label={`Edit task: ${taskLabel}`}
         className={`relative z-10 flex-1 bg-transparent border-none outline-none font-bold text-[14px] text-gray-text placeholder:text-gray-nav/40 transition-all ${
           showCompletedText ? 'line-through text-gray-nav decoration-green decoration-2' : ''
         }`}
@@ -138,6 +141,7 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
       <button
         type="button"
         onClick={() => removeTask(task.id)}
+        aria-label={`Remove task: ${taskLabel}`}
         className="opacity-0 group-hover:opacity-100 p-2 text-gray-nav hover:text-red transition-all"
       >
         <Trash size={16} />

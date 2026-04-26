@@ -23,6 +23,9 @@ vi.mock('./offlineStorage', () => ({
 const mockAuth = vi.mocked(supabase.auth.getUser);
 const mockFrom = vi.mocked(supabase.from);
 const mockGetAllNotes = vi.mocked(offlineStorage.getAllNotes);
+const mockGetNoteById = vi.mocked(offlineStorage.getNoteById);
+const mockSaveNote = vi.mocked(offlineStorage.saveNote);
+const mockMarkAsSynced = vi.mocked(offlineStorage.markAsSynced);
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -129,5 +132,102 @@ describe('noteService.getMonthlyCount', () => {
 
     expect(result).toBe(0);
     expect(mockFrom).not.toHaveBeenCalled();
+  });
+});
+
+describe('noteService.create', () => {
+  it('waits for the create insert to settle before resolving', async () => {
+    const randomUUID = vi
+      .spyOn(crypto, 'randomUUID')
+      .mockReturnValue('note-1' as `${string}-${string}-${string}-${string}-${string}`);
+    let resolveInsert: (value: { error: null }) => void = () => {};
+    const insertResult = new Promise<{ error: null }>((resolve) => {
+      resolveInsert = resolve;
+    });
+    const chain = {
+      insert: vi.fn().mockReturnValue(insertResult),
+    };
+    mockFrom.mockReturnValue(chain as any);
+
+    const created = noteService.create({
+      title: 'Draft',
+      content: 'A note',
+      tasks: [{ id: 'task-1', text: 'Follow up', completed: false }],
+    });
+    let settled = false;
+    void created.then(() => {
+      settled = true;
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(chain.insert).toHaveBeenCalled();
+    expect(settled).toBe(false);
+    expect(chain.insert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'note-1',
+        user_id: 'uid-1',
+        title: 'Draft',
+        content: 'A note',
+        tasks: [{ id: 'task-1', text: 'Follow up', completed: false }],
+      }),
+    );
+
+    resolveInsert({ error: null });
+    await expect(created).resolves.toMatchObject({ id: 'note-1', title: 'Draft' });
+    expect(mockSaveNote).toHaveBeenCalledWith(expect.objectContaining({ syncStatus: 'pending_insert' }));
+    expect(mockMarkAsSynced).toHaveBeenCalledWith('note-1');
+    randomUUID.mockRestore();
+  });
+});
+
+describe('noteService.update', () => {
+  it('upserts the full note when the local note is still pending insert', async () => {
+    const upsert = vi.fn().mockResolvedValue({ error: null });
+    mockFrom.mockReturnValue({ upsert } as any);
+    mockGetNoteById.mockResolvedValue({
+      id: 'note-1',
+      userId: 'uid-1',
+      syncStatus: 'pending_insert',
+      title: 'Draft',
+      content: 'Old content',
+      createdAt: '2026-04-20T00:00:00.000Z',
+      updatedAt: '2026-04-20T00:00:00.000Z',
+      tasks: [{ id: 'task-1', text: 'Follow up', completed: false }],
+    } as any);
+
+    await noteService.update('note-1', {
+      content: 'Final content',
+      attachments: [
+        {
+          id: 'attachment-1',
+          name: 'voice.m4a',
+          path: 'notes/note-1/voice.m4a',
+          size: 123,
+          type: 'audio/mp4',
+        },
+      ],
+    });
+
+    expect(upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'note-1',
+        user_id: 'uid-1',
+        title: 'Draft',
+        content: 'Final content',
+        attachments: [
+          {
+            id: 'attachment-1',
+            name: 'voice.m4a',
+            path: 'notes/note-1/voice.m4a',
+            size: 123,
+            type: 'audio/mp4',
+          },
+        ],
+        tasks: [{ id: 'task-1', text: 'Follow up', completed: false }],
+        created_at: '2026-04-20T00:00:00.000Z',
+      }),
+    );
+    expect(mockMarkAsSynced).toHaveBeenCalledWith('note-1');
   });
 });

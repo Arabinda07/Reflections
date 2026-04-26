@@ -20,7 +20,12 @@ import { aiService } from '../../services/aiService';
 import { noteService } from '../../services/noteService';
 import { DEFAULT_WELLNESS_PROMPTS } from '../../services/wellnessPrompts';
 import { supabase } from '../../src/supabaseClient';
-import { RoutePath, Note, Task } from '../../types';
+import { Note, RoutePath } from '../../types';
+import {
+  buildHomeIntentionSummary,
+  getHomeIntentionToggleUpdate,
+  type HomeIntentionSummary,
+} from './homeIntentions';
 const bentoContainerVariants = {
   hidden: { opacity: 0 },
   show: {
@@ -81,9 +86,9 @@ const ONBOARDING_STEPS = [
   {
     icon: ShieldCheck,
     label: 'Privacy',
-    title: 'Private by design',
+    title: 'Private by default',
     body:
-      'Your notes stay with you. AI only appears if you ask for help finding a pattern.',
+      'Your notes stay with you. AI is optional and only appears if you ask for help finding a pattern.',
   },
   {
     icon: Brain,
@@ -107,7 +112,10 @@ export const HomeAuthenticated: React.FC = () => {
   const [dailyPrompt, setDailyPrompt] = useState(DEFAULT_WELLNESS_PROMPTS[0]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [quote, setQuote] = useState({ text: '', author: '' });
-  const [intentions, setIntentions] = useState<{ id: string; text: string; noteId: string; completed: boolean }[]>([]);
+  const [taskNotes, setTaskNotes] = useState<Note[]>([]);
+  const [intentionSummary, setIntentionSummary] = useState<HomeIntentionSummary>(() =>
+    buildHomeIntentionSummary([]),
+  );
   const shouldReduceMotion = useReducedMotion();
 
   const entranceDuration = isFromSave ? 0.3 : 0.8;
@@ -202,6 +210,11 @@ export const HomeAuthenticated: React.FC = () => {
     setShowOnboarding(false);
   }, []);
 
+  const updateIntentionSummary = useCallback((notes: Note[]) => {
+    setTaskNotes(notes);
+    setIntentionSummary(buildHomeIntentionSummary(notes));
+  }, []);
+
   const handleNextOnboardingStep = useCallback(() => {
     if (isLastOnboardingStep) {
       handleCloseOnboarding();
@@ -226,16 +239,10 @@ export const HomeAuthenticated: React.FC = () => {
           noteService.getAll()
         ]);
         setNoteCount(count);
-        
-        // Extract intentions from all notes
-        const allIntentions = notes.flatMap(note => 
-          (note.tasks || [])
-            .filter(t => !t.completed)
-            .map(t => ({ id: t.id, text: t.text, noteId: note.id, completed: t.completed }))
-        );
-        setIntentions(allIntentions);
+        updateIntentionSummary(notes);
       } catch {
         setNoteCount(0);
+        updateIntentionSummary([]);
       } finally {
         setIsCountLoading(false);
       }
@@ -255,7 +262,7 @@ export const HomeAuthenticated: React.FC = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [updateIntentionSummary, user]);
 
   const handleCreateClick = (prompt?: string) => {
     if (prompt) {
@@ -268,33 +275,17 @@ export const HomeAuthenticated: React.FC = () => {
 
   const handleToggleIntention = async (noteId: string, taskId: string) => {
     try {
-      const note = await noteService.getById(noteId);
+      const note = taskNotes.find((item) => item.id === noteId) || await noteService.getById(noteId);
       if (!note) return;
 
-      const updatedTasks = (note.tasks || []).map(t => 
-        t.id === taskId ? { ...t, completed: !t.completed } : t
-      );
+      const update = getHomeIntentionToggleUpdate(note, taskId);
+      if (!update) return;
 
-      // Also update the prose content [ ] -> [x]
-      const taskToToggle = (note.tasks || []).find(t => t.id === taskId);
-      if (taskToToggle) {
-        const oldMarker = taskToToggle.completed ? '[x]' : '[ ]';
-        const newMarker = taskToToggle.completed ? '[ ]' : '[x]';
-        
-        // Very simple string replacement, might need to be more robust for HTML
-        // but for basic [ ] mirroring it works.
-        const escapedText = taskToToggle.text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const pattern = new RegExp(`\\[${taskToToggle.completed ? '[xX]' : ' '}\\]\\s*${escapedText}`, 'g');
-        const updatedContent = note.content.replace(pattern, `${newMarker} ${taskToToggle.text}`);
-        
-        await noteService.update(noteId, { 
-          tasks: updatedTasks,
-          content: updatedContent 
-        });
-      }
-
-      // Update local state to trigger animation/removal
-      setIntentions(prev => prev.filter(t => t.id !== taskId));
+      const updatedNote = await noteService.update(noteId, update);
+      const nextNotes = taskNotes.some((item) => item.id === noteId)
+        ? taskNotes.map((item) => (item.id === noteId ? updatedNote : item))
+        : [...taskNotes, updatedNote];
+      updateIntentionSummary(nextNotes);
     } catch (err) {
       console.error('Failed to toggle intention:', err);
     }
@@ -411,12 +402,17 @@ export const HomeAuthenticated: React.FC = () => {
                   Your Intentions
                 </span>
               </div>
+              {intentionSummary.openCount > 0 ? (
+                <span className="text-[10px] font-black uppercase tracking-widest text-green/70">
+                  {intentionSummary.openCount} open
+                </span>
+              ) : null}
             </div>
 
             <div className="space-y-3">
               <AnimatePresence mode="popLayout">
-                {intentions.length > 0 ? (
-                  intentions.slice(0, 5).map((intention) => (
+                {intentionSummary.items.length > 0 ? (
+                  intentionSummary.items.map((intention) => (
                     <motion.button
                       key={intention.id}
                       layout
@@ -426,13 +422,18 @@ export const HomeAuthenticated: React.FC = () => {
                       whileTap={{ scale: 0.98 }}
                       className="group w-full flex items-start gap-4 p-4 rounded-2xl bg-panel-bg border border-border/40 hover:border-green/20 transition-all text-left min-h-[52px] shadow-none"
                       onClick={() => handleToggleIntention(intention.noteId, intention.id)}
-                      aria-label={`Mark "${intention.text}" as finished`}
+                      aria-label={`Mark "${intention.text}" from ${intention.noteTitle} as complete`}
                     >
                       <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 border-border group-hover:border-green transition-colors">
                         <div className="h-2 w-2 rounded-full bg-green opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
-                      <span className="font-serif italic text-[17px] text-gray-text group-hover:text-green transition-colors line-clamp-2 leading-relaxed">
-                        {intention.text}
+                      <span className="min-w-0">
+                        <span className="block font-serif italic text-[17px] text-gray-text group-hover:text-green transition-colors line-clamp-2 leading-relaxed">
+                          {intention.text}
+                        </span>
+                        <span className="mt-1 block truncate text-[10px] font-black uppercase tracking-widest text-gray-nav/45">
+                          {intention.noteTitle}
+                        </span>
                       </span>
                     </motion.button>
                   ))
@@ -448,18 +449,26 @@ export const HomeAuthenticated: React.FC = () => {
                       </div>
                     </div>
                     <p className="text-[11px] font-black text-gray-nav/30 uppercase tracking-[0.2em]">
-                      All intentions <br /> are settled
+                      {intentionSummary.hasAnyTasks ? (
+                        <>
+                          All intentions <br /> are settled
+                        </>
+                      ) : (
+                        <>
+                          No intentions <br /> yet
+                        </>
+                      )}
                     </p>
                   </motion.div>
                 )}
               </AnimatePresence>
               
-              {intentions.length > 5 && (
+              {intentionSummary.hiddenCount > 0 && (
                 <button 
                   onClick={() => navigate(RoutePath.NOTES)}
                   className="w-full text-center text-[10px] font-black uppercase tracking-[0.25em] text-gray-nav/40 hover:text-green transition-colors pt-6"
                 >
-                  + {intentions.length - 5} more in your notes
+                  + {intentionSummary.hiddenCount} more in your notes
                 </button>
               )}
             </div>
