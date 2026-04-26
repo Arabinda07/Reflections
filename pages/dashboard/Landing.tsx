@@ -132,6 +132,5 @@ export const Landing: React.FC = () => {
         </video>
       </motion.div>
     </div>
-  </div>
-);
+  );
 };
