@@ -58,6 +58,7 @@ import {
   CREATE_NOTE_UNSUPPORTED_WHISPER_MESSAGE,
   hasUnsavedCreateNoteChanges,
 } from './createNoteDraftState';
+import { extractTasksFromContent, mergeTasks } from '../../src/utils/taskParser';
 import trailLoadingAnimation from '@/src/lottie/trail-loading.json';
 
 const MOOD_CONFIG: Record<string, { nav: string, modal: string, icon: any }> = {
@@ -412,8 +413,14 @@ export const CreateNote: React.FC = () => {
       if (!user) throw new Error("Unauthenticated");
 
       let noteId = id;
+      
+      // Auto-extract tasks from content
+      const extractedTasks = extractTasksFromContent(content);
+      const syncedTasks = mergeTasks(tasks, extractedTasks);
+      setTasks(syncedTasks); // Sync local state for UI consistency
+
       if (!noteId) {
-        const newNote = await noteService.create({ title, content, tags, mood, tasks });
+        const newNote = await noteService.create({ title, content, tags, mood, tasks: syncedTasks });
         noteId = newNote.id;
       }
 
@@ -437,7 +444,7 @@ export const CreateNote: React.FC = () => {
       }
 
       await noteService.update(noteId, {
-        title, content, mood, tags, tasks,
+        title, content, mood, tags, tasks: syncedTasks,
         thumbnailUrl: finalThumbnailUrl || undefined,
         attachments: mergedAttachments
       });

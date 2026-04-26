@@ -7,9 +7,10 @@ import {
   Sparkle,
   Target,
 } from '@phosphor-icons/react';
-import { animate, motion, useReducedMotion } from 'motion/react';
+import { animate, motion, useReducedMotion, AnimatePresence } from 'motion/react';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { ListChecks, CheckCircle as CheckCircleIcon, X as XIcon } from '@phosphor-icons/react';
 
 import { AmbientMusicButton } from '../../components/ui/AmbientMusicButton';
 import { Button } from '../../components/ui/Button';
@@ -18,7 +19,7 @@ import { useAuth } from '../../context/AuthContext';
 import { noteService } from '../../services/noteService';
 import { DEFAULT_WELLNESS_PROMPTS } from '../../services/wellnessPrompts';
 import { supabase } from '../../src/supabaseClient';
-import { RoutePath } from '../../types';
+import { RoutePath, Note, Task } from '../../types';
 
 const WRITING_NOTES = [
   {
@@ -82,6 +83,7 @@ export const HomeAuthenticated: React.FC = () => {
   const [dailyPrompt, setDailyPrompt] = useState(DEFAULT_WELLNESS_PROMPTS[0]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [quote, setQuote] = useState({ text: '', author: '' });
+  const [intentions, setIntentions] = useState<{ id: string; text: string; noteId: string; completed: boolean }[]>([]);
   const shouldReduceMotion = useReducedMotion();
 
   const entranceDuration = isFromSave ? 0.3 : 0.8;
@@ -159,8 +161,19 @@ export const HomeAuthenticated: React.FC = () => {
 
       setIsCountLoading(true);
       try {
-        const count = await noteService.getCount();
+        const [count, notes] = await Promise.all([
+          noteService.getCount(),
+          noteService.getAll()
+        ]);
         setNoteCount(count);
+        
+        // Extract intentions from all notes
+        const allIntentions = notes.flatMap(note => 
+          (note.tasks || [])
+            .filter(t => !t.completed)
+            .map(t => ({ id: t.id, text: t.text, noteId: note.id, completed: t.completed }))
+        );
+        setIntentions(allIntentions);
       } catch {
         setNoteCount(0);
       } finally {
@@ -191,6 +204,40 @@ export const HomeAuthenticated: React.FC = () => {
     }
 
     navigate(RoutePath.CREATE_NOTE);
+  };
+
+  const handleToggleIntention = async (noteId: string, taskId: string) => {
+    try {
+      const note = await noteService.getById(noteId);
+      if (!note) return;
+
+      const updatedTasks = (note.tasks || []).map(t => 
+        t.id === taskId ? { ...t, completed: !t.completed } : t
+      );
+
+      // Also update the prose content [ ] -> [x]
+      const taskToToggle = (note.tasks || []).find(t => t.id === taskId);
+      if (taskToToggle) {
+        const oldMarker = taskToToggle.completed ? '[x]' : '[ ]';
+        const newMarker = taskToToggle.completed ? '[ ]' : '[x]';
+        
+        // Very simple string replacement, might need to be more robust for HTML
+        // but for basic [ ] mirroring it works.
+        const escapedText = taskToToggle.text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const pattern = new RegExp(`\\[${taskToToggle.completed ? '[xX]' : ' '}\\]\\s*${escapedText}`, 'g');
+        const updatedContent = note.content.replace(pattern, `${newMarker} ${taskToToggle.text}`);
+        
+        await noteService.update(noteId, { 
+          tasks: updatedTasks,
+          content: updatedContent 
+        });
+      }
+
+      // Update local state to trigger animation/removal
+      setIntentions(prev => prev.filter(t => t.id !== taskId));
+    } catch (err) {
+      console.error('Failed to toggle intention:', err);
+    }
   };
 
   return (
@@ -263,22 +310,78 @@ export const HomeAuthenticated: React.FC = () => {
               </button>
             </div>
 
-            <button
-              onClick={() => navigate(RoutePath.INSIGHTS)}
-              className="group flex flex-col items-start gap-5 p-8 rounded-3xl bg-panel-bg border border-border hover:border-green/30 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 text-left"
-              aria-label="View writing patterns"
-            >
-              <div className="flex items-center gap-2 text-gray-nav mb-2">
-                <Brain size={16} weight="bold" className="text-green" />
-                <span className="text-[10px] font-black uppercase tracking-widest opacity-60">
-                  Librarian&apos;s Note
-                </span>
+              <button
+                onClick={() => navigate(RoutePath.INSIGHTS)}
+                className="group flex flex-col items-start gap-5 p-8 rounded-3xl bg-panel-bg border border-border hover:border-green/30 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 text-left"
+                aria-label="View writing patterns"
+              >
+                <div className="flex items-center gap-2 text-gray-nav mb-2">
+                  <Brain size={16} weight="bold" className="text-green" />
+                  <span className="text-[10px] font-black uppercase tracking-widest opacity-60">
+                    Librarian&apos;s Note
+                  </span>
+                </div>
+                <p className="text-xl md:text-2xl font-serif italic text-gray-light group-hover:text-gray-text transition-colors leading-relaxed">
+                  Patterns stay here quietly until you ask Reflections to build them.
+                </p>
+              </button>
+            </div>
+
+            {/* Intentions Drawer Card */}
+            <div className="p-10 sm:p-16 border-b lg:border-b-0 lg:border-r border-border flex flex-col justify-start h-full bg-white dark:bg-white/14 overflow-hidden">
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-2 text-gray-nav">
+                  <ListChecks size={18} weight="bold" className="text-green" />
+                  <span className="text-[11px] font-black uppercase tracking-widest opacity-60">
+                    Your Intentions
+                  </span>
+                </div>
               </div>
-              <p className="text-xl md:text-2xl font-serif italic text-gray-light group-hover:text-gray-text transition-colors leading-relaxed">
-                Patterns stay here quietly until you ask Reflections to build them.
-              </p>
-            </button>
-          </div>
+
+              <div className="space-y-4">
+                <AnimatePresence mode="popLayout">
+                  {intentions.length > 0 ? (
+                    intentions.slice(0, 5).map((intention) => (
+                      <motion.div
+                        key={intention.id}
+                        layout
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className="group flex items-center gap-3 p-3 rounded-2xl bg-panel-bg border border-border hover:border-green/20 transition-all cursor-pointer"
+                        onClick={() => handleToggleIntention(intention.noteId, intention.id)}
+                      >
+                        <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 border-green/30 group-hover:border-green transition-colors">
+                          <div className="h-2 w-2 rounded-full bg-green opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                        <span className="text-[14px] font-bold text-gray-text group-hover:text-green transition-colors line-clamp-1">
+                          {intention.text}
+                        </span>
+                      </motion.div>
+                    ))
+                  ) : (
+                    <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="py-12 text-center"
+                    >
+                      <p className="text-[13px] font-bold text-gray-nav/40 uppercase tracking-widest">
+                        No active intentions
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                
+                {intentions.length > 5 && (
+                  <button 
+                    onClick={() => navigate(RoutePath.NOTES)}
+                    className="w-full text-center text-[11px] font-black uppercase tracking-[0.2em] text-gray-nav/60 hover:text-green transition-colors pt-4"
+                  >
+                    + {intentions.length - 5} more in your notes
+                  </button>
+                )}
+              </div>
+            </div>
 
           <div className="p-10 sm:p-16 border-b lg:border-b-0 lg:border-r border-border flex flex-col justify-between h-full bg-white dark:bg-white/14">
             <div className="flex-grow">
