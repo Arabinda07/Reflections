@@ -1,6 +1,7 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
+import emailjs from '@emailjs/browser';
 import { 
   List, 
   X, 
@@ -25,11 +26,14 @@ import { NATIVE_PAGE_TOP_PADDING, NATIVE_TOP_CONTROL_OFFSET } from '../src/nativ
 import { useAndroidBackHandler } from '../src/native/useAndroidBackHandler';
 
 const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
+const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY; 
 
 export const DashboardLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
   const { canInstall, isInstalled, triggerInstall } = usePWAInstall();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const mobileMenuId = useId();
@@ -47,6 +51,7 @@ export const DashboardLayout: React.FC = () => {
   const [bugMessage, setBugMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useAndroidBackHandler();
 
@@ -132,18 +137,36 @@ export const DashboardLayout: React.FC = () => {
     if (!bugMessage.trim()) return;
     
     setIsSubmitting(true);
-    // Placeholder for EmailJS connection
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    setSubmitError(null);
     
-    console.log('Bug reported:', bugMessage, 'on page:', window.location.href);
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    setBugMessage('');
-    
-    setTimeout(() => {
-      setIsBugModalOpen(false);
-      setTimeout(() => setIsSubmitted(false), 500);
-    }, 2500);
+    try {
+      const templateParams = {
+        from_name: user?.email || 'Guest User',
+        message: bugMessage,
+        page_url: window.location.href,
+        timestamp: new Date().toLocaleString(),
+      };
+
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        templateParams,
+        EMAILJS_PUBLIC_KEY
+      );
+      
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+      setBugMessage('');
+      
+      setTimeout(() => {
+        setIsBugModalOpen(false);
+        setTimeout(() => setIsSubmitted(false), 500);
+      }, 2500);
+    } catch (error) {
+      console.error('Failed to send bug report:', error);
+      setIsSubmitting(false);
+      setSubmitError('I couldn\'t send your report just now. Please try again or email us directly.');
+    }
   };
 
   const guestNavItems = [
@@ -453,7 +476,10 @@ export const DashboardLayout: React.FC = () => {
       {/* Bug Report Modal */}
       <ModalSheet
         isOpen={isBugModalOpen}
-        onClose={() => setIsBugModalOpen(false)}
+        onClose={() => {
+          setIsBugModalOpen(false);
+          setSubmitError(null);
+        }}
         title={isSubmitted ? "Thank you" : "Report a bug"}
         description={isSubmitted ? "Your report has been sent. We'll look into it." : "Tell us what felt unclear or broken. Your feedback helps make Reflections better."}
         icon={isSubmitted ? <CheckCircle size={28} weight="duotone" /> : <Bug size={28} weight="duotone" />}
@@ -473,6 +499,11 @@ export const DashboardLayout: React.FC = () => {
                   onChange={(e) => setBugMessage(e.target.value)}
                   className="w-full min-h-[160px] p-4 rounded-2xl border border-border bg-body/50 text-gray-text font-serif text-[17px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-green/20 focus:border-green/30 transition-all resize-none"
                 />
+                {submitError && (
+                  <p className="text-[13px] font-semibold text-red animate-in fade-in slide-in-from-top-1 duration-300">
+                    {submitError}
+                  </p>
+                )}
               </div>
               <div className="flex justify-end gap-3 pt-2">
                 <Button 
