@@ -11,6 +11,10 @@ import {
   PenNib,
   ShieldCheck,
   Tag,
+  Headphones,
+  Microphone,
+  Image as ImageIcon,
+  ListChecks,
 } from '@phosphor-icons/react';
 
 import { Button } from '../../components/ui/Button';
@@ -93,12 +97,12 @@ const detailItems = [
 ];
 
 const featureGrid = [
-  { title: 'Ambient sound', body: 'Soundscapes to help you focus. Quiet the room as you write.' },
-  { title: 'Whisper mode', body: 'Speak your thoughts. Fast, private transcription for when you need it.' },
-  { title: 'Writing sparks', body: 'Gentle prompts for those days when you aren\'t sure where to start.' },
-  { title: 'Visual covers', body: 'Add atmospheric imagery to set the mood for your entries.' },
-  { title: 'Embedded tasks', body: 'Keep track of follow-ups and intentions right inside your prose.' },
-  { title: 'Life Wiki', body: 'A high-level summary of your world, updated only when you choose.' },
+  { title: 'Ambient sound', body: 'Soundscapes to help you focus. Quiet the room as you write.', icon: Headphones },
+  { title: 'Whisper mode', body: 'Speak your thoughts. Fast, private transcription for when you need it.', icon: Microphone },
+  { title: 'Writing sparks', body: 'Gentle prompts for those days when you aren\'t sure where to start.', icon: Tag },
+  { title: 'Visual covers', body: 'Add atmospheric imagery to set the mood for your entries.', icon: ImageIcon },
+  { title: 'Embedded tasks', body: 'Keep track of follow-ups and intentions right inside your prose.', icon: ListChecks },
+  { title: 'Life Wiki', body: 'A high-level summary of your world, updated only when you choose.', icon: Brain },
 ];
 
 export const FAQ: React.FC = () => {
@@ -208,48 +212,24 @@ export const FAQ: React.FC = () => {
 
         {/* Feature Grid */}
         <section className="mb-28">
-          <div className="grid gap-x-12 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-            {featureGrid.map((feature) => (
-              <div key={feature.title} className="space-y-3">
-                <h4 className="text-[14px] font-black uppercase tracking-widest text-gray-text">{feature.title}</h4>
-                <p className="font-serif text-[16px] leading-relaxed text-gray-light">{feature.body}</p>
-              </div>
-            ))}
+          <div className="grid gap-x-12 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+            {featureGrid.map((feature) => {
+              const Icon = feature.icon;
+              return (
+                <div key={feature.title} className="space-y-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface border border-border/40 text-green shadow-sm">
+                    <Icon size={20} weight="duotone" />
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="text-[14px] font-black uppercase tracking-widest text-gray-text">{feature.title}</h4>
+                    <p className="font-serif text-[16px] leading-relaxed text-gray-light">{feature.body}</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </section>
 
-        <section className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center border-t border-border pt-20">
-          <div className="space-y-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-[var(--radius-panel)] border border-green/10 bg-green/5 text-green">
-              <EnvelopeSimple size={24} weight="duotone" />
-            </div>
-            <h2 className="text-[32px] font-display leading-tight text-gray-text">
-              Have a question about your writing or account?
-            </h2>
-            <p className="max-w-2xl font-serif text-[17px] leading-relaxed text-gray-light">
-              Send a note to{' '}
-              <a href={`mailto:${SUPPORT_EMAIL}`} className="font-bold text-green hover:underline">
-                {SUPPORT_EMAIL}
-              </a>
-              . Keep private details out of the first message unless they are needed to help with the request.
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={() => navigate(RoutePath.SIGNUP)}
-              aria-label="Begin writing"
-            >
-              Begin writing
-              <ArrowRight size={20} weight="bold" className="ml-2" />
-            </Button>
-            <Button variant="secondary" size="lg" onClick={() => navigate(RoutePath.HOME)}>
-              Back to home
-            </Button>
-          </div>
-        </section>
       </main>
     </div>
   );
