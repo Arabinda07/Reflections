@@ -301,11 +301,11 @@ select:focus-visible,
 
   /* Typography Standard */
   .h1-hero {
-    @apply text-5xl md:text-7xl lg:text-[100px] font-display tracking-tight text-gray-text leading-[1.05];
+    @apply text-5xl md:text-7xl lg:text-[100px] font-display tracking-[-0.04em] text-gray-text leading-[1.05] text-balance;
   }
 
   .h2-section {
-    @apply text-4xl md:text-5xl font-display tracking-tight text-gray-text leading-tight;
+    @apply text-4xl md:text-5xl font-display tracking-[-0.03em] text-gray-text leading-tight text-balance;
   }
 
   .body-editorial {
@@ -313,7 +313,11 @@ select:focus-visible,
   }
 
   .label-caps {
-    @apply text-[11px] font-black tracking-[0.2em] uppercase text-gray-nav;
+    @apply text-[11px] font-black tracking-[0.2em] uppercase text-gray-nav text-balance;
+  }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
   }
 
   /* Sanctioned Surface Families */

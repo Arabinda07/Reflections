@@ -20,6 +20,29 @@ import { noteService } from '../../services/noteService';
 import { DEFAULT_WELLNESS_PROMPTS } from '../../services/wellnessPrompts';
 import { supabase } from '../../src/supabaseClient';
 import { RoutePath, Note, Task } from '../../types';
+const bentoContainerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const bentoItemVariants = {
+  hidden: { opacity: 0, y: 15 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: 'spring',
+      stiffness: 100,
+      damping: 20,
+    },
+  },
+};
 
 const WRITING_NOTES = [
   {
@@ -276,7 +299,7 @@ export const HomeAuthenticated: React.FC = () => {
               }}
               className="max-w-4xl"
             >
-              <h1 className="h1-hero hero-ink mb-12">
+              <h1 className="h1-hero hero-ink mb-12 text-balance">
                 Welcome back, <br />
                 <span className="font-serif italic hero-ink-accent">
                   {user?.name?.split(' ')[0] || 'Reflector'}
@@ -286,12 +309,22 @@ export const HomeAuthenticated: React.FC = () => {
           </div>
         </section>
 
-        <section className="grid grid-cols-1 lg:grid-cols-3 border-t border-border bg-white dark:bg-transparent min-h-[500px]">
-          <div className="p-8 sm:p-12 lg:p-16 border-b lg:border-b-0 lg:border-r border-border flex flex-col justify-between h-full bg-white/50 dark:bg-white/12">
+        <motion.section 
+          variants={bentoContainerVariants}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-100px" }}
+          className="grid grid-cols-1 lg:grid-cols-3 border-t border-border/40 bg-white dark:bg-transparent min-h-[500px]"
+        >
+          {/* Overview Card */}
+          <motion.div 
+            variants={bentoItemVariants}
+            className="p-8 sm:p-12 lg:p-16 border-b lg:border-b-0 lg:border-r border-border/40 flex flex-col justify-between h-full bg-white/50 dark:bg-white/12"
+          >
             <div>
               <div className="flex items-center gap-2 text-gray-nav mb-12">
                 <FolderOpen size={18} weight="bold" className="text-green" />
-                <span className="text-[11px] font-black uppercase tracking-widest opacity-60">
+                <span className="text-[11px] font-black uppercase tracking-[0.2em] opacity-60">
                   Reflections Overview
                 </span>
               </div>
@@ -301,7 +334,7 @@ export const HomeAuthenticated: React.FC = () => {
                 className="group flex flex-col items-start gap-4 mb-16 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300"
                 aria-label="View all reflections"
               >
-                <h2 className="text-5xl md:text-7xl font-display text-gray-text group-hover:text-green transition-colors tracking-tighter">
+                <h2 className="text-5xl md:text-7xl font-display text-gray-text group-hover:text-green transition-colors tracking-tighter tabular-nums">
                   {isCountLoading ? '...' : displayCount}
                 </h2>
                 <p className="text-[13px] font-bold text-gray-nav uppercase tracking-tight">
@@ -312,23 +345,28 @@ export const HomeAuthenticated: React.FC = () => {
 
             <button
               onClick={() => navigate(RoutePath.INSIGHTS)}
-              className="group flex flex-col items-start gap-5 p-7 sm:p-8 rounded-3xl bg-panel-bg border border-border hover:border-green/30 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 text-left"
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+              className="group flex flex-col items-start gap-5 p-7 sm:p-8 rounded-3xl bg-panel-bg border border-border/40 hover:border-green/30 transition-all text-left shadow-none"
               aria-label="View writing patterns"
             >
               <div className="flex items-center gap-2 text-gray-nav mb-2">
                 <Brain size={16} weight="bold" className="text-green" />
                 <span className="text-[10px] font-black uppercase tracking-widest opacity-60">
-                  Librarian&apos;s Note
+                  Writing Patterns
                 </span>
               </div>
-              <p className="text-xl md:text-2xl font-serif italic text-gray-light group-hover:text-gray-text transition-colors leading-relaxed">
+              <p className="text-[15px] font-serif italic text-gray-light leading-relaxed group-hover:text-gray-text transition-colors">
                 Patterns stay here quietly until you ask Reflections to build them.
               </p>
             </button>
-          </div>
-
-          {/* Intentions Drawer Card */}
-          <div className="p-8 sm:p-12 lg:p-16 border-b lg:border-b-0 lg:border-r border-border flex flex-col justify-start h-full bg-white dark:bg-white/14 overflow-hidden">
+          </motion.div>
+          
+          {/* Intentions Card */}
+          <motion.div 
+            variants={bentoItemVariants}
+            className="p-8 sm:p-12 lg:p-16 border-b lg:border-b-0 lg:border-r border-border/40 flex flex-col justify-start h-full bg-white/30 dark:bg-white/8 overflow-hidden"
+          >
             <div className="flex items-center justify-between mb-10">
               <div className="flex items-center gap-2 text-gray-nav">
                 <ListChecks size={18} weight="bold" className="text-green" />
@@ -349,7 +387,7 @@ export const HomeAuthenticated: React.FC = () => {
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, scale: 0.95 }}
                       whileTap={{ scale: 0.98 }}
-                      className="group w-full flex items-start gap-4 p-4 rounded-2xl bg-panel-bg border border-border hover:border-green/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/20 transition-all text-left min-h-[52px]"
+                      className="group w-full flex items-start gap-4 p-4 rounded-2xl bg-panel-bg border border-border/40 hover:border-green/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/20 transition-all text-left min-h-[52px] shadow-none"
                       onClick={() => handleToggleIntention(intention.noteId, intention.id)}
                       aria-label={`Mark "${intention.text}" as finished`}
                     >
@@ -388,9 +426,13 @@ export const HomeAuthenticated: React.FC = () => {
                 </button>
               )}
             </div>
-          </div>
+          </motion.div>
 
-          <div className="p-8 sm:p-12 lg:p-16 border-b lg:border-b-0 lg:border-r border-border flex flex-col justify-between h-full bg-white dark:bg-white/14">
+          {/* Quote Card */}
+          <motion.div 
+            variants={bentoItemVariants}
+            className="p-8 sm:p-12 lg:p-16 border-b lg:border-b-0 lg:border-r border-border/40 flex flex-col justify-between h-full bg-white dark:bg-white/14"
+          >
             <div className="flex-grow">
               <div className="flex items-center gap-2 text-gray-nav mb-12">
                 <Sparkle size={18} weight="bold" className="text-orange" />
@@ -414,9 +456,13 @@ export const HomeAuthenticated: React.FC = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="p-8 sm:p-12 lg:p-16 flex flex-col justify-between h-full bg-white dark:bg-white/20">
+          {/* Daily Focus Card */}
+          <motion.div 
+            variants={bentoItemVariants}
+            className="p-8 sm:p-12 lg:p-16 flex flex-col justify-between h-full bg-white dark:bg-white/20 border-b lg:border-b-0 border-border/40"
+          >
             <div>
               <div className="flex items-center justify-between mb-12">
                 <div className="flex items-center gap-2 text-gray-nav">
@@ -448,15 +494,17 @@ export const HomeAuthenticated: React.FC = () => {
 
             <Button
               variant="primary"
-              className="mt-16 h-14 rounded-xl text-[15px] font-bold bg-green text-white hover:bg-green/90 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg shadow-green/20"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="mt-16 h-14 rounded-xl text-[15px] font-bold bg-green text-white hover:bg-green/90 transition-colors shadow-none"
               onClick={() => handleCreateClick(dailyPrompt)}
               aria-label="Start a new reflection with this prompt"
             >
               Start Reflection
               <Plus size={18} weight="bold" className="ml-2" />
             </Button>
-          </div>
-        </section>
+          </motion.div>
+        </motion.section>
       </div>
 
       <ModalSheet

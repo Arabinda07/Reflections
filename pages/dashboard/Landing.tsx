@@ -39,7 +39,7 @@ export const Landing: React.FC = () => {
               variants={staggerContainer}
               initial="hidden"
               animate="show"
-              className="pointer-events-auto flex max-w-[11ch] flex-col text-mk-display font-display tracking-[-0.04em] text-gray-text leading-[0.92] sm:max-w-[12ch] sm:leading-[0.94] lg:max-w-5xl lg:leading-[0.96]"
+              className="pointer-events-auto flex max-w-[11ch] flex-col text-mk-display font-display tracking-[-0.04em] text-gray-text leading-[0.92] sm:max-w-[12ch] sm:leading-[0.94] lg:max-w-5xl lg:leading-[0.96] text-balance"
             >
               <motion.span variants={staggerLine} style={{ willChange: 'transform, opacity, filter' }}>
                 Your mind,
@@ -68,9 +68,12 @@ export const Landing: React.FC = () => {
             transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.6 }}
             className="pointer-events-auto mt-auto flex w-full max-w-[26rem] flex-col items-start gap-5 sm:max-w-none sm:flex-row sm:items-end sm:justify-between sm:gap-6 lg:mt-0 lg:w-[60%] xl:w-[55%]"
           >
-            <button
+            <motion.button
               onClick={() => navigate(RoutePath.SIGNUP)}
-              className="group flex min-h-11 w-fit items-center justify-start gap-3 rounded-[var(--radius-control)] border border-green/20 bg-green px-6 py-3.5 text-[16px] font-black text-white shadow-[0_8px_24px_-8px_rgba(22,163,74,0.3)] transition-all duration-300 hover:bg-green-hover hover:shadow-lg active:scale-95 sm:w-auto sm:justify-start sm:text-[18px]"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className="group flex min-h-11 w-fit items-center justify-start gap-3 rounded-[var(--radius-control)] border border-green/20 bg-green px-6 py-3.5 text-[16px] font-black text-white shadow-none transition-all duration-300 hover:bg-green-hover sm:w-auto sm:justify-start sm:text-[18px]"
               aria-label="Begin writing"
             >
               Begin writing

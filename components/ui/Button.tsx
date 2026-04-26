@@ -1,6 +1,7 @@
 import React from 'react';
+import { motion, HTMLMotionProps } from 'motion/react';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends Omit<HTMLMotionProps<"button">, 'ref'> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'bezel';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
@@ -13,16 +14,18 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   className = '',
   isLoading,
   disabled,
+  whileHover,
+  whileTap,
   ...props
 }, ref) => {
-  const baseStyles = "inline-flex items-center justify-center font-bold transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] focus:outline-none disabled:opacity-50 disabled:pointer-events-none select-none relative active:scale-[0.98]";
+  const baseStyles = "inline-flex items-center justify-center font-bold transition-all focus:outline-none disabled:opacity-50 disabled:pointer-events-none select-none relative";
 
   const variants = {
-    primary: "border border-transparent bg-green text-white shadow-lg shadow-green/20 hover:bg-green-hover",
-    secondary: "border border-border bg-white dark:bg-[var(--panel-bg)] text-gray-text shadow-sm hover:border-green/20 hover:bg-green/5 dark:hover:bg-white/10",
-    outline: "border border-border bg-transparent text-gray-nav hover:border-green/20 hover:bg-green/5 hover:text-gray-text",
+    primary: "border border-transparent bg-green text-white shadow-none hover:bg-green-hover",
+    secondary: "border border-border/40 bg-white dark:bg-[var(--panel-bg)] text-gray-text shadow-none hover:border-green/20 hover:bg-green/5 dark:hover:bg-white/10",
+    outline: "border border-border/40 bg-transparent text-gray-nav hover:border-green/20 hover:bg-green/5 hover:text-gray-text",
     ghost: "bg-transparent text-gray-nav hover:bg-green/5 hover:text-green",
-    danger: "border border-transparent bg-red text-white shadow-lg shadow-red/20 hover:brightness-105",
+    danger: "border border-transparent bg-red text-white shadow-none hover:brightness-105",
     bezel: "surface-bezel p-0 !border-none !bg-transparent group",
   };
 
@@ -32,10 +35,19 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
     lg: "h-14 px-8 text-[16px] rounded-[var(--radius-control)]",
   };
 
+  const springTransition = {
+    type: 'spring',
+    stiffness: 400,
+    damping: 25
+  };
+
   if (variant === 'bezel') {
     return (
-      <button
+      <motion.button
         ref={ref}
+        whileHover={whileHover || { scale: 1.02 }}
+        whileTap={whileTap || { scale: 0.98 }}
+        transition={springTransition}
         className={`${baseStyles} ${variants.bezel} ${className}`}
         disabled={isLoading || disabled}
         {...props}
@@ -44,20 +56,23 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
           {isLoading && <span className="mr-2 h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />}
           {children}
         </div>
-      </button>
+      </motion.button>
     );
   }
 
   return (
-    <button
+    <motion.button
       ref={ref}
+      whileHover={whileHover || { scale: 1.02 }}
+      whileTap={whileTap || { scale: 0.98 }}
+      transition={springTransition}
       className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
       disabled={isLoading || disabled}
       {...props}
     >
       {isLoading && <span className="mr-2 h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />}
       {children}
-    </button>
+    </motion.button>
   );
 });
 

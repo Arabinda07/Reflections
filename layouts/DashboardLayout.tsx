@@ -127,6 +127,11 @@ export const DashboardLayout: React.FC = () => {
     setIsDarkMode(!isDarkMode);
   };
 
+  const handleCloseBugModal = React.useCallback(() => {
+    setIsBugModalOpen(false);
+    setSubmitError(null);
+  }, []);
+
   const handleNavigation = (path: string) => {
     navigate(path);
     setIsMobileMenuOpen(false);
@@ -476,10 +481,7 @@ export const DashboardLayout: React.FC = () => {
       {/* Bug Report Modal */}
       <ModalSheet
         isOpen={isBugModalOpen}
-        onClose={() => {
-          setIsBugModalOpen(false);
-          setSubmitError(null);
-        }}
+        onClose={handleCloseBugModal}
         title={isSubmitted ? "Thank you" : "Report a bug"}
         description={isSubmitted ? "Your report has been sent. We'll look into it." : "Tell us what felt unclear or broken. Your feedback helps make Reflections better."}
         icon={isSubmitted ? <CheckCircle size={28} weight="duotone" /> : <Bug size={28} weight="duotone" />}

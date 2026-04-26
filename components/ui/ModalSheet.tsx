@@ -48,14 +48,19 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
   const panelRef = useRef<HTMLDivElement | null>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
   useEffect(() => {
     if (!isOpen) return;
 
     return registerAndroidBackAction(() => {
-      onClose();
+      onCloseRef.current();
       return true;
     });
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -66,7 +71,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        onClose();
+        onCloseRef.current();
         return;
       }
 
@@ -95,7 +100,11 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
     };
 
     const focusTimer = window.setTimeout(() => {
-      closeButtonRef.current?.focus();
+      // Only focus the close button if no other element inside the modal is focused yet.
+      // This prevents stealing focus from autoFocus elements like textareas.
+      if (!panelRef.current?.contains(document.activeElement)) {
+        closeButtonRef.current?.focus();
+      }
     }, 40);
 
     window.addEventListener('keydown', handleKeyDown);
@@ -106,7 +115,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
       window.clearTimeout(focusTimer);
       previousFocusRef.current?.focus();
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   if (typeof document === 'undefined') return null;
 
