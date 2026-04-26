@@ -3,17 +3,17 @@ import {
   Brain,
   FolderOpen,
   Plus,
-  Smiley,
+  ShieldCheck,
   Sparkle,
-  Tag,
   Target,
 } from '@phosphor-icons/react';
-import { animate, motion } from 'motion/react';
+import { animate, motion, useReducedMotion } from 'motion/react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { AmbientMusicButton } from '../../components/ui/AmbientMusicButton';
 import { Button } from '../../components/ui/Button';
+import { ModalSheet } from '../../components/ui/ModalSheet';
 import { useAuth } from '../../context/AuthContext';
 import { noteService } from '../../services/noteService';
 import { DEFAULT_WELLNESS_PROMPTS } from '../../services/wellnessPrompts';
@@ -38,6 +38,37 @@ const WRITING_NOTES = [
   { text: 'The page can hold more than one feeling at once.', author: 'Reflections' },
 ];
 
+const ONBOARDING_STEPS = [
+  {
+    icon: Sparkle,
+    label: 'Welcome',
+    title: 'Welcome',
+    body:
+      'Reflections is a private, writing-first wellness journal. It gives you a calm place to put thoughts into words and return to them with care.',
+  },
+  {
+    icon: Target,
+    label: 'Writing first',
+    title: 'Writing first',
+    body:
+      'The main action is simple: begin with a sentence, stay with your own words, and let the page hold the unfinished parts.',
+  },
+  {
+    icon: ShieldCheck,
+    label: 'Private by default',
+    title: 'Private by default',
+    body:
+      'Your notes stay tied to your account. AI is optional and appears only when you ask Reflections to help you notice a pattern.',
+  },
+  {
+    icon: Brain,
+    label: 'Begin',
+    title: 'Begin',
+    body:
+      'Start with the daily focus, open a blank note, or read what you have already saved. Reflections will stay quiet until you choose the next step.',
+  },
+];
+
 export const HomeAuthenticated: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -47,11 +78,16 @@ export const HomeAuthenticated: React.FC = () => {
   const [displayCount, setDisplayCount] = useState<number | string>('...');
   const [isCountLoading, setIsCountLoading] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingStep, setOnboardingStep] = useState(0);
   const [dailyPrompt, setDailyPrompt] = useState(DEFAULT_WELLNESS_PROMPTS[0]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [quote, setQuote] = useState({ text: '', author: '' });
+  const shouldReduceMotion = useReducedMotion();
 
   const entranceDuration = isFromSave ? 0.3 : 0.8;
+  const currentOnboardingStep = ONBOARDING_STEPS[onboardingStep];
+  const OnboardingIcon = currentOnboardingStep.icon;
+  const isLastOnboardingStep = onboardingStep === ONBOARDING_STEPS.length - 1;
 
   useEffect(() => {
     setDailyPrompt(
@@ -100,21 +136,22 @@ export const HomeAuthenticated: React.FC = () => {
 
   const handleCloseOnboarding = useCallback(() => {
     localStorage.setItem('hasSeenOnboarding', 'true');
+    setOnboardingStep(0);
     setShowOnboarding(false);
   }, []);
 
-  useEffect(() => {
-    if (!showOnboarding) return;
+  const handleNextOnboardingStep = useCallback(() => {
+    if (isLastOnboardingStep) {
+      handleCloseOnboarding();
+      return;
+    }
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        handleCloseOnboarding();
-      }
-    };
+    setOnboardingStep((current) => Math.min(current + 1, ONBOARDING_STEPS.length - 1));
+  }, [handleCloseOnboarding, isLastOnboardingStep]);
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleCloseOnboarding, showOnboarding]);
+  const handlePreviousOnboardingStep = useCallback(() => {
+    setOnboardingStep((current) => Math.max(current - 1, 0));
+  }, []);
 
   useEffect(() => {
     const fetchCount = async () => {
@@ -177,6 +214,7 @@ export const HomeAuthenticated: React.FC = () => {
             className="absolute inset-0 w-full h-full object-cover object-center z-0"
           />
           <div className="absolute inset-0 z-10 hero-scrim" />
+          <div className="absolute inset-0 z-10 screen-scrim opacity-20" />
           <div className="absolute inset-0 bg-gradient-to-t from-body via-transparent to-transparent z-10" />
 
           <div className="relative z-20 h-full flex flex-col items-center justify-start pt-[10vh] text-center px-6">
@@ -311,65 +349,76 @@ export const HomeAuthenticated: React.FC = () => {
         </section>
       </div>
 
-      {showOnboarding && (
-        <div
-          className="fixed inset-0 z-[200] flex items-center justify-center p-6 screen-scrim screen-scrim--strong animate-in fade-in duration-500"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="home-onboarding-title"
-        >
-          <div className="bezel-outer max-w-lg w-full bg-white shadow-2xl">
-            <div className="bezel-inner p-10 flex flex-col gap-10">
-              <div className="flex justify-between items-center border-b border-border pb-6">
-                <h2 id="home-onboarding-title" className="text-2xl font-display text-gray-text">
-                  Welcome to Reflections.
-                </h2>
-                <Sparkle size={24} className="text-green" weight="fill" />
-              </div>
-
-              <div className="space-y-6">
-                {[
-                  {
-                    icon: Brain,
-                    title: 'Guided reflection',
-                    desc: 'Ask for a gentle mirror back only when you want one.',
-                  },
-                  {
-                    icon: Smiley,
-                    title: 'Mood Tracking',
-                    desc: 'Understand your emotional rhythms.',
-                  },
-                  {
-                    icon: Tag,
-                    title: 'Life Wiki themes',
-                    desc: "Refresh a broader pattern view when you're ready.",
-                  },
-                ].map((feature) => (
-                  <div key={feature.title} className="flex gap-4">
-                    <div className="w-10 h-10 rounded-lg border border-green/10 bg-green/5 flex items-center justify-center shrink-0">
-                      <feature.icon size={18} weight="bold" className="text-gray-nav" />
-                    </div>
-                    <div>
-                      <h4 className="text-[14px] font-bold text-gray-text">{feature.title}</h4>
-                      <p className="text-[13px] text-gray-light leading-normal">
-                        {feature.desc}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
+      <ModalSheet
+        isOpen={showOnboarding}
+        onClose={handleCloseOnboarding}
+        title={currentOnboardingStep.title}
+        description="A short introduction to the writing space."
+        icon={<OnboardingIcon size={20} weight="duotone" />}
+        size="lg"
+        closeLabel="Skip onboarding"
+        bodyClassName="space-y-8"
+        footer={
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <Button variant="ghost" onClick={handleCloseOnboarding} aria-label="Skip onboarding">
+              Skip onboarding
+            </Button>
+            <div className="flex gap-3">
               <Button
-                variant="primary"
-                className="w-full h-14 rounded-xl text-[15px] font-bold bg-gray-text text-white"
-                onClick={handleCloseOnboarding}
+                variant="secondary"
+                onClick={handlePreviousOnboardingStep}
+                disabled={onboardingStep === 0}
               >
-                Begin in Reflections
+                Back
+              </Button>
+              <Button variant="primary" onClick={handleNextOnboardingStep}>
+                {isLastOnboardingStep ? 'Begin writing' : 'Next'}
               </Button>
             </div>
           </div>
+        }
+      >
+        <div className="space-y-6">
+          <div className="flex flex-wrap items-center gap-3">
+            <p className="label-caps text-green" aria-live="polite">
+              Step {onboardingStep + 1} of {ONBOARDING_STEPS.length}
+            </p>
+            <div className="flex items-center gap-2" aria-hidden="true">
+              {ONBOARDING_STEPS.map((step, index) => (
+                <span
+                  key={step.label}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    index === onboardingStep ? 'w-8 bg-green' : 'w-2 bg-green/20'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+
+          <motion.div
+            key={currentOnboardingStep.title}
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: shouldReduceMotion ? 0 : 0.25, ease: [0.22, 1, 0.36, 1] }}
+            className="space-y-5"
+          >
+            <div className="flex h-14 w-14 items-center justify-center rounded-[var(--radius-panel)] border border-green/10 bg-green/5 text-green">
+              <OnboardingIcon size={28} weight="duotone" />
+            </div>
+            <div className="space-y-3">
+              <p className="text-[12px] font-black uppercase tracking-widest text-gray-nav">
+                {currentOnboardingStep.label}
+              </p>
+              <h3 className="text-[32px] font-display leading-tight text-gray-text">
+                {currentOnboardingStep.title}
+              </h3>
+              <p className="max-w-2xl font-serif text-[18px] leading-relaxed text-gray-light">
+                {currentOnboardingStep.body}
+              </p>
+            </div>
+          </motion.div>
         </div>
-      )}
+      </ModalSheet>
 
       <div
         style={{

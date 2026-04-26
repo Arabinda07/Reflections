@@ -1,8 +1,7 @@
-import { ArrowRight, DownloadSimple, SpeakerHigh, SpeakerSlash } from '@phosphor-icons/react';
+import { ArrowRight, SpeakerHigh, SpeakerSlash } from '@phosphor-icons/react';
 import { motion } from 'motion/react';
 import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { usePWAInstall } from '../../context/PWAInstallContext';
 import { RoutePath } from '../../types';
 
 const staggerContainer = {
@@ -15,11 +14,28 @@ const staggerLine = {
   show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] } },
 };
 
+const landingAnswers = [
+  {
+    title: 'What is Reflections?',
+    body:
+      'Reflections is a private writing-first wellness journal for saving notes, naming moods, and returning to patterns when you are ready.',
+  },
+  {
+    title: 'Who is Reflections for?',
+    body:
+      'It is for people who want a calm place to think in writing without streaks, public sharing, pressure loops, or automatic AI interruptions.',
+  },
+  {
+    title: 'Why writing first?',
+    body:
+      'Writing is the main practice. Optional AI support and Life Wiki refreshes stay out of the way until you ask for them.',
+  },
+];
+
 export const Landing: React.FC = () => {
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isMuted, setIsMuted] = useState(true);
-  const { canInstall, isInstalled, triggerInstall } = usePWAInstall();
 
   const toggleMute = () => {
     if (videoRef.current) {
@@ -29,9 +45,9 @@ export const Landing: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-[100dvh] overflow-hidden selection:bg-green/20 selection:text-green bg-body text-gray-text transition-colors duration-300">
+    <div className="relative min-h-[100dvh] overflow-x-hidden selection:bg-green/20 selection:text-green bg-body text-gray-text transition-colors duration-300">
       {/* Full-bleed layered container */}
-      <div className="min-h-[100dvh] w-full relative">
+      <div className="min-h-[100dvh] w-full relative overflow-hidden">
 
         {/* ── Left panel: content ── */}
         <div className="relative z-20 flex min-h-[100dvh] flex-col px-6 pb-10 pt-[calc(env(safe-area-inset-top)+var(--header-height)+1.5rem)] sm:px-12 sm:pb-10 sm:pt-[calc(env(safe-area-inset-top)+var(--header-height)+2rem)] lg:justify-between lg:pt-[28vh] lg:pb-12 lg:px-16 xl:px-24 pointer-events-none">
@@ -72,7 +88,8 @@ export const Landing: React.FC = () => {
           >
             <button
               onClick={() => navigate(RoutePath.SIGNUP)}
-              className="group flex w-fit items-center justify-start gap-3 rounded-[var(--radius-control)] border border-green/20 bg-green px-8 py-4 text-[16px] font-black text-white shadow-[0_12px_32px_-12px_rgba(22,163,74,0.35)] transition-all duration-300 hover:bg-green-hover hover:shadow-lg active:scale-95 sm:w-auto sm:justify-start sm:text-[18px]"
+              className="group flex min-h-11 w-fit items-center justify-start gap-3 rounded-[var(--radius-control)] border border-green/20 bg-green px-8 py-4 text-[16px] font-black text-white shadow-[0_12px_32px_-12px_rgba(22,163,74,0.35)] transition-all duration-300 hover:bg-green-hover hover:shadow-lg active:scale-95 sm:w-auto sm:justify-start sm:text-[18px]"
+              aria-label="Begin writing"
             >
               Begin writing
               <ArrowRight size={22} className="group-hover:translate-x-1.5 transition-transform duration-500 ease-out-expo" />
@@ -81,30 +98,18 @@ export const Landing: React.FC = () => {
             <div className="flex flex-wrap items-center gap-x-8 gap-y-4 px-2 sm:justify-end sm:px-0">
               <button
                 onClick={() => navigate(RoutePath.LOGIN)}
-                className="inline-flex items-center text-[15px] font-bold text-gray-text transition-all duration-300 hover:text-green active:scale-95"
+                className="inline-flex min-h-11 items-center text-[15px] font-bold text-gray-text transition-all duration-300 hover:text-green active:scale-95"
               >
                 Sign in
               </button>
 
               <button
                 onClick={() => navigate(RoutePath.FAQ)}
-                className="label-caps inline-flex items-center text-gray-text transition-all duration-300 hover:text-green active:scale-95"
+                className="label-caps inline-flex min-h-11 items-center text-gray-text transition-all duration-300 hover:text-green active:scale-95"
               >
                 How it works
               </button>
 
-              {canInstall && !isInstalled && (
-                <motion.button
-                  onClick={triggerInstall}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 1.2, duration: 0.5 }}
-                  className="label-caps inline-flex items-center gap-2 text-gray-text transition-all duration-300 hover:text-green active:scale-95"
-                >
-                  <DownloadSimple size={14} weight="bold" />
-                  Install app
-                </motion.button>
-              )}
             </div>
           </motion.div>
         </div>
@@ -136,7 +141,7 @@ export const Landing: React.FC = () => {
 
           <button
             onClick={toggleMute}
-            className="absolute bottom-10 right-6 z-30 flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] border-[1.5px] border-border bg-surface text-gray-text transition-all duration-300 hover:bg-white hover:shadow-sm active:scale-95 lg:bottom-12 lg:right-16"
+            className="surface-floating surface-floating--media absolute bottom-10 right-6 z-30 flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] text-gray-text transition-all duration-300 hover:shadow-sm active:scale-95 lg:bottom-12 lg:right-16"
             aria-label={isMuted ? 'Unmute video' : 'Mute video'}
           >
             {isMuted ? <SpeakerSlash size={20} weight="bold" /> : <SpeakerHigh size={20} weight="bold" />}
@@ -144,6 +149,33 @@ export const Landing: React.FC = () => {
         </motion.div>
 
       </div>
+
+      <section
+        aria-labelledby="landing-product-answers"
+        className="relative z-20 border-t border-border bg-body px-6 py-16 sm:px-12 lg:px-16 xl:px-24"
+      >
+        <div className="mx-auto grid max-w-[1440px] gap-12 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] lg:items-start">
+          <div className="space-y-5">
+            <p className="label-caps text-green">Last updated April 26, 2026</p>
+            <h2 id="landing-product-answers" className="text-mk-h2 font-display leading-tight text-gray-text">
+              A quieter place to understand what keeps returning.
+            </h2>
+          </div>
+
+          <div className="grid gap-8 md:grid-cols-3">
+            {landingAnswers.map((answer) => (
+              <article key={answer.title} className="border-t border-border pt-6">
+                <h2 className="mb-4 text-[22px] font-display leading-tight text-gray-text">
+                  {answer.title}
+                </h2>
+                <p className="font-serif text-[16px] leading-relaxed text-gray-light">
+                  {answer.body}
+                </p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

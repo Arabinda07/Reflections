@@ -8,6 +8,7 @@ import {
   Sun, 
   DownloadSimple, 
   CaretRight,
+  ChatCircleText,
   Leaf 
 } from '@phosphor-icons/react';
 import { RoutePath } from '../types';
@@ -20,11 +21,13 @@ import { registerAndroidBackAction } from '../src/native/androidBack';
 import { NATIVE_PAGE_TOP_PADDING, NATIVE_TOP_CONTROL_OFFSET } from '../src/native/safeArea';
 import { useAndroidBackHandler } from '../src/native/useAndroidBackHandler';
 
+const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
+
 export const DashboardLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, isAuthenticated, logout } = useAuth();
-  const { canInstall, triggerInstall } = usePWAInstall();
+  const { isAuthenticated, logout } = useAuth();
+  const { canInstall, isInstalled, triggerInstall } = usePWAInstall();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const mobileMenuId = useId();
   const mobileMenuTitleId = useId();
@@ -111,6 +114,17 @@ export const DashboardLayout: React.FC = () => {
     setIsDarkMode(!isDarkMode);
   };
 
+  const openFeedbackDraft = () => {
+    const subject = 'Reflections feedback';
+    const body = `Hi,\n\nI wanted to share feedback about Reflections.\n\nPage: ${window.location.href}\n\nFeedback:\n`;
+    window.location.href = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  };
+
+  const handleFeedbackClick = () => {
+    openFeedbackDraft();
+    setIsMobileMenuOpen(false);
+  };
+
   const handleNavigation = (path: string) => {
     navigate(path);
     setIsMobileMenuOpen(false);
@@ -171,6 +185,7 @@ export const DashboardLayout: React.FC = () => {
               onClick={toggleDarkMode}
               className={`p-2 rounded-xl transition-colors ${landingControlClass}`}
               title="Toggle Dark Mode"
+              aria-label={isDarkMode ? 'Use light mode' : 'Use dark mode'}
             >
               {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
             </button>
@@ -184,6 +199,15 @@ export const DashboardLayout: React.FC = () => {
                 {item.label}
               </button>
             ))}
+            <button
+              type="button"
+              onClick={openFeedbackDraft}
+              className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-[13px] font-extrabold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-1 ${landingControlClass}`}
+              aria-label="Send feedback about Reflections"
+            >
+              <ChatCircleText size={18} weight="bold" />
+              Send feedback
+            </button>
             <div className="w-[1px] h-[24px] bg-border mx-2"></div>
             {isAuthenticated ? (
               <Button 
@@ -222,6 +246,7 @@ export const DashboardLayout: React.FC = () => {
               onClick={toggleDarkMode}
               className={`p-2 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green ${landingControlClass}`}
               title="Toggle Dark Mode"
+              aria-label={isDarkMode ? 'Use light mode' : 'Use dark mode'}
             >
               {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
             </button>
@@ -302,16 +327,26 @@ export const DashboardLayout: React.FC = () => {
                           <CaretRight weight="bold" className="opacity-0 group-hover:opacity-100 transition-opacity" />
                         </button>
                       ))}
+                      <button
+                        type="button"
+                        onClick={handleFeedbackClick}
+                        className="w-full p-6 text-left text-[24px] font-black text-gray-text hover:text-green transition-all duration-300 active:bg-green/5 rounded-2xl flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset"
+                        aria-label="Send feedback about Reflections"
+                      >
+                        <span>Send feedback</span>
+                        <ChatCircleText weight="bold" className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </button>
                     </div>
                     <div className="mt-8 flex flex-col gap-4" style={{ paddingBottom: 'calc(2.5rem + env(safe-area-inset-bottom))' }}>
                       {/* PWA Install Button — only visible when browser supports it */}
-                      {canInstall && (
+                      {canInstall && !isInstalled && (
                         <button
                           onClick={async () => {
                             await triggerInstall();
                             setIsMobileMenuOpen(false);
                           }}
                           className="w-full flex items-center justify-center gap-3 p-5 rounded-2xl border-2 border-green/30 bg-green/5 text-green font-black text-[14px] transition-all duration-300 hover:bg-green/10 active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+                          aria-label="Add Reflections to your home screen"
                         >
                           <DownloadSimple size={20} weight="bold" />
                           Add to home screen
@@ -347,6 +382,15 @@ export const DashboardLayout: React.FC = () => {
                         <CaretRight weight="bold" className="opacity-0 group-hover:opacity-100 transition-opacity" />
                       </button>
                     ))}
+                    <button
+                      type="button"
+                      onClick={handleFeedbackClick}
+                      className="w-full p-6 text-left text-[24px] font-black text-gray-text hover:text-green transition-all duration-300 ease-out-quart active:bg-green/5 rounded-2xl flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset"
+                      aria-label="Send feedback about Reflections"
+                    >
+                      <span>Send feedback</span>
+                      <ChatCircleText weight="bold" className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </button>
                   </div>
                 )}
               </div>

@@ -94,9 +94,15 @@
           "price": "0",
           "priceCurrency": "INR"
         },
-        "description": "A private journal for thoughtful writing, mood tracking, and calm reflection. Works offline.",
+        "description": "A private writing-first journal for thoughtful notes, mood tracking, and calm reflection. Optional AI support only runs when the user asks for it.",
         "screenshot": "https://reflections-ebon.vercel.app/icons/icon-512.png",
-        "featureList": "Private journaling, Mood tracking, Optional reflections, Offline support, Privacy-focused"
+        "featureList": [
+          "Private writing space",
+          "Mood and tag tracking",
+          "Optional AI reflections",
+          "Life Wiki refreshes on request",
+          "Progressive web app installation"
+        ]
       },
       {
         "@context": "https://schema.org",
@@ -108,6 +114,85 @@
           "target": "https://reflections-ebon.vercel.app/#/notes?q={search_term_string}",
           "query-input": "required name=search_term_string"
         }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "name": "Reflections private journal",
+        "url": "https://reflections-ebon.vercel.app/",
+        "serviceType": "Private digital journaling and reflection",
+        "provider": {
+          "@type": "Organization",
+          "name": "Reflections",
+          "url": "https://reflections-ebon.vercel.app/"
+        },
+        "areaServed": "Worldwide",
+        "audience": {
+          "@type": "Audience",
+          "audienceType": "People who want a private, writing-first wellness journal"
+        },
+        "description": "Reflections helps people write private notes, name moods, organize tags, and ask for optional AI-supported reflection when they choose."
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is Reflections?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Reflections is a private writing-first wellness journal for saving notes, naming moods, and returning to patterns when the user is ready."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Who is Reflections for?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Reflections is for people who want a calm place to think in writing without streaks, public sharing, pressure loops, or automatic AI interruptions."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does AI run automatically?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. Optional AI support only runs when the user asks for it."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is Reflections therapy?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. Reflections is a private writing space for noticing thoughts more clearly. It is not professional mental health care."
+            }
+          }
+        ]
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "Add Reflections to your home screen",
+        "description": "Install Reflections as a progressive web app when the browser shows the Add to home screen option.",
+        "step": [
+          {
+            "@type": "HowToStep",
+            "name": "Open the mobile menu",
+            "text": "Open the Reflections navigation menu on a supported mobile browser."
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Choose Add to home screen",
+            "text": "Tap Add to home screen when the browser reports that installation is available."
+          },
+          {
+            "@type": "HowToStep",
+            "name": "Confirm installation",
+            "text": "Use the browser prompt to add Reflections to the device home screen."
+          }
+        ]
       },
       {
         "@context": "https://schema.org",
