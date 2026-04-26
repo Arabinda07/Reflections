@@ -66,31 +66,31 @@ const WRITING_NOTES = [
 const ONBOARDING_STEPS = [
   {
     icon: Sparkle,
-    label: 'Welcome',
-    title: 'Welcome',
+    label: 'Intro',
+    title: 'A space to think',
     body:
-      'Reflections is a private, writing-first wellness journal. It gives you a calm place to put thoughts into words and return to them with care.',
+      'Reflections is a private journal for your writing. It’s a place to get thoughts out of your head and return to them later.',
   },
   {
     icon: Target,
-    label: 'Writing first',
-    title: 'Writing first',
+    label: 'Focus',
+    title: 'Writing comes first',
     body:
-      'The main action is simple: begin with a sentence, stay with your own words, and let the page hold the unfinished parts.',
+      'Just start with one sentence. Write what you need to say and let the page hold the rest.',
   },
   {
     icon: ShieldCheck,
-    label: 'Private by default',
-    title: 'Private by default',
+    label: 'Privacy',
+    title: 'Private by design',
     body:
-      'Your notes stay tied to your account. AI is optional and appears only when you ask Reflections to help you notice a pattern.',
+      'Your notes stay with you. AI only appears if you ask for help finding a pattern.',
   },
   {
     icon: Brain,
-    label: 'Begin',
-    title: 'Begin',
+    label: 'Ready',
+    title: 'Start when you’re ready',
     body:
-      'Start with the daily focus, open a blank note, or read what you have already saved. Reflections will stay quiet until you choose the next step.',
+      'Try a daily focus, a blank note, or look through your saved reflections. The app waits until you decide the next step.',
   },
 ];
 
@@ -424,7 +424,7 @@ export const HomeAuthenticated: React.FC = () => {
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, scale: 0.95 }}
                       whileTap={{ scale: 0.98 }}
-                      className="group w-full flex items-start gap-4 p-4 rounded-2xl bg-panel-bg border border-border/40 hover:border-green/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/20 transition-all text-left min-h-[52px] shadow-none"
+                      className="group w-full flex items-start gap-4 p-4 rounded-2xl bg-panel-bg border border-border/40 hover:border-green/20 transition-all text-left min-h-[52px] shadow-none"
                       onClick={() => handleToggleIntention(intention.noteId, intention.id)}
                       aria-label={`Mark "${intention.text}" as finished`}
                     >
@@ -547,12 +547,10 @@ export const HomeAuthenticated: React.FC = () => {
       <ModalSheet
         isOpen={showOnboarding}
         onClose={handleCloseOnboarding}
-        title={currentOnboardingStep.title}
-        description="A short introduction to the writing space."
         icon={<OnboardingIcon size={20} weight="duotone" />}
         size="lg"
         closeLabel="Skip onboarding"
-        bodyClassName="space-y-8"
+        bodyClassName="pt-4 space-y-8"
         footer={
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <Button variant="ghost" onClick={handleCloseOnboarding} aria-label="Skip onboarding">

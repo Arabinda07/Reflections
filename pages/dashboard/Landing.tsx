@@ -2,6 +2,7 @@ import { ArrowRight, SpeakerHigh, SpeakerSlash } from '@phosphor-icons/react';
 import { motion } from 'motion/react';
 import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '../../components/ui/Button';
 import { RoutePath } from '../../types';
 
 const staggerContainer = {
@@ -68,43 +69,44 @@ export const Landing: React.FC = () => {
             transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.6 }}
             className="pointer-events-auto mt-auto flex w-full max-w-[26rem] flex-col items-start gap-5 sm:max-w-none sm:flex-row sm:items-end sm:justify-between sm:gap-6 lg:mt-0 lg:w-[60%] xl:w-[55%]"
           >
-            <motion.button
+            <Button
+              variant="primary"
               onClick={() => navigate(RoutePath.SIGNUP)}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-              className="group flex min-h-11 w-fit items-center justify-start gap-3 rounded-[var(--radius-control)] border border-green/20 bg-green px-6 py-3.5 text-[16px] font-black text-white shadow-none transition-all duration-300 hover:bg-green-hover sm:w-auto sm:justify-start sm:text-[18px]"
+              className="group h-auto py-3.5 px-6 text-[18px] font-black sm:w-auto"
               aria-label="Begin writing"
             >
               Begin writing
-              <ArrowRight size={22} className="group-hover:translate-x-1.5 transition-transform duration-500 ease-out-expo" />
-            </motion.button>
+              <ArrowRight size={22} className="ml-3 group-hover:translate-x-1.5 transition-transform duration-500 ease-out-expo" />
+            </Button>
 
             <div className="flex flex-wrap items-center gap-x-8 gap-y-4 px-2 sm:justify-end sm:px-0">
-              <button
+              <Button
+                variant="ghost"
                 onClick={() => navigate(RoutePath.LOGIN)}
-                className="inline-flex min-h-11 items-center text-[15px] font-bold text-gray-text transition-all duration-300 hover:text-green active:scale-95"
+                className="h-11 px-0 text-[15px] font-bold text-gray-text hover:text-green"
               >
                 Sign in
-              </button>
+              </Button>
 
-              <button
+              <Button
+                variant="ghost"
                 onClick={() => navigate(RoutePath.FAQ)}
-                className="label-caps inline-flex min-h-11 items-center text-gray-text transition-all duration-300 hover:text-green active:scale-95"
+                className="label-caps h-11 px-0 text-gray-text hover:text-green"
               >
                 How it works
-              </button>
+              </Button>
             </div>
           </motion.div>
 
           {/* Mute Button Extracted to Content Layer */}
-          <button
+          <Button
+            variant="secondary"
             onClick={toggleMute}
-            className="pointer-events-auto absolute bottom-6 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] border-[1.5px] border-border bg-surface text-gray-nav shadow-sm transition-all duration-300 hover:text-green hover:border-green/40 hover:scale-105 active:scale-95 lg:right-16 lg:bottom-12 group"
+            className="pointer-events-auto absolute bottom-6 right-6 z-50 h-11 w-11 !px-0 rounded-[var(--radius-control)] border-[1.5px] border-border bg-surface text-gray-nav shadow-sm hover:text-green hover:border-green/40 lg:right-16 lg:bottom-12 group"
             aria-label={isMuted ? 'Unmute video' : 'Mute video'}
           >
             {isMuted ? <SpeakerSlash size={20} weight="bold" /> : <SpeakerHigh size={20} weight="bold" />}
-          </button>
+          </Button>
         </div>
       </div>
 
