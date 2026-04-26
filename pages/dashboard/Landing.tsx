@@ -14,24 +14,6 @@ const staggerLine = {
   show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] } },
 };
 
-const landingAnswers = [
-  {
-    title: 'What is Reflections?',
-    body:
-      'Reflections is a private writing-first wellness journal for saving notes, naming moods, and returning to patterns when you are ready.',
-  },
-  {
-    title: 'Who is Reflections for?',
-    body:
-      'It is for people who want a calm place to think in writing without streaks, public sharing, pressure loops, or automatic AI interruptions.',
-  },
-  {
-    title: 'Why writing first?',
-    body:
-      'Writing is the main practice. Optional AI support and Life Wiki refreshes stay out of the way until you ask for them.',
-  },
-];
-
 export const Landing: React.FC = () => {
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -149,33 +131,6 @@ export const Landing: React.FC = () => {
         </motion.div>
 
       </div>
-
-      <section
-        aria-labelledby="landing-product-answers"
-        className="relative z-20 border-t border-border bg-body px-6 py-16 sm:px-12 lg:px-16 xl:px-24"
-      >
-        <div className="mx-auto grid max-w-[1440px] gap-12 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] lg:items-start">
-          <div className="space-y-5">
-            <p className="label-caps text-green">Last updated April 26, 2026</p>
-            <h2 id="landing-product-answers" className="text-mk-h2 font-display leading-tight text-gray-text">
-              A quieter place to understand what keeps returning.
-            </h2>
-          </div>
-
-          <div className="grid gap-8 md:grid-cols-3">
-            {landingAnswers.map((answer) => (
-              <article key={answer.title} className="border-t border-border pt-6">
-                <h2 className="mb-4 text-[22px] font-display leading-tight text-gray-text">
-                  {answer.title}
-                </h2>
-                <p className="font-serif text-[16px] leading-relaxed text-gray-light">
-                  {answer.body}
-                </p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
     </div>
   );
 };

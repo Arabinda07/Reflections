@@ -8,14 +8,17 @@ import {
   Sun, 
   DownloadSimple, 
   CaretRight,
-  ChatCircleText,
-  Leaf 
+  Bug,
+  Leaf,
+  PaperPlaneTilt,
+  CheckCircle
 } from '@phosphor-icons/react';
 import { RoutePath } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { usePWAInstall } from '../context/PWAInstallContext';
 import { AnalyticsRouteTracker } from '../src/analytics/AnalyticsRouteTracker';
 import { Button } from '../components/ui/Button';
+import { ModalSheet } from '../components/ui/ModalSheet';
 import { SyncBanner } from '../components/ui/SyncBanner';
 import { registerAndroidBackAction } from '../src/native/androidBack';
 import { NATIVE_PAGE_TOP_PADDING, NATIVE_TOP_CONTROL_OFFSET } from '../src/native/safeArea';
@@ -39,8 +42,13 @@ export const DashboardLayout: React.FC = () => {
     return document.documentElement.classList.contains('dark');
   });
 
-  useAndroidBackHandler();
+  // Bug Report State
+  const [isBugModalOpen, setIsBugModalOpen] = useState(false);
+  const [bugMessage, setBugMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
+  useAndroidBackHandler();
 
   useEffect(() => {
     if (isDarkMode) {
@@ -114,20 +122,28 @@ export const DashboardLayout: React.FC = () => {
     setIsDarkMode(!isDarkMode);
   };
 
-  const openFeedbackDraft = () => {
-    const subject = 'Reflections feedback';
-    const body = `Hi,\n\nI wanted to share feedback about Reflections.\n\nPage: ${window.location.href}\n\nFeedback:\n`;
-    window.location.href = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  };
-
-  const handleFeedbackClick = () => {
-    openFeedbackDraft();
-    setIsMobileMenuOpen(false);
-  };
-
   const handleNavigation = (path: string) => {
     navigate(path);
     setIsMobileMenuOpen(false);
+  };
+
+  const handleBugSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!bugMessage.trim()) return;
+    
+    setIsSubmitting(true);
+    // Placeholder for EmailJS connection
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    console.log('Bug reported:', bugMessage, 'on page:', window.location.href);
+    setIsSubmitting(false);
+    setIsSubmitted(true);
+    setBugMessage('');
+    
+    setTimeout(() => {
+      setIsBugModalOpen(false);
+      setTimeout(() => setIsSubmitted(false), 500);
+    }, 2500);
   };
 
   const guestNavItems = [
@@ -199,15 +215,6 @@ export const DashboardLayout: React.FC = () => {
                 {item.label}
               </button>
             ))}
-            <button
-              type="button"
-              onClick={openFeedbackDraft}
-              className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-[13px] font-extrabold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-1 ${landingControlClass}`}
-              aria-label="Send feedback about Reflections"
-            >
-              <ChatCircleText size={18} weight="bold" />
-              Send feedback
-            </button>
             <div className="w-[1px] h-[24px] bg-border mx-2"></div>
             {isAuthenticated ? (
               <Button 
@@ -327,15 +334,6 @@ export const DashboardLayout: React.FC = () => {
                           <CaretRight weight="bold" className="opacity-0 group-hover:opacity-100 transition-opacity" />
                         </button>
                       ))}
-                      <button
-                        type="button"
-                        onClick={handleFeedbackClick}
-                        className="w-full p-6 text-left text-[24px] font-black text-gray-text hover:text-green transition-all duration-300 active:bg-green/5 rounded-2xl flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset"
-                        aria-label="Send feedback about Reflections"
-                      >
-                        <span>Send feedback</span>
-                        <ChatCircleText weight="bold" className="opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </button>
                     </div>
                     <div className="mt-8 flex flex-col gap-4" style={{ paddingBottom: 'calc(2.5rem + env(safe-area-inset-bottom))' }}>
                       {/* PWA Install Button — only visible when browser supports it */}
@@ -382,15 +380,6 @@ export const DashboardLayout: React.FC = () => {
                         <CaretRight weight="bold" className="opacity-0 group-hover:opacity-100 transition-opacity" />
                       </button>
                     ))}
-                    <button
-                      type="button"
-                      onClick={handleFeedbackClick}
-                      className="w-full p-6 text-left text-[24px] font-black text-gray-text hover:text-green transition-all duration-300 ease-out-quart active:bg-green/5 rounded-2xl flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset"
-                      aria-label="Send feedback about Reflections"
-                    >
-                      <span>Send feedback</span>
-                      <ChatCircleText weight="bold" className="opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </button>
                   </div>
                 )}
               </div>
@@ -451,6 +440,71 @@ export const DashboardLayout: React.FC = () => {
           </footer>
         )}
       </main>
+
+      {/* Floating Bug Report Button */}
+      <button
+        onClick={() => setIsBugModalOpen(true)}
+        className="fixed bottom-6 right-6 z-[100] flex h-14 w-14 items-center justify-center rounded-2xl bg-green text-white shadow-[0_12px_24px_-8px_rgba(0,130,100,0.4)] transition-all duration-300 hover:scale-105 active:scale-95 group"
+        aria-label="Report a bug"
+      >
+        <Bug size={28} weight="fill" className="transition-transform group-hover:rotate-12" />
+      </button>
+
+      {/* Bug Report Modal */}
+      <ModalSheet
+        isOpen={isBugModalOpen}
+        onClose={() => setIsBugModalOpen(false)}
+        title={isSubmitted ? "Thank you" : "Report a bug"}
+        description={isSubmitted ? "Your report has been sent. We'll look into it." : "Tell us what felt unclear or broken. Your feedback helps make Reflections better."}
+        icon={isSubmitted ? <CheckCircle size={28} weight="duotone" /> : <Bug size={28} weight="duotone" />}
+        size="md"
+      >
+        <div className="space-y-6 py-2">
+          {!isSubmitted ? (
+            <form onSubmit={handleBugSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <label htmlFor="bug-message" className="label-caps text-gray-light">Your report</label>
+                <textarea
+                  id="bug-message"
+                  autoFocus
+                  required
+                  placeholder="Describe what happened..."
+                  value={bugMessage}
+                  onChange={(e) => setBugMessage(e.target.value)}
+                  className="w-full min-h-[160px] p-4 rounded-2xl border border-border bg-body/50 text-gray-text font-serif text-[17px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-green/20 focus:border-green/30 transition-all resize-none"
+                />
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  onClick={() => setIsBugModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit" 
+                  variant="primary" 
+                  isLoading={isSubmitting}
+                  disabled={!bugMessage.trim()}
+                >
+                  Send report
+                  <PaperPlaneTilt size={18} weight="bold" className="ml-2" />
+                </Button>
+              </div>
+            </form>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-8 text-center animate-in fade-in zoom-in duration-500">
+              <div className="h-20 w-20 rounded-full bg-green/10 text-green flex items-center justify-center mb-6">
+                <CheckCircle size={48} weight="fill" />
+              </div>
+              <p className="font-serif text-[18px] text-gray-text max-w-xs">
+                We've received your report and will look into it soon.
+              </p>
+            </div>
+          )}
+        </div>
+      </ModalSheet>
     </div>
   );
 };

@@ -23,57 +23,82 @@ const guideSections = [
     icon: BookOpen,
     title: 'What is Reflections?',
     body:
-      'Reflections is a private writing-first wellness journal. It helps you write honestly, save what matters, notice patterns, and return to your own words without pressure.',
+      'Reflections is a private writing-first wellness journal for saving notes, naming moods, and returning to patterns when you are ready.',
   },
   {
     icon: Heart,
     title: 'Who is Reflections for?',
     body:
-      'It is for people who want a calm place to think in writing. It is useful when your thoughts feel scattered, when you want a record of what keeps returning, or when you need a quieter alternative to habit apps.',
+      'It is for people who want a calm place to think in writing without streaks, public sharing, pressure loops, or automatic AI interruptions.',
   },
   {
     icon: PenNib,
-    title: 'What does Reflections do?',
+    title: 'Why writing first?',
     body:
-      'You can write notes, add moods and tags, keep small tasks near your prose, attach context, and revisit your saved reflections. The product is built around writing before dashboards.',
+      'Writing is the main practice. Optional AI support and Life Wiki refreshes stay out of the way until you ask for them.',
+  },
+];
+
+const practiceItems = [
+  {
+    title: 'The practice',
+    body: 'A quiet space to write, one reflection at a time.',
+    icon: BookOpen,
   },
   {
-    icon: ShieldCheck,
-    title: 'Is Reflections private?',
-    body:
-      'Your notes stay tied to your account and are not public. Privacy copy stays plain on purpose: Reflections should make control understandable without overpromising what software cannot guarantee.',
-  },
-  {
-    icon: Brain,
-    title: 'Does AI run automatically?',
-    body:
-      'No. AI-supported reflections and Life Wiki refreshes run only when you choose them. Optional AI support stays out of the way until you ask for it.',
-  },
-  {
+    title: 'Morning or night',
+    body: 'Set an intention for the day or clear your head before sleep. Write whenever you find your rhythm.',
     icon: Compass,
-    title: 'Is Reflections therapy?',
-    body:
-      'No. Reflections is not therapy, a diagnosis tool, or professional mental health care. It is a private writing space for noticing your own thoughts more clearly.',
   },
   {
-    icon: Checks,
-    title: 'How do Free and Pro work?',
-    body:
-      'The free plan includes 30 notes each month, one AI reflection, and one Life Wiki refresh after there is enough writing to support it. Pro keeps writing unlimited and lets you refresh AI-supported views whenever you ask.',
-  },
-  {
+    title: 'The daily spark',
+    body: "If you're staring at a blank page, tap the spark. It's a gentle nudge to help you get started.",
     icon: Tag,
-    title: 'Can I export or keep ownership of my notes?',
-    body:
-      'Your writing belongs to you. Today, saved notes remain in your account and support can help with access or deletion requests. A fuller self-serve export path should stay on the product improvement list.',
+  },
+  {
+    title: 'Just you and the page',
+    body: 'Focus Mode lets the interface fade away. No distractions, just you and your words.',
+    icon: ShieldCheck,
+  },
+  {
+    title: 'Naming the feeling',
+    body: "Check in with your mood. It's how you start noticing the patterns in your emotional life.",
+    icon: Heart,
   },
 ];
 
 const detailItems = [
-  'Writing remains the first action on the page.',
-  'Mood and tag patterns are there to help you notice, not score yourself.',
-  'Life Wiki and AI-supported views are refreshed only when you ask.',
-  'Pro language is about continuity and room, not pressure.',
+  {
+    title: 'Private to your account',
+    body: 'Your notes are tied to your login and protected by account-level security. You own your writing, period.',
+    label: 'Account protected',
+    icon: ShieldCheck,
+  },
+  {
+    title: 'Notice the rhythm',
+    body: 'See how your feelings shift over time with simple mood mapping.',
+    icon: Brain,
+  },
+  {
+    title: 'Keep what matters',
+    body: 'Attach images, tasks, and notes as you need them.',
+    icon: Tag,
+  },
+  {
+    title: 'Optional AI support',
+    body: "Reflections can help notice patterns or refresh your Life Wiki, but only when you ask. It never runs in the background, and we don't use your notes to train AI models.",
+    label: 'On demand only • Private by design',
+    icon: Brain,
+  },
+];
+
+const featureGrid = [
+  { title: 'Ambient sound', body: 'Soundscapes to help you focus. Quiet the room as you write.' },
+  { title: 'Whisper mode', body: 'Speak your thoughts. Fast, private transcription for when you need it.' },
+  { title: 'Writing sparks', body: 'Gentle prompts for those days when you aren\'t sure where to start.' },
+  { title: 'Visual covers', body: 'Add atmospheric imagery to set the mood for your entries.' },
+  { title: 'Embedded tasks', body: 'Keep track of follow-ups and intentions right inside your prose.' },
+  { title: 'Life Wiki', body: 'A high-level summary of your world, updated only when you choose.' },
 ];
 
 export const FAQ: React.FC = () => {
@@ -103,21 +128,22 @@ export const FAQ: React.FC = () => {
       </section>
 
       <main className="mx-auto w-full max-w-[1440px] px-6 sm:px-10 lg:px-16">
-        <section className="mb-20 grid gap-4 md:grid-cols-2">
+        {/* Core Guide Sections */}
+        <section className="mb-20 grid gap-4 md:grid-cols-3">
           {guideSections.map((section) => {
             const Icon = section.icon;
 
             return (
-              <article key={section.title} className="surface-flat overflow-hidden">
-                <div className="flex h-full flex-col gap-8 p-8 sm:p-10">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-[var(--radius-panel)] border border-green/10 bg-green/5 text-green">
-                    <Icon size={24} weight="duotone" />
+              <article key={section.title} className="surface-flat overflow-hidden border border-border/50">
+                <div className="flex h-full flex-col gap-6 p-8">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-panel)] border border-green/10 bg-green/5 text-green">
+                    <Icon size={20} weight="duotone" />
                   </div>
-                  <div className="space-y-4">
-                    <h2 className="text-[28px] font-display leading-tight text-gray-text">
+                  <div className="space-y-3">
+                    <h2 className="text-[22px] font-display leading-tight text-gray-text">
                       {section.title}
                     </h2>
-                    <p className="font-serif text-[17px] leading-relaxed text-gray-light">
+                    <p className="font-serif text-[16px] leading-relaxed text-gray-light">
                       {section.body}
                     </p>
                   </div>
@@ -127,26 +153,72 @@ export const FAQ: React.FC = () => {
           })}
         </section>
 
-        <section className="mb-20 border-y border-border py-14">
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:items-start">
-            <div className="space-y-5">
-              <p className="label-caps text-green">How to read Reflections</p>
-              <h2 className="text-mk-h2 font-display leading-tight text-gray-text">
-                A journal first, with support around the edges.
-              </h2>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
-              {detailItems.map((item) => (
-                <div key={item} className="rounded-[var(--radius-panel)] border border-border bg-white/5 p-5">
-                  <p className="text-[14px] font-semibold leading-relaxed text-gray-light">{item}</p>
+        {/* The Practice Section */}
+        <section className="mb-20">
+          <div className="mb-10 space-y-4">
+            <p className="label-caps text-green">The practice</p>
+            <h2 className="text-mk-h2 font-display text-gray-text">A space to write, one reflection at a time.</h2>
+          </div>
+          
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {practiceItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <div key={item.title} className="surface-flat p-8 border border-border/30">
+                  <div className="mb-6 flex h-10 w-10 items-center justify-center rounded-xl bg-body border border-border text-gray-light">
+                    <Icon size={20} weight="bold" />
+                  </div>
+                  <h3 className="mb-3 text-[19px] font-display text-gray-text">{item.title}</h3>
+                  <p className="font-serif text-[16px] leading-relaxed text-gray-light">{item.body}</p>
                 </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
         </section>
 
-        <section className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+        {/* The Details Section */}
+        <section className="mb-20 border-y border-border py-20">
+          <div className="mb-12 space-y-4">
+            <p className="label-caps text-green">The details</p>
+            <h2 className="text-mk-h2 font-display text-gray-text">Tools built to support you without getting in the way.</h2>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            {detailItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <div key={item.title} className="relative overflow-hidden rounded-[var(--radius-panel)] border border-border bg-white/5 p-8">
+                  <div className="flex gap-6">
+                    <div className="flex-none flex h-12 w-12 items-center justify-center rounded-2xl bg-green/10 text-green">
+                      <Icon size={24} weight="duotone" />
+                    </div>
+                    <div className="space-y-4">
+                      <div className="space-y-1">
+                        <h3 className="text-[24px] font-display text-gray-text">{item.title}</h3>
+                        {item.label && <p className="text-[11px] font-black uppercase tracking-widest text-green/60">{item.label}</p>}
+                      </div>
+                      <p className="font-serif text-[17px] leading-relaxed text-gray-light">{item.body}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Feature Grid */}
+        <section className="mb-28">
+          <div className="grid gap-x-12 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            {featureGrid.map((feature) => (
+              <div key={feature.title} className="space-y-3">
+                <h4 className="text-[14px] font-black uppercase tracking-widest text-gray-text">{feature.title}</h4>
+                <p className="font-serif text-[16px] leading-relaxed text-gray-light">{feature.body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center border-t border-border pt-20">
           <div className="space-y-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-[var(--radius-panel)] border border-green/10 bg-green/5 text-green">
               <EnvelopeSimple size={24} weight="duotone" />
