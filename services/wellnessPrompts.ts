@@ -1,11 +1,12 @@
 export const DEFAULT_WELLNESS_PROMPTS = [
-  "What is one thing that made you feel peaceful today, even if just for a second?",
-  "How did you handle a challenge today with kindness toward yourself?",
-  "What's a small victory you want to celebrate right now?",
-  "If you could send a message to your future self, what would it say?",
-  "What's one thing you're letting go of to make room for growth?",
-  "Describe a moment today where you felt truly present.",
-  "What's a quality you admire in yourself that you used today?",
+  "Begin with what you remember.",
+  "A few lines are enough.",
+  "What do you want to remember about today?",
+  "Write the part you keep returning to.",
+  "What was the quietest moment of your day?",
+  "Notice one thing that felt heavy today.",
+  "One detail that felt true.",
+  "Where did you find a little room today?",
 ];
 
 export function getCurrentWellnessPrompt(index: number, prompts: string[]) {

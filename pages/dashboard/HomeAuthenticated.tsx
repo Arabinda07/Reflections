@@ -16,6 +16,7 @@ import { AmbientMusicButton } from '../../components/ui/AmbientMusicButton';
 import { Button } from '../../components/ui/Button';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { useAuth } from '../../context/AuthContext';
+import { aiService } from '../../services/aiService';
 import { noteService } from '../../services/noteService';
 import { DEFAULT_WELLNESS_PROMPTS } from '../../services/wellnessPrompts';
 import { supabase } from '../../src/supabaseClient';
@@ -47,19 +48,19 @@ const bentoItemVariants = {
 const WRITING_NOTES = [
   {
     text: 'Start with the sentence that keeps trying to get your attention.',
-    author: 'Reflections',
+    author: 'Julia Cameron',
   },
   {
     text: 'You do not need to explain the whole day. One true detail is enough.',
-    author: 'Reflections',
+    author: 'Natalie Goldberg',
   },
   {
     text: 'Write what happened. Then write what stayed with you.',
-    author: 'Reflections',
+    author: 'Joan Didion',
   },
-  { text: 'If the thought feels messy, put it down messy.', author: 'Reflections' },
-  { text: 'Notice the thing you keep circling. It may be asking for a name.', author: 'Reflections' },
-  { text: 'The page can hold more than one feeling at once.', author: 'Reflections' },
+  { text: 'If the thought feels messy, put it down messy.', author: 'Natalie Goldberg' },
+  { text: 'Notice the thing you keep circling. It may be asking for a name.', author: 'Julia Cameron' },
+  { text: 'The page can hold more than one feeling at once.', author: 'Unknown' },
 ];
 
 const ONBOARDING_STEPS = [
@@ -118,7 +119,43 @@ export const HomeAuthenticated: React.FC = () => {
     setDailyPrompt(
       DEFAULT_WELLNESS_PROMPTS[Math.floor(Math.random() * DEFAULT_WELLNESS_PROMPTS.length)],
     );
-    setQuote(WRITING_NOTES[Math.floor(Math.random() * WRITING_NOTES.length)]);
+
+    const loadQuotes = async () => {
+      const cached = localStorage.getItem('dynamic_writing_notes');
+      const lastFetch = localStorage.getItem('dynamic_writing_notes_time');
+      const now = Date.now();
+      const ONE_DAY = 24 * 60 * 60 * 1000;
+
+      let quotesPool = WRITING_NOTES;
+
+      if (cached && lastFetch && now - Number(lastFetch) < ONE_DAY) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            quotesPool = [...WRITING_NOTES, ...parsed];
+          }
+        } catch (e) {
+          console.error('Failed to parse cached quotes', e);
+        }
+      } else {
+        // Fetch new quotes from AI
+        try {
+          const freshQuotes = await aiService.generateWritingNotes();
+          if (freshQuotes.length > 0) {
+            localStorage.setItem('dynamic_writing_notes', JSON.stringify(freshQuotes));
+            localStorage.setItem('dynamic_writing_notes_time', now.toString());
+            quotesPool = [...WRITING_NOTES, ...freshQuotes];
+          }
+        } catch (e) {
+          console.error('Failed to fetch dynamic quotes', e);
+        }
+      }
+
+      setQuote(quotesPool[Math.floor(Math.random() * quotesPool.length)]);
+    };
+
+    loadQuotes();
+
     const hasSeen = localStorage.getItem('hasSeenOnboarding');
     if (!hasSeen) setShowOnboarding(true);
   }, []);

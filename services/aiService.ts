@@ -280,4 +280,22 @@ export const aiService = {
       console.error('[aiService] Index rebuild error:', error);
     }
   },
+
+  /**
+   * Generates a fresh set of writing notes (quotes/advice) for the dashboard.
+   */
+  generateWritingNotes: async (): Promise<{ text: string; author: string }[]> => {
+    try {
+      const indexPage = await wikiService.getWikiPage('index');
+      const notes = await aiClient.requestJson<{ text: string; author: string }[]>(
+        'writingNotes',
+        { indexPage },
+      );
+
+      return notes || [];
+    } catch (error) {
+      console.error('[aiService] Failed to generate writing notes:', error);
+      return [];
+    }
+  },
 };

@@ -8,7 +8,8 @@ type AiAction =
   | 'ingestDecision'
   | 'ingestSynthesis'
   | 'wikiPage'
-  | 'index';
+  | 'index'
+  | 'writingNotes';
 
 type AiRequest = {
   action?: AiAction;
@@ -136,13 +137,13 @@ const handlePrompts = async (payload: any) => {
     .join('\n\n');
 
   const prompt = buildPrompt([
-    'You are a thoughtful, grounded journaling partner. Your goal is to help the user connect their current mood with recurring themes in their life.',
+    'You are a careful, grounded reader for the app Reflections. Your goal is to help the user notice patterns in their writing without judgment.',
     `Context:\n${currentMood ? `The user is currently feeling ${currentMood}.` : 'The user has not specified a mood for this entry yet.'}`,
     noteContext
       ? `Here are their most recent entries for context:\n${noteContext}`
       : 'The user has no past entries yet.',
     `Current entry:\nTitle: ${note?.title || 'Untitled'}\nContent: ${stripHtml(String(note?.content || ''))}`,
-    'Instructions:\n1. Identify a recurring theme, unresolved tension, or pattern from these recent entries.\n2. Generate 4 brief, personalized journaling prompts.\n3. One prompt should be a gentle nudge, one should invite a slower look, and two should relate to their specific recurring themes.\n4. Avoid flowery language. Be direct, human, and helpful.\n5. Return only a JSON array of strings.',
+    'Instructions:\n1. Notice a recurring theme, quiet tension, or pattern from these recent entries.\n2. Generate 4 brief, personalized journaling prompts.\n3. One prompt should be a gentle nudge to begin, one should invite a slower look at a specific detail, and two should relate to recurring patterns.\n4. Avoid clinical language or wellness slogans. Be direct, human, and spacious.\n5. Return only a JSON array of strings.',
   ]);
 
   const data = await generateJson<unknown>(prompt, {
@@ -189,13 +190,18 @@ const handleReflection = async (payload: any) => {
     : '';
 
   const prompt = buildPrompt([
-    'You are a warm, careful reader for the app Reflections.',
-    'Your tone is human, non-clinical, and quietly insightful.',
-    indexPage?.content ? `Overview:\n${indexPage.content}` : '',
-    wikiContext ? `PATTERNS THE NOTES SUGGEST\n${wikiContext}` : '',
+    'You are a careful, grounded reader for the app Reflections.',
+    'Your tone is human, observant, and quietly reflective. You mirror the user’s language lightly and avoid certainty.',
+    indexPage?.content ? `Overview of their patterns:\n${indexPage.content}` : '',
+    wikiContext ? `PATTERNS NOTICED SO FAR\n${wikiContext}` : '',
     recentContext ? `RECENT ENTRIES\n${recentContext}` : '',
     `Now here is today's journal entry:\nTitle: ${note?.title || 'Untitled'}\nMood: ${note?.mood || 'Not noted'}\nContent:\n${stripHtml(String(note?.content || ''))}`,
-    'Write a reflection of 3-4 short paragraphs. Open with something you genuinely noticed. Reference patterns only when it adds real insight. End with one open question. Output plain prose only.',
+    'Instructions:',
+    '1. Write a reflection of 3 short paragraphs.',
+    '2. Use the structure: One specific observation, one possible pattern ("seems to", "might"), and one gentle question or point to return to.',
+    '3. Avoid diagnosis, clinical labels, or generic advice.',
+    '4. Stay grounded in the current note while noticing connections to the past.',
+    '5. Output plain prose only.',
   ]);
 
   const text = await generateText(prompt);
@@ -210,11 +216,11 @@ const handleIngestDecision = async (payload: any) => {
     .join('\n');
 
   const prompt = buildPrompt([
-    'You are a careful Life Wiki organizer for a journaling app.',
-    'Decide whether this journal entry should integrate into an existing Life Theme, create a new one, or be skipped.',
+    'You are a careful Life Wiki organizer for the app Reflections.',
+    'Decide whether this journal entry contains a pattern worth noticing or if it should be skipped.',
     `Current Life Themes:\n${themeIndex || '(None yet - first entry)'}`,
     `New Journal Entry:\nTitle: ${note?.title || 'Untitled'}\nDate: ${note?.createdAt ? new Date(note.createdAt).toLocaleDateString() : 'Unknown'}\nContent: ${stripHtml(String(note?.content || ''))}\nMood: ${note?.mood || 'Not set'}`,
-    'Return only valid JSON with action, themeId, newThemeTitle, and reasoning.',
+    'Return only valid JSON with action, themeId, newThemeTitle, and reasoning. Use grounded, non-clinical reasoning.',
   ]);
 
   return generateJson<{
@@ -238,11 +244,11 @@ const handleIngestSynthesis = async (payload: any) => {
   const note = payload?.note || {};
   const theme = payload?.theme || {};
   const prompt = buildPrompt([
-    "You are a careful cognitive synthesizer maintaining the user's personal Wiki.",
+    'You are a careful reader maintaining the user’s Life Wiki in Reflections.',
     `Updating the Life Theme: "${theme?.title || 'Untitled'}"`,
-    `Current state of this theme:\n${theme?.content || '(Brand new theme - start from scratch.)'}`,
+    `Current state of this theme:\n${theme?.content || '(New theme)'}`,
     `New journal entry to ingest:\nTitle: ${note?.title || 'Untitled'}\nDate: ${note?.createdAt ? new Date(note.createdAt).toLocaleDateString() : 'Unknown'}\nContent: ${stripHtml(String(note?.content || ''))}\nMood: ${note?.mood || 'Not set'}`,
-    'Write the completely updated Markdown for this Life Theme. Output raw markdown only.',
+    'Rewrite the updated Markdown for this Life Theme. Use observant, non-clinical language. Focus on what seems to be returning. Output raw markdown only.',
   ]);
 
   return generateText(prompt, INGEST_MODEL);
@@ -254,11 +260,11 @@ const handleWikiPage = async (payload: any) => {
   const allThemeContent = String(payload?.allThemeContent || '');
 
   const prompt = buildPrompt([
-    'You are maintaining a personal wiki for a journaling app user.',
+    'You are a careful reader maintaining a Life Wiki for the app Reflections.',
     `Here is everything they have written across all their Life Themes:\n${allThemeContent}`,
     `Task: Write the "${title}" wiki page for this person.`,
     instruction,
-    'Output raw markdown only. No preamble.',
+    'Output raw markdown only. Use quiet, observant language. Avoid clinical labels.',
   ]);
 
   return generateText(prompt, INGEST_MODEL);
@@ -271,13 +277,40 @@ const handleIndex = async (payload: any) => {
     .join('\n\n---\n\n');
 
   const prompt = buildPrompt([
-    'You are building an index page for a personal wiki.',
+    'You are building a quiet index page for a personal Life Wiki.',
     `Here are all the wiki pages (truncated):\n${allContent}`,
-    "Write a concise index: one bullet per page, format exactly as - **[Page Title]**: one sentence summarising the page's key insight.",
-    'Output only the bullet list.',
+    "Write a concise index: one bullet per page, format exactly as - **[Page Title]**: one short sentence noticing the page's primary theme.",
+    'Output only the bullet list. Use observant, plain language.',
   ]);
 
   return generateText(prompt, INGEST_MODEL);
+};
+
+const handleWritingNotes = async (payload: any) => {
+  const indexPage = payload?.indexPage || null;
+  const prompt = buildPrompt([
+    'You are a careful, grounded mentor for the app Reflections, focused on private writing and mental clarity.',
+    indexPage?.content ? `User context (from their Life Wiki patterns):\n${indexPage.content}` : 'No user context available yet.',
+    'Instructions:',
+    '1. Generate 3 fresh "Writing Notes" (short, punchy quotes or pieces of advice) for the user.',
+    '2. They should be inspiring, grounded, and focused on the act of noticing or returning to one’s thoughts.',
+    '3. If user context is provided, tailor at least one note to what seems to be recurring in their life.',
+    '4. Each note must have an "author" (a real person like Marcus Aurelius, Carl Jung, Joan Didion, Natalie Goldberg, or "Reflections" if it is general system wisdom).',
+    '5. Avoid wellness slogans, clinical advice, or "optimization" language. Be quiet, human, and spacious.',
+    '6. Return only a JSON array of objects with "text" and "author" fields.',
+  ]);
+
+  return generateJson<unknown>(prompt, {
+    type: Type.ARRAY,
+    items: {
+      type: Type.OBJECT,
+      properties: {
+        text: { type: Type.STRING },
+        author: { type: Type.STRING },
+      },
+      required: ['text', 'author'],
+    },
+  } as any);
 };
 
 const handlers: Record<AiAction, (payload: any) => Promise<any>> = {
@@ -288,6 +321,7 @@ const handlers: Record<AiAction, (payload: any) => Promise<any>> = {
   ingestSynthesis: handleIngestSynthesis,
   wikiPage: handleWikiPage,
   index: handleIndex,
+  writingNotes: handleWritingNotes,
 };
 
 export default async function handler(req: any, res: any) {
