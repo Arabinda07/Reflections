@@ -70,7 +70,7 @@ export const Landing: React.FC = () => {
           >
             <button
               onClick={() => navigate(RoutePath.SIGNUP)}
-              className="group flex min-h-11 w-fit items-center justify-start gap-3 rounded-[var(--radius-control)] border border-green/20 bg-green px-8 py-4 text-[16px] font-black text-white shadow-[0_12px_32px_-12px_rgba(22,163,74,0.35)] transition-all duration-300 hover:bg-green-hover hover:shadow-lg active:scale-95 sm:w-auto sm:justify-start sm:text-[18px]"
+              className="group flex min-h-11 w-fit items-center justify-start gap-3 rounded-[var(--radius-control)] border border-green/20 bg-green px-6 py-3.5 text-[16px] font-black text-white shadow-[0_8px_24px_-8px_rgba(22,163,74,0.3)] transition-all duration-300 hover:bg-green-hover hover:shadow-lg active:scale-95 sm:w-auto sm:justify-start sm:text-[18px]"
               aria-label="Begin writing"
             >
               Begin writing
