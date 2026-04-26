@@ -108,34 +108,30 @@ export const Landing: React.FC = () => {
         </div>
       </div>
 
-        {/* ── Background Video Layer ── */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-          className="absolute inset-0 overflow-hidden pointer-events-none z-0"
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+        className="absolute inset-0 overflow-hidden pointer-events-none z-0"
+      >
+        <div className="video-mask video-mask--mobile lg:hidden" />
+        <div className="video-mask video-mask--desktop hidden lg:block" />
+
+        <video
+          ref={videoRef}
+          poster="/assets/videos/landing_video.png"
+          className="absolute inset-0 h-full w-full object-cover object-[48%_center] bg-body opacity-90 sm:object-[64%_center] lg:object-center"
+          autoPlay
+          loop
+          muted={isMuted}
+          playsInline
+          preload="metadata"
         >
-          {/* Subtle responsive masks */}
-          <div className="video-mask video-mask--mobile lg:hidden" />
-          <div className="video-mask video-mask--desktop hidden lg:block" />
-
-          <video
-            ref={videoRef}
-            poster="/assets/videos/landing_video.png"
-            className="absolute inset-0 h-full w-full object-cover object-[48%_center] bg-body opacity-90 sm:object-[64%_center] lg:object-center"
-            autoPlay
-            loop
-            muted={isMuted}
-            playsInline
-            preload="metadata"
-          >
-            <source src="/assets/videos/landing_video.webm" type="video/webm" />
-            <source src="/assets/videos/landing_video.mp4" type="video/mp4" />
-          </video>
-
-        </motion.div>
-
-      </div>
+          <source src="/assets/videos/landing_video.webm" type="video/webm" />
+          <source src="/assets/videos/landing_video.mp4" type="video/mp4" />
+        </video>
+      </motion.div>
     </div>
-  );
+  </div>
+);
 };
