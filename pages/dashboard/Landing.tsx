@@ -67,20 +67,20 @@ export const Landing: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.6 }}
-            className="pointer-events-auto mt-auto flex w-full flex-col items-stretch gap-8 sm:max-w-none sm:flex-row sm:items-center sm:justify-between lg:mt-0"
+            className="pointer-events-auto mt-auto flex w-full flex-col items-start gap-8 sm:max-w-none sm:flex-row sm:items-center sm:justify-between lg:mt-0"
           >
             <Button
               variant="primary"
               onClick={() => navigate(RoutePath.SIGNUP)}
-              className="group h-14 px-8 text-[18px] font-black sm:w-auto"
+              className="group h-14 w-auto px-8 text-[18px] font-black"
               aria-label="Begin writing"
             >
               Begin writing
               <ArrowRight size={22} className="ml-3 group-hover:translate-x-1.5 transition-transform duration-500 ease-out-expo" />
             </Button>
 
-            <div className="flex flex-col items-stretch gap-8 sm:flex-row sm:items-center sm:gap-x-10 lg:gap-x-12">
-              <div className="flex items-center justify-around gap-x-8 sm:justify-end sm:gap-x-10">
+            <div className="flex w-full items-center justify-between sm:w-auto sm:gap-x-10 lg:gap-x-12">
+              <div className="flex items-center gap-x-8 sm:gap-x-10">
                 <Button
                   variant="ghost"
                   onClick={() => navigate(RoutePath.LOGIN)}
@@ -98,16 +98,14 @@ export const Landing: React.FC = () => {
                 </Button>
               </div>
 
-              <div className="flex justify-center sm:block">
-                <Button
-                  variant="secondary"
-                  onClick={toggleMute}
-                  className="h-11 w-11 !px-0 rounded-[var(--radius-control)] border-[1.5px] border-border bg-surface text-gray-nav shadow-sm hover:text-green hover:border-green/40 transition-all duration-300 group"
-                  aria-label={isMuted ? 'Unmute video' : 'Mute video'}
-                >
-                  {isMuted ? <SpeakerSlash size={20} weight="bold" /> : <SpeakerHigh size={20} weight="bold" />}
-                </Button>
-              </div>
+              <Button
+                variant="secondary"
+                onClick={toggleMute}
+                className="h-11 w-11 !px-0 rounded-[var(--radius-control)] border-[1.5px] border-border bg-surface text-gray-nav shadow-sm hover:text-green hover:border-green/40 transition-all duration-300 group"
+                aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+              >
+                {isMuted ? <SpeakerSlash size={20} weight="bold" /> : <SpeakerHigh size={20} weight="bold" />}
+              </Button>
             </div>
           </motion.div>
         </div>
