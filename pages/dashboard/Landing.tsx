@@ -95,8 +95,16 @@ export const Landing: React.FC = () => {
                 How it works
               </button>
 
-            </div>
           </motion.div>
+
+          {/* Mute Button Extracted to Content Layer */}
+          <button
+            onClick={toggleMute}
+            className="pointer-events-auto absolute bottom-6 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] border-[1.5px] border-border bg-surface text-gray-nav shadow-sm transition-all duration-300 hover:text-green hover:border-green/40 hover:scale-105 active:scale-95 lg:right-16 lg:bottom-12 group"
+            aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+          >
+            {isMuted ? <SpeakerSlash size={20} weight="bold" /> : <SpeakerHigh size={20} weight="bold" />}
+          </button>
         </div>
 
         {/* ── Background Video Layer ── */}
@@ -104,7 +112,7 @@ export const Landing: React.FC = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-          className="absolute inset-0 overflow-hidden pointer-events-none z-20"
+          className="absolute inset-0 overflow-hidden pointer-events-none z-0"
         >
           {/* Subtle responsive masks */}
           <div className="video-mask video-mask--mobile lg:hidden" />
@@ -124,13 +132,6 @@ export const Landing: React.FC = () => {
             <source src="/assets/videos/landing_video.mp4" type="video/mp4" />
           </video>
 
-          <button
-            onClick={toggleMute}
-            className="absolute bottom-6 right-6 z-30 flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] border-[1.5px] border-border bg-surface text-gray-nav shadow-sm transition-all duration-300 hover:text-green hover:border-green/40 hover:scale-105 active:scale-95 lg:right-16 lg:bottom-12 group pointer-events-auto"
-            aria-label={isMuted ? 'Unmute video' : 'Mute video'}
-          >
-            {isMuted ? <SpeakerSlash size={20} weight="bold" /> : <SpeakerHigh size={20} weight="bold" />}
-          </button>
         </motion.div>
 
       </div>

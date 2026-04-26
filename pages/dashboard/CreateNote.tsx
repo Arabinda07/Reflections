@@ -317,7 +317,9 @@ export const CreateNote: React.FC = () => {
               newAttachments: [],
             }),
           );
-          setLoading(false);
+          setTimeout(() => {
+            if (!isUnmounted.current) setLoading(false);
+          }, 1200);
           return;
         }
         const note = await noteService.getById(id);

@@ -98,6 +98,7 @@ export const HomeAuthenticated: React.FC = () => {
   const location = useLocation();
   const isFromSave = location.state?.fromSave;
   const { user } = useAuth();
+  const [isNavigating, setIsNavigating] = useState(false);
   const [noteCount, setNoteCount] = useState<number | null>(null);
   const [displayCount, setDisplayCount] = useState<number | string>('...');
   const [isCountLoading, setIsCountLoading] = useState(false);
@@ -221,6 +222,7 @@ export const HomeAuthenticated: React.FC = () => {
   }, [user]);
 
   const handleCreateClick = (prompt?: string) => {
+    setIsNavigating(true);
     if (prompt) {
       navigate(RoutePath.CREATE_NOTE, { state: { initialPrompt: prompt } });
       return;
@@ -461,10 +463,10 @@ export const HomeAuthenticated: React.FC = () => {
           {/* Daily Focus Card */}
           <motion.div 
             variants={bentoItemVariants}
-            className="p-8 sm:p-12 lg:p-16 flex flex-col justify-between h-full bg-white dark:bg-white/20 border-b lg:border-b-0 border-border/40"
+            className="p-6 sm:p-10 lg:p-12 flex flex-col justify-between h-full bg-white dark:bg-white/20 border-b lg:border-b-0 border-border/40"
           >
             <div>
-              <div className="flex items-center justify-between mb-12">
+              <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-2 text-gray-nav">
                   <Target size={18} weight="bold" className="text-green" />
                   <span className="text-[11px] font-black uppercase tracking-widest opacity-60">
@@ -496,7 +498,8 @@ export const HomeAuthenticated: React.FC = () => {
               variant="primary"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="mt-16 h-14 rounded-xl text-[15px] font-bold bg-green text-white hover:bg-green/90 transition-colors shadow-none"
+              isLoading={isNavigating}
+              className="mt-10 h-14 rounded-xl text-[15px] font-bold bg-green text-white hover:bg-green/90 transition-colors shadow-none"
               onClick={() => handleCreateClick(dailyPrompt)}
               aria-label="Start a new reflection with this prompt"
             >
