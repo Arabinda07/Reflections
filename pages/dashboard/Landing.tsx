@@ -64,14 +64,17 @@ export const Landing: React.FC = () => {
           </div>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.6 }}
+            initial={{ opacity: 0, y: 24, filter: 'blur(10px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.7 }}
             className="pointer-events-auto mt-auto flex w-full flex-col items-start gap-8 sm:max-w-none sm:flex-row sm:items-center sm:justify-between lg:mt-0"
           >
             <Button
               variant="primary"
               onClick={() => navigate(RoutePath.SIGNUP)}
+              whileHover={{ y: -3, scale: 1.01 }}
+              whileTap={{ scale: 0.98, y: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
               className="group h-14 w-auto px-8 text-[18px] font-black"
               aria-label="Begin writing"
             >
@@ -84,6 +87,9 @@ export const Landing: React.FC = () => {
                 <Button
                   variant="ghost"
                   onClick={() => navigate(RoutePath.LOGIN)}
+                  whileHover={{ y: -1 }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   className="h-11 px-0 text-[15px] font-medium text-gray-text hover:text-green transition-colors"
                 >
                   Sign in
@@ -92,6 +98,9 @@ export const Landing: React.FC = () => {
                 <Button
                   variant="ghost"
                   onClick={() => navigate(RoutePath.FAQ)}
+                  whileHover={{ y: -1 }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   className="h-11 px-0 text-[15px] font-medium text-gray-text hover:text-green transition-colors"
                 >
                   How it works
@@ -99,9 +108,12 @@ export const Landing: React.FC = () => {
               </div>
 
               <Button
-                variant="secondary"
+                variant="outline"
                 onClick={toggleMute}
-                className="h-11 w-11 !px-0 rounded-[var(--radius-control)] border-[1.5px] border-border bg-surface text-gray-nav shadow-sm hover:text-green hover:border-green/40 transition-all duration-300 group"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.9, rotate: -8 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                className="h-11 w-11 !px-0 rounded-2xl bg-surface !text-gray-nav hover:!text-green hover:border-green/40 shadow-sm transition-all duration-300 group"
                 aria-label={isMuted ? 'Unmute video' : 'Mute video'}
               >
                 {isMuted ? <SpeakerSlash size={20} weight="bold" /> : <SpeakerHigh size={20} weight="bold" />}
