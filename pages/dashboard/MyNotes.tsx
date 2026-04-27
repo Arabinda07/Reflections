@@ -32,8 +32,8 @@ import { Surface } from '../../components/ui/Surface';
 import { useAuth } from '../../context/AuthContext';
 import { noteService } from '../../services/noteService';
 import { Note, RoutePath } from '../../types';
-import { NoteExportDialog } from './NoteExportDialog';
 import { buildNotePreviewText } from './noteContent';
+import { downloadNoteExport } from './noteExport';
 
 const MyNotesCalendar = lazy(() =>
   import('./MyNotesCalendar').then((module) => ({ default: module.MyNotesCalendar })),
@@ -48,7 +48,6 @@ export const MyNotes: React.FC = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [noteIdToDelete, setNoteIdToDelete] = useState<string | null>(null);
-  const [noteToExport, setNoteToExport] = useState<Note | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'calendar'>('grid');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
@@ -80,11 +79,6 @@ export const MyNotes: React.FC = () => {
     event.stopPropagation();
     setNoteIdToDelete(id);
     setIsConfirmOpen(true);
-  };
-
-  const openExportDialog = (event: React.MouseEvent, note: Note) => {
-    event.stopPropagation();
-    setNoteToExport(note);
   };
 
   const performDelete = async () => {
@@ -250,7 +244,10 @@ export const MyNotes: React.FC = () => {
               <div className="flex shrink-0 items-center gap-2">
                 <button
                   type="button"
-                  onClick={(event) => openExportDialog(event, note)}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    downloadNoteExport(note, 'md');
+                  }}
                   className="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-control)] border border-border/40 text-gray-nav transition-all hover:border-green/25 hover:bg-green/5 hover:text-green"
                   title={`Export ${note.title}`}
                   aria-label={`Export ${note.title}`}
@@ -438,12 +435,6 @@ export const MyNotes: React.FC = () => {
         confirmLabel={isDeleting ? 'Deleting...' : 'Delete note'}
         isConfirming={isDeleting}
         variant="danger"
-      />
-
-      <NoteExportDialog
-        isOpen={Boolean(noteToExport)}
-        note={noteToExport}
-        onClose={() => setNoteToExport(null)}
       />
     </>
   );

@@ -10,23 +10,16 @@ import {
   Book,
   CaretRight,
   Hash,
-  Warning,
 } from '@phosphor-icons/react';
 import { Button } from '../../components/ui/Button';
-import { Alert } from '../../components/ui/Alert';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { MetadataPill } from '../../components/ui/MetadataPill';
-import { ModalSheet } from '../../components/ui/ModalSheet';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { Surface } from '../../components/ui/Surface';
-import { LifeTheme, Note, RoutePath, WellnessAccess } from '../../types';
+import { LifeTheme, Note, RoutePath } from '../../types';
 import { noteService } from '../../services/noteService';
 import { wikiService } from '../../services/wikiService';
-import { aiService } from '../../services/aiService';
-import { profileService } from '../../services/profileService';
-import { FREE_WIKI_MINIMUM_ENTRIES, getWikiInsightsGate } from '../../services/wellnessPolicy';
-import { trackLifeWikiRefreshed } from '../../src/analytics/events';
 
 const MOOD_TONE_CLASSES: Record<string, { label: string; track: string; fill: string }> = {
   happy: { label: 'text-orange', track: 'bg-orange/10', fill: 'bg-orange' },
@@ -45,33 +38,21 @@ const DEFAULT_MOOD_TONE = {
 
 const TAG_TONE_CLASSES = ['text-green', 'text-blue', 'text-orange', 'text-gray-text'];
 
-type RefreshFeedback = {
-  variant: 'warning' | 'error';
-  title: string;
-  description: string;
-};
-
 export const Insights: React.FC = () => {
   const navigate = useNavigate();
   const [notes, setNotes] = useState<Note[]>([]);
   const [themes, setThemes] = useState<LifeTheme[]>([]);
-  const [selectedTheme, setSelectedTheme] = useState<LifeTheme | null>(null);
-  const [access, setAccess] = useState<WellnessAccess | null>(null);
-  const [isRefreshingWiki, setIsRefreshingWiki] = useState(false);
-  const [refreshFeedback, setRefreshFeedback] = useState<RefreshFeedback | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [allNotes, allThemes, accessData] = await Promise.all([
+        const [allNotes, allThemes] = await Promise.all([
           noteService.getAll(),
           wikiService.getAllThemes(),
-          profileService.getWellnessAccess(),
         ]);
 
         setNotes(allNotes);
         setThemes(allThemes);
-        setAccess(accessData);
       } catch (error) {
         console.error('[Insights] Failed to load data:', error);
       }
@@ -79,75 +60,6 @@ export const Insights: React.FC = () => {
 
     fetchData();
   }, []);
-
-  const gate = useMemo(() => {
-    if (!access) return null;
-    return getWikiInsightsGate(access, notes.length);
-  }, [access, notes.length]);
-
-  const handleRefreshWiki = async () => {
-    if (!gate?.canGenerate) return;
-
-    setIsRefreshingWiki(true);
-    setRefreshFeedback(null);
-    let claimedFreeRefresh = false;
-    try {
-      if (access?.planTier !== 'pro') {
-        claimedFreeRefresh = await profileService.incrementFreeWikiInsights();
-
-        if (!claimedFreeRefresh) {
-          const newAccess = await profileService.getWellnessAccess();
-          setAccess(newAccess);
-          return;
-        }
-      }
-
-      const refreshResult = await aiService.refreshWikiOnDemand(notes);
-
-      if (claimedFreeRefresh && (refreshResult.source === 'none' || refreshResult.pageCount === 0)) {
-        await profileService.releaseClaimedFreeWikiInsight();
-        claimedFreeRefresh = false;
-        setRefreshFeedback({
-          variant: 'warning',
-          title: 'Nothing could be built yet',
-          description: 'The Life Wiki did not find enough usable signal this time. Add a little more detail to your reflections and try again.',
-        });
-      }
-
-      if (refreshResult.pageCount > 0) {
-        trackLifeWikiRefreshed({
-          planTier: access?.planTier || 'free',
-          entryCount: notes.length,
-          pageCount: refreshResult.pageCount,
-          source: refreshResult.source,
-          usedFreeRefresh: claimedFreeRefresh,
-        });
-      }
-
-      const [allThemes, newAccess] = await Promise.all([
-        wikiService.getAllThemes(),
-        profileService.getWellnessAccess(),
-      ]);
-      setThemes(allThemes);
-      setAccess(newAccess);
-    } catch (error) {
-      if (claimedFreeRefresh) {
-        await profileService.releaseClaimedFreeWikiInsight().catch((refundError) => {
-          console.error('[Insights] Failed to refund wiki refresh claim:', refundError);
-        });
-      }
-      const newAccess = await profileService.getWellnessAccess().catch(() => access);
-      setAccess(newAccess || null);
-      setRefreshFeedback({
-        variant: 'error',
-        title: 'Refresh failed',
-        description: "I couldn't refresh the Life Wiki just now. Please try again in a moment.",
-      });
-      console.error('[Insights] Failed to refresh wiki:', error);
-    } finally {
-      setIsRefreshingWiki(false);
-    }
-  };
 
   const stats = useMemo(() => {
     const now = new Date();
@@ -200,15 +112,6 @@ export const Insights: React.FC = () => {
     };
   }, [notes]);
 
-  const selectedThemeParagraphs = useMemo(() => {
-    if (!selectedTheme) return [];
-
-    return selectedTheme.content
-      .split(/\n{2,}/)
-      .map((paragraph) => paragraph.trim())
-      .filter(Boolean);
-  }, [selectedTheme]);
-
   return (
     <>
       <PageContainer className="pb-24 pt-4 md:pt-8">
@@ -228,20 +131,6 @@ export const Insights: React.FC = () => {
                 {new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}
               </MetadataPill>
             </div>
-
-            {themes.length > 0 && !gate?.requiresUpgrade ? (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-[11px] font-black text-green hover:text-green-hover uppercase tracking-widest"
-                onClick={handleRefreshWiki}
-                isLoading={isRefreshingWiki}
-                disabled={isRefreshingWiki || !gate?.canGenerate}
-              >
-                <Sparkle size={14} weight="fill" className="mr-2" />
-                {isRefreshingWiki ? 'Refreshing...' : 'Refresh with AI'}
-              </Button>
-            ) : null}
           </div>
 
           <SectionHeader
@@ -398,171 +287,30 @@ export const Insights: React.FC = () => {
             </Surface>
           </div>
 
-          <Surface variant="flat" className="overflow-hidden">
-            <div className="p-8 md:p-12 space-y-8">
-              <SectionHeader
-                title="Themes that keep resurfacing"
-                titleAs="h2"
-                description={`Built from ${notes.length} reflections. Nothing is generated until you ask.`}
-                icon={
-                  <div className="icon-block icon-block-md">
-                    <Book size={26} weight="duotone" />
-                  </div>
-                }
-              />
-
-              {gate?.requiresUpgrade ? (
-                <Alert
-                  variant="warning"
-                  icon={<Warning size={20} weight="fill" />}
-                  title="You have used your free Life Wiki refresh."
-                  description="You can still read what is already here. Upgrade when you want to keep refreshing it with AI."
-                  actions={
-                    <Button size="sm" variant="primary" className="font-black" onClick={() => navigate(RoutePath.ACCOUNT)}>
-                      See Pro options
-                    </Button>
-                  }
-                />
-              ) : null}
-
-              {refreshFeedback ? (
-                <Alert
-                  variant={refreshFeedback.variant}
-                  icon={<Warning size={20} weight="fill" />}
-                  title={refreshFeedback.title}
-                  description={refreshFeedback.description}
-                />
-              ) : null}
-
-              {notes.length === 0 ? (
-                <EmptyState
-                  surface="none"
-                  icon={<Sparkle size={18} weight="duotone" className="text-orange" />}
-                  title="This space is ready when your first reflection arrives."
-                  description="Write your first note and this space will stay quiet until you choose to build the Life Wiki."
-                  action={
-                    <Button variant="ghost" className="text-[11px] font-black uppercase tracking-widest text-green" onClick={() => navigate(RoutePath.CREATE_NOTE)}>
-                      Begin your first entry
-                    </Button>
-                  }
-                />
-              ) : notes.length < FREE_WIKI_MINIMUM_ENTRIES ? (
-                <div className="flex flex-col items-center gap-6">
-                  {gate && !gate.requiresUpgrade && gate.canGenerate ? (
-                    <Button
-                      variant="primary"
-                      onClick={handleRefreshWiki}
-                      isLoading={isRefreshingWiki}
-                      disabled={isRefreshingWiki}
-                      className="px-8"
-                    >
-                      <Sparkle size={16} weight="fill" className="mr-2" />
-                      {isRefreshingWiki ? 'Building...' : 'Refresh with AI'}
-                    </Button>
-                  ) : null}
-                  <EmptyState
-                    surface="none"
-                    icon={<Sparkle size={18} weight="duotone" className="text-orange" />}
-                    title="Still gathering enough signal."
-                    description={`Write ${FREE_WIKI_MINIMUM_ENTRIES - notes.length} more ${FREE_WIKI_MINIMUM_ENTRIES - notes.length === 1 ? 'entry' : 'entries'} before the Life Wiki can say anything useful.`}
-                  />
+          <Surface 
+            variant="flat" 
+            className="overflow-hidden group cursor-pointer border border-transparent hover:border-green/20 transition-all duration-300"
+            onClick={() => navigate(RoutePath.WIKI)}
+          >
+            <div className="flex flex-col md:flex-row items-center justify-between p-8 md:p-12 gap-8">
+              <div className="space-y-4">
+                <div className="icon-block icon-block-md">
+                  <Book size={26} weight="duotone" />
                 </div>
-              ) : themes.length === 0 ? (
-                <EmptyState
-                  surface="none"
-                  icon={<Sparkle size={18} weight="duotone" className="text-orange" />}
-                  title="Build your Life Wiki when you’re ready."
-                  description="This stays on demand. Nothing is generated until you ask for it."
-                  action={
-                    gate?.requiresUpgrade ? (
-                      <Button variant="primary" onClick={() => navigate(RoutePath.ACCOUNT)}>
-                        See Pro options
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="primary"
-                        onClick={handleRefreshWiki}
-                        isLoading={isRefreshingWiki}
-                        disabled={isRefreshingWiki || !gate?.canGenerate}
-                      >
-                        {isRefreshingWiki ? 'Refreshing...' : 'Refresh with AI'}
-                      </Button>
-                    )
-                  }
-                />
-              ) : (
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  {themes.map((theme) => (
-                    <Surface
-                      key={theme.id}
-                      variant="bezel"
-                      className="group cursor-pointer transition-all duration-300 hover:shadow-none"
-                    >
-                      <button
-                        type="button"
-                        onClick={() => setSelectedTheme(theme)}
-                        className="flex h-full w-full flex-col justify-between p-6 text-left"
-                      >
-                        <div>
-                          <div className="mb-3 flex items-center justify-between">
-                            <span className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Life theme</span>
-                            <Hash size={14} weight="bold" className="text-gray-light opacity-50" />
-                          </div>
-                          <h3 className="line-clamp-2 text-xl font-display leading-tight text-gray-text transition-colors group-hover:text-green">
-                            {theme.title}
-                          </h3>
-                        </div>
-
-                        <div className="mt-5 flex items-center justify-between">
-                          <span className="text-[11px] font-medium text-gray-light">
-                            Updated {new Date(theme.updatedAt).toLocaleDateString()}
-                          </span>
-                          <div className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-white/5 transition-all duration-300 group-hover:border-green group-hover:bg-green group-hover:text-white">
-                            <CaretRight size={16} weight="bold" />
-                          </div>
-                        </div>
-                      </button>
-                    </Surface>
-                  ))}
-                </div>
-              )}
+                <h2 className="text-2xl font-display text-gray-text">Your Life Wiki</h2>
+                <p className="text-gray-light max-w-lg leading-relaxed">
+                  A dedicated editorial space where your scattered reflections are woven into clear, recurring themes.
+                </p>
+              </div>
+              
+              <div className="shrink-0 flex items-center justify-center h-12 px-6 rounded-[var(--radius-control)] bg-white/5 border border-border group-hover:bg-green/10 group-hover:border-green/30 group-hover:text-green transition-all duration-300 text-gray-text font-black text-[13px] uppercase tracking-widest">
+                Open Wiki
+                <CaretRight size={16} weight="bold" className="ml-2" />
+              </div>
             </div>
           </Surface>
         </div>
       </PageContainer>
-
-      <ModalSheet
-        isOpen={Boolean(selectedTheme)}
-        onClose={() => setSelectedTheme(null)}
-        title={selectedTheme?.title}
-        description={
-          selectedTheme
-            ? `Personal wiki entry updated ${new Date(selectedTheme.updatedAt).toLocaleDateString()}.`
-            : undefined
-        }
-        icon={<Book size={20} weight="duotone" />}
-        size="xl"
-        footer={
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-[12px] font-medium italic text-gray-light">
-              This page evolves as you keep writing.
-            </p>
-            <Button size="sm" variant="ghost" className="text-[11px] font-black" onClick={() => setSelectedTheme(null)}>
-              Close entry
-            </Button>
-          </div>
-        }
-      >
-        {selectedTheme ? (
-          <div className="prose prose-slate max-w-none text-gray-text leading-relaxed">
-            {selectedThemeParagraphs.map((paragraph, index) => (
-              <p key={`${selectedTheme.id}-${index}`} className="whitespace-pre-line">
-                {paragraph}
-              </p>
-            ))}
-          </div>
-        ) : null}
-      </ModalSheet>
     </>
   );
 };

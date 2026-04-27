@@ -21,6 +21,7 @@ const CreateNote = lazy(() => import('./pages/dashboard/CreateNote').then(m => (
 const SingleNote = lazy(() => import('./pages/dashboard/SingleNote').then(m => ({ default: m.SingleNote })));
 const Account = lazy(() => import('./pages/dashboard/Account').then(m => ({ default: m.Account })));
 const Insights = lazy(() => import('./pages/dashboard/Insights').then(m => ({ default: m.Insights })));
+const LifeWiki = lazy(() => import('./pages/dashboard/LifeWiki').then(m => ({ default: m.LifeWiki })));
 const FAQ = lazy(() => import('./pages/dashboard/FAQ').then(m => ({ default: m.FAQ })));
 const PrivacyPolicy = lazy(() => import('./pages/dashboard/PrivacyPolicy').then(m => ({ default: m.PrivacyPolicy })));
 const TermsOfService = lazy(() => import('./pages/dashboard/TermsOfService').then(m => ({ default: m.TermsOfService })));
@@ -90,6 +91,14 @@ const router = createHashRouter(
         element={
           <ProtectedRoute>
             <Insights />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={RoutePath.WIKI}
+        element={
+          <ProtectedRoute>
+            <LifeWiki />
           </ProtectedRoute>
         }
       />

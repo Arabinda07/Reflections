@@ -111,4 +111,5 @@ export enum RoutePath {
   FAQ = '/faq',
   PRIVACY = '/privacy',
   TERMS = '/terms',
+  WIKI = '/wiki',
 }
