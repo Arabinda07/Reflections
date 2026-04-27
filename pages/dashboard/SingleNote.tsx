@@ -349,85 +349,8 @@ export const SingleNote: React.FC = () => {
             />
           ) : null}
 
-          <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-8">
-            <Surface variant="flat" className="hidden self-start lg:sticky lg:top-28 lg:block">
-              <div className="flex flex-col gap-6 p-5">
-                <div className="space-y-3">
-                  <span className="text-[10px] font-black tracking-widest uppercase text-green/80">
-                    Reflection controls
-                  </span>
-                  <MetadataPill icon={<Calendar size={14} weight="bold" />}>
-                    {new Date(note.createdAt).toLocaleDateString(undefined, {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </MetadataPill>
-                </div>
+          <div className="mx-auto max-w-3xl">
 
-                <div className="space-y-3">
-                  <button
-                    type="button"
-                    onClick={() => downloadNoteExport(note, 'md')}
-                    className="flex w-full items-center justify-between rounded-[var(--radius-panel)] border border-border bg-white/5 px-4 py-3 text-left text-gray-nav transition-all hover:border-green/25 hover:text-green"
-                  >
-                    <span className="flex items-center gap-3 text-[13px] font-black uppercase tracking-tight">
-                      <Download size={18} weight="duotone" />
-                      Export note
-                    </span>
-                    <span className="text-[11px] font-bold uppercase tracking-widest opacity-60">Open</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setIsMoodOpen(true)}
-                    className={`flex w-full items-center justify-between rounded-[var(--radius-panel)] border px-4 py-3 text-left transition-all ${
-                      note.mood
-                        ? 'border-green/30 bg-green/5 text-green'
-                        : 'border-border bg-white/5 text-gray-nav hover:border-green/25 hover:text-green'
-                    }`}
-                  >
-                    <span className="flex items-center gap-3 text-[13px] font-black uppercase tracking-tight">
-                      {note.mood ? getMoodIcon(note.mood) : <Smiley size={18} weight="duotone" />}
-                      {note.mood ? note.mood : 'Set mood'}
-                    </span>
-                    <span className="text-[11px] font-bold uppercase tracking-widest opacity-60">Edit</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setIsTagsOpen(true)}
-                    className={`flex w-full items-center justify-between rounded-[var(--radius-panel)] border px-4 py-3 text-left transition-all ${
-                      note.tags && note.tags.length > 0
-                        ? 'border-green/30 bg-green/5 text-green'
-                        : 'border-border bg-white/5 text-gray-nav hover:border-green/25 hover:text-green'
-                    }`}
-                  >
-                    <span className="flex items-center gap-3 text-[13px] font-black uppercase tracking-tight">
-                      <Tag size={18} weight="duotone" />
-                      {note.tags?.length ? `${note.tags.length} tags` : 'Add tags'}
-                    </span>
-                    <span className="text-[11px] font-bold uppercase tracking-widest opacity-60">Edit</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setIsTasksOpen(true)}
-                    className={`flex w-full items-center justify-between rounded-[var(--radius-panel)] border px-4 py-3 text-left transition-all ${
-                      pendingTaskCount > 0
-                        ? 'border-green/30 bg-green/5 text-green'
-                        : 'border-border bg-white/5 text-gray-nav hover:border-green/25 hover:text-green'
-                    }`}
-                  >
-                    <span className="flex items-center gap-3 text-[13px] font-black uppercase tracking-tight">
-                      <ListChecks size={18} weight="duotone" />
-                      {pendingTaskCount > 0 ? `${pendingTaskCount} open tasks` : 'Tasks'}
-                    </span>
-                    <span className="text-[11px] font-bold uppercase tracking-widest opacity-60">Open</span>
-                  </button>
-                </div>
-              </div>
-            </Surface>
 
             <Surface variant="bezel" className="bg-white">
               <article>
@@ -464,17 +387,37 @@ export const SingleNote: React.FC = () => {
                         day: 'numeric',
                       })}
                     </MetadataPill>
-                    <MetadataPill icon={<Clock size={14} weight="bold" />}>
-                      {new Date(note.updatedAt).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </MetadataPill>
-                    {note.mood ? (
-                      <MetadataPill icon={getMoodIcon(note.mood)} tone="green">
-                        <span className="capitalize">{note.mood}</span>
-                      </MetadataPill>
-                    ) : null}
+
+                    <button
+                      type="button"
+                      onClick={() => setIsMoodOpen(true)}
+                      className="group flex items-center gap-1.5 rounded-full border border-border/60 bg-white/5 px-2.5 py-1 text-[11px] font-black uppercase tracking-widest text-gray-nav transition-colors hover:border-green/30 hover:bg-green/5 hover:text-green"
+                    >
+                      {note.mood ? getMoodIcon(note.mood) : <Smiley size={14} weight="bold" />}
+                      <span className="mt-0.5">{note.mood || 'Mood'}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setIsTagsOpen(true)}
+                      className="group flex items-center gap-1.5 rounded-full border border-border/60 bg-white/5 px-2.5 py-1 text-[11px] font-black uppercase tracking-widest text-gray-nav transition-colors hover:border-green/30 hover:bg-green/5 hover:text-green"
+                    >
+                      <Tag size={14} weight="bold" />
+                      <span className="mt-0.5">{note.tags?.length || 'Tags'}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setIsTasksOpen(true)}
+                      className={`group flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-black uppercase tracking-widest transition-colors ${
+                        pendingTaskCount > 0
+                          ? 'border-green/30 bg-green/5 text-green'
+                          : 'border-border/60 bg-white/5 text-gray-nav hover:border-green/30 hover:bg-green/5 hover:text-green'
+                      }`}
+                    >
+                      <ListChecks size={14} weight="bold" />
+                      <span className="mt-0.5">{pendingTaskCount || 'Tasks'}</span>
+                    </button>
                   </div>
 
                   <div

@@ -156,80 +156,32 @@ export const Insights: React.FC = () => {
             description="Mood, rhythm, and recurring themes"
           />
 
-          <div className="grid gap-6 lg:grid-cols-[1.35fr_0.65fr]">
-            <Surface variant="bezel" innerClassName="p-8 md:p-10">
-              <div className="flex flex-col gap-8">
-                <div className="flex flex-wrap items-start justify-between gap-5">
-                  <div className="space-y-3">
-                    <MetadataPill tone="green">Writing rhythm</MetadataPill>
-                    <h2 className="text-3xl md:text-4xl font-display text-gray-text tracking-tight">
-                      {stats.monthNotes} reflections this month
-                    </h2>
-                    <p className="max-w-xl text-[15px] font-medium leading-relaxed text-gray-light">
-                      You checked in on {stats.daysCheckedIn} different days, and the current emotional tone leans{' '}
-                      <span className="capitalize text-green font-bold">
-                        {stats.topMood === 'undefined' ? 'toward clarity' : stats.topMood}
-                      </span>
-                      .
-                    </p>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    <MetadataPill icon={<Calendar size={13} weight="bold" />} tone="green">
-                      {stats.totalNotes} total notes
-                    </MetadataPill>
-                    <MetadataPill icon={<Book size={13} weight="bold" />} tone="green">
-                      {stats.wordsWritten.toLocaleString()} words written
-                    </MetadataPill>
-                  </div>
-                </div>
-
-                <div className="grid gap-4 sm:grid-cols-3">
-                  <div className="rounded-[var(--radius-panel)] border border-border bg-white/5 p-5">
-                    <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">This month</p>
-                    <p className="mt-3 text-4xl font-display text-gray-text">{stats.monthNotes}</p>
-                    <p className="mt-2 text-[12px] font-medium text-gray-light">entries written recently</p>
-                  </div>
-                  <div className="rounded-[var(--radius-panel)] border border-border bg-white/5 p-5">
-                    <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Check-in days</p>
-                    <p className="mt-3 text-4xl font-display text-gray-text">{stats.daysCheckedIn}</p>
-                    <p className="mt-2 text-[12px] font-medium text-gray-light">days you made space to write</p>
-                  </div>
-                  <div className="rounded-[var(--radius-panel)] border border-border bg-white/5 p-5">
-                    <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Words written</p>
-                    <p className="mt-3 text-4xl font-display text-gray-text">{stats.wordsWritten.toLocaleString()}</p>
-                    <p className="mt-2 text-[12px] font-medium text-gray-light">words saved across your notes</p>
-                  </div>
-                </div>
+          <Surface variant="bezel" innerClassName="p-8 md:p-12">
+            <div className="flex flex-col gap-6 md:gap-8">
+              <div className="flex flex-wrap items-center gap-2">
+                <MetadataPill tone="green">Writing rhythm</MetadataPill>
+                <MetadataPill icon={<Calendar size={13} weight="bold" />}>
+                  {stats.totalNotes} total notes
+                </MetadataPill>
+                <MetadataPill icon={<Book size={13} weight="bold" />}>
+                  {stats.wordsWritten.toLocaleString()} words written
+                </MetadataPill>
               </div>
-            </Surface>
-
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-1">
-              <Surface variant="flat" className="overflow-hidden">
-                <div className="flex h-full flex-col gap-4 p-6">
-                  <Heart size={24} weight="duotone" className="text-green opacity-80" />
-                  <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Prevalent mood</p>
-                  <p className="text-3xl font-display text-gray-text capitalize">
-                    {stats.topMood === 'undefined' ? 'Unlabeled' : stats.topMood}
-                  </p>
-                  <p className="text-[13px] font-medium text-gray-light">
-                    The feeling showing up most often across your reflections.
-                  </p>
-                </div>
-              </Surface>
-
-              <Surface variant="flat" className="overflow-hidden">
-                <div className="flex h-full flex-col gap-4 p-6">
-                  <TrendUp size={24} weight="duotone" className="text-green opacity-80" />
-                  <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Library growth</p>
-                  <p className="text-3xl font-display text-gray-text">{themes.length}</p>
-                  <p className="text-[13px] font-medium text-gray-light">
-                    themes currently captured in your personal life wiki.
-                  </p>
-                </div>
-              </Surface>
+              
+              <div className="space-y-4 max-w-2xl">
+                <h2 className="text-3xl md:text-5xl font-display text-gray-text tracking-tight leading-tight">
+                  You wrote {stats.monthNotes} reflections this month.
+                </h2>
+                <p className="text-[18px] md:text-[20px] font-serif italic text-gray-light leading-relaxed">
+                  You checked in on {stats.daysCheckedIn} different days, and the current emotional tone leans{' '}
+                  <span className="capitalize text-green font-bold not-italic">
+                    {stats.topMood === 'undefined' ? 'toward clarity' : stats.topMood}
+                  </span>
+                  . Your Life Wiki has grown to {themes.length} themes.
+                </p>
+              </div>
             </div>
-          </div>
+          </Surface>
 
           <div className="grid gap-6 md:grid-cols-2">
             <Surface variant="bezel" innerClassName="p-8">
