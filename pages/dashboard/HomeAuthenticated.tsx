@@ -65,37 +65,37 @@ const WRITING_NOTES = [
   },
   { text: 'If the thought feels messy, put it down messy.', author: 'Natalie Goldberg' },
   { text: 'Notice the thing you keep circling. It may be asking for a name.', author: 'Julia Cameron' },
-  { text: 'The page can hold more than one feeling at once.', author: 'Unknown' },
+  { text: 'You do not have to be certain before you start writing.', author: 'Reflections' },
 ];
 
 const ONBOARDING_STEPS = [
   {
     icon: Sparkle,
     label: 'Intro',
-    title: 'A space to think',
+    title: 'A private space for notes',
     body:
-      'Reflections is a private journal for your writing. It’s a place to get thoughts out of your head and return to them later.',
+      'This is a private journal for your writing. Use it to get thoughts down and come back to them later.',
   },
   {
     icon: Target,
     label: 'Focus',
-    title: 'Writing comes first',
+    title: 'Focus on the writing',
     body:
-      'Just start with one sentence. Write what you need to say and let the page hold the rest.',
+      'Start with one sentence. Write what you need to say and let the page hold the rest.',
   },
   {
     icon: ShieldCheck,
     label: 'Privacy',
-    title: 'Private by default',
+    title: 'Private and secure',
     body:
-      'Your notes stay with you. AI is optional and only appears if you ask for help finding a pattern.',
+      'Your notes stay with you. AI only runs if you specifically ask it to help you find a pattern.',
   },
   {
     icon: Brain,
     label: 'Ready',
-    title: 'Start when you’re ready',
+    title: 'Ready to start',
     body:
-      'Try a daily focus, a blank note, or look through your saved reflections. The app waits until you decide the next step.',
+      'Start with a blank note or use a daily focus prompt. Your archived reflections are always available.',
   },
 ];
 
@@ -544,7 +544,7 @@ export const HomeAuthenticated: React.FC = () => {
 
               <div className="space-y-6">
                 <p
-                  className="text-2xl md:text-3xl text-gray-text font-serif italic leading-relaxed"
+                  className="text-2xl md:text-3xl text-gray-text font-medium leading-relaxed"
                   style={{ opacity: isRefreshing ? 0 : 1, transition: 'opacity 0.4s ease' }}
                 >
                   {dailyPrompt}

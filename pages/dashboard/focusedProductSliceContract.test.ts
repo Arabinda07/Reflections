@@ -50,4 +50,15 @@ describe('focused product slice source contract', () => {
     expect(singleNote).toContain('setIsExportOpen(true)');
     expect(singleNote).toContain('aria-label="Export this reflection"');
   });
+
+  it('keeps the daily focus card labels while removing poetic styling from prompts', () => {
+    const homeAuthenticated = read('pages/dashboard/HomeAuthenticated.tsx');
+
+    expect(homeAuthenticated).toContain('Daily Focus');
+    expect(homeAuthenticated).toContain('Start Reflection');
+    
+    // Check for the specific combination of classes that was removed from the prompt
+    expect(homeAuthenticated).not.toContain('text-2xl md:text-3xl text-gray-text font-serif italic leading-relaxed');
+    expect(homeAuthenticated).toContain('text-2xl md:text-3xl text-gray-text font-medium leading-relaxed');
+  });
 });

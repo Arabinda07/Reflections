@@ -28,8 +28,8 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
     expect(home).toContain('Back');
     expect(home).toContain('Next');
     expect(home).toContain('Begin writing');
-    expect(home).toContain('Private by default');
-    expect(home).toContain('AI is optional');
+    expect(home).toContain('Private and secure');
+    expect(home).toContain('AI only runs if you specifically ask');
     expect(home).toContain('hasSeenOnboarding');
     expect(home).toContain('aria-live="polite"');
   });

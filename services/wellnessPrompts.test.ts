@@ -7,11 +7,37 @@ import {
 
 describe('wellnessPrompts', () => {
   it('provides a shared fallback prompt list', () => {
-    expect(DEFAULT_WELLNESS_PROMPTS.length).toBeGreaterThan(3);
+    expect(DEFAULT_WELLNESS_PROMPTS).toEqual([
+      "What happened today?",
+      "What is on your mind right now?",
+      "What are you trying to figure out?",
+      "Write down the thing you keep replaying.",
+      "What do you need to handle next?",
+      "What changed since yesterday?",
+      "What did you not get to say?",
+      "What do you want to remember later?",
+    ]);
   });
 
   it('keeps the default prompts grounded instead of therapy-coded', () => {
-    expect(DEFAULT_WELLNESS_PROMPTS.join(' ')).not.toMatch(
+    const forbidden = [
+      'few lines',
+      'small detail',
+      'day moves on',
+      'journey',
+      'deeper',
+      'unlock',
+      'inner world',
+      'enough',
+      'gentle nudge',
+    ];
+    const joined = DEFAULT_WELLNESS_PROMPTS.join(' ').toLowerCase();
+    
+    forbidden.forEach(phrase => {
+      expect(joined).not.toContain(phrase);
+    });
+    
+    expect(joined).not.toMatch(
       /felt heavy|quietest moment|little room|keep returning/i,
     );
   });

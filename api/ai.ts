@@ -143,7 +143,7 @@ const handlePrompts = async (payload: any) => {
       ? `Here are their most recent entries for context:\n${noteContext}`
       : 'The user has no past entries yet.',
     `Current entry:\nTitle: ${note?.title || 'Untitled'}\nContent: ${stripHtml(String(note?.content || ''))}`,
-    'Instructions:\n1. Notice a recurring theme, quiet tension, or pattern from these recent entries.\n2. Generate 4 brief, personalized journaling prompts.\n3. One prompt should be a gentle nudge to begin, one should invite a slower look at a specific detail, and two should relate to recurring patterns.\n4. Avoid clinical language or wellness slogans. Be direct, human, and spacious.\n5. Return only a JSON array of strings.',
+    'Instructions:\n1. Notice a recurring theme, quiet tension, or pattern from these recent entries.\n2. Generate 4 brief, personalized journaling prompts that act as practical writing starters.\n3. Avoid clinical language, poetic metaphors, or wellness slogans. Do not use phrases like "gentle nudge," "slower look," "inner world," or "journey."\n4. Be direct, human, and useful. Focus on the actual events and thoughts described.\n5. Return only a JSON array of strings.',
   ]);
 
   const data = await generateJson<unknown>(prompt, {
@@ -291,13 +291,7 @@ const handleWritingNotes = async (payload: any) => {
   const prompt = buildPrompt([
     'You are a careful, grounded mentor for the app Reflections, focused on private writing and mental clarity.',
     indexPage?.content ? `User context (from their Life Wiki patterns):\n${indexPage.content}` : 'No user context available yet.',
-    'Instructions:',
-    '1. Generate 3 fresh "Writing Notes" (short, punchy quotes or pieces of advice) for the user.',
-    '2. They should be inspiring, grounded, and focused on the act of noticing or returning to one’s thoughts.',
-    '3. If user context is provided, tailor at least one note to what seems to be recurring in their life.',
-    '4. Each note must have an "author" (a real person like Marcus Aurelius, Carl Jung, Joan Didion, Natalie Goldberg, or "Reflections" if it is general system wisdom).',
-    '5. Avoid wellness slogans, clinical advice, or "optimization" language. Be quiet, human, and spacious.',
-    '6. Return only a JSON array of objects with "text" and "author" fields.',
+    'Instructions:\n1. Generate 3 fresh "Writing Notes" (short, punchy quotes or pieces of advice) for the user.\n2. They should be grounded and focused on the act of noticing or returning to one’s thoughts. Avoid being overly "inspiring" or using wellness slogans.\n3. If user context is provided, tailor at least one note to what seems to be recurring in their life.\n4. Each note must have an "author" (a real person like Marcus Aurelius, Carl Jung, Joan Didion, Natalie Goldberg, or "Reflections" if it is general system wisdom).\n5. Avoid clinical labels or "optimization" language. Be quiet, human, and direct.\n6. Return only a JSON array of objects with "text" and "author" fields.',
   ]);
 
   return generateJson<unknown>(prompt, {
