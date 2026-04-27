@@ -1,7 +1,7 @@
 @font-face {
-  font-family: 'Geist';
-  src: url('/assets/fonts/Geist[wght].woff2') format('woff2');
-  font-weight: 100 900;
+  font-family: 'Manrope';
+  src: url('/assets/fonts/Manrope[wght].woff2') format('woff2');
+  font-weight: 200 800;
   font-style: normal;
   font-display: swap;
 }
@@ -39,8 +39,26 @@
 }
 
 @font-face {
-  font-family: 'Feather Bold';
-  src: url('/assets/fonts/Feather Bold.woff2') format('woff2');
+  font-family: 'Fraunces';
+  src: url('/assets/fonts/Fraunces144ptSoft-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Fraunces';
+  src: url('/assets/fonts/Fraunces144ptSoft-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Fraunces';
+  src: url('/assets/fonts/Fraunces144ptSoft-Black.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
   font-display: swap;
 }
 
@@ -227,7 +245,7 @@ html {
 }
 
 body {
-  font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
   color: var(--gray-text);
   background-color: var(--bg-color);
   font-weight: 400;
@@ -529,7 +547,7 @@ select:focus-visible,
   }
 
   .section-header-title {
-    font-family: 'Feather Bold', 'Geist', sans-serif;
+    font-family: 'Fraunces', 'Manrope', sans-serif;
     font-size: clamp(2rem, 3vw + 1rem, 3.5rem);
     line-height: 0.98;
     letter-spacing: -0.04em;

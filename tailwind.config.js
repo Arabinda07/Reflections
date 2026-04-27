@@ -14,9 +14,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Geist"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        sans: ['"Manrope"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
         serif: ['"Spectral"', 'serif'],
-        display: ['"Feather Bold"', '"Geist"', 'sans-serif'],
+        display: ['"Fraunces"', '"Manrope"', 'sans-serif'],
         editor: ['var(--font-editor)'],
         mono: ['"Geist Mono"', 'monospace'],
       },
