@@ -36,13 +36,7 @@ export const Magnetic: React.FC<MagneticProps> = ({ children, strength = 35 }) =
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       animate={{ x: position.x, y: position.y }}
-      transition={{ 
-        type: "spring", 
-        stiffness: 150, 
-        damping: 12, 
-        mass: 0.1,
-        restDelta: 0.001
-      }}
+      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
       style={{ display: 'inline-block' }}
     >
       {children}

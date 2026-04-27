@@ -413,7 +413,7 @@ export const DashboardLayout: React.FC = () => {
                       <button
                         key={item.label}
                         onClick={() => handleNavigation(item.path)}
-                        className="w-full p-6 text-left text-[24px] font-black text-gray-text hover:text-green transition-all duration-300 ease-out-quart active:bg-green/5 rounded-2xl flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset"
+                        className="w-full p-6 text-left text-[24px] font-black text-gray-text hover:text-green transition-all duration-300 ease-out-expo active:bg-green/5 rounded-2xl flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset"
                       >
                         <span>{item.label}</span>
                         <CaretRight weight="bold" className="opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -505,7 +505,7 @@ export const DashboardLayout: React.FC = () => {
               initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.95 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
               className="fixed bottom-[68px] left-6 z-[105] w-[calc(100vw-48px)] sm:w-[380px] bg-[rgba(var(--panel-bg-rgb),0.98)] backdrop-blur-xl border border-border/40 rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.4)] overflow-hidden"
             >
               <div className="p-6">

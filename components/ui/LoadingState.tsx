@@ -24,7 +24,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
           <DotLottieReact data={animationData} autoplay loop />
         </div>
 
-        <div className="overlay-feedback-copy">
+        <div className="overlay-feedback-copy sr-only">
           <h2 className="h2-section mb-0">{title}</h2>
         </div>
       </div>

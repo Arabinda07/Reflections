@@ -291,7 +291,7 @@ export const AmbientMusicButton: React.FC = () => {
               className="pointer-events-none absolute inset-[-3px] rounded-full border-2"
               style={{ borderColor: accentColor }}
               animate={{ scale: [1, 1.6], opacity: [0.55, 0] }}
-              transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut' }}
+              transition={{ duration: 1.8, repeat: Infinity, ease: [0.16, 1, 0.3, 1] }}
             />
           ) : null}
         </motion.button>

@@ -39,7 +39,7 @@ export const SyncBanner: React.FC = () => {
           initial={{ opacity: 0, y: -20, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -20, scale: 0.95 }}
-          transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
           className="fixed top-[80px] left-0 right-0 z-[90] flex justify-center pointer-events-none px-4"
         >
           <div

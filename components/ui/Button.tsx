@@ -35,10 +35,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
     lg: "h-14 px-8 text-[16px] rounded-[var(--radius-control)]",
   };
 
-  const springTransition = {
-    type: 'spring',
-    stiffness: 400,
-    damping: 25
+  const expoTransition = {
+    duration: 0.25,
+    ease: [0.16, 1, 0.3, 1]
   };
 
   if (variant === 'bezel') {
@@ -47,7 +46,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
         ref={ref}
         whileHover={whileHover || { scale: 1.02 }}
         whileTap={whileTap || { scale: 0.98 }}
-        transition={springTransition}
+        transition={expoTransition}
         className={`${baseStyles} ${variants.bezel} ${className}`}
         disabled={isLoading || disabled}
         {...props}
@@ -65,7 +64,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
       ref={ref}
       whileHover={whileHover || { scale: 1.02 }}
       whileTap={whileTap || { scale: 0.98 }}
-      transition={springTransition}
+      transition={expoTransition}
       className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
       disabled={isLoading || disabled}
       {...props}

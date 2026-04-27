@@ -143,7 +143,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
               initial={{ opacity: 0, y: 24, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 24, scale: 0.96 }}
-              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
               className={`modal-sheet-frame ${sizeClasses[size]} ${className}`.trim()}
             >
               <div className="surface-bezel">

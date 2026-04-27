@@ -34,7 +34,7 @@ export const PaperPlaneToast: React.FC<PaperPlaneToastProps> = ({
         initial={{ scale: 0.9, y: 14 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.96, y: -16, opacity: 0 }}
-        transition={{ type: 'spring', damping: 24, stiffness: 220, mass: 0.8 }}
+        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
         className="flex items-center gap-3"
       >
         <div className="w-[80px] h-[80px] shrink-0 -my-3 -ml-2">
