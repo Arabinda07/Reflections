@@ -312,3 +312,22 @@ export const consumeNativeGoogleOAuthCallback = async (
     return { handled: false };
   }
 };
+export const signInWithVerifiedEmail = async (assertion: string) => {
+  try {
+    const { data, error } = await supabase.auth.signInWithIdToken({
+      provider: 'google',
+      token: assertion,
+    });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'An unexpected error occurred during Verified Email login.',
+    };
+  }
+};

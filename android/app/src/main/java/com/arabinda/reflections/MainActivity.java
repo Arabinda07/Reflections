@@ -13,8 +13,9 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        registerPlugin(NativeToastPlugin.class);
         super.onCreate(savedInstanceState);
+        registerPlugin(NativeToastPlugin.class);
+        registerPlugin(CredentialManagerPlugin.class);
     }
 }
 

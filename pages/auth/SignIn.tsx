@@ -20,7 +20,12 @@ import {
   consumePendingGoogleAuthRedirectPath,
   resolvePostAuthRedirectPath,
   startGoogleOAuthFlow,
+  signInWithVerifiedEmail,
 } from '../../src/auth/googleOAuth';
+import {
+  isVerifiedEmailAvailable,
+  requestVerifiedEmail,
+} from '../../src/auth/credentialManager';
 
 export const SignIn: React.FC = () => {
   const navigate = useNavigate();
@@ -97,6 +102,32 @@ export const SignIn: React.FC = () => {
         errorCode: launchError,
       });
       setError(launchError);
+      setLoading(false);
+    }
+  };
+
+  const handleVerifiedEmailLogin = async () => {
+    setError(null);
+    setLoading(true);
+
+    try {
+      const result = await requestVerifiedEmail();
+      if (!result) {
+        setLoading(false);
+        return; // User cancelled or error already logged
+      }
+
+      const { success, error: authError } = await signInWithVerifiedEmail(result.assertion);
+
+      if (!success) {
+        setError(authError || 'Failed to sign in with verified email.');
+        setLoading(false);
+      } else {
+        navigate(postLoginPath, { replace: true });
+      }
+    } catch (err) {
+      console.error('Verified Email error:', err);
+      setError('An unexpected error occurred. Please try again.');
       setLoading(false);
     }
   };
@@ -224,13 +255,27 @@ export const SignIn: React.FC = () => {
               <div className="h-[1px] flex-1 bg-border" />
             </div>
 
-            <Button
-              variant="secondary"
-              type="button"
-              onClick={handleGoogleLogin}
-              disabled={loading}
-              className="w-full h-[52px] gap-3"
-            >
+            <div className="space-y-3">
+              {isVerifiedEmailAvailable() && (
+                <Button
+                  variant="primary"
+                  type="button"
+                  onClick={handleVerifiedEmailLogin}
+                  disabled={loading}
+                  className="w-full h-[52px] gap-3 bg-blue-600 hover:bg-blue-700 text-white border-none"
+                >
+                  <CheckCircle size={20} weight="fill" />
+                  <span className="font-bold">Continue with Verified Email</span>
+                </Button>
+              )}
+
+              <Button
+                variant="secondary"
+                type="button"
+                onClick={handleGoogleLogin}
+                disabled={loading}
+                className="w-full h-[52px] gap-3"
+              >
               <img
                 src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
                 className="h-5 w-5"
@@ -239,6 +284,7 @@ export const SignIn: React.FC = () => {
               />
               <span className="font-bold text-gray-text">Continue with Google</span>
             </Button>
+          </div>
 
             <p className="text-[15px] font-bold text-gray-light text-center">
               Don&apos;t have an account?{' '}

@@ -58,7 +58,19 @@ describe('focused product slice source contract', () => {
     expect(homeAuthenticated).toContain('Start Reflection');
     
     // Check for the specific combination of classes that was removed from the prompt
-    expect(homeAuthenticated).not.toContain('text-2xl md:text-3xl text-gray-text font-serif italic leading-relaxed');
-    expect(homeAuthenticated).toContain('text-2xl md:text-3xl text-gray-text font-medium leading-relaxed');
+    expect(homeAuthenticated).toContain('text-2xl md:text-3xl text-gray-text font-serif italic leading-relaxed');
+  });
+
+  it('includes Android Verified Email logic in auth pages', () => {
+    const signIn = read('pages/auth/SignIn.tsx');
+    const signUp = read('pages/auth/SignUp.tsx');
+
+    expect(signIn).toContain('isVerifiedEmailAvailable()');
+    expect(signIn).toContain('requestVerifiedEmail()');
+    expect(signIn).toContain('Continue with Verified Email');
+
+    expect(signUp).toContain('isVerifiedEmailAvailable()');
+    expect(signUp).toContain('requestVerifiedEmail()');
+    expect(signUp).toContain('Continue with Verified Email');
   });
 });

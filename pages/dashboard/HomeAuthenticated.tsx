@@ -544,7 +544,7 @@ export const HomeAuthenticated: React.FC = () => {
 
               <div className="space-y-6">
                 <p
-                  className="text-2xl md:text-3xl text-gray-text font-medium leading-relaxed"
+                  className="text-2xl md:text-3xl text-gray-text font-serif italic leading-relaxed"
                   style={{ opacity: isRefreshing ? 0 : 1, transition: 'opacity 0.4s ease' }}
                 >
                   {dailyPrompt}
