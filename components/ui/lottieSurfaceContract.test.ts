@@ -11,6 +11,9 @@ describe('lottie surface mapping contract', () => {
     const loadingState = read('components/ui/LoadingState.tsx');
     const paperPlaneToast = read('components/ui/PaperPlaneToast.tsx');
     const routeErrorBoundary = read('pages/RouteErrorBoundary.tsx');
+    const notFound = read('pages/NotFound.tsx');
+    const myNotes = read('pages/dashboard/MyNotes.tsx');
+    const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
 
     expect(createNote).toContain("from '@/src/lottie/trail-loading.json'");
     expect(createNote).not.toContain("from '@/src/lottie/loading.json'");
@@ -18,5 +21,8 @@ describe('lottie surface mapping contract', () => {
     expect(loadingState).toContain("from '@/src/lottie/loading.json'");
     expect(paperPlaneToast).toContain("from '@/src/lottie/paperplane.json'");
     expect(routeErrorBoundary).toContain("from '@/src/lottie/error-404.json'");
+    expect(notFound).toContain('/assets/lottie/Error 404.json');
+    expect(myNotes).toContain('/assets/lottie/empty notes.json');
+    expect(lifeWiki).toContain('/assets/lottie/Level Up Animation.json');
   });
 });

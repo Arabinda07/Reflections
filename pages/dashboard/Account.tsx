@@ -479,7 +479,7 @@ export const Account: React.FC = () => {
                     <p className="text-[11px] font-black uppercase tracking-widest text-red">Danger zone</p>
                     <h3 className="text-[24px] font-display text-red">Delete saved writing</h3>
                     <p className="max-w-xl text-[14px] font-medium leading-relaxed text-gray-light">
-                      Delete your notes, moods, tags, tasks, and saved profile details here. If you also want the sign-in account closed, the sheet below gives you that request path too.
+                      Saved writing and app data will be removed.
                     </p>
                   </div>
 

@@ -7,19 +7,19 @@ const read = (filePath: string) =>
 
 describe('Insights refresh contract', () => {
   it('uses the on-demand Life Wiki refresh path and refunds unusable refresh claims', () => {
-    const insights = read('pages/dashboard/Insights.tsx');
+    const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
 
-    expect(insights).toContain('refreshWikiOnDemand(notes)');
-    expect(insights).toContain('releaseClaimedFreeWikiInsight()');
-    expect(insights).toContain("source === 'none'");
-    expect(insights).toContain('pageCount === 0');
+    expect(lifeWiki).toContain('refreshWikiOnDemand(notes)');
+    expect(lifeWiki).toContain('releaseClaimedFreeWikiInsight()');
+    expect(lifeWiki).toContain("source === 'none'");
+    expect(lifeWiki).toContain('pageCount === 0');
   });
 
   it('shows inline feedback when the Life Wiki cannot be built or refresh fails', () => {
-    const insights = read('pages/dashboard/Insights.tsx');
+    const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
 
-    expect(insights).toContain('Nothing could be built yet');
-    expect(insights).toContain('Refresh failed');
-    expect(insights).toContain('<Alert');
+    expect(lifeWiki).toContain('Nothing could be built yet');
+    expect(lifeWiki).toContain('Refresh failed');
+    expect(lifeWiki).toContain('<Alert');
   });
 });

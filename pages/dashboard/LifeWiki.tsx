@@ -283,9 +283,9 @@ export const LifeWiki: React.FC = () => {
             ) : themes.length === 0 ? (
               <EmptyState
                 surface="flat"
-                illustration={<DotLottieReact src="/assets/lottie/Square Box.json" autoplay loop />}
-                title="Build your Life Wiki when you’re ready."
-                description="This stays on demand. Nothing is generated until you ask for it."
+                illustration={<DotLottieReact src="/assets/lottie/Level Up Animation.json" autoplay loop />}
+                title="Your wiki is ready for insights."
+                description="You have enough writing to build it. Nothing is generated until you ask."
                 action={
                   gate?.requiresUpgrade ? (
                     <Button variant="primary" onClick={() => navigate(RoutePath.ACCOUNT)}>

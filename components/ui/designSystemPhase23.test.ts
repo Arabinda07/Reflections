@@ -46,6 +46,7 @@ describe('phase 2/3 design-system rollout', () => {
     const myNotes = read('pages/dashboard/MyNotes.tsx');
     const singleNote = read('pages/dashboard/SingleNote.tsx');
     const insights = read('pages/dashboard/Insights.tsx');
+    const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
     const account = read('pages/dashboard/Account.tsx');
     const signIn = read('pages/auth/SignIn.tsx');
     const signUp = read('pages/auth/SignUp.tsx');
@@ -60,7 +61,7 @@ describe('phase 2/3 design-system rollout', () => {
     expect(singleNote).toContain('<ModalSheet');
 
     expect(insights).toContain('<SectionHeader');
-    expect(insights).toContain('<ModalSheet');
+    expect(lifeWiki).toContain('<ModalSheet');
 
     expect(account).toContain('<Alert');
     expect(account).not.toContain('alert(');

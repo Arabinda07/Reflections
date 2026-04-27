@@ -75,7 +75,7 @@ export const Landing: React.FC = () => {
               whileHover={{ y: -3, scale: 1.02 }}
               whileTap={{ scale: 0.98, y: 0 }}
               transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-              className="group h-16 w-auto px-10 text-[19px] font-black shadow-2xl shadow-green/30 hover:shadow-green/40 hover:bg-green-hover"
+              className="group h-16 w-auto px-10 font-editor text-[19px] font-bold shadow-2xl shadow-green/30 hover:shadow-green/40 hover:bg-green-hover"
               aria-label="Begin writing"
             >
               Begin writing

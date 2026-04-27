@@ -15,7 +15,6 @@ import {
   PaperPlaneTilt,
   CheckCircle
 } from '@phosphor-icons/react';
-import { ProfileModal } from '../components/ui/ProfileModal';
 import { RoutePath } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useKeyboardShortcut } from '../src/hooks/useKeyboardShortcut';

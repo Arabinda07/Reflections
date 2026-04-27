@@ -20,7 +20,7 @@ describe('PostHog integration contract', () => {
     const signUp = read('pages/auth/SignUp.tsx');
     const app = read('App.tsx');
     const createNote = read('pages/dashboard/CreateNote.tsx');
-    const insights = read('pages/dashboard/Insights.tsx');
+    const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
     const authContext = read('context/AuthContext.tsx');
 
     expect(signIn).toContain('trackGoogleAuthStarted');
@@ -28,7 +28,7 @@ describe('PostHog integration contract', () => {
     expect(app).toContain('trackGoogleAuthSucceeded');
     expect(app).toContain('trackGoogleAuthFailed');
     expect(createNote).toContain('trackNoteSaved');
-    expect(insights).toContain('trackLifeWikiRefreshed');
+    expect(lifeWiki).toContain('trackLifeWikiRefreshed');
     expect(authContext).toContain('identifyAnalyticsUser');
     expect(authContext).toContain('resetAnalyticsUser');
   });

@@ -1,9 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
-  Sparkle,
-  Brain,
   Calendar,
   Heart,
   TrendUp,
@@ -11,6 +9,7 @@ import {
   CaretRight,
   Hash,
 } from '@phosphor-icons/react';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { Button } from '../../components/ui/Button';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { MetadataPill } from '../../components/ui/MetadataPill';
@@ -22,6 +21,7 @@ import { noteService } from '../../services/noteService';
 import { wikiService } from '../../services/wikiService';
 import { profileService } from '../../services/profileService';
 import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
+import { FREE_WIKI_MINIMUM_ENTRIES, getWikiInsightsGate } from '../../services/wellnessPolicy';
 
 const MOOD_TONE_CLASSES: Record<string, { label: string; track: string; fill: string }> = {
   happy: { label: 'text-orange', track: 'bg-orange/10', fill: 'bg-orange' },
@@ -116,6 +116,15 @@ export const Insights: React.FC = () => {
       wordsWritten,
     };
   }, [notes]);
+
+  const wikiGate = useMemo(() => {
+    if (!access) return null;
+    return getWikiInsightsGate(access, notes.length);
+  }, [access, notes.length]);
+
+  const isWikiReadyToBuild = Boolean(
+    wikiGate?.canGenerate && notes.length >= FREE_WIKI_MINIMUM_ENTRIES && themes.length === 0,
+  );
 
   return (
     <>
@@ -287,19 +296,32 @@ export const Insights: React.FC = () => {
             </Surface>
           </div>
 
-          <Surface 
-            variant="flat" 
-            className="overflow-hidden group cursor-pointer border border-transparent hover:border-green/20 transition-all duration-300"
-            onClick={() => navigate(RoutePath.WIKI)}
+          <Surface
+            variant="flat"
+            className="overflow-hidden border border-transparent transition-all duration-300 hover:border-green/20"
           >
-            <div className="flex flex-col md:flex-row items-center justify-between p-8 md:p-12 gap-8">
+            <Link
+              to={RoutePath.WIKI}
+              className="group flex flex-col items-center justify-between gap-8 p-8 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 md:flex-row md:p-12"
+              aria-label="Open your Life Wiki"
+            >
               <div className="space-y-4">
-                <div className="icon-block icon-block-md">
-                  <Book size={26} weight="duotone" />
-                </div>
-                <h2 className="text-2xl font-display text-gray-text">Your Life Wiki</h2>
+                {isWikiReadyToBuild ? (
+                  <div className="h-24 w-24 overflow-hidden rounded-[var(--radius-panel)] bg-green/5">
+                    <DotLottieReact src="/assets/lottie/Level Up Animation.json" autoplay loop />
+                  </div>
+                ) : (
+                  <div className="icon-block icon-block-md">
+                    <Book size={26} weight="duotone" />
+                  </div>
+                )}
+                <h2 className="text-2xl font-display text-gray-text">
+                  {isWikiReadyToBuild ? 'Your wiki is ready for insights' : 'Your Life Wiki'}
+                </h2>
                 <p className="text-gray-light max-w-lg leading-relaxed">
-                  A dedicated editorial space where your scattered reflections are woven into clear, recurring themes.
+                  {isWikiReadyToBuild
+                    ? 'You have enough writing to build your first Life Wiki refresh when you choose.'
+                    : 'A dedicated editorial space where your scattered reflections are woven into clear, recurring themes.'}
                 </p>
               </div>
               
@@ -307,7 +329,7 @@ export const Insights: React.FC = () => {
                 Open Wiki
                 <CaretRight size={16} weight="bold" className="ml-2" />
               </div>
-            </div>
+            </Link>
           </Surface>
 
           {access?.planTier !== 'pro' && (

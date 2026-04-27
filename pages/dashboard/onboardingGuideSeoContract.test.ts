@@ -51,12 +51,15 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
 
   it('keeps the landing page in its full-bleed hero form', () => {
     const landing = read('pages/dashboard/Landing.tsx');
+    const tailwind = read('tailwind.config.js');
 
     expect(landing).not.toContain('usePWAInstall');
     expect(landing).not.toContain('Install app');
     expect(landing).toContain('Your mind,');
     expect(landing).toContain('beautifully');
     expect(landing).toContain('organized.');
+    expect(landing).toContain('font-editor');
+    expect(tailwind).toContain("editor: ['var(--font-editor)']");
     expect(landing).not.toContain('Plain answers');
     expect(landing).not.toContain('Last updated April 26, 2026');
   });

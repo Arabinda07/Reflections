@@ -31,6 +31,8 @@ describe('remaining roadmap contract', () => {
     const paperPlaneToast = read('components/ui/PaperPlaneToast.tsx');
     const companionObservation = read('components/ui/CompanionObservation.tsx');
     const notFound = read('pages/NotFound.tsx');
+    const myNotes = read('pages/dashboard/MyNotes.tsx');
+    const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
 
     expect(createNote).toContain('DotLottieReact');
     expect(createNote).toContain("from '@/src/lottie/trail-loading.json'");
@@ -40,7 +42,10 @@ describe('remaining roadmap contract', () => {
     expect(loadingState).toContain('loadingAnimation');
     expect(paperPlaneToast).toContain('DotLottieReact');
     expect(companionObservation).toContain('DotLottieReact');
-    expect(notFound).not.toContain('DotLottieReact');
+    expect(notFound).toContain('DotLottieReact');
+    expect(notFound).toContain('/assets/lottie/Error 404.json');
+    expect(myNotes).toContain('/assets/lottie/empty notes.json');
+    expect(lifeWiki).toContain('/assets/lottie/Level Up Animation.json');
   });
 
   it('keeps the library page on the shared loader and lazy calendar path', () => {
