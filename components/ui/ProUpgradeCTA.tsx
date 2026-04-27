@@ -128,7 +128,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ className = '', va
     'Early access to Pro features',
   ];
 
-  const SubscriptionModal = () => (
+  const renderSubscriptionModal = () => (
     <ModalSheet
       isOpen={isModalOpen}
       onClose={() => !isUnlocked && setIsModalOpen(false)}
@@ -140,13 +140,14 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ className = '', va
       <div className="px-6 sm:px-8 pb-6 pt-2 space-y-6">
         {!isUnlocked ? (
           <>
-            <div className="relative h-48 w-full overflow-hidden mb-6 bg-black rounded-2xl">
+            <div className="relative h-48 w-full overflow-hidden mb-6 bg-[#070b09] rounded-2xl transform-gpu">
               <video
                 src="/assets/videos/cycling.mp4"
                 autoPlay
                 loop
                 muted
                 playsInline
+                style={{ willChange: 'transform' }}
                 className="absolute inset-0 h-full w-full object-cover"
               />
             </div>
@@ -155,8 +156,8 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ className = '', va
               <button
                 type="button"
                 onClick={() => setSelectedPlan('monthly')}
-                className={`flex flex-col items-start p-4 rounded-xl border-2 transition-all ${
-                  selectedPlan === 'monthly' ? 'border-green bg-green/5' : 'border-border bg-white hover:border-green/50 dark:bg-[var(--body-bg)]'
+                className={`flex flex-col items-start p-4 rounded-xl border-2 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:shadow-lg ${
+                  selectedPlan === 'monthly' ? 'border-green bg-green/5 shadow-md shadow-green/10' : 'border-border bg-white hover:border-green/50 dark:bg-[var(--body-bg)]'
                 }`}
               >
                 <span className={`text-[12px] font-black uppercase tracking-widest ${selectedPlan === 'monthly' ? 'text-green' : 'text-gray-nav'}`}>Monthly</span>
@@ -166,8 +167,8 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ className = '', va
               <button
                 type="button"
                 onClick={() => setSelectedPlan('yearly')}
-                className={`flex flex-col items-start p-4 rounded-xl border-2 transition-all ${
-                  selectedPlan === 'yearly' ? 'border-green bg-green/5' : 'border-border bg-white hover:border-green/50 dark:bg-[var(--body-bg)]'
+                className={`flex flex-col items-start p-4 rounded-xl border-2 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:shadow-lg ${
+                  selectedPlan === 'yearly' ? 'border-green bg-green/5 shadow-md shadow-green/10' : 'border-border bg-white hover:border-green/50 dark:bg-[var(--body-bg)]'
                 }`}
               >
                 <div className="w-full flex justify-between items-center">
@@ -210,13 +211,14 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ className = '', va
           </>
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center animate-in fade-in zoom-in duration-700">
-            <div className="relative h-48 w-full overflow-hidden mb-8 bg-black rounded-3xl opacity-80 mix-blend-luminosity">
+            <div className="relative h-48 w-full overflow-hidden mb-8 bg-[#070b09] rounded-3xl opacity-80 mix-blend-luminosity transform-gpu">
               <video
                 src="/assets/videos/cycling.mp4"
                 autoPlay
                 loop
                 muted
                 playsInline
+                style={{ willChange: 'transform' }}
                 className="absolute inset-0 h-full w-full object-cover"
               />
               <div className="absolute inset-0 flex items-center justify-center bg-black/40">
@@ -267,7 +269,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ className = '', va
             Join Pro
           </Button>
 
-          <SubscriptionModal />
+          {renderSubscriptionModal()}
         </div>
       </div>
     );
@@ -304,7 +306,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ className = '', va
           </div>
         </div>
       </div>
-      <SubscriptionModal />
+      {renderSubscriptionModal()}
     </>
   );
 };

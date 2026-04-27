@@ -898,7 +898,7 @@ select:focus-visible,
 
   .modal-sheet-heading {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 0.9rem;
     flex: 1;
   }

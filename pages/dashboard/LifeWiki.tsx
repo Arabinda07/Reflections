@@ -166,9 +166,6 @@ export const LifeWiki: React.FC = () => {
   const [access, setAccess] = useState<WellnessAccess | null>(null);
   const [isRefreshingWiki, setIsRefreshingWiki] = useState(false);
   const [refreshFeedback, setRefreshFeedback] = useState<RefreshFeedback | null>(null);
-  const [showEntrance, setShowEntrance] = useState(
-    Boolean((location.state as { fromInsights?: boolean } | null)?.fromInsights),
-  );
 
   const loadData = async () => {
     try {
@@ -189,13 +186,6 @@ export const LifeWiki: React.FC = () => {
   useEffect(() => {
     void loadData();
   }, []);
-
-  useEffect(() => {
-    if (!showEntrance) return undefined;
-
-    const timeout = window.setTimeout(() => setShowEntrance(false), 1400);
-    return () => window.clearTimeout(timeout);
-  }, [showEntrance]);
 
   const gate = useMemo(() => {
     if (!access) return null;
@@ -376,7 +366,7 @@ export const LifeWiki: React.FC = () => {
 
   const renderEntrance = () => (
     <AnimatePresence>
-      {(showEntrance || isRefreshingWiki) && (
+      {isRefreshingWiki && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -411,13 +401,14 @@ export const LifeWiki: React.FC = () => {
       <>
         {renderEntrance()}
         <div className="fixed inset-0 pointer-events-none z-[-1] bg-surface/60 backdrop-blur-[60px]" style={{ willChange: 'backdrop-filter' }} />
-        <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden bg-body">
+        <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden bg-body transform-gpu">
           <video
             src="/assets/videos/cycling.mp4"
             autoPlay
             loop
             muted
             playsInline
+            style={{ willChange: 'transform' }}
             className="absolute inset-0 h-full w-full object-cover opacity-[0.25]"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-green/10 via-body/80 to-body" />
@@ -549,13 +540,14 @@ export const LifeWiki: React.FC = () => {
     <>
       {renderEntrance()}
       <div className="fixed inset-0 pointer-events-none z-[-1] bg-surface/60 backdrop-blur-[60px]" style={{ willChange: 'backdrop-filter' }} />
-      <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden bg-body">
+      <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden bg-body transform-gpu">
         <video
           src="/assets/videos/cycling.mp4"
           autoPlay
           loop
           muted
           playsInline
+          style={{ willChange: 'transform' }}
           className="absolute inset-0 h-full w-full object-cover opacity-[0.25]"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-green/10 via-body/80 to-body" />
@@ -590,10 +582,6 @@ export const LifeWiki: React.FC = () => {
           </div>
 
           <header className="mx-auto max-w-4xl space-y-5 border-b border-border/40 pb-8 text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[var(--radius-panel)] border border-white bg-white/40 shadow-sm backdrop-blur-xl">
-              <Book size={32} weight="duotone" className="text-green" />
-            </div>
-            <MetadataPill tone="green">Private reading room</MetadataPill>
             <h1 className="text-5xl font-display text-gray-text md:text-6xl">
               Your Life Wiki
             </h1>
