@@ -34,44 +34,62 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
     expect(home).toContain('aria-live="polite"');
   });
 
-  it('removes landing install prompts and adds machine-readable product answers', () => {
+  it('keeps onboarding centered and non-repetitive on mobile', () => {
+    const home = read('pages/dashboard/HomeAuthenticated.tsx');
+    const modalSheet = read('components/ui/ModalSheet.tsx');
+    const css = read('index.css');
+
+    expect(home).toContain('mobilePlacement="center"');
+    expect(home).toContain('title={currentOnboardingStep.title}');
+    expect(home).toContain('description={currentOnboardingStep.body}');
+    expect(home).not.toContain('<OnboardingIcon size={28} weight="duotone" />');
+
+    expect(modalSheet).toContain("mobilePlacement?: 'bottom' | 'center'");
+    expect(modalSheet).toContain('modal-sheet-root--center');
+    expect(css).toContain('.modal-sheet-root--center');
+  });
+
+  it('keeps the landing page in its full-bleed hero form', () => {
     const landing = read('pages/dashboard/Landing.tsx');
 
     expect(landing).not.toContain('usePWAInstall');
     expect(landing).not.toContain('Install app');
-    expect(landing).toContain('Last updated April 26, 2026');
-    expect(landing).toContain('What is Reflections?');
-    expect(landing).toContain('Who is Reflections for?');
-    expect(landing).toContain('Why writing first?');
+    expect(landing).toContain('Your mind,');
+    expect(landing).toContain('beautifully');
+    expect(landing).toContain('organized.');
+    expect(landing).not.toContain('Plain answers');
+    expect(landing).not.toContain('Last updated April 26, 2026');
   });
 
-  it('keeps install in the mobile menu only and adds global feedback mailto actions', () => {
+  it('keeps the original floating bug report and avoids footer feedback mailto actions', () => {
     const layout = read('layouts/DashboardLayout.tsx');
 
-    expect(layout).toContain('const SUPPORT_EMAIL');
-    expect(layout).toContain('openFeedbackDraft');
-    expect(layout).toContain('Send feedback');
-    expect(layout).toContain('mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent');
+    expect(layout).toContain("import emailjs from '@emailjs/browser';");
+    expect(layout).toContain('handleBugSubmit');
+    expect(layout).toContain('Floating Bug Report Button');
+    expect(layout).toContain('Report a bug');
+    expect(layout).not.toContain('openFeedbackDraft');
+    expect(layout).not.toContain('Send feedback');
     expect(layout).toContain('const { canInstall, isInstalled, triggerInstall } = usePWAInstall();');
     expect(layout).toContain('canInstall && !isInstalled');
     expect(layout).toContain('aria-label="Add Reflections to your home screen"');
   });
 
-  it('turns FAQ into an editorial guide that answers the required product questions', () => {
+  it('keeps the FAQ in its prior guide and feature-grid structure', () => {
     const faq = read('pages/dashboard/FAQ.tsx');
 
     expect(faq).toContain('Untangle your');
     expect(faq).toContain('thoughts.');
+    expect(faq).toContain('const guideSections');
+    expect(faq).toContain('const practiceItems');
+    expect(faq).toContain('const detailItems');
+    expect(faq).toContain('const featureGrid');
     expect(faq).toContain('What is Reflections?');
     expect(faq).toContain('Who is Reflections for?');
-    expect(faq).toContain('What does Reflections do?');
-    expect(faq).toContain('Is Reflections private?');
-    expect(faq).toContain('Does AI run automatically?');
-    expect(faq).toContain('Is Reflections therapy?');
-    expect(faq).toContain('No. Reflections is not therapy');
-    expect(faq).toContain('How do Free and Pro work?');
-    expect(faq).toContain('Can I export or keep ownership of my notes?');
+    expect(faq).toContain('Why writing first?');
     expect(faq).toContain('robinsaha434@gmail.com');
+    expect(faq).not.toContain('What does Reflections do?');
+    expect(faq).not.toContain('No. Reflections is not therapy');
   });
 
   it('publishes structured data for app, service, guide answers, and install help', () => {

@@ -571,9 +571,12 @@ export const HomeAuthenticated: React.FC = () => {
         isOpen={showOnboarding}
         onClose={handleCloseOnboarding}
         icon={<OnboardingIcon size={20} weight="duotone" />}
+        title={currentOnboardingStep.title}
+        description={currentOnboardingStep.body}
         size="lg"
+        mobilePlacement="center"
         closeLabel="Skip onboarding"
-        bodyClassName="pt-4 space-y-8"
+        bodyClassName="pt-3 space-y-6"
         footer={
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <Button variant="ghost" onClick={handleCloseOnboarding} aria-label="Skip onboarding">
@@ -594,46 +597,37 @@ export const HomeAuthenticated: React.FC = () => {
           </div>
         }
       >
-        <div className="space-y-6">
-          <div className="flex flex-wrap items-center gap-3">
+        <motion.div
+          key={currentOnboardingStep.title}
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: shouldReduceMotion ? 0 : 0.25, ease: [0.22, 1, 0.36, 1] }}
+          className="space-y-5"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="label-caps text-green" aria-live="polite">
               Step {onboardingStep + 1} of {ONBOARDING_STEPS.length}
             </p>
-            <div className="flex items-center gap-2" aria-hidden="true">
-              {ONBOARDING_STEPS.map((step, index) => (
-                <span
-                  key={step.label}
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    index === onboardingStep ? 'w-8 bg-green' : 'w-2 bg-green/20'
-                  }`}
-                />
-              ))}
-            </div>
+            <p className="text-[12px] font-black uppercase tracking-widest text-gray-nav">
+              {currentOnboardingStep.label}
+            </p>
           </div>
 
-          <motion.div
-            key={currentOnboardingStep.title}
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: shouldReduceMotion ? 0 : 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="space-y-5"
-          >
-            <div className="flex h-14 w-14 items-center justify-center rounded-[var(--radius-panel)] border border-green/10 bg-green/5 text-green">
-              <OnboardingIcon size={28} weight="duotone" />
-            </div>
-            <div className="space-y-3">
-              <p className="text-[12px] font-black uppercase tracking-widest text-gray-nav">
-                {currentOnboardingStep.label}
-              </p>
-              <h3 className="text-[32px] font-display leading-tight text-gray-text">
-                {currentOnboardingStep.title}
-              </h3>
-              <p className="max-w-2xl font-serif text-[18px] leading-relaxed text-gray-light">
-                {currentOnboardingStep.body}
-              </p>
-            </div>
-          </motion.div>
-        </div>
+          <div className="flex items-center gap-2" aria-hidden="true">
+            {ONBOARDING_STEPS.map((step, index) => (
+              <span
+                key={step.label}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  index === onboardingStep ? 'w-8 bg-green' : 'w-2 bg-green/20'
+                }`}
+              />
+            ))}
+          </div>
+
+          <p className="max-w-[34ch] font-medium leading-relaxed text-gray-light">
+            Move through the basics, then start writing when you are ready.
+          </p>
+        </motion.div>
       </ModalSheet>
 
       <div

@@ -831,6 +831,15 @@ select:focus-visible,
     padding: 1rem;
   }
 
+  .modal-sheet-root--center {
+    align-items: center;
+    padding: 1rem;
+  }
+
+  .modal-sheet-root--center .modal-sheet-handle {
+    display: none;
+  }
+
   @media (min-width: 640px) {
     .modal-sheet-root {
       align-items: center;

@@ -18,6 +18,7 @@ interface ModalSheetProps {
   panelClassName?: string;
   hideClose?: boolean;
   closeLabel?: string;
+  mobilePlacement?: 'bottom' | 'center';
 }
 
 const sizeClasses = {
@@ -41,6 +42,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
   panelClassName = '',
   hideClose = false,
   closeLabel = 'Close dialog',
+  mobilePlacement = 'bottom',
 }) => {
   const titleId = useId();
   const descriptionId = useId();
@@ -122,7 +124,11 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
   return createPortal(
     <AnimatePresence>
       {isOpen && (
-        <div className="modal-sheet-root">
+        <div
+          className={`modal-sheet-root ${
+            mobilePlacement === 'center' ? 'modal-sheet-root--center' : ''
+          }`.trim()}
+        >
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
