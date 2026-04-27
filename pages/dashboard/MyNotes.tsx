@@ -435,7 +435,6 @@ export const MyNotes: React.FC = () => {
         onClose={() => setIsConfirmOpen(false)}
         onConfirm={performDelete}
         title="Delete this reflection?"
-        description="This entry will be removed from your library permanently."
         confirmLabel={isDeleting ? 'Deleting...' : 'Delete note'}
         isConfirming={isDeleting}
         variant="danger"

@@ -122,7 +122,7 @@ function App() {
       try {
         await StatusBar.setOverlaysWebView({ overlay: false });
         await StatusBar.setStyle({ style: Style.Dark });
-        await StatusBar.setBackgroundColor({ color: '#121212' });
+        await StatusBar.setBackgroundColor({ color: '#282A27' });
         await StatusBar.show();
       } catch (error) {
         console.warn('[native] Failed to align the Android status bar.', error);

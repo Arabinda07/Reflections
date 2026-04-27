@@ -92,7 +92,6 @@ export const ResetPassword: React.FC = () => {
             <SectionHeader
               eyebrow="Recovery"
               title="Create a new password"
-              description="Choose a new password and step back into your writing without friction."
               icon={
                 <div className="icon-block icon-block-md">
                   <LockKey size={24} weight="duotone" />

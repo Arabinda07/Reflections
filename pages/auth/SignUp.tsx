@@ -148,7 +148,6 @@ export const SignUp: React.FC = () => {
             <SectionHeader
               eyebrow="Start gently"
               title="Create account"
-              description="Create your private writing space. Optional AI stays optional until you ask for it."
               icon={
                 <div className="icon-block icon-block-md">
                   <UserPlus size={24} weight="duotone" />

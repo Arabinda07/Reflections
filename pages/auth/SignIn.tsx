@@ -167,7 +167,6 @@ export const SignIn: React.FC = () => {
             <SectionHeader
               eyebrow="Welcome back"
               title="Sign in"
-              description="Come back to your writing space with the same calm flow you left."
               icon={
                 <div className="icon-block icon-block-md">
                   <Lock size={24} weight="duotone" />

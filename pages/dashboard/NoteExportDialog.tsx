@@ -46,7 +46,6 @@ export const NoteExportDialog: React.FC<NoteExportDialogProps> = ({
       isOpen={isOpen && Boolean(note)}
       onClose={onClose}
       title="Export note"
-      description="Download a local copy. Your saved reflection stays unchanged."
       icon={<Download size={20} weight="duotone" />}
       size="md"
       footer={

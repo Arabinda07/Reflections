@@ -11,8 +11,8 @@ const staggerContainer = {
 };
 
 const staggerLine = {
-  hidden: { opacity: 0, y: 60, filter: 'blur(10px)' },
-  show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] } },
+  hidden: { opacity: 0, y: 60 },
+  show: { opacity: 1, y: 0, transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] } },
 };
 
 export const Landing: React.FC = () => {
@@ -28,7 +28,7 @@ export const Landing: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-[100dvh] overflow-x-hidden selection:bg-green/20 selection:text-green bg-body text-gray-text transition-colors duration-300">
+    <main className="relative min-h-[100dvh] overflow-x-hidden selection:bg-green/20 selection:text-green bg-body text-gray-text transition-colors duration-300">
       {/* Full-bleed layered container */}
       <div className="min-h-[100dvh] w-full relative overflow-hidden">
 
@@ -42,13 +42,13 @@ export const Landing: React.FC = () => {
               animate="show"
               className="pointer-events-auto flex max-w-[11ch] flex-col text-mk-display font-display tracking-[-0.04em] text-gray-text leading-[0.92] sm:max-w-[12ch] sm:leading-[0.94] lg:max-w-5xl lg:leading-[0.96] text-balance"
             >
-              <motion.span variants={staggerLine} style={{ willChange: 'transform, opacity, filter' }}>
+              <motion.span variants={staggerLine} style={{ willChange: 'transform, opacity' }}>
                 Your mind,
               </motion.span>
-              <motion.span variants={staggerLine} className="font-serif italic text-green" style={{ lineHeight: 1.1, willChange: 'transform, opacity, filter' }}>
+              <motion.span variants={staggerLine} className="font-serif italic text-green" style={{ lineHeight: 1.1, willChange: 'transform, opacity' }}>
                 beautifully
               </motion.span>
-              <motion.span variants={staggerLine} style={{ willChange: 'transform, opacity, filter' }}>
+              <motion.span variants={staggerLine} style={{ willChange: 'transform, opacity' }}>
                 organized.
               </motion.span>
             </motion.div>
@@ -64,8 +64,8 @@ export const Landing: React.FC = () => {
           </div>
 
           <motion.div
-            initial={{ opacity: 0, y: 24, filter: 'blur(10px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.7 }}
             className="pointer-events-auto mt-auto flex w-full flex-col items-start gap-8 sm:max-w-none sm:flex-row sm:items-center sm:justify-between lg:mt-0"
           >
@@ -75,7 +75,7 @@ export const Landing: React.FC = () => {
               whileHover={{ y: -3, scale: 1.01 }}
               whileTap={{ scale: 0.98, y: 0 }}
               transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-              className="group h-14 w-auto px-8 text-[18px] font-black"
+              className="group h-14 w-auto px-8 text-[18px] font-serif font-bold italic"
               aria-label="Begin writing"
             >
               Begin writing
@@ -146,6 +146,6 @@ export const Landing: React.FC = () => {
           <source src="/assets/videos/landing_video.mp4" type="video/mp4" />
         </video>
       </motion.div>
-    </div>
+    </main>
   );
 };

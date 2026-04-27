@@ -58,7 +58,6 @@ export const TermsOfService: React.FC = () => {
 
         <SectionHeader
           title="Terms"
-          description="The basics of using Reflections—what you agree to, what we promise, and how to reach us."
         />
 
         <p className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-nav/50 -mt-6 mb-10">

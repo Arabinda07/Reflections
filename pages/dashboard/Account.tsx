@@ -311,7 +311,6 @@ export const Account: React.FC = () => {
           <SectionHeader
             eyebrow="Account"
             title="Your account settings"
-            description="Keep your profile, access, and privacy details in step with the same calm product experience."
             icon={
               <div className="icon-block icon-block-lg">
                 <User size={34} weight="duotone" />
@@ -557,7 +556,6 @@ export const Account: React.FC = () => {
         isOpen={showUpgradeSheet}
         onClose={() => setShowUpgradeSheet(false)}
         title="Join the Pro waitlist"
-        description="Billing is not open yet, but you can register your interest from here today."
         icon={<Sparkle size={20} weight="duotone" />}
         size="md"
         footer={
@@ -599,7 +597,6 @@ export const Account: React.FC = () => {
         isOpen={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
         title="Delete your saved writing"
-        description="You can erase stored writing and profile details here. Full sign-in account closure still needs a support request."
         icon={<Trash size={20} weight="duotone" />}
         size="md"
         footer={

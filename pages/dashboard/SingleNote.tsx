@@ -529,7 +529,6 @@ export const SingleNote: React.FC = () => {
         isOpen={isMoodOpen}
         onClose={() => setIsMoodOpen(false)}
         title="Reflection mood"
-        description="Let this reflection carry the feeling that belongs to it."
         size="sm"
       >
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -558,7 +557,6 @@ export const SingleNote: React.FC = () => {
         isOpen={isTagsOpen}
         onClose={() => setIsTagsOpen(false)}
         title="Reflection tags"
-        description="Keep this note easy to find without turning it into a dashboard."
         size="md"
         footer={
           <div className="flex flex-col gap-3 sm:flex-row">
@@ -602,7 +600,6 @@ export const SingleNote: React.FC = () => {
         isOpen={isTasksOpen}
         onClose={() => setIsTasksOpen(false)}
         title="Tasks tied to this reflection"
-        description="Capture the actions that came out of this note and keep them gentle."
         size="lg"
         footer={
           <div className="flex flex-col gap-3 sm:flex-row">
@@ -636,7 +633,6 @@ export const SingleNote: React.FC = () => {
         onClose={() => setIsConfirmOpen(false)}
         onConfirm={performDelete}
         title="Delete this reflection?"
-        description="This reflection and its attachments will be removed permanently."
         confirmLabel={isDeleting ? 'Deleting...' : 'Delete note'}
         isConfirming={isDeleting}
         variant="danger"

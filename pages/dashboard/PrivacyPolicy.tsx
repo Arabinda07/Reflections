@@ -62,7 +62,6 @@ export const PrivacyPolicy: React.FC = () => {
 
         <SectionHeader
           title="Privacy"
-          description="How we handle your writing, how AI interacts with it, and how you stay in control."
         />
 
         <p className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-nav/50 -mt-6 mb-10">

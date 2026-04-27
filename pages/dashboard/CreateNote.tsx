@@ -913,7 +913,6 @@ export const CreateNote: React.FC = () => {
         isOpen={isMobile && isMobileOptionsOpen}
         onClose={() => setIsMobileOptionsOpen(false)}
         title="Personalize"
-        description="Adjust the details around this reflection without leaving the page."
         size="sm"
         bodyClassName="pt-2"
       >
@@ -947,7 +946,6 @@ export const CreateNote: React.FC = () => {
         isOpen={isTasksOpen}
         onClose={() => setIsTasksOpen(false)}
         title="Tasks"
-        description="Keep the next small promises close to your reflection."
         icon={<ListChecks size={24} weight="bold" className="text-green" />}
         size="md"
         bodyClassName="max-h-[72vh] pt-2"
@@ -975,7 +973,6 @@ export const CreateNote: React.FC = () => {
         isOpen={isTagsOpen}
         onClose={() => setIsTagsOpen(false)}
         title="Tags"
-        description="Add a few words to anchor what this reflection is about."
         size="sm"
         bodyClassName="pt-2"
       >
@@ -1017,7 +1014,6 @@ export const CreateNote: React.FC = () => {
         isOpen={isMoodOpen}
         onClose={() => setIsMoodOpen(false)}
         title="Mood"
-        description="Name how this moment feels before you keep writing."
         size="sm"
         bodyClassName="pt-2"
       >
@@ -1050,7 +1046,6 @@ export const CreateNote: React.FC = () => {
         isOpen={isMusicOpen}
         onClose={() => setIsMusicOpen(false)}
         title="Sounds"
-        description={musicPlaying && activeMusicTrack ? `${activeMusicTrack.label} is playing in the background.` : 'Choose a soft soundscape for this reflection.'}
         size="sm"
         bodyClassName="pt-2"
       >
@@ -1090,7 +1085,6 @@ export const CreateNote: React.FC = () => {
         isOpen={Boolean(aiReflection)}
         onClose={() => setAiReflection(null)}
         title="AI reflection"
-        description="On demand only. Nothing is sent until you ask for it."
         icon={<Brain size={24} weight="duotone" className="text-green" />}
         size="lg"
         bodyClassName="pt-4"
@@ -1108,7 +1102,6 @@ export const CreateNote: React.FC = () => {
         onClose={handleStayOnDraft}
         onConfirm={handleLeaveDraft}
         title="Leave this draft?"
-        description="You have unsaved changes in this reflection. If you leave now, this draft will be lost."
         confirmLabel="Leave without saving"
         cancelLabel="Keep writing"
       />
