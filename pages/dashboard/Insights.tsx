@@ -142,22 +142,14 @@ export const Insights: React.FC = () => {
       <div className={`transition-opacity duration-1000 ${isTransitioning ? 'opacity-0 scale-[0.98]' : 'opacity-100 scale-100'}`}>
         <PageContainer className="pb-24 pt-4 md:pt-8">
         <div className="space-y-10">
-          <div className="sticky-bar">
-            <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate(RoutePath.HOME)}
-                className="text-gray-nav hover:text-gray-text font-bold text-[12px]"
-              >
-                <ArrowLeft className="mr-2 h-5 w-5 shrink-0" weight="bold" />
-                Back
-              </Button>
-              <MetadataPill icon={<Calendar size={12} weight="bold" />} tone="green">
-                {new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}
-              </MetadataPill>
-            </div>
-          </div>
+          <button 
+            onClick={() => navigate(RoutePath.HOME)}
+            className="surface-floating fixed left-4 z-[80] flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] transition-all hover:text-green"
+            style={{ top: 'calc(1.5rem + env(safe-area-inset-top))' }}
+            aria-label="Back"
+          >
+            <ArrowLeft size={20} weight="bold" />
+          </button>
 
           <SectionHeader
             title="Patterns in your writing"

@@ -415,17 +415,14 @@ export const LifeWiki: React.FC = () => {
         </div>
         <PageContainer size="narrow" className="pb-24 pt-4 md:pt-8 relative z-10">
           <div className="space-y-8">
-            <div className="sticky-bar">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate(RoutePath.SANCTUARY)}
-                className="text-gray-nav hover:text-gray-text font-bold text-[12px]"
-              >
-                <ArrowLeft className="mr-2 h-5 w-5 shrink-0" weight="bold" />
-                Back to Sanctuary
-              </Button>
-            </div>
+            <button 
+              onClick={() => navigate(RoutePath.SANCTUARY)}
+              className="surface-floating fixed left-4 z-[80] flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] transition-all hover:text-green"
+              style={{ top: 'calc(1.5rem + env(safe-area-inset-top))' }}
+              aria-label="Back to Sanctuary"
+            >
+              <ArrowLeft size={20} weight="bold" />
+            </button>
 
             {!articlePage ? (
               <EmptyState
@@ -555,31 +552,26 @@ export const LifeWiki: React.FC = () => {
 
       <PageContainer className="pb-24 pt-4 md:pt-8 relative z-10">
         <div className="space-y-10">
-          <div className="sticky-bar">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate(RoutePath.INSIGHTS)}
-              className="text-gray-nav hover:text-gray-text font-bold text-[12px]"
-            >
-              <ArrowLeft className="mr-2 h-5 w-5 shrink-0" weight="bold" />
-              Back to Insights
-            </Button>
+          <button 
+            onClick={() => navigate(RoutePath.INSIGHTS)}
+            className="surface-floating fixed left-4 z-[80] flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] transition-all hover:text-green"
+            style={{ top: 'calc(1.5rem + env(safe-area-inset-top))' }}
+            aria-label="Back to Insights"
+          >
+            <ArrowLeft size={20} weight="bold" />
+          </button>
 
-            {!gate?.requiresUpgrade ? (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-[11px] font-black text-green hover:text-green-hover uppercase tracking-widest"
-                onClick={handleRefreshWiki}
-                isLoading={isRefreshingWiki}
-                disabled={isRefreshingWiki || !gate?.canGenerate}
-              >
-                <Sparkle size={14} weight="fill" className="mr-2" />
-                Refresh with AI
-              </Button>
-            ) : null}
-          </div>
+          {!gate?.requiresUpgrade ? (
+            <button
+              onClick={handleRefreshWiki}
+              disabled={isRefreshingWiki || !gate?.canGenerate}
+              className="surface-floating fixed right-4 z-[80] flex h-11 items-center justify-center gap-2 rounded-full px-4 transition-all hover:text-green text-[11px] font-black uppercase tracking-widest text-green disabled:opacity-50"
+              style={{ top: 'calc(1.5rem + env(safe-area-inset-top))' }}
+            >
+              <Sparkle size={16} weight="fill" />
+              <span className="hidden sm:inline">Refresh with AI</span>
+            </button>
+          ) : null}
 
           <header className="mx-auto max-w-4xl space-y-5 border-b border-border/40 pb-8 text-center">
             <h1 className="text-5xl font-display text-gray-text md:text-6xl">

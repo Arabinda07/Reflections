@@ -290,25 +290,25 @@ export const SingleNote: React.FC = () => {
     <>
       <PageContainer className="pb-20 pt-4 md:pt-8">
         <div className="space-y-8 selection:bg-green/10">
-          <div className="sticky-bar">
+          <div className="sticky-bar !px-2 sm:!px-4">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigate(RoutePath.NOTES)}
-              className="text-gray-nav hover:text-gray-text font-bold text-[12px]"
+              className="text-gray-nav hover:text-gray-text font-bold text-[12px] !px-2 sm:!px-3"
               aria-label="Go back to my reflections"
             >
-              <ArrowLeft className="mr-2 h-5 w-5 shrink-0" weight="bold" />
-              Back
+              <ArrowLeft className="h-5 w-5 shrink-0 sm:mr-2" weight="bold" />
+              <span className="hidden sm:inline">Back</span>
             </Button>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
               <Button
                 variant="secondary"
                 size="md"
                 onClick={() => downloadNoteExport(note, 'md')}
                 disabled={isDeleting}
-                className="shadow-sm hover:border-green/20 hover:bg-green/5 !px-3 sm:!px-6"
+                className="shadow-sm hover:border-green/20 hover:bg-green/5 !px-3 sm:!px-4"
                 aria-label="Export this reflection"
               >
                 <Download weight="bold" className="h-5 w-5 shrink-0 text-green sm:mr-2" />
@@ -319,11 +319,11 @@ export const SingleNote: React.FC = () => {
                 size="md"
                 onClick={handleEdit}
                 disabled={isDeleting}
-                className="shadow-sm hover:border-green/20 hover:bg-green/5"
+                className="shadow-sm hover:border-green/20 hover:bg-green/5 !px-3 sm:!px-4"
                 aria-label="Edit this reflection"
               >
-                <PencilSimple weight="bold" className="mr-2 h-5 w-5 shrink-0 text-green" />
-                Edit
+                <PencilSimple weight="bold" className="h-5 w-5 shrink-0 text-green sm:mr-2" />
+                <span className="hidden sm:inline">Edit</span>
               </Button>
               <Button
                 variant="secondary"
@@ -331,11 +331,11 @@ export const SingleNote: React.FC = () => {
                 onClick={() => setIsConfirmOpen(true)}
                 isLoading={isDeleting}
                 disabled={isDeleting}
-                className="shadow-sm text-red hover:bg-red/5 hover:border-red/30"
+                className="shadow-sm text-red hover:bg-red/5 hover:border-red/30 !px-3 sm:!px-4"
                 aria-label="Delete this reflection"
               >
-                <Trash weight="bold" className="mr-2 h-5 w-5 shrink-0 text-red" />
-                Delete
+                <Trash weight="bold" className="h-5 w-5 shrink-0 text-red sm:mr-2" />
+                <span className="hidden sm:inline">Delete</span>
               </Button>
             </div>
           </div>
