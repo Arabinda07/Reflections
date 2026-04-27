@@ -392,7 +392,7 @@ export const LifeWiki: React.FC = () => {
             className="relative z-10 flex max-w-sm flex-col items-center px-6 text-center"
           >
             <div className="h-32 w-32 overflow-hidden rounded-[var(--radius-panel)] bg-green/5">
-              <DotLottieReact src="/assets/lottie/Level Up Animation.json" autoplay loop />
+              <DotLottieReact src="/assets/lottie/Level%20Up%20Animation.json" autoplay loop />
             </div>
             <h2 className="mt-6 text-4xl font-serif italic text-gray-text">
               {isRefreshingWiki ? 'Refreshing your Life Wiki...' : 'Opening Sanctuary'}

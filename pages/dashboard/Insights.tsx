@@ -7,6 +7,7 @@ import {
   TrendUp,
   Book,
   CaretRight,
+  CircleNotch,
   Hash,
 } from '@phosphor-icons/react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
@@ -318,7 +319,7 @@ export const Insights: React.FC = () => {
               <div className="space-y-4">
                 {isWikiReadyToBuild ? (
                   <div className="h-24 w-24 overflow-hidden rounded-[var(--radius-panel)] bg-green/5">
-                    <DotLottieReact src="/assets/lottie/Level Up Animation.json" autoplay loop />
+                    <DotLottieReact src="/assets/lottie/Level%20Up%20Animation.json" autoplay loop />
                   </div>
                 ) : (
                   <div className="icon-block icon-block-md">
