@@ -55,7 +55,7 @@ export const PrivacyPolicy: React.FC = () => {
   return (
     <PageContainer size="narrow" className="py-12 sm:py-16">
       <div className="space-y-10">
-        <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="-ml-2 text-gray-nav hover:text-green">
+        <Button variant="ghost" size="sm" onClick={() => navigate('/')} className="-ml-2 text-gray-nav hover:text-green">
           <ArrowLeft size={16} weight="bold" className="mr-2" />
           Back
         </Button>

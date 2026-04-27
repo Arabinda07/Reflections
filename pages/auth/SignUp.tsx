@@ -221,14 +221,14 @@ export const SignUp: React.FC = () => {
             <div className="space-y-3">
               {isVerifiedEmailAvailable() && (
                 <Button
-                  variant="primary"
+                  variant="secondary"
                   type="button"
                   onClick={handleVerifiedEmailLogin}
                   disabled={loading}
-                  className="w-full h-[52px] gap-3 bg-blue-600 hover:bg-blue-700 text-white border-none"
+                  className="w-full h-[52px] gap-3"
                 >
-                  <CheckCircle size={20} weight="fill" />
-                  <span className="font-bold">Continue with Verified Email</span>
+                  <CheckCircle size={20} weight="fill" className="text-green" />
+                  <span className="font-bold text-gray-text">Continue with Verified Email</span>
                 </Button>
               )}
 

@@ -309,9 +309,9 @@ export const LifeWiki: React.FC = () => {
         key={meta.pageType}
         className={`group relative h-full overflow-hidden rounded-[32px] transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
           page
-            ? 'border-[1.5px] border-white/20 bg-white/40 hover:-translate-y-2 hover:bg-white/60 hover:shadow-[0_20px_40px_-15px_rgba(22,163,74,0.15)] hover:border-green/30 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10'
+            ? 'border-[1.5px] border-border/50 bg-white/5 hover:-translate-y-2 hover:bg-white/10 hover:shadow-[0_20px_40px_-15px_rgba(22,163,74,0.15)] hover:border-green/30'
             : 'quiet placeholder border-[1.5px] border-dashed border-border/70 bg-transparent opacity-80'
-        } backdrop-blur-[20px]`}
+        }`}
       >
         {page ? (
           <Link
@@ -400,18 +400,8 @@ export const LifeWiki: React.FC = () => {
     return (
       <>
         {renderEntrance()}
-        <div className="fixed inset-0 pointer-events-none z-[-1] bg-surface/60 backdrop-blur-[60px]" style={{ willChange: 'backdrop-filter' }} />
-        <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden bg-body transform-gpu">
-          <video
-            src="/assets/videos/cycling.mp4"
-            autoPlay
-            loop
-            muted
-            playsInline
-            style={{ willChange: 'transform' }}
-            className="absolute inset-0 h-full w-full object-cover opacity-[0.25]"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-green/10 via-body/80 to-body" />
+        <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden bg-body">
+          <div className="absolute inset-0 bg-gradient-to-b from-green/5 via-body to-body opacity-50" />
         </div>
         <PageContainer size="narrow" className="pb-24 pt-4 md:pt-8 relative z-10">
           <div className="space-y-8">
@@ -536,18 +526,8 @@ export const LifeWiki: React.FC = () => {
   return (
     <>
       {renderEntrance()}
-      <div className="fixed inset-0 pointer-events-none z-[-1] bg-surface/60 backdrop-blur-[60px]" style={{ willChange: 'backdrop-filter' }} />
-      <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden bg-body transform-gpu">
-        <video
-          src="/assets/videos/cycling.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
-          style={{ willChange: 'transform' }}
-          className="absolute inset-0 h-full w-full object-cover opacity-[0.25]"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-green/10 via-body/80 to-body" />
+      <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden bg-body">
+        <div className="absolute inset-0 bg-gradient-to-b from-green/5 via-body to-body opacity-50" />
       </div>
 
       <PageContainer className="pb-24 pt-4 md:pt-8 relative z-10">
