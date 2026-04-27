@@ -540,53 +540,75 @@ export const HomeAuthenticated: React.FC = () => {
         onClose={handleCloseOnboarding}
         icon={<OnboardingIcon size={20} weight="duotone" />}
         title={currentOnboardingStep.title}
-        description={currentOnboardingStep.body}
         size="lg"
         mobilePlacement="center"
         closeLabel="Skip onboarding"
-        bodyClassName="pt-3 space-y-6"
+        bodyClassName="pt-4 sm:pt-5"
         footer={
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <Button variant="ghost" onClick={handleCloseOnboarding} aria-label="Skip onboarding">
+          <div className="onboarding-footer-actions flex flex-col gap-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCloseOnboarding}
+              aria-label="Skip onboarding"
+              className="self-center px-3 text-gray-nav/75 hover:text-green"
+            >
               Skip onboarding
             </Button>
-            <div className="flex gap-3">
+            <div className="flex items-center justify-between gap-3 sm:justify-between">
               <Button
                 variant="secondary"
                 onClick={handlePreviousOnboardingStep}
                 disabled={onboardingStep === 0}
+                className="min-w-[6.75rem]"
               >
                 Back
               </Button>
-              <Button variant="primary" onClick={handleNextOnboardingStep}>
+              <Button
+                variant="primary"
+                onClick={handleNextOnboardingStep}
+                className="min-w-[8.75rem]"
+              >
                 {isLastOnboardingStep ? 'Begin writing' : 'Next'}
               </Button>
             </div>
           </div>
         }
       >
-        <motion.div
-          key={currentOnboardingStep.title}
-          initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: shouldReduceMotion ? 0 : 0.25, ease: [0.22, 1, 0.36, 1] }}
-          className="space-y-4 pb-2"
-        >
-          <p className="label-caps text-green" aria-live="polite">
-            Step {onboardingStep + 1} of {ONBOARDING_STEPS.length}
-          </p>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={currentOnboardingStep.title}
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
+            animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+            exit={shouldReduceMotion ? undefined : { opacity: 0, y: -8 }}
+            transition={{
+              duration: shouldReduceMotion ? 0 : 0.24,
+              ease: [0.16, 1, 0.3, 1],
+            }}
+            className="onboarding-step-copy flex min-h-[13.5rem] flex-col gap-6 pb-1 sm:min-h-[14.5rem]"
+          >
+            <div className="space-y-3">
+              <p className="label-caps text-green" aria-live="polite">
+                Step {onboardingStep + 1} of {ONBOARDING_STEPS.length}
+              </p>
 
-          <div className="flex items-center gap-2" aria-hidden="true">
-            {ONBOARDING_STEPS.map((step, index) => (
-              <span
-                key={step.label}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  index === onboardingStep ? 'w-8 bg-green' : 'w-2 bg-green/20'
-                }`}
-              />
-            ))}
-          </div>
-        </motion.div>
+              <div className="grid grid-cols-4 gap-2" aria-hidden="true">
+                {ONBOARDING_STEPS.map((step, index) => (
+                  <span
+                    key={step.label}
+                    className={`h-1.5 rounded-full bg-green transition-opacity duration-300 ease-out-expo ${
+                      index <= onboardingStep ? 'opacity-100' : 'opacity-20'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <p className="max-w-[31rem] text-[1.0625rem] font-medium leading-8 text-gray-text sm:text-ui-lg sm:leading-[1.75]">
+              {currentOnboardingStep.body}
+            </p>
+          </motion.div>
+        </AnimatePresence>
       </ModalSheet>
 
       <div

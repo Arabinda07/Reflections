@@ -24,6 +24,7 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
     expect(home).toContain('const ONBOARDING_STEPS');
     expect(home).toContain('onboardingStep');
     expect(home).toContain('Step {onboardingStep + 1} of {ONBOARDING_STEPS.length}');
+    expect(home).toContain('onboarding-step-copy');
     expect(home).toContain('Skip onboarding');
     expect(home).toContain('Back');
     expect(home).toContain('Next');
@@ -41,7 +42,9 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
 
     expect(home).toContain('mobilePlacement="center"');
     expect(home).toContain('title={currentOnboardingStep.title}');
-    expect(home).toContain('description={currentOnboardingStep.body}');
+    expect(home).not.toContain('description={currentOnboardingStep.body}');
+    expect(home).toContain('onboarding-footer-actions');
+    expect(home).toContain('sm:justify-between');
     expect(home).not.toContain('<OnboardingIcon size={28} weight="duotone" />');
 
     expect(modalSheet).toContain("mobilePlacement?: 'bottom' | 'center'");
