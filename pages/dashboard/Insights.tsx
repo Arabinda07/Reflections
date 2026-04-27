@@ -147,7 +147,7 @@ export const Insights: React.FC = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate(-1)}
+                onClick={() => navigate(RoutePath.HOME)}
                 className="text-gray-nav hover:text-gray-text font-bold text-[12px]"
               >
                 <ArrowLeft className="mr-2 h-5 w-5 shrink-0" weight="bold" />

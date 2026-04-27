@@ -216,6 +216,7 @@ export const CreateNote: React.FC = () => {
   const [showPlane, setShowPlane] = useState(false);
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
   const [promptIndex, setPromptIndex] = useState(0);
+  const [smartModeEnabled, setSmartModeEnabled] = useState(false);
   const [baselineDraftSnapshot, setBaselineDraftSnapshot] = useState(() =>
     buildCreateNoteDraftSnapshot({
       title: '',
@@ -313,6 +314,11 @@ export const CreateNote: React.FC = () => {
   useEffect(() => {
     const fetchNote = async () => {
       try {
+        const access = await profileService.getWellnessAccess();
+        if (!isUnmounted.current) {
+          setSmartModeEnabled(access.smartModeEnabled);
+        }
+
         if (!id) {
           setBaselineDraftSnapshot(
             buildCreateNoteDraftSnapshot({
@@ -331,7 +337,6 @@ export const CreateNote: React.FC = () => {
           }, 1200);
           
           // Check note limit for new notes
-          const access = await profileService.getWellnessAccess();
           const allNotes = await noteService.getAll();
           const usage = getMonthlyNoteUsage(allNotes, access);
           if (!isUnmounted.current) {
@@ -464,7 +469,7 @@ export const CreateNote: React.FC = () => {
         finalThumbnailUrl = await storageService.uploadFile(file, user.id, 'notes', noteId);
       }
 
-      await noteService.update(noteId, {
+      const savedNote = await noteService.update(noteId, {
         title, content, mood, tags, tasks: syncedTasks,
         thumbnailUrl: finalThumbnailUrl || undefined,
         attachments: mergedAttachments
@@ -497,6 +502,14 @@ export const CreateNote: React.FC = () => {
         tagCount: tags.length,
         taskCount: tasks.length,
       });
+
+      if (smartModeEnabled) {
+        void noteService.getAll()
+          .then((allNotes) => aiService.autoIngestSavedNote(savedNote, allNotes))
+          .catch((error) => {
+            console.error('[CreateNote] Smart Mode auto-ingest failed:', error);
+          });
+      }
 
       const [totalCount, recentNotes] = await Promise.all([
         noteService.getCount(),

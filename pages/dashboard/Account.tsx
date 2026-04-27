@@ -33,6 +33,7 @@ import { offlineStorage } from '../../services/offlineStorage';
 import { useAuth } from '../../context/AuthContext';
 import { profileService } from '../../services/profileService';
 import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
+import { aiService, type GreatIngestProgress } from '../../services/aiService';
 
 const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
 
@@ -58,6 +59,8 @@ export const Account: React.FC = () => {
   const [feedback, setFeedback] = useState<FeedbackState>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeletingData, setIsDeletingData] = useState(false);
+  const [isSmartModeChanging, setIsSmartModeChanging] = useState(false);
+  const [greatIngestProgress, setGreatIngestProgress] = useState<GreatIngestProgress | null>(null);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
 
   const [formData, setFormData] = useState({
@@ -119,6 +122,10 @@ export const Account: React.FC = () => {
   }, [isSaved]);
 
   const membershipCopy = useMemo(() => {
+    if (access?.smartModeEnabled) {
+      return 'Smart Mode is on. Reflections can refresh your Life Wiki after saves while keeping manual Refresh with AI available.';
+    }
+
     if (access?.planTier === 'pro') {
       return 'Unlimited note writing plus on-demand AI reflections and Life Wiki refreshes are available.';
     }
@@ -219,6 +226,61 @@ export const Account: React.FC = () => {
         title: 'Password reset could not be sent.',
         description: 'Please try again in a moment.',
       });
+    }
+  };
+
+  const handleSmartModeToggle = async () => {
+    if (!access || isSmartModeChanging) return;
+
+    const nextEnabled = !access.smartModeEnabled;
+    setIsSmartModeChanging(true);
+    setGreatIngestProgress(null);
+    setFeedback(null);
+
+    try {
+      const updatedAccess = await profileService.setSmartModeEnabled(nextEnabled);
+      setAccess(updatedAccess);
+
+      if (!nextEnabled) {
+        setFeedback({
+          variant: 'info',
+          title: 'Smart Mode is off.',
+          description: 'Your existing Life Wiki stays readable. Future saves will not refresh it in the background.',
+        });
+        return;
+      }
+
+      try {
+        const notes = await noteService.getAll();
+        const result = await aiService.runGreatIngest(notes, {
+          onProgress: setGreatIngestProgress,
+        });
+
+        setFeedback({
+          variant: result.pageCount > 0 ? 'success' : 'warning',
+          title: result.pageCount > 0 ? 'Smart Mode is ready.' : 'Smart Mode is on.',
+          description:
+            result.pageCount > 0
+              ? 'Your Sanctuary has been refreshed from your saved notes. New saves can keep it up to date quietly.'
+              : 'There was not enough writing to build the Sanctuary yet. It will try again after future saves.',
+        });
+      } catch (ingestError) {
+        console.error(ingestError);
+        setFeedback({
+          variant: 'warning',
+          title: 'Smart Mode is on.',
+          description: 'The first Sanctuary refresh could not finish. Future saves will try again quietly.',
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      setFeedback({
+        variant: 'error',
+        title: 'Smart Mode could not be changed.',
+        description: 'Please try again in a moment.',
+      });
+    } finally {
+      setIsSmartModeChanging(false);
     }
   };
 
@@ -466,6 +528,51 @@ export const Account: React.FC = () => {
                         </div>
                         <MetadataPill>Coming soon</MetadataPill>
                       </div>
+                    </div>
+                  </div>
+                </Surface>
+
+                <Surface variant="bezel">
+                  <div className="p-6">
+                    <div className="mb-6 flex items-center gap-4">
+                      <div className="icon-block icon-block-md">
+                        <Sparkle size={24} weight="duotone" />
+                      </div>
+                      <div>
+                        <p className="text-[11px] font-black uppercase tracking-widest text-green">Sanctuary</p>
+                        <h3 className="text-[24px] font-display text-gray-text">Smart Mode</h3>
+                      </div>
+                    </div>
+
+                    <p className="text-[14px] font-medium leading-relaxed text-gray-light">
+                      Keep AI on demand by default, or let Smart Mode refresh the Life Wiki after saves. Your writing screen stays quiet either way.
+                    </p>
+
+                    {greatIngestProgress ? (
+                      <div className="mt-5 rounded-[var(--radius-panel)] border border-green/15 bg-green/5 p-4">
+                        <p className="text-[11px] font-black uppercase tracking-widest text-green">
+                          Preparing Sanctuary
+                        </p>
+                        <p className="mt-2 text-[14px] font-bold text-gray-text">
+                          Processing entry {greatIngestProgress.processedCount} of {greatIngestProgress.totalCount}
+                        </p>
+                      </div>
+                    ) : null}
+
+                    <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <MetadataPill tone={access?.smartModeEnabled ? 'green' : undefined}>
+                        {access?.smartModeEnabled ? 'Enabled' : 'Off'}
+                      </MetadataPill>
+                      <Button
+                        type="button"
+                        variant={access?.smartModeEnabled ? 'secondary' : 'primary'}
+                        size="sm"
+                        onClick={handleSmartModeToggle}
+                        isLoading={isSmartModeChanging}
+                        disabled={!access}
+                      >
+                        {access?.smartModeEnabled ? 'Turn off Smart Mode' : 'Enable Smart Mode'}
+                      </Button>
                     </div>
                   </div>
                 </Surface>

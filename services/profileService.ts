@@ -7,13 +7,21 @@ const getAuthenticatedUser = async () => {
   return user;
 };
 
+const mapWellnessAccess = (userId: string, data: any): WellnessAccess => ({
+  userId,
+  planTier: (data?.plan as PlanTier) || 'free',
+  freeAiReflectionsUsed: data?.free_ai_reflections_used || 0,
+  freeWikiInsightsUsed: data?.free_wiki_insights_used || 0,
+  smartModeEnabled: Boolean(data?.smart_mode_enabled),
+});
+
 export const profileService = {
   getWellnessAccess: async (): Promise<WellnessAccess> => {
     const user = await getAuthenticatedUser();
 
     const { data, error } = await supabase
       .from('profiles')
-      .select('plan, free_ai_reflections_used, free_wiki_insights_used')
+      .select('plan, free_ai_reflections_used, free_wiki_insights_used, smart_mode_enabled')
       .eq('id', user.id)
       .single();
 
@@ -25,15 +33,25 @@ export const profileService = {
         planTier: 'free',
         freeAiReflectionsUsed: 0,
         freeWikiInsightsUsed: 0,
+        smartModeEnabled: false,
       };
     }
 
-    return {
-      userId: user.id,
-      planTier: (data.plan as PlanTier) || 'free',
-      freeAiReflectionsUsed: data.free_ai_reflections_used || 0,
-      freeWikiInsightsUsed: data.free_wiki_insights_used || 0,
-    };
+    return mapWellnessAccess(user.id, data);
+  },
+
+  setSmartModeEnabled: async (enabled: boolean): Promise<WellnessAccess> => {
+    const user = await getAuthenticatedUser();
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({ smart_mode_enabled: enabled })
+      .eq('id', user.id)
+      .select('plan, free_ai_reflections_used, free_wiki_insights_used, smart_mode_enabled')
+      .single();
+
+    if (error) throw error;
+    return mapWellnessAccess(user.id, data);
   },
 
   incrementFreeAiReflections: async (): Promise<void> => {

@@ -62,6 +62,7 @@ export interface WellnessAccess {
   planTier: PlanTier;
   freeAiReflectionsUsed: number;
   freeWikiInsightsUsed: number;
+  smartModeEnabled: boolean;
 }
 
 export interface NoteUsage {

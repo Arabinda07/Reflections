@@ -20,6 +20,7 @@ create table if not exists profiles (
   newsletter_opt_in boolean default false,
   free_ai_reflections_used int default 0,
   free_wiki_insights_used int default 0,
+  smart_mode_enabled boolean default false,
   updated_at timestamp with time zone default timezone('utc'::text, now())
 );
 
@@ -162,6 +163,38 @@ create policy "Users can delete citations for own themes"
 
 
 -- ─────────────────────────────────────────────
+-- 4b. WIKI ABSORB LOG (Smart Mode hash tracking)
+-- ─────────────────────────────────────────────
+
+create table if not exists wiki_absorb_log (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) on delete cascade not null,
+  note_id uuid references notes(id) on delete cascade not null,
+  content_hash text not null,
+  absorbed_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  unique(user_id, note_id)
+);
+
+alter table wiki_absorb_log enable row level security;
+
+drop policy if exists "Users can view their own absorb log" on wiki_absorb_log;
+create policy "Users can view their own absorb log"
+  on wiki_absorb_log for select using (auth.uid() = user_id);
+
+drop policy if exists "Users can insert their own absorb log" on wiki_absorb_log;
+create policy "Users can insert their own absorb log"
+  on wiki_absorb_log for insert with check (auth.uid() = user_id);
+
+drop policy if exists "Users can update their own absorb log" on wiki_absorb_log;
+create policy "Users can update their own absorb log"
+  on wiki_absorb_log for update using (auth.uid() = user_id);
+
+drop policy if exists "Users can delete their own absorb log" on wiki_absorb_log;
+create policy "Users can delete their own absorb log"
+  on wiki_absorb_log for delete using (auth.uid() = user_id);
+
+
+-- ─────────────────────────────────────────────
 -- 5. STORAGE POLICIES (app-files bucket)
 -- ─────────────────────────────────────────────
 -- Assumes the bucket 'app-files' already exists.
@@ -240,6 +273,7 @@ create trigger tr_enforce_note_limit
 create or replace function delete_user_data()
 returns void as $$
 begin
+  delete from public.wiki_absorb_log where user_id = auth.uid();
   delete from public.theme_citations
     where theme_id in (select id from public.life_themes where user_id = auth.uid());
   delete from public.life_themes where user_id = auth.uid();
@@ -279,5 +313,13 @@ begin
     where table_name = 'profiles' and column_name = 'newsletter_opt_in'
   ) then
     alter table profiles add column newsletter_opt_in boolean default false;
+  end if;
+
+  -- Add smart_mode_enabled column to profiles if missing
+  if not exists (
+    select 1 from information_schema.columns
+    where table_name = 'profiles' and column_name = 'smart_mode_enabled'
+  ) then
+    alter table profiles add column smart_mode_enabled boolean default false;
   end if;
 end $$;

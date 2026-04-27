@@ -586,7 +586,7 @@ export const LifeWiki: React.FC = () => {
               Your Life Wiki
             </h1>
             <p className="mx-auto max-w-2xl text-[17px] font-medium leading-relaxed text-gray-light">
-              A dedicated Sanctuary library of AI-generated wiki pages, refreshed only when you ask and grounded in your saved notes.
+              A dedicated Sanctuary library of AI-generated wiki pages, refreshed when you ask or when Smart Mode is enabled.
             </p>
           </header>
 
@@ -641,6 +641,14 @@ export const LifeWiki: React.FC = () => {
                     : missingPrimaryPages.map((meta) => meta.label).join(', ')}
                 </p>
               </div>
+            </div>
+            <div className="mt-3 rounded-[var(--radius-panel)] border border-border/50 bg-white/5 p-4">
+              <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Mode</p>
+              <p className="mt-2 text-[14px] font-bold text-gray-text">
+                {access?.smartModeEnabled
+                  ? 'Smart Mode is on. Future saves can refresh this quietly.'
+                  : 'On demand. Use Refresh with AI when you want the library rebuilt.'}
+              </p>
             </div>
           </Surface>
 

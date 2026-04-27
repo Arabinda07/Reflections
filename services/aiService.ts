@@ -2,6 +2,7 @@ import type { LifeTheme, Note } from '../types';
 import { wikiService } from './wikiService';
 import { type WikiPageType } from './wikiTypes';
 import { aiClient } from './aiClient';
+import { absorbLogService } from './absorbLogService';
 
 export type WikiRefreshSource = 'themes' | 'notes' | 'none';
 
@@ -10,41 +11,65 @@ export interface WikiRefreshResult {
   source: WikiRefreshSource;
 }
 
+export interface GreatIngestProgress {
+  batchCount: number;
+  batchIndex: number;
+  processedCount: number;
+  totalCount: number;
+}
+
+export interface GreatIngestResult extends WikiRefreshResult {
+  batchCount: number;
+  processedCount: number;
+  totalCount: number;
+}
+
+export interface AutoIngestResult extends WikiRefreshResult {
+  skipped: boolean;
+}
+
+const SMART_MODE_BATCH_SIZE = 5;
+
 const WIKI_PAGE_CONFIGS: { pageType: WikiPageType; title: string; instruction: string }[] = [
   {
     pageType: 'people',
     title: 'People',
     instruction: `Write a compact wiki essay about the people, relationships, and social worlds that appear in the notes.
 Focus on recurring names, roles, tensions, support, and unresolved relationship patterns. Avoid diagnosis or certainty.
-Use inline source markers near grounded claims in this exact format: [source:note-id]. Max 420 words.`,
+Use an encyclopedic third-person tone. Do not summarize diary events; synthesize durable roles and relationships.
+Every grounded claim must carry an inline source marker in this exact format: [Source: note-id]. Max 420 words.`,
   },
   {
     pageType: 'patterns',
     title: 'Patterns',
     instruction: `Write a compact wiki essay about recurring emotional, practical, and attention patterns visible in the notes.
 Focus on repeated situations, rhythms, moods, triggers, and shifts over time. Avoid diagnosis or certainty.
-Use inline source markers near grounded claims in this exact format: [source:note-id]. Max 420 words.`,
+Use an encyclopedic third-person tone. Do not diagnose or turn patterns into certainty.
+Every grounded claim must carry an inline source marker in this exact format: [Source: note-id]. Max 420 words.`,
   },
   {
     pageType: 'philosophies',
     title: 'Philosophies',
     instruction: `Write a compact wiki essay about values, beliefs, principles, and ways of seeing life that show up in the notes.
 Focus on what the person seems to care about and the ideas they return to. Keep the language grounded and tentative.
-Use inline source markers near grounded claims in this exact format: [source:note-id]. Max 420 words.`,
+Use an encyclopedic third-person tone. Prefer careful synthesis over motivational language.
+Every grounded claim must carry an inline source marker in this exact format: [Source: note-id]. Max 420 words.`,
   },
   {
     pageType: 'eras',
     title: 'Eras',
     instruction: `Write a compact wiki essay about seasons, phases, transitions, and periods that appear across the notes.
 Focus on what changed, what repeated, and what may still be forming. Do not overstate the timeline if dates are thin.
-Use inline source markers near grounded claims in this exact format: [source:note-id]. Max 420 words.`,
+Use an encyclopedic third-person tone. Name eras only when the notes give enough signal.
+Every grounded claim must carry an inline source marker in this exact format: [Source: note-id]. Max 420 words.`,
   },
   {
     pageType: 'decisions',
     title: 'Decisions',
     instruction: `Write a compact wiki essay about meaningful decisions, open questions, commitments, and tradeoffs visible in the notes.
 Focus on choices already made, choices being considered, and what seems to make those choices difficult.
-Use inline source markers near grounded claims in this exact format: [source:note-id]. Max 420 words.`,
+Use an encyclopedic third-person tone. Preserve uncertainty around unresolved choices.
+Every grounded claim must carry an inline source marker in this exact format: [Source: note-id]. Max 420 words.`,
   },
 ];
 
@@ -60,10 +85,13 @@ const noteHasSignal = (note: Note) =>
       note.tasks?.length,
   );
 
+const sortNotesChronologically = (notes: Note[]) =>
+  [...notes].sort((left, right) => new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime());
+
+const getSignalNotes = (notes: Note[]) => sortNotesChronologically(notes.filter(noteHasSignal));
+
 const buildNotesCorpus = (notes: Note[]) =>
-  notes
-    .filter(noteHasSignal)
-    .sort((left, right) => new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime())
+  getSignalNotes(notes)
     .map((note) => {
       const plainTitle = stripHtml(note.title) || 'Untitled reflection';
       const plainContent = stripHtml(note.content);
@@ -133,6 +161,11 @@ const refreshStructuredWikiPages = async (allThemeContent: string): Promise<numb
   }
 
   return pageCount;
+};
+
+const ensureNoteInCorpus = (savedNote: Note, notes: Note[]) => {
+  if (notes.some((note) => note.id === savedNote.id)) return notes;
+  return [...notes, savedNote];
 };
 
 export const aiService = {
@@ -237,6 +270,88 @@ export const aiService = {
     return {
       pageCount,
       source: pageCount > 0 ? 'notes' : 'none',
+    };
+  },
+
+  /**
+   * Smart Mode's first run. It rebuilds the Sanctuary from saved notes in
+   * small chronological batches so the UI can show honest progress.
+   */
+  runGreatIngest: async (
+    notes: Note[],
+    options: { onProgress?: (progress: GreatIngestProgress) => void } = {},
+  ): Promise<GreatIngestResult> => {
+    const signalNotes = getSignalNotes(notes);
+    const totalCount = signalNotes.length;
+
+    if (totalCount === 0) {
+      return {
+        batchCount: 0,
+        pageCount: 0,
+        processedCount: 0,
+        source: 'none',
+        totalCount: 0,
+      };
+    }
+
+    const batchCount = Math.ceil(totalCount / SMART_MODE_BATCH_SIZE);
+    let processedNotes: Note[] = [];
+    let pageCount = 0;
+
+    for (let index = 0; index < batchCount; index += 1) {
+      const batch = signalNotes.slice(
+        index * SMART_MODE_BATCH_SIZE,
+        (index + 1) * SMART_MODE_BATCH_SIZE,
+      );
+      processedNotes = [...processedNotes, ...batch];
+
+      const notesCorpus = buildNotesCorpus(processedNotes);
+      pageCount = notesCorpus.trim() ? await refreshStructuredWikiPages(notesCorpus) : 0;
+
+      if (pageCount > 0) {
+        await absorbLogService.logAbsorptions(batch);
+      }
+
+      options.onProgress?.({
+        batchCount,
+        batchIndex: index + 1,
+        processedCount: processedNotes.length,
+        totalCount,
+      });
+    }
+
+    return {
+      batchCount,
+      pageCount,
+      processedCount: processedNotes.length,
+      source: pageCount > 0 ? 'notes' : 'none',
+      totalCount,
+    };
+  },
+
+  /**
+   * Smart Mode's steady state. This is intentionally fire-and-forget from the
+   * editor; the saved note is already durable before this runs.
+   */
+  autoIngestSavedNote: async (savedNote: Note, notes: Note[] = [savedNote]): Promise<AutoIngestResult> => {
+    const needsReAbsorb = await absorbLogService.needsReAbsorb(savedNote);
+    if (!needsReAbsorb) {
+      return {
+        pageCount: 0,
+        skipped: true,
+        source: 'none',
+      };
+    }
+
+    const refreshResult = await aiService.refreshWikiOnDemand(ensureNoteInCorpus(savedNote, notes));
+
+    if (refreshResult.pageCount > 0) {
+      await absorbLogService.logAbsorption(savedNote);
+    }
+
+    return {
+      ...refreshResult,
+      skipped: false,
     };
   },
 

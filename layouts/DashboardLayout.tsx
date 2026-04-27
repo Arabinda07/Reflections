@@ -202,6 +202,9 @@ export const DashboardLayout: React.FC = () => {
     location.pathname.includes('/new') ||
     location.pathname.includes('/edit') ||
     (location.pathname.startsWith('/notes/') && location.pathname !== '/notes/');
+  const isMobileNavSuppressedRoute =
+    location.pathname === RoutePath.INSIGHTS ||
+    location.pathname.startsWith(RoutePath.SANCTUARY);
   const isLandingRoute = location.pathname === RoutePath.HOME && !isAuthenticated;
   const landingControlClass = isLandingRoute
     ? 'surface-floating surface-floating--media'
@@ -216,7 +219,7 @@ export const DashboardLayout: React.FC = () => {
 
       {/* Navbar — flex-none keeps it outside the scroll container, no sticky needed */}
       {!isWritingRoute && (
-        <nav className={`z-[100] flex-none flex justify-center transition-colors duration-500 ${isLandingRoute ? 'landing-nav-scrim fixed left-0 right-0 top-0 pt-[env(safe-area-inset-top)]' : 'border-b border-border/80 bg-[rgba(var(--panel-bg-rgb),0.9)] pt-[env(safe-area-inset-top)]'}`}>
+        <nav className={`z-[100] flex-none ${isMobileNavSuppressedRoute ? 'hidden md:flex' : 'flex'} justify-center transition-colors duration-500 ${isLandingRoute ? 'landing-nav-scrim fixed left-0 right-0 top-0 pt-[env(safe-area-inset-top)]' : 'border-b border-border/80 bg-[rgba(var(--panel-bg-rgb),0.9)] pt-[env(safe-area-inset-top)]'}`}>
         <div className="w-full max-w-[1440px] px-4 md:px-10 h-14 flex items-center justify-between">
           {/* Left Side */}
           <div className="flex items-center gap-4">

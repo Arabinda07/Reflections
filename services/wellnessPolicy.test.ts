@@ -23,7 +23,7 @@ describe('wellnessPolicy', () => {
   });
 
   it('counts only notes from the current month', () => {
-    const access: WellnessAccess = { userId: '1', planTier: 'free', freeAiReflectionsUsed: 0, freeWikiInsightsUsed: 0 };
+    const access: WellnessAccess = { userId: '1', planTier: 'free', freeAiReflectionsUsed: 0, freeWikiInsightsUsed: 0, smartModeEnabled: false };
     const usage = getMonthlyNoteUsage([
       note('march', '2026-03-31T23:00:00.000Z'),
       note('april-one', '2026-04-01T00:00:00.000Z'),
@@ -45,6 +45,7 @@ describe('wellnessPolicy', () => {
       planTier: 'free',
       freeAiReflectionsUsed: 1,
       freeWikiInsightsUsed: 0,
+      smartModeEnabled: false,
     };
 
     expect(getAiReflectionGate(access, 2, true)).toEqual({
@@ -68,6 +69,7 @@ describe('wellnessPolicy', () => {
       planTier: 'free',
       freeAiReflectionsUsed: 0,
       freeWikiInsightsUsed: 0,
+      smartModeEnabled: false,
     };
 
     expect(getAiReflectionGate(access, 3, true)).toEqual({
@@ -83,6 +85,7 @@ describe('wellnessPolicy', () => {
       planTier: 'free',
       freeAiReflectionsUsed: 0,
       freeWikiInsightsUsed: 0,
+      smartModeEnabled: false,
     };
 
     expect(getWikiInsightsGate(access, 2)).toEqual<WikiInsightsGate>({
@@ -99,6 +102,7 @@ describe('wellnessPolicy', () => {
       planTier: 'free',
       freeAiReflectionsUsed: 1,
       freeWikiInsightsUsed: 0,
+      smartModeEnabled: false,
     };
 
     expect(getWikiInsightsGate(access, 3)).toEqual<WikiInsightsGate>({
@@ -114,6 +118,7 @@ describe('wellnessPolicy', () => {
       planTier: 'free',
       freeAiReflectionsUsed: 0,
       freeWikiInsightsUsed: 1,
+      smartModeEnabled: false,
     };
 
     expect(getWikiInsightsGate(access, 3)).toEqual<WikiInsightsGate>({
@@ -130,6 +135,7 @@ describe('wellnessPolicy', () => {
       planTier: 'pro',
       freeAiReflectionsUsed: 1,
       freeWikiInsightsUsed: 1,
+      smartModeEnabled: false,
     };
 
     expect(getWikiInsightsGate(access, 0)).toEqual<WikiInsightsGate>({
