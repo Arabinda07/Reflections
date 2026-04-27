@@ -61,7 +61,8 @@ describe('phase 2/3 design-system rollout', () => {
     expect(singleNote).toContain('<ModalSheet');
 
     expect(insights).toContain('<SectionHeader');
-    expect(lifeWiki).toContain('<ModalSheet');
+    expect(lifeWiki).toContain('<PageContainer');
+    expect(lifeWiki).toContain('<ReactMarkdown');
 
     expect(account).toContain('<Alert');
     expect(account).not.toContain('alert(');

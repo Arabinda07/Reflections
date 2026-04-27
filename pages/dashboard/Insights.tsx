@@ -301,7 +301,8 @@ export const Insights: React.FC = () => {
             className="overflow-hidden border border-transparent transition-all duration-300 hover:border-green/20"
           >
             <Link
-              to={RoutePath.WIKI}
+              to={RoutePath.SANCTUARY}
+              state={{ fromInsights: true }}
               className="group flex flex-col items-center justify-between gap-8 p-8 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 md:flex-row md:p-12"
               aria-label="Open your Life Wiki"
             >
@@ -321,12 +322,12 @@ export const Insights: React.FC = () => {
                 <p className="text-gray-light max-w-lg leading-relaxed">
                   {isWikiReadyToBuild
                     ? 'You have enough writing to build your first Life Wiki refresh when you choose.'
-                    : 'A dedicated editorial space where your scattered reflections are woven into clear, recurring themes.'}
+                    : 'A private reading room where AI-generated wiki pages stay grounded in your saved notes.'}
                 </p>
               </div>
               
               <div className="shrink-0 flex items-center justify-center h-12 px-6 rounded-[var(--radius-control)] bg-white/5 border border-border group-hover:bg-green/10 group-hover:border-green/30 group-hover:text-green transition-all duration-300 text-gray-text font-black text-[13px] uppercase tracking-widest">
-                Open Wiki
+                Open Sanctuary
                 <CaretRight size={16} weight="bold" className="ml-2" />
               </div>
             </Link>

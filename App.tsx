@@ -102,6 +102,22 @@ const router = createHashRouter(
           </ProtectedRoute>
         }
       />
+      <Route
+        path={RoutePath.SANCTUARY}
+        element={
+          <ProtectedRoute>
+            <LifeWiki />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={RoutePath.SANCTUARY_ARTICLE}
+        element={
+          <ProtectedRoute>
+            <LifeWiki />
+          </ProtectedRoute>
+        }
+      />
 
       <Route path="*" element={<NotFound />} />
     </Route>,

@@ -1,30 +1,35 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { AnimatePresence, motion } from 'motion/react';
+import ReactMarkdown from 'react-markdown';
 import {
   ArrowLeft,
-  Sparkle,
   Book,
   CaretRight,
   Hash,
+  Sparkle,
   Warning,
 } from '@phosphor-icons/react';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { Button } from '../../components/ui/Button';
 import { Alert } from '../../components/ui/Alert';
 import { EmptyState } from '../../components/ui/EmptyState';
-import { ModalSheet } from '../../components/ui/ModalSheet';
+import { MetadataPill } from '../../components/ui/MetadataPill';
 import { PageContainer } from '../../components/ui/PageContainer';
-import { SectionHeader } from '../../components/ui/SectionHeader';
 import { Surface } from '../../components/ui/Surface';
 import { LifeTheme, Note, RoutePath, WellnessAccess } from '../../types';
 import { noteService } from '../../services/noteService';
 import { wikiService } from '../../services/wikiService';
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
-import { useAuth } from '../../context/AuthContext';
 import { aiService } from '../../services/aiService';
 import { profileService } from '../../services/profileService';
 import { FREE_WIKI_MINIMUM_ENTRIES, getWikiInsightsGate } from '../../services/wellnessPolicy';
 import { trackLifeWikiRefreshed } from '../../src/analytics/events';
+import {
+  SANCTUARY_WIKI_PAGES,
+  SUPPORTING_WIKI_PAGES,
+  isUserVisibleWikiPage,
+  type WikiPageType,
+} from '../../services/wikiTypes';
 
 type RefreshFeedback = {
   variant: 'warning' | 'error';
@@ -32,39 +37,196 @@ type RefreshFeedback = {
   description: string;
 };
 
+type PageMeta = {
+  pageType: WikiPageType;
+  label: string;
+  description: string;
+};
+
+const SANCTUARY_META: PageMeta[] = [
+  {
+    pageType: 'people',
+    label: 'People',
+    description: 'Relationships, roles, and recurring names that appear in your notes.',
+  },
+  {
+    pageType: 'patterns',
+    label: 'Patterns',
+    description: 'Repeated situations, moods, rhythms, and attention loops.',
+  },
+  {
+    pageType: 'philosophies',
+    label: 'Philosophies',
+    description: 'Values, beliefs, principles, and ways of seeing life.',
+  },
+  {
+    pageType: 'eras',
+    label: 'Eras',
+    description: 'Seasons, transitions, and phases that seem to be forming.',
+  },
+  {
+    pageType: 'decisions',
+    label: 'Decisions',
+    description: 'Choices, open questions, commitments, and tradeoffs.',
+  },
+];
+
+const SUPPORTING_META: PageMeta[] = [
+  {
+    pageType: 'mood_patterns',
+    label: 'Mood Patterns',
+    description: 'The older generated mood summary, kept as supporting context.',
+  },
+  {
+    pageType: 'recurring_themes',
+    label: 'Recurring Themes',
+    description: 'The older generated theme summary, kept as supporting context.',
+  },
+  {
+    pageType: 'self_model',
+    label: 'Self Model',
+    description: 'The older generated self-model page, kept as supporting context.',
+  },
+  {
+    pageType: 'timeline',
+    label: 'Timeline',
+    description: 'The older generated timeline page, kept as supporting context.',
+  },
+];
+
+const SOURCE_LINK_PREFIX = 'source-note:';
+const SOURCE_MARKER_PATTERN = /\[source:([^\]]+)\]/gi;
+
+const articlePath = (pageType: WikiPageType) =>
+  RoutePath.SANCTUARY_ARTICLE.replace(':pageType', pageType);
+
+const notePath = (noteId: string) =>
+  RoutePath.NOTE_DETAIL.replace(':id', encodeURIComponent(noteId));
+
+const splitSourceIds = (rawIds: string) =>
+  rawIds
+    .split(/[,\s]+/)
+    .map((id) => id.trim())
+    .filter(Boolean);
+
+const extractSourceIds = (content: string) => {
+  const ids = new Set<string>();
+
+  content.replace(SOURCE_MARKER_PATTERN, (_match, rawIds: string) => {
+    splitSourceIds(rawIds).forEach((id) => ids.add(id));
+    return '';
+  });
+
+  return Array.from(ids);
+};
+
+const renderSourceMarkersAsLinks = (content: string) =>
+  content.replace(SOURCE_MARKER_PATTERN, (_match, rawIds: string) =>
+    splitSourceIds(rawIds)
+      .map((id) => `[source:${id}](${SOURCE_LINK_PREFIX}${encodeURIComponent(id)})`)
+      .join(' '),
+  );
+
+const stripSourceMarkers = (content: string) =>
+  content.replace(SOURCE_MARKER_PATTERN, '').replace(/\s+/g, ' ').trim();
+
+const previewText = (content: string) => {
+  const plainText = stripSourceMarkers(content)
+    .replace(/[#*_>`~[\]()]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (!plainText) return 'This page is quiet for now.';
+  return plainText.length > 160 ? `${plainText.slice(0, 157).trim()}...` : plainText;
+};
+
+const getLastRefreshLabel = (pages: LifeTheme[]) => {
+  const newest = pages
+    .map((page) => new Date(page.updatedAt).getTime())
+    .filter((time) => Number.isFinite(time))
+    .sort((left, right) => right - left)[0];
+
+  if (!newest) return 'Not refreshed yet';
+  return new Date(newest).toLocaleDateString();
+};
+
+const getPageMap = (pages: LifeTheme[]) =>
+  new Map(
+    pages
+      .filter((page) => isUserVisibleWikiPage(page.pageType))
+      .map((page) => [page.pageType, page]),
+  );
+
 export const LifeWiki: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { pageType } = useParams();
   const [notes, setNotes] = useState<Note[]>([]);
   const [themes, setThemes] = useState<LifeTheme[]>([]);
-  const [selectedTheme, setSelectedTheme] = useState<LifeTheme | null>(null);
   const [access, setAccess] = useState<WellnessAccess | null>(null);
   const [isRefreshingWiki, setIsRefreshingWiki] = useState(false);
   const [refreshFeedback, setRefreshFeedback] = useState<RefreshFeedback | null>(null);
+  const [showEntrance, setShowEntrance] = useState(
+    Boolean((location.state as { fromInsights?: boolean } | null)?.fromInsights),
+  );
+
+  const loadData = async () => {
+    try {
+      const [allNotes, allThemes, accessData] = await Promise.all([
+        noteService.getAll(),
+        wikiService.getAllThemes(),
+        profileService.getWellnessAccess(),
+      ]);
+
+      setNotes(allNotes);
+      setThemes(allThemes);
+      setAccess(accessData);
+    } catch (error) {
+      console.error('[LifeWiki] Failed to load data:', error);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [allNotes, allThemes, accessData] = await Promise.all([
-          noteService.getAll(),
-          wikiService.getAllThemes(),
-          profileService.getWellnessAccess(),
-        ]);
-
-        setNotes(allNotes);
-        setThemes(allThemes);
-        setAccess(accessData);
-      } catch (error) {
-        console.error('[LifeWiki] Failed to load data:', error);
-      }
-    };
-
-    fetchData();
+    void loadData();
   }, []);
+
+  useEffect(() => {
+    if (!showEntrance) return undefined;
+
+    const timeout = window.setTimeout(() => setShowEntrance(false), 1400);
+    return () => window.clearTimeout(timeout);
+  }, [showEntrance]);
 
   const gate = useMemo(() => {
     if (!access) return null;
     return getWikiInsightsGate(access, notes.length);
   }, [access, notes.length]);
+
+  const wikiPages = useMemo(
+    () => themes.filter((theme) => isUserVisibleWikiPage(theme.pageType)),
+    [themes],
+  );
+  const pageMap = useMemo(() => getPageMap(wikiPages), [wikiPages]);
+  const primaryPages = useMemo(
+    () => wikiPages.filter((theme) => SANCTUARY_WIKI_PAGES.includes(theme.pageType as (typeof SANCTUARY_WIKI_PAGES)[number])),
+    [wikiPages],
+  );
+  const supportingPages = useMemo(
+    () => wikiPages.filter((theme) => SUPPORTING_WIKI_PAGES.includes(theme.pageType as (typeof SUPPORTING_WIKI_PAGES)[number])),
+    [wikiPages],
+  );
+  const missingPrimaryPages = SANCTUARY_META.filter((meta) => !pageMap.has(meta.pageType));
+
+  const articlePageType =
+    pageType !== 'theme' && pageType !== 'index' && isUserVisibleWikiPage(pageType)
+      ? pageType
+      : null;
+  const articlePage = articlePageType ? pageMap.get(articlePageType) || null : null;
+  const articleMeta = [...SANCTUARY_META, ...SUPPORTING_META].find(
+    (meta) => meta.pageType === articlePageType,
+  );
+  const sourceIds = articlePage ? extractSourceIds(articlePage.content) : [];
+  const sourceNoteMap = useMemo(() => new Map(notes.map((note) => [note.id, note])), [notes]);
 
   const handleRefreshWiki = async () => {
     if (!gate?.canGenerate) return;
@@ -72,6 +234,7 @@ export const LifeWiki: React.FC = () => {
     setIsRefreshingWiki(true);
     setRefreshFeedback(null);
     let claimedFreeRefresh = false;
+
     try {
       if (access?.planTier !== 'pro') {
         claimedFreeRefresh = await profileService.incrementFreeWikiInsights();
@@ -105,18 +268,14 @@ export const LifeWiki: React.FC = () => {
         });
       }
 
-      const [allThemes, newAccess] = await Promise.all([
-        wikiService.getAllThemes(),
-        profileService.getWellnessAccess(),
-      ]);
-      setThemes(allThemes);
-      setAccess(newAccess);
+      await loadData();
     } catch (error) {
       if (claimedFreeRefresh) {
         await profileService.releaseClaimedFreeWikiInsight().catch((refundError) => {
           console.error('[LifeWiki] Failed to refund wiki refresh claim:', refundError);
         });
       }
+
       const newAccess = await profileService.getWellnessAccess().catch(() => access);
       setAccess(newAccess || null);
       setRefreshFeedback({
@@ -130,73 +289,273 @@ export const LifeWiki: React.FC = () => {
     }
   };
 
-  const selectedThemeParagraphs = useMemo(() => {
-    if (!selectedTheme) return [];
+  const sourceLink = (noteId: string, children: React.ReactNode) => {
+    const note = sourceNoteMap.get(noteId);
 
-    return selectedTheme.content
-      .split(/\n{2,}/)
-      .map((paragraph) => paragraph.trim())
-      .filter(Boolean);
-  }, [selectedTheme]);
+    if (!note) {
+      return (
+        <span className="inline-flex rounded-full border border-border/60 bg-white/5 px-2 py-0.5 text-[11px] font-black uppercase tracking-widest text-gray-light">
+          {children}
+        </span>
+      );
+    }
 
-  return (
-    <>
-      {/* Cinematic Background Scrim for Editorial Feel */}
-      <div className="fixed inset-0 pointer-events-none z-[-1] bg-surface/50 backdrop-blur-[60px]" />
-      <div className="fixed inset-0 pointer-events-none z-[-2] bg-gradient-to-b from-green/5 to-transparent" />
+    return (
+      <button
+        type="button"
+        onClick={() => navigate(notePath(noteId))}
+        className="inline-flex rounded-full border border-green/20 bg-green/5 px-2 py-0.5 text-[11px] font-black uppercase tracking-widest text-green transition-colors hover:border-green/40 hover:bg-green/10"
+      >
+        {children}
+      </button>
+    );
+  };
 
-      {/* Immersive Loading Video Overlay */}
-      <AnimatePresence>
-        {isRefreshingWiki && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-body"
+  const renderPageCard = (meta: PageMeta, page?: LifeTheme | null, isSupporting = false) => {
+    const sources = page ? extractSourceIds(page.content) : [];
+
+    return (
+      <Surface
+        key={meta.pageType}
+        variant={page ? 'floating' : 'flat'}
+        className={`group h-full border transition-all duration-300 ${
+          page
+            ? 'border-border/60 hover:border-green/30 hover:shadow-lg hover:shadow-green/5'
+            : 'quiet placeholder border-dashed border-border/70 opacity-80'
+        }`}
+      >
+        {page ? (
+          <Link
+            to={articlePath(meta.pageType)}
+            className="flex h-full min-h-[220px] flex-col justify-between p-6 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
           >
-            <video
-              src="/assets/videos/cycling.mp4"
-              className="absolute inset-0 h-full w-full object-cover opacity-40 mix-blend-screen"
-              autoPlay
-              loop
-              muted
-              playsInline
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-body via-body/40 to-body/20" />
-            
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.8 }}
-              className="relative z-10 text-center px-6"
-            >
-              <Sparkle size={32} weight="duotone" className="text-green mx-auto mb-6 animate-pulse" />
-              <h2 className="text-4xl md:text-5xl font-serif italic text-gray-text mb-4">Refining your Life Wiki</h2>
-              <p className="text-[12px] font-black uppercase tracking-widest text-gray-nav/60">
-                Finding the patterns in your reflections...
-              </p>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-[11px] font-black uppercase tracking-widest text-green/80">
+                  {isSupporting ? 'Supporting page' : 'Sanctuary page'}
+                </span>
+                <Hash size={14} weight="bold" className="text-green/40 transition-colors group-hover:text-green/80" />
+              </div>
+              <div className="space-y-3">
+                <h2 className="text-2xl font-display text-gray-text">{meta.label}</h2>
+                <p className="text-[14px] font-medium leading-relaxed text-gray-light">
+                  {previewText(page.content)}
+                </p>
+              </div>
+            </div>
 
-      <PageContainer className="pb-24 pt-4 md:pt-8 relative z-10">
-        <div className="space-y-10">
-          <div className="sticky-bar">
-            <div className="flex items-center gap-3">
+            <div className="mt-7 flex flex-wrap items-center justify-between gap-3 border-t border-border/40 pt-4">
+              <div className="flex flex-wrap gap-2">
+                <MetadataPill tone="green">{sources.length} source{sources.length === 1 ? '' : 's'}</MetadataPill>
+                <MetadataPill tone="green">Updated {new Date(page.updatedAt).toLocaleDateString()}</MetadataPill>
+              </div>
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-green/5 text-green transition-all duration-300 group-hover:bg-green group-hover:text-white">
+                <CaretRight size={14} weight="bold" />
+              </span>
+            </div>
+          </Link>
+        ) : (
+          <div className="flex h-full min-h-[220px] flex-col justify-between p-6">
+            <div className="space-y-4">
+              <span className="text-[11px] font-black uppercase tracking-widest text-gray-nav">
+                Waiting for signal
+              </span>
+              <div className="space-y-3">
+                <h2 className="text-2xl font-display text-gray-text">{meta.label}</h2>
+                <p className="text-[14px] font-medium leading-relaxed text-gray-light">
+                  {meta.description}
+                </p>
+              </div>
+            </div>
+            <p className="mt-7 border-t border-border/40 pt-4 text-[12px] font-medium text-gray-light">
+              Not enough here yet. This page will stay quiet until your notes can support it.
+            </p>
+          </div>
+        )}
+      </Surface>
+    );
+  };
+
+  const renderEntrance = () => (
+    <AnimatePresence>
+      {(showEntrance || isRefreshingWiki) && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.4 }}
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-body"
+        >
+          <div className="absolute inset-0 bg-gradient-to-b from-green/10 via-body to-body" />
+          <motion.div
+            initial={{ y: 18, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1, duration: 0.5 }}
+            className="relative z-10 flex max-w-sm flex-col items-center px-6 text-center"
+          >
+            <div className="h-32 w-32 overflow-hidden rounded-[var(--radius-panel)] bg-green/5">
+              <DotLottieReact src="/assets/lottie/Level Up Animation.json" autoplay loop />
+            </div>
+            <h2 className="mt-6 text-4xl font-serif italic text-gray-text">
+              {isRefreshingWiki ? 'Refreshing your Life Wiki...' : 'Opening Sanctuary'}
+            </h2>
+            <p className="mt-3 text-[12px] font-black uppercase tracking-widest text-gray-nav">
+              {isRefreshingWiki ? 'Reading only your saved notes' : 'A quiet threshold into the library'}
+            </p>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+
+  if (articlePageType) {
+    return (
+      <>
+        {renderEntrance()}
+        <div className="fixed inset-0 pointer-events-none z-[-1] bg-surface/50 backdrop-blur-[60px]" />
+        <PageContainer size="narrow" className="pb-24 pt-4 md:pt-8">
+          <div className="space-y-8">
+            <div className="sticky-bar">
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate(RoutePath.INSIGHTS)}
+                onClick={() => navigate(RoutePath.SANCTUARY)}
                 className="text-gray-nav hover:text-gray-text font-bold text-[12px]"
               >
                 <ArrowLeft className="mr-2 h-5 w-5 shrink-0" weight="bold" />
-                Back to Insights
+                Back to Sanctuary
               </Button>
             </div>
 
-            {themes.length > 0 && !gate?.requiresUpgrade ? (
+            {!articlePage ? (
+              <EmptyState
+                surface="flat"
+                icon={<Book size={24} weight="duotone" className="text-green" />}
+                title={`${articleMeta?.label || 'This page'} is quiet for now.`}
+                description="The library knows this room exists, but your notes have not given it enough to say yet."
+                action={
+                  <Button variant="ghost" onClick={() => navigate(RoutePath.SANCTUARY)}>
+                    Return to the library
+                  </Button>
+                }
+              />
+            ) : (
+              <article className="space-y-8">
+                <header className="border-b border-border/50 pb-8">
+                  <div className="mb-5 flex flex-wrap items-center gap-2">
+                    <MetadataPill tone="green">{articleMeta?.label || articlePage.title}</MetadataPill>
+                    <MetadataPill tone="green">Updated {new Date(articlePage.updatedAt).toLocaleDateString()}</MetadataPill>
+                    <MetadataPill tone="green">{sourceIds.length} source{sourceIds.length === 1 ? '' : 's'}</MetadataPill>
+                  </div>
+                  <h1 className="text-5xl font-display text-gray-text md:text-6xl">
+                    {articlePage.title}
+                  </h1>
+                  <p className="mt-4 max-w-2xl text-[16px] font-medium leading-relaxed text-gray-light">
+                    This AI-generated wiki page is based on notes you saved here. Source badges point back to the entries that can support a claim.
+                  </p>
+                </header>
+
+                <Surface variant="flat" className="p-6 md:p-8">
+                  <div className="space-y-5 font-serif text-[18px] leading-loose text-gray-text">
+                    <ReactMarkdown
+                      skipHtml
+                      components={{
+                        a: ({ href, children }) => {
+                          if (href?.startsWith(SOURCE_LINK_PREFIX)) {
+                            const noteId = decodeURIComponent(href.slice(SOURCE_LINK_PREFIX.length));
+                            return sourceLink(noteId, children);
+                          }
+
+                          return (
+                            <a href={href} className="text-green underline decoration-green/30 underline-offset-4">
+                              {children}
+                            </a>
+                          );
+                        },
+                        h1: ({ children }) => (
+                          <h2 className="mt-8 text-3xl font-display text-gray-text first:mt-0">{children}</h2>
+                        ),
+                        h2: ({ children }) => (
+                          <h2 className="mt-8 text-2xl font-display text-gray-text first:mt-0">{children}</h2>
+                        ),
+                        h3: ({ children }) => (
+                          <h3 className="mt-6 text-xl font-display text-gray-text">{children}</h3>
+                        ),
+                        p: ({ children }) => <p className="mb-5 last:mb-0">{children}</p>,
+                        ul: ({ children }) => <ul className="mb-5 list-disc space-y-2 pl-6">{children}</ul>,
+                        ol: ({ children }) => <ol className="mb-5 list-decimal space-y-2 pl-6">{children}</ol>,
+                      }}
+                    >
+                      {renderSourceMarkersAsLinks(articlePage.content)}
+                    </ReactMarkdown>
+                  </div>
+                </Surface>
+
+                <Surface variant="flat" className="p-6">
+                  <div className="mb-4 flex items-center gap-2">
+                    <Book size={18} weight="duotone" className="text-green" />
+                    <h2 className="text-[13px] font-black uppercase tracking-widest text-gray-nav">
+                      Source notes
+                    </h2>
+                  </div>
+                  {sourceIds.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {sourceIds.map((sourceId) => {
+                        const note = sourceNoteMap.get(sourceId);
+
+                        return note ? (
+                          <button
+                            key={sourceId}
+                            type="button"
+                            onClick={() => navigate(notePath(sourceId))}
+                            className="rounded-full border border-green/20 bg-green/5 px-3 py-2 text-[12px] font-bold text-green transition-colors hover:border-green/40 hover:bg-green/10"
+                          >
+                            {note.title || 'Untitled reflection'}
+                          </button>
+                        ) : (
+                          <span
+                            key={sourceId}
+                            className="rounded-full border border-border/60 bg-white/5 px-3 py-2 text-[12px] font-bold text-gray-light"
+                          >
+                            {sourceId}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="text-[13px] font-medium text-gray-light">
+                      This older page does not include inline source badges yet.
+                    </p>
+                  )}
+                </Surface>
+              </article>
+            )}
+          </div>
+        </PageContainer>
+      </>
+    );
+  }
+
+  return (
+    <>
+      {renderEntrance()}
+      <div className="fixed inset-0 pointer-events-none z-[-1] bg-surface/50 backdrop-blur-[60px]" />
+      <div className="fixed inset-0 pointer-events-none z-[-2] bg-gradient-to-b from-green/5 to-transparent" />
+
+      <PageContainer className="pb-24 pt-4 md:pt-8">
+        <div className="space-y-10">
+          <div className="sticky-bar">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate(RoutePath.INSIGHTS)}
+              className="text-gray-nav hover:text-gray-text font-bold text-[12px]"
+            >
+              <ArrowLeft className="mr-2 h-5 w-5 shrink-0" weight="bold" />
+              Back to Insights
+            </Button>
+
+            {!gate?.requiresUpgrade ? (
               <Button
                 variant="ghost"
                 size="sm"
@@ -206,175 +565,142 @@ export const LifeWiki: React.FC = () => {
                 disabled={isRefreshingWiki || !gate?.canGenerate}
               >
                 <Sparkle size={14} weight="fill" className="mr-2" />
-                {isRefreshingWiki ? 'Refreshing...' : 'Refresh with AI'}
+                Refresh with AI
               </Button>
             ) : null}
           </div>
 
-          <div className="max-w-4xl mx-auto space-y-12">
-            <header className="text-center space-y-6 pt-8 pb-12 border-b border-border/40">
-              <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-white/40 shadow-sm border border-white backdrop-blur-xl mb-4">
-                <Book size={32} weight="duotone" className="text-green" />
+          <header className="mx-auto max-w-4xl space-y-5 border-b border-border/40 pb-8 text-center">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[var(--radius-panel)] border border-white bg-white/40 shadow-sm backdrop-blur-xl">
+              <Book size={32} weight="duotone" className="text-green" />
+            </div>
+            <MetadataPill tone="green">Private reading room</MetadataPill>
+            <h1 className="text-5xl font-display text-gray-text md:text-6xl">
+              Your Life Wiki
+            </h1>
+            <p className="mx-auto max-w-2xl text-[17px] font-medium leading-relaxed text-gray-light">
+              A dedicated Sanctuary library of AI-generated wiki pages, refreshed only when you ask and grounded in your saved notes.
+            </p>
+          </header>
+
+          {gate?.requiresUpgrade ? (
+            <Alert
+              variant="warning"
+              icon={<Warning size={20} weight="fill" />}
+              title="You have used your free Life Wiki refresh."
+              description="You can still read what is already here. Upgrade when you want to keep refreshing it with AI."
+              actions={
+                <Button size="sm" variant="primary" className="font-black" onClick={() => navigate(RoutePath.ACCOUNT)}>
+                  See Pro options
+                </Button>
+              }
+            />
+          ) : null}
+
+          {refreshFeedback ? (
+            <Alert
+              variant={refreshFeedback.variant}
+              icon={<Warning size={20} weight="fill" />}
+              title={refreshFeedback.title}
+              description={refreshFeedback.description}
+            />
+          ) : null}
+
+          <Surface variant="flat" className="p-5">
+            <div className="mb-4 flex items-center gap-2">
+              <Sparkle size={18} weight="duotone" className="text-green" />
+              <h2 className="text-[13px] font-black uppercase tracking-widest text-gray-nav">
+                Signals
+              </h2>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="rounded-[var(--radius-panel)] border border-border/50 bg-white/5 p-4">
+                <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Entries</p>
+                <p className="mt-2 text-3xl font-display text-gray-text">{notes.length}</p>
               </div>
-              <h1 className="text-5xl md:text-6xl font-display text-gray-text tracking-tight leading-tight font-serif italic text-balance">
-                Your Life Wiki
-              </h1>
-              <p className="text-lg md:text-xl font-medium text-gray-light max-w-2xl mx-auto leading-relaxed">
-                A quiet, editorial sanctuary where your scattered reflections are woven into clear, recurring themes.
-              </p>
-            </header>
-
-            {gate?.requiresUpgrade ? (
-              <Alert
-                variant="warning"
-                icon={<Warning size={20} weight="fill" />}
-                title="You have used your free Life Wiki refresh."
-                description="You can still read what is already here. Upgrade when you want to keep refreshing it with AI."
-                actions={
-                  <Button size="sm" variant="primary" className="font-black" onClick={() => navigate(RoutePath.ACCOUNT)}>
-                    See Pro options
-                  </Button>
-                }
-              />
-            ) : null}
-
-            {refreshFeedback ? (
-              <Alert
-                variant={refreshFeedback.variant}
-                icon={<Warning size={20} weight="fill" />}
-                title={refreshFeedback.title}
-                description={refreshFeedback.description}
-              />
-            ) : null}
-
-            {notes.length === 0 ? (
-              <EmptyState
-                surface="flat"
-                icon={<Sparkle size={24} weight="duotone" className="text-orange" />}
-                title="This space is ready when your first reflection arrives."
-                description="Write your first note and this space will stay quiet until you choose to build the Life Wiki."
-                action={
-                  <Button variant="ghost" className="text-[12px] font-black uppercase tracking-widest text-green" onClick={() => navigate(RoutePath.CREATE_NOTE)}>
-                    Begin your first entry
-                  </Button>
-                }
-              />
-            ) : notes.length < FREE_WIKI_MINIMUM_ENTRIES ? (
-              <div className="flex flex-col items-center gap-6 py-12">
-                {gate && !gate.requiresUpgrade && gate.canGenerate ? (
-                  <Button
-                    variant="primary"
-                    onClick={handleRefreshWiki}
-                    isLoading={isRefreshingWiki}
-                    disabled={isRefreshingWiki}
-                    className="px-8"
-                  >
-                    <Sparkle size={16} weight="fill" className="mr-2" />
-                    {isRefreshingWiki ? 'Building...' : 'Refresh with AI'}
-                  </Button>
-                ) : null}
-                <EmptyState
-                  surface="flat"
-                  icon={<Sparkle size={24} weight="duotone" className="text-orange" />}
-                  title="Still gathering enough signal."
-                  description={`Write ${FREE_WIKI_MINIMUM_ENTRIES - notes.length} more ${FREE_WIKI_MINIMUM_ENTRIES - notes.length === 1 ? 'entry' : 'entries'} before the Life Wiki can say anything useful.`}
-                />
+              <div className="rounded-[var(--radius-panel)] border border-border/50 bg-white/5 p-4">
+                <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Generated pages</p>
+                <p className="mt-2 text-3xl font-display text-gray-text">{wikiPages.length}</p>
               </div>
-            ) : themes.length === 0 ? (
-              <EmptyState
-                surface="flat"
-                illustration={<DotLottieReact src="/assets/lottie/Level Up Animation.json" autoplay loop />}
-                title="Your wiki is ready for insights."
-                description="You have enough writing to build it. Nothing is generated until you ask."
-                action={
-                  gate?.requiresUpgrade ? (
-                    <Button variant="primary" onClick={() => navigate(RoutePath.ACCOUNT)}>
-                      See Pro options
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="primary"
-                      onClick={handleRefreshWiki}
-                      isLoading={isRefreshingWiki}
-                      disabled={isRefreshingWiki || !gate?.canGenerate}
-                    >
-                      {isRefreshingWiki ? 'Refreshing...' : 'Refresh with AI'}
-                    </Button>
-                  )
-                }
-              />
-            ) : (
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                {themes.map((theme) => (
-                  <Surface
-                    key={theme.id}
-                    variant="floating"
-                    className="group cursor-pointer transition-all duration-500 hover:shadow-xl hover:shadow-green/5 border border-border/60 hover:border-green/30"
-                  >
-                    <button
-                      type="button"
-                      onClick={() => setSelectedTheme(theme)}
-                      className="flex h-full w-full flex-col justify-between p-8 text-left"
-                    >
-                      <div>
-                        <div className="mb-4 flex items-center justify-between">
-                          <span className="text-[11px] font-black uppercase tracking-widest text-green/80">Life theme</span>
-                          <Hash size={14} weight="bold" className="text-green/40 group-hover:text-green/80 transition-colors" />
-                        </div>
-                        <h3 className="line-clamp-2 text-2xl font-serif italic leading-snug text-gray-text transition-colors group-hover:text-green">
-                          {theme.title}
-                        </h3>
-                      </div>
-
-                      <div className="mt-8 flex items-center justify-between border-t border-border/40 pt-4">
-                        <span className="text-[11px] font-medium text-gray-light uppercase tracking-wider">
-                          Updated {new Date(theme.updatedAt).toLocaleDateString()}
-                        </span>
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green/5 text-green transition-all duration-500 group-hover:bg-green group-hover:text-white">
-                          <CaretRight size={14} weight="bold" />
-                        </div>
-                      </div>
-                    </button>
-                  </Surface>
-                ))}
+              <div className="rounded-[var(--radius-panel)] border border-border/50 bg-white/5 p-4">
+                <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Last refresh</p>
+                <p className="mt-3 text-[14px] font-bold text-gray-text">{getLastRefreshLabel(wikiPages)}</p>
               </div>
-            )}
-          </div>
+              <div className="rounded-[var(--radius-panel)] border border-border/50 bg-white/5 p-4">
+                <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Still quiet</p>
+                <p className="mt-3 text-[14px] font-bold text-gray-text">
+                  {missingPrimaryPages.length === 0
+                    ? 'All five rooms have pages.'
+                    : missingPrimaryPages.map((meta) => meta.label).join(', ')}
+                </p>
+              </div>
+            </div>
+          </Surface>
+
+          {notes.length === 0 ? (
+            <EmptyState
+              surface="flat"
+              icon={<Sparkle size={24} weight="duotone" className="text-orange" />}
+              title="The Life Wiki is quiet for now."
+              description="Write your first note and this space will stay quiet until you choose to refresh it with AI."
+              action={
+                <Button variant="ghost" className="text-[12px] font-black uppercase tracking-widest text-green" onClick={() => navigate(RoutePath.CREATE_NOTE)}>
+                  Begin your first entry
+                </Button>
+              }
+            />
+          ) : notes.length < FREE_WIKI_MINIMUM_ENTRIES ? (
+            <EmptyState
+              surface="flat"
+              icon={<Sparkle size={24} weight="duotone" className="text-orange" />}
+              title="Still gathering enough signal."
+              description={`Write ${FREE_WIKI_MINIMUM_ENTRIES - notes.length} more ${FREE_WIKI_MINIMUM_ENTRIES - notes.length === 1 ? 'entry' : 'entries'} before the Life Wiki can say anything useful.`}
+            />
+          ) : null}
+
+          <section className="space-y-5">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-display text-gray-text">Sanctuary pages</h2>
+                <p className="mt-2 text-[14px] font-medium text-gray-light">
+                  The five main AI-generated wiki pages for this library.
+                </p>
+              </div>
+              {primaryPages.length === 0 && notes.length >= FREE_WIKI_MINIMUM_ENTRIES && !gate?.requiresUpgrade ? (
+                <Button
+                  variant="primary"
+                  onClick={handleRefreshWiki}
+                  isLoading={isRefreshingWiki}
+                  disabled={isRefreshingWiki || !gate?.canGenerate}
+                >
+                  <Sparkle size={16} weight="fill" className="mr-2" />
+                  Refresh with AI
+                </Button>
+              ) : null}
+            </div>
+
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+              {SANCTUARY_META.map((meta) => renderPageCard(meta, pageMap.get(meta.pageType)))}
+            </div>
+          </section>
+
+          {supportingPages.length > 0 ? (
+            <section className="space-y-5">
+              <div>
+                <h2 className="text-2xl font-display text-gray-text">Supporting shelf</h2>
+                <p className="mt-2 text-[14px] font-medium text-gray-light">
+                  Earlier generated summaries remain readable, but the five Sanctuary pages are the main surface.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                {SUPPORTING_META.filter((meta) => pageMap.has(meta.pageType)).map((meta) =>
+                  renderPageCard(meta, pageMap.get(meta.pageType), true),
+                )}
+              </div>
+            </section>
+          ) : null}
         </div>
       </PageContainer>
-
-      <ModalSheet
-        isOpen={Boolean(selectedTheme)}
-        onClose={() => setSelectedTheme(null)}
-        title={selectedTheme?.title}
-        description={
-          selectedTheme
-            ? `Compiled ${new Date(selectedTheme.updatedAt).toLocaleDateString()}.`
-            : undefined
-        }
-        icon={<Book size={24} weight="duotone" className="text-green" />}
-        size="xl"
-        footer={
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-[12px] font-medium italic text-gray-light">
-              This page evolves as you keep writing.
-            </p>
-            <Button size="sm" variant="ghost" className="text-[11px] font-black" onClick={() => setSelectedTheme(null)}>
-              Close entry
-            </Button>
-          </div>
-        }
-      >
-        {selectedTheme ? (
-          <div className="prose prose-slate max-w-none text-gray-text leading-loose font-serif text-[17px]">
-            {selectedThemeParagraphs.map((paragraph, index) => (
-              <p key={`${selectedTheme.id}-${index}`} className="whitespace-pre-line mb-6 last:mb-0">
-                {paragraph}
-              </p>
-            ))}
-          </div>
-        ) : null}
-      </ModalSheet>
     </>
   );
 };

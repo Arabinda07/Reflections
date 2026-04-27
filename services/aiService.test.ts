@@ -67,7 +67,7 @@ describe('aiService.refreshWikiOnDemand', () => {
     });
   });
 
-  it('refreshes structured pages from existing freeform themes when they exist', async () => {
+  it('refreshes the five Sanctuary pages from notes even when freeform themes exist', async () => {
     vi.mocked(wikiService.getUserThemes).mockResolvedValue([baseTheme()]);
 
     const refreshWikiOnDemand = (aiService as {
@@ -79,22 +79,31 @@ describe('aiService.refreshWikiOnDemand', () => {
 
     const result = await refreshWikiOnDemand([baseNote()]);
 
-    expect(result).toEqual({ pageCount: 4, source: 'themes' });
+    expect(result).toEqual({ pageCount: 5, source: 'notes' });
     expect(vi.mocked(aiClient.requestText)).toHaveBeenCalledWith(
       'wikiPage',
       expect.objectContaining({
-        allThemeContent: expect.stringContaining('## Growth'),
+        allThemeContent: expect.stringMatching(/Morning pages[\s\S]*Note id: note-1/),
       }),
     );
     expect(vi.mocked(wikiService.upsertWikiPage)).toHaveBeenCalledWith(
+      'people',
+      'People',
+      'People body',
+    );
+    expect(vi.mocked(wikiService.upsertWikiPage)).not.toHaveBeenCalledWith(
       'mood_patterns',
-      'Mood Patterns',
-      'Mood Patterns body',
+      expect.any(String),
+      expect.any(String),
     );
   });
 
-  it('builds structured pages from notes when no freeform themes exist yet', async () => {
+  it('asks for inline note-id source markers and skips empty generated pages', async () => {
     vi.mocked(wikiService.getUserThemes).mockResolvedValue([]);
+    vi.mocked(aiClient.requestText).mockImplementation(async (_action, payload) => {
+      const title = (payload as { title: string }).title;
+      return title === 'People' ? '' : `${title} body [source:note-1]`;
+    });
 
     const refreshWikiOnDemand = (aiService as {
       refreshWikiOnDemand?: (notes: Note[]) => Promise<{ pageCount: number; source: string }>;
@@ -109,7 +118,7 @@ describe('aiService.refreshWikiOnDemand', () => {
     expect(vi.mocked(aiClient.requestText)).toHaveBeenCalledWith(
       'wikiPage',
       expect.objectContaining({
-        allThemeContent: expect.stringContaining('Morning pages'),
+        instruction: expect.stringContaining('[source:note-id]'),
       }),
     );
     expect(vi.mocked(aiClient.requestText)).toHaveBeenCalledWith(
@@ -117,6 +126,11 @@ describe('aiService.refreshWikiOnDemand', () => {
       expect.objectContaining({
         allThemeContent: expect.not.stringContaining('<p>'),
       }),
+    );
+    expect(vi.mocked(wikiService.upsertWikiPage)).not.toHaveBeenCalledWith(
+      'people',
+      expect.any(String),
+      expect.any(String),
     );
   });
 });

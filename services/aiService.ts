@@ -12,42 +12,44 @@ export interface WikiRefreshResult {
 
 const WIKI_PAGE_CONFIGS: { pageType: WikiPageType; title: string; instruction: string }[] = [
   {
-    pageType: 'mood_patterns',
-    title: 'Mood Patterns',
-    instruction: `Extract and synthesise the recurring emotional states and triggers visible across the source material below.
-Focus on: what emotions come up repeatedly, what situations tend to cause them, and any shifts over time.
-Format: short paragraphs + bullet points. Max 300 words.`,
+    pageType: 'people',
+    title: 'People',
+    instruction: `Write a compact wiki essay about the people, relationships, and social worlds that appear in the notes.
+Focus on recurring names, roles, tensions, support, and unresolved relationship patterns. Avoid diagnosis or certainty.
+Use inline source markers near grounded claims in this exact format: [source:note-id]. Max 420 words.`,
   },
   {
-    pageType: 'recurring_themes',
-    title: 'Recurring Themes',
-    instruction: `Identify the topics and concerns this person keeps returning to across the source material below.
-Focus on: what subjects appear repeatedly, which ones seem unresolved, which ones show growth.
-Format: short paragraphs + bullet points. Max 300 words.`,
+    pageType: 'patterns',
+    title: 'Patterns',
+    instruction: `Write a compact wiki essay about recurring emotional, practical, and attention patterns visible in the notes.
+Focus on repeated situations, rhythms, moods, triggers, and shifts over time. Avoid diagnosis or certainty.
+Use inline source markers near grounded claims in this exact format: [source:note-id]. Max 420 words.`,
   },
   {
-    pageType: 'self_model',
-    title: 'Self Model',
-    instruction: `Build a concise picture of how this person sees themselves — their values, beliefs, and identity as revealed through the source material below.
-Focus on: how they describe themselves, what they care about, and any contradictions in self-perception.
-Format: short paragraphs. Max 300 words. Write in third person ("They...").`,
+    pageType: 'philosophies',
+    title: 'Philosophies',
+    instruction: `Write a compact wiki essay about values, beliefs, principles, and ways of seeing life that show up in the notes.
+Focus on what the person seems to care about and the ideas they return to. Keep the language grounded and tentative.
+Use inline source markers near grounded claims in this exact format: [source:note-id]. Max 420 words.`,
   },
   {
-    pageType: 'timeline',
-    title: 'Timeline',
-    instruction: `Extract the key moments, turning points, and shifts mentioned across the source material below.
-List them chronologically where possible.
-Format: bullet list, each item with approximate context. Max 300 words.`,
+    pageType: 'eras',
+    title: 'Eras',
+    instruction: `Write a compact wiki essay about seasons, phases, transitions, and periods that appear across the notes.
+Focus on what changed, what repeated, and what may still be forming. Do not overstate the timeline if dates are thin.
+Use inline source markers near grounded claims in this exact format: [source:note-id]. Max 420 words.`,
+  },
+  {
+    pageType: 'decisions',
+    title: 'Decisions',
+    instruction: `Write a compact wiki essay about meaningful decisions, open questions, commitments, and tradeoffs visible in the notes.
+Focus on choices already made, choices being considered, and what seems to make those choices difficult.
+Use inline source markers near grounded claims in this exact format: [source:note-id]. Max 420 words.`,
   },
 ];
 
 const stripHtml = (value = '') =>
   value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-
-const buildThemeCorpus = (themes: LifeTheme[]) =>
-  themes
-    .map((theme) => `## ${theme.title}\n${theme.content}`)
-    .join('\n\n---\n\n');
 
 const noteHasSignal = (note: Note) =>
   Boolean(
@@ -66,6 +68,7 @@ const buildNotesCorpus = (notes: Note[]) =>
       const plainTitle = stripHtml(note.title) || 'Untitled reflection';
       const plainContent = stripHtml(note.content);
       const metadata = [
+        `Note id: ${note.id}`,
         `Date: ${new Date(note.createdAt).toLocaleDateString('en-US', {
           month: 'short',
           day: 'numeric',
@@ -114,8 +117,10 @@ const refreshStructuredWikiPages = async (allThemeContent: string): Promise<numb
         allThemeContent,
       });
 
-      if (content) {
-        await wikiService.upsertWikiPage(config.pageType, config.title, content.trim());
+      const trimmedContent = content?.trim();
+
+      if (trimmedContent) {
+        await wikiService.upsertWikiPage(config.pageType, config.title, trimmedContent);
         pageCount += 1;
       }
     } catch (error) {
@@ -217,20 +222,9 @@ export const aiService = {
   },
 
   /**
-   * Rebuilds the structured wiki pages from either freeform themes or, when
-   * needed, directly from the user's notes.
+   * Rebuilds the primary Sanctuary pages directly from the user's saved notes.
    */
   refreshWikiOnDemand: async (notes: Note[]): Promise<WikiRefreshResult> => {
-    const userThemes = await wikiService.getUserThemes();
-
-    if (userThemes.length > 0) {
-      const pageCount = await refreshStructuredWikiPages(buildThemeCorpus(userThemes));
-      return {
-        pageCount,
-        source: pageCount > 0 ? 'themes' : 'none',
-      };
-    }
-
     const notesCorpus = buildNotesCorpus(notes);
     if (!notesCorpus.trim()) {
       return {

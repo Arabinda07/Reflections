@@ -87,7 +87,7 @@ create table if not exists life_themes (
   title text not null,
   content text default '',
   state text default 'active' check (state in ('active', 'archived', 'resolved')),
-  page_type text default 'theme' check (page_type in ('theme', 'mood_patterns', 'recurring_themes', 'self_model', 'timeline', 'index')),
+  page_type text default 'theme' check (page_type in ('theme', 'people', 'patterns', 'philosophies', 'eras', 'decisions', 'mood_patterns', 'recurring_themes', 'self_model', 'timeline', 'index')),
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
