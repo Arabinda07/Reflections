@@ -39,26 +39,8 @@
 }
 
 @font-face {
-  font-family: 'Fraunces';
-  src: url('/assets/fonts/Fraunces144ptSoft-SemiBold.woff2') format('woff2');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Fraunces';
-  src: url('/assets/fonts/Fraunces144ptSoft-Bold.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Fraunces';
-  src: url('/assets/fonts/Fraunces144ptSoft-Black.woff2') format('woff2');
-  font-weight: 900;
-  font-style: normal;
+  font-family: 'Feather Bold';
+  src: url('/assets/fonts/Feather Bold.woff2') format('woff2');
   font-display: swap;
 }
 
@@ -547,7 +529,7 @@ select:focus-visible,
   }
 
   .section-header-title {
-    font-family: 'Fraunces', 'Manrope', sans-serif;
+    font-family: 'Feather Bold', 'Manrope', sans-serif;
     font-size: clamp(2rem, 3vw + 1rem, 3.5rem);
     line-height: 0.98;
     letter-spacing: -0.04em;
