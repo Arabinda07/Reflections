@@ -11,6 +11,7 @@ import {
   Hash,
 } from '@phosphor-icons/react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '../../components/ui/Button';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { MetadataPill } from '../../components/ui/MetadataPill';
@@ -133,12 +134,13 @@ export const Insights: React.FC = () => {
     setIsTransitioning(true);
     setTimeout(() => {
       navigate(RoutePath.SANCTUARY, { state: { fromInsights: true } });
-    }, 1200);
+    }, 3500);
   };
 
   return (
-    <div className={`transition-opacity duration-1000 ${isTransitioning ? 'opacity-0 scale-[0.98]' : 'opacity-100 scale-100'}`}>
-      <PageContainer className="pb-24 pt-4 md:pt-8">
+    <>
+      <div className={`transition-opacity duration-1000 ${isTransitioning ? 'opacity-0 scale-[0.98]' : 'opacity-100 scale-100'}`}>
+        <PageContainer className="pb-24 pt-4 md:pt-8">
         <div className="space-y-10">
           <div className="sticky-bar">
             <div className="flex items-center gap-3">
@@ -361,6 +363,38 @@ export const Insights: React.FC = () => {
           )}
         </div>
       </PageContainer>
-    </div>
+      </div>
+
+      <AnimatePresence>
+        {isTransitioning && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-body"
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 10 }}
+              animate={{ scale: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+              className="flex flex-col items-center gap-8 px-6"
+            >
+              <div className="h-32 w-32 overflow-hidden rounded-[var(--radius-panel)] bg-green/5 border border-green/10 shadow-xl flex items-center justify-center">
+                <DotLottieReact src="/assets/lottie/Level%20Up%20Animation.json" autoplay loop />
+              </div>
+              <div className="text-center space-y-3">
+                <h2 className="text-3xl md:text-4xl font-serif italic text-gray-text">
+                  Preparing your Sanctuary
+                </h2>
+                <p className="text-[16px] text-gray-light max-w-xs mx-auto leading-relaxed">
+                  Synthesizing your reflections and finding the patterns...
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
