@@ -315,19 +315,18 @@ export const LifeWiki: React.FC = () => {
     const sources = page ? extractSourceIds(page.content) : [];
 
     return (
-      <Surface
+      <div
         key={meta.pageType}
-        variant={page ? 'floating' : 'flat'}
-        className={`group h-full border transition-all duration-300 ${
+        className={`group relative h-full overflow-hidden rounded-[32px] transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
           page
-            ? 'border-border/60 hover:border-green/30 hover:shadow-lg hover:shadow-green/5'
-            : 'quiet placeholder border-dashed border-border/70 opacity-80'
-        }`}
+            ? 'border-[1.5px] border-white/20 bg-white/40 hover:-translate-y-2 hover:bg-white/60 hover:shadow-[0_20px_40px_-15px_rgba(22,163,74,0.15)] hover:border-green/30 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10'
+            : 'quiet placeholder border-[1.5px] border-dashed border-border/70 bg-transparent opacity-80'
+        } backdrop-blur-[20px]`}
       >
         {page ? (
           <Link
             to={articlePath(meta.pageType)}
-            className="flex h-full min-h-[220px] flex-col justify-between p-6 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
+            className="flex h-full min-h-[260px] flex-col justify-between p-8 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 relative z-10"
           >
             <div className="space-y-4">
               <div className="flex items-center justify-between gap-4">
@@ -336,43 +335,42 @@ export const LifeWiki: React.FC = () => {
                 </span>
                 <Hash size={14} weight="bold" className="text-green/40 transition-colors group-hover:text-green/80" />
               </div>
-              <div className="space-y-3">
-                <h2 className="text-2xl font-display text-gray-text">{meta.label}</h2>
-                <p className="text-[14px] font-medium leading-relaxed text-gray-light">
+              <div className="space-y-4">
+                <h2 className="text-3xl md:text-4xl font-display text-gray-text">{meta.label}</h2>
+                <p className="text-[16px] font-serif italic leading-relaxed text-gray-text/70 line-clamp-3">
                   {previewText(page.content)}
                 </p>
               </div>
             </div>
 
-            <div className="mt-7 flex flex-wrap items-center justify-between gap-3 border-t border-border/40 pt-4">
-              <div className="flex flex-wrap gap-2">
+            <div className="mt-8 flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-border/40">
+              <div className="flex flex-wrap gap-2 pt-4">
                 <MetadataPill tone="green">{sources.length} source{sources.length === 1 ? '' : 's'}</MetadataPill>
-                <MetadataPill tone="green">Updated {new Date(page.updatedAt).toLocaleDateString()}</MetadataPill>
               </div>
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-green/5 text-green transition-all duration-300 group-hover:bg-green group-hover:text-white">
-                <CaretRight size={14} weight="bold" />
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/50 text-green transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:bg-green group-hover:text-white group-hover:scale-110 shadow-sm mt-4">
+                <CaretRight size={16} weight="bold" />
               </span>
             </div>
           </Link>
         ) : (
-          <div className="flex h-full min-h-[220px] flex-col justify-between p-6">
+          <div className="flex h-full min-h-[260px] flex-col justify-between p-8 relative z-10">
             <div className="space-y-4">
               <span className="text-[11px] font-black uppercase tracking-widest text-gray-nav">
                 Waiting for signal
               </span>
               <div className="space-y-3">
-                <h2 className="text-2xl font-display text-gray-text">{meta.label}</h2>
-                <p className="text-[14px] font-medium leading-relaxed text-gray-light">
+                <h2 className="text-3xl md:text-4xl font-display text-gray-text opacity-50">{meta.label}</h2>
+                <p className="text-[15px] font-medium leading-relaxed text-gray-light">
                   {meta.description}
                 </p>
               </div>
             </div>
-            <p className="mt-7 border-t border-border/40 pt-4 text-[12px] font-medium text-gray-light">
+            <p className="mt-8 border-t border-border/40 pt-4 text-[12px] font-medium text-gray-light">
               Not enough here yet. This page will stay quiet until your notes can support it.
             </p>
           </div>
         )}
-      </Surface>
+      </div>
     );
   };
 
@@ -412,8 +410,19 @@ export const LifeWiki: React.FC = () => {
     return (
       <>
         {renderEntrance()}
-        <div className="fixed inset-0 pointer-events-none z-[-1] bg-surface/50 backdrop-blur-[60px]" />
-        <PageContainer size="narrow" className="pb-24 pt-4 md:pt-8">
+        <div className="fixed inset-0 pointer-events-none z-[-1] bg-surface/60 backdrop-blur-[40px]" />
+        <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden">
+          <video
+            src="/assets/videos/cycling.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 h-full w-full object-cover opacity-[0.15] filter blur-3xl scale-110"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-green/5 via-body/80 to-body" />
+        </div>
+        <PageContainer size="narrow" className="pb-24 pt-4 md:pt-8 relative z-10">
           <div className="space-y-8">
             <div className="sticky-bar">
               <Button
@@ -539,10 +548,20 @@ export const LifeWiki: React.FC = () => {
   return (
     <>
       {renderEntrance()}
-      <div className="fixed inset-0 pointer-events-none z-[-1] bg-surface/50 backdrop-blur-[60px]" />
-      <div className="fixed inset-0 pointer-events-none z-[-2] bg-gradient-to-b from-green/5 to-transparent" />
+      <div className="fixed inset-0 pointer-events-none z-[-1] bg-surface/60 backdrop-blur-[40px]" />
+      <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden">
+        <video
+          src="/assets/videos/cycling.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 h-full w-full object-cover opacity-[0.15] filter blur-3xl scale-110"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-green/5 via-body/80 to-body" />
+      </div>
 
-      <PageContainer className="pb-24 pt-4 md:pt-8">
+      <PageContainer className="pb-24 pt-4 md:pt-8 relative z-10">
         <div className="space-y-10">
           <div className="sticky-bar">
             <Button

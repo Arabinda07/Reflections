@@ -390,108 +390,126 @@ export const HomeAuthenticated: React.FC = () => {
             </button>
           </motion.div>
           
-          {/* Intentions Card */}
+          {/* Daily Focus & Intentions Card */}
           <motion.div 
             variants={bentoItemVariants}
-            className="p-8 sm:p-12 lg:p-16 border-b lg:border-b-0 lg:border-r border-border/40 flex flex-col justify-start h-full bg-white/30 dark:bg-white/8 overflow-hidden"
+            className="p-8 sm:p-12 lg:p-16 border-b lg:border-b-0 lg:border-r border-border/40 flex flex-col justify-between h-full bg-white/30 dark:bg-white/8 overflow-hidden"
           >
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2 text-gray-nav">
-                <ListChecks size={18} weight="bold" className="text-green" />
-                <span className="text-[11px] font-black uppercase tracking-[0.2em] opacity-60">
-                  Your Intentions
-                </span>
+            <div>
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-2 text-gray-nav">
+                  <Target size={18} weight="bold" className="text-green" />
+                  <span className="text-[11px] font-black uppercase tracking-widest opacity-60">
+                    Daily Focus
+                  </span>
+                </div>
+                <button
+                  onClick={refreshPrompt}
+                  className={`flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] text-gray-nav transition-colors hover:text-green ${
+                    isRefreshing ? 'animate-spin' : ''
+                  }`}
+                  aria-label="Refresh daily focus prompt"
+                >
+                  <ArrowsClockwise size={20} weight="bold" />
+                </button>
+              </div>
+
+              <div className="space-y-8 mb-12">
+                <p
+                  className="text-2xl md:text-3xl text-gray-text font-serif italic leading-relaxed"
+                  style={{ opacity: isRefreshing ? 0 : 1, transition: 'opacity 0.4s ease' }}
+                >
+                  {dailyPrompt}
+                </p>
+                <Button
+                  variant="primary"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="h-14 w-full md:w-auto px-8 rounded-xl text-[15px] font-bold bg-green text-white hover:bg-green/90 transition-colors shadow-none"
+                  onClick={() => handleCreateClick(dailyPrompt)}
+                  aria-label="Start a new reflection with this prompt"
+                >
+                  Start Reflection
+                  <Plus size={18} weight="bold" className="ml-2" />
+                </Button>
               </div>
             </div>
 
-            <div className="mb-6 rounded-[var(--radius-panel)] border border-border/40 bg-panel-bg px-5 py-4">
-              <p className="text-[10px] font-black uppercase tracking-widest text-gray-nav/50">
-                Task summary
-              </p>
-              <p className="mt-2 flex items-baseline gap-2 text-gray-text">
-                <span className="text-4xl font-display tabular-nums tracking-tight">
-                  {intentionSummary.openCount}
-                </span>
-                <span className="text-[13px] font-black uppercase tracking-widest text-gray-nav">
-                  open {intentionSummary.openCount === 1 ? 'task' : 'tasks'}
-                </span>
-              </p>
-              {intentionSummary.completedCount > 0 ? (
-                <p className="mt-1 text-[12px] font-medium text-gray-light">
-                  {intentionSummary.completedCount} settled in your notes.
-                </p>
-              ) : null}
-            </div>
-
-            <div className="space-y-3">
-              <AnimatePresence mode="popLayout">
-                {intentionSummary.items.length > 0 ? (
-                  intentionSummary.items.map((intention) => (
-                    <motion.button
-                      key={intention.id}
-                      layout
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="group w-full flex items-start gap-4 p-4 rounded-2xl bg-panel-bg border border-border/40 hover:border-green/20 transition-all text-left min-h-[52px] shadow-none"
-                      onClick={() => handleToggleIntention(intention.noteId, intention.id)}
-                      aria-label={`Mark "${intention.text}" from ${intention.noteTitle} as complete`}
-                    >
-                      <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 border-border group-hover:border-green transition-colors">
-                        <div className="h-2 w-2 rounded-full bg-green opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </div>
-                      <span className="min-w-0">
-                        <span className="block font-serif italic text-[17px] text-gray-text group-hover:text-green transition-colors line-clamp-2 leading-relaxed">
-                          {intention.text}
-                        </span>
-                        <span className="mt-1 block truncate text-[10px] font-black uppercase tracking-widest text-gray-nav/45">
-                          {intention.noteTitle}
-                        </span>
-                      </span>
-                    </motion.button>
-                  ))
-                ) : (
-                  <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="py-16 text-center"
-                  >
-                    <div className="mb-4 flex justify-center">
-                      <div className="h-10 w-10 rounded-full border border-border flex items-center justify-center text-gray-nav/20">
-                        <CheckCircleIcon size={24} weight="duotone" />
-                      </div>
-                    </div>
-                    <p className="text-[11px] font-black text-gray-nav/30 uppercase tracking-[0.2em]">
-                      {intentionSummary.hasAnyTasks ? (
-                        <>
-                          All intentions <br /> are settled
-                        </>
-                      ) : (
-                        <>
-                          No intentions <br /> yet
-                        </>
-                      )}
-                    </p>
-                  </motion.div>
+            {/* Nested Intentions Card */}
+            <div className="group flex flex-col gap-4 p-7 sm:p-8 rounded-3xl bg-panel-bg border border-border/40 hover:border-green/20 transition-all text-left shadow-none">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-gray-nav">
+                  <ListChecks size={16} weight="bold" className="text-green" />
+                  <span className="text-[10px] font-black uppercase tracking-widest opacity-60">
+                    Your Intentions
+                  </span>
+                </div>
+                {intentionSummary.openCount > 0 && (
+                  <span className="text-[11px] font-bold text-gray-nav/60">
+                    {intentionSummary.openCount} open
+                  </span>
                 )}
-              </AnimatePresence>
-              
-              {intentionSummary.hiddenCount > 0 && (
-                <button 
-                  onClick={() => navigate(RoutePath.NOTES)}
-                  className="w-full text-center text-[10px] font-black uppercase tracking-[0.25em] text-gray-nav/40 hover:text-green transition-colors pt-6"
-                >
-                  + {intentionSummary.hiddenCount} more in your notes
-                </button>
-              )}
+              </div>
+
+              <div className="space-y-3 mt-2">
+                <AnimatePresence mode="popLayout">
+                  {intentionSummary.items.length > 0 ? (
+                    intentionSummary.items.slice(0, 3).map((intention) => (
+                      <motion.button
+                        key={intention.id}
+                        layout
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="w-full flex items-start gap-4 p-4 rounded-2xl bg-white/5 border border-border/40 hover:border-green/20 transition-all text-left shadow-none group/btn"
+                        onClick={() => handleToggleIntention(intention.noteId, intention.id)}
+                        aria-label={`Mark "${intention.text}" from ${intention.noteTitle} as complete`}
+                      >
+                        <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 border-border group-hover/btn:border-green transition-colors">
+                          <div className="h-2 w-2 rounded-full bg-green opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+                        </div>
+                        <span className="min-w-0">
+                          <span className="block font-serif italic text-[15px] text-gray-text group-hover/btn:text-green transition-colors line-clamp-2 leading-snug">
+                            {intention.text}
+                          </span>
+                        </span>
+                      </motion.button>
+                    ))
+                  ) : (
+                    <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="py-6 text-center"
+                    >
+                      <div className="mb-3 flex justify-center">
+                        <div className="h-8 w-8 rounded-full border border-border flex items-center justify-center text-gray-nav/20">
+                          <CheckCircleIcon size={18} weight="duotone" />
+                        </div>
+                      </div>
+                      <p className="text-[11px] font-black text-gray-nav/30 uppercase tracking-[0.2em]">
+                        {intentionSummary.hasAnyTasks ? 'All settled' : 'No intentions yet'}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                
+                {(intentionSummary.hiddenCount > 0 || intentionSummary.items.length > 3) && (
+                  <button 
+                    onClick={() => navigate(RoutePath.NOTES)}
+                    className="w-full text-center text-[10px] font-black uppercase tracking-[0.25em] text-gray-nav/40 hover:text-green transition-colors pt-4"
+                  >
+                    + {intentionSummary.hiddenCount + Math.max(0, intentionSummary.items.length - 3)} more
+                  </button>
+                )}
+              </div>
             </div>
           </motion.div>
 
           {/* Quote Card */}
           <motion.div 
             variants={bentoItemVariants}
-            className="p-8 sm:p-12 lg:p-16 border-b lg:border-b-0 lg:border-r border-border/40 flex flex-col justify-between h-full bg-white dark:bg-white/14"
+            className="p-8 sm:p-12 lg:p-16 border-b lg:border-b-0 border-border/40 flex flex-col justify-between h-full bg-white dark:bg-white/14"
           >
             <div className="flex-grow">
               <div className="flex items-center gap-2 text-gray-nav mb-12">
@@ -516,53 +534,6 @@ export const HomeAuthenticated: React.FC = () => {
                 </div>
               </div>
             </div>
-          </motion.div>
-
-          {/* Daily Focus Card */}
-          <motion.div 
-            variants={bentoItemVariants}
-            className="p-6 sm:p-10 lg:p-12 flex flex-col justify-between h-full bg-white dark:bg-white/20 border-b lg:border-b-0 border-border/40"
-          >
-            <div>
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-2 text-gray-nav">
-                  <Target size={18} weight="bold" className="text-green" />
-                  <span className="text-[11px] font-black uppercase tracking-widest opacity-60">
-                    Daily Focus
-                  </span>
-                </div>
-                <button
-                  onClick={refreshPrompt}
-                  className={`flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] text-gray-nav transition-colors hover:text-green ${
-                    isRefreshing ? 'animate-spin' : ''
-                  }`}
-                  aria-label="Refresh daily focus prompt"
-                >
-                  <ArrowsClockwise size={20} weight="bold" />
-                </button>
-              </div>
-
-              <div className="space-y-6">
-                <p
-                  className="text-2xl md:text-3xl text-gray-text font-serif italic leading-relaxed"
-                  style={{ opacity: isRefreshing ? 0 : 1, transition: 'opacity 0.4s ease' }}
-                >
-                  {dailyPrompt}
-                </p>
-              </div>
-            </div>
-
-            <Button
-              variant="primary"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="mt-10 h-14 rounded-xl text-[15px] font-bold bg-green text-white hover:bg-green/90 transition-colors shadow-none"
-              onClick={() => handleCreateClick(dailyPrompt)}
-              aria-label="Start a new reflection with this prompt"
-            >
-              Start Reflection
-              <Plus size={18} weight="bold" className="ml-2" />
-            </Button>
           </motion.div>
         </motion.section>
       </div>

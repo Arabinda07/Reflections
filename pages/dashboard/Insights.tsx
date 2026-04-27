@@ -45,6 +45,7 @@ export const Insights: React.FC = () => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [themes, setThemes] = useState<LifeTheme[]>([]);
   const [access, setAccess] = useState<WellnessAccess | null>(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -126,8 +127,16 @@ export const Insights: React.FC = () => {
     wikiGate?.canGenerate && notes.length >= FREE_WIKI_MINIMUM_ENTRIES && themes.length === 0,
   );
 
+  const handleOpenSanctuary = () => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    setTimeout(() => {
+      navigate(RoutePath.SANCTUARY, { state: { fromInsights: true } });
+    }, 1200);
+  };
+
   return (
-    <>
+    <div className={`transition-opacity duration-1000 ${isTransitioning ? 'opacity-0 scale-[0.98]' : 'opacity-100 scale-100'}`}>
       <PageContainer className="pb-24 pt-4 md:pt-8">
         <div className="space-y-10">
           <div className="sticky-bar">
@@ -298,13 +307,13 @@ export const Insights: React.FC = () => {
 
           <Surface
             variant="flat"
-            className="overflow-hidden border border-transparent transition-all duration-300 hover:border-green/20"
+            className={`overflow-hidden border transition-all duration-500 ${isTransitioning ? 'border-green/40 bg-green/5' : 'border-transparent hover:border-green/20'}`}
           >
-            <Link
-              to={RoutePath.SANCTUARY}
-              state={{ fromInsights: true }}
-              className="group flex flex-col items-center justify-between gap-8 p-8 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 md:flex-row md:p-12"
+            <button
+              onClick={handleOpenSanctuary}
+              className="group flex w-full flex-col items-center justify-between gap-8 p-8 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 md:flex-row md:p-12"
               aria-label="Open your Life Wiki"
+              disabled={isTransitioning}
             >
               <div className="space-y-4">
                 {isWikiReadyToBuild ? (
@@ -326,11 +335,16 @@ export const Insights: React.FC = () => {
                 </p>
               </div>
               
-              <div className="shrink-0 flex items-center justify-center h-12 px-6 rounded-[var(--radius-control)] bg-white/5 border border-border group-hover:bg-green/10 group-hover:border-green/30 group-hover:text-green transition-all duration-300 text-gray-text font-black text-[13px] uppercase tracking-widest">
-                Open Sanctuary
-                <CaretRight size={16} weight="bold" className="ml-2" />
+              <div className="shrink-0 flex items-center justify-center h-12 px-6 rounded-[var(--radius-control)] bg-white/5 border border-border group-hover:bg-green/10 group-hover:border-green/30 group-hover:text-green transition-all duration-300 text-gray-text font-black text-[13px] uppercase tracking-widest relative overflow-hidden">
+                <span className={`flex items-center transition-transform duration-500 ${isTransitioning ? '-translate-y-12 opacity-0' : 'translate-y-0 opacity-100'}`}>
+                  Open Sanctuary
+                  <CaretRight size={16} weight="bold" className="ml-2" />
+                </span>
+                <span className={`absolute inset-0 flex items-center justify-center text-green transition-transform duration-500 ${isTransitioning ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
+                  <CircleNotch size={20} weight="bold" className="animate-spin" />
+                </span>
               </div>
-            </Link>
+            </button>
           </Surface>
 
           {access?.planTier !== 'pro' && (
@@ -340,6 +354,6 @@ export const Insights: React.FC = () => {
           )}
         </div>
       </PageContainer>
-    </>
+    </div>
   );
 };

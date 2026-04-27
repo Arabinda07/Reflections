@@ -452,7 +452,6 @@ export const Account: React.FC = () => {
                           <Key size={20} weight="bold" className="text-green" />
                           <div>
                             <p className="text-[14px] font-bold text-gray-text">Password reset</p>
-                            <p className="text-[12px] font-medium text-gray-light">Send a secure recovery link to {email}.</p>
                           </div>
                         </div>
                         <EnvelopeSimple size={18} weight="bold" className="text-gray-nav" />
@@ -463,7 +462,6 @@ export const Account: React.FC = () => {
                           <DeviceMobile size={20} weight="bold" className="text-gray-nav" />
                           <div>
                             <p className="text-[14px] font-bold text-gray-text">Two-factor authentication</p>
-                            <p className="text-[12px] font-medium text-gray-light">Planned for a later security pass.</p>
                           </div>
                         </div>
                         <MetadataPill>Coming soon</MetadataPill>
@@ -477,14 +475,14 @@ export const Account: React.FC = () => {
                 <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                   <div className="space-y-2">
                     <p className="text-[11px] font-black uppercase tracking-widest text-red">Danger zone</p>
-                    <h3 className="text-[24px] font-display text-red">Delete saved writing</h3>
+                    <h3 className="text-[24px] font-display text-red">Delete account</h3>
                     <p className="max-w-xl text-[14px] font-medium leading-relaxed text-gray-light">
                       Saved writing and app data will be removed.
                     </p>
                   </div>
 
                   <Button type="button" variant="danger" className="px-8" onClick={() => setShowDeleteConfirm(true)}>
-                    Delete saved writing
+                    Delete
                   </Button>
                 </div>
               </div>
