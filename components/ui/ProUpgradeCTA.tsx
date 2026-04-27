@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { CheckCircle, Crown, Check } from '@phosphor-icons/react';
-import emailjs from '@emailjs/browser';
 import { Button } from './Button';
 import { ModalSheet } from './ModalSheet';
+import { supabase } from '../../src/supabaseClient';
+import { useAuth } from '../../context/AuthContext';
 
 interface ProUpgradeCTAProps {
   onSuccess?: () => void;
@@ -10,59 +11,113 @@ interface ProUpgradeCTAProps {
   variant?: 'card' | 'fullscreen';
 }
 
-const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY; 
+const RAZORPAY_MONTHLY_PLAN_ID = import.meta.env.VITE_RAZORPAY_MONTHLY_PLAN_ID;
+const RAZORPAY_YEARLY_PLAN_ID = import.meta.env.VITE_RAZORPAY_YEARLY_PLAN_ID;
 
 export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ className = '', variant = 'card' }) => {
+  const { session } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(false);
   
   // Form State
-  const [email, setEmail] = useState('');
-  const [hasConsent, setHasConsent] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'yearly'>('monthly');
   const [wantsNewsletter, setWantsNewsletter] = useState(false);
 
-  const handleSubmit = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!hasConsent || !email) return;
-    
+  const loadRazorpay = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const handleSubscribe = async () => {
     setIsProcessing(true);
     setError(null);
 
     try {
-      const templateParams = {
-        from_name: email,
-        message: `Waitlist request. Consent: true. Newsletter: ${wantsNewsletter}`,
-        page_url: window.location.href,
-        timestamp: new Date().toLocaleString(),
+      const planId = selectedPlan === 'monthly' ? RAZORPAY_MONTHLY_PLAN_ID : RAZORPAY_YEARLY_PLAN_ID;
+
+      if (!planId) {
+        throw new Error('Subscription plans are not fully configured yet.');
+      }
+
+      // 1. Create Subscription
+      const res = await fetch('/api/create-razorpay-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`
+        },
+        body: JSON.stringify({ planId })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to initialize subscription');
+
+      // 2. Open Razorpay Checkout
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        subscription_id: data.subscriptionId,
+        name: 'Reflections',
+        description: 'Reflections Pro Subscription',
+        handler: async function (response: any) {
+          try {
+            setIsProcessing(true);
+            // 3. Verify Payment
+            const verifyRes = await fetch('/api/verify-razorpay-payment', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session?.access_token}`
+              },
+              body: JSON.stringify({
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_subscription_id: response.razorpay_subscription_id,
+                razorpay_signature: response.razorpay_signature,
+                newsletterOptIn: wantsNewsletter
+              })
+            });
+
+            const verifyData = await verifyRes.json();
+            if (!verifyRes.ok) throw new Error(verifyData.error || 'Verification failed');
+
+            // 4. Show Unlock Sequence
+            setIsUnlocked(true);
+            
+            // Reload user profile data to reflect Pro status
+            await supabase.auth.refreshSession();
+            
+            if (onSuccess) {
+              setTimeout(() => {
+                setIsModalOpen(false);
+                onSuccess();
+              }, 4000);
+            }
+          } catch (err: any) {
+            setError(err.message || 'Payment verification failed');
+            setIsProcessing(false);
+          }
+        },
+        theme: {
+          color: '#2A3F33' // green
+        }
       };
 
-      await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        templateParams,
-        EMAILJS_PUBLIC_KEY
-      );
+      const rzp = new (window as any).Razorpay(options);
+      rzp.on('payment.failed', function (response: any) {
+        setError(response.error.description);
+        setIsProcessing(false);
+      });
       
-      setIsSubmitted(true);
-      if (onSuccess) onSuccess();
-      
-      setTimeout(() => {
-        setIsModalOpen(false);
-        setTimeout(() => {
-          setIsSubmitted(false);
-          setEmail('');
-          setHasConsent(false);
-          setWantsNewsletter(false);
-        }, 500);
-      }, 2500);
-    } catch (err) {
-      console.error('Could not submit waitlist request:', err);
-      setError('Please try again or email support to join.');
-    } finally {
+      rzp.open();
+    } catch (err: any) {
+      console.error('Subscription error:', err);
+      setError(err.message || 'Please try again later.');
       setIsProcessing(false);
     }
   };
@@ -73,70 +128,57 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ className = '', va
     'Early access to Pro features',
   ];
 
-  const WaitlistModal = () => (
+  const SubscriptionModal = () => (
     <ModalSheet
       isOpen={isModalOpen}
-      onClose={() => setIsModalOpen(false)}
-      title="Join the Waitlist"
+      onClose={() => !isUnlocked && setIsModalOpen(false)}
+      title="Join Pro"
       icon={<Crown size={20} weight="duotone" />}
       size="md"
       bodyClassName="p-0"
     >
-      <div className="relative h-48 w-full overflow-hidden mb-6 bg-black">
-        <video
-          src="/assets/videos/cycling.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 h-full w-full object-cover opacity-70"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[var(--panel-bg)] to-transparent" />
-        <div className="absolute bottom-6 left-6 right-6 z-10 flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-white backdrop-blur-md">
-            <Crown size={28} weight="fill" />
-          </div>
-          <div>
-            <h3 className="font-serif italic text-2xl text-white">Reflections Pro</h3>
-            <p className="text-[13px] font-bold uppercase tracking-widest text-white/70">Coming Soon</p>
-          </div>
-        </div>
-      </div>
-      
-      <div className="px-6 sm:px-8 pb-8 space-y-6">
-        {!isSubmitted ? (
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <label htmlFor="waitlist-email" className="block text-[11px] font-extrabold uppercase tracking-widest text-gray-nav">Email address</label>
-              <input
-                id="waitlist-email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                className="w-full h-12 rounded-[var(--radius-control)] border border-border bg-white px-4 text-[15px] font-medium text-gray-text shadow-sm transition-all focus:border-green focus:outline-none focus:ring-4 focus:ring-green/10 dark:bg-[var(--body-bg)]"
+      <div className="px-6 sm:px-8 pb-6 pt-2 space-y-6">
+        {!isUnlocked ? (
+          <>
+            <div className="relative h-48 w-full overflow-hidden mb-6 bg-black rounded-2xl">
+              <video
+                src="/assets/videos/cycling.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="absolute inset-0 h-full w-full object-cover"
               />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                type="button"
+                onClick={() => setSelectedPlan('monthly')}
+                className={`flex flex-col items-start p-4 rounded-xl border-2 transition-all ${
+                  selectedPlan === 'monthly' ? 'border-green bg-green/5' : 'border-border bg-white hover:border-green/50 dark:bg-[var(--body-bg)]'
+                }`}
+              >
+                <span className={`text-[12px] font-black uppercase tracking-widest ${selectedPlan === 'monthly' ? 'text-green' : 'text-gray-nav'}`}>Monthly</span>
+                <span className="text-2xl font-serif italic text-gray-text mt-1">₹99<span className="text-[14px] not-italic text-gray-light">/mo</span></span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSelectedPlan('yearly')}
+                className={`flex flex-col items-start p-4 rounded-xl border-2 transition-all ${
+                  selectedPlan === 'yearly' ? 'border-green bg-green/5' : 'border-border bg-white hover:border-green/50 dark:bg-[var(--body-bg)]'
+                }`}
+              >
+                <div className="w-full flex justify-between items-center">
+                  <span className={`text-[12px] font-black uppercase tracking-widest ${selectedPlan === 'yearly' ? 'text-green' : 'text-gray-nav'}`}>Yearly</span>
+                  <span className="text-[10px] font-bold bg-green/10 text-green px-2 py-0.5 rounded-full">SAVE 15%</span>
+                </div>
+                <span className="text-2xl font-serif italic text-gray-text mt-1">₹999<span className="text-[14px] not-italic text-gray-light">/yr</span></span>
+              </button>
             </div>
 
             <div className="space-y-4">
-              <label className="flex items-start gap-3 cursor-pointer group">
-                <div className="relative flex h-5 w-5 shrink-0 items-center justify-center rounded border border-border bg-white transition-colors group-hover:border-green dark:bg-white/5 mt-0.5">
-                  <input
-                    type="checkbox"
-                    checked={hasConsent}
-                    onChange={(e) => setHasConsent(e.target.checked)}
-                    className="peer absolute h-full w-full cursor-pointer opacity-0"
-                  />
-                  <div className="pointer-events-none opacity-0 transition-opacity peer-checked:opacity-100 text-green">
-                    <Check size={14} weight="bold" />
-                  </div>
-                </div>
-                <span className="text-[14px] font-medium leading-relaxed text-gray-light">
-                  I consent to joining the Reflections Pro waitlist and being contacted when it is ready.
-                </span>
-              </label>
-
               <label className="flex items-start gap-3 cursor-pointer group">
                 <div className="relative flex h-5 w-5 shrink-0 items-center justify-center rounded border border-border bg-white transition-colors group-hover:border-green dark:bg-white/5 mt-0.5">
                   <input
@@ -158,23 +200,34 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ className = '', va
             {error && <p className="text-red text-[13px] font-bold">{error}</p>}
 
             <Button
-              type="submit"
               variant="primary"
               className="w-full h-14 text-[16px] rounded-xl"
               isLoading={isProcessing}
-              disabled={!hasConsent || !email}
+              onClick={handleSubscribe}
             >
-              Join the waitlist
+              Join Pro
             </Button>
-          </form>
+          </>
         ) : (
-          <div className="flex flex-col items-center justify-center py-8 text-center animate-in fade-in zoom-in duration-500">
-            <div className="h-20 w-20 rounded-full bg-green/10 text-green flex items-center justify-center mb-6">
-              <CheckCircle size={40} weight="fill" />
+          <div className="flex flex-col items-center justify-center py-12 text-center animate-in fade-in zoom-in duration-700">
+            <div className="relative h-48 w-full overflow-hidden mb-8 bg-black rounded-3xl opacity-80 mix-blend-luminosity">
+              <video
+                src="/assets/videos/cycling.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                <div className="h-20 w-20 rounded-full bg-green text-white flex items-center justify-center">
+                  <CheckCircle size={40} weight="fill" />
+                </div>
+              </div>
             </div>
-            <h3 className="text-3xl font-serif italic text-gray-text mb-3">You're on the list</h3>
-            <p className="text-[15px] font-medium text-gray-light leading-relaxed max-w-[250px]">
-              We'll let you know the moment Reflections Pro is ready for you.
+            <h3 className="text-3xl font-serif italic text-gray-text mb-3">Your sanctuary is unlocked</h3>
+            <p className="text-[15px] font-medium text-gray-light leading-relaxed max-w-[280px]">
+              Welcome to Reflections Pro. The journey continues.
             </p>
           </div>
         )}
@@ -193,7 +246,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ className = '', va
           <div>
             <h2 className="text-4xl font-serif italic text-gray-text mb-4">Reflections Pro</h2>
             <p className="text-[16px] text-gray-light leading-relaxed">
-              Pro is not live yet. Join the waitlist and we will let you know when it is ready.
+              Unlock unlimited reflections and deeper insights.
             </p>
           </div>
 
@@ -211,10 +264,10 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ className = '', va
             className="w-full h-14 text-[16px] rounded-xl"
             onClick={() => setIsModalOpen(true)}
           >
-            Join the waitlist
+            Join Pro
           </Button>
 
-          <WaitlistModal />
+          <SubscriptionModal />
         </div>
       </div>
     );
@@ -230,7 +283,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ className = '', va
               <Crown size={20} weight="fill" />
               <span className="text-[11px] font-black uppercase tracking-widest">Reflections Pro</span>
             </div>
-            <h3 className="text-2xl font-serif italic text-gray-text">Pro is almost ready.</h3>
+            <h3 className="text-2xl font-serif italic text-gray-text">Ready for more?</h3>
             <ul className="space-y-2">
               {features.map((feature) => (
                 <li key={feature} className="flex items-center gap-2 text-[13px] text-gray-light">
@@ -246,13 +299,12 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ className = '', va
               className="w-full md:w-auto h-12 px-6 rounded-xl"
               onClick={() => setIsModalOpen(true)}
             >
-              Join the waitlist
+              Join Pro
             </Button>
           </div>
         </div>
       </div>
-      <WaitlistModal />
+      <SubscriptionModal />
     </>
   );
 };
-

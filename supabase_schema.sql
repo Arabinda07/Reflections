@@ -17,6 +17,7 @@ create table if not exists profiles (
   full_name text,
   avatar_url text,
   plan text default 'free',
+  newsletter_opt_in boolean default false,
   free_ai_reflections_used int default 0,
   free_wiki_insights_used int default 0,
   updated_at timestamp with time zone default timezone('utc'::text, now())
@@ -211,7 +212,13 @@ create or replace function enforce_note_limit()
 returns trigger as $$
 declare
   note_count int;
+  user_plan text;
 begin
+  select plan into user_plan from profiles where id = new.user_id;
+  if user_plan = 'pro' then
+    return new;
+  end if;
+
   select count(*) into note_count
   from notes
   where user_id = new.user_id
@@ -264,5 +271,13 @@ begin
     where table_name = 'life_themes' and column_name = 'page_type'
   ) then
     alter table life_themes add column page_type text default 'theme';
+  end if;
+
+  -- Add newsletter_opt_in column to profiles if missing
+  if not exists (
+    select 1 from information_schema.columns
+    where table_name = 'profiles' and column_name = 'newsletter_opt_in'
+  ) then
+    alter table profiles add column newsletter_opt_in boolean default false;
   end if;
 end $$;

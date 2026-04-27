@@ -573,16 +573,11 @@ export const HomeAuthenticated: React.FC = () => {
           initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: shouldReduceMotion ? 0 : 0.25, ease: [0.22, 1, 0.36, 1] }}
-          className="space-y-5"
+          className="space-y-4 pb-2"
         >
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="label-caps text-green" aria-live="polite">
-              Step {onboardingStep + 1} of {ONBOARDING_STEPS.length}
-            </p>
-            <p className="text-[12px] font-black uppercase tracking-widest text-gray-nav">
-              {currentOnboardingStep.label}
-            </p>
-          </div>
+          <p className="label-caps text-green" aria-live="polite">
+            Step {onboardingStep + 1} of {ONBOARDING_STEPS.length}
+          </p>
 
           <div className="flex items-center gap-2" aria-hidden="true">
             {ONBOARDING_STEPS.map((step, index) => (
@@ -594,10 +589,6 @@ export const HomeAuthenticated: React.FC = () => {
               />
             ))}
           </div>
-
-          <p className="max-w-[34ch] font-medium leading-relaxed text-gray-light">
-            Move through the basics, then start writing when you are ready.
-          </p>
         </motion.div>
       </ModalSheet>
 
