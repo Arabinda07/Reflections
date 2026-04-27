@@ -336,11 +336,17 @@ export const Insights: React.FC = () => {
               </div>
               
               <div className="shrink-0 flex items-center justify-center h-12 px-6 rounded-[var(--radius-control)] bg-white/5 border border-border group-hover:bg-green/10 group-hover:border-green/30 group-hover:text-green transition-all duration-300 text-gray-text font-black text-[13px] uppercase tracking-widest relative overflow-hidden">
-                <span className={`flex items-center transition-transform duration-500 ${isTransitioning ? '-translate-y-12 opacity-0' : 'translate-y-0 opacity-100'}`}>
+                <span 
+                  className={`flex items-center transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isTransitioning ? '-translate-y-12 opacity-0' : 'translate-y-0 opacity-100'}`}
+                  style={{ willChange: 'transform, opacity' }}
+                >
                   Open Sanctuary
                   <CaretRight size={16} weight="bold" className="ml-2" />
                 </span>
-                <span className={`absolute inset-0 flex items-center justify-center text-green transition-transform duration-500 ${isTransitioning ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
+                <span 
+                  className={`absolute inset-0 flex items-center justify-center text-green transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isTransitioning ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}
+                  style={{ willChange: 'transform, opacity' }}
+                >
                   <CircleNotch size={20} weight="bold" className="animate-spin" />
                 </span>
               </div>

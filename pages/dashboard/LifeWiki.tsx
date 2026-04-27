@@ -410,17 +410,17 @@ export const LifeWiki: React.FC = () => {
     return (
       <>
         {renderEntrance()}
-        <div className="fixed inset-0 pointer-events-none z-[-1] bg-surface/60 backdrop-blur-[40px]" />
-        <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden">
+        <div className="fixed inset-0 pointer-events-none z-[-1] bg-surface/60 backdrop-blur-[60px]" style={{ willChange: 'backdrop-filter' }} />
+        <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden bg-body">
           <video
             src="/assets/videos/cycling.mp4"
             autoPlay
             loop
             muted
             playsInline
-            className="absolute inset-0 h-full w-full object-cover opacity-[0.15] filter blur-3xl scale-110"
+            className="absolute inset-0 h-full w-full object-cover opacity-[0.25]"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-green/5 via-body/80 to-body" />
+          <div className="absolute inset-0 bg-gradient-to-b from-green/10 via-body/80 to-body" />
         </div>
         <PageContainer size="narrow" className="pb-24 pt-4 md:pt-8 relative z-10">
           <div className="space-y-8">
@@ -482,13 +482,13 @@ export const LifeWiki: React.FC = () => {
                           );
                         },
                         h1: ({ children }) => (
-                          <h2 className="mt-8 text-3xl font-display text-gray-text first:mt-0">{children}</h2>
+                          <h2 className="mt-12 text-4xl font-display text-gray-text tracking-tight first:mt-0">{children}</h2>
                         ),
                         h2: ({ children }) => (
-                          <h2 className="mt-8 text-2xl font-display text-gray-text first:mt-0">{children}</h2>
+                          <h2 className="mt-10 text-3xl font-display text-gray-text tracking-tight first:mt-0">{children}</h2>
                         ),
                         h3: ({ children }) => (
-                          <h3 className="mt-6 text-xl font-display text-gray-text">{children}</h3>
+                          <h3 className="mt-8 text-2xl font-display text-gray-text tracking-tight">{children}</h3>
                         ),
                         p: ({ children }) => <p className="mb-5 last:mb-0">{children}</p>,
                         ul: ({ children }) => <ul className="mb-5 list-disc space-y-2 pl-6">{children}</ul>,
@@ -548,17 +548,17 @@ export const LifeWiki: React.FC = () => {
   return (
     <>
       {renderEntrance()}
-      <div className="fixed inset-0 pointer-events-none z-[-1] bg-surface/60 backdrop-blur-[40px]" />
-      <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden">
+      <div className="fixed inset-0 pointer-events-none z-[-1] bg-surface/60 backdrop-blur-[60px]" style={{ willChange: 'backdrop-filter' }} />
+      <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden bg-body">
         <video
           src="/assets/videos/cycling.mp4"
           autoPlay
           loop
           muted
           playsInline
-          className="absolute inset-0 h-full w-full object-cover opacity-[0.15] filter blur-3xl scale-110"
+          className="absolute inset-0 h-full w-full object-cover opacity-[0.25]"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-green/5 via-body/80 to-body" />
+        <div className="absolute inset-0 bg-gradient-to-b from-green/10 via-body/80 to-body" />
       </div>
 
       <PageContainer className="pb-24 pt-4 md:pt-8 relative z-10">
