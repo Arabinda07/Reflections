@@ -35,19 +35,6 @@ export default {
         'mk-body': ['clamp(1rem, 1vw + 0.875rem, 1.125rem)', { lineHeight: '1.6' }],
       },
       colors: {
-        background: 'var(--background)',
-        foreground: 'var(--foreground)',
-        surface: 'var(--surface)',
-        'surface-muted': 'var(--surface-muted)',
-        'surface-floating': 'var(--surface-floating)',
-        primary: 'var(--primary)',
-        'primary-foreground': 'var(--primary-foreground)',
-        secondary: 'var(--secondary)',
-        'secondary-foreground': 'var(--secondary-foreground)',
-        destructive: 'var(--destructive)',
-        'destructive-foreground': 'var(--destructive-foreground)',
-        'border-subtle': 'var(--border-subtle)',
-        'ring-focus': 'var(--ring-focus)',
         green: {
           DEFAULT: 'var(--green)',
           hover: 'var(--green-hover)',
@@ -86,16 +73,6 @@ export default {
         'space-10': 'var(--space-10)',
         'space-12': 'var(--space-12)',
         'space-16': 'var(--space-16)',
-      },
-      borderRadius: {
-        control: 'var(--radius-control)',
-        panel: 'var(--radius-panel)',
-        floating: 'var(--radius-floating)',
-        shell: 'var(--radius-shell)',
-      },
-      transitionDuration: {
-        'steady': 'var(--motion-duration-steady)',
-        calm: 'var(--motion-duration-calm)',
       },
       transitionTimingFunction: {
         'out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',

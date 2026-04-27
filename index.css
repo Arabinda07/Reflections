@@ -59,50 +59,38 @@
   --header-height: 3.5rem;
   /* 56px – comfortable mobile app-bar */
 
-  /* Reflections semantic tokens */
-  --background: #fbfcfb;
-  --foreground: #252525;
-  --surface: #f7f8f6;
-  --surface-muted: #f1f3f0;
-  --surface-floating: rgba(247, 248, 246, 0.86);
-  --surface-floating-strong: rgba(247, 248, 246, 0.94);
-  --primary: #008151;
-  --primary-foreground: #ffffff;
-  --secondary: #5383c2;
-  --secondary-foreground: #ffffff;
-  --destructive: #a46c53;
-  --destructive-foreground: #ffffff;
-  --border-subtle: rgba(37, 37, 37, 0.12);
-  --ring-focus: rgba(0, 129, 81, 0.26);
-  --motion-duration-steady: 220ms;
-  --motion-duration-calm: 350ms;
-
-  /* Legacy aliases retained so existing screens inherit the Reflections foundation. */
-  --green: var(--primary);
-  --green-hover: #006d45;
-  --green-shadow: #005537;
+  /* Brand Hue = 135 (Cool botanical green, aligned with tinted neutrals) */
+  /* CONTRAST FIX: L=0.47 achieves ~4.95:1 on light bg (passes WCAG AA 4.5:1).
+     Chroma 0.18 sits at the 'calm ceiling' for high-end wellness brands. */
+  --green: oklch(0.47 0.18 135);
+  --green-hover: oklch(0.41 0.16 135);
+  --green-shadow: oklch(0.35 0.14 135);
 
   --dark-blue: oklch(0.25 0.05 260);
-  --blue: var(--secondary);
+  --blue: oklch(0.54 0.16 245);
   --blue-shadow: oklch(0.40 0.16 245);
 
   /* Tinted Neutrals (Strict Chroma 0.01 leaning toward hue 135) */
-  --gray-text: var(--foreground);
+  --gray-text: oklch(0.25 0.01 135);
   /* CONTRAST FIX: L=0.55 → ~3.4:1 on near-white bg. Darkened to L=0.43 → ~5.0:1. */
   --gray-light: oklch(0.43 0.01 135);
-  --border-color: var(--border-subtle);
+  --border-color: oklch(0.92 0.01 135);
   /* CONTRAST FIX: L=0.60 → ~2.9:1 on near-white bg. Darkened to L=0.46 → ~4.6:1. */
   --nav-text: oklch(0.46 0.01 135);
 
   --footer-green: oklch(0.72 0.18 135);
-  /* Supporting accents kept behind semantic aliases for consistency. */
-  --red: var(--destructive);
+  /* CONTRAST FIX: orange/red/blue are used as text in pills and alert panels.
+     Darkened each to achieve ≥4.5:1 on their tinted panel backgrounds.
+     orange: L=0.75 → ~1.9:1 ✗ → L=0.57 → ~4.6:1 ✓
+     red:   L=0.65 → ~2.5:1 ✗ → L=0.55 → ~4.7:1 ✓
+     blue:  L=0.65 → ~2.5:1 ✗ → L=0.54 → ~4.8:1 ✓ */
+  --red: oklch(0.55 0.18 20);
   --red-shadow: oklch(0.45 0.18 20);
   --orange: oklch(0.57 0.16 50);
   --golden: oklch(0.85 0.15 80);
 
-  --bg-color: var(--background);
-  --panel-bg: var(--surface);
+  --bg-color: oklch(0.99 0.01 135);
+  --panel-bg: oklch(0.98 0.01 135);
   --panel-bg-rgb: 247 248 246;
   --black-rgb: 0 0 0;
   --hero-ink: oklch(0.98 0.01 135);
@@ -114,9 +102,9 @@
       oklch(0.24 0.02 135 / 0.28));
   --screen-scrim-soft: rgba(var(--panel-bg-rgb), 0.72);
   --screen-scrim-strong: rgba(var(--panel-bg-rgb), 0.84);
-  --floating-panel-bg: var(--surface-floating);
-  --floating-panel-bg-strong: var(--surface-floating-strong);
-  --floating-panel-border: var(--border-subtle);
+  --floating-panel-bg: rgba(var(--panel-bg-rgb), 0.82);
+  --floating-panel-bg-strong: rgba(var(--panel-bg-rgb), 0.92);
+  --floating-panel-border: oklch(from var(--border-color) l c h / 0.82);
   --floating-panel-shadow:
     0 20px 40px -26px rgba(0, 0, 0, 0.16),
     0 8px 18px -14px rgba(0, 0, 0, 0.08);
@@ -178,7 +166,6 @@
   --radius-chip: 0.75rem;
   --radius-control: 1rem;
   --radius-panel: 1.5rem;
-  --radius-floating: 1.5rem;
   --radius-shell: 2rem;
 
   /* Natural Physics: Out-Quart (Exponential) Easing */
@@ -192,24 +179,9 @@
 }
 
 .dark {
-  --background: oklch(0.18 0.012 135);
-  --foreground: oklch(0.85 0.02 135);
-  --surface: oklch(0.22 0.012 135);
-  --surface-muted: oklch(0.25 0.012 135);
-  --surface-floating: rgba(40, 42, 39, 0.78);
-  --surface-floating-strong: rgba(40, 42, 39, 0.9);
-  --primary: oklch(0.68 0.15 138);
-  --primary-foreground: oklch(0.14 0.012 135);
-  --secondary: oklch(0.67 0.15 245);
-  --secondary-foreground: oklch(0.14 0.012 135);
-  --destructive: oklch(0.67 0.18 20);
-  --destructive-foreground: oklch(0.14 0.012 135);
-  --border-subtle: oklch(0.3 0.02 135);
-  --ring-focus: oklch(0.68 0.15 138 / 0.32);
-
   /* PERCEPTUAL ADJUSTMENT: Hue nudged +3° warmer (135 -> 138) in dark mode
      to counteract the cooling effect of dark backgrounds and maintain brand temperature. */
-  --green: var(--primary);
+  --green: oklch(0.68 0.15 138);
   --green-hover: oklch(0.74 0.17 138);
   --green-shadow: oklch(0.45 0.14 138);
 
@@ -217,20 +189,20 @@
 
   --dark-blue: oklch(0.85 0.05 260);
   /* CONTRAST FIX: dark mode blue L=0.60 → ~4.1:1 on dark bg. Lightened to L=0.67 → ~5.2:1 ✓ */
-  --blue: var(--secondary);
+  --blue: oklch(0.67 0.15 245);
   --blue-shadow: oklch(0.44 0.15 245);
   /* CONTRAST FIX: dark mode red L=0.58 → ~3.9:1 on dark bg. Lightened to L=0.67 → ~5.2:1 ✓ */
-  --red: var(--destructive);
+  --red: oklch(0.67 0.18 20);
 
   /* Tinted Neutrals - Dark Mode (Chroma 0.02 leaning toward hue 135) */
-  --gray-text: var(--foreground);
+  --gray-text: oklch(0.85 0.02 135);
   --gray-light: oklch(0.65 0.02 135);
-  --border-color: var(--border-subtle);
+  --border-color: oklch(0.25 0.02 135);
   --nav-text: oklch(0.70 0.02 135);
 
   /* Pure black #000 explicitly banned, utilizing dark gray base */
-  --bg-color: var(--background);
-  --panel-bg: var(--surface);
+  --bg-color: oklch(0.18 0.012 135);
+  --panel-bg: oklch(0.22 0.012 135);
   --panel-bg-rgb: 40 42 39;
   --black-rgb: 0 0 0;
   --hero-ink: oklch(0.95 0.02 135);
