@@ -140,15 +140,15 @@ export const Insights: React.FC = () => {
   return (
     <>
       <div className={`transition-opacity duration-1000 ${isTransitioning ? 'opacity-0 scale-[0.98]' : 'opacity-100 scale-100'}`}>
-        <PageContainer className="pb-24 pt-4 md:pt-8">
+        <PageContainer className="pb-24 pt-6 md:pt-10">
         <div className="space-y-10">
           <button 
             onClick={() => navigate(RoutePath.HOME)}
-            className="surface-floating fixed left-4 z-[80] flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] transition-all hover:text-green"
-            style={{ top: 'calc(1.5rem + env(safe-area-inset-top))' }}
-            aria-label="Back"
+            className="flex items-center gap-2 text-[13px] font-bold text-gray-nav hover:text-green transition-colors w-fit"
+            aria-label="Back to home"
           >
-            <ArrowLeft size={20} weight="bold" />
+            <ArrowLeft size={16} weight="bold" />
+            <span>Back</span>
           </button>
 
           <SectionHeader

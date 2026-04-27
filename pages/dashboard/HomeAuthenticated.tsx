@@ -339,12 +339,12 @@ export const HomeAuthenticated: React.FC = () => {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-100px" }}
-          className="grid grid-cols-1 lg:grid-cols-3 border-t border-border/40 bg-white dark:bg-transparent min-h-[500px]"
+          className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6 md:p-10 max-w-[1440px] mx-auto min-h-[500px]"
         >
           {/* Overview Card */}
           <motion.div 
             variants={bentoItemVariants}
-            className="p-8 sm:p-12 lg:p-16 border-b lg:border-b-0 lg:border-r border-border/40 flex flex-col justify-between h-full bg-white/50 dark:bg-white/12"
+            className="p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full bg-white/50 dark:bg-white/5 rounded-3xl border border-border/40"
           >
             <div>
               <div className="flex items-center gap-2 text-gray-nav mb-12">
@@ -390,7 +390,7 @@ export const HomeAuthenticated: React.FC = () => {
           {/* Daily Focus & Intentions Card */}
           <motion.div 
             variants={bentoItemVariants}
-            className="p-8 sm:p-12 lg:p-16 border-b lg:border-b-0 lg:border-r border-border/40 flex flex-col justify-between h-full bg-white/30 dark:bg-white/8 overflow-hidden"
+            className="p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full bg-white/40 dark:bg-white/5 rounded-3xl border border-border/40 overflow-hidden"
           >
             <div>
               <div className="flex items-center justify-between mb-8">
@@ -506,7 +506,7 @@ export const HomeAuthenticated: React.FC = () => {
           {/* Quote Card */}
           <motion.div 
             variants={bentoItemVariants}
-            className="p-8 sm:p-12 lg:p-16 border-b lg:border-b-0 border-border/40 flex flex-col justify-between h-full bg-white dark:bg-white/14"
+            className="p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full bg-white/60 dark:bg-white/5 rounded-3xl border border-border/40"
           >
             <div className="flex-grow">
               <div className="flex items-center gap-2 text-gray-nav mb-12">
