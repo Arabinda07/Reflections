@@ -1,7 +1,8 @@
 import React from 'react';
-import { motion, HTMLMotionProps } from 'motion/react';
+import { motion, HTMLMotionProps, Transition } from 'motion/react';
 
 interface ButtonProps extends Omit<HTMLMotionProps<"button">, 'ref'> {
+  children?: React.ReactNode;
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'bezel';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
@@ -35,9 +36,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
     lg: "h-14 px-8 text-[16px] rounded-[var(--radius-control)]",
   };
 
-  const expoTransition = {
+  const expoTransition: Transition = {
     duration: 0.25,
-    ease: [0.16, 1, 0.3, 1]
+    ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
   };
 
   if (variant === 'bezel') {
