@@ -74,7 +74,7 @@ export const Landing: React.FC = () => {
               onClick={() => navigate(RoutePath.SIGNUP)}
               whileHover={{ y: -3, scale: 1.02 }}
               whileTap={{ scale: 0.98, y: 0 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
               className="group h-16 w-auto px-10 font-editor text-[19px] font-bold shadow-2xl shadow-green/30 hover:shadow-green/40 hover:bg-green-hover"
               aria-label="Begin writing"
             >
@@ -89,7 +89,7 @@ export const Landing: React.FC = () => {
                   onClick={() => navigate(RoutePath.LOGIN)}
                   whileHover={{ y: -1 }}
                   whileTap={{ scale: 0.97 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                   className="h-11 px-0 text-[15px] font-medium text-gray-text hover:text-green transition-colors"
                 >
                   Sign in
@@ -100,7 +100,7 @@ export const Landing: React.FC = () => {
                   onClick={() => navigate(RoutePath.FAQ)}
                   whileHover={{ y: -1 }}
                   whileTap={{ scale: 0.97 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                   className="h-11 px-0 text-[15px] font-medium text-gray-text hover:text-green transition-colors"
                 >
                   How it works
@@ -112,7 +112,7 @@ export const Landing: React.FC = () => {
                 onClick={toggleMute}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.9, rotate: -8 }}
-                transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                 className="surface-floating surface-floating--media h-11 min-h-11 w-11 min-w-11 !px-0 rounded-2xl !text-gray-nav hover:!text-green hover:border-green/40 transition-all duration-300 group"
                 aria-label={isMuted ? 'Unmute video' : 'Mute video'}
               >

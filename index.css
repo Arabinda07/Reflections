@@ -1397,7 +1397,7 @@ select:focus-visible,
     padding: 24px !important;
     border-radius: 32px;
     background: var(--panel-bg);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35) !important;
+    box-shadow: var(--hero-shadow) !important;
     border: 2px solid var(--border-color);
     display: block !important;
   }
@@ -1421,7 +1421,7 @@ select:focus-visible,
     padding: 20px !important;
     border-radius: 32px;
     background: var(--panel-bg);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35) !important;
+    box-shadow: var(--hero-shadow) !important;
     border: 2px solid var(--border-color);
     display: flex !important;
     flex-wrap: wrap;
