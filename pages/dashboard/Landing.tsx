@@ -1,18 +1,18 @@
 import { ArrowRight, SpeakerHigh, SpeakerSlash } from '@phosphor-icons/react';
-import { motion } from 'motion/react';
+import { motion, Variants } from 'motion/react';
 import React, { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { RoutePath } from '../../types';
 
-const staggerContainer = {
+const staggerContainer: Variants = {
   hidden: {},
   show: { transition: { staggerChildren: 0.11, delayChildren: 0.05 } },
 };
 
-const staggerLine = {
+const staggerLine: Variants = {
   hidden: { opacity: 0, y: 60 },
-  show: { opacity: 1, y: 0, transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] } },
+  show: { opacity: 1, y: 0, transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] } },
 };
 
 export const Landing: React.FC = () => {

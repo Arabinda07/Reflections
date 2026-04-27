@@ -14,8 +14,8 @@ interface ProUpgradeCTAProps {
 const RAZORPAY_MONTHLY_PLAN_ID = import.meta.env.VITE_RAZORPAY_MONTHLY_PLAN_ID;
 const RAZORPAY_YEARLY_PLAN_ID = import.meta.env.VITE_RAZORPAY_YEARLY_PLAN_ID;
 
-export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ className = '', variant = 'card' }) => {
-  const { session } = useAuth();
+export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, className = '', variant = 'card' }) => {
+  useAuth(); // keep useAuth for checking user state if needed, but we fetch session below
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,6 +46,8 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ className = '', va
         throw new Error('Subscription plans are not fully configured yet.');
       }
 
+      const { data: { session } } = await supabase.auth.getSession();
+      
       // 1. Create Subscription
       const res = await fetch('/api/create-razorpay-subscription', {
         method: 'POST',
@@ -68,6 +70,8 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ className = '', va
         handler: async function (response: any) {
           try {
             setIsProcessing(true);
+            const { data: { session } } = await supabase.auth.getSession();
+            
             // 3. Verify Payment
             const verifyRes = await fetch('/api/verify-razorpay-payment', {
               method: 'POST',

@@ -35,7 +35,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
     lg: "h-14 px-8 text-[16px] rounded-[var(--radius-control)]",
   };
 
-  const expoTransition = {
+  const expoTransition: any = {
     duration: 0.25,
     ease: [0.16, 1, 0.3, 1]
   };
@@ -53,7 +53,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
       >
         <div className="surface-bezel-inner flex items-center justify-center px-6 py-2">
           {isLoading && <span className="mr-2 h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />}
-          {children}
+          {children as React.ReactNode}
         </div>
       </motion.button>
     );
@@ -70,7 +70,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
       {...props}
     >
       {isLoading && <span className="mr-2 h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />}
-      {children}
+      {children as React.ReactNode}
     </motion.button>
   );
 });

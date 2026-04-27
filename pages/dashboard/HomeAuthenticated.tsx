@@ -7,7 +7,7 @@ import {
   Sparkle,
   Target,
 } from '@phosphor-icons/react';
-import { animate, motion, useReducedMotion, AnimatePresence } from 'motion/react';
+import { animate, motion, useReducedMotion, AnimatePresence, Variants } from 'motion/react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { ListChecks, CheckCircle as CheckCircleIcon, X as XIcon } from '@phosphor-icons/react';
@@ -26,7 +26,7 @@ import {
   getHomeIntentionToggleUpdate,
   type HomeIntentionSummary,
 } from './homeIntentions';
-const bentoContainerVariants = {
+const bentoContainerVariants: Variants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
@@ -37,14 +37,14 @@ const bentoContainerVariants = {
   },
 };
 
-const bentoItemVariants = {
+const bentoItemVariants: Variants = {
   hidden: { opacity: 0, y: 15 },
   show: {
     opacity: 1,
     y: 0,
     transition: {
       duration: 0.6,
-      ease: [0.16, 1, 0.3, 1],
+      ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
     },
   },
 };
@@ -368,7 +368,7 @@ export const HomeAuthenticated: React.FC = () => {
               </button>
             </div>
 
-            <button
+            <motion.button
               onClick={() => navigate(RoutePath.INSIGHTS)}
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.99 }}
@@ -384,7 +384,7 @@ export const HomeAuthenticated: React.FC = () => {
               <p className="text-[15px] font-serif italic text-gray-light leading-relaxed group-hover:text-gray-text transition-colors">
                 Patterns stay here quietly until you ask Reflections to build them.
               </p>
-            </button>
+            </motion.button>
           </motion.div>
           
           {/* Daily Focus & Intentions Card */}
