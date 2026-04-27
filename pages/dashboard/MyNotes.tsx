@@ -1,5 +1,5 @@
 import React, { Suspense, lazy, useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Plus,
   FileText,
@@ -13,6 +13,7 @@ import {
   Lightning,
   Trash,
   CircleNotch,
+  Download,
   SquaresFour,
   Tag,
   X,
@@ -31,6 +32,7 @@ import { Surface } from '../../components/ui/Surface';
 import { useAuth } from '../../context/AuthContext';
 import { noteService } from '../../services/noteService';
 import { Note, RoutePath } from '../../types';
+import { NoteExportDialog } from './NoteExportDialog';
 import { buildNotePreviewText } from './noteContent';
 
 const MyNotesCalendar = lazy(() =>
@@ -46,6 +48,7 @@ export const MyNotes: React.FC = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [noteIdToDelete, setNoteIdToDelete] = useState<string | null>(null);
+  const [noteToExport, setNoteToExport] = useState<Note | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'calendar'>('grid');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
@@ -77,6 +80,11 @@ export const MyNotes: React.FC = () => {
     event.stopPropagation();
     setNoteIdToDelete(id);
     setIsConfirmOpen(true);
+  };
+
+  const openExportDialog = (event: React.MouseEvent, note: Note) => {
+    event.stopPropagation();
+    setNoteToExport(note);
   };
 
   const performDelete = async () => {
@@ -146,98 +154,129 @@ export const MyNotes: React.FC = () => {
     );
   };
 
-  const renderNoteCard = (note: Note, index: number) => (
-    <Surface
-      key={note.id}
-      variant="flat"
-      className="group cursor-pointer overflow-hidden hover:border-green/25 hover:shadow-xl hover:shadow-black/5 transition-all duration-500"
-    >
-      <div
-        onClick={() => navigate(RoutePath.NOTE_DETAIL.replace(':id', note.id))}
-        className="flex h-full flex-col"
-        style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
+  const renderNoteCard = (note: Note, index: number) => {
+    const noteDetailPath = RoutePath.NOTE_DETAIL.replace(':id', note.id);
+
+    return (
+      <Surface
+        key={note.id}
+        variant="flat"
+        className="group overflow-hidden hover:border-green/25 hover:shadow-xl hover:shadow-black/5 transition-all duration-500"
       >
-        <div className="relative h-44 w-full overflow-hidden border-b border-border/40">
-          {note.thumbnailUrl ? (
-            <>
-              <div className="absolute inset-0 bg-green/0 transition-colors duration-500 group-hover:bg-green/5 z-10" />
-              <StorageImage
-                path={note.thumbnailUrl}
-                alt={note.title}
-                className="h-full w-full object-cover transition-transform duration-700 ease-out will-change-transform group-hover:scale-105"
-              />
-            </>
-          ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gray-50/5 dark:bg-white/5">
-              <FileText className="text-border transition-colors group-hover:text-green/30" size={48} weight="duotone" />
-            </div>
-          )}
+        <article
+          className="flex h-full flex-col"
+          style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
+        >
+          <div className="relative h-44 w-full overflow-hidden border-b border-border/40">
+            <Link
+              to={noteDetailPath}
+              className="block h-full w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
+              aria-label={`Open ${note.title}`}
+            >
+              {note.thumbnailUrl ? (
+                <>
+                  <div className="absolute inset-0 z-10 bg-green/0 transition-colors duration-500 group-hover:bg-green/5" />
+                  <StorageImage
+                    path={note.thumbnailUrl}
+                    alt={note.title}
+                    className="h-full w-full object-cover transition-transform duration-700 ease-out will-change-transform group-hover:scale-105"
+                  />
+                </>
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-gray-50/5 dark:bg-white/5">
+                  <FileText className="text-border transition-colors group-hover:text-green/30" size={48} weight="duotone" />
+                </div>
+              )}
+            </Link>
 
-          <button
-            onClick={(event) => initiateDelete(event, note.id)}
-            disabled={isDeleting && noteIdToDelete === note.id}
-            className="absolute left-4 top-4 z-20 inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] border border-border/60 bg-white/90 text-gray-text shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-red/30 hover:text-red"
-            aria-label={`Delete ${note.title}`}
-          >
-            {isDeleting && noteIdToDelete === note.id ? (
-              <CircleNotch size={16} weight="bold" className="animate-spin text-red" />
-            ) : (
-              <Trash size={16} weight="bold" />
-            )}
-          </button>
+            <button
+              onClick={(event) => initiateDelete(event, note.id)}
+              disabled={isDeleting && noteIdToDelete === note.id}
+              className="absolute left-4 top-4 z-20 inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] border border-border/60 bg-white/90 text-gray-text shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-red/30 hover:text-red"
+              aria-label={`Delete ${note.title}`}
+            >
+              {isDeleting && noteIdToDelete === note.id ? (
+                <CircleNotch size={16} weight="bold" className="animate-spin text-red" />
+              ) : (
+                <Trash size={16} weight="bold" />
+              )}
+            </button>
 
-          <div className="absolute right-4 top-4 z-20 flex flex-wrap justify-end gap-2">
-            <MetadataPill icon={<CalendarIcon size={12} weight="bold" />}>
-              {new Date(note.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-            </MetadataPill>
-            {note.mood ? (
-              <MetadataPill icon={getMoodIcon(note.mood)} tone="green">
-                <span className="capitalize">{note.mood}</span>
+            <div className="absolute right-4 top-4 z-20 flex flex-wrap justify-end gap-2">
+              <MetadataPill icon={<CalendarIcon size={12} weight="bold" />}>
+                {new Date(note.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
               </MetadataPill>
-            ) : null}
-          </div>
-        </div>
-
-        <div className="flex flex-1 flex-col p-6">
-          <div className="mb-3 flex flex-wrap gap-2">
-            {note.tags?.map((tag) => (
-              <Chip key={tag} as="span" active className="text-[10px]">
-                #{tag}
-              </Chip>
-            ))}
+              {note.mood ? (
+                <MetadataPill icon={getMoodIcon(note.mood)} tone="green">
+                  <span className="capitalize">{note.mood}</span>
+                </MetadataPill>
+              ) : null}
+            </div>
           </div>
 
-          <h3 className="mb-2 text-[18px] font-bold tracking-[-0.01em] text-gray-text leading-snug transition-colors group-hover:text-green text-balance">
-            {note.title}
-          </h3>
+          <div className="flex flex-1 flex-col p-6">
+            <div className="mb-3 flex flex-wrap gap-2">
+              {note.tags?.map((tag) => (
+                <Chip key={tag} as="span" active className="text-[10px]">
+                  #{tag}
+                </Chip>
+              ))}
+            </div>
 
-          <p className="mb-5 text-[14px] font-medium leading-relaxed text-gray-light line-clamp-3 font-serif italic">
-            {getPreviewText(note.content)}
-          </p>
+            <Link
+              to={noteDetailPath}
+              className="rounded-[var(--radius-control)] focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
+              aria-label={`Open ${note.title}`}
+            >
+              <h3 className="mb-2 text-[18px] font-bold tracking-[-0.01em] text-gray-text leading-snug transition-colors group-hover:text-green text-balance">
+                {note.title}
+              </h3>
 
-          <div className="mt-auto flex items-center justify-between border-t border-border/40 pt-4">
-            <div className="flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-green text-[10px] font-extrabold text-white shadow-sm">
-                {user?.name?.charAt(0) || 'U'}
+              <p className="mb-5 text-[14px] font-medium leading-relaxed text-gray-light line-clamp-3 font-serif italic">
+                {getPreviewText(note.content)}
+              </p>
+            </Link>
+
+            <div className="mt-auto flex items-center justify-between gap-3 border-t border-border/40 pt-4">
+              <div className="flex min-w-0 items-center gap-2">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green text-[10px] font-extrabold text-white shadow-sm">
+                  {user?.name?.charAt(0) || 'U'}
+                </div>
+                <span className="truncate text-[12px] font-bold text-gray-nav">
+                  Edited {format(new Date(note.updatedAt), 'MMM d')}
+                </span>
               </div>
-              <span className="text-[12px] font-bold text-gray-nav">
-                Edited {format(new Date(note.updatedAt), 'MMM d')}
-              </span>
-            </div>
 
-            <div className="flex items-center text-[12px] font-bold text-green transition-all duration-300 group-hover:opacity-70">
-              <span>Open</span>
-              <ArrowUpRight
-                size={14}
-                weight="bold"
-                className="ml-1 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-              />
+              <div className="flex shrink-0 items-center gap-2">
+                <button
+                  type="button"
+                  onClick={(event) => openExportDialog(event, note)}
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-control)] border border-border/40 text-gray-nav transition-all hover:border-green/25 hover:bg-green/5 hover:text-green"
+                  title={`Export ${note.title}`}
+                  aria-label={`Export ${note.title}`}
+                >
+                  <Download size={15} weight="bold" />
+                </button>
+
+                <Link
+                  to={noteDetailPath}
+                  className="inline-flex min-h-10 items-center rounded-[var(--radius-control)] px-2 text-[12px] font-bold text-green transition-all duration-300 hover:bg-green/5 group-hover:opacity-70 focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
+                  aria-label={`Open ${note.title}`}
+                >
+                  <span>Open</span>
+                  <ArrowUpRight
+                    size={14}
+                    weight="bold"
+                    className="ml-1 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  />
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-    </Surface>
-  );
+        </article>
+      </Surface>
+    );
+  };
 
   return (
     <>
@@ -400,6 +439,12 @@ export const MyNotes: React.FC = () => {
         confirmLabel={isDeleting ? 'Deleting...' : 'Delete note'}
         isConfirming={isDeleting}
         variant="danger"
+      />
+
+      <NoteExportDialog
+        isOpen={Boolean(noteToExport)}
+        note={noteToExport}
+        onClose={() => setNoteToExport(null)}
       />
     </>
   );

@@ -33,7 +33,7 @@ export const Landing: React.FC = () => {
       <div className="min-h-[100dvh] w-full relative overflow-hidden">
 
         {/* ── Left panel: content ── */}
-        <div className="relative z-20 flex min-h-[100dvh] flex-col px-6 pb-10 pt-[calc(env(safe-area-inset-top)+var(--header-height)+1.5rem)] sm:px-12 sm:pb-10 sm:pt-[calc(env(safe-area-inset-top)+var(--header-height)+2rem)] lg:justify-between lg:pt-[28vh] lg:pb-12 lg:px-16 xl:px-24 pointer-events-none">
+        <div className="relative z-20 flex min-h-[100dvh] flex-col px-6 pb-[calc(env(safe-area-inset-bottom)+1.75rem)] pt-[calc(env(safe-area-inset-top)+var(--header-height)+1.5rem)] sm:px-12 sm:pt-[calc(env(safe-area-inset-top)+var(--header-height)+2rem)] lg:justify-between lg:pt-[28vh] lg:pb-12 lg:px-16 xl:px-24 pointer-events-none">
 
           <div className="flex flex-col gap-6 lg:w-[60%] lg:gap-8 xl:w-[55%]">
             <motion.div
@@ -113,7 +113,7 @@ export const Landing: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.9, rotate: -8 }}
                 transition={{ type: 'spring', stiffness: 500, damping: 25 }}
-                className="h-11 w-11 !px-0 rounded-2xl bg-surface !text-gray-nav hover:!text-green hover:border-green/40 shadow-sm transition-all duration-300 group"
+                className="surface-floating surface-floating--media h-11 min-h-11 w-11 min-w-11 !px-0 rounded-2xl !text-gray-nav hover:!text-green hover:border-green/40 transition-all duration-300 group"
                 aria-label={isMuted ? 'Unmute video' : 'Mute video'}
               >
                 {isMuted ? <SpeakerSlash size={20} weight="bold" /> : <SpeakerHigh size={20} weight="bold" />}

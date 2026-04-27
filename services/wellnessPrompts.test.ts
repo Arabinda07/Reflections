@@ -10,6 +10,12 @@ describe('wellnessPrompts', () => {
     expect(DEFAULT_WELLNESS_PROMPTS.length).toBeGreaterThan(3);
   });
 
+  it('keeps the default prompts grounded instead of therapy-coded', () => {
+    expect(DEFAULT_WELLNESS_PROMPTS.join(' ')).not.toMatch(
+      /felt heavy|quietest moment|little room|keep returning/i,
+    );
+  });
+
   it('returns the prompt at the current index', () => {
     expect(getCurrentWellnessPrompt(1, ['one', 'two', 'three'])).toBe('two');
   });

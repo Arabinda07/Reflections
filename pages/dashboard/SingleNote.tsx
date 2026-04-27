@@ -36,6 +36,7 @@ import { Surface } from '../../components/ui/Surface';
 import { noteService } from '../../services/noteService';
 import { storageService } from '../../services/storageService';
 import { Note, RoutePath, Task } from '../../types';
+import { NoteExportDialog } from './NoteExportDialog';
 import { sanitizeNoteHtml } from './noteContent';
 
 const MOOD_OPTIONS = ['happy', 'calm', 'anxious', 'sad', 'angry', 'tired'] as const;
@@ -51,6 +52,7 @@ export const SingleNote: React.FC = () => {
   const [isMoodOpen, setIsMoodOpen] = useState(false);
   const [isTagsOpen, setIsTagsOpen] = useState(false);
   const [isTasksOpen, setIsTasksOpen] = useState(false);
+  const [isExportOpen, setIsExportOpen] = useState(false);
   const [tagDraft, setTagDraft] = useState('');
   const [taskDraft, setTaskDraft] = useState('');
 
@@ -305,6 +307,17 @@ export const SingleNote: React.FC = () => {
               <Button
                 variant="secondary"
                 size="md"
+                onClick={() => setIsExportOpen(true)}
+                disabled={isDeleting}
+                className="shadow-sm hover:border-green/20 hover:bg-green/5 !px-3 sm:!px-6"
+                aria-label="Export this reflection"
+              >
+                <Download weight="bold" className="h-5 w-5 shrink-0 text-green sm:mr-2" />
+                <span className="hidden sm:inline">Export</span>
+              </Button>
+              <Button
+                variant="secondary"
+                size="md"
                 onClick={handleEdit}
                 disabled={isDeleting}
                 className="shadow-sm hover:border-green/20 hover:bg-green/5"
@@ -354,6 +367,18 @@ export const SingleNote: React.FC = () => {
                 </div>
 
                 <div className="space-y-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsExportOpen(true)}
+                    className="flex w-full items-center justify-between rounded-[var(--radius-panel)] border border-border bg-white/5 px-4 py-3 text-left text-gray-nav transition-all hover:border-green/25 hover:text-green"
+                  >
+                    <span className="flex items-center gap-3 text-[13px] font-black uppercase tracking-tight">
+                      <Download size={18} weight="duotone" />
+                      Export note
+                    </span>
+                    <span className="text-[11px] font-bold uppercase tracking-widest opacity-60">Open</span>
+                  </button>
+
                   <button
                     type="button"
                     onClick={() => setIsMoodOpen(true)}
@@ -615,6 +640,12 @@ export const SingleNote: React.FC = () => {
         confirmLabel={isDeleting ? 'Deleting...' : 'Delete note'}
         isConfirming={isDeleting}
         variant="danger"
+      />
+
+      <NoteExportDialog
+        isOpen={isExportOpen}
+        note={note}
+        onClose={() => setIsExportOpen(false)}
       />
     </>
   );

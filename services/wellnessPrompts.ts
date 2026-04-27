@@ -2,11 +2,11 @@ export const DEFAULT_WELLNESS_PROMPTS = [
   "Begin with what you remember.",
   "A few lines are enough.",
   "What do you want to remember about today?",
-  "Write the part you keep returning to.",
-  "What was the quietest moment of your day?",
-  "Notice one thing that felt heavy today.",
-  "One detail that felt true.",
-  "Where did you find a little room today?",
+  "Write the plain version first.",
+  "What happened that is still worth noting?",
+  "Name one small detail before the day moves on.",
+  "What do you need to remember later?",
+  "Start with the last thing on your mind.",
 ];
 
 export function getCurrentWellnessPrompt(index: number, prompts: string[]) {

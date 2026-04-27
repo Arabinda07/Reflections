@@ -15,7 +15,11 @@ const HomeFallback: React.FC = () => (
 );
 
 export const Home: React.FC = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isInitialCheckDone } = useAuth();
+
+  if (!isInitialCheckDone) {
+    return <HomeFallback />;
+  }
 
   if (!isAuthenticated) {
     return <Landing />;

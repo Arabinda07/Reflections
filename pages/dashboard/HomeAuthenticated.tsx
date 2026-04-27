@@ -395,17 +395,31 @@ export const HomeAuthenticated: React.FC = () => {
             variants={bentoItemVariants}
             className="p-8 sm:p-12 lg:p-16 border-b lg:border-b-0 lg:border-r border-border/40 flex flex-col justify-start h-full bg-white/30 dark:bg-white/8 overflow-hidden"
           >
-            <div className="flex items-center justify-between mb-10">
+            <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2 text-gray-nav">
                 <ListChecks size={18} weight="bold" className="text-green" />
                 <span className="text-[11px] font-black uppercase tracking-[0.2em] opacity-60">
                   Your Intentions
                 </span>
               </div>
-              {intentionSummary.openCount > 0 ? (
-                <span className="text-[10px] font-black uppercase tracking-widest text-green/70">
-                  {intentionSummary.openCount} open
+            </div>
+
+            <div className="mb-6 rounded-[var(--radius-panel)] border border-border/40 bg-panel-bg px-5 py-4">
+              <p className="text-[10px] font-black uppercase tracking-widest text-gray-nav/50">
+                Task summary
+              </p>
+              <p className="mt-2 flex items-baseline gap-2 text-gray-text">
+                <span className="text-4xl font-display tabular-nums tracking-tight">
+                  {intentionSummary.openCount}
                 </span>
+                <span className="text-[13px] font-black uppercase tracking-widest text-gray-nav">
+                  open {intentionSummary.openCount === 1 ? 'task' : 'tasks'}
+                </span>
+              </p>
+              {intentionSummary.completedCount > 0 ? (
+                <p className="mt-1 text-[12px] font-medium text-gray-light">
+                  {intentionSummary.completedCount} settled in your notes.
+                </p>
               ) : null}
             </div>
 
