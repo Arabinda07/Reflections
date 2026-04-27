@@ -23,12 +23,13 @@ describe('wellnessPolicy', () => {
   });
 
   it('counts only notes from the current month', () => {
+    const access: WellnessAccess = { userId: '1', planTier: 'free', freeAiReflectionsUsed: 0, freeWikiInsightsUsed: 0 };
     const usage = getMonthlyNoteUsage([
       note('march', '2026-03-31T23:00:00.000Z'),
       note('april-one', '2026-04-01T00:00:00.000Z'),
       note('april-two', '2026-04-13T08:00:00.000Z'),
       note('may', '2026-05-01T00:00:00.000Z'),
-    ], new Date('2026-04-13T10:30:00.000Z'));
+    ], access, new Date('2026-04-13T10:30:00.000Z'));
 
     expect(usage).toEqual({
       usedThisMonth: 2,

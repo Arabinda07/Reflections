@@ -32,6 +32,7 @@ import { storageService } from '../../services/storageService';
 import { offlineStorage } from '../../services/offlineStorage';
 import { useAuth } from '../../context/AuthContext';
 import { profileService } from '../../services/profileService';
+import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
 
 const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
 
@@ -56,7 +57,6 @@ export const Account: React.FC = () => {
   const [lastSignIn, setLastSignIn] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<FeedbackState>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [showUpgradeSheet, setShowUpgradeSheet] = useState(false);
   const [isDeletingData, setIsDeletingData] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -220,19 +220,6 @@ export const Account: React.FC = () => {
         description: 'Please try again in a moment.',
       });
     }
-  };
-
-  const handleUpgradeRequest = () => {
-    openSupportDraft(
-      'Reflections Pro waitlist',
-      `Hi,\n\nPlease add ${email || 'my account'} to the Reflections Pro waitlist.\n\nThanks.`,
-    );
-    setShowUpgradeSheet(false);
-    setFeedback({
-      variant: 'info',
-      title: 'Draft ready.',
-      description: 'Send it when you want to join the Pro waitlist.',
-    });
   };
 
   const handleAccountClosureRequest = () => {
@@ -433,14 +420,12 @@ export const Account: React.FC = () => {
 
                     <div className="mt-6 flex flex-wrap gap-2">
                       <MetadataPill tone="green">{access?.planTier === 'pro' ? 'Active' : 'Free tier'}</MetadataPill>
-                      <MetadataPill>{access?.freeAiReflectionsUsed || 0}/1 AI reflection used</MetadataPill>
-                      <MetadataPill>{access?.freeWikiInsightsUsed || 0}/1 Life Wiki refresh used</MetadataPill>
                     </div>
 
                     {access?.planTier !== 'pro' ? (
-                      <Button type="button" variant="primary" className="mt-6 w-full" onClick={() => setShowUpgradeSheet(true)}>
-                        Join Pro waitlist
-                      </Button>
+                      <div className="mt-8">
+                        <ProUpgradeCTA />
+                      </div>
                     ) : null}
                   </div>
                 </Surface>
@@ -551,47 +536,6 @@ export const Account: React.FC = () => {
           </Surface>
         </div>
       </PageContainer>
-
-      <ModalSheet
-        isOpen={showUpgradeSheet}
-        onClose={() => setShowUpgradeSheet(false)}
-        title="Join the Pro waitlist"
-        icon={<Sparkle size={20} weight="duotone" />}
-        size="md"
-        footer={
-          <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-            <Button variant="secondary" onClick={() => setShowUpgradeSheet(false)}>
-              Maybe later
-            </Button>
-            <Button variant="primary" onClick={handleUpgradeRequest}>
-              Join the Pro waitlist
-            </Button>
-          </div>
-        }
-      >
-        <div className="space-y-4">
-          <p className="text-[14px] font-medium leading-relaxed text-gray-light">
-            Pro keeps your notes unlimited and includes AI reflections and Life Wiki refreshes whenever you ask. No hard sell.
-          </p>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Surface variant="flat" className="overflow-hidden">
-              <div className="p-4">
-                <p className="text-[11px] font-black uppercase tracking-widest text-green">Includes</p>
-                <p className="mt-2 text-[14px] font-medium text-gray-light">Unlimited note writing and optional AI reflections when you ask for them.</p>
-              </div>
-            </Surface>
-            <Surface variant="flat" className="overflow-hidden">
-              <div className="p-4">
-                <p className="text-[11px] font-black uppercase tracking-widest text-green">Also includes</p>
-                <p className="mt-2 text-[14px] font-medium text-gray-light">Ongoing Life Wiki refreshes and future pattern surfaces as they launch.</p>
-              </div>
-            </Surface>
-          </div>
-          <p className="text-[13px] font-medium text-gray-light">
-            Prefer email directly? Write to <a href={`mailto:${SUPPORT_EMAIL}`} className="font-bold text-green hover:underline">{SUPPORT_EMAIL}</a>.
-          </p>
-        </div>
-      </ModalSheet>
 
       <ModalSheet
         isOpen={showDeleteConfirm}

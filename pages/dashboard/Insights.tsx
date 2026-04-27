@@ -17,9 +17,11 @@ import { MetadataPill } from '../../components/ui/MetadataPill';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { Surface } from '../../components/ui/Surface';
-import { LifeTheme, Note, RoutePath } from '../../types';
+import { LifeTheme, Note, RoutePath, WellnessAccess } from '../../types';
 import { noteService } from '../../services/noteService';
 import { wikiService } from '../../services/wikiService';
+import { profileService } from '../../services/profileService';
+import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
 
 const MOOD_TONE_CLASSES: Record<string, { label: string; track: string; fill: string }> = {
   happy: { label: 'text-orange', track: 'bg-orange/10', fill: 'bg-orange' },
@@ -42,17 +44,20 @@ export const Insights: React.FC = () => {
   const navigate = useNavigate();
   const [notes, setNotes] = useState<Note[]>([]);
   const [themes, setThemes] = useState<LifeTheme[]>([]);
+  const [access, setAccess] = useState<WellnessAccess | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [allNotes, allThemes] = await Promise.all([
+        const [allNotes, allThemes, accessData] = await Promise.all([
           noteService.getAll(),
           wikiService.getAllThemes(),
+          profileService.getWellnessAccess(),
         ]);
 
         setNotes(allNotes);
         setThemes(allThemes);
+        setAccess(accessData);
       } catch (error) {
         console.error('[Insights] Failed to load data:', error);
       }
@@ -135,12 +140,7 @@ export const Insights: React.FC = () => {
 
           <SectionHeader
             title="Patterns in your writing"
-            description="Mood, rhythm, and recurring themes — refreshed only when you ask."
-            icon={
-              <div className="icon-block icon-block-lg">
-                <Brain size={34} weight="duotone" />
-              </div>
-            }
+            description="Mood, rhythm, and recurring themes"
           />
 
           <div className="grid gap-6 lg:grid-cols-[1.35fr_0.65fr]">
@@ -262,7 +262,7 @@ export const Insights: React.FC = () => {
                 <EmptyState
                   surface="none"
                   icon={<Hash size={22} weight="duotone" />}
-                  title="Tags will become a gentle map of what you keep returning to."
+                  title="Tags will appear here."
                   description="As you tag your entries, this view will help you spot recurring subjects."
                 />
               ) : (
@@ -309,6 +309,12 @@ export const Insights: React.FC = () => {
               </div>
             </div>
           </Surface>
+
+          {access?.planTier !== 'pro' && (
+            <div className="pt-4">
+              <ProUpgradeCTA />
+            </div>
+          )}
         </div>
       </PageContainer>
     </>

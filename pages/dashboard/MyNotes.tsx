@@ -21,6 +21,7 @@ import {
 import { format, isSameDay } from 'date-fns';
 import { Button } from '../../components/ui/Button';
 import { Chip } from '../../components/ui/Chip';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
 import { LoadingState } from '../../components/ui/LoadingState';

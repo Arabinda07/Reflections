@@ -25,8 +25,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
         </div>
 
         <div className="overlay-feedback-copy">
-          <h2 className="h2-section mb-4">{title}</h2>
-          <p className="body-editorial max-w-sm mx-auto">{message}</p>
+          <h2 className="h2-section mb-0">{title}</h2>
         </div>
       </div>
     </OverlayFeedback>

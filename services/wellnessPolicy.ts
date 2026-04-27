@@ -12,7 +12,16 @@ export function getMonthRange(now = new Date()) {
   return { start, end };
 }
 
-export function getMonthlyNoteUsage(notes: Note[], now = new Date()): NoteUsage {
+export function getMonthlyNoteUsage(notes: Note[], access: WellnessAccess, now = new Date()): NoteUsage {
+  if (access.planTier === 'pro') {
+    return {
+      usedThisMonth: notes.length,
+      monthlyLimit: Infinity,
+      remainingThisMonth: Infinity,
+      canCreateNote: true,
+    };
+  }
+
   const { start, end } = getMonthRange(now);
   const usedThisMonth = notes.filter((note) => {
     const created = new Date(note.createdAt);

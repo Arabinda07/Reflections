@@ -15,8 +15,10 @@ import {
   PaperPlaneTilt,
   CheckCircle
 } from '@phosphor-icons/react';
+import { ProfileModal } from '../components/ui/ProfileModal';
 import { RoutePath } from '../types';
 import { useAuth } from '../context/AuthContext';
+import { useKeyboardShortcut } from '../src/hooks/useKeyboardShortcut';
 import { usePWAInstall } from '../context/PWAInstallContext';
 import { AnalyticsRouteTracker } from '../src/analytics/AnalyticsRouteTracker';
 import { Button } from '../components/ui/Button';
@@ -25,6 +27,8 @@ import { SyncBanner } from '../components/ui/SyncBanner';
 import { registerAndroidBackAction } from '../src/native/androidBack';
 import { NATIVE_PAGE_TOP_PADDING, NATIVE_TOP_CONTROL_OFFSET } from '../src/native/safeArea';
 import { useAndroidBackHandler } from '../src/native/useAndroidBackHandler';
+import { noteService } from '../services/noteService';
+import { FREE_WIKI_MINIMUM_ENTRIES } from '../services/wellnessPolicy';
 
 const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
@@ -46,6 +50,16 @@ export const DashboardLayout: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return document.documentElement.classList.contains('dark');
   });
+  const [hasWikiUnlocked, setHasWikiUnlocked] = useState(false);
+
+  useKeyboardShortcut(
+    { key: 'n', ctrlOrCmd: true },
+    (e) => {
+      e.preventDefault();
+      navigate(RoutePath.CREATE_NOTE);
+    },
+    [navigate]
+  );
 
   // Bug Report State
   const [isBugModalOpen, setIsBugModalOpen] = useState(false);
@@ -63,6 +77,19 @@ export const DashboardLayout: React.FC = () => {
       document.documentElement.classList.remove('dark');
     }
   }, [isDarkMode]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const checkWikiUnlock = async () => {
+      try {
+        const count = await noteService.getCount();
+        setHasWikiUnlocked(count >= FREE_WIKI_MINIMUM_ENTRIES);
+      } catch (e) {
+        console.error('Failed to check wiki unlock status', e);
+      }
+    };
+    checkWikiUnlock();
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (!isMobileMenuOpen) return;
@@ -183,6 +210,7 @@ export const DashboardLayout: React.FC = () => {
   const authNavItems = [
     { label: 'My notes', path: RoutePath.NOTES },
     { label: 'Create note', path: RoutePath.CREATE_NOTE },
+    ...(hasWikiUnlocked ? [{ label: 'Life Wiki', path: RoutePath.WIKI }] : []),
     { label: 'Account', path: RoutePath.ACCOUNT },
     { label: 'FAQ', path: RoutePath.FAQ },
   ];

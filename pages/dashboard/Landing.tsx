@@ -72,17 +72,17 @@ export const Landing: React.FC = () => {
             <Button
               variant="primary"
               onClick={() => navigate(RoutePath.SIGNUP)}
-              whileHover={{ y: -3, scale: 1.01 }}
+              whileHover={{ y: -3, scale: 1.02 }}
               whileTap={{ scale: 0.98, y: 0 }}
               transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-              className="group h-14 w-auto px-8 text-[18px] font-serif font-bold italic"
+              className="group h-16 w-auto px-10 text-[19px] font-black shadow-2xl shadow-green/30 hover:shadow-green/40 hover:bg-green-hover"
               aria-label="Begin writing"
             >
               Begin writing
               <ArrowRight size={22} className="ml-3 group-hover:translate-x-1.5 transition-transform duration-500 ease-out-expo" />
             </Button>
 
-            <div className="flex w-full items-center justify-between sm:w-auto sm:gap-x-10 lg:gap-x-12">
+            <div className="flex w-full items-center justify-between sm:w-auto sm:gap-x-10 lg:gap-x-12 mt-4 sm:mt-0">
               <div className="flex items-center gap-x-8 sm:gap-x-10">
                 <Button
                   variant="ghost"

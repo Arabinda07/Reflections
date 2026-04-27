@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -18,6 +19,8 @@ import { Surface } from '../../components/ui/Surface';
 import { LifeTheme, Note, RoutePath, WellnessAccess } from '../../types';
 import { noteService } from '../../services/noteService';
 import { wikiService } from '../../services/wikiService';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { useAuth } from '../../context/AuthContext';
 import { aiService } from '../../services/aiService';
 import { profileService } from '../../services/profileService';
 import { FREE_WIKI_MINIMUM_ENTRIES, getWikiInsightsGate } from '../../services/wellnessPolicy';
@@ -142,6 +145,42 @@ export const LifeWiki: React.FC = () => {
       <div className="fixed inset-0 pointer-events-none z-[-1] bg-surface/50 backdrop-blur-[60px]" />
       <div className="fixed inset-0 pointer-events-none z-[-2] bg-gradient-to-b from-green/5 to-transparent" />
 
+      {/* Immersive Loading Video Overlay */}
+      <AnimatePresence>
+        {isRefreshingWiki && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-body"
+          >
+            <video
+              src="/assets/videos/cycling.mp4"
+              className="absolute inset-0 h-full w-full object-cover opacity-40 mix-blend-screen"
+              autoPlay
+              loop
+              muted
+              playsInline
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-body via-body/40 to-body/20" />
+            
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.8 }}
+              className="relative z-10 text-center px-6"
+            >
+              <Sparkle size={32} weight="duotone" className="text-green mx-auto mb-6 animate-pulse" />
+              <h2 className="text-4xl md:text-5xl font-serif italic text-gray-text mb-4">Refining your Life Wiki</h2>
+              <p className="text-[12px] font-black uppercase tracking-widest text-gray-nav/60">
+                Finding the patterns in your reflections...
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <PageContainer className="pb-24 pt-4 md:pt-8 relative z-10">
         <div className="space-y-10">
           <div className="sticky-bar">
@@ -244,7 +283,7 @@ export const LifeWiki: React.FC = () => {
             ) : themes.length === 0 ? (
               <EmptyState
                 surface="flat"
-                icon={<Sparkle size={24} weight="duotone" className="text-orange" />}
+                illustration={<DotLottieReact src="/assets/lottie/Square Box.json" autoplay loop />}
                 title="Build your Life Wiki when you’re ready."
                 description="This stays on demand. Nothing is generated until you ask for it."
                 action={

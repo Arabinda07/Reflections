@@ -52,6 +52,10 @@ import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { getOrderedTasks, getTaskDrawerTriggerLabel } from './createNoteTasks';
 import { canNavigateBackInApp } from '../../src/native/androidBack';
 import { NATIVE_PAGE_TOP_PADDING, NATIVE_TOP_CONTROL_OFFSET } from '../../src/native/safeArea';
+import { profileService } from '../../services/profileService';
+import { getMonthlyNoteUsage } from '../../services/wellnessPolicy';
+import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
+import { useKeyboardShortcut } from '../../src/hooks/useKeyboardShortcut';
 import {
   buildCreateNoteDraftSnapshot,
   CREATE_NOTE_SAVE_VISUAL_FLOOR_MS,
@@ -172,6 +176,7 @@ export const CreateNote: React.FC = () => {
   const [newAttachments, setNewAttachments] = useState<File[]>([]);
   const [existingAttachments, setExistingAttachments] = useState<NoteAttachment[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [canCreateNote, setCanCreateNote] = useState<boolean>(true);
   
   // UI States
   const isMobile = useMediaQuery('(max-width: 1023px)');
@@ -324,6 +329,14 @@ export const CreateNote: React.FC = () => {
           setTimeout(() => {
             if (!isUnmounted.current) setLoading(false);
           }, 1200);
+          
+          // Check note limit for new notes
+          const access = await profileService.getWellnessAccess();
+          const allNotes = await noteService.getAll();
+          const usage = getMonthlyNoteUsage(allNotes, access);
+          if (!isUnmounted.current) {
+            setCanCreateNote(usage.canCreateNote);
+          }
           return;
         }
         const note = await noteService.getById(id);
@@ -646,6 +659,14 @@ export const CreateNote: React.FC = () => {
           <h2 className="h2-section mb-4">Take a breath.</h2>
           <p className="body-editorial max-w-sm">Let the noise settle before you start.</p>
         </motion.div>
+      </div>
+    );
+  }
+
+  if (!id && !canCreateNote) {
+    return (
+      <div className="relative flex flex-1 min-h-[100dvh] bg-body">
+        <ProUpgradeCTA variant="fullscreen" onSuccess={() => setCanCreateNote(true)} />
       </div>
     );
   }
