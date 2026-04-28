@@ -326,7 +326,7 @@ export const LifeWiki: React.FC = () => {
                 <Hash size={14} weight="bold" className="text-green/40 transition-colors group-hover:text-green/80" />
               </div>
               <div className="space-y-4">
-                <h2 className="text-3xl md:text-4xl font-display text-gray-text">{meta.label}</h2>
+                <h2 className="text-3xl md:text-4xl font-display font-bold text-gray-text">{meta.label}</h2>
                 <p className="text-[16px] font-serif italic leading-relaxed text-gray-text/70 line-clamp-3">
                   {previewText(page.content)}
                 </p>
@@ -349,7 +349,7 @@ export const LifeWiki: React.FC = () => {
                 Waiting for signal
               </span>
               <div className="space-y-3">
-                <h2 className="text-3xl md:text-4xl font-display text-gray-text opacity-50">{meta.label}</h2>
+                <h2 className="text-3xl md:text-4xl font-display font-bold text-gray-text opacity-50">{meta.label}</h2>
                 <p className="text-[15px] font-medium leading-relaxed text-gray-light">
                   {meta.description}
                 </p>
@@ -434,7 +434,7 @@ export const LifeWiki: React.FC = () => {
                     <MetadataPill tone="green">Updated {new Date(articlePage.updatedAt).toLocaleDateString()}</MetadataPill>
                     <MetadataPill tone="green">{sourceIds.length} source{sourceIds.length === 1 ? '' : 's'}</MetadataPill>
                   </div>
-                  <h1 className="text-5xl font-display text-gray-text md:text-6xl">
+                  <h1 className="text-5xl font-display font-extrabold text-gray-text md:text-6xl">
                     {articlePage.title}
                   </h1>
                   <p className="mt-4 max-w-2xl text-[16px] font-medium leading-relaxed text-gray-light">
@@ -460,13 +460,13 @@ export const LifeWiki: React.FC = () => {
                           );
                         },
                         h1: ({ children }) => (
-                          <h2 className="mt-12 text-4xl font-display text-gray-text tracking-tight first:mt-0">{children}</h2>
+                          <h2 className="mt-12 text-4xl font-display font-bold text-gray-text tracking-tight first:mt-0">{children}</h2>
                         ),
                         h2: ({ children }) => (
-                          <h2 className="mt-10 text-3xl font-display text-gray-text tracking-tight first:mt-0">{children}</h2>
+                          <h2 className="mt-10 text-3xl font-display font-bold text-gray-text tracking-tight first:mt-0">{children}</h2>
                         ),
                         h3: ({ children }) => (
-                          <h3 className="mt-8 text-2xl font-display text-gray-text tracking-tight">{children}</h3>
+                          <h3 className="mt-8 text-2xl font-display font-bold text-gray-text tracking-tight">{children}</h3>
                         ),
                         p: ({ children }) => <p className="mb-5 last:mb-0">{children}</p>,
                         ul: ({ children }) => <ul className="mb-5 list-disc space-y-2 pl-6">{children}</ul>,
@@ -555,7 +555,7 @@ export const LifeWiki: React.FC = () => {
           </div>
 
           <header className="mx-auto max-w-4xl space-y-5 border-b border-border/40 pb-8 text-center">
-            <h1 className="text-5xl font-display text-gray-text md:text-6xl">
+            <h1 className="text-5xl font-display font-extrabold text-gray-text md:text-6xl">
               Your Life Wiki
             </h1>
             <p className="mx-auto max-w-2xl text-[17px] font-medium leading-relaxed text-gray-light">
@@ -596,11 +596,11 @@ export const LifeWiki: React.FC = () => {
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <div className="rounded-[var(--radius-panel)] border border-border/50 bg-white/5 p-4">
                 <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Entries</p>
-                <p className="mt-2 text-3xl font-display text-gray-text">{notes.length}</p>
+                <p className="mt-2 text-3xl font-display font-bold text-gray-text">{notes.length}</p>
               </div>
               <div className="rounded-[var(--radius-panel)] border border-border/50 bg-white/5 p-4">
                 <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Generated pages</p>
-                <p className="mt-2 text-3xl font-display text-gray-text">{wikiPages.length}</p>
+                <p className="mt-2 text-3xl font-display font-bold text-gray-text">{wikiPages.length}</p>
               </div>
               <div className="rounded-[var(--radius-panel)] border border-border/50 bg-white/5 p-4">
                 <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Last refresh</p>
@@ -649,7 +649,7 @@ export const LifeWiki: React.FC = () => {
           <section className="space-y-5">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
-                <h2 className="text-2xl font-display text-gray-text">Sanctuary pages</h2>
+                <h2 className="text-2xl font-display font-bold text-gray-text">Sanctuary pages</h2>
                 <p className="mt-2 text-[14px] font-medium text-gray-light">
                   The five main AI-generated wiki pages for this library.
                 </p>
@@ -675,7 +675,7 @@ export const LifeWiki: React.FC = () => {
           {supportingPages.length > 0 ? (
             <section className="space-y-5">
               <div>
-                <h2 className="text-2xl font-display text-gray-text">Supporting shelf</h2>
+                <h2 className="text-2xl font-display font-bold text-gray-text">Supporting shelf</h2>
                 <p className="mt-2 text-[14px] font-medium text-gray-light">
                   Earlier generated summaries remain readable, but the five Sanctuary pages are the main surface.
                 </p>

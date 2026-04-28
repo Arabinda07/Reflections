@@ -82,7 +82,7 @@ export const PrivacyPolicy: React.FC = () => {
               <div className="p-7 sm:p-8">
                 <div className="mb-5 flex items-center gap-4">
                   <div className="icon-block icon-block-sm">{section.icon}</div>
-                  <h2 className="text-[20px] font-display text-gray-text">{section.title}</h2>
+                  <h2 className="text-[20px] font-display font-bold text-gray-text">{section.title}</h2>
                 </div>
                 <div className="space-y-4 text-[15px] font-medium leading-relaxed text-gray-light">
                   {section.body.map((paragraph) => (
@@ -100,7 +100,7 @@ export const PrivacyPolicy: React.FC = () => {
               <div className="icon-block icon-block-sm">
                 <Envelope size={20} weight="duotone" />
               </div>
-              <h2 className="text-[20px] font-display text-gray-text">Questions</h2>
+              <h2 className="text-[20px] font-display font-bold text-gray-text">Questions</h2>
             </div>
 
             <p className="text-[15px] font-medium leading-relaxed text-gray-light">

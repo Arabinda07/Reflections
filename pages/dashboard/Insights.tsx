@@ -169,7 +169,7 @@ export const Insights: React.FC = () => {
               </div>
               
               <div className="space-y-4 max-w-2xl">
-                <h2 className="text-3xl md:text-5xl font-display text-gray-text tracking-tight leading-tight">
+                <h2 className="text-3xl md:text-5xl font-display font-extrabold text-gray-text tracking-tight leading-tight">
                   You wrote {stats.monthNotes} reflections this month.
                 </h2>
                 <p className="text-[18px] md:text-[20px] font-serif italic text-gray-light leading-relaxed">
@@ -185,7 +185,7 @@ export const Insights: React.FC = () => {
 
           <div className="grid gap-6 md:grid-cols-2">
             <Surface variant="bezel" innerClassName="p-8">
-              <h3 className="text-[18px] font-display text-gray-text mb-6">Mood frequency</h3>
+              <h3 className="text-[18px] font-display font-bold text-gray-text mb-6">Mood frequency</h3>
               {stats.moodData.length === 0 ? (
                 <EmptyState
                   surface="none"
@@ -222,7 +222,7 @@ export const Insights: React.FC = () => {
             </Surface>
 
             <Surface variant="bezel" innerClassName="p-8">
-              <h3 className="text-[18px] font-display text-gray-text mb-6">Recurring tags</h3>
+              <h3 className="text-[18px] font-display font-bold text-gray-text mb-6">Recurring tags</h3>
               {stats.topTags.length === 0 ? (
                 <EmptyState
                   surface="none"
@@ -237,7 +237,7 @@ export const Insights: React.FC = () => {
                     return (
                       <span
                         key={tag}
-                        className={`font-display lowercase ${TAG_TONE_CLASSES[index % TAG_TONE_CLASSES.length]}`}
+                        className={`font-display font-bold lowercase ${TAG_TONE_CLASSES[index % TAG_TONE_CLASSES.length]}`}
                         style={{
                           fontSize: `${scale}rem`,
                           lineHeight: '1',
@@ -272,7 +272,7 @@ export const Insights: React.FC = () => {
                     <Book size={26} weight="duotone" />
                   </div>
                 )}
-                <h2 className="text-2xl font-display text-gray-text">
+                <h2 className="text-2xl font-display font-bold text-gray-text">
                   {isWikiReadyToBuild ? 'Your wiki is ready for insights' : 'Your Life Wiki'}
                 </h2>
                 <p className="text-gray-light max-w-lg leading-relaxed">

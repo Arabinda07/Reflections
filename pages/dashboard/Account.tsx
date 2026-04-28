@@ -472,7 +472,7 @@ export const Account: React.FC = () => {
                       </div>
                       <div>
                         <p className="text-[11px] font-black uppercase tracking-widest text-green">Membership</p>
-                        <h3 className="text-[24px] font-display text-gray-text capitalize">
+                        <h3 className="text-[24px] font-display font-bold text-gray-text capitalize">
                           {access?.planTier || 'Free'} plan
                         </h3>
                       </div>
@@ -500,7 +500,7 @@ export const Account: React.FC = () => {
                       </div>
                       <div>
                         <p className="text-[11px] font-black uppercase tracking-widest text-green">Security</p>
-                        <h3 className="text-[24px] font-display text-gray-text">Keep this private</h3>
+                        <h3 className="text-[24px] font-display font-bold text-gray-text">Keep this private</h3>
                       </div>
                     </div>
 
@@ -540,7 +540,7 @@ export const Account: React.FC = () => {
                       </div>
                       <div>
                         <p className="text-[11px] font-black uppercase tracking-widest text-green">Sanctuary</p>
-                        <h3 className="text-[24px] font-display text-gray-text">Smart Mode</h3>
+                        <h3 className="text-[24px] font-display font-bold text-gray-text">Smart Mode</h3>
                       </div>
                     </div>
 
@@ -582,7 +582,7 @@ export const Account: React.FC = () => {
                 <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                   <div className="space-y-2">
                     <p className="text-[11px] font-black uppercase tracking-widest text-red">Danger zone</p>
-                    <h3 className="text-[24px] font-display text-red">Delete account</h3>
+                    <h3 className="text-[24px] font-display font-bold text-red">Delete account</h3>
                     <p className="max-w-xl text-[14px] font-medium leading-relaxed text-gray-light">
                       Saved writing and app data will be removed.
                     </p>
