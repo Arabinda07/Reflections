@@ -245,11 +245,11 @@ export const Insights: React.FC = () => {
               </div>
               
               <div className="space-y-4 max-w-2xl">
-                <h2 className="whitespace-nowrap text-2xl sm:text-3xl md:text-5xl font-display font-extrabold text-gray-text tracking-normal leading-tight">
-                  This month: {stats.monthNotes} reflections.
+                <h2 className="whitespace-nowrap text-xl sm:text-3xl md:text-5xl font-display font-extrabold text-gray-text tracking-normal leading-tight">
+                  {stats.monthNotes} reflections
                 </h2>
                 <p className="text-[18px] md:text-[20px] font-serif italic text-gray-light leading-relaxed">
-                  You checked in on {stats.daysCheckedIn} different days, and the current emotional tone leans{' '}
+                  This month, you checked in on {stats.daysCheckedIn} different days, and the current emotional tone leans{' '}
                   <span className="capitalize text-green font-bold not-italic">
                     {stats.topMood === 'undefined' ? 'toward clarity' : stats.topMood}
                   </span>

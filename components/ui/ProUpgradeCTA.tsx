@@ -34,9 +34,13 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
 
       const existingScript = document.querySelector<HTMLScriptElement>('script[data-razorpay-checkout="true"]');
       if (existingScript) {
-        existingScript.addEventListener('load', () => resolve(true), { once: true });
-        existingScript.addEventListener('error', () => resolve(false), { once: true });
-        return;
+        if (existingScript.dataset.razorpayFailed === 'true') {
+          existingScript.remove();
+        } else {
+          existingScript.addEventListener('load', () => resolve(true), { once: true });
+          existingScript.addEventListener('error', () => resolve(false), { once: true });
+          return;
+        }
       }
 
       const script = document.createElement('script');
@@ -44,7 +48,11 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
       script.async = true;
       script.dataset.razorpayCheckout = 'true';
       script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
+      script.onerror = () => {
+        script.dataset.razorpayFailed = 'true';
+        script.remove();
+        resolve(false);
+      };
       document.body.appendChild(script);
     });
   };
