@@ -44,6 +44,30 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'Fraunces';
+  src: url('/assets/fonts/Fraunces144ptSoft-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Fraunces';
+  src: url('/assets/fonts/Fraunces144ptSoft-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Fraunces';
+  src: url('/assets/fonts/Fraunces144ptSoft-Black.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -301,11 +325,11 @@ select:focus-visible,
 
   /* Typography Standard */
   .h1-hero {
-    @apply text-5xl md:text-7xl lg:text-[100px] font-display tracking-[-0.04em] text-gray-text leading-[1.05] text-balance;
+    @apply text-5xl md:text-7xl lg:text-[100px] font-display font-black tracking-[-0.04em] text-gray-text leading-[1.05] text-balance;
   }
 
   .h2-section {
-    @apply text-4xl md:text-5xl font-display tracking-[-0.03em] text-gray-text leading-tight text-balance;
+    @apply text-4xl md:text-5xl font-display font-bold tracking-[-0.03em] text-gray-text leading-tight text-balance;
   }
 
   .body-editorial {
@@ -529,7 +553,7 @@ select:focus-visible,
   }
 
   .section-header-title {
-    font-family: 'Feather Bold', 'Manrope', sans-serif;
+    @apply font-display font-semibold;
     font-size: clamp(2rem, 3vw + 1rem, 3.5rem);
     line-height: 0.98;
     letter-spacing: -0.04em;
