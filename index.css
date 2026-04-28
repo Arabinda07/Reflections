@@ -39,31 +39,25 @@
 }
 
 @font-face {
-  font-family: 'Feather Bold';
-  src: url('/assets/fonts/Feather Bold.woff2') format('woff2');
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Fraunces';
-  src: url('/assets/fonts/Fraunces144ptSoft-SemiBold.woff2') format('woff2');
-  font-weight: 600;
+  font-family: 'Sora';
+  src: url('/assets/fonts/sora-regular.woff2') format('woff2');
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Fraunces';
-  src: url('/assets/fonts/Fraunces144ptSoft-Bold.woff2') format('woff2');
+  font-family: 'Sora';
+  src: url('/assets/fonts/sora-700.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Fraunces';
-  src: url('/assets/fonts/Fraunces144ptSoft-Black.woff2') format('woff2');
-  font-weight: 900;
+  font-family: 'Sora';
+  src: url('/assets/fonts/sora-800.woff2') format('woff2');
+  font-weight: 800;
   font-style: normal;
   font-display: swap;
 }
@@ -325,7 +319,7 @@ select:focus-visible,
 
   /* Typography Standard */
   .h1-hero {
-    @apply text-5xl md:text-7xl lg:text-[100px] font-display font-black tracking-[-0.04em] text-gray-text leading-[1.05] text-balance;
+    @apply text-5xl md:text-7xl lg:text-[100px] font-display font-extrabold tracking-[-0.04em] text-gray-text leading-[1.05] text-balance;
   }
 
   .h2-section {
@@ -553,7 +547,7 @@ select:focus-visible,
   }
 
   .section-header-title {
-    @apply font-display font-semibold;
+    @apply font-display font-bold;
     font-size: clamp(2rem, 3vw + 1rem, 3.5rem);
     line-height: 0.98;
     letter-spacing: -0.04em;
