@@ -583,6 +583,33 @@ select:focus-visible,
     }
   }
 
+  .insights-section-header .section-header-copy {
+    max-width: none;
+  }
+
+  .insights-section-header .section-header-title {
+    font-size: 2rem;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 420px) {
+    .insights-section-header .section-header-title {
+      font-size: 1.75rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .insights-section-header .section-header-title {
+      font-size: 3rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .insights-section-header .section-header-title {
+      font-size: 3.5rem;
+    }
+  }
+
   .section-header-description {
     font-size: 0.97rem;
     line-height: 1.75;

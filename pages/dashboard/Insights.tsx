@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import {
   ArrowLeft,
   Heart,
@@ -7,7 +8,7 @@ import {
   CaretRight,
   Hash,
 } from '@phosphor-icons/react';
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { DotLottieReact, type DotLottie } from '@lottiefiles/dotlottie-react';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { MetadataPill } from '../../components/ui/MetadataPill';
 import { PageContainer } from '../../components/ui/PageContainer';
@@ -35,12 +36,18 @@ const DEFAULT_MOOD_TONE = {
 };
 
 const TAG_TONE_CLASSES = ['text-green', 'text-blue', 'text-orange', 'text-gray-text'];
+const SANCTUARY_ENTRANCE_LOTTIE = '/assets/lottie/Level%20Up%20Animation.json';
+const SANCTUARY_ENTRANCE_FALLBACK_MS = 2200;
 
 export const Insights: React.FC = () => {
   const navigate = useNavigate();
+  const shouldReduceMotion = useReducedMotion();
   const [notes, setNotes] = useState<Note[]>([]);
   const [themes, setThemes] = useState<LifeTheme[]>([]);
   const [access, setAccess] = useState<WellnessAccess | null>(null);
+  const [isOpeningSanctuary, setIsOpeningSanctuary] = useState(false);
+  const isOpeningSanctuaryRef = useRef(false);
+  const openingTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -122,8 +129,96 @@ export const Insights: React.FC = () => {
     wikiGate?.canGenerate && notes.length >= FREE_WIKI_MINIMUM_ENTRIES && themes.length === 0,
   );
 
+  const completeOpenSanctuary = useCallback(() => {
+    if (!isOpeningSanctuaryRef.current) return;
+
+    isOpeningSanctuaryRef.current = false;
+    if (openingTimerRef.current !== null) {
+      window.clearTimeout(openingTimerRef.current);
+      openingTimerRef.current = null;
+    }
+
+    navigate(RoutePath.SANCTUARY);
+  }, [navigate]);
+
+  const handleOpenSanctuary = useCallback((event: React.MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    if (isOpeningSanctuaryRef.current) return;
+
+    if (shouldReduceMotion) {
+      navigate(RoutePath.SANCTUARY);
+      return;
+    }
+
+    isOpeningSanctuaryRef.current = true;
+    setIsOpeningSanctuary(true);
+    openingTimerRef.current = window.setTimeout(completeOpenSanctuary, SANCTUARY_ENTRANCE_FALLBACK_MS);
+  }, [completeOpenSanctuary, navigate, shouldReduceMotion]);
+
+  const bindSanctuaryEntrancePlayer = useCallback((dotLottie: DotLottie | null) => {
+    if (!dotLottie) return;
+    dotLottie.addEventListener('complete', completeOpenSanctuary);
+  }, [completeOpenSanctuary]);
+
+  useEffect(() => {
+    return () => {
+      if (openingTimerRef.current !== null) {
+        window.clearTimeout(openingTimerRef.current);
+      }
+    };
+  }, []);
+
   return (
     <>
+      <AnimatePresence>
+        {isOpeningSanctuary ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-body px-6"
+            aria-live="polite"
+            aria-label="Opening Sanctuary"
+          >
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,oklch(0.70_0.05_135_/_0.16),transparent_54%)]" />
+            <div className="absolute inset-0 bg-gradient-to-b from-green/10 via-body/95 to-body" />
+            <motion.div
+              aria-hidden="true"
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 0.2, scale: 1 }}
+              transition={{ delay: 0.08, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+              className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center mix-blend-luminosity"
+            >
+              <div className="h-[min(66vmin,34rem)] w-[min(66vmin,34rem)]">
+                <DotLottieReact
+                  src={SANCTUARY_ENTRANCE_LOTTIE}
+                  autoplay
+                  loop={false}
+                  dotLottieRefCallback={bindSanctuaryEntrancePlayer}
+                />
+              </div>
+            </motion.div>
+            <motion.div
+              initial={{ y: 16, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.12, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+              className="relative z-10 flex max-w-[42rem] flex-col items-center text-center"
+            >
+              <p className="text-[11px] font-black uppercase tracking-widest text-green">
+                Private reading room
+              </p>
+              <h2 className="mt-4 text-4xl font-display font-bold leading-tight text-gray-text md:text-5xl">
+                Opening Sanctuary
+              </h2>
+              <p className="mt-4 max-w-[36ch] text-[15px] font-medium leading-relaxed text-gray-light">
+                Crossing into the library without breaking the calm of the page.
+              </p>
+            </motion.div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+
       <PageContainer className="pb-24 pt-6 md:pt-10">
         <div className="space-y-10">
           <button 
@@ -138,6 +233,7 @@ export const Insights: React.FC = () => {
           <SectionHeader
             title="Patterns in your writing"
             description="Mood, rhythm, and recurring themes"
+            className="insights-section-header"
           />
 
           <Surface variant="bezel" innerClassName="p-8 md:p-12">
@@ -149,8 +245,8 @@ export const Insights: React.FC = () => {
               </div>
               
               <div className="space-y-4 max-w-2xl">
-                <h2 className="text-3xl md:text-5xl font-display font-extrabold text-gray-text tracking-normal leading-tight">
-                  You wrote {stats.monthNotes} reflections this month.
+                <h2 className="whitespace-nowrap text-2xl sm:text-3xl md:text-5xl font-display font-extrabold text-gray-text tracking-normal leading-tight">
+                  This month: {stats.monthNotes} reflections.
                 </h2>
                 <p className="text-[18px] md:text-[20px] font-serif italic text-gray-light leading-relaxed">
                   You checked in on {stats.daysCheckedIn} different days, and the current emotional tone leans{' '}
@@ -239,13 +335,15 @@ export const Insights: React.FC = () => {
             <Link
               to={RoutePath.SANCTUARY}
               state={{ fromInsights: true }}
+              onClick={handleOpenSanctuary}
               className="group flex w-full flex-col items-center justify-between gap-8 p-8 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 md:flex-row md:p-12"
               aria-label="Open your Life Wiki"
+              aria-busy={isOpeningSanctuary}
             >
               <div className="space-y-4">
                 {isWikiReadyToBuild ? (
                   <div className="h-24 w-24 overflow-hidden rounded-[var(--radius-panel)] bg-green/5">
-                    <DotLottieReact src="/assets/lottie/Level%20Up%20Animation.json" autoplay loop />
+                    <DotLottieReact src={SANCTUARY_ENTRANCE_LOTTIE} autoplay loop />
                   </div>
                 ) : (
                   <div className="icon-block icon-block-md">

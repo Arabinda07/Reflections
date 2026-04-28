@@ -67,7 +67,7 @@ describe('Sanctuary Life Wiki contract', () => {
     expect(policy).toContain("reason: 'free_limit_reached'");
     expect(lifeWiki).toContain('Still gathering enough signal.');
     expect(lifeWiki).toContain('Life Wiki unlocks after 3 entries');
-    expect(lifeWiki).toContain('Generated pages stay readable');
+    expect(lifeWiki).toContain('Existing generated pages stay readable');
     expect(lifeWiki).toContain('gate?.requiresUpgrade');
   });
 
@@ -88,7 +88,15 @@ describe('Sanctuary Life Wiki contract', () => {
     const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
 
     expect(insights).toContain("state={{ fromInsights: true }}");
-    expect(lifeWiki).toContain('fromInsights');
-    expect(lifeWiki).toContain('/assets/lottie/Level Up Animation.json');
+    expect(insights).toContain('isOpeningSanctuary');
+    expect(insights).toContain('handleOpenSanctuary');
+    expect(insights).toContain('event.preventDefault()');
+    expect(insights).toContain('loop={false}');
+    expect(insights).toContain('dotLottieRefCallback={bindSanctuaryEntrancePlayer}');
+    expect(insights).toContain("addEventListener('complete'");
+    expect(insights).toContain('window.setTimeout(completeOpenSanctuary, SANCTUARY_ENTRANCE_FALLBACK_MS)');
+    expect(insights).toContain('/assets/lottie/Level%20Up%20Animation.json');
+    expect(lifeWiki).not.toContain('refreshModeLabel');
+    expect(lifeWiki).not.toContain('On demand. Use Refresh with AI when you want the library rebuilt.');
   });
 });

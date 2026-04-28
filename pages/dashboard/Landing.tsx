@@ -19,6 +19,7 @@ export const Landing: React.FC = () => {
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isMuted, setIsMuted] = useState(true);
+  const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);
 
   const toggleMute = () => {
     if (videoRef.current) {
@@ -123,29 +124,32 @@ export const Landing: React.FC = () => {
         </div>
       </div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-        className="absolute inset-0 overflow-hidden pointer-events-none z-0"
-      >
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div className="video-mask video-mask--mobile lg:hidden" />
         <div className="video-mask video-mask--desktop hidden lg:block" />
+        <img
+          src="/assets/videos/landing_video.png"
+          alt=""
+          aria-hidden="true"
+          fetchPriority="high"
+          className="absolute inset-0 h-full w-full object-cover object-[48%_center] opacity-90 sm:object-[64%_center] lg:object-center"
+        />
 
         <video
           ref={videoRef}
           poster="/assets/videos/landing_video.png"
-          className="absolute inset-0 h-full w-full object-cover object-[48%_center] bg-body opacity-90 sm:object-[64%_center] lg:object-center"
+          className={`absolute inset-0 h-full w-full object-cover object-[48%_center] bg-transparent transition-opacity duration-700 ease-out-expo sm:object-[64%_center] lg:object-center ${isHeroVideoReady ? 'opacity-90' : 'opacity-0'}`}
           autoPlay
           loop
           muted={isMuted}
           playsInline
           preload="metadata"
+          onLoadedData={() => setIsHeroVideoReady(true)}
         >
           <source src="/assets/videos/landing_video.webm" type="video/webm" />
           <source src="/assets/videos/landing_video.mp4" type="video/mp4" />
         </video>
-      </motion.div>
+      </div>
     </main>
   );
 };

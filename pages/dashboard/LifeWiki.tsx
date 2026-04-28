@@ -299,9 +299,6 @@ export const LifeWiki: React.FC = () => {
       : hasEnoughEntriesForWiki
         ? 'Ready for first refresh'
         : `${entriesNeededForWiki} more ${entriesNeededForWiki === 1 ? 'entry' : 'entries'}`;
-  const refreshModeLabel = gate?.requiresUpgrade
-    ? 'Generated pages stay readable. Future refreshes need Pro.'
-    : 'On demand. Use Refresh with AI when you want the library rebuilt.';
 
   const articlePageType =
     pageType !== 'theme' && pageType !== 'index' && isUserVisibleWikiPage(pageType)
@@ -478,7 +475,7 @@ export const LifeWiki: React.FC = () => {
             className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center mix-blend-luminosity"
           >
             <div className="h-[min(66vmin,34rem)] w-[min(66vmin,34rem)]">
-              <DotLottieReact src={SANCTUARY_ENTRANCE_LOTTIE} autoplay loop />
+              <DotLottieReact src={SANCTUARY_ENTRANCE_LOTTIE} autoplay loop={isRefreshingWiki} />
             </div>
           </motion.div>
           <motion.div
@@ -795,12 +792,6 @@ export const LifeWiki: React.FC = () => {
                   <p className="mt-2 text-[15px] font-bold leading-relaxed text-gray-text">{value}</p>
                 </div>
               ))}
-            </div>
-            <div className="mt-5 border-t border-border/60 pt-5">
-              <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Mode</p>
-              <p className="mt-2 max-w-3xl text-[14px] font-bold leading-relaxed text-gray-text">
-                {refreshModeLabel}
-              </p>
             </div>
           </Surface>
 
