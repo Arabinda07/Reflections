@@ -121,7 +121,6 @@ export const HomeAuthenticated: React.FC = () => {
   const [intentionSummary, setIntentionSummary] = useState<HomeIntentionSummary>(() =>
     buildHomeIntentionSummary([]),
   );
-  const [isHeroPosterReady, setIsHeroPosterReady] = useState(false);
   const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);
   const shouldReduceMotion = useReducedMotion();
 
@@ -316,10 +315,7 @@ export const HomeAuthenticated: React.FC = () => {
             aria-hidden="true"
             loading="eager"
             decoding="async"
-            onLoad={() => setIsHeroPosterReady(true)}
-            className={`absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center transition-opacity duration-500 ease-out-expo ${
-              isHeroPosterReady && !isHeroVideoReady ? 'opacity-100' : 'opacity-0'
-            }`}
+            className="absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center opacity-100"
           />
           <video
             src="/assets/videos/field.mp4"

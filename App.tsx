@@ -3,6 +3,7 @@ import { Route, RouterProvider, createHashRouter, createRoutesFromElements } fro
 import { AuthProvider } from './context/AuthContext';
 import { PWAInstallProvider } from './context/PWAInstallContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { RouteLoadingFrame } from './components/ui/RouteLoadingFrame';
 import { DashboardLayout } from './layouts/DashboardLayout';
 import { Home } from './pages/dashboard/Home';
 import { RouteErrorBoundary } from './pages/RouteErrorBoundary';
@@ -41,30 +42,27 @@ const LazyVercelVitals = lazy(async () => {
   };
 });
 
-// Loading fallback for Suspense
-const PageLoader = () => (
-  <div className="flex-1 flex items-center justify-center min-h-[50vh]">
-    <div className="h-8 w-8 rounded-full border-2 border-border border-t-green animate-spin" />
-  </div>
+const withRouteFallback = (element: React.ReactNode) => (
+  <Suspense fallback={<RouteLoadingFrame />}>{element}</Suspense>
 );
 
 const router = createHashRouter(
   createRoutesFromElements(
     <Route element={<DashboardLayout />} errorElement={<RouteErrorBoundary />}>
       <Route path={RoutePath.HOME} element={<Home />} />
-      <Route path={RoutePath.FAQ} element={<FAQ />} />
-      <Route path={RoutePath.PRIVACY} element={<PrivacyPolicy />} />
-      <Route path={RoutePath.TERMS} element={<TermsOfService />} />
+      <Route path={RoutePath.FAQ} element={withRouteFallback(<FAQ />)} />
+      <Route path={RoutePath.PRIVACY} element={withRouteFallback(<PrivacyPolicy />)} />
+      <Route path={RoutePath.TERMS} element={withRouteFallback(<TermsOfService />)} />
 
-      <Route path={RoutePath.LOGIN} element={<SignIn />} />
-      <Route path={RoutePath.SIGNUP} element={<SignUp />} />
-      <Route path={RoutePath.RESET_PASSWORD} element={<ResetPassword />} />
+      <Route path={RoutePath.LOGIN} element={withRouteFallback(<SignIn />)} />
+      <Route path={RoutePath.SIGNUP} element={withRouteFallback(<SignUp />)} />
+      <Route path={RoutePath.RESET_PASSWORD} element={withRouteFallback(<ResetPassword />)} />
 
       <Route
         path={RoutePath.NOTES}
         element={
           <ProtectedRoute>
-            <MyNotes />
+            {withRouteFallback(<MyNotes />)}
           </ProtectedRoute>
         }
       />
@@ -72,7 +70,7 @@ const router = createHashRouter(
         path={RoutePath.CREATE_NOTE}
         element={
           <ProtectedRoute>
-            <CreateNote />
+            {withRouteFallback(<CreateNote />)}
           </ProtectedRoute>
         }
       />
@@ -80,7 +78,7 @@ const router = createHashRouter(
         path={RoutePath.EDIT_NOTE}
         element={
           <ProtectedRoute>
-            <CreateNote />
+            {withRouteFallback(<CreateNote />)}
           </ProtectedRoute>
         }
       />
@@ -88,7 +86,7 @@ const router = createHashRouter(
         path={RoutePath.NOTE_DETAIL}
         element={
           <ProtectedRoute>
-            <SingleNote />
+            {withRouteFallback(<SingleNote />)}
           </ProtectedRoute>
         }
       />
@@ -96,7 +94,7 @@ const router = createHashRouter(
         path={RoutePath.ACCOUNT}
         element={
           <ProtectedRoute>
-            <Account />
+            {withRouteFallback(<Account />)}
           </ProtectedRoute>
         }
       />
@@ -104,7 +102,7 @@ const router = createHashRouter(
         path={RoutePath.INSIGHTS}
         element={
           <ProtectedRoute>
-            <Insights />
+            {withRouteFallback(<Insights />)}
           </ProtectedRoute>
         }
       />
@@ -112,7 +110,7 @@ const router = createHashRouter(
         path={RoutePath.WIKI}
         element={
           <ProtectedRoute>
-            <LifeWiki />
+            {withRouteFallback(<LifeWiki />)}
           </ProtectedRoute>
         }
       />
@@ -120,7 +118,7 @@ const router = createHashRouter(
         path={RoutePath.SANCTUARY}
         element={
           <ProtectedRoute>
-            <LifeWiki />
+            {withRouteFallback(<LifeWiki />)}
           </ProtectedRoute>
         }
       />
@@ -128,12 +126,12 @@ const router = createHashRouter(
         path={RoutePath.SANCTUARY_ARTICLE}
         element={
           <ProtectedRoute>
-            <LifeWiki />
+            {withRouteFallback(<LifeWiki />)}
           </ProtectedRoute>
         }
       />
 
-      <Route path="*" element={<NotFound />} />
+      <Route path="*" element={withRouteFallback(<NotFound />)} />
     </Route>,
   ),
 );
@@ -311,9 +309,7 @@ function App() {
         <DeferredVercelVitals />
         <SyncWrapper>
           <MotionConfig reducedMotion="user">
-            <Suspense fallback={<PageLoader />}>
-              <RouterProvider router={router} />
-            </Suspense>
+            <RouterProvider router={router} />
           </MotionConfig>
         </SyncWrapper>
       </AuthProvider>

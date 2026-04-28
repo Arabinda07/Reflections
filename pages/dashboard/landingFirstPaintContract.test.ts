@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -6,6 +6,29 @@ const read = (filePath: string) =>
   readFileSync(path.resolve(process.cwd(), filePath), 'utf8');
 
 describe('landing first-paint contract', () => {
+  it('keeps lazy route waits inside the app shell instead of replacing the router', () => {
+    const app = read('App.tsx');
+    const protectedRoute = read('components/auth/ProtectedRoute.tsx');
+    const home = read('pages/dashboard/Home.tsx');
+
+    expect(existsSync(path.resolve(process.cwd(), 'components/ui/RouteLoadingFrame.tsx'))).toBe(true);
+    expect(app).toContain("import { RouteLoadingFrame } from './components/ui/RouteLoadingFrame';");
+    expect(app).toContain('const withRouteFallback = (element: React.ReactNode) => (');
+    expect(app).toContain('fallback={<RouteLoadingFrame />}');
+    expect(app).not.toContain('const PageLoader');
+    expect(app).not.toContain('<Suspense fallback={<PageLoader />}>');
+
+    expect(protectedRoute).toContain("import { RouteLoadingFrame } from '../ui/RouteLoadingFrame';");
+    expect(protectedRoute).toContain('return <RouteLoadingFrame />;');
+    expect(protectedRoute).not.toContain('return null;');
+    expect(protectedRoute).not.toContain('StartupScreen is covering this visually');
+
+    expect(home).toContain("import { RouteLoadingFrame } from '../../components/ui/RouteLoadingFrame';");
+    expect(home).toContain('return <RouteLoadingFrame />;');
+    expect(home).toContain('<Suspense fallback={<RouteLoadingFrame />}>');
+    expect(home).not.toContain('CircleNotch');
+  });
+
   it('keeps guests on a stable landing frame after local auth hydration', () => {
     const authContext = read('context/AuthContext.tsx');
     const home = read('pages/dashboard/Home.tsx');
@@ -40,6 +63,7 @@ describe('landing first-paint contract', () => {
     expect(landing).toContain('preload="metadata"');
     expect(landing).not.toContain('preload="auto"');
     expect(landing).toContain('opacity-90 sm:object-[64%_center]');
+    expect(landing).not.toContain("isHeroPosterReady && !isHeroVideoReady ? 'opacity-90' : 'opacity-0'");
     expect(landing).toContain('onCanPlay={() => setIsHeroVideoReady(true)}');
     expect(landing).toContain('onPlaying={() => setIsHeroVideoReady(true)}');
     expect(landing).toContain("isHeroVideoReady ? 'opacity-90' : 'opacity-0'");
@@ -64,7 +88,9 @@ describe('landing first-paint contract', () => {
     expect(homeAuthenticated).toContain('relative isolate h-[60dvh] min-h-[450px] w-full overflow-hidden bg-body');
     expect(homeAuthenticated).toContain('src="/assets/videos/field.png"');
     expect(homeAuthenticated).toContain('h-full min-h-full w-full min-w-full object-cover object-center');
-    expect(homeAuthenticated).toContain("isHeroPosterReady && !isHeroVideoReady ? 'opacity-100' : 'opacity-0'");
+    expect(homeAuthenticated).toContain('object-cover object-center opacity-100');
+    expect(homeAuthenticated).not.toContain('isHeroPosterReady');
+    expect(homeAuthenticated).not.toContain("isHeroPosterReady && !isHeroVideoReady ? 'opacity-100' : 'opacity-0'");
     expect(homeAuthenticated).not.toContain("filter: 'blur(10px) brightness(0.8)'");
   });
 

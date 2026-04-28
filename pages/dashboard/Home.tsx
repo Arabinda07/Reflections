@@ -1,17 +1,11 @@
-import { CircleNotch } from '@phosphor-icons/react';
 import React, { Suspense, lazy } from 'react';
 
+import { RouteLoadingFrame } from '../../components/ui/RouteLoadingFrame';
 import { useAuth } from '../../context/AuthContext';
 import { Landing } from './Landing';
 
 const HomeAuthenticated = lazy(() =>
   import('./HomeAuthenticated').then((module) => ({ default: module.HomeAuthenticated })),
-);
-
-const HomeFallback: React.FC = () => (
-  <div className="flex min-h-[60dvh] items-center justify-center bg-body">
-    <CircleNotch size={28} className="animate-spin text-green" weight="bold" />
-  </div>
 );
 
 export const Home: React.FC = () => {
@@ -22,7 +16,7 @@ export const Home: React.FC = () => {
   }
 
   if (!isInitialCheckDone) {
-    return <HomeFallback />;
+    return <RouteLoadingFrame />;
   }
 
   if (!isAuthenticated) {
@@ -30,7 +24,7 @@ export const Home: React.FC = () => {
   }
 
   return (
-    <Suspense fallback={<HomeFallback />}>
+    <Suspense fallback={<RouteLoadingFrame />}>
       <HomeAuthenticated />
     </Suspense>
   );

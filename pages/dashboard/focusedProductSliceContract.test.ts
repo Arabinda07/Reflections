@@ -11,7 +11,8 @@ describe('focused product slice source contract', () => {
 
     expect(home).toContain('isInitialCheckDone');
     expect(home).toContain('if (!isInitialCheckDone)');
-    expect(home).toContain('<HomeFallback />');
+    expect(home).toContain('<RouteLoadingFrame />');
+    expect(home).not.toContain('<HomeFallback />');
   });
 
   it('makes the home intentions panel a visible task summary', () => {
