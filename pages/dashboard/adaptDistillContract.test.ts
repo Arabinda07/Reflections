@@ -16,7 +16,7 @@ describe('adapt and distill source contract', () => {
     expect(home).toContain('h-11 w-11');
   });
 
-  it('removes repeated grain overlays and flattens the FAQ detail cards', () => {
+  it('removes repeated grain overlays and flattens the FAQ guide', () => {
     const landing = read('pages/dashboard/Landing.tsx');
     const layout = read('layouts/DashboardLayout.tsx');
     const createNote = read('pages/dashboard/CreateNote.tsx');
@@ -26,6 +26,19 @@ describe('adapt and distill source contract', () => {
     expect(layout).not.toContain('grain-overlay');
     expect(createNote).not.toContain('grain-overlay');
     expect(faq).not.toContain('bezel-outer group');
-    expect(faq).toContain('surface-flat');
+    expect(faq).not.toContain('surface-flat');
+    expect(faq).not.toContain('border-l border-border');
+    expect(faq).toContain('Plain answers');
+  });
+
+  it('keeps the Life Wiki and Pro upgrade surfaces quiet after distill', () => {
+    const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
+    const proUpgrade = read('components/ui/ProUpgradeCTA.tsx');
+
+    expect(lifeWiki).not.toContain('tone.wash');
+    expect(lifeWiki).not.toContain('Hash');
+    expect(lifeWiki).toContain('life-wiki-signals');
+    expect(proUpgrade).not.toContain('cycling.mp4');
+    expect(proUpgrade).toContain('Keep writing unlimited.');
   });
 });

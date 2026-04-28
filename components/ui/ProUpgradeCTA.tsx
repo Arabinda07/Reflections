@@ -15,13 +15,11 @@ const RAZORPAY_MONTHLY_PLAN_ID = import.meta.env.VITE_RAZORPAY_MONTHLY_PLAN_ID;
 const RAZORPAY_YEARLY_PLAN_ID = import.meta.env.VITE_RAZORPAY_YEARLY_PLAN_ID;
 
 export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, className = '', variant = 'card' }) => {
-  useAuth(); // keep useAuth for checking user state if needed, but we fetch session below
+  useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isUnlocked, setIsUnlocked] = useState(false);
-  
-  // Form State
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'yearly'>('monthly');
   const [wantsNewsletter, setWantsNewsletter] = useState(false);
 
@@ -166,29 +164,23 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
       title="Join Pro"
       icon={<Crown size={20} weight="duotone" />}
       size="md"
-      bodyClassName="p-0"
+      bodyClassName="px-6 pb-6 pt-2 sm:px-8"
     >
-      <div className="px-6 sm:px-8 pb-6 pt-2 space-y-6">
+      <div className="space-y-6">
         {!isUnlocked ? (
           <>
-            <div className="relative h-48 w-full overflow-hidden mb-6 bg-body rounded-2xl transform-gpu">
-              <video
-                src="/assets/videos/cycling.mp4"
-                autoPlay
-                loop
-                muted
-                playsInline
-                style={{ willChange: 'transform' }}
-                className="absolute inset-0 h-full w-full object-cover"
-              />
+            <div className="space-y-2">
+              <p className="text-[15px] font-medium leading-relaxed text-gray-light">
+                Keep writing unlimited. Add more on-demand reflections and Life Wiki refreshes when you need them.
+              </p>
             </div>
             
             <div className="grid grid-cols-2 gap-4">
               <button
                 type="button"
                 onClick={() => setSelectedPlan('monthly')}
-                className={`flex flex-col items-start p-4 rounded-xl border-2 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:shadow-lg ${
-                  selectedPlan === 'monthly' ? 'border-green bg-green/5 shadow-md shadow-green/10' : 'border-border bg-white hover:border-green/50 dark:bg-[var(--body-bg)]'
+                className={`flex flex-col items-start rounded-[var(--radius-control)] border p-4 text-left transition-colors duration-300 ease-out-expo ${
+                  selectedPlan === 'monthly' ? 'border-green bg-green/5' : 'border-border/60 bg-white/5 hover:border-green/30'
                 }`}
               >
                 <span className={`text-[12px] font-black uppercase tracking-widest ${selectedPlan === 'monthly' ? 'text-green' : 'text-gray-nav'}`}>Monthly</span>
@@ -198,19 +190,28 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
               <button
                 type="button"
                 onClick={() => setSelectedPlan('yearly')}
-                className={`flex flex-col items-start p-4 rounded-xl border-2 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:shadow-lg ${
-                  selectedPlan === 'yearly' ? 'border-green bg-green/5 shadow-md shadow-green/10' : 'border-border bg-white hover:border-green/50 dark:bg-[var(--body-bg)]'
+                className={`flex flex-col items-start rounded-[var(--radius-control)] border p-4 text-left transition-colors duration-300 ease-out-expo ${
+                  selectedPlan === 'yearly' ? 'border-green bg-green/5' : 'border-border/60 bg-white/5 hover:border-green/30'
                 }`}
               >
-                <div className="w-full flex justify-between items-center">
+                <div className="flex w-full items-center justify-between gap-3">
                   <span className={`text-[12px] font-black uppercase tracking-widest ${selectedPlan === 'yearly' ? 'text-green' : 'text-gray-nav'}`}>Yearly</span>
-                  <span className="text-[10px] font-bold bg-green/10 text-green px-2 py-0.5 rounded-full">SAVE 15%</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-green">Save 15%</span>
                 </div>
                 <span className="text-2xl font-serif italic text-gray-text mt-1">₹999<span className="text-[14px] not-italic text-gray-light">/yr</span></span>
               </button>
             </div>
 
-            <div className="space-y-4">
+            <ul className="space-y-2 border-y border-border/50 py-4">
+              {features.map((feature) => (
+                <li key={feature} className="flex items-center gap-3 text-[14px] font-semibold text-gray-text">
+                  <CheckCircle size={16} weight="fill" className="text-green" />
+                  {feature}
+                </li>
+              ))}
+            </ul>
+
+            <div>
               <label className="flex items-start gap-3 cursor-pointer group">
                 <div className="relative flex h-5 w-5 shrink-0 items-center justify-center rounded border border-border bg-white transition-colors group-hover:border-green dark:bg-white/5 mt-0.5">
                   <input
@@ -224,7 +225,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
                   </div>
                 </div>
                 <span className="text-[14px] font-medium leading-relaxed text-gray-light">
-                  Sign up for the newsletter regarding journaling ideas and updates.
+                  Send me occasional journaling ideas and product updates.
                 </span>
               </label>
             </div>
@@ -242,21 +243,8 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
           </>
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center animate-in fade-in zoom-in duration-700">
-            <div className="relative h-48 w-full overflow-hidden mb-8 bg-body rounded-3xl opacity-80 mix-blend-luminosity transform-gpu">
-              <video
-                src="/assets/videos/cycling.mp4"
-                autoPlay
-                loop
-                muted
-                playsInline
-                style={{ willChange: 'transform' }}
-                className="absolute inset-0 h-full w-full object-cover"
-              />
-              <div className="absolute inset-0 flex items-center justify-center bg-body/60 backdrop-blur-sm">
-                <div className="h-20 w-20 rounded-full bg-green text-white flex items-center justify-center">
-                  <CheckCircle size={40} weight="fill" />
-                </div>
-              </div>
+            <div className="mb-8 flex h-20 w-20 items-center justify-center rounded-[var(--radius-panel)] bg-green text-white">
+              <CheckCircle size={40} weight="fill" />
             </div>
             <h3 className="text-3xl font-display font-extrabold text-gray-text mb-3">Welcome to Pro</h3>
             <p className="text-[15px] font-medium text-gray-light leading-relaxed max-w-[280px]">
@@ -271,9 +259,8 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
   if (variant === 'fullscreen') {
     return (
       <div className={`fixed inset-0 z-50 flex items-center justify-center bg-body p-6 ${className}`}>
-        <div className="absolute inset-0 bg-gradient-to-br from-green/5 to-transparent pointer-events-none" />
         <div className="max-w-md w-full relative z-10 text-center space-y-8">
-          <div className="mx-auto w-20 h-20 bg-green/10 text-green rounded-full flex items-center justify-center mb-6">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[var(--radius-panel)] border border-green/15 bg-green/5 text-green">
             <Crown size={40} weight="duotone" />
           </div>
           <div>
@@ -283,7 +270,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
             </p>
           </div>
 
-          <div className="bg-panel-bg border border-border/40 rounded-3xl p-6 text-left space-y-4">
+          <div className="border-y border-border/50 py-5 text-left space-y-4">
             {features.map((feature) => (
               <div key={feature} className="flex items-center gap-3">
                 <CheckCircle size={20} weight="fill" className="text-green" />
@@ -308,22 +295,16 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
 
   return (
     <>
-      <div className={`surface-floating p-6 md:p-8 rounded-[24px] border border-green/20 relative overflow-hidden group ${className}`}>
-        <div className="absolute inset-0 bg-gradient-to-br from-green/10 to-transparent opacity-50 pointer-events-none" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-4 max-w-sm">
+      <div className={`surface-floating rounded-[var(--radius-panel)] border border-border/50 p-6 md:p-7 ${className}`}>
+        <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
+          <div className="max-w-md space-y-3">
             <div className="flex items-center gap-2 text-green">
               <Crown size={20} weight="fill" />
               <span className="text-[11px] font-black uppercase tracking-widest">Reflections Pro</span>
             </div>
-            <h3 className="text-2xl font-display font-bold text-gray-text">Reflections Pro</h3>
-            <ul className="space-y-2">
-              {features.map((feature) => (
-                <li key={feature} className="flex items-center gap-2 text-[13px] text-gray-light">
-                  <CheckCircle size={14} className="text-green" /> {feature}
-                </li>
-              ))}
-            </ul>
+            <p className="text-[15px] font-medium leading-relaxed text-gray-light">
+              More on-demand reflections, Life Wiki refreshes, and early Pro features.
+            </p>
           </div>
 
           <div className="flex flex-col gap-2 md:items-end">

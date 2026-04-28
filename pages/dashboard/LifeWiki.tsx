@@ -6,7 +6,6 @@ import {
   ArrowLeft,
   Book,
   CaretRight,
-  Hash,
   Sparkle,
   Warning,
 } from '@phosphor-icons/react';
@@ -113,55 +112,43 @@ const ROOM_TONE_CLASSES: Record<PageMeta['tone'], {
   accent: string;
   border: string;
   bg: string;
-  wash: string;
   hover: string;
-  iconBg: string;
   text: string;
 }> = {
   blue: {
-    accent: 'text-blue',
-    border: 'border-blue/20',
-    bg: 'bg-blue/5',
-    wash: 'from-blue/10 via-white/40 to-body',
-    hover: 'hover:border-blue/30 hover:bg-blue/10 hover:shadow-blue/10',
-    iconBg: 'bg-blue/10',
-    text: 'text-blue',
+    accent: 'text-gray-nav',
+    border: 'border-border/60',
+    bg: 'bg-white/5',
+    hover: 'hover:border-green/25 hover:bg-green/5',
+    text: 'text-green',
   },
   darkBlue: {
-    accent: 'text-dark-blue',
-    border: 'border-dark-blue/20',
-    bg: 'bg-dark-blue/5',
-    wash: 'from-dark-blue/10 via-white/40 to-body',
-    hover: 'hover:border-dark-blue/30 hover:bg-dark-blue/10 hover:shadow-dark-blue/10',
-    iconBg: 'bg-dark-blue/10',
-    text: 'text-dark-blue',
+    accent: 'text-gray-nav',
+    border: 'border-border/60',
+    bg: 'bg-white/5',
+    hover: 'hover:border-green/25 hover:bg-green/5',
+    text: 'text-green',
   },
   golden: {
-    accent: 'text-golden',
-    border: 'border-golden/30',
-    bg: 'bg-golden/10',
-    wash: 'from-golden/15 via-white/40 to-body',
-    hover: 'hover:border-golden/40 hover:bg-golden/20 hover:shadow-golden/10',
-    iconBg: 'bg-golden/20',
-    text: 'text-golden',
+    accent: 'text-gray-nav',
+    border: 'border-border/60',
+    bg: 'bg-white/5',
+    hover: 'hover:border-green/25 hover:bg-green/5',
+    text: 'text-green',
   },
   green: {
     accent: 'text-green',
     border: 'border-green/20',
     bg: 'bg-green/5',
-    wash: 'from-green/10 via-white/40 to-body',
-    hover: 'hover:border-green/30 hover:bg-green/10 hover:shadow-green/10',
-    iconBg: 'bg-green/10',
+    hover: 'hover:border-green/25 hover:bg-green/5',
     text: 'text-green',
   },
   orange: {
-    accent: 'text-orange',
-    border: 'border-orange/25',
-    bg: 'bg-orange/10',
-    wash: 'from-orange/15 via-white/40 to-body',
-    hover: 'hover:border-orange/30 hover:bg-orange/20 hover:shadow-orange/10',
-    iconBg: 'bg-orange/20',
-    text: 'text-orange',
+    accent: 'text-gray-nav',
+    border: 'border-border/60',
+    bg: 'bg-white/5',
+    hover: 'hover:border-green/25 hover:bg-green/5',
+    text: 'text-green',
   },
 };
 
@@ -400,34 +387,26 @@ export const LifeWiki: React.FC = () => {
     const isEmptyRoom = !page;
     const sources = page ? extractSourceIds(page.content) : [];
     const tone = ROOM_TONE_CLASSES[meta.tone];
-    const roomIndex = SANCTUARY_META.findIndex((room) => room.pageType === meta.pageType) + 1;
-    const roomNumber = roomIndex > 0 ? String(roomIndex).padStart(2, '0') : 'S';
 
     return (
       <div
         key={meta.pageType}
-        className={`group relative h-full overflow-hidden rounded-[var(--radius-shell)] border ${isEmptyRoom ? tone.border : 'border-border/60'} bg-white/30 shadow-sm shadow-black/5 transition-all duration-[600ms] ease-out-expo hover:-translate-y-1 hover:shadow-xl ${tone.hover}`}
+        className={`group h-full rounded-[var(--radius-shell)] border ${isEmptyRoom ? tone.border : 'border-border/60'} bg-white/20 transition-colors duration-300 ease-out-expo ${tone.hover}`}
       >
-        <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${tone.wash} ${isEmptyRoom ? 'opacity-70' : 'opacity-40'}`} />
-        <div className="pointer-events-none absolute -right-8 top-8 h-28 w-28 rounded-full border border-current opacity-[0.04]" />
         <Link
           to={articlePath(meta.pageType)}
-          className="relative z-10 flex h-full min-h-[284px] flex-col justify-between p-7 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 md:p-8"
+          className="flex h-full min-h-[244px] flex-col justify-between p-6 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 md:p-7"
           aria-label={`Open ${meta.label} Sanctuary page`}
         >
           <div className="space-y-4">
             <div className="flex items-center justify-between gap-4">
               <span className={`text-[11px] font-black uppercase tracking-widest ${tone.accent}`}>
-                {isSupporting ? 'Supporting page' : isEmptyRoom ? 'Room awaiting signal' : 'Sanctuary page'}
+                {isSupporting ? 'Supporting page' : isEmptyRoom ? 'Room awaiting signal' : 'Generated page'}
               </span>
-              <span className={`flex h-9 w-9 items-center justify-center rounded-[var(--radius-chip)] border ${tone.border} ${tone.bg}`}>
-                <span className={`font-mono text-[11px] font-black ${tone.text}`}>
-                  {roomNumber}
-                </span>
-              </span>
+              <CaretRight size={16} weight="bold" className={`${tone.text} transition-transform duration-300 ease-out-expo group-hover:translate-x-1`} />
             </div>
-            <div className="space-y-4">
-              <h2 className="text-3xl md:text-4xl font-display font-bold text-gray-text">{meta.label}</h2>
+            <div className="space-y-3">
+              <h2 className="text-3xl font-display font-bold text-gray-text md:text-4xl">{meta.label}</h2>
               <p className="line-clamp-4 text-[16px] font-serif italic leading-relaxed text-gray-text/75">
                 {isEmptyRoom ? meta.emptyLine || meta.description : previewText(page.content)}
               </p>
@@ -439,16 +418,11 @@ export const LifeWiki: React.FC = () => {
             </div>
           </div>
 
-          <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-border/40 pt-5">
-            <div className="flex flex-wrap gap-2">
-              <MetadataPill tone={isEmptyRoom ? undefined : 'green'}>
-                {isEmptyRoom ? 'No sources yet' : `${sources.length} source${sources.length === 1 ? '' : 's'}`}
-              </MetadataPill>
-              <MetadataPill>{isEmptyRoom ? 'Ready room' : new Date(page.updatedAt).toLocaleDateString()}</MetadataPill>
-            </div>
-            <span className={`mt-1 flex h-10 w-10 items-center justify-center rounded-[var(--radius-control)] border ${tone.border} ${tone.iconBg} ${tone.text} transition-all duration-500 ease-out-expo group-hover:translate-x-1`}>
-              {isEmptyRoom ? <Hash size={16} weight="bold" /> : <CaretRight size={16} weight="bold" />}
-            </span>
+          <div className="mt-7 flex flex-wrap gap-2">
+            <MetadataPill tone={isEmptyRoom ? undefined : 'green'}>
+              {isEmptyRoom ? 'No sources yet' : `${sources.length} source${sources.length === 1 ? '' : 's'}`}
+            </MetadataPill>
+            <MetadataPill>{isEmptyRoom ? 'Ready room' : new Date(page.updatedAt).toLocaleDateString()}</MetadataPill>
           </div>
         </Link>
       </div>
@@ -556,24 +530,16 @@ export const LifeWiki: React.FC = () => {
                 </Surface>
               ) : (
                 <article className="space-y-8">
-                  <header className={`relative overflow-hidden rounded-[var(--radius-shell)] border ${articleTone.border} bg-gradient-to-br ${articleTone.wash} p-8 md:p-10`}>
-                    <div className="relative z-10">
-                      <div className="mb-5 flex flex-wrap items-center gap-2">
-                        <span className={`metadata-pill ${articleTone.bg} ${articleTone.border} ${articleTone.text}`}>
-                          {articleMeta?.label || 'Sanctuary page'}
-                        </span>
-                        <MetadataPill>Ready room</MetadataPill>
-                      </div>
-                      <p className={`text-[11px] font-black uppercase tracking-widest ${articleTone.text}`}>
-                        Room awaiting signal
-                      </p>
-                      <h1 className="mt-4 max-w-3xl text-5xl font-display font-extrabold text-gray-text md:text-6xl">
-                        {articleMeta?.label || 'This page'}
-                      </h1>
-                      <p className="mt-5 max-w-2xl font-serif text-[20px] italic leading-relaxed text-gray-text/75">
-                        {articleMeta?.emptyLine || 'This room will collect the notes that belong together.'}
-                      </p>
-                    </div>
+                  <header className="space-y-4 pb-2">
+                    <p className={`text-[11px] font-black uppercase tracking-widest ${articleTone.text}`}>
+                      Room awaiting signal
+                    </p>
+                    <h1 className="max-w-3xl text-5xl font-display font-extrabold text-gray-text md:text-6xl">
+                      {articleMeta?.label || 'This page'}
+                    </h1>
+                    <p className="max-w-2xl font-serif text-[20px] italic leading-relaxed text-gray-text/75">
+                      {articleMeta?.emptyLine || 'This room will collect the notes that belong together.'}
+                    </p>
                   </header>
 
                   <Surface variant="flat" className="p-6 md:p-9">
@@ -610,8 +576,8 @@ export const LifeWiki: React.FC = () => {
               )
             ) : (
               <article className="space-y-8">
-                <header className="border-b border-border/50 pb-8">
-                  <div className="mb-5 flex flex-wrap items-center gap-2">
+                <header className="space-y-4 pb-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className={`metadata-pill ${articleTone.bg} ${articleTone.border} ${articleTone.text}`}>
                       {articleMeta?.label || articlePage.title}
                     </span>
@@ -621,7 +587,7 @@ export const LifeWiki: React.FC = () => {
                   <h1 className="max-w-3xl text-5xl font-display font-extrabold text-gray-text md:text-6xl">
                     {articlePage.title}
                   </h1>
-                  <p className="mt-4 max-w-2xl text-[16px] font-medium leading-relaxed text-gray-light">
+                  <p className="max-w-2xl text-[16px] font-medium leading-relaxed text-gray-light">
                     This AI-generated wiki page is based on notes you saved here. Source badges point back to the entries that can support a claim.
                   </p>
                 </header>
@@ -770,13 +736,10 @@ export const LifeWiki: React.FC = () => {
             />
           ) : null}
 
-          <Surface variant="flat" className="p-5 md:p-6">
-            <div className="mb-5 flex items-center gap-2">
-              <Sparkle size={18} weight="duotone" className="text-green" />
-              <h2 className="text-[13px] font-black uppercase tracking-widest text-gray-nav">
+          <section className="border-y border-border/60 py-5" aria-labelledby="life-wiki-signals">
+            <h2 id="life-wiki-signals" className="mb-5 text-[13px] font-black uppercase tracking-widest text-gray-nav">
                 Signals
-              </h2>
-            </div>
+            </h2>
             <div className="grid gap-0 divide-y divide-border/60 md:grid-cols-4 md:divide-x md:divide-y-0">
               {[
                 ['Entries', notes.length.toString()],
@@ -790,7 +753,7 @@ export const LifeWiki: React.FC = () => {
                 </div>
               ))}
             </div>
-          </Surface>
+          </section>
 
           {!hasEnoughEntriesForWiki ? (
             <Surface variant="bezel" innerClassName="p-7 md:p-9">
@@ -869,24 +832,13 @@ export const LifeWiki: React.FC = () => {
 
           {canShowSanctuaryRooms ? (
             <section className="space-y-5">
-              <div className="flex flex-wrap items-end justify-between gap-4">
+              <div className="max-w-2xl">
                 <div>
                   <h2 className="text-2xl font-display font-bold text-gray-text">Sanctuary pages</h2>
                   <p className="mt-2 text-[14px] font-medium text-gray-light">
                     The five main rooms for this library, kept visible once your Life Wiki is unlocked.
                   </p>
                 </div>
-                {primaryPages.length > 0 && !gate?.requiresUpgrade ? (
-                  <Button
-                    variant="primary"
-                    onClick={handleRefreshWiki}
-                    isLoading={isRefreshingWiki}
-                    disabled={isRefreshingWiki || !gate?.canGenerate}
-                  >
-                    <Sparkle size={16} weight="fill" className="mr-2" />
-                    Refresh with AI
-                  </Button>
-                ) : null}
               </div>
 
               <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
