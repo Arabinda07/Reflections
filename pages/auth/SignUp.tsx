@@ -146,7 +146,7 @@ export const SignUp: React.FC = () => {
         <Surface variant="bezel">
           <div className="p-8 sm:p-10 space-y-6">
             <SectionHeader
-              eyebrow="Start gently"
+              eyebrow="Join Reflections"
               title="Create account"
               icon={
                 <div className="icon-block icon-block-md">

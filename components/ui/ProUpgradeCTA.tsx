@@ -231,9 +231,9 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
                 </div>
               </div>
             </div>
-            <h3 className="text-3xl font-serif italic text-gray-text mb-3">Your sanctuary is unlocked</h3>
+            <h3 className="text-3xl font-display font-extrabold text-gray-text mb-3">Welcome to Pro</h3>
             <p className="text-[15px] font-medium text-gray-light leading-relaxed max-w-[280px]">
-              Welcome to Reflections Pro. The journey continues.
+              Writing stays unlimited. You can refresh your Life Wiki whenever you ask.
             </p>
           </div>
         )}
@@ -250,9 +250,9 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
             <Crown size={40} weight="duotone" />
           </div>
           <div>
-            <h2 className="text-4xl font-serif italic text-gray-text mb-4">Reflections Pro</h2>
+            <h2 className="text-4xl font-display font-extrabold text-gray-text mb-4">Reflections Pro</h2>
             <p className="text-[16px] text-gray-light leading-relaxed">
-              Unlock unlimited reflections and deeper insights.
+              Unlimited writing and on-demand Life Wiki refreshes.
             </p>
           </div>
 
@@ -289,7 +289,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
               <Crown size={20} weight="fill" />
               <span className="text-[11px] font-black uppercase tracking-widest">Reflections Pro</span>
             </div>
-            <h3 className="text-2xl font-serif italic text-gray-text">Ready for more?</h3>
+            <h3 className="text-2xl font-display font-bold text-gray-text">Reflections Pro</h3>
             <ul className="space-y-2">
               {features.map((feature) => (
                 <li key={feature} className="flex items-center gap-2 text-[13px] text-gray-light">
