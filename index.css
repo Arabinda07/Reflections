@@ -1325,6 +1325,19 @@ select:focus-visible,
     font-weight: 400 !important;
   }
 
+  /* Force Quill elements to inherit the font, squashing Arial/Helvetica */
+  .ql-editor * {
+    font-family: inherit !important;
+  }
+
+  /* Override React Calendar generic fonts */
+  .react-calendar, 
+  .react-calendar *, 
+  .react-calendar button, 
+  .react-calendar input {
+    font-family: var(--font-sans), 'Manrope', -apple-system, sans-serif !important;
+  }
+
   /* Editor body wrapper — sets DM Sans for the writing surface only */
   .editor-body {
     font-family: var(--font-editor);

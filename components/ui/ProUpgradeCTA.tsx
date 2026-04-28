@@ -144,7 +144,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
       <div className="px-6 sm:px-8 pb-6 pt-2 space-y-6">
         {!isUnlocked ? (
           <>
-            <div className="relative h-48 w-full overflow-hidden mb-6 bg-[#070b09] rounded-2xl transform-gpu">
+            <div className="relative h-48 w-full overflow-hidden mb-6 bg-body rounded-2xl transform-gpu">
               <video
                 src="/assets/videos/cycling.mp4"
                 autoPlay
@@ -215,7 +215,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
           </>
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center animate-in fade-in zoom-in duration-700">
-            <div className="relative h-48 w-full overflow-hidden mb-8 bg-[#070b09] rounded-3xl opacity-80 mix-blend-luminosity transform-gpu">
+            <div className="relative h-48 w-full overflow-hidden mb-8 bg-body rounded-3xl opacity-80 mix-blend-luminosity transform-gpu">
               <video
                 src="/assets/videos/cycling.mp4"
                 autoPlay
@@ -225,7 +225,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
                 style={{ willChange: 'transform' }}
                 className="absolute inset-0 h-full w-full object-cover"
               />
-              <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+              <div className="absolute inset-0 flex items-center justify-center bg-body/60 backdrop-blur-sm">
                 <div className="h-20 w-20 rounded-full bg-green text-white flex items-center justify-center">
                   <CheckCircle size={40} weight="fill" />
                 </div>

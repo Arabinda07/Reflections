@@ -40,7 +40,7 @@ export const Landing: React.FC = () => {
               variants={staggerContainer}
               initial="hidden"
               animate="show"
-              className="pointer-events-auto flex max-w-[11ch] flex-col text-mk-display font-display tracking-[-0.04em] text-gray-text leading-[0.92] sm:max-w-[12ch] sm:leading-[0.94] lg:max-w-5xl lg:leading-[0.96] text-balance"
+              className="pointer-events-auto flex max-w-[11ch] flex-col text-mk-display font-display font-extrabold tracking-[-0.04em] text-gray-text leading-[0.92] sm:max-w-[12ch] sm:leading-[0.94] lg:max-w-5xl lg:leading-[0.96] text-balance"
             >
               <motion.span variants={staggerLine} style={{ willChange: 'transform, opacity' }}>
                 Your mind,
