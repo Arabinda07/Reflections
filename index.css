@@ -1045,6 +1045,167 @@ select:focus-visible,
     background: rgba(var(--panel-bg-rgb), 0.82);
   }
 
+  .onboarding-modal-panel {
+    overflow: hidden;
+  }
+
+  .onboarding-modal-panel .modal-sheet-header {
+    padding: 1.4rem 1.4rem 0;
+  }
+
+  .onboarding-modal-panel .modal-sheet-copy {
+    gap: 0.55rem;
+  }
+
+  .onboarding-modal-panel .modal-sheet-title {
+    max-width: 15ch;
+    font-family: var(--font-serif);
+    font-size: 2rem;
+    font-style: italic;
+    font-weight: 700;
+    line-height: 1.05;
+  }
+
+  .onboarding-modal-panel .modal-sheet-footer {
+    background:
+      linear-gradient(180deg, rgba(var(--panel-bg-rgb), 0.72), rgba(var(--panel-bg-rgb), 0.96));
+  }
+
+  .onboarding-modal-body {
+    padding: 1rem 1.4rem 1.25rem;
+  }
+
+  .onboarding-step-signal {
+    display: inline-flex;
+    min-height: 2rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-chip);
+    border: 1px solid oklch(from var(--green) l c h / 0.16);
+    background: oklch(from var(--green) l c h / 0.07);
+    color: var(--green);
+    padding: 0.35rem 0.7rem;
+    font-size: 0.76rem;
+    font-weight: 800;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .onboarding-step-stage {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border-radius: calc(var(--radius-shell) - 0.25rem);
+    border: 1.5px solid oklch(from var(--green) l c h / 0.12);
+    background:
+      linear-gradient(135deg, oklch(from var(--green) 0.96 0.018 h / 0.86), rgba(var(--panel-bg-rgb), 0.92));
+    padding: 1.35rem;
+  }
+
+  .onboarding-step-stage::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      repeating-linear-gradient(
+        180deg,
+        transparent 0,
+        transparent 2.3rem,
+        oklch(from var(--green) l c h / 0.08) 2.35rem
+      );
+    opacity: 0.75;
+  }
+
+  .onboarding-step-index {
+    position: absolute;
+    right: 1rem;
+    top: 0.25rem;
+    color: oklch(from var(--green) l c h / 0.1);
+    font-family: var(--font-display);
+    font-size: 5.5rem;
+    font-weight: 800;
+    line-height: 1;
+    pointer-events: none;
+  }
+
+  .onboarding-step-icon {
+    display: inline-flex;
+    width: 3.4rem;
+    height: 3.4rem;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1.25rem;
+    border: 1.5px solid oklch(from var(--green) l c h / 0.2);
+    background: rgba(var(--panel-bg-rgb), 0.68);
+    color: var(--green);
+    box-shadow: 0 16px 28px -22px rgba(0, 0, 0, 0.24);
+  }
+
+  .onboarding-step-note {
+    max-width: 28rem;
+    color: color-mix(in oklch, var(--gray-text) 78%, var(--green) 22%);
+    font-size: 1.08rem;
+    line-height: 1.65;
+  }
+
+  .onboarding-step-folio {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+
+  .onboarding-step-folio span {
+    display: flex;
+    min-height: 2.4rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-chip);
+    border: 1px solid var(--border-color);
+    color: var(--nav-text);
+    font-size: 0.78rem;
+    font-weight: 800;
+    line-height: 1;
+    transition:
+      background-color 240ms var(--ease-out-expo),
+      border-color 240ms var(--ease-out-expo),
+      color 240ms var(--ease-out-expo);
+  }
+
+  .onboarding-step-folio span.is-active {
+    border-color: oklch(from var(--green) l c h / 0.24);
+    background: oklch(from var(--green) l c h / 0.08);
+    color: var(--green);
+  }
+
+  .dark .onboarding-step-stage {
+    background:
+      linear-gradient(135deg, oklch(from var(--green) 0.24 0.035 h / 0.42), rgba(var(--panel-bg-rgb), 0.88));
+  }
+
+  .dark .onboarding-step-icon {
+    background: rgba(var(--panel-bg-rgb), 0.78);
+  }
+
+  @media (max-width: 420px) {
+    .onboarding-modal-panel .modal-sheet-title {
+      font-size: 1.72rem;
+    }
+
+    .onboarding-modal-body {
+      padding-inline: 1.1rem;
+    }
+
+    .onboarding-step-stage {
+      padding: 1.1rem;
+    }
+
+    .onboarding-step-index {
+      font-size: 4.5rem;
+    }
+  }
+
   .overlay-feedback {
     position: fixed;
     inset: 0;

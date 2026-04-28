@@ -1,15 +1,20 @@
 import {
+  Archive,
   ArrowsClockwise,
   Brain,
+  CheckCircle as CheckCircleIcon,
+  Feather,
   FolderOpen,
+  ListChecks,
+  LockKey,
+  NotePencil,
   Plus,
   Sparkle,
   Target,
 } from '@phosphor-icons/react';
 import { animate, motion, useReducedMotion, AnimatePresence, Variants } from 'motion/react';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { ListChecks, CheckCircle as CheckCircleIcon, X as XIcon } from '@phosphor-icons/react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { AmbientMusicButton } from '../../components/ui/AmbientMusicButton';
 import { Button } from '../../components/ui/Button';
@@ -70,28 +75,38 @@ const ONBOARDING_STEPS = [
   {
     label: 'Intro',
     title: 'A private space for notes',
+    signal: 'Start quietly',
     body:
       'This is a private journal for your writing. Use it to get thoughts down and come back to them later.',
+    note: 'One honest line is already enough to begin.',
   },
   {
     label: 'Focus',
     title: 'Focus on the writing',
+    signal: 'No pressure',
     body:
       'Start with one sentence. Write what you need to say and let the page hold the rest.',
+    note: 'The page can hold the unfinished part too.',
   },
   {
     label: 'Privacy',
     title: 'Private and secure',
+    signal: 'You choose',
     body:
       'Your notes stay with you. AI only runs if you specifically ask it to help you find a pattern.',
+    note: 'Support appears only when you invite it in.',
   },
   {
     label: 'Ready',
     title: 'Ready to start',
+    signal: 'Begin',
     body:
       'Start with a blank note or use a daily focus prompt. Your archived reflections are always available.',
+    note: 'When you are ready, begin with the smallest true thing.',
   },
 ];
+
+const onboardingStepIcons = [NotePencil, Feather, LockKey, Archive] as const;
 
 export const HomeAuthenticated: React.FC = () => {
   const navigate = useNavigate();
@@ -115,6 +130,7 @@ export const HomeAuthenticated: React.FC = () => {
   const entranceDuration = isFromSave ? 0.3 : 0.8;
   const currentOnboardingStep = ONBOARDING_STEPS[onboardingStep];
   const isLastOnboardingStep = onboardingStep === ONBOARDING_STEPS.length - 1;
+  const CurrentOnboardingIcon = onboardingStepIcons[onboardingStep];
 
   useEffect(() => {
     setDailyPrompt(
@@ -541,9 +557,10 @@ export const HomeAuthenticated: React.FC = () => {
         size="lg"
         mobilePlacement="center"
         closeLabel="Skip onboarding"
-        bodyClassName="pt-3 sm:pt-4"
+        panelClassName="onboarding-modal-panel"
+        bodyClassName="onboarding-modal-body"
         footer={
-          <div className="onboarding-footer-actions flex flex-col gap-3">
+          <div className="onboarding-footer-actions flex flex-col gap-3 sm:gap-4">
             <Button
               variant="ghost"
               size="sm"
@@ -558,14 +575,14 @@ export const HomeAuthenticated: React.FC = () => {
                 variant="secondary"
                 onClick={handlePreviousOnboardingStep}
                 disabled={onboardingStep === 0}
-                className="min-w-[6.75rem]"
+                className="min-w-[6.75rem] flex-1 sm:flex-none"
               >
                 Back
               </Button>
               <Button
                 variant="primary"
                 onClick={handleNextOnboardingStep}
-                className="min-w-[8.75rem]"
+                className="min-w-[8.75rem] flex-1 sm:flex-none"
               >
                 {isLastOnboardingStep ? 'Begin writing' : 'Next'}
               </Button>
@@ -583,12 +600,17 @@ export const HomeAuthenticated: React.FC = () => {
               duration: shouldReduceMotion ? 0 : 0.24,
               ease: [0.16, 1, 0.3, 1],
             }}
-            className="onboarding-step-copy flex min-h-[12.5rem] flex-col justify-between gap-7 pb-1 sm:min-h-[13.5rem]"
+            className="onboarding-step-copy flex min-h-[18rem] flex-col justify-between gap-6 pb-1 sm:min-h-[19rem]"
           >
             <div className="space-y-4">
-              <p className="label-caps text-green" aria-live="polite">
-                Step {onboardingStep + 1} of {ONBOARDING_STEPS.length}
-              </p>
+              <div className="flex items-center justify-between gap-3">
+                <p className="label-caps text-green" aria-live="polite">
+                  Step {onboardingStep + 1} of {ONBOARDING_STEPS.length}
+                </p>
+                <span className="onboarding-step-signal">
+                  {currentOnboardingStep.signal}
+                </span>
+              </div>
 
               <div className="onboarding-progress-rail grid grid-cols-4 gap-2" aria-hidden="true">
                 {ONBOARDING_STEPS.map((step, index) => (
@@ -602,9 +624,35 @@ export const HomeAuthenticated: React.FC = () => {
               </div>
             </div>
 
-            <p className="max-w-[32rem] text-[1.125rem] font-medium leading-8 text-gray-text sm:text-ui-lg sm:leading-[1.75]">
-              {currentOnboardingStep.body}
-            </p>
+            <div className="onboarding-step-stage">
+              <span className="onboarding-step-index" aria-hidden="true">
+                {String(onboardingStep + 1).padStart(2, '0')}
+              </span>
+              <div className="relative flex flex-col gap-6 sm:flex-row sm:items-start">
+                <div className="onboarding-step-icon" aria-hidden="true">
+                  <CurrentOnboardingIcon size={28} weight="duotone" />
+                </div>
+                <div className="space-y-4">
+                  <p className="max-w-[32rem] text-[1.05rem] font-semibold leading-8 text-gray-text sm:text-ui-lg sm:leading-[1.7]">
+                    {currentOnboardingStep.body}
+                  </p>
+                  <p className="onboarding-step-note font-serif italic">
+                    {currentOnboardingStep.note}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="onboarding-step-folio" aria-hidden="true">
+              {ONBOARDING_STEPS.map((step, index) => (
+                <span
+                  key={step.label}
+                  className={index === onboardingStep ? 'is-active' : ''}
+                >
+                  {step.label}
+                </span>
+              ))}
+            </div>
           </motion.div>
         </AnimatePresence>
       </ModalSheet>
