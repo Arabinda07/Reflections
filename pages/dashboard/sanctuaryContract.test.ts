@@ -22,6 +22,11 @@ describe('Sanctuary Life Wiki contract', () => {
 
     expect(insights).toContain('to={RoutePath.SANCTUARY}');
     expect(insights).toContain('Open Sanctuary');
+    expect(insights).toContain('bg-green text-white');
+    expect(insights).not.toContain('Writing rhythm');
+    expect(insights).not.toContain('total notes');
+    expect(insights).not.toContain('Your Life Wiki has grown');
+    expect(insights).not.toContain('ProUpgradeCTA');
     expect(insights).not.toContain('refreshWikiOnDemand');
     expect(insights).not.toContain('handleRefreshWiki');
     expect(dashboardLayout).not.toContain("label: 'Life Wiki'");
@@ -36,8 +41,34 @@ describe('Sanctuary Life Wiki contract', () => {
     expect(lifeWiki).toContain('Private reading room');
     expect(lifeWiki).toContain('Signals');
     expect(lifeWiki).toContain('Supporting shelf');
-    expect(lifeWiki).toContain('quiet placeholder');
+    expect(lifeWiki).toContain('hasEnoughEntriesForWiki');
+    expect(lifeWiki).toContain('primaryPages.length > 0');
+    expect(lifeWiki).not.toContain('quiet placeholder');
+    expect(lifeWiki).not.toContain('Waiting for signal');
     expect(lifeWiki).toContain('Refresh with AI');
+  });
+
+  it('keeps all five Sanctuary rooms designed once the Life Wiki is unlocked, even before every page has content', () => {
+    const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
+
+    expect(lifeWiki).toContain('const canShowSanctuaryRooms = hasEnoughEntriesForWiki || primaryPages.length > 0;');
+    expect(lifeWiki).toContain('Room awaiting signal');
+    expect(lifeWiki).toContain('This Sanctuary room is ready, but it has not been written yet.');
+    expect(lifeWiki).toContain('SANCTUARY_META.map((meta) => renderPageCard(meta, pageMap.get(meta.pageType)))');
+    expect(lifeWiki).toContain('font-serif italic');
+  });
+
+  it('emphasizes the 3-entry gate and locks only future refreshes after the free generation', () => {
+    const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
+    const policy = read('services/wellnessPolicy.ts');
+
+    expect(policy).toContain('FREE_WIKI_MINIMUM_ENTRIES = 3');
+    expect(policy).toContain('FREE_WIKI_INSIGHT_GENERATIONS = 1');
+    expect(policy).toContain("reason: 'free_limit_reached'");
+    expect(lifeWiki).toContain('Still gathering enough signal.');
+    expect(lifeWiki).toContain('Life Wiki unlocks after 3 entries');
+    expect(lifeWiki).toContain('Generated pages stay readable');
+    expect(lifeWiki).toContain('gate?.requiresUpgrade');
   });
 
   it('uses full-page articles for AI-generated wiki pages and excludes freeform/index pages', () => {

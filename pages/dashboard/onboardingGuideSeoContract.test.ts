@@ -45,7 +45,9 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
     expect(home).not.toContain('description={currentOnboardingStep.body}');
     expect(home).toContain('onboarding-footer-actions');
     expect(home).toContain('sm:justify-between');
-    expect(home).not.toContain('<OnboardingIcon size={28} weight="duotone" />');
+    expect(home).toContain('onboarding-progress-rail');
+    expect(home).not.toContain('const OnboardingIcon');
+    expect(home).not.toContain('icon={<OnboardingIcon');
 
     expect(modalSheet).toContain("mobilePlacement?: 'bottom' | 'center'");
     expect(modalSheet).toContain('modal-sheet-root--center');

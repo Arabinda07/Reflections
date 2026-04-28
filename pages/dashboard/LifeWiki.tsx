@@ -13,7 +13,6 @@ import {
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { Button } from '../../components/ui/Button';
 import { Alert } from '../../components/ui/Alert';
-import { EmptyState } from '../../components/ui/EmptyState';
 import { MetadataPill } from '../../components/ui/MetadataPill';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { Surface } from '../../components/ui/Surface';
@@ -41,6 +40,7 @@ type PageMeta = {
   pageType: WikiPageType;
   label: string;
   description: string;
+  emptyLine?: string;
   tone: 'green' | 'blue' | 'golden' | 'orange' | 'darkBlue';
 };
 
@@ -49,30 +49,35 @@ const SANCTUARY_META: PageMeta[] = [
     pageType: 'people',
     label: 'People',
     description: 'Relationships, roles, and recurring names that appear in your notes.',
+    emptyLine: 'The names, roles, and relational weather in your writing will gather here.',
     tone: 'blue',
   },
   {
     pageType: 'patterns',
     label: 'Patterns',
     description: 'Repeated situations, moods, rhythms, and attention loops.',
+    emptyLine: 'Repeated moods, loops, and attention paths will become easier to notice here.',
     tone: 'green',
   },
   {
     pageType: 'philosophies',
     label: 'Philosophies',
     description: 'Values, beliefs, principles, and ways of seeing life.',
+    emptyLine: 'The private rules and values you keep returning to will be held here.',
     tone: 'golden',
   },
   {
     pageType: 'eras',
     label: 'Eras',
     description: 'Seasons, transitions, and phases that seem to be forming.',
+    emptyLine: 'The larger chapters and thresholds in your notes will be named here.',
     tone: 'darkBlue',
   },
   {
     pageType: 'decisions',
     label: 'Decisions',
     description: 'Choices, open questions, commitments, and tradeoffs.',
+    emptyLine: 'Open questions, tradeoffs, and commitments will settle into view here.',
     tone: 'orange',
   },
 ];
@@ -108,6 +113,7 @@ const ROOM_TONE_CLASSES: Record<PageMeta['tone'], {
   accent: string;
   border: string;
   bg: string;
+  wash: string;
   hover: string;
   iconBg: string;
   text: string;
@@ -116,6 +122,7 @@ const ROOM_TONE_CLASSES: Record<PageMeta['tone'], {
     accent: 'text-blue',
     border: 'border-blue/20',
     bg: 'bg-blue/5',
+    wash: 'from-blue/10 via-white/40 to-body',
     hover: 'hover:border-blue/30 hover:bg-blue/10 hover:shadow-blue/10',
     iconBg: 'bg-blue/10',
     text: 'text-blue',
@@ -124,6 +131,7 @@ const ROOM_TONE_CLASSES: Record<PageMeta['tone'], {
     accent: 'text-dark-blue',
     border: 'border-dark-blue/20',
     bg: 'bg-dark-blue/5',
+    wash: 'from-dark-blue/10 via-white/40 to-body',
     hover: 'hover:border-dark-blue/30 hover:bg-dark-blue/10 hover:shadow-dark-blue/10',
     iconBg: 'bg-dark-blue/10',
     text: 'text-dark-blue',
@@ -132,6 +140,7 @@ const ROOM_TONE_CLASSES: Record<PageMeta['tone'], {
     accent: 'text-golden',
     border: 'border-golden/30',
     bg: 'bg-golden/10',
+    wash: 'from-golden/15 via-white/40 to-body',
     hover: 'hover:border-golden/40 hover:bg-golden/20 hover:shadow-golden/10',
     iconBg: 'bg-golden/20',
     text: 'text-golden',
@@ -140,6 +149,7 @@ const ROOM_TONE_CLASSES: Record<PageMeta['tone'], {
     accent: 'text-green',
     border: 'border-green/20',
     bg: 'bg-green/5',
+    wash: 'from-green/10 via-white/40 to-body',
     hover: 'hover:border-green/30 hover:bg-green/10 hover:shadow-green/10',
     iconBg: 'bg-green/10',
     text: 'text-green',
@@ -148,6 +158,7 @@ const ROOM_TONE_CLASSES: Record<PageMeta['tone'], {
     accent: 'text-orange',
     border: 'border-orange/25',
     bg: 'bg-orange/10',
+    wash: 'from-orange/15 via-white/40 to-body',
     hover: 'hover:border-orange/30 hover:bg-orange/20 hover:shadow-orange/10',
     iconBg: 'bg-orange/20',
     text: 'text-orange',
@@ -226,6 +237,7 @@ export const LifeWiki: React.FC = () => {
   const [themes, setThemes] = useState<LifeTheme[]>([]);
   const [access, setAccess] = useState<WellnessAccess | null>(null);
   const [isRefreshingWiki, setIsRefreshingWiki] = useState(false);
+  const [hasLoadedLibrary, setHasLoadedLibrary] = useState(false);
   const [refreshFeedback, setRefreshFeedback] = useState<RefreshFeedback | null>(null);
   const [showInsightsEntrance, setShowInsightsEntrance] = useState(
     () => Boolean((location.state as { fromInsights?: boolean } | null)?.fromInsights),
@@ -245,6 +257,8 @@ export const LifeWiki: React.FC = () => {
       setAccess(accessData);
     } catch (error) {
       console.error('[LifeWiki] Failed to load data:', error);
+    } finally {
+      setHasLoadedLibrary(true);
     }
   };
 
@@ -276,7 +290,18 @@ export const LifeWiki: React.FC = () => {
     () => wikiPages.filter((theme) => SUPPORTING_WIKI_PAGES.includes(theme.pageType as (typeof SUPPORTING_WIKI_PAGES)[number])),
     [wikiPages],
   );
-  const missingPrimaryPages = SANCTUARY_META.filter((meta) => !pageMap.has(meta.pageType));
+  const hasEnoughEntriesForWiki = notes.length >= FREE_WIKI_MINIMUM_ENTRIES;
+  const entriesNeededForWiki = Math.max(FREE_WIKI_MINIMUM_ENTRIES - notes.length, 0);
+  const canShowSanctuaryRooms = hasEnoughEntriesForWiki || primaryPages.length > 0;
+  const roomsReadyLabel =
+    primaryPages.length > 0
+      ? `${primaryPages.length} of ${SANCTUARY_META.length} generated`
+      : hasEnoughEntriesForWiki
+        ? 'Ready for first refresh'
+        : `${entriesNeededForWiki} more ${entriesNeededForWiki === 1 ? 'entry' : 'entries'}`;
+  const refreshModeLabel = gate?.requiresUpgrade
+    ? 'Generated pages stay readable. Future refreshes need Pro.'
+    : 'On demand. Use Refresh with AI when you want the library rebuilt.';
 
   const articlePageType =
     pageType !== 'theme' && pageType !== 'index' && isUserVisibleWikiPage(pageType)
@@ -373,68 +398,62 @@ export const LifeWiki: React.FC = () => {
   };
 
   const renderPageCard = (meta: PageMeta, page?: LifeTheme | null, isSupporting = false) => {
+    if (!page && isSupporting) return null;
+
+    const isEmptyRoom = !page;
     const sources = page ? extractSourceIds(page.content) : [];
     const tone = ROOM_TONE_CLASSES[meta.tone];
+    const roomIndex = SANCTUARY_META.findIndex((room) => room.pageType === meta.pageType) + 1;
+    const roomNumber = roomIndex > 0 ? String(roomIndex).padStart(2, '0') : 'S';
 
     return (
       <div
         key={meta.pageType}
-        className={`group relative h-full overflow-hidden rounded-[var(--radius-shell)] transition-all duration-[600ms] ease-out-expo ${
-          page
-            ? `border border-border/60 bg-white/30 shadow-sm shadow-black/5 hover:-translate-y-1 hover:shadow-xl ${tone.hover}`
-            : 'quiet placeholder border border-dashed border-border/70 bg-transparent opacity-85'
-        }`}
+        className={`group relative h-full overflow-hidden rounded-[var(--radius-shell)] border ${isEmptyRoom ? tone.border : 'border-border/60'} bg-white/30 shadow-sm shadow-black/5 transition-all duration-[600ms] ease-out-expo hover:-translate-y-1 hover:shadow-xl ${tone.hover}`}
       >
-        {page ? (
-          <Link
-            to={articlePath(meta.pageType)}
-            className="relative z-10 flex h-full min-h-[284px] flex-col justify-between p-7 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 md:p-8"
-          >
-            <div className="space-y-4">
-              <div className="flex items-center justify-between gap-4">
-                <span className={`text-[11px] font-black uppercase tracking-widest ${tone.accent}`}>
-                  {isSupporting ? 'Supporting page' : 'Sanctuary page'}
-                </span>
-                <span className={`flex h-9 w-9 items-center justify-center rounded-[var(--radius-chip)] border ${tone.border} ${tone.bg}`}>
-                  <Hash size={15} weight="bold" className={tone.text} />
-                </span>
-              </div>
-              <div className="space-y-4">
-                <h2 className="text-3xl md:text-4xl font-display font-bold text-gray-text">{meta.label}</h2>
-                <p className="line-clamp-4 text-[16px] font-serif italic leading-relaxed text-gray-text/75">
-                  {previewText(page.content)}
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-border/40 pt-5">
-              <div className="flex flex-wrap gap-2">
-                <MetadataPill tone="green">{sources.length} source{sources.length === 1 ? '' : 's'}</MetadataPill>
-                <MetadataPill>{new Date(page.updatedAt).toLocaleDateString()}</MetadataPill>
-              </div>
-              <span className={`mt-1 flex h-10 w-10 items-center justify-center rounded-[var(--radius-control)] border ${tone.border} ${tone.iconBg} ${tone.text} transition-all duration-500 ease-out-expo group-hover:translate-x-1`}>
-                <CaretRight size={16} weight="bold" />
-              </span>
-            </div>
-          </Link>
-        ) : (
-          <div className="relative z-10 flex h-full min-h-[284px] flex-col justify-between p-7 md:p-8">
-            <div className="space-y-4">
+        <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${tone.wash} ${isEmptyRoom ? 'opacity-70' : 'opacity-40'}`} />
+        <div className="pointer-events-none absolute -right-8 top-8 h-28 w-28 rounded-full border border-current opacity-[0.04]" />
+        <Link
+          to={articlePath(meta.pageType)}
+          className="relative z-10 flex h-full min-h-[284px] flex-col justify-between p-7 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 md:p-8"
+          aria-label={`Open ${meta.label} Sanctuary page`}
+        >
+          <div className="space-y-4">
+            <div className="flex items-center justify-between gap-4">
               <span className={`text-[11px] font-black uppercase tracking-widest ${tone.accent}`}>
-                Waiting for signal
+                {isSupporting ? 'Supporting page' : isEmptyRoom ? 'Room awaiting signal' : 'Sanctuary page'}
               </span>
-              <div className="space-y-3">
-                <h2 className="text-3xl md:text-4xl font-display font-bold text-gray-text opacity-60">{meta.label}</h2>
-                <p className="text-[15px] font-medium leading-relaxed text-gray-light">
-                  {meta.description}
-                </p>
-              </div>
+              <span className={`flex h-9 w-9 items-center justify-center rounded-[var(--radius-chip)] border ${tone.border} ${tone.bg}`}>
+                <span className={`font-mono text-[11px] font-black ${tone.text}`}>
+                  {roomNumber}
+                </span>
+              </span>
             </div>
-            <p className="mt-8 border-t border-border/40 pt-4 text-[12px] font-medium text-gray-light">
-              Not enough here yet. This page will stay quiet until your notes can support it.
-            </p>
+            <div className="space-y-4">
+              <h2 className="text-3xl md:text-4xl font-display font-bold text-gray-text">{meta.label}</h2>
+              <p className="line-clamp-4 text-[16px] font-serif italic leading-relaxed text-gray-text/75">
+                {isEmptyRoom ? meta.emptyLine || meta.description : previewText(page.content)}
+              </p>
+              {isEmptyRoom ? (
+                <p className="max-w-[28ch] text-[12px] font-bold uppercase tracking-widest text-gray-nav">
+                  This Sanctuary room is ready, but it has not been written yet.
+                </p>
+              ) : null}
+            </div>
           </div>
-        )}
+
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-border/40 pt-5">
+            <div className="flex flex-wrap gap-2">
+              <MetadataPill tone={isEmptyRoom ? undefined : 'green'}>
+                {isEmptyRoom ? 'No sources yet' : `${sources.length} source${sources.length === 1 ? '' : 's'}`}
+              </MetadataPill>
+              <MetadataPill>{isEmptyRoom ? 'Ready room' : new Date(page.updatedAt).toLocaleDateString()}</MetadataPill>
+            </div>
+            <span className={`mt-1 flex h-10 w-10 items-center justify-center rounded-[var(--radius-control)] border ${tone.border} ${tone.iconBg} ${tone.text} transition-all duration-500 ease-out-expo group-hover:translate-x-1`}>
+              {isEmptyRoom ? <Hash size={16} weight="bold" /> : <CaretRight size={16} weight="bold" />}
+            </span>
+          </div>
+        </Link>
       </div>
     );
   };
@@ -506,17 +525,92 @@ export const LifeWiki: React.FC = () => {
             </button>
 
             {!articlePage ? (
-              <EmptyState
-                surface="flat"
-                icon={<Book size={24} weight="duotone" className="text-green" />}
-                title={`${articleMeta?.label || 'This page'} is quiet for now.`}
-                description="The library knows this room exists, but your notes have not given it enough to say yet."
-                action={
-                  <Button variant="ghost" onClick={() => navigate(RoutePath.SANCTUARY)}>
-                    Return to the library
-                  </Button>
-                }
-              />
+              !hasLoadedLibrary ? (
+                <Surface variant="flat" className="p-8 md:p-10">
+                  <div className="mx-auto max-w-xl text-center">
+                    <p className="text-[11px] font-black uppercase tracking-widest text-green">
+                      Opening room
+                    </p>
+                    <h1 className="mt-3 text-4xl font-display font-bold text-gray-text">
+                      Reading the shelf...
+                    </h1>
+                  </div>
+                </Surface>
+              ) : !canShowSanctuaryRooms ? (
+                <Surface variant="bezel" innerClassName="p-8 md:p-10">
+                  <div className="mx-auto max-w-2xl text-center">
+                    <p className="text-[11px] font-black uppercase tracking-widest text-green">
+                      Life Wiki unlocks after 3 entries
+                    </p>
+                    <h1 className="mt-3 text-4xl font-display font-bold text-gray-text">
+                      Still gathering enough signal.
+                    </h1>
+                    <p className="mx-auto mt-4 max-w-[46ch] text-[15px] font-medium leading-relaxed text-gray-light">
+                      Write {entriesNeededForWiki} more {entriesNeededForWiki === 1 ? 'entry' : 'entries'} before this Sanctuary room opens.
+                    </p>
+                    <Button
+                      variant="primary"
+                      className="mt-7 h-12 px-6 text-[12px] font-black uppercase tracking-widest"
+                      onClick={() => navigate(RoutePath.CREATE_NOTE)}
+                    >
+                      {notes.length === 0 ? 'Begin your first entry' : 'Write another entry'}
+                    </Button>
+                  </div>
+                </Surface>
+              ) : (
+                <article className="space-y-8">
+                  <header className={`relative overflow-hidden rounded-[var(--radius-shell)] border ${articleTone.border} bg-gradient-to-br ${articleTone.wash} p-8 md:p-10`}>
+                    <div className="relative z-10">
+                      <div className="mb-5 flex flex-wrap items-center gap-2">
+                        <span className={`metadata-pill ${articleTone.bg} ${articleTone.border} ${articleTone.text}`}>
+                          {articleMeta?.label || 'Sanctuary page'}
+                        </span>
+                        <MetadataPill>Ready room</MetadataPill>
+                      </div>
+                      <p className={`text-[11px] font-black uppercase tracking-widest ${articleTone.text}`}>
+                        Room awaiting signal
+                      </p>
+                      <h1 className="mt-4 max-w-3xl text-5xl font-display font-extrabold text-gray-text md:text-6xl">
+                        {articleMeta?.label || 'This page'}
+                      </h1>
+                      <p className="mt-5 max-w-2xl font-serif text-[20px] italic leading-relaxed text-gray-text/75">
+                        {articleMeta?.emptyLine || 'This room will collect the notes that belong together.'}
+                      </p>
+                    </div>
+                  </header>
+
+                  <Surface variant="flat" className="p-6 md:p-9">
+                    <div className="flex flex-col gap-7 md:flex-row md:items-end md:justify-between">
+                      <div className="max-w-2xl space-y-3">
+                        <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">
+                          Not written yet
+                        </p>
+                        <h2 className="text-3xl font-display font-bold text-gray-text">
+                          This Sanctuary room is ready, but it has not been written yet.
+                        </h2>
+                        <p className="text-[15px] font-medium leading-relaxed text-gray-light">
+                          Refresh with AI from the library when you want this room drafted from your saved reflections.
+                        </p>
+                      </div>
+                      {!gate?.requiresUpgrade ? (
+                        <Button
+                          variant="primary"
+                          onClick={handleRefreshWiki}
+                          isLoading={isRefreshingWiki}
+                          disabled={isRefreshingWiki || !gate?.canGenerate}
+                        >
+                          <Sparkle size={16} weight="fill" className="mr-2" />
+                          Refresh with AI
+                        </Button>
+                      ) : (
+                        <Button variant="primary" onClick={() => navigate(RoutePath.ACCOUNT)}>
+                          See Pro options
+                        </Button>
+                      )}
+                    </div>
+                  </Surface>
+                </article>
+              )
             ) : (
               <article className="space-y-8">
                 <header className="border-b border-border/50 pb-8">
@@ -655,7 +749,7 @@ export const LifeWiki: React.FC = () => {
               Your Life Wiki
             </h1>
             <p className="mx-auto max-w-2xl text-[17px] font-medium leading-relaxed text-gray-light">
-              A dedicated Sanctuary library of AI-generated wiki pages, refreshed when you ask or when Smart Mode is enabled.
+              A dedicated Sanctuary library of AI-generated wiki pages, refreshed only when you ask.
             </p>
           </header>
 
@@ -694,12 +788,7 @@ export const LifeWiki: React.FC = () => {
                 ['Entries', notes.length.toString()],
                 ['Generated pages', wikiPages.length.toString()],
                 ['Last refresh', getLastRefreshLabel(wikiPages)],
-                [
-                  'Still quiet',
-                  missingPrimaryPages.length === 0
-                    ? 'All five rooms have pages.'
-                    : missingPrimaryPages.map((meta) => meta.label).join(', '),
-                ],
+                ['Rooms ready', roomsReadyLabel],
               ].map(([label, value]) => (
                 <div key={label} className="px-0 py-4 first:pt-0 last:pb-0 md:px-5 md:py-0 md:first:pl-0 md:last:pr-0">
                   <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">{label}</p>
@@ -710,59 +799,113 @@ export const LifeWiki: React.FC = () => {
             <div className="mt-5 border-t border-border/60 pt-5">
               <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Mode</p>
               <p className="mt-2 max-w-3xl text-[14px] font-bold leading-relaxed text-gray-text">
-                {access?.smartModeEnabled
-                  ? 'Smart Mode is on. Future saves can refresh this quietly.'
-                  : 'On demand. Use Refresh with AI when you want the library rebuilt.'}
+                {refreshModeLabel}
               </p>
             </div>
           </Surface>
 
-          {notes.length === 0 ? (
-            <EmptyState
-              surface="flat"
-              icon={<Sparkle size={24} weight="duotone" className="text-orange" />}
-              title="The Life Wiki is quiet for now."
-              description="Write your first note and this space will stay quiet until you choose to refresh it with AI."
-              action={
-                <Button variant="ghost" className="text-[12px] font-black uppercase tracking-widest text-green" onClick={() => navigate(RoutePath.CREATE_NOTE)}>
-                  Begin your first entry
-                </Button>
-              }
-            />
-          ) : notes.length < FREE_WIKI_MINIMUM_ENTRIES ? (
-            <EmptyState
-              surface="flat"
-              icon={<Sparkle size={24} weight="duotone" className="text-orange" />}
-              title="Still gathering enough signal."
-              description={`Write ${FREE_WIKI_MINIMUM_ENTRIES - notes.length} more ${FREE_WIKI_MINIMUM_ENTRIES - notes.length === 1 ? 'entry' : 'entries'} before the Life Wiki can say anything useful.`}
-            />
-          ) : null}
-
-          <section className="space-y-5">
-            <div className="flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <h2 className="text-2xl font-display font-bold text-gray-text">Sanctuary pages</h2>
-                <p className="mt-2 text-[14px] font-medium text-gray-light">
-                  The five main AI-generated wiki pages for this library.
-                </p>
-              </div>
-              {primaryPages.length === 0 && notes.length >= FREE_WIKI_MINIMUM_ENTRIES && !gate?.requiresUpgrade ? (
+          {!hasEnoughEntriesForWiki ? (
+            <Surface variant="bezel" innerClassName="p-7 md:p-9">
+              <div className="flex flex-col gap-7 md:flex-row md:items-end md:justify-between">
+                <div className="max-w-2xl space-y-5">
+                  <p className="text-[11px] font-black uppercase tracking-widest text-green">
+                    Life Wiki unlocks after 3 entries
+                  </p>
+                  <div className="space-y-3">
+                    <h2 className="text-3xl font-display font-bold leading-tight text-gray-text md:text-4xl">
+                      Still gathering enough signal.
+                    </h2>
+                    <p className="text-[16px] font-medium leading-relaxed text-gray-light">
+                      Write {entriesNeededForWiki} more {entriesNeededForWiki === 1 ? 'entry' : 'entries'} before the Sanctuary can build pages that are grounded in your notes.
+                    </p>
+                  </div>
+                  <div className="grid max-w-sm grid-cols-3 gap-2" aria-hidden="true">
+                    {Array.from({ length: FREE_WIKI_MINIMUM_ENTRIES }).map((_, index) => (
+                      <span
+                        key={index}
+                        className={`h-1.5 rounded-full transition-opacity duration-300 ease-out-expo ${
+                          index < notes.length ? 'bg-green opacity-100' : 'bg-border opacity-80'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
                 <Button
                   variant="primary"
-                  onClick={handleRefreshWiki}
-                  isLoading={isRefreshingWiki}
-                  disabled={isRefreshingWiki || !gate?.canGenerate}
+                  className="h-12 shrink-0 px-6 text-[12px] font-black uppercase tracking-widest"
+                  onClick={() => navigate(RoutePath.CREATE_NOTE)}
                 >
-                  <Sparkle size={16} weight="fill" className="mr-2" />
-                  Refresh with AI
+                  {notes.length === 0 ? 'Begin your first entry' : 'Write another entry'}
                 </Button>
-              ) : null}
-            </div>
+              </div>
+            </Surface>
+          ) : null}
 
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {SANCTUARY_META.map((meta) => renderPageCard(meta, pageMap.get(meta.pageType)))}
-            </div>
-          </section>
+          {hasEnoughEntriesForWiki && primaryPages.length === 0 ? (
+            <Surface variant="bezel" innerClassName="p-7 md:p-9">
+              <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+                <div className="max-w-2xl space-y-3">
+                  <p className="text-[11px] font-black uppercase tracking-widest text-green">
+                    Sanctuary ready
+                  </p>
+                  <h2 className="text-3xl font-display font-bold text-gray-text">
+                    {gate?.requiresUpgrade ? 'Future Life Wiki refreshes are locked.' : 'Your first Life Wiki refresh is ready.'}
+                  </h2>
+                  <p className="text-[15px] font-medium leading-relaxed text-gray-light">
+                    {gate?.requiresUpgrade
+                      ? 'This account has used its free Life Wiki refresh. Existing generated pages stay readable; another refresh needs Pro.'
+                      : 'Refresh with AI to create the five Sanctuary pages from the entries you have saved here.'}
+                  </p>
+                </div>
+                {!gate?.requiresUpgrade ? (
+                  <Button
+                    variant="primary"
+                    onClick={handleRefreshWiki}
+                    isLoading={isRefreshingWiki}
+                    disabled={isRefreshingWiki || !gate?.canGenerate}
+                  >
+                    <Sparkle size={16} weight="fill" className="mr-2" />
+                    Refresh with AI
+                  </Button>
+                ) : (
+                  <Button
+                    variant="primary"
+                    onClick={() => navigate(RoutePath.ACCOUNT)}
+                  >
+                    See Pro options
+                  </Button>
+                )}
+              </div>
+            </Surface>
+          ) : null}
+
+          {canShowSanctuaryRooms ? (
+            <section className="space-y-5">
+              <div className="flex flex-wrap items-end justify-between gap-4">
+                <div>
+                  <h2 className="text-2xl font-display font-bold text-gray-text">Sanctuary pages</h2>
+                  <p className="mt-2 text-[14px] font-medium text-gray-light">
+                    The five main rooms for this library, kept visible once your Life Wiki is unlocked.
+                  </p>
+                </div>
+                {primaryPages.length > 0 && !gate?.requiresUpgrade ? (
+                  <Button
+                    variant="primary"
+                    onClick={handleRefreshWiki}
+                    isLoading={isRefreshingWiki}
+                    disabled={isRefreshingWiki || !gate?.canGenerate}
+                  >
+                    <Sparkle size={16} weight="fill" className="mr-2" />
+                    Refresh with AI
+                  </Button>
+                ) : null}
+              </div>
+
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+                {SANCTUARY_META.map((meta) => renderPageCard(meta, pageMap.get(meta.pageType)))}
+              </div>
+            </section>
+          ) : null}
 
           {supportingPages.length > 0 ? (
             <section className="space-y-5">

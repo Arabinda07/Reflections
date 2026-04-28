@@ -49,7 +49,7 @@ export const Landing: React.FC = () => {
                 beautifully
               </motion.span>
               <motion.span variants={staggerLine} style={{ willChange: 'transform, opacity' }}>
-                organized.
+                organized
               </motion.span>
             </motion.div>
 
@@ -57,9 +57,9 @@ export const Landing: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.5 }}
-              className="pointer-events-auto max-w-[26ch] sm:max-w-[32ch] lg:max-w-[40ch] font-sans text-lg font-medium leading-relaxed text-gray-text sm:text-xl tracking-normal text-balance"
+              className="pointer-events-auto max-w-[26ch] sm:max-w-[32ch] lg:max-w-[40ch] font-sans text-base font-medium leading-relaxed text-gray-text sm:text-lg tracking-normal text-balance"
             >
-              A private journal. Write what's on your mind, notice the patterns, and keep it to yourself.
+              A private journal. Write what's on your mind, notice the patterns, and keep it to yourself
             </motion.p>
           </div>
 
@@ -75,7 +75,7 @@ export const Landing: React.FC = () => {
               whileHover={{ y: -3, scale: 1.02 }}
               whileTap={{ scale: 0.98, y: 0 }}
               transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="group h-16 w-auto px-10 font-sans text-[18px] font-extrabold shadow-2xl shadow-green/30 hover:shadow-green/40 hover:bg-green-hover"
+              className="group h-16 w-auto px-10 font-sans text-[19px] font-bold tracking-normal shadow-2xl shadow-green/30 hover:shadow-green/40 hover:bg-green-hover"
               aria-label="Begin writing"
             >
               Begin writing

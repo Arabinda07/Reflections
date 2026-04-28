@@ -2,15 +2,12 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
-  Calendar,
   Heart,
-  TrendUp,
   Book,
   CaretRight,
   Hash,
 } from '@phosphor-icons/react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
-import { Button } from '../../components/ui/Button';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { MetadataPill } from '../../components/ui/MetadataPill';
 import { PageContainer } from '../../components/ui/PageContainer';
@@ -20,7 +17,6 @@ import { LifeTheme, Note, RoutePath, WellnessAccess } from '../../types';
 import { noteService } from '../../services/noteService';
 import { wikiService } from '../../services/wikiService';
 import { profileService } from '../../services/profileService';
-import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
 import { FREE_WIKI_MINIMUM_ENTRIES, getWikiInsightsGate } from '../../services/wellnessPolicy';
 
 const MOOD_TONE_CLASSES: Record<string, { label: string; track: string; fill: string }> = {
@@ -147,10 +143,6 @@ export const Insights: React.FC = () => {
           <Surface variant="bezel" innerClassName="p-8 md:p-12">
             <div className="flex flex-col gap-6 md:gap-8">
               <div className="flex flex-wrap items-center gap-2">
-                <MetadataPill tone="green">Writing rhythm</MetadataPill>
-                <MetadataPill icon={<Calendar size={13} weight="bold" />}>
-                  {stats.totalNotes} total notes
-                </MetadataPill>
                 <MetadataPill icon={<Book size={13} weight="bold" />}>
                   {stats.wordsWritten.toLocaleString()} words written
                 </MetadataPill>
@@ -165,7 +157,7 @@ export const Insights: React.FC = () => {
                   <span className="capitalize text-green font-bold not-italic">
                     {stats.topMood === 'undefined' ? 'toward clarity' : stats.topMood}
                   </span>
-                  . Your Life Wiki has grown to {themes.length} themes.
+                  .
                 </p>
               </div>
             </div>
@@ -270,18 +262,12 @@ export const Insights: React.FC = () => {
                 </p>
               </div>
               
-              <div className="relative flex h-12 shrink-0 items-center justify-center overflow-hidden rounded-[var(--radius-control)] border border-border bg-white/5 px-6 text-[13px] font-black uppercase tracking-widest text-gray-text transition-all duration-300 group-hover:border-green/30 group-hover:bg-green/10 group-hover:text-green">
+              <div className="relative flex h-12 shrink-0 items-center justify-center overflow-hidden rounded-[var(--radius-control)] border border-green bg-green text-white px-6 text-[13px] font-black uppercase tracking-widest transition-all duration-300 group-hover:bg-green/90 group-hover:shadow-lg group-hover:shadow-green/20">
                 Open Sanctuary
                 <CaretRight size={16} weight="bold" className="ml-2 transition-transform duration-500 ease-out-expo group-hover:translate-x-1" />
               </div>
             </Link>
           </Surface>
-
-          {access?.planTier !== 'pro' && (
-            <div className="pt-4">
-              <ProUpgradeCTA />
-            </div>
-          )}
         </div>
       </PageContainer>
     </>

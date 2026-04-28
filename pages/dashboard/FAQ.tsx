@@ -118,14 +118,14 @@ export const FAQ: React.FC = () => {
         <div className="lg:col-span-8">
           <h1 className="text-mk-display font-display font-extrabold leading-[0.95] tracking-normal text-gray-text text-balance">
             Untangle your <br />
-            <span className="font-serif italic font-normal text-green">thoughts.</span>
+            <span className="font-serif italic font-normal text-green">thoughts</span>
           </h1>
         </div>
 
         <div className="lg:col-span-4">
           <p className="border-l border-border pl-6 font-serif text-[18px] leading-relaxed text-gray-light">
             Reflections is a calm, private writing space. This guide explains what the product does,
-            what it avoids, and how optional AI fits around the writing.
+            what it avoids, and how optional AI fits around the writing
           </p>
         </div>
       </section>
@@ -160,7 +160,7 @@ export const FAQ: React.FC = () => {
         <section className="mb-20">
           <div className="mb-10 space-y-4">
             <p className="label-caps text-green">The practice</p>
-            <h2 className="text-mk-h2 font-display font-bold text-gray-text">A space to write, one reflection at a time.</h2>
+            <h2 className="text-mk-h2 font-display font-bold text-gray-text">A space to write, one reflection at a time</h2>
           </div>
           
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -183,7 +183,7 @@ export const FAQ: React.FC = () => {
         <section className="mb-20 border-y border-border py-20">
           <div className="mb-12 space-y-4">
             <p className="label-caps text-green">The details</p>
-            <h2 className="text-mk-h2 font-display font-bold text-gray-text">Tools built to support you without getting in the way.</h2>
+            <h2 className="text-mk-h2 font-display font-bold text-gray-text">Tools built to support you without getting in the way</h2>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">

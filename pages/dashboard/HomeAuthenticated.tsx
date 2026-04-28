@@ -3,7 +3,6 @@ import {
   Brain,
   FolderOpen,
   Plus,
-  ShieldCheck,
   Sparkle,
   Target,
 } from '@phosphor-icons/react';
@@ -69,28 +68,24 @@ const WRITING_NOTES = [
 
 const ONBOARDING_STEPS = [
   {
-    icon: Sparkle,
     label: 'Intro',
     title: 'A private space for notes',
     body:
       'This is a private journal for your writing. Use it to get thoughts down and come back to them later.',
   },
   {
-    icon: Target,
     label: 'Focus',
     title: 'Focus on the writing',
     body:
       'Start with one sentence. Write what you need to say and let the page hold the rest.',
   },
   {
-    icon: ShieldCheck,
     label: 'Privacy',
     title: 'Private and secure',
     body:
       'Your notes stay with you. AI only runs if you specifically ask it to help you find a pattern.',
   },
   {
-    icon: Brain,
     label: 'Ready',
     title: 'Ready to start',
     body:
@@ -119,7 +114,6 @@ export const HomeAuthenticated: React.FC = () => {
 
   const entranceDuration = isFromSave ? 0.3 : 0.8;
   const currentOnboardingStep = ONBOARDING_STEPS[onboardingStep];
-  const OnboardingIcon = currentOnboardingStep.icon;
   const isLastOnboardingStep = onboardingStep === ONBOARDING_STEPS.length - 1;
 
   useEffect(() => {
@@ -543,12 +537,11 @@ export const HomeAuthenticated: React.FC = () => {
       <ModalSheet
         isOpen={showOnboarding}
         onClose={handleCloseOnboarding}
-        icon={<OnboardingIcon size={20} weight="duotone" />}
         title={currentOnboardingStep.title}
         size="lg"
         mobilePlacement="center"
         closeLabel="Skip onboarding"
-        bodyClassName="pt-4 sm:pt-5"
+        bodyClassName="pt-3 sm:pt-4"
         footer={
           <div className="onboarding-footer-actions flex flex-col gap-3">
             <Button
@@ -590,14 +583,14 @@ export const HomeAuthenticated: React.FC = () => {
               duration: shouldReduceMotion ? 0 : 0.24,
               ease: [0.16, 1, 0.3, 1],
             }}
-            className="onboarding-step-copy flex min-h-[13.5rem] flex-col gap-6 pb-1 sm:min-h-[14.5rem]"
+            className="onboarding-step-copy flex min-h-[12.5rem] flex-col justify-between gap-7 pb-1 sm:min-h-[13.5rem]"
           >
-            <div className="space-y-3">
+            <div className="space-y-4">
               <p className="label-caps text-green" aria-live="polite">
                 Step {onboardingStep + 1} of {ONBOARDING_STEPS.length}
               </p>
 
-              <div className="grid grid-cols-4 gap-2" aria-hidden="true">
+              <div className="onboarding-progress-rail grid grid-cols-4 gap-2" aria-hidden="true">
                 {ONBOARDING_STEPS.map((step, index) => (
                   <span
                     key={step.label}
@@ -609,7 +602,7 @@ export const HomeAuthenticated: React.FC = () => {
               </div>
             </div>
 
-            <p className="max-w-[31rem] text-[1.0625rem] font-medium leading-8 text-gray-text sm:text-ui-lg sm:leading-[1.75]">
+            <p className="max-w-[32rem] text-[1.125rem] font-medium leading-8 text-gray-text sm:text-ui-lg sm:leading-[1.75]">
               {currentOnboardingStep.body}
             </p>
           </motion.div>
