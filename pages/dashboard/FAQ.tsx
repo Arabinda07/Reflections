@@ -116,9 +116,9 @@ export const FAQ: React.FC = () => {
     <div className="relative min-h-full bg-body pb-28 text-gray-text transition-colors duration-300">
       <section className="mx-auto grid w-full max-w-[1440px] gap-12 px-6 py-20 sm:px-10 lg:grid-cols-12 lg:items-end lg:px-16 lg:py-28">
         <div className="lg:col-span-8">
-          <h1 className="text-mk-display font-display leading-[0.95] tracking-[-0.04em] text-gray-text text-balance">
+          <h1 className="text-mk-display font-display font-extrabold leading-[0.95] tracking-[-0.04em] text-gray-text text-balance">
             Untangle your <br />
-            <span className="font-serif italic text-green">thoughts.</span>
+            <span className="font-serif italic font-normal text-green">thoughts.</span>
           </h1>
         </div>
 
@@ -143,10 +143,10 @@ export const FAQ: React.FC = () => {
                     <Icon size={20} weight="duotone" />
                   </div>
                   <div className="space-y-3">
-                    <h2 className="text-[22px] font-display leading-tight text-gray-text">
+                    <h2 className="text-[22px] font-display font-bold leading-tight text-gray-text">
                       {section.title}
                     </h2>
-                    <p className="font-serif text-[16px] leading-relaxed text-gray-light">
+                    <p className="font-sans text-[16px] leading-relaxed text-gray-light">
                       {section.body}
                     </p>
                   </div>
@@ -160,7 +160,7 @@ export const FAQ: React.FC = () => {
         <section className="mb-20">
           <div className="mb-10 space-y-4">
             <p className="label-caps text-green">The practice</p>
-            <h2 className="text-mk-h2 font-display text-gray-text">A space to write, one reflection at a time.</h2>
+            <h2 className="text-mk-h2 font-display font-bold text-gray-text">A space to write, one reflection at a time.</h2>
           </div>
           
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -171,8 +171,8 @@ export const FAQ: React.FC = () => {
                   <div className="mb-6 flex h-10 w-10 items-center justify-center rounded-xl bg-body border border-border text-gray-light">
                     <Icon size={20} weight="bold" />
                   </div>
-                  <h3 className="mb-3 text-[19px] font-display text-gray-text">{item.title}</h3>
-                  <p className="font-serif text-[16px] leading-relaxed text-gray-light">{item.body}</p>
+                  <h3 className="mb-3 text-[19px] font-display font-bold text-gray-text">{item.title}</h3>
+                  <p className="font-sans text-[16px] leading-relaxed text-gray-light">{item.body}</p>
                 </div>
               );
             })}
@@ -183,7 +183,7 @@ export const FAQ: React.FC = () => {
         <section className="mb-20 border-y border-border py-20">
           <div className="mb-12 space-y-4">
             <p className="label-caps text-green">The details</p>
-            <h2 className="text-mk-h2 font-display text-gray-text">Tools built to support you without getting in the way.</h2>
+            <h2 className="text-mk-h2 font-display font-bold text-gray-text">Tools built to support you without getting in the way.</h2>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">
@@ -197,10 +197,10 @@ export const FAQ: React.FC = () => {
                     </div>
                     <div className="space-y-4">
                       <div className="space-y-1">
-                        <h3 className="text-[24px] font-display text-gray-text">{item.title}</h3>
+                        <h3 className="text-[24px] font-display font-bold text-gray-text">{item.title}</h3>
                         {item.label && <p className="text-[11px] font-black uppercase tracking-widest text-green/60">{item.label}</p>}
                       </div>
-                      <p className="font-serif text-[17px] leading-relaxed text-gray-light">{item.body}</p>
+                      <p className="font-sans text-[17px] leading-relaxed text-gray-light">{item.body}</p>
                     </div>
                   </div>
                 </div>
@@ -221,7 +221,7 @@ export const FAQ: React.FC = () => {
                   </div>
                   <div className="space-y-2">
                     <h4 className="text-[14px] font-black uppercase tracking-widest text-gray-text">{feature.title}</h4>
-                    <p className="font-serif text-[16px] leading-relaxed text-gray-light">{feature.body}</p>
+                    <p className="font-sans text-[16px] leading-relaxed text-gray-light">{feature.body}</p>
                   </div>
                 </div>
               );

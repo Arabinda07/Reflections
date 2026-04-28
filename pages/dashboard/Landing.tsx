@@ -45,7 +45,7 @@ export const Landing: React.FC = () => {
               <motion.span variants={staggerLine} style={{ willChange: 'transform, opacity' }}>
                 Your mind,
               </motion.span>
-              <motion.span variants={staggerLine} className="font-serif italic text-green" style={{ lineHeight: 1.1, willChange: 'transform, opacity' }}>
+              <motion.span variants={staggerLine} className="font-serif italic font-normal text-green" style={{ lineHeight: 1.1, willChange: 'transform, opacity' }}>
                 beautifully
               </motion.span>
               <motion.span variants={staggerLine} style={{ willChange: 'transform, opacity' }}>
@@ -75,7 +75,7 @@ export const Landing: React.FC = () => {
               whileHover={{ y: -3, scale: 1.02 }}
               whileTap={{ scale: 0.98, y: 0 }}
               transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="group h-16 w-auto px-10 font-editor text-[19px] font-bold shadow-2xl shadow-green/30 hover:shadow-green/40 hover:bg-green-hover"
+              className="group h-16 w-auto px-10 font-sans text-[18px] font-extrabold shadow-2xl shadow-green/30 hover:shadow-green/40 hover:bg-green-hover"
               aria-label="Begin writing"
             >
               Begin writing
