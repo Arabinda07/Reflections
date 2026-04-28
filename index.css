@@ -1058,7 +1058,7 @@ select:focus-visible,
   }
 
   .onboarding-modal-panel .modal-sheet-title {
-    max-width: 15ch;
+    max-width: none;
     font-family: var(--font-serif);
     font-size: 2rem;
     font-style: italic;
@@ -1073,22 +1073,6 @@ select:focus-visible,
 
   .onboarding-modal-body {
     padding: 1rem 1.4rem 1.25rem;
-  }
-
-  .onboarding-step-signal {
-    display: inline-flex;
-    min-height: 2rem;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-chip);
-    border: 1px solid oklch(from var(--green) l c h / 0.16);
-    background: oklch(from var(--green) l c h / 0.07);
-    color: var(--green);
-    padding: 0.35rem 0.7rem;
-    font-size: 0.76rem;
-    font-weight: 800;
-    line-height: 1;
-    white-space: nowrap;
   }
 
   .onboarding-step-stage {
@@ -1117,18 +1101,6 @@ select:focus-visible,
     opacity: 0.75;
   }
 
-  .onboarding-step-index {
-    position: absolute;
-    right: 1rem;
-    top: 0.25rem;
-    color: oklch(from var(--green) l c h / 0.1);
-    font-family: var(--font-display);
-    font-size: 5.5rem;
-    font-weight: 800;
-    line-height: 1;
-    pointer-events: none;
-  }
-
   .onboarding-step-icon {
     display: inline-flex;
     width: 3.4rem;
@@ -1148,35 +1120,6 @@ select:focus-visible,
     color: color-mix(in oklch, var(--gray-text) 78%, var(--green) 22%);
     font-size: 1.08rem;
     line-height: 1.65;
-  }
-
-  .onboarding-step-folio {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.5rem;
-  }
-
-  .onboarding-step-folio span {
-    display: flex;
-    min-height: 2.4rem;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-chip);
-    border: 1px solid var(--border-color);
-    color: var(--nav-text);
-    font-size: 0.78rem;
-    font-weight: 800;
-    line-height: 1;
-    transition:
-      background-color 240ms var(--ease-out-expo),
-      border-color 240ms var(--ease-out-expo),
-      color 240ms var(--ease-out-expo);
-  }
-
-  .onboarding-step-folio span.is-active {
-    border-color: oklch(from var(--green) l c h / 0.24);
-    background: oklch(from var(--green) l c h / 0.08);
-    color: var(--green);
   }
 
   .dark .onboarding-step-stage {
@@ -1199,10 +1142,6 @@ select:focus-visible,
 
     .onboarding-step-stage {
       padding: 1.1rem;
-    }
-
-    .onboarding-step-index {
-      font-size: 4.5rem;
     }
   }
 

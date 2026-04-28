@@ -61,13 +61,18 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
     expect(home).toContain('panelClassName="onboarding-modal-panel"');
     expect(home).toContain('CurrentOnboardingIcon');
     expect(home).toContain('onboarding-step-stage');
-    expect(home).toContain('onboarding-step-folio');
     expect(home).toContain('onboarding-step-note');
     expect(home).toContain('font-serif italic');
+    expect(home).not.toContain('currentOnboardingStep.signal');
+    expect(home).not.toContain('onboarding-step-index');
+    expect(home).not.toContain('onboarding-step-folio');
 
     expect(css).toContain('.onboarding-modal-panel .modal-sheet-title');
     expect(css).toContain('font-family: var(--font-serif)');
-    expect(css).toContain('.onboarding-step-folio');
+    expect(css).toContain('max-width: none');
+    expect(css).not.toContain('.onboarding-step-index');
+    expect(css).not.toContain('.onboarding-step-signal');
+    expect(css).not.toContain('.onboarding-step-folio');
   });
 
   it('keeps the landing page in its full-bleed hero form', () => {

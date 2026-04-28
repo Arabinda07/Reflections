@@ -31,9 +31,12 @@ describe('landing first-paint contract', () => {
     const indexHtml = read('index.html');
 
     expect(indexHtml).toContain('rel="preload" href="/assets/videos/landing_video.png" as="image" fetchpriority="high"');
+    expect(landing).toContain('const [isHeroPosterReady, setIsHeroPosterReady] = useState(false);');
     expect(landing).toContain('const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);');
     expect(landing).toContain('fetchPriority="high"');
+    expect(landing).toContain('onLoad={() => setIsHeroPosterReady(true)}');
     expect(landing).toContain('onLoadedData={() => setIsHeroVideoReady(true)}');
+    expect(landing).toContain("isHeroPosterReady && !isHeroVideoReady ? 'opacity-90' : 'opacity-0'");
     expect(landing).toContain("isHeroVideoReady ? 'opacity-90' : 'opacity-0'");
   });
 

@@ -75,7 +75,6 @@ const ONBOARDING_STEPS = [
   {
     label: 'Intro',
     title: 'A private space for notes',
-    signal: 'Start quietly',
     body:
       'This is a private journal for your writing. Use it to get thoughts down and come back to them later.',
     note: 'One honest line is already enough to begin.',
@@ -83,7 +82,6 @@ const ONBOARDING_STEPS = [
   {
     label: 'Focus',
     title: 'Focus on the writing',
-    signal: 'No pressure',
     body:
       'Start with one sentence. Write what you need to say and let the page hold the rest.',
     note: 'The page can hold the unfinished part too.',
@@ -91,7 +89,6 @@ const ONBOARDING_STEPS = [
   {
     label: 'Privacy',
     title: 'Private and secure',
-    signal: 'You choose',
     body:
       'Your notes stay with you. AI only runs if you specifically ask it to help you find a pattern.',
     note: 'Support appears only when you invite it in.',
@@ -99,7 +96,6 @@ const ONBOARDING_STEPS = [
   {
     label: 'Ready',
     title: 'Ready to start',
-    signal: 'Begin',
     body:
       'Start with a blank note or use a daily focus prompt. Your archived reflections are always available.',
     note: 'When you are ready, begin with the smallest true thing.',
@@ -603,14 +599,9 @@ export const HomeAuthenticated: React.FC = () => {
             className="onboarding-step-copy flex min-h-[18rem] flex-col justify-between gap-6 pb-1 sm:min-h-[19rem]"
           >
             <div className="space-y-4">
-              <div className="flex items-center justify-between gap-3">
-                <p className="label-caps text-green" aria-live="polite">
-                  Step {onboardingStep + 1} of {ONBOARDING_STEPS.length}
-                </p>
-                <span className="onboarding-step-signal">
-                  {currentOnboardingStep.signal}
-                </span>
-              </div>
+              <p className="label-caps text-green" aria-live="polite">
+                Step {onboardingStep + 1} of {ONBOARDING_STEPS.length}
+              </p>
 
               <div className="onboarding-progress-rail grid grid-cols-4 gap-2" aria-hidden="true">
                 {ONBOARDING_STEPS.map((step, index) => (
@@ -625,9 +616,6 @@ export const HomeAuthenticated: React.FC = () => {
             </div>
 
             <div className="onboarding-step-stage">
-              <span className="onboarding-step-index" aria-hidden="true">
-                {String(onboardingStep + 1).padStart(2, '0')}
-              </span>
               <div className="relative flex flex-col gap-6 sm:flex-row sm:items-start">
                 <div className="onboarding-step-icon" aria-hidden="true">
                   <CurrentOnboardingIcon size={28} weight="duotone" />
@@ -641,17 +629,6 @@ export const HomeAuthenticated: React.FC = () => {
                   </p>
                 </div>
               </div>
-            </div>
-
-            <div className="onboarding-step-folio" aria-hidden="true">
-              {ONBOARDING_STEPS.map((step, index) => (
-                <span
-                  key={step.label}
-                  className={index === onboardingStep ? 'is-active' : ''}
-                >
-                  {step.label}
-                </span>
-              ))}
             </div>
           </motion.div>
         </AnimatePresence>

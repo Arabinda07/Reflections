@@ -738,10 +738,7 @@ export const LifeWiki: React.FC = () => {
             ) : null}
           </div>
 
-          <header className="mx-auto max-w-4xl space-y-5 border-b border-border/40 pb-8 text-center">
-            <p className="text-[11px] font-black uppercase tracking-widest text-green">
-              Private reading room
-            </p>
+          <header className="mx-auto max-w-4xl space-y-5 pb-3 text-center">
             <h1 className="text-5xl font-display font-extrabold text-gray-text md:text-6xl">
               Your Life Wiki
             </h1>

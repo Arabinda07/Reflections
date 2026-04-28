@@ -22,7 +22,11 @@ describe('polish contract', () => {
     const appLaunch = read('src/native/appLaunch.ts');
 
     expect(startupScreen).toContain('isVideoReady');
+    expect(startupScreen).toContain('isPosterReady');
+    expect(startupScreen).toContain('onLoad={() => setIsPosterReady(true)}');
     expect(startupScreen).toContain('onLoadedData={() => setIsVideoReady(true)}');
+    expect(startupScreen).toContain("isPosterReady && !isVideoReady ? 'opacity-85' : 'opacity-0'");
+    expect(startupScreen).toContain("isVideoReady ? 'opacity-85' : 'opacity-0'");
     expect(startupScreen).toContain('opacity-0');
     expect(startupScreen).toContain('bg-[radial-gradient');
     expect(startupScreen).not.toContain('animate-pulse');

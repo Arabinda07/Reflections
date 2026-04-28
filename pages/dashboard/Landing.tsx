@@ -19,6 +19,7 @@ export const Landing: React.FC = () => {
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isMuted, setIsMuted] = useState(true);
+  const [isHeroPosterReady, setIsHeroPosterReady] = useState(false);
   const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);
 
   const toggleMute = () => {
@@ -132,7 +133,12 @@ export const Landing: React.FC = () => {
           alt=""
           aria-hidden="true"
           fetchPriority="high"
-          className="absolute inset-0 h-full w-full object-cover object-[48%_center] opacity-90 sm:object-[64%_center] lg:object-center"
+          loading="eager"
+          decoding="async"
+          onLoad={() => setIsHeroPosterReady(true)}
+          className={`absolute inset-0 h-full w-full object-cover object-[48%_center] transition-opacity duration-700 ease-out-expo sm:object-[64%_center] lg:object-center ${
+            isHeroPosterReady && !isHeroVideoReady ? 'opacity-90' : 'opacity-0'
+          }`}
         />
 
         <video

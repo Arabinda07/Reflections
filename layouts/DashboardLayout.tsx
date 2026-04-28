@@ -208,7 +208,7 @@ export const DashboardLayout: React.FC = () => {
     : 'text-gray-nav hover:text-green hover:bg-green/5';
 
   return (
-    <div className="relative flex h-[100dvh] flex-col overflow-hidden bg-body font-sans selection:bg-green/30 selection:text-green transition-colors duration-300">
+    <div className="relative flex min-h-[100dvh] flex-col overflow-hidden bg-body font-sans selection:bg-green/30 selection:text-green transition-colors duration-300">
       <AnalyticsRouteTracker />
       <a href="#main-content" className="skip-link">
         Skip to content
