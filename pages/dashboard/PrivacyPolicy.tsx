@@ -108,7 +108,7 @@ export const PrivacyPolicy: React.FC = () => {
             </p>
             <a
               href="mailto:robinsaha434@gmail.com"
-              className="mt-4 inline-flex items-center gap-2 text-green font-bold hover:underline tracking-tight"
+              className="mt-4 inline-flex items-center gap-2 text-green font-bold hover:underline tracking-normal"
             >
               <Envelope size={16} weight="bold" />
               robinsaha434@gmail.com

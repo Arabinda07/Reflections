@@ -7,11 +7,9 @@ import {
   TrendUp,
   Book,
   CaretRight,
-  CircleNotch,
   Hash,
 } from '@phosphor-icons/react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
-import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '../../components/ui/Button';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { MetadataPill } from '../../components/ui/MetadataPill';
@@ -47,7 +45,6 @@ export const Insights: React.FC = () => {
   const [notes, setNotes] = useState<Note[]>([]);
   const [themes, setThemes] = useState<LifeTheme[]>([]);
   const [access, setAccess] = useState<WellnessAccess | null>(null);
-  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -129,18 +126,9 @@ export const Insights: React.FC = () => {
     wikiGate?.canGenerate && notes.length >= FREE_WIKI_MINIMUM_ENTRIES && themes.length === 0,
   );
 
-  const handleOpenSanctuary = () => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
-    setTimeout(() => {
-      navigate(RoutePath.SANCTUARY, { state: { fromInsights: true } });
-    }, 3500);
-  };
-
   return (
     <>
-      <div className={`transition-opacity duration-1000 ${isTransitioning ? 'opacity-0 scale-[0.98]' : 'opacity-100 scale-100'}`}>
-        <PageContainer className="pb-24 pt-6 md:pt-10">
+      <PageContainer className="pb-24 pt-6 md:pt-10">
         <div className="space-y-10">
           <button 
             onClick={() => navigate(RoutePath.HOME)}
@@ -169,7 +157,7 @@ export const Insights: React.FC = () => {
               </div>
               
               <div className="space-y-4 max-w-2xl">
-                <h2 className="text-3xl md:text-5xl font-display font-extrabold text-gray-text tracking-tight leading-tight">
+                <h2 className="text-3xl md:text-5xl font-display font-extrabold text-gray-text tracking-normal leading-tight">
                   You wrote {stats.monthNotes} reflections this month.
                 </h2>
                 <p className="text-[18px] md:text-[20px] font-serif italic text-gray-light leading-relaxed">
@@ -254,13 +242,13 @@ export const Insights: React.FC = () => {
 
           <Surface
             variant="flat"
-            className={`overflow-hidden border transition-all duration-500 ${isTransitioning ? 'border-green/40 bg-green/5' : 'border-transparent hover:border-green/20'}`}
+            className="overflow-hidden border border-transparent transition-all duration-500 hover:border-green/20"
           >
-            <button
-              onClick={handleOpenSanctuary}
+            <Link
+              to={RoutePath.SANCTUARY}
+              state={{ fromInsights: true }}
               className="group flex w-full flex-col items-center justify-between gap-8 p-8 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 md:flex-row md:p-12"
               aria-label="Open your Life Wiki"
-              disabled={isTransitioning}
             >
               <div className="space-y-4">
                 {isWikiReadyToBuild ? (
@@ -282,22 +270,11 @@ export const Insights: React.FC = () => {
                 </p>
               </div>
               
-              <div className="shrink-0 flex items-center justify-center h-12 px-6 rounded-[var(--radius-control)] bg-white/5 border border-border group-hover:bg-green/10 group-hover:border-green/30 group-hover:text-green transition-all duration-300 text-gray-text font-black text-[13px] uppercase tracking-widest relative overflow-hidden">
-                <span 
-                  className={`flex items-center transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isTransitioning ? '-translate-y-12 opacity-0' : 'translate-y-0 opacity-100'}`}
-                  style={{ willChange: 'transform, opacity' }}
-                >
-                  Open Sanctuary
-                  <CaretRight size={16} weight="bold" className="ml-2" />
-                </span>
-                <span 
-                  className={`absolute inset-0 flex items-center justify-center text-green transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${isTransitioning ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}
-                  style={{ willChange: 'transform, opacity' }}
-                >
-                  <CircleNotch size={20} weight="bold" className="animate-spin" />
-                </span>
+              <div className="relative flex h-12 shrink-0 items-center justify-center overflow-hidden rounded-[var(--radius-control)] border border-border bg-white/5 px-6 text-[13px] font-black uppercase tracking-widest text-gray-text transition-all duration-300 group-hover:border-green/30 group-hover:bg-green/10 group-hover:text-green">
+                Open Sanctuary
+                <CaretRight size={16} weight="bold" className="ml-2 transition-transform duration-500 ease-out-expo group-hover:translate-x-1" />
               </div>
-            </button>
+            </Link>
           </Surface>
 
           {access?.planTier !== 'pro' && (
@@ -307,38 +284,6 @@ export const Insights: React.FC = () => {
           )}
         </div>
       </PageContainer>
-      </div>
-
-      <AnimatePresence>
-        {isTransitioning && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-body"
-          >
-            <motion.div
-              initial={{ scale: 0.95, y: 10 }}
-              animate={{ scale: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className="flex flex-col items-center gap-8 px-6"
-            >
-              <div className="h-32 w-32 overflow-hidden rounded-[var(--radius-panel)] bg-green/5 border border-green/10 shadow-xl flex items-center justify-center">
-                <DotLottieReact src="/assets/lottie/Level%20Up%20Animation.json" autoplay loop />
-              </div>
-              <div className="text-center space-y-3">
-                <h2 className="text-3xl md:text-4xl font-serif italic text-gray-text">
-                  Preparing your Sanctuary
-                </h2>
-                <p className="text-[16px] text-gray-light max-w-xs mx-auto leading-relaxed">
-                  Synthesizing your reflections and finding the patterns...
-                </p>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   );
 };

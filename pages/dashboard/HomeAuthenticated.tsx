@@ -192,6 +192,11 @@ export const HomeAuthenticated: React.FC = () => {
   useEffect(() => {
     if (noteCount === null) return;
 
+    if (shouldReduceMotion) {
+      setDisplayCount(noteCount);
+      return;
+    }
+
     const controls = animate(0, noteCount, {
       duration: 2,
       ease: [0.16, 1, 0.3, 1],
@@ -201,7 +206,7 @@ export const HomeAuthenticated: React.FC = () => {
     });
 
     return () => controls.stop();
-  }, [noteCount]);
+  }, [noteCount, shouldReduceMotion]);
 
   const handleCloseOnboarding = useCallback(() => {
     localStorage.setItem('hasSeenOnboarding', 'true');
@@ -359,10 +364,10 @@ export const HomeAuthenticated: React.FC = () => {
                 className="group flex flex-col items-start gap-4 mb-16 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300"
                 aria-label="View all reflections"
               >
-                <h2 className="text-5xl md:text-7xl font-display font-extrabold text-gray-text group-hover:text-green transition-colors tracking-tighter tabular-nums">
+                <h2 className="text-5xl md:text-7xl font-display font-extrabold text-gray-text group-hover:text-green transition-colors tracking-normal tabular-nums">
                   {isCountLoading ? '...' : displayCount}
                 </h2>
-                <p className="text-[13px] font-bold text-gray-nav uppercase tracking-tight">
+                <p className="text-[13px] font-bold text-gray-nav uppercase tracking-normal">
                   Reflections Archived
                 </p>
               </button>

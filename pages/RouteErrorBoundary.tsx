@@ -52,7 +52,7 @@ export const RouteErrorBoundary: React.FC = () => {
         </div>
 
         <span className="label-caps text-gray-nav">Route recovery</span>
-        <h1 className="mt-5 max-w-[10ch] text-mk-display leading-[0.92] tracking-[-0.03em]">
+        <h1 className="mt-5 max-w-[10ch] text-mk-display leading-[0.92] tracking-normal">
           {title}
         </h1>
         <p className="mt-4 max-w-[34rem] font-serif text-[1rem] leading-[1.72] text-gray-light sm:text-[1.125rem]">

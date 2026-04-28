@@ -45,8 +45,10 @@ export const profileService = {
 
     const { data, error } = await supabase
       .from('profiles')
-      .update({ smart_mode_enabled: enabled })
-      .eq('id', user.id)
+      .upsert(
+        { id: user.id, smart_mode_enabled: enabled },
+        { onConflict: 'id' },
+      )
       .select('plan, free_ai_reflections_used, free_wiki_insights_used, smart_mode_enabled')
       .single();
 

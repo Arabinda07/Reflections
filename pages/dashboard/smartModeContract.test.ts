@@ -18,6 +18,10 @@ describe('Smart Mode Sanctuary contract', () => {
     expect(account).toContain('Smart Mode');
     expect(account).toContain('setSmartModeEnabled');
     expect(account).toContain('runGreatIngest');
+    expect(account).toContain('role="switch"');
+    expect(account).toContain('aria-checked={Boolean(access?.smartModeEnabled)}');
+    expect(account).toContain('Turn off Smart Mode');
+    expect(account).toContain('Enable Smart Mode');
 
     expect(createNote).toContain('smartModeEnabled');
     expect(createNote).toContain('autoIngestSavedNote');
@@ -36,5 +40,14 @@ describe('Smart Mode Sanctuary contract', () => {
     expect(types).toContain('smartModeEnabled: boolean');
     expect(profileService).toContain('smart_mode_enabled');
     expect(profileService).toContain('setSmartModeEnabled');
+    expect(profileService).toContain('upsert(');
+  });
+
+  it('ships deployed-database Smart Mode migrations outside the full fresh schema', () => {
+    const updateSchema = read('supabase_schema_update.sql');
+
+    expect(updateSchema).toContain('smart_mode_enabled');
+    expect(updateSchema).toContain('create table if not exists wiki_absorb_log');
+    expect(updateSchema).toContain('content_hash text not null');
   });
 });

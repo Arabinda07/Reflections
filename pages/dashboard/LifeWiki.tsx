@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
 import {
   ArrowLeft,
@@ -41,6 +41,7 @@ type PageMeta = {
   pageType: WikiPageType;
   label: string;
   description: string;
+  tone: 'green' | 'blue' | 'golden' | 'orange' | 'darkBlue';
 };
 
 const SANCTUARY_META: PageMeta[] = [
@@ -48,26 +49,31 @@ const SANCTUARY_META: PageMeta[] = [
     pageType: 'people',
     label: 'People',
     description: 'Relationships, roles, and recurring names that appear in your notes.',
+    tone: 'blue',
   },
   {
     pageType: 'patterns',
     label: 'Patterns',
     description: 'Repeated situations, moods, rhythms, and attention loops.',
+    tone: 'green',
   },
   {
     pageType: 'philosophies',
     label: 'Philosophies',
     description: 'Values, beliefs, principles, and ways of seeing life.',
+    tone: 'golden',
   },
   {
     pageType: 'eras',
     label: 'Eras',
     description: 'Seasons, transitions, and phases that seem to be forming.',
+    tone: 'darkBlue',
   },
   {
     pageType: 'decisions',
     label: 'Decisions',
     description: 'Choices, open questions, commitments, and tradeoffs.',
+    tone: 'orange',
   },
 ];
 
@@ -76,26 +82,81 @@ const SUPPORTING_META: PageMeta[] = [
     pageType: 'mood_patterns',
     label: 'Mood Patterns',
     description: 'The older generated mood summary, kept as supporting context.',
+    tone: 'green',
   },
   {
     pageType: 'recurring_themes',
     label: 'Recurring Themes',
     description: 'The older generated theme summary, kept as supporting context.',
+    tone: 'blue',
   },
   {
     pageType: 'self_model',
     label: 'Self Model',
     description: 'The older generated self-model page, kept as supporting context.',
+    tone: 'golden',
   },
   {
     pageType: 'timeline',
     label: 'Timeline',
     description: 'The older generated timeline page, kept as supporting context.',
+    tone: 'darkBlue',
   },
 ];
 
+const ROOM_TONE_CLASSES: Record<PageMeta['tone'], {
+  accent: string;
+  border: string;
+  bg: string;
+  hover: string;
+  iconBg: string;
+  text: string;
+}> = {
+  blue: {
+    accent: 'text-blue',
+    border: 'border-blue/20',
+    bg: 'bg-blue/5',
+    hover: 'hover:border-blue/30 hover:bg-blue/10 hover:shadow-blue/10',
+    iconBg: 'bg-blue/10',
+    text: 'text-blue',
+  },
+  darkBlue: {
+    accent: 'text-dark-blue',
+    border: 'border-dark-blue/20',
+    bg: 'bg-dark-blue/5',
+    hover: 'hover:border-dark-blue/30 hover:bg-dark-blue/10 hover:shadow-dark-blue/10',
+    iconBg: 'bg-dark-blue/10',
+    text: 'text-dark-blue',
+  },
+  golden: {
+    accent: 'text-golden',
+    border: 'border-golden/30',
+    bg: 'bg-golden/10',
+    hover: 'hover:border-golden/40 hover:bg-golden/20 hover:shadow-golden/10',
+    iconBg: 'bg-golden/20',
+    text: 'text-golden',
+  },
+  green: {
+    accent: 'text-green',
+    border: 'border-green/20',
+    bg: 'bg-green/5',
+    hover: 'hover:border-green/30 hover:bg-green/10 hover:shadow-green/10',
+    iconBg: 'bg-green/10',
+    text: 'text-green',
+  },
+  orange: {
+    accent: 'text-orange',
+    border: 'border-orange/25',
+    bg: 'bg-orange/10',
+    hover: 'hover:border-orange/30 hover:bg-orange/20 hover:shadow-orange/10',
+    iconBg: 'bg-orange/20',
+    text: 'text-orange',
+  },
+};
+
 const SOURCE_LINK_PREFIX = 'source-note:';
 const SOURCE_MARKER_PATTERN = /\[source:([^\]]+)\]/gi;
+const SANCTUARY_ENTRANCE_LOTTIE = '/assets/lottie/Level Up Animation.json';
 
 const articlePath = (pageType: WikiPageType) =>
   RoutePath.SANCTUARY_ARTICLE.replace(':pageType', pageType);
@@ -166,6 +227,10 @@ export const LifeWiki: React.FC = () => {
   const [access, setAccess] = useState<WellnessAccess | null>(null);
   const [isRefreshingWiki, setIsRefreshingWiki] = useState(false);
   const [refreshFeedback, setRefreshFeedback] = useState<RefreshFeedback | null>(null);
+  const [showInsightsEntrance, setShowInsightsEntrance] = useState(
+    () => Boolean((location.state as { fromInsights?: boolean } | null)?.fromInsights),
+  );
+  const shouldReduceMotion = useReducedMotion();
 
   const loadData = async () => {
     try {
@@ -186,6 +251,12 @@ export const LifeWiki: React.FC = () => {
   useEffect(() => {
     void loadData();
   }, []);
+
+  useEffect(() => {
+    if (!showInsightsEntrance) return;
+    const timer = window.setTimeout(() => setShowInsightsEntrance(false), 1100);
+    return () => window.clearTimeout(timer);
+  }, [showInsightsEntrance]);
 
   const gate = useMemo(() => {
     if (!access) return null;
@@ -303,53 +374,57 @@ export const LifeWiki: React.FC = () => {
 
   const renderPageCard = (meta: PageMeta, page?: LifeTheme | null, isSupporting = false) => {
     const sources = page ? extractSourceIds(page.content) : [];
+    const tone = ROOM_TONE_CLASSES[meta.tone];
 
     return (
       <div
         key={meta.pageType}
-        className={`group relative h-full overflow-hidden rounded-[32px] transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        className={`group relative h-full overflow-hidden rounded-[var(--radius-shell)] transition-all duration-[600ms] ease-out-expo ${
           page
-            ? 'border-[1.5px] border-border/50 bg-white/5 hover:-translate-y-2 hover:bg-white/10 hover:shadow-2xl hover:shadow-green/20 hover:border-green/30'
-            : 'quiet placeholder border-[1.5px] border-dashed border-border/70 bg-transparent opacity-80'
+            ? `border border-border/60 bg-white/30 shadow-sm shadow-black/5 hover:-translate-y-1 hover:shadow-xl ${tone.hover}`
+            : 'quiet placeholder border border-dashed border-border/70 bg-transparent opacity-85'
         }`}
       >
         {page ? (
           <Link
             to={articlePath(meta.pageType)}
-            className="flex h-full min-h-[260px] flex-col justify-between p-8 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 relative z-10"
+            className="relative z-10 flex h-full min-h-[284px] flex-col justify-between p-7 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 md:p-8"
           >
             <div className="space-y-4">
               <div className="flex items-center justify-between gap-4">
-                <span className="text-[11px] font-black uppercase tracking-widest text-green/80">
+                <span className={`text-[11px] font-black uppercase tracking-widest ${tone.accent}`}>
                   {isSupporting ? 'Supporting page' : 'Sanctuary page'}
                 </span>
-                <Hash size={14} weight="bold" className="text-green/40 transition-colors group-hover:text-green/80" />
+                <span className={`flex h-9 w-9 items-center justify-center rounded-[var(--radius-chip)] border ${tone.border} ${tone.bg}`}>
+                  <Hash size={15} weight="bold" className={tone.text} />
+                </span>
               </div>
               <div className="space-y-4">
                 <h2 className="text-3xl md:text-4xl font-display font-bold text-gray-text">{meta.label}</h2>
-                <p className="text-[16px] font-serif italic leading-relaxed text-gray-text/70 line-clamp-3">
+                <p className="line-clamp-4 text-[16px] font-serif italic leading-relaxed text-gray-text/75">
                   {previewText(page.content)}
                 </p>
               </div>
             </div>
 
-            <div className="mt-8 flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-border/40">
-              <div className="flex flex-wrap gap-2 pt-4">
+            <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-border/40 pt-5">
+              <div className="flex flex-wrap gap-2">
                 <MetadataPill tone="green">{sources.length} source{sources.length === 1 ? '' : 's'}</MetadataPill>
+                <MetadataPill>{new Date(page.updatedAt).toLocaleDateString()}</MetadataPill>
               </div>
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white/50 text-green transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:bg-green group-hover:text-white group-hover:scale-110 shadow-sm mt-4">
+              <span className={`mt-1 flex h-10 w-10 items-center justify-center rounded-[var(--radius-control)] border ${tone.border} ${tone.iconBg} ${tone.text} transition-all duration-500 ease-out-expo group-hover:translate-x-1`}>
                 <CaretRight size={16} weight="bold" />
               </span>
             </div>
           </Link>
         ) : (
-          <div className="flex h-full min-h-[260px] flex-col justify-between p-8 relative z-10">
+          <div className="relative z-10 flex h-full min-h-[284px] flex-col justify-between p-7 md:p-8">
             <div className="space-y-4">
-              <span className="text-[11px] font-black uppercase tracking-widest text-gray-nav">
+              <span className={`text-[11px] font-black uppercase tracking-widest ${tone.accent}`}>
                 Waiting for signal
               </span>
               <div className="space-y-3">
-                <h2 className="text-3xl md:text-4xl font-display font-bold text-gray-text opacity-50">{meta.label}</h2>
+                <h2 className="text-3xl md:text-4xl font-display font-bold text-gray-text opacity-60">{meta.label}</h2>
                 <p className="text-[15px] font-medium leading-relaxed text-gray-light">
                   {meta.description}
                 </p>
@@ -366,29 +441,43 @@ export const LifeWiki: React.FC = () => {
 
   const renderEntrance = () => (
     <AnimatePresence>
-      {isRefreshingWiki && (
+      {(isRefreshingWiki || showInsightsEntrance) && (
         <motion.div
-          initial={{ opacity: 0 }}
+          initial={shouldReduceMotion ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.4 }}
-          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-body"
+          transition={{ duration: shouldReduceMotion ? 0 : 0.35, ease: [0.16, 1, 0.3, 1] }}
+          className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-body px-6"
         >
-          <div className="absolute inset-0 bg-gradient-to-b from-green/10 via-body to-body" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,oklch(0.70_0.05_135_/_0.18),transparent_54%)]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-green/10 via-body/95 to-body" />
           <motion.div
-            initial={{ y: 18, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.1, duration: 0.5 }}
-            className="relative z-10 flex max-w-sm flex-col items-center px-6 text-center"
+            aria-hidden="true"
+            initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.96 }}
+            animate={{ opacity: shouldReduceMotion ? 0.14 : 0.2, scale: 1 }}
+            transition={{ delay: shouldReduceMotion ? 0 : 0.08, duration: shouldReduceMotion ? 0 : 0.55, ease: [0.16, 1, 0.3, 1] }}
+            className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center mix-blend-luminosity"
           >
-            <div className="h-32 w-32 overflow-hidden rounded-[var(--radius-panel)] bg-green/5">
-              <DotLottieReact src="/assets/lottie/Level%20Up%20Animation.json" autoplay loop />
+            <div className="h-[min(66vmin,34rem)] w-[min(66vmin,34rem)]">
+              <DotLottieReact src={SANCTUARY_ENTRANCE_LOTTIE} autoplay loop />
             </div>
-            <h2 className="mt-6 text-4xl font-serif italic text-gray-text">
+          </motion.div>
+          <motion.div
+            initial={shouldReduceMotion ? false : { y: 16, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: shouldReduceMotion ? 0 : 0.12, duration: shouldReduceMotion ? 0 : 0.45, ease: [0.16, 1, 0.3, 1] }}
+            className="relative z-10 flex max-w-[42rem] flex-col items-center text-center"
+          >
+            <p className="text-[11px] font-black uppercase tracking-widest text-green">
+              {isRefreshingWiki ? 'Reading only your saved notes' : 'Private reading room'}
+            </p>
+            <h2 className="mt-4 text-4xl font-display font-bold leading-tight text-gray-text md:text-5xl">
               {isRefreshingWiki ? 'Refreshing your Life Wiki...' : 'Opening Sanctuary'}
             </h2>
-            <p className="mt-3 text-[12px] font-black uppercase tracking-widest text-gray-nav">
-              {isRefreshingWiki ? 'Reading only your saved notes' : 'A quiet threshold into the library'}
+            <p className="mt-4 max-w-[36ch] text-[15px] font-medium leading-relaxed text-gray-light">
+              {isRefreshingWiki
+                ? 'The library is rebuilding from the writing you saved here.'
+                : 'Crossing into the library without leaving the calm of the page.'}
             </p>
           </motion.div>
         </motion.div>
@@ -397,6 +486,8 @@ export const LifeWiki: React.FC = () => {
   );
 
   if (articlePageType) {
+    const articleTone = articleMeta ? ROOM_TONE_CLASSES[articleMeta.tone] : ROOM_TONE_CLASSES.green;
+
     return (
       <>
         {renderEntrance()}
@@ -405,7 +496,7 @@ export const LifeWiki: React.FC = () => {
         </div>
         <PageContainer size="narrow" className="pb-24 pt-6 md:pt-10 relative z-10">
           <div className="space-y-8">
-            <button 
+            <button
               onClick={() => navigate(RoutePath.SANCTUARY)}
               className="flex items-center gap-2 text-[13px] font-bold text-gray-nav hover:text-green transition-colors w-fit"
               aria-label="Back to Sanctuary"
@@ -430,11 +521,13 @@ export const LifeWiki: React.FC = () => {
               <article className="space-y-8">
                 <header className="border-b border-border/50 pb-8">
                   <div className="mb-5 flex flex-wrap items-center gap-2">
-                    <MetadataPill tone="green">{articleMeta?.label || articlePage.title}</MetadataPill>
+                    <span className={`metadata-pill ${articleTone.bg} ${articleTone.border} ${articleTone.text}`}>
+                      {articleMeta?.label || articlePage.title}
+                    </span>
                     <MetadataPill tone="green">Updated {new Date(articlePage.updatedAt).toLocaleDateString()}</MetadataPill>
                     <MetadataPill tone="green">{sourceIds.length} source{sourceIds.length === 1 ? '' : 's'}</MetadataPill>
                   </div>
-                  <h1 className="text-5xl font-display font-extrabold text-gray-text md:text-6xl">
+                  <h1 className="max-w-3xl text-5xl font-display font-extrabold text-gray-text md:text-6xl">
                     {articlePage.title}
                   </h1>
                   <p className="mt-4 max-w-2xl text-[16px] font-medium leading-relaxed text-gray-light">
@@ -442,8 +535,8 @@ export const LifeWiki: React.FC = () => {
                   </p>
                 </header>
 
-                <Surface variant="flat" className="p-6 md:p-8">
-                  <div className="space-y-5 font-serif text-[18px] leading-loose text-gray-text">
+                <Surface variant="flat" className="p-6 md:p-10">
+                  <div className="mx-auto max-w-[68ch] space-y-5 font-serif text-[18px] leading-loose text-gray-text">
                     <ReactMarkdown
                       skipHtml
                       components={{
@@ -460,13 +553,13 @@ export const LifeWiki: React.FC = () => {
                           );
                         },
                         h1: ({ children }) => (
-                          <h2 className="mt-12 text-4xl font-display font-bold text-gray-text tracking-tight first:mt-0">{children}</h2>
+                          <h2 className="mt-12 text-4xl font-display font-bold text-gray-text first:mt-0">{children}</h2>
                         ),
                         h2: ({ children }) => (
-                          <h2 className="mt-10 text-3xl font-display font-bold text-gray-text tracking-tight first:mt-0">{children}</h2>
+                          <h2 className="mt-10 text-3xl font-display font-bold text-gray-text first:mt-0">{children}</h2>
                         ),
                         h3: ({ children }) => (
-                          <h3 className="mt-8 text-2xl font-display font-bold text-gray-text tracking-tight">{children}</h3>
+                          <h3 className="mt-8 text-2xl font-display font-bold text-gray-text">{children}</h3>
                         ),
                         p: ({ children }) => <p className="mb-5 last:mb-0">{children}</p>,
                         ul: ({ children }) => <ul className="mb-5 list-disc space-y-2 pl-6">{children}</ul>,
@@ -555,6 +648,9 @@ export const LifeWiki: React.FC = () => {
           </div>
 
           <header className="mx-auto max-w-4xl space-y-5 border-b border-border/40 pb-8 text-center">
+            <p className="text-[11px] font-black uppercase tracking-widest text-green">
+              Private reading room
+            </p>
             <h1 className="text-5xl font-display font-extrabold text-gray-text md:text-6xl">
               Your Life Wiki
             </h1>
@@ -586,38 +682,34 @@ export const LifeWiki: React.FC = () => {
             />
           ) : null}
 
-          <Surface variant="flat" className="p-5">
-            <div className="mb-4 flex items-center gap-2">
+          <Surface variant="flat" className="p-5 md:p-6">
+            <div className="mb-5 flex items-center gap-2">
               <Sparkle size={18} weight="duotone" className="text-green" />
               <h2 className="text-[13px] font-black uppercase tracking-widest text-gray-nav">
                 Signals
               </h2>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="rounded-[var(--radius-panel)] border border-border/50 bg-white/5 p-4">
-                <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Entries</p>
-                <p className="mt-2 text-3xl font-display font-bold text-gray-text">{notes.length}</p>
-              </div>
-              <div className="rounded-[var(--radius-panel)] border border-border/50 bg-white/5 p-4">
-                <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Generated pages</p>
-                <p className="mt-2 text-3xl font-display font-bold text-gray-text">{wikiPages.length}</p>
-              </div>
-              <div className="rounded-[var(--radius-panel)] border border-border/50 bg-white/5 p-4">
-                <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Last refresh</p>
-                <p className="mt-3 text-[14px] font-bold text-gray-text">{getLastRefreshLabel(wikiPages)}</p>
-              </div>
-              <div className="rounded-[var(--radius-panel)] border border-border/50 bg-white/5 p-4">
-                <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Still quiet</p>
-                <p className="mt-3 text-[14px] font-bold text-gray-text">
-                  {missingPrimaryPages.length === 0
+            <div className="grid gap-0 divide-y divide-border/60 md:grid-cols-4 md:divide-x md:divide-y-0">
+              {[
+                ['Entries', notes.length.toString()],
+                ['Generated pages', wikiPages.length.toString()],
+                ['Last refresh', getLastRefreshLabel(wikiPages)],
+                [
+                  'Still quiet',
+                  missingPrimaryPages.length === 0
                     ? 'All five rooms have pages.'
-                    : missingPrimaryPages.map((meta) => meta.label).join(', ')}
-                </p>
-              </div>
+                    : missingPrimaryPages.map((meta) => meta.label).join(', '),
+                ],
+              ].map(([label, value]) => (
+                <div key={label} className="px-0 py-4 first:pt-0 last:pb-0 md:px-5 md:py-0 md:first:pl-0 md:last:pr-0">
+                  <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">{label}</p>
+                  <p className="mt-2 text-[15px] font-bold leading-relaxed text-gray-text">{value}</p>
+                </div>
+              ))}
             </div>
-            <div className="mt-3 rounded-[var(--radius-panel)] border border-border/50 bg-white/5 p-4">
+            <div className="mt-5 border-t border-border/60 pt-5">
               <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Mode</p>
-              <p className="mt-2 text-[14px] font-bold text-gray-text">
+              <p className="mt-2 max-w-3xl text-[14px] font-bold leading-relaxed text-gray-text">
                 {access?.smartModeEnabled
                   ? 'Smart Mode is on. Future saves can refresh this quietly.'
                   : 'On demand. Use Refresh with AI when you want the library rebuilt.'}

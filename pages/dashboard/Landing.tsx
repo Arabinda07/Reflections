@@ -40,7 +40,7 @@ export const Landing: React.FC = () => {
               variants={staggerContainer}
               initial="hidden"
               animate="show"
-              className="pointer-events-auto flex max-w-[11ch] flex-col text-mk-display font-display font-extrabold tracking-[-0.04em] text-gray-text leading-[0.92] sm:max-w-[12ch] sm:leading-[0.94] lg:max-w-5xl lg:leading-[0.96] text-balance"
+              className="pointer-events-auto flex max-w-[11ch] flex-col text-mk-display font-display font-extrabold tracking-normal text-gray-text leading-[0.92] sm:max-w-[12ch] sm:leading-[0.94] lg:max-w-5xl lg:leading-[0.96] text-balance"
             >
               <motion.span variants={staggerLine} style={{ willChange: 'transform, opacity' }}>
                 Your mind,
@@ -57,7 +57,7 @@ export const Landing: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.5 }}
-              className="pointer-events-auto max-w-[26ch] sm:max-w-[32ch] lg:max-w-[40ch] font-sans text-lg font-medium leading-relaxed text-gray-text sm:text-xl tracking-tight text-balance"
+              className="pointer-events-auto max-w-[26ch] sm:max-w-[32ch] lg:max-w-[40ch] font-sans text-lg font-medium leading-relaxed text-gray-text sm:text-xl tracking-normal text-balance"
             >
               A private journal. Write what's on your mind, notice the patterns, and keep it to yourself.
             </motion.p>

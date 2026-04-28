@@ -68,7 +68,11 @@
 
 @layer base {
   :root {
-    --font-editor: 'Spectral', serif;
+    --font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-serif: 'Spectral', serif;
+    --font-display: 'Sora', 'Manrope', sans-serif;
+    --font-mono: 'Geist Mono', monospace;
+    --font-editor: var(--font-serif);
   }
 }
 
@@ -245,7 +249,7 @@ html {
 }
 
 body {
-  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-sans);
   color: var(--gray-text);
   background-color: var(--bg-color);
   font-weight: 400;
@@ -315,15 +319,28 @@ select:focus-visible,
   box-shadow: 0 0 0 4px oklch(from var(--green) l c h / 0.1);
 }
 
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-delay: 0ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 @layer components {
 
   /* Typography Standard */
   .h1-hero {
-    @apply text-5xl md:text-7xl lg:text-[100px] font-display font-extrabold tracking-[-0.04em] text-gray-text leading-[1.05] text-balance;
+    @apply text-5xl md:text-7xl lg:text-[100px] font-display font-extrabold tracking-normal text-gray-text leading-[1.05] text-balance;
   }
 
   .h2-section {
-    @apply text-4xl md:text-5xl font-display font-bold tracking-[-0.03em] text-gray-text leading-tight text-balance;
+    @apply text-4xl md:text-5xl font-display font-bold tracking-normal text-gray-text leading-tight text-balance;
   }
 
   .body-editorial {
@@ -548,10 +565,22 @@ select:focus-visible,
 
   .section-header-title {
     @apply font-display font-bold;
-    font-size: clamp(2rem, 3vw + 1rem, 3.5rem);
+    font-size: 2.25rem;
     line-height: 0.98;
-    letter-spacing: -0.04em;
+    letter-spacing: 0;
     color: var(--gray-text);
+  }
+
+  @media (min-width: 768px) {
+    .section-header-title {
+      font-size: 3rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .section-header-title {
+      font-size: 3.5rem;
+    }
   }
 
   .section-header-description {
@@ -937,8 +966,8 @@ select:focus-visible,
   .modal-sheet-title {
     font-size: 1.35rem;
     line-height: 1.15;
-    letter-spacing: -0.03em;
-    font-family: 'Feather Bold', 'Geist', sans-serif;
+    letter-spacing: 0;
+    font-family: var(--font-display);
     color: var(--gray-text);
   }
 
@@ -1044,7 +1073,7 @@ select:focus-visible,
   }
 
   .overlay-feedback-title {
-    font-family: 'Geist', sans-serif;
+    font-family: var(--font-sans);
     font-size: 0.8rem;
     font-weight: 900;
     letter-spacing: 0.18em;
@@ -1061,10 +1090,10 @@ select:focus-visible,
   }
 
   .overlay-feedback-wordmark {
-    font-family: 'Geist', sans-serif;
+    font-family: var(--font-sans);
     font-size: 1.15rem;
     font-weight: 800;
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
     text-transform: lowercase;
     color: var(--gray-text);
   }
@@ -1156,7 +1185,7 @@ select:focus-visible,
   }
 
   .audio-track-title {
-    font-family: 'Geist', sans-serif;
+    font-family: var(--font-sans);
     font-size: 0.82rem;
     font-weight: 800;
     color: var(--gray-text);
@@ -1174,10 +1203,10 @@ select:focus-visible,
     border: 1px solid var(--floating-panel-border);
     background: var(--ambient-hint-bg);
     color: var(--gray-text);
-    font-family: 'Geist', sans-serif;
+    font-family: var(--font-sans);
     font-size: 0.72rem;
     font-weight: 800;
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
     white-space: nowrap;
     box-shadow: var(--ambient-hint-shadow);
   }
@@ -1335,7 +1364,7 @@ select:focus-visible,
   .react-calendar *, 
   .react-calendar button, 
   .react-calendar input {
-    font-family: var(--font-sans), 'Manrope', -apple-system, sans-serif !important;
+    font-family: var(--font-sans) !important;
   }
 
   /* Editor body wrapper — sets DM Sans for the writing surface only */

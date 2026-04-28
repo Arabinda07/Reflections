@@ -559,20 +559,45 @@ export const Account: React.FC = () => {
                       </div>
                     ) : null}
 
-                    <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <MetadataPill tone={access?.smartModeEnabled ? 'green' : undefined}>
-                        {access?.smartModeEnabled ? 'Enabled' : 'Off'}
-                      </MetadataPill>
-                      <Button
+                    <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="space-y-1">
+                        <MetadataPill tone={access?.smartModeEnabled ? 'green' : undefined}>
+                          {access?.smartModeEnabled ? 'Enabled' : 'Off'}
+                        </MetadataPill>
+                        <p className="text-[12px] font-medium text-gray-light" id="smart-mode-state">
+                          {isSmartModeChanging
+                            ? 'Updating Smart Mode...'
+                            : access?.smartModeEnabled
+                              ? 'Future saves can refresh the Life Wiki quietly.'
+                              : 'AI stays on demand until you switch this on.'}
+                        </p>
+                      </div>
+                      <button
                         type="button"
-                        variant={access?.smartModeEnabled ? 'secondary' : 'primary'}
-                        size="sm"
+                        role="switch"
+                        aria-checked={Boolean(access?.smartModeEnabled)}
+                        aria-label={access?.smartModeEnabled ? 'Turn off Smart Mode' : 'Enable Smart Mode'}
+                        aria-describedby="smart-mode-state"
                         onClick={handleSmartModeToggle}
-                        isLoading={isSmartModeChanging}
-                        disabled={!access}
+                        disabled={!access || isSmartModeChanging}
+                        className={`relative flex h-11 w-[156px] shrink-0 items-center rounded-[var(--radius-control)] border px-1.5 transition-all duration-500 ease-out-expo focus:outline-none focus-visible:ring-4 focus-visible:ring-green/15 disabled:pointer-events-none disabled:opacity-50 ${
+                          access?.smartModeEnabled
+                            ? 'border-green/30 bg-green/10 text-green'
+                            : 'border-border bg-white/5 text-gray-nav hover:border-green/20 hover:bg-green/5'
+                        }`}
                       >
-                        {access?.smartModeEnabled ? 'Turn off Smart Mode' : 'Enable Smart Mode'}
-                      </Button>
+                        <span
+                          className={`absolute h-8 w-8 rounded-[var(--radius-chip)] bg-white shadow-sm shadow-black/10 transition-transform duration-500 ease-out-expo ${
+                            access?.smartModeEnabled ? 'translate-x-[110px]' : 'translate-x-0'
+                          }`}
+                        />
+                        <span className="relative z-10 flex w-full items-center justify-between px-2 text-[11px] font-black uppercase tracking-widest">
+                          <span>{access?.smartModeEnabled ? 'On' : 'Off'}</span>
+                          <span className="text-gray-text">
+                            {isSmartModeChanging ? 'Saving' : 'Smart Mode'}
+                          </span>
+                        </span>
+                      </button>
                     </div>
                   </div>
                 </Surface>

@@ -10,6 +10,7 @@ import { RoutePath } from './types';
 import { useSync } from './hooks/useSync';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
+import { MotionConfig } from 'motion/react';
 import { trackGoogleAuthFailed, trackGoogleAuthSucceeded } from './src/analytics/events';
 
 // Lazy load non-critical routes to reduce initial bundle size
@@ -264,9 +265,11 @@ function App() {
         <Analytics />
         <SpeedInsights />
         <SyncWrapper>
-          <Suspense fallback={<PageLoader />}>
-            <RouterProvider router={router} />
-          </Suspense>
+          <MotionConfig reducedMotion="user">
+            <Suspense fallback={<PageLoader />}>
+              <RouterProvider router={router} />
+            </Suspense>
+          </MotionConfig>
         </SyncWrapper>
       </AuthProvider>
     </PWAInstallProvider>

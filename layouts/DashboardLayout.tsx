@@ -228,7 +228,7 @@ export const DashboardLayout: React.FC = () => {
               <div className="h-10 w-10 rounded-xl bg-green flex items-center justify-center text-white shadow-sm transition-all duration-300 group-hover:scale-105 group-hover:-rotate-12">
                 <Leaf size={24} weight="fill" />
               </div>
-              <span className="font-serif italic text-[22px] sm:text-[26px] text-green tracking-tight truncate max-w-[150px] sm:max-w-none">
+              <span className="font-serif italic text-[22px] sm:text-[26px] text-green tracking-normal truncate max-w-[150px] sm:max-w-none">
                 Reflections
               </span>
             </Link>
