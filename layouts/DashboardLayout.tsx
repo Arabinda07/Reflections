@@ -208,7 +208,7 @@ export const DashboardLayout: React.FC = () => {
     : 'text-gray-nav hover:text-green hover:bg-green/5';
 
   return (
-    <div className="relative flex min-h-[100dvh] flex-col overflow-hidden bg-body font-sans selection:bg-green/30 selection:text-green transition-colors duration-300">
+    <div className="relative flex h-[100dvh] min-h-[100dvh] flex-col overflow-hidden bg-body font-sans selection:bg-green/30 selection:text-green transition-colors duration-300">
       <AnalyticsRouteTracker />
       <a href="#main-content" className="skip-link">
         Skip to content
@@ -428,7 +428,7 @@ export const DashboardLayout: React.FC = () => {
         : null}
 
       {/* Main Content — sole scroll container in the shell */}
-      <main id="main-content" tabIndex={-1} className="relative flex flex-1 min-h-0 flex-col overflow-y-auto custom-scrollbar">
+      <main id="main-content" tabIndex={-1} className="relative flex min-h-0 w-full flex-1 flex-col overflow-y-auto custom-scrollbar">
         <SyncBanner />
         <div className="w-full flex-1 flex flex-col">
           <Outlet />

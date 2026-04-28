@@ -30,9 +30,40 @@ export const Landing: React.FC = () => {
   };
 
   return (
-    <main className="relative min-h-[100dvh] overflow-x-hidden selection:bg-green/20 selection:text-green bg-body text-gray-text transition-colors duration-300">
+    <main className="relative min-h-[100dvh] overflow-hidden selection:bg-green/20 selection:text-green bg-body text-gray-text transition-colors duration-300">
       {/* Full-bleed layered container */}
-      <div className="min-h-[100dvh] w-full relative overflow-hidden">
+      <div className="relative isolate min-h-[100dvh] w-full overflow-hidden bg-body">
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+          <div className="video-mask video-mask--mobile lg:hidden" />
+          <div className="video-mask video-mask--desktop hidden lg:block" />
+          <img
+            src="/assets/videos/landing_video.png"
+            alt=""
+            aria-hidden="true"
+            fetchPriority="high"
+            loading="eager"
+            decoding="async"
+            onLoad={() => setIsHeroPosterReady(true)}
+            className={`absolute inset-0 h-full min-h-full w-full min-w-full object-cover object-[48%_center] transition-opacity duration-700 ease-out-expo sm:object-[64%_center] lg:object-center ${
+              isHeroPosterReady ? 'opacity-90' : 'opacity-0'
+            }`}
+          />
+
+          <video
+            ref={videoRef}
+            poster="/assets/videos/landing_video.png"
+            className={`absolute inset-0 h-full min-h-full w-full min-w-full object-cover object-[48%_center] bg-body transition-opacity duration-700 ease-out-expo sm:object-[64%_center] lg:object-center ${isHeroVideoReady ? 'opacity-90' : 'opacity-0'}`}
+            autoPlay
+            loop
+            muted={isMuted}
+            playsInline
+            preload="metadata"
+            onLoadedData={() => setIsHeroVideoReady(true)}
+          >
+            <source src="/assets/videos/landing_video.webm" type="video/webm" />
+            <source src="/assets/videos/landing_video.mp4" type="video/mp4" />
+          </video>
+        </div>
 
         {/* ── Left panel: content ── */}
         <div className="relative z-20 flex min-h-[100dvh] flex-col px-6 pb-[calc(env(safe-area-inset-bottom)+1.75rem)] pt-[calc(env(safe-area-inset-top)+var(--header-height)+1.5rem)] sm:px-12 sm:pt-[calc(env(safe-area-inset-top)+var(--header-height)+2rem)] lg:justify-between lg:pt-[28vh] lg:pb-12 lg:px-16 xl:px-24 pointer-events-none">
@@ -123,38 +154,6 @@ export const Landing: React.FC = () => {
             </div>
           </motion.div>
         </div>
-      </div>
-
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="video-mask video-mask--mobile lg:hidden" />
-        <div className="video-mask video-mask--desktop hidden lg:block" />
-        <img
-          src="/assets/videos/landing_video.png"
-          alt=""
-          aria-hidden="true"
-          fetchPriority="high"
-          loading="eager"
-          decoding="async"
-          onLoad={() => setIsHeroPosterReady(true)}
-          className={`absolute inset-0 h-full w-full object-cover object-[48%_center] transition-opacity duration-700 ease-out-expo sm:object-[64%_center] lg:object-center ${
-            isHeroPosterReady && !isHeroVideoReady ? 'opacity-90' : 'opacity-0'
-          }`}
-        />
-
-        <video
-          ref={videoRef}
-          poster="/assets/videos/landing_video.png"
-          className={`absolute inset-0 h-full w-full object-cover object-[48%_center] bg-transparent transition-opacity duration-700 ease-out-expo sm:object-[64%_center] lg:object-center ${isHeroVideoReady ? 'opacity-90' : 'opacity-0'}`}
-          autoPlay
-          loop
-          muted={isMuted}
-          playsInline
-          preload="metadata"
-          onLoadedData={() => setIsHeroVideoReady(true)}
-        >
-          <source src="/assets/videos/landing_video.webm" type="video/webm" />
-          <source src="/assets/videos/landing_video.mp4" type="video/mp4" />
-        </video>
       </div>
     </main>
   );

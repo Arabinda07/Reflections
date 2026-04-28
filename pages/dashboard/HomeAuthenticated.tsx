@@ -121,6 +121,8 @@ export const HomeAuthenticated: React.FC = () => {
   const [intentionSummary, setIntentionSummary] = useState<HomeIntentionSummary>(() =>
     buildHomeIntentionSummary([]),
   );
+  const [isHeroPosterReady, setIsHeroPosterReady] = useState(false);
+  const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);
   const shouldReduceMotion = useReducedMotion();
 
   const entranceDuration = isFromSave ? 0.3 : 0.8;
@@ -307,11 +309,19 @@ export const HomeAuthenticated: React.FC = () => {
         className="relative min-h-full flex flex-col flex-1 bg-body selection:bg-green/10"
         {...((showOnboarding ? { 'aria-hidden': 'true' } : {}) as any)}
       >
-        <section className="relative w-full h-[60dvh] min-h-[450px] overflow-hidden">
-          <motion.video
-            initial={{ scale: 1.05, filter: 'blur(10px) brightness(0.8)' }}
-            animate={{ scale: 1, filter: 'blur(0px) brightness(1)' }}
-            transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+        <section className="relative isolate h-[60dvh] min-h-[450px] w-full overflow-hidden bg-body">
+          <img
+            src="/assets/videos/field.png"
+            alt=""
+            aria-hidden="true"
+            loading="eager"
+            decoding="async"
+            onLoad={() => setIsHeroPosterReady(true)}
+            className={`absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center transition-opacity duration-500 ease-out-expo ${
+              isHeroPosterReady ? 'opacity-100' : 'opacity-0'
+            }`}
+          />
+          <video
             src="/assets/videos/field.mp4"
             poster="/assets/videos/field.png"
             autoPlay
@@ -319,7 +329,10 @@ export const HomeAuthenticated: React.FC = () => {
             muted
             playsInline
             preload="metadata"
-            className="absolute inset-0 w-full h-full object-cover object-center z-0"
+            onLoadedData={() => setIsHeroVideoReady(true)}
+            className={`absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center bg-body transition-opacity duration-700 ease-out-expo ${
+              isHeroVideoReady ? 'opacity-95' : 'opacity-0'
+            }`}
           />
           <div className="absolute inset-0 z-10 hero-scrim" />
           <div className="absolute inset-0 z-10 screen-scrim opacity-20" />
