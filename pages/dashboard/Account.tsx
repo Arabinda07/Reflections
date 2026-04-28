@@ -396,7 +396,7 @@ export const Account: React.FC = () => {
                     onClick={() => avatarInputRef.current?.click()}
                     aria-label="Upload a new profile photo"
                   >
-                    <div className="h-32 w-32 overflow-hidden rounded-full border-4 border-white bg-white/5 shadow-[0_20px_42px_-28px_rgba(15,23,42,0.42)]">
+                    <div className="h-32 w-32 overflow-hidden rounded-full border-4 border-white bg-white/5 shadow-xl shadow-black/10">
                       {avatarPath ? (
                         <StorageImage path={avatarPath} alt="Profile" className="h-full w-full object-cover" />
                       ) : (
@@ -405,7 +405,7 @@ export const Account: React.FC = () => {
                         </div>
                       )}
                     </div>
-                    <div className="absolute bottom-1 right-1 flex h-11 w-11 items-center justify-center rounded-full border-4 border-white bg-green text-white shadow-[0_18px_36px_-24px_rgba(22,163,74,0.45)] transition-transform group-hover:scale-105">
+                    <div className="absolute bottom-1 right-1 flex h-11 w-11 items-center justify-center rounded-full border-4 border-white bg-green text-white shadow-xl shadow-green/40 transition-transform group-hover:scale-105">
                       <Camera size={18} weight="bold" />
                     </div>
                   </button>

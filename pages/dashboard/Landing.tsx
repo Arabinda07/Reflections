@@ -57,7 +57,7 @@ export const Landing: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.5 }}
-              className="pointer-events-auto max-w-[33ch] font-sans text-lg font-medium leading-relaxed text-gray-text sm:max-w-[38ch] sm:text-xl lg:max-w-[44ch] tracking-tight"
+              className="pointer-events-auto max-w-[26ch] sm:max-w-[32ch] lg:max-w-[40ch] font-sans text-lg font-medium leading-relaxed text-gray-text sm:text-xl tracking-tight text-balance"
             >
               A private journal. Write what's on your mind, notice the patterns, and keep it to yourself.
             </motion.p>

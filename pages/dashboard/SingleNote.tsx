@@ -525,6 +525,7 @@ export const SingleNote: React.FC = () => {
                 icon={<Tag size={12} weight="bold" />}
                 onClick={() => removeTag(tag)}
                 className="pr-3"
+                aria-label={`Remove tag: ${tag}`}
               >
                 {tag}
                 <X size={12} weight="bold" />

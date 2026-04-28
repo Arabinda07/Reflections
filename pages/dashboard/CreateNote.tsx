@@ -931,7 +931,7 @@ export const CreateNote: React.FC = () => {
                 whileTap={{ scale: 0.95 }}
                 onClick={handleSave}
                 disabled={saving}
-                className="group relative h-16 w-16 rounded-full bg-green text-white shadow-[0_24px_40px_-10px_rgba(22,163,74,0.4)] flex items-center justify-center transition-all"
+                className="group relative h-16 w-16 rounded-full bg-green text-white shadow-2xl shadow-green/40 flex items-center justify-center transition-all"
                 aria-label="Save reflection"
               >
                 <div className="absolute inset-2 rounded-full bg-white/12 group-hover:scale-110 transition-transform duration-500 ease-out" />

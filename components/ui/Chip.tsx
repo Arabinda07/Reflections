@@ -8,6 +8,7 @@ interface ChipProps {
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   className?: string;
   title?: string;
+  'aria-label'?: string;
 }
 
 export const Chip: React.FC<ChipProps> = ({
@@ -18,6 +19,7 @@ export const Chip: React.FC<ChipProps> = ({
   onClick,
   className = '',
   title,
+  'aria-label': ariaLabel,
 }) => {
   const classes = ['chip-filter', active ? 'chip-filter--active' : '', className]
     .filter(Boolean)
@@ -32,14 +34,14 @@ export const Chip: React.FC<ChipProps> = ({
 
   if (as === 'span') {
     return (
-      <span className={classes} title={title}>
+      <span className={classes} title={title} aria-label={ariaLabel}>
         {content}
       </span>
     );
   }
 
   return (
-    <button type="button" onClick={onClick} className={classes} title={title}>
+    <button type="button" onClick={onClick} className={classes} title={title} aria-label={ariaLabel}>
       {content}
     </button>
   );

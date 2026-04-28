@@ -309,7 +309,7 @@ export const LifeWiki: React.FC = () => {
         key={meta.pageType}
         className={`group relative h-full overflow-hidden rounded-[32px] transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
           page
-            ? 'border-[1.5px] border-border/50 bg-white/5 hover:-translate-y-2 hover:bg-white/10 hover:shadow-[0_20px_40px_-15px_rgba(22,163,74,0.15)] hover:border-green/30'
+            ? 'border-[1.5px] border-border/50 bg-white/5 hover:-translate-y-2 hover:bg-white/10 hover:shadow-2xl hover:shadow-green/20 hover:border-green/30'
             : 'quiet placeholder border-[1.5px] border-dashed border-border/70 bg-transparent opacity-80'
         }`}
       >
