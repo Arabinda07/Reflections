@@ -1,14 +1,14 @@
 import React, { useEffect, useRef } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { useLocation } from 'react-router-dom';
-import { captureAnalyticsEvent } from './events';
+import { captureAnalyticsEventDeferred } from './deferredEvents';
 import { createScreenViewTracker } from './screenTracking';
 
 export const AnalyticsRouteTracker: React.FC = () => {
   const location = useLocation();
   const trackerRef = useRef(
     createScreenViewTracker({
-      capture: captureAnalyticsEvent,
+      capture: captureAnalyticsEventDeferred,
       isNative: Capacitor.isNativePlatform(),
     }),
   );

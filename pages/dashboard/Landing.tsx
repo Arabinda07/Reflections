@@ -19,7 +19,6 @@ export const Landing: React.FC = () => {
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isMuted, setIsMuted] = useState(true);
-  const [isHeroPosterReady, setIsHeroPosterReady] = useState(false);
   const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);
 
   const toggleMute = () => {
@@ -43,22 +42,21 @@ export const Landing: React.FC = () => {
             fetchPriority="high"
             loading="eager"
             decoding="async"
-            onLoad={() => setIsHeroPosterReady(true)}
-            className={`absolute inset-0 h-full min-h-full w-full min-w-full object-cover object-[48%_center] transition-opacity duration-700 ease-out-expo sm:object-[64%_center] lg:object-center ${
-              isHeroPosterReady && !isHeroVideoReady ? 'opacity-90' : 'opacity-0'
-            }`}
+            className="absolute inset-0 h-full min-h-full w-full min-w-full object-cover object-[48%_center] opacity-90 sm:object-[64%_center] lg:object-center"
           />
 
           <video
             ref={videoRef}
             poster="/assets/videos/landing_video.png"
-            className={`absolute inset-0 h-full min-h-full w-full min-w-full object-cover object-[48%_center] bg-transparent transition-opacity duration-700 ease-out-expo sm:object-[64%_center] lg:object-center ${isHeroVideoReady ? 'opacity-90' : 'opacity-0'}`}
+            aria-hidden="true"
+            className={`absolute inset-0 h-full min-h-full w-full min-w-full transform-gpu object-cover object-[48%_center] bg-transparent transition-opacity duration-700 ease-out-expo motion-reduce:transition-none sm:object-[64%_center] lg:object-center ${isHeroVideoReady ? 'opacity-90' : 'opacity-0'}`}
             autoPlay
             loop
             muted={isMuted}
             playsInline
-            preload="metadata"
-            onLoadedData={() => setIsHeroVideoReady(true)}
+            preload="auto"
+            onCanPlay={() => setIsHeroVideoReady(true)}
+            onPlaying={() => setIsHeroVideoReady(true)}
           >
             <source src="/assets/videos/landing_video.webm" type="video/webm" />
             <source src="/assets/videos/landing_video.mp4" type="video/mp4" />

@@ -32,6 +32,7 @@ const vendorChunk = (id: string) => {
 
 export default defineConfig(({ mode }) => {
     return {
+      root: __dirname,
       server: {
         port: 3000,
         host: '0.0.0.0',

@@ -1,10 +1,10 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { User } from '../types';
 import { supabase } from '../src/supabaseClient';
 import { Session } from '@supabase/supabase-js';
 import { useAuthStore } from '../hooks/useAuthStore';
 import { StartupScreen } from '../components/ui/StartupScreen';
-import { identifyAnalyticsUser, resetAnalyticsUser } from '../src/analytics/events';
+import { identifyAnalyticsUserDeferred, resetAnalyticsUserDeferred } from '../src/analytics/deferredEvents';
 import { NATIVE_STARTUP_FADE_MS, NATIVE_STARTUP_MIN_MS } from '../src/native/appLaunch';
 
 interface AuthContextType {
@@ -27,6 +27,7 @@ const mapSessionToUser = (session: Session): User => ({
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, isAuthenticated, setHydrated, setUser, logout, isHydrated } = useAuthStore();
   const [loading, setLoading] = useState(true);
+  const hasIdentifiedAnalyticsUserRef = useRef(false);
   const [showStartup, setShowStartup] = useState(() => {
     return !sessionStorage.getItem('startup_shown');
   });
@@ -95,11 +96,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     if (user) {
-      identifyAnalyticsUser(user);
+      hasIdentifiedAnalyticsUserRef.current = true;
+      identifyAnalyticsUserDeferred(user);
       return;
     }
 
-    resetAnalyticsUser();
+    if (hasIdentifiedAnalyticsUserRef.current) {
+      hasIdentifiedAnalyticsUserRef.current = false;
+      resetAnalyticsUserDeferred();
+    }
   }, [user, loading, isHydrated]);
 
   // Hide startup screen

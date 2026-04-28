@@ -9,7 +9,7 @@ import { RouteErrorBoundary } from './pages/RouteErrorBoundary';
 import { RoutePath } from './types';
 import { useSync } from './hooks/useSync';
 import { MotionConfig } from 'motion/react';
-import { trackGoogleAuthFailed, trackGoogleAuthSucceeded } from './src/analytics/events';
+import { trackGoogleAuthFailedDeferred, trackGoogleAuthSucceededDeferred } from './src/analytics/deferredEvents';
 
 // Lazy load non-critical routes to reduce initial bundle size
 const SignIn = lazy(() => import('./pages/auth/SignIn').then(m => ({ default: m.SignIn })));
@@ -262,14 +262,14 @@ function App() {
         }
 
         if ('error' in result) {
-          trackGoogleAuthFailed({
+          trackGoogleAuthFailedDeferred({
             sourcePath: pendingSourcePath,
             isNative: true,
             errorCode: result.error,
           });
           googleOAuth.stashGoogleAuthError(result.error);
         } else {
-          trackGoogleAuthSucceeded({
+          trackGoogleAuthSucceededDeferred({
             sourcePath: pendingSourcePath,
             redirectPath: RoutePath.HOME,
             isNative: true,

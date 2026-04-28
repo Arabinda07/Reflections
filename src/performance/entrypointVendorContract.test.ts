@@ -29,8 +29,15 @@ describe('entrypoint vendor loading contract', () => {
   it('loads PostHog only from async event-time helpers', () => {
     const events = read('src/analytics/events.ts');
     const index = read('index.tsx');
+    const app = read('App.tsx');
+    const authContext = read('context/AuthContext.tsx');
+    const routeTracker = read('src/analytics/AnalyticsRouteTracker.tsx');
 
     expect(index).not.toContain('getPostHogBootstrapConfig');
+    expect(app).not.toContain("from './src/analytics/events'");
+    expect(authContext).not.toContain("from '../src/analytics/events'");
+    expect(routeTracker).not.toContain("from './events'");
+    expect(routeTracker).toContain('captureAnalyticsEventDeferred');
     expect(events).not.toContain("import posthog from 'posthog-js'");
     expect(events).toContain("import('posthog-js')");
     expect(events).toContain('posthog.init');
@@ -55,5 +62,12 @@ describe('entrypoint vendor loading contract', () => {
     expect(viteConfig).toContain('**/vendor-lottie-*.js');
     expect(viteConfig).toContain('**/vendor-analytics-*.js');
     expect(viteConfig).toContain('**/vendor-sentry-*.js');
+  });
+
+  it('pins the Vite dev server root to this repo', () => {
+    const viteConfig = read('vite.config.ts');
+
+    expect(viteConfig).toContain('root: __dirname');
+    expect(viteConfig).toContain("path.resolve(__dirname, '.')");
   });
 });

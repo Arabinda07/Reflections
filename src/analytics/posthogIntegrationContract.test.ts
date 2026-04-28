@@ -27,14 +27,28 @@ describe('PostHog integration contract', () => {
     const createNote = read('pages/dashboard/CreateNote.tsx');
     const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
     const authContext = read('context/AuthContext.tsx');
+    const routeTracker = read('src/analytics/AnalyticsRouteTracker.tsx');
 
     expect(signIn).toContain('trackGoogleAuthStarted');
     expect(signUp).toContain('trackGoogleAuthStarted');
-    expect(app).toContain('trackGoogleAuthSucceeded');
-    expect(app).toContain('trackGoogleAuthFailed');
+    expect(app).not.toContain("from './src/analytics/events'");
+    expect(app).toContain('trackGoogleAuthSucceededDeferred');
+    expect(app).toContain('trackGoogleAuthFailedDeferred');
     expect(createNote).toContain('trackNoteSaved');
     expect(lifeWiki).toContain('trackLifeWikiRefreshed');
-    expect(authContext).toContain('identifyAnalyticsUser');
-    expect(authContext).toContain('resetAnalyticsUser');
+    expect(authContext).not.toContain("from '../src/analytics/events'");
+    expect(authContext).toContain('identifyAnalyticsUserDeferred');
+    expect(authContext).toContain('resetAnalyticsUserDeferred');
+    expect(routeTracker).not.toContain("from './events'");
+    expect(routeTracker).toContain('captureAnalyticsEventDeferred');
+  });
+
+  it('keeps analytics events off the startup shell path', () => {
+    const deferredEvents = read('src/analytics/deferredEvents.ts');
+
+    expect(deferredEvents).toContain("import('./events')");
+    expect(deferredEvents).toContain('Deferred event skipped');
+    expect(deferredEvents).toContain('analyticsEventsPromise = null');
+    expect(deferredEvents).toContain('captureAnalyticsEventDeferred');
   });
 });
