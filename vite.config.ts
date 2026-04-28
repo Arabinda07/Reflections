@@ -31,6 +31,8 @@ const vendorChunk = (id: string) => {
 };
 
 export default defineConfig(({ mode }) => {
+    const hasSentryAuthToken = Boolean(process.env.SENTRY_AUTH_TOKEN);
+
     return {
       root: __dirname,
       server: {
@@ -153,11 +155,11 @@ export default defineConfig(({ mode }) => {
           org: process.env.SENTRY_ORG,
           project: process.env.SENTRY_PROJECT,
           authToken: process.env.SENTRY_AUTH_TOKEN,
-          disable: !process.env.SENTRY_AUTH_TOKEN,
+          disable: !hasSentryAuthToken,
         }),
       ],
       build: {
-        sourcemap: 'hidden',
+        sourcemap: hasSentryAuthToken ? 'hidden' : false,
         rollupOptions: {
           output: {
             manualChunks: vendorChunk,

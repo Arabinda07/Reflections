@@ -1,6 +1,6 @@
 import { ArrowRight, SpeakerHigh, SpeakerSlash } from '@phosphor-icons/react';
 import { motion, Variants } from 'motion/react';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { RoutePath } from '../../types';
@@ -19,9 +19,31 @@ export const Landing: React.FC = () => {
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isMuted, setIsMuted] = useState(true);
+  const [isHeroPosterReady, setIsHeroPosterReady] = useState(false);
+  const [shouldLoadHeroVideo, setShouldLoadHeroVideo] = useState(false);
   const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);
 
+  useEffect(() => {
+    if (!isHeroPosterReady || shouldLoadHeroVideo) return;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const saveData = Boolean(
+      (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData,
+    );
+
+    if (prefersReducedMotion || saveData) return;
+
+    const timerId = window.setTimeout(() => setShouldLoadHeroVideo(true), 600);
+    return () => window.clearTimeout(timerId);
+  }, [isHeroPosterReady, shouldLoadHeroVideo]);
+
   const toggleMute = () => {
+    if (!videoRef.current) {
+      setShouldLoadHeroVideo(true);
+      setIsMuted(false);
+      return;
+    }
+
     if (videoRef.current) {
       videoRef.current.muted = !isMuted;
       setIsMuted(!isMuted);
@@ -42,25 +64,28 @@ export const Landing: React.FC = () => {
             fetchPriority="high"
             loading="eager"
             decoding="async"
+            onLoad={() => setIsHeroPosterReady(true)}
             className="absolute inset-0 h-full min-h-full w-full min-w-full object-cover object-[48%_center] opacity-90 sm:object-[64%_center] lg:object-center"
           />
 
-          <video
-            ref={videoRef}
-            poster="/assets/videos/landing_video.png"
-            aria-hidden="true"
-            className={`absolute inset-0 h-full min-h-full w-full min-w-full transform-gpu object-cover object-[48%_center] bg-transparent transition-opacity duration-700 ease-out-expo motion-reduce:transition-none sm:object-[64%_center] lg:object-center ${isHeroVideoReady ? 'opacity-90' : 'opacity-0'}`}
-            autoPlay
-            loop
-            muted={isMuted}
-            playsInline
-            preload="auto"
-            onCanPlay={() => setIsHeroVideoReady(true)}
-            onPlaying={() => setIsHeroVideoReady(true)}
-          >
-            <source src="/assets/videos/landing_video.webm" type="video/webm" />
-            <source src="/assets/videos/landing_video.mp4" type="video/mp4" />
-          </video>
+          {shouldLoadHeroVideo ? (
+            <video
+              ref={videoRef}
+              poster="/assets/videos/landing_video.png"
+              aria-hidden="true"
+              className={`absolute inset-0 h-full min-h-full w-full min-w-full transform-gpu object-cover object-[48%_center] bg-transparent transition-opacity duration-700 ease-out-expo motion-reduce:transition-none sm:object-[64%_center] lg:object-center ${isHeroVideoReady ? 'opacity-90' : 'opacity-0'}`}
+              autoPlay
+              loop
+              muted={isMuted}
+              playsInline
+              preload="metadata"
+              onCanPlay={() => setIsHeroVideoReady(true)}
+              onPlaying={() => setIsHeroVideoReady(true)}
+            >
+              <source src="/assets/videos/landing_video.webm" type="video/webm" />
+              <source src="/assets/videos/landing_video.mp4" type="video/mp4" />
+            </video>
+          ) : null}
         </div>
 
         {/* ── Left panel: content ── */}

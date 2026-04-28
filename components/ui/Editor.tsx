@@ -8,6 +8,7 @@ interface EditorProps {
   onChange: (value: string) => void;
   onFocusChange?: (isFocused: boolean) => void;
   placeholder?: string;
+  ariaLabel?: string;
   className?: string;
   hideToolbar?: boolean;
 }
@@ -16,9 +17,7 @@ export interface EditorRef {
   focus: () => void;
 }
 
-// Quill is now imported locally
-
-export const Editor = forwardRef<EditorRef, EditorProps>(({ value, onChange, onFocusChange, placeholder, className = '', hideToolbar = false }, ref) => {
+export const Editor = forwardRef<EditorRef, EditorProps>(({ value, onChange, onFocusChange, placeholder, ariaLabel = 'Reflection body', className = '', hideToolbar = false }, ref) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const quillInstance = useRef<any>(null);
 
@@ -98,6 +97,15 @@ export const Editor = forwardRef<EditorRef, EditorProps>(({ value, onChange, onF
       quillInstance.current.root.dataset.placeholder = placeholder;
     }
   }, [placeholder]);
+
+  useEffect(() => {
+    const editorRoot = quillInstance.current?.root as HTMLElement | undefined;
+    if (!editorRoot) return;
+
+    editorRoot.setAttribute('role', 'textbox');
+    editorRoot.setAttribute('aria-multiline', 'true');
+    editorRoot.setAttribute('aria-label', ariaLabel);
+  }, [ariaLabel]);
 
   return (
     <div className={`prose prose-zinc max-w-none ${className} note-editor`}>

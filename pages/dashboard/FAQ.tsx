@@ -122,8 +122,9 @@ export const FAQ: React.FC = () => {
           </h1>
         </div>
 
-        <div className="lg:col-span-4">
-          <p className="border-l border-border pl-6 font-serif text-[18px] leading-relaxed text-gray-light">
+        <div className="space-y-4 lg:col-span-4">
+          <p className="label-caps text-green">Plain answers</p>
+          <p className="max-w-[36rem] font-serif text-[18px] leading-relaxed text-gray-light">
             Reflections is a calm, private writing space. This guide explains what the product does,
             what it avoids, and how optional AI fits around the writing
           </p>
@@ -137,8 +138,8 @@ export const FAQ: React.FC = () => {
             const Icon = section.icon;
 
             return (
-              <article key={section.title} className="surface-flat overflow-hidden border border-border/50">
-                <div className="flex h-full flex-col gap-6 p-8">
+              <article key={section.title} className="border-t border-border/60 py-8">
+                <div className="flex h-full flex-col gap-6">
                   <div className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-panel)] border border-green/10 bg-green/5 text-green">
                     <Icon size={20} weight="duotone" />
                   </div>
@@ -167,7 +168,7 @@ export const FAQ: React.FC = () => {
             {practiceItems.map((item) => {
               const Icon = item.icon;
               return (
-                <div key={item.title} className="surface-flat p-8 border border-border/30">
+                <div key={item.title} className="border-t border-border/60 py-7">
                   <div className="mb-6 flex h-10 w-10 items-center justify-center rounded-xl bg-body border border-border text-gray-light">
                     <Icon size={20} weight="bold" />
                   </div>

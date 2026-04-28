@@ -202,6 +202,9 @@ export const DashboardLayout: React.FC = () => {
     location.pathname.includes('/new') ||
     location.pathname.includes('/edit') ||
     (location.pathname.startsWith('/notes/') && location.pathname !== '/notes/');
+  const isMobileNavSuppressedRoute =
+    location.pathname === RoutePath.INSIGHTS ||
+    location.pathname.startsWith(RoutePath.SANCTUARY);
   const isLandingRoute = location.pathname === RoutePath.HOME && !isAuthenticated;
   const landingControlClass = isLandingRoute
     ? 'surface-floating surface-floating--media'
@@ -235,7 +238,7 @@ export const DashboardLayout: React.FC = () => {
           </div>
 
           {/* Right Side - Desktop Nav */}
-          <div className="hidden md:flex items-center gap-2">
+          <div className={`${isMobileNavSuppressedRoute ? 'hidden md:flex' : 'flex'} hidden md:flex items-center gap-2`}>
             <button 
               onClick={toggleDarkMode}
               className={`p-2 rounded-xl transition-colors ${landingControlClass}`}
@@ -287,7 +290,7 @@ export const DashboardLayout: React.FC = () => {
           </div>
 
           {/* Mobile Menu Icon */}
-          <div className="md:hidden flex items-center gap-2">
+          <div className={`${isMobileNavSuppressedRoute ? 'hidden' : 'flex'} md:hidden items-center gap-2`}>
             <button 
               onClick={toggleDarkMode}
               className={`p-2 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green ${landingControlClass}`}
@@ -318,12 +321,6 @@ export const DashboardLayout: React.FC = () => {
                 className="absolute inset-0 screen-scrim screen-scrim--strong"
                 onClick={() => setIsMobileMenuOpen(false)}
               />
-
-              {/* Ambient Background for Mobile Menu */}
-              <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-[-10%] right-[-10%] w-[300px] h-[300px] bg-green/10 blur-[100px] rounded-full animate-pulse" />
-                <div className="absolute bottom-[-10%] left-[-10%] h-[300px] w-[300px] animate-pulse rounded-full bg-golden/10 blur-[100px]" style={{ animationDelay: '1s' }} />
-              </div>
 
               <div
                 ref={mobileMenuPanelRef}

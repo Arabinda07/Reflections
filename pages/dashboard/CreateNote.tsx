@@ -747,7 +747,7 @@ export const CreateNote: React.FC = () => {
               <CaretRight size={14} className="opacity-40" />
             </button>
 
-            <button onClick={toggleWhisper} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${isWhispering ? 'bg-green/10 border-green/20 text-green animate-pulse' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border/40 text-gray-text'}`}>
+            <button onClick={toggleWhisper} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${isWhispering ? 'bg-green/10 border-green/20 text-green' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border/40 text-gray-text'}`}>
               <div className="flex items-center gap-3">{isWhispering ? <Microphone size={20} weight="fill" /> : <MicrophoneSlash size={20} weight="regular" />}<span className="text-[13px] font-bold">Whisper</span></div>
             </button>
 
@@ -851,6 +851,7 @@ export const CreateNote: React.FC = () => {
           {/* Title as H1 */}
           <input
             type="text"
+            aria-label="Reflection title"
             placeholder="Untitled Reflection"
             value={title}
             onChange={e => setTitle(e.target.value)}
@@ -878,6 +879,7 @@ export const CreateNote: React.FC = () => {
               }
             }}
             placeholder={activePlaceholder || "What's on your mind?"} 
+            ariaLabel="Reflection body"
             hideToolbar={isMobile}
             className="text-[20px] md:text-[22px] font-serif leading-[1.8] text-gray-text/90" 
           />
@@ -955,7 +957,7 @@ export const CreateNote: React.FC = () => {
           <button onClick={() => { setIsMobileOptionsOpen(false); setIsTagsOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><TagIcon size={24} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-[14px] font-bold">Tags</span></button>
           <button onClick={() => { setIsMobileOptionsOpen(false); setIsMusicOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${musicPlaying ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><Headphones size={24} weight={musicPlaying ? "fill" : "regular"} /><span className="text-[14px] font-bold">Sounds</span></button>
           <button onClick={() => { setIsMobileOptionsOpen(false); setIsTasksOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><ListChecks size={24} weight={tasks.some(t => !t.completed) ? "fill" : "regular"} /><span className="text-[14px] font-bold">Tasks</span></button>
-          <button onClick={toggleWhisper} className={`flex items-center gap-3 rounded-2xl border p-4 ${isWhispering ? 'bg-green/10 border-green/20 text-green animate-pulse' : 'border-border text-gray-text'}`}>{isWhispering ? <Microphone size={24} weight="fill" /> : <MicrophoneSlash size={24} weight="regular" />}<span className="text-[14px] font-bold">Whisper</span></button>
+          <button onClick={toggleWhisper} className={`flex items-center gap-3 rounded-2xl border p-4 ${isWhispering ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}>{isWhispering ? <Microphone size={24} weight="fill" /> : <MicrophoneSlash size={24} weight="regular" />}<span className="text-[14px] font-bold">Whisper</span></button>
 
           <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-border p-4 text-gray-text transition-colors hover:border-green/20 hover:bg-green/5">
             <Paperclip size={24} weight="regular" /><span className="text-[14px] font-bold">Files</span>

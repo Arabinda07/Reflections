@@ -12,6 +12,7 @@ describe('audit fix source contract', () => {
     expect(createNote).toContain("from 'react-router'");
     expect(createNote).toContain("from '../../components/ui/ConfirmationDialog'");
     expect(createNote).toContain('beforeunload');
+    expect(createNote).not.toContain('animate-pulse');
     expect(createNote).not.toContain('return alert("Browser doesn\'t support speech recognition.")');
     expect(createNote).not.toContain('return alert("Browser doesn\\\'t support speech recognition.")');
   });

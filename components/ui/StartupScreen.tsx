@@ -55,7 +55,7 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
                 loop
                 muted
                 playsInline
-                preload="auto"
+                preload="metadata"
                 aria-hidden="true"
                 onLoadedData={() => setIsVideoReady(true)}
                 className={`absolute inset-0 z-[1] h-full w-full object-cover transition-opacity duration-700 ease-out ${

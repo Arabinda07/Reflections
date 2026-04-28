@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Headphones, Pause, Play, SpeakerSlash } from '@phosphor-icons/react';
 import { ModalSheet } from '../ui/ModalSheet';
@@ -59,6 +59,7 @@ const AMBIENT_PRESETS: AmbientPreset[] = [
 ];
 
 export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused }) => {
+  const ambientOptionsId = useId();
   const [isOpen, setIsOpen] = useState(false);
   const [activePresetId, setActivePresetId] = useState<string | null>(null);
   const isMobileLayout = useMediaQuery('(max-width: 639px)');
@@ -179,7 +180,11 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
     };
   }, [stopPreset]);
 
+  const activePresetName = AMBIENT_PRESETS.find((preset) => preset.id === activePresetId)?.name;
   const isPlaying = activePresetId !== null;
+  const triggerLabel = isPlaying
+    ? `${activePresetName || 'Ambient sound'} is playing. Choose ambient sound.`
+    : 'Choose ambient sound.';
 
   return (
     <div className="relative" ref={containerRef}>
@@ -187,12 +192,13 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
         <button
           onClick={() => setIsOpen((current) => !current)}
           aria-expanded={isOpen}
-          aria-haspopup="menu"
+          aria-controls={ambientOptionsId}
+          aria-label={triggerLabel}
           className="flex h-full items-center gap-2 px-3 sm:px-4 py-2 flex-nowrap whitespace-nowrap"
           title="Choose ambient sound"
         >
           <Headphones size={16} weight="bold" className="shrink-0" />
-          <span className="hidden sm:inline">{isPlaying ? AMBIENT_PRESETS.find(p => p.id === activePresetId)?.name || 'Ambient' : 'Ambient'}</span>
+          <span className="hidden sm:inline">{isPlaying ? activePresetName || 'Ambient' : 'Ambient'}</span>
         </button>
         {isPlaying && (
           <div className="flex items-center pr-2">
@@ -203,6 +209,7 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
                 stopPreset();
               }}
               className="p-1 text-gray-nav hover:text-red hover:bg-red/5 rounded-lg transition-all duration-300 ease-out-quart"
+              aria-label="Turn ambient sound off"
               title="Turn ambient sound off"
             >
               <SpeakerSlash size={16} weight="bold" />
@@ -220,12 +227,14 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
             transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
             className="absolute right-0 top-full z-[100] mt-2 chooser-popover w-[260px] sm:w-[280px]"
           >
-            <div className="space-y-2">
+            <div id={ambientOptionsId} role="group" aria-label="Ambient sounds" className="space-y-2">
               {AMBIENT_PRESETS.map((preset) => {
                 const isPresetPlaying = activePresetId === preset.id;
                 return (
                   <button
                     key={preset.id}
+                    aria-pressed={isPresetPlaying}
+                    aria-label={isPresetPlaying ? `${preset.name} is playing` : `Play ${preset.name}`}
                     onClick={() => {
                       playPreset(preset);
                       setIsOpen(false);
@@ -254,18 +263,20 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
         title="Ambient sounds"
         description={
           isPlaying
-            ? `${AMBIENT_PRESETS.find((preset) => preset.id === activePresetId)?.name || 'Ambient'} is playing.`
+            ? `${activePresetName || 'Ambient'} is playing.`
             : 'Pick a gentle background texture for your writing session.'
         }
         size="sm"
         bodyClassName="pt-2"
       >
-        <div className="space-y-2">
+        <div id={ambientOptionsId} role="group" aria-label="Ambient sounds" className="space-y-2">
           {AMBIENT_PRESETS.map((preset) => {
             const isPresetPlaying = activePresetId === preset.id;
             return (
               <button
                 key={preset.id}
+                aria-pressed={isPresetPlaying}
+                aria-label={isPresetPlaying ? `${preset.name} is playing` : `Play ${preset.name}`}
                 onClick={() => {
                   playPreset(preset);
                   setIsOpen(false);
