@@ -318,7 +318,7 @@ export const HomeAuthenticated: React.FC = () => {
             decoding="async"
             onLoad={() => setIsHeroPosterReady(true)}
             className={`absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center transition-opacity duration-500 ease-out-expo ${
-              isHeroPosterReady ? 'opacity-100' : 'opacity-0'
+              isHeroPosterReady && !isHeroVideoReady ? 'opacity-100' : 'opacity-0'
             }`}
           />
           <video
@@ -330,7 +330,7 @@ export const HomeAuthenticated: React.FC = () => {
             playsInline
             preload="metadata"
             onLoadedData={() => setIsHeroVideoReady(true)}
-            className={`absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center bg-body transition-opacity duration-700 ease-out-expo ${
+            className={`absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center bg-transparent transition-opacity duration-700 ease-out-expo ${
               isHeroVideoReady ? 'opacity-95' : 'opacity-0'
             }`}
           />

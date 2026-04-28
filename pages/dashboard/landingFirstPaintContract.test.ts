@@ -6,17 +6,14 @@ const read = (filePath: string) =>
   readFileSync(path.resolve(process.cwd(), filePath), 'utf8');
 
 describe('landing first-paint contract', () => {
-  it('keeps home neutral until the auth check is fully resolved', () => {
+  it('keeps guests on a stable landing frame after local auth hydration', () => {
     const authContext = read('context/AuthContext.tsx');
     const home = read('pages/dashboard/Home.tsx');
 
     expect(authContext).toContain('isAuthStoreHydrated: boolean');
     expect(authContext).toContain('isAuthStoreHydrated: isHydrated');
-    expect(home).not.toContain('isAuthStoreHydrated');
-    expect(home).not.toContain('if (!isInitialCheckDone && isAuthStoreHydrated && !isAuthenticated)');
-    expect(home).toContain('if (!isInitialCheckDone)');
-    expect(home).toContain('return <HomeFallback />;');
-    expect(home).toContain('if (!isAuthenticated)');
+    expect(home).toContain('isAuthStoreHydrated');
+    expect(home).toContain('if (!isInitialCheckDone && isAuthStoreHydrated && !isAuthenticated)');
     expect(home).toContain('return <Landing />;');
   });
 
@@ -39,8 +36,15 @@ describe('landing first-paint contract', () => {
     expect(landing).toContain('fetchPriority="high"');
     expect(landing).toContain('onLoad={() => setIsHeroPosterReady(true)}');
     expect(landing).toContain('onLoadedData={() => setIsHeroVideoReady(true)}');
-    expect(landing).toContain("isHeroPosterReady ? 'opacity-90' : 'opacity-0'");
+    expect(landing).toContain("isHeroPosterReady && !isHeroVideoReady ? 'opacity-90' : 'opacity-0'");
     expect(landing).toContain("isHeroVideoReady ? 'opacity-90' : 'opacity-0'");
+  });
+
+  it('allows the landing content to grow vertically while clipping horizontal bleed', () => {
+    const landing = read('pages/dashboard/Landing.tsx');
+
+    expect(landing).toContain('<main className="relative min-h-[100dvh] overflow-x-hidden');
+    expect(landing).not.toContain('<main className="relative min-h-[100dvh] overflow-hidden');
   });
 
   it('clips hero media to the page frame instead of letting it bleed into the shell', () => {
@@ -55,6 +59,7 @@ describe('landing first-paint contract', () => {
     expect(homeAuthenticated).toContain('relative isolate h-[60dvh] min-h-[450px] w-full overflow-hidden bg-body');
     expect(homeAuthenticated).toContain('src="/assets/videos/field.png"');
     expect(homeAuthenticated).toContain('h-full min-h-full w-full min-w-full object-cover object-center');
+    expect(homeAuthenticated).toContain("isHeroPosterReady && !isHeroVideoReady ? 'opacity-100' : 'opacity-0'");
     expect(homeAuthenticated).not.toContain("filter: 'blur(10px) brightness(0.8)'");
   });
 
