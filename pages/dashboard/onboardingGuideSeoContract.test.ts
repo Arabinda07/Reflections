@@ -54,6 +54,22 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
     expect(css).toContain('.modal-sheet-root--center');
   });
 
+  it('gives onboarding modal a distinctive editorial treatment', () => {
+    const home = read('pages/dashboard/HomeAuthenticated.tsx');
+    const css = read('index.css');
+
+    expect(home).toContain('panelClassName="onboarding-modal-panel"');
+    expect(home).toContain('CurrentOnboardingIcon');
+    expect(home).toContain('onboarding-step-stage');
+    expect(home).toContain('onboarding-step-folio');
+    expect(home).toContain('onboarding-step-note');
+    expect(home).toContain('font-serif italic');
+
+    expect(css).toContain('.onboarding-modal-panel .modal-sheet-title');
+    expect(css).toContain('font-family: var(--font-serif)');
+    expect(css).toContain('.onboarding-step-folio');
+  });
+
   it('keeps the landing page in its full-bleed hero form', () => {
     const landing = read('pages/dashboard/Landing.tsx');
     const tailwind = read('tailwind.config.js');

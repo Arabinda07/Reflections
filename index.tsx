@@ -1,22 +1,22 @@
-import "./src/instrument"; // ← MUST be first — Sentry init before any other code
-
-import { PostHogProvider } from "@posthog/react";
-import { reactErrorHandler } from "@sentry/react";
-import { StrictMode } from "react";
+import { StrictMode, type ErrorInfo } from "react";
 import { createRoot } from "react-dom/client";
-import { getPostHogBootstrapConfig } from "./src/analytics/posthogBootstrap";
 import { getMissingClientEnvNames } from "./src/bootstrapEnv";
+import { captureReactRootError, scheduleSentryInitialization } from "./src/instrument";
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
   throw new Error("Could not find root element to mount to");
 }
 
+const handleReactRootError = (error: unknown, errorInfo: ErrorInfo) => {
+  console.error("React root error.", error);
+  void captureReactRootError(error, errorInfo);
+};
+
 const root = createRoot(rootElement, {
-  // React 19 error handlers — route uncaught/caught/recoverable errors to Sentry
-  onUncaughtError: reactErrorHandler(),
-  onCaughtError: reactErrorHandler(),
-  onRecoverableError: reactErrorHandler(),
+  onUncaughtError: handleReactRootError,
+  onCaughtError: handleReactRootError,
+  onRecoverableError: handleReactRootError,
 });
 
 const renderBootstrapState = (title: string, body: string, detail?: string) => {
@@ -55,22 +55,13 @@ const bootstrapApp = async () => {
 
   try {
     const { default: App } = await import('./App');
-    const posthogConfig = getPostHogBootstrapConfig({
-      VITE_PUBLIC_POSTHOG_PROJECT_TOKEN: import.meta.env.VITE_PUBLIC_POSTHOG_PROJECT_TOKEN,
-      VITE_PUBLIC_POSTHOG_HOST: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
-    });
 
     root.render(
       <StrictMode>
-        {posthogConfig ? (
-          <PostHogProvider apiKey={posthogConfig.apiKey} options={posthogConfig.options}>
-            <App />
-          </PostHogProvider>
-        ) : (
-          <App />
-        )}
+        <App />
       </StrictMode>,
     );
+    scheduleSentryInitialization();
   } catch (error) {
     const detail = error instanceof Error ? error.message : "Unknown startup error";
 

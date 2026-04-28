@@ -1,4 +1,3 @@
-import posthog from 'posthog-js';
 import type { User, PlanTier } from '../../types';
 import { RoutePath } from '../../types';
 import { getPostHogBootstrapConfig } from './posthogBootstrap';
@@ -17,6 +16,47 @@ const hasAnalytics = () => Boolean(getAnalyticsConfig());
 const hasRedirectPath = (redirectPath?: string) =>
   Boolean(redirectPath && redirectPath !== RoutePath.HOME);
 
+type PostHogClient = typeof import('posthog-js')['default'];
+
+let posthogPromise: Promise<PostHogClient> | null = null;
+let initializedConfigKey: string | null = null;
+
+const getPostHogClient = async () => {
+  const config = getAnalyticsConfig();
+  if (!config) {
+    return null;
+  }
+
+  posthogPromise ??= import('posthog-js').then((module) => module.default);
+  const posthog = await posthogPromise;
+  const configKey = `${config.apiKey}|${config.options.api_host}`;
+
+  if (initializedConfigKey !== configKey) {
+    posthog.init(config.apiKey, config.options);
+    initializedConfigKey = configKey;
+  }
+
+  return posthog;
+};
+
+const queueAnalytics = (action: (posthog: PostHogClient) => void) => {
+  if (!hasAnalytics()) {
+    return false;
+  }
+
+  void getPostHogClient()
+    .then((posthog) => {
+      if (posthog) {
+        action(posthog);
+      }
+    })
+    .catch((error) => {
+      console.warn('[analytics] PostHog event skipped.', error);
+    });
+
+  return true;
+};
+
 export const sanitizeAnalyticsErrorCode = (value?: string | null) => {
   const normalized = value
     ?.trim()
@@ -32,12 +72,7 @@ export const captureAnalyticsEvent = (
   eventName: string,
   properties: Record<string, unknown>,
 ) => {
-  if (!hasAnalytics()) {
-    return false;
-  }
-
-  posthog.capture(eventName, properties);
-  return true;
+  return queueAnalytics((posthog) => posthog.capture(eventName, properties));
 };
 
 export const trackGoogleAuthStarted = ({
@@ -125,22 +160,12 @@ export const trackLifeWikiRefreshed = ({
   });
 
 export const identifyAnalyticsUser = (user: Pick<User, 'id' | 'email' | 'name'>) => {
-  if (!hasAnalytics()) {
-    return false;
-  }
-
-  posthog.identify(user.id, {
+  return queueAnalytics((posthog) => posthog.identify(user.id, {
     email: user.email,
     name: user.name,
-  });
-  return true;
+  }));
 };
 
 export const resetAnalyticsUser = () => {
-  if (!hasAnalytics()) {
-    return false;
-  }
-
-  posthog.reset();
-  return true;
+  return queueAnalytics((posthog) => posthog.reset());
 };

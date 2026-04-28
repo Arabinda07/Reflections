@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect } from 'react';
+import React, { Suspense, lazy, useEffect, useState } from 'react';
 import { Route, RouterProvider, createHashRouter, createRoutesFromElements } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { PWAInstallProvider } from './context/PWAInstallContext';
@@ -8,8 +8,6 @@ import { Home } from './pages/dashboard/Home';
 import { RouteErrorBoundary } from './pages/RouteErrorBoundary';
 import { RoutePath } from './types';
 import { useSync } from './hooks/useSync';
-import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from '@vercel/speed-insights/react';
 import { MotionConfig } from 'motion/react';
 import { trackGoogleAuthFailed, trackGoogleAuthSucceeded } from './src/analytics/events';
 
@@ -27,6 +25,21 @@ const FAQ = lazy(() => import('./pages/dashboard/FAQ').then(m => ({ default: m.F
 const PrivacyPolicy = lazy(() => import('./pages/dashboard/PrivacyPolicy').then(m => ({ default: m.PrivacyPolicy })));
 const TermsOfService = lazy(() => import('./pages/dashboard/TermsOfService').then(m => ({ default: m.TermsOfService })));
 const NotFound = lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })));
+const LazyVercelVitals = lazy(async () => {
+  const [{ Analytics }, { SpeedInsights }] = await Promise.all([
+    import('@vercel/analytics/react'),
+    import('@vercel/speed-insights/react'),
+  ]);
+
+  return {
+    default: () => (
+      <>
+        <Analytics />
+        <SpeedInsights />
+      </>
+    ),
+  };
+});
 
 // Loading fallback for Suspense
 const PageLoader = () => (
@@ -130,6 +143,39 @@ const SyncWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   useSync();
 
   return <>{children}</>;
+};
+
+const scheduleIdleMount = (callback: () => void) => {
+  const idleWindow = window as Window & {
+    requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
+    cancelIdleCallback?: (handle: number) => void;
+  };
+
+  if (idleWindow.requestIdleCallback) {
+    const handle = idleWindow.requestIdleCallback(callback, { timeout: 3000 });
+    return () => idleWindow.cancelIdleCallback?.(handle);
+  }
+
+  const handle = window.setTimeout(callback, 1200);
+  return () => window.clearTimeout(handle);
+};
+
+const DeferredVercelVitals: React.FC = () => {
+  const [shouldMount, setShouldMount] = useState(false);
+
+  useEffect(() => {
+    return scheduleIdleMount(() => setShouldMount(true));
+  }, []);
+
+  if (!shouldMount) {
+    return null;
+  }
+
+  return (
+    <Suspense fallback={null}>
+      <LazyVercelVitals />
+    </Suspense>
+  );
 };
 
 function App() {
@@ -262,8 +308,7 @@ function App() {
   return (
     <PWAInstallProvider>
       <AuthProvider>
-        <Analytics />
-        <SpeedInsights />
+        <DeferredVercelVitals />
         <SyncWrapper>
           <MotionConfig reducedMotion="user">
             <Suspense fallback={<PageLoader />}>

@@ -13,12 +13,14 @@ import {
 
 vi.mock('posthog-js', () => ({
   default: {
+    init: vi.fn(),
     capture: vi.fn(),
     identify: vi.fn(),
     reset: vi.fn(),
   },
 }));
 
+const mockInit = vi.mocked(posthog.init);
 const mockCapture = vi.mocked(posthog.capture);
 const mockIdentify = vi.mocked(posthog.identify);
 const mockReset = vi.mocked(posthog.reset);
@@ -45,33 +47,36 @@ describe('analytics events', () => {
   it('stays quiet when PostHog is not configured', () => {
     disablePostHogEnv();
 
-    trackNoteSaved({
+    expect(trackNoteSaved({
       mode: 'new',
       attachmentCount: 0,
       tagCount: 0,
       taskCount: 0,
-    });
+    })).toBe(false);
 
+    expect(mockInit).not.toHaveBeenCalled();
     expect(mockCapture).not.toHaveBeenCalled();
   });
 
-  it('captures Google auth start without freeform data', () => {
+  it('captures Google auth start without freeform data', async () => {
     enablePostHogEnv();
 
-    trackGoogleAuthStarted({
+    expect(trackGoogleAuthStarted({
       sourcePath: RoutePath.LOGIN,
       redirectPath: RoutePath.HOME,
       isNative: true,
-    });
+    })).toBe(true);
 
-    expect(mockCapture).toHaveBeenCalledWith('auth_google_started', {
-      source_path: RoutePath.LOGIN,
-      has_redirect_path: false,
-      is_native: true,
+    await vi.waitFor(() => {
+      expect(mockCapture).toHaveBeenCalledWith('auth_google_started', {
+        source_path: RoutePath.LOGIN,
+        has_redirect_path: false,
+        is_native: true,
+      });
     });
   });
 
-  it('captures Google auth success with the redirect hint', () => {
+  it('captures Google auth success with the redirect hint', async () => {
     enablePostHogEnv();
 
     trackGoogleAuthSucceeded({
@@ -80,14 +85,16 @@ describe('analytics events', () => {
       isNative: true,
     });
 
-    expect(mockCapture).toHaveBeenCalledWith('auth_google_succeeded', {
-      source_path: RoutePath.SIGNUP,
-      has_redirect_path: true,
-      is_native: true,
+    await vi.waitFor(() => {
+      expect(mockCapture).toHaveBeenCalledWith('auth_google_succeeded', {
+        source_path: RoutePath.SIGNUP,
+        has_redirect_path: true,
+        is_native: true,
+      });
     });
   });
 
-  it('captures Google auth failures with a sanitized error code', () => {
+  it('captures Google auth failures with a sanitized error code', async () => {
     enablePostHogEnv();
 
     trackGoogleAuthFailed({
@@ -96,14 +103,16 @@ describe('analytics events', () => {
       errorCode: 'access_denied',
     });
 
-    expect(mockCapture).toHaveBeenCalledWith('auth_google_failed', {
-      source_path: RoutePath.LOGIN,
-      is_native: true,
-      error_code: 'access_denied',
+    await vi.waitFor(() => {
+      expect(mockCapture).toHaveBeenCalledWith('auth_google_failed', {
+        source_path: RoutePath.LOGIN,
+        is_native: true,
+        error_code: 'access_denied',
+      });
     });
   });
 
-  it('captures note saves as counts only', () => {
+  it('captures note saves as counts only', async () => {
     enablePostHogEnv();
 
     trackNoteSaved({
@@ -113,15 +122,17 @@ describe('analytics events', () => {
       taskCount: 4,
     });
 
-    expect(mockCapture).toHaveBeenCalledWith('note_saved', {
-      mode: 'edit',
-      attachment_count: 2,
-      tag_count: 3,
-      task_count: 4,
+    await vi.waitFor(() => {
+      expect(mockCapture).toHaveBeenCalledWith('note_saved', {
+        mode: 'edit',
+        attachment_count: 2,
+        tag_count: 3,
+        task_count: 4,
+      });
     });
   });
 
-  it('captures Life Wiki refreshes without theme or note text', () => {
+  it('captures Life Wiki refreshes without theme or note text', async () => {
     enablePostHogEnv();
 
     trackLifeWikiRefreshed({
@@ -132,16 +143,18 @@ describe('analytics events', () => {
       usedFreeRefresh: true,
     });
 
-    expect(mockCapture).toHaveBeenCalledWith('life_wiki_refreshed', {
-      plan_tier: 'free',
-      entry_count: 5,
-      page_count: 4,
-      source: 'notes',
-      used_free_refresh: true,
+    await vi.waitFor(() => {
+      expect(mockCapture).toHaveBeenCalledWith('life_wiki_refreshed', {
+        plan_tier: 'free',
+        entry_count: 5,
+        page_count: 4,
+        source: 'notes',
+        used_free_refresh: true,
+      });
     });
   });
 
-  it('identifies and resets the authenticated analytics user', () => {
+  it('identifies and resets the authenticated analytics user', async () => {
     enablePostHogEnv();
 
     identifyAnalyticsUser({
@@ -151,10 +164,12 @@ describe('analytics events', () => {
     });
     resetAnalyticsUser();
 
-    expect(mockIdentify).toHaveBeenCalledWith('user-123', {
-      email: 'hello@example.com',
-      name: 'Arabinda',
+    await vi.waitFor(() => {
+      expect(mockIdentify).toHaveBeenCalledWith('user-123', {
+        email: 'hello@example.com',
+        name: 'Arabinda',
+      });
+      expect(mockReset).toHaveBeenCalled();
     });
-    expect(mockReset).toHaveBeenCalled();
   });
 });

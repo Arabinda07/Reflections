@@ -1,9 +1,11 @@
-import React from 'react';
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import React, { Suspense, lazy } from 'react';
 import { isRouteErrorResponse, useNavigate, useRouteError } from 'react-router-dom';
-import error404Animation from '@/src/lottie/error-404.json';
 import { Button } from '../components/ui/Button';
 import { RoutePath } from '../types';
+
+const LottieAnimation = lazy(() => import('../components/ui/LottieAnimation').then((module) => ({
+  default: module.LottieAnimation,
+})));
 
 const getRouteErrorCopy = (error: unknown) => {
   if (isRouteErrorResponse(error)) {
@@ -48,7 +50,9 @@ export const RouteErrorBoundary: React.FC = () => {
 
       <div className="relative z-10 flex min-h-[100dvh] flex-col items-center justify-center px-6 py-12 text-center">
         <div className="h-64 w-64 sm:h-80 sm:w-80">
-          <DotLottieReact data={error404Animation} autoplay loop />
+          <Suspense fallback={<div className="h-full w-full rounded-[var(--radius-panel)] bg-green/5" />}>
+            <LottieAnimation src="/assets/lottie/Error%20404.json" autoplay loop />
+          </Suspense>
         </div>
 
         <span className="label-caps text-gray-nav">Route recovery</span>

@@ -6,13 +6,18 @@ const read = (filePath: string) =>
   readFileSync(path.resolve(process.cwd(), filePath), 'utf8');
 
 describe('PostHog integration contract', () => {
-  it('keeps PostHog bootstrap optional and rooted in index.tsx', () => {
+  it('keeps PostHog bootstrap optional and outside the root entrypoint', () => {
     const index = read('index.tsx');
+    const events = read('src/analytics/events.ts');
 
-    expect(index).toContain('PostHogProvider');
-    expect(index).toContain('getPostHogBootstrapConfig');
-    expect(index).toContain('VITE_PUBLIC_POSTHOG_PROJECT_TOKEN');
-    expect(index).toContain('VITE_PUBLIC_POSTHOG_HOST');
+    expect(index).not.toContain('PostHogProvider');
+    expect(index).not.toContain('@posthog/react');
+    expect(index).not.toContain('getPostHogBootstrapConfig');
+
+    expect(events).toContain('getPostHogBootstrapConfig');
+    expect(events).toContain('VITE_PUBLIC_POSTHOG_PROJECT_TOKEN');
+    expect(events).toContain('VITE_PUBLIC_POSTHOG_HOST');
+    expect(events).toContain("import('posthog-js')");
   });
 
   it('wires the agreed analytics events into the auth, note, wiki, and auth-state seams', () => {
