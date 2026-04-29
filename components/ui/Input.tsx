@@ -19,7 +19,6 @@ export const Input: React.FC<InputProps> = ({ label, error, icon: Icon, classNam
         {Icon && (
           <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-nav z-10 pointer-events-none flex items-center justify-center">
             <Icon size={20} weight="regular" />
-
           </div>
         )}
         <input

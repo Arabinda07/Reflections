@@ -266,7 +266,6 @@ export const MyNotes: React.FC = () => {
       <LoadingState
         isVisible={loading}
         title="Gathering your thoughts..."
-        message="A moment while we prepare your reflection library."
       />
 
       {!loading ? (

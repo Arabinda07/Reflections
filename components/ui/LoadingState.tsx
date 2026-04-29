@@ -5,14 +5,12 @@ import { OverlayFeedback } from './OverlayFeedback';
 
 interface LoadingStateProps {
   title?: string;
-  message?: string;
   isVisible?: boolean;
-  animationData?: any;
+  animationData?: Record<string, unknown>;
 }
 
 export const LoadingState: React.FC<LoadingStateProps> = ({
   title = 'Gathering your thoughts...',
-  message = 'Just a moment while we prepare your space.',
   isVisible = true,
   animationData = loadingAnimation,
 }) => {

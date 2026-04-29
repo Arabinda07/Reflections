@@ -263,7 +263,6 @@ export const SingleNote: React.FC = () => {
     return (
       <LoadingState
         title="Opening your reflection..."
-        message="A moment while we bring your thoughts back into focus."
         isVisible
       />
     );

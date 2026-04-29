@@ -131,6 +131,7 @@ export const HomeAuthenticated: React.FC = () => {
   );
   const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);
   const shouldReduceMotion = useReducedMotion();
+  const { showToast } = useToast();
 
   const entranceDuration = isFromSave ? 0.3 : 0.8;
   const currentOnboardingStep = ONBOARDING_STEPS[onboardingStep];
@@ -298,7 +299,6 @@ export const HomeAuthenticated: React.FC = () => {
     navigate(RoutePath.CREATE_NOTE);
   };
 
-  const { showToast } = useToast();
 
   const handleMoodCheckIn = async (mood: string) => {
     if (isSavingCheckIn) return;
