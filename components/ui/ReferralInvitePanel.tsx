@@ -111,7 +111,7 @@ export const ReferralInvitePanel: React.FC<ReferralInvitePanelProps> = ({ compac
         {invite?.lastSharedAt ? <MetadataPill>Shared {new Date(invite.lastSharedAt).toLocaleDateString()}</MetadataPill> : null}
       </div>
 
-      <div className="rounded-[var(--radius-panel)] border border-border/60 bg-white/5 p-4">
+      <div className="surface-inline-panel p-4">
         <p className="mb-2 text-[11px] font-black uppercase tracking-widest text-gray-nav">
           Invite link
         </p>

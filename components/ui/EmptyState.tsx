@@ -1,5 +1,6 @@
 import React from 'react';
 import { Surface } from './Surface';
+import type { SurfaceTone } from './surfaceTone';
 
 interface EmptyStateProps {
   title: string;
@@ -8,6 +9,7 @@ interface EmptyStateProps {
   illustration?: React.ReactNode;
   action?: React.ReactNode;
   surface?: 'bezel' | 'flat' | 'none';
+  tone?: SurfaceTone;
   className?: string;
 }
 
@@ -37,6 +39,7 @@ const EmptyStateBody: React.FC<Omit<EmptyStateProps, 'surface'>> = ({
 
 export const EmptyState: React.FC<EmptyStateProps> = ({
   surface = 'bezel',
+  tone = 'inherit',
   ...props
 }) => {
   if (surface === 'none') {
@@ -44,7 +47,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   }
 
   return (
-    <Surface variant={surface} className="overflow-hidden">
+    <Surface variant={surface} tone={tone} className="overflow-hidden">
       <EmptyStateBody {...props} />
     </Surface>
   );

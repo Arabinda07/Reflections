@@ -46,7 +46,7 @@ export const SyncBanner: React.FC = () => {
         >
           <div
             className={`
-              flex items-center gap-3 px-4 py-3 rounded-2xl border-2 shadow-2xl backdrop-blur-2xl bg-panel-bg
+              surface-inline-panel flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl backdrop-blur-2xl
               ${bannerMode === 'offline' 
                 ? 'border-amber-500/20 text-amber-700 dark:border-amber-500/30 dark:text-amber-400'
                 : 'border-green/20 text-green-700 dark:border-green/30 dark:text-green-400'

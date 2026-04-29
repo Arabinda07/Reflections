@@ -23,7 +23,7 @@ export const Input: React.FC<InputProps> = ({ label, error, icon: Icon, classNam
           </div>
         )}
         <input
-          className={`w-full h-12 rounded-[var(--radius-control)] border border-border bg-white shadow-sm px-4 text-[15px] font-semibold text-gray-text placeholder:text-gray-nav placeholder:font-medium transition-[border-color,box-shadow,background-color] duration-200 focus:outline-none focus:border-green focus:ring-4 focus:ring-green/10 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[var(--panel-bg)] dark:text-zinc-100 dark:placeholder:text-zinc-500 ${
+          className={`input-surface w-full h-12 px-4 text-[15px] font-semibold placeholder:text-gray-nav placeholder:font-medium disabled:cursor-not-allowed disabled:opacity-50 ${
             Icon ? 'pl-12' : ''
           } ${error ? 'border-red focus:border-red focus:ring-red/10' : ''} ${className}`}
           {...props}

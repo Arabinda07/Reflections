@@ -1,21 +1,22 @@
 import React from 'react';
+import { SURFACE_TONE_CLASS, type SurfaceTone } from './surfaceTone';
 
 interface SurfaceProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   variant?: 'bezel' | 'flat' | 'floating';
-  tone?: 'neutral' | 'sage' | 'sky' | 'honey' | 'clay';
+  tone?: SurfaceTone;
   innerClassName?: string;
 }
 
 export const Surface: React.FC<SurfaceProps> = ({
   children,
   variant = 'flat',
-  tone = 'neutral',
+  tone = 'inherit',
   className = '',
   innerClassName = '',
   ...rest
 }) => {
-  const toneClassName = `surface-tone-${tone}`;
+  const toneClassName = SURFACE_TONE_CLASS[tone];
 
   if (variant === 'bezel') {
     return (

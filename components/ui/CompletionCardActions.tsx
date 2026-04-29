@@ -93,7 +93,7 @@ export const CompletionCardActions: React.FC<CompletionCardActionsProps> = ({
 
   return (
     <div
-      className={`rounded-[var(--radius-panel)] border border-border/50 bg-white/5 p-5 ${className}`.trim()}
+      className={`surface-inline-panel surface-tone-honey p-5 ${className}`.trim()}
     >
       <div className="mb-4 space-y-1">
         <p className="text-[11px] font-black uppercase tracking-widest text-green">

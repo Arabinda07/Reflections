@@ -237,7 +237,7 @@ export const Insights: React.FC = () => {
         ) : null}
       </AnimatePresence>
 
-      <PageContainer className="pb-24 pt-6 md:pt-10">
+      <PageContainer className="surface-scope-sky pb-24 pt-6 md:pt-10">
         <div className="space-y-10">
           <button 
             onClick={() => navigate(RoutePath.HOME)}

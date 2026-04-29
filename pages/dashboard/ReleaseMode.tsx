@@ -42,7 +42,7 @@ export const ReleaseMode: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-[100dvh] flex-1 flex-col bg-body">
+    <div className="surface-scope-clay flex min-h-[100dvh] flex-1 flex-col bg-body">
       <div className="mx-auto flex min-h-[100dvh] w-full max-w-4xl flex-col px-5 py-5 sm:px-8 sm:py-8">
         <div className="mb-5 flex items-center justify-between">
           <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.HOME)} className="-ml-2 min-h-11">
@@ -76,7 +76,7 @@ export const ReleaseMode: React.FC = () => {
                 transition={{ duration: shouldReduceMotion ? 0 : 0.52, ease: [0.16, 1, 0.3, 1] }}
                 className="space-y-7"
               >
-                <div className="rounded-[28px] border border-border/60 bg-panel-bg/80 p-4 shadow-sm sm:p-6">
+                <div className="surface-flat p-4 sm:p-6">
                   <label htmlFor="release-writing" className="sr-only">
                     Release writing
                   </label>
@@ -87,7 +87,7 @@ export const ReleaseMode: React.FC = () => {
                     disabled={isReleasing}
                     autoFocus
                     placeholder="Write what you are ready to put down."
-                    className="min-h-[34dvh] w-full resize-none rounded-[22px] border border-border/40 bg-white/60 p-5 font-serif text-[20px] leading-9 text-gray-text outline-none transition-all placeholder:text-gray-nav/35 focus:border-green/30 focus:ring-4 focus:ring-green/10 disabled:opacity-60 dark:bg-white/5 sm:min-h-[42dvh] sm:p-8 sm:text-[22px] sm:leading-10"
+                    className="input-surface min-h-[34dvh] w-full resize-none rounded-[22px] p-5 font-serif text-[20px] leading-9 text-gray-text placeholder:text-gray-nav/35 disabled:opacity-60 sm:min-h-[42dvh] sm:p-8 sm:text-[22px] sm:leading-10"
                   />
                 </div>
 

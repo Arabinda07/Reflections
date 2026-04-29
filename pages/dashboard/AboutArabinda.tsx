@@ -38,7 +38,7 @@ export const AboutArabinda: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <PageContainer size="narrow" className="py-12 sm:py-16">
+    <PageContainer size="narrow" className="surface-scope-sage py-12 sm:py-16">
       <div className="space-y-10">
         <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.HOME)} className="-ml-2 min-h-11">
           <ArrowLeft size={16} weight="bold" className="mr-2" />

@@ -62,9 +62,9 @@ export const NoteExportDialog: React.FC<NoteExportDialogProps> = ({
             key={option.format}
             type="button"
             onClick={() => handleExport(option.format)}
-            className="flex min-h-11 w-full items-center gap-4 rounded-[var(--radius-panel)] border border-border bg-white/5 px-4 py-4 text-left transition-all hover:border-green/25 hover:bg-green/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
+            className="surface-inline-panel flex min-h-11 w-full items-center gap-4 px-4 py-4 text-left transition-all hover:border-green/25 hover:bg-green/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
           >
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] border border-border bg-white text-green shadow-sm dark:bg-white/10">
+            <span className="tone-icon flex h-11 w-11 shrink-0 rounded-[var(--radius-control)] text-green shadow-sm">
               <FileText size={20} weight="duotone" />
             </span>
             <span className="min-w-0 flex-1">

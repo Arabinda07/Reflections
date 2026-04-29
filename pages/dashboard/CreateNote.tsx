@@ -713,14 +713,14 @@ export const CreateNote: React.FC = () => {
 
   if (!id && !canCreateNote) {
     return (
-      <div className="relative flex flex-1 min-h-[100dvh] bg-body">
+      <div className="surface-scope-paper relative flex flex-1 min-h-[100dvh] bg-body">
         <ProUpgradeCTA variant="fullscreen" onSuccess={() => setCanCreateNote(true)} />
       </div>
     );
   }
 
   return (
-    <div className="relative flex-1 flex min-h-0 bg-body transition-colors duration-700 ease-out-quart overflow-hidden">
+    <div className="surface-scope-paper relative flex-1 flex min-h-0 bg-body transition-colors duration-700 ease-out-quart overflow-hidden">
       {/* ── Mobile Back Button ── */}
       {isMobile && (
         <button 
@@ -758,7 +758,7 @@ export const CreateNote: React.FC = () => {
               onClick={() => navigate(RoutePath.NOTES)}
               className="flex items-center gap-2 text-gray-nav hover:text-gray-text text-[13px] font-bold mb-8 group transition-colors"
             >
-              <div className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-control)] border border-border bg-white transition-colors group-hover:border-green/20 group-hover:bg-green/5">
+              <div className="control-surface flex h-8 w-8 items-center justify-center transition-colors group-hover:border-green/20 group-hover:bg-green/5">
                 <ArrowLeft size={14} weight="bold" />
               </div>
               Back to Notes
@@ -767,32 +767,32 @@ export const CreateNote: React.FC = () => {
             <span className="text-[10px] font-black text-gray-nav tracking-widest uppercase opacity-40 ml-2">Personalize</span>
             
             {/* Options */}
-            <button onClick={() => setIsMoodOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${mood ? getMoodConfig(mood)?.nav || 'bg-green/10 border-green/20 text-green' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border/40 text-gray-text'}`}>
+            <button onClick={() => setIsMoodOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${mood ? getMoodConfig(mood)?.nav || 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>
               <div className="flex items-center gap-3"><ActiveMoodIcon size={20} weight={mood ? "fill" : "regular"} /><span className="text-[13px] font-bold capitalize">{mood ? getMoodConfig(mood)?.label || mood : 'Mood'}</span></div>
               <CaretRight size={14} className="opacity-40" />
             </button>
 
-            <button onClick={() => setIsTagsOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${tags.length > 0 ? 'bg-sky/10 border-sky/20 text-sky' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border/40 text-gray-text'}`}>
+            <button onClick={() => setIsTagsOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${tags.length > 0 ? 'bg-sky/10 border-sky/20 text-sky' : 'control-surface text-gray-text'}`}>
               <div className="flex items-center gap-3"><TagIcon size={20} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-[13px] font-bold">{tags.length > 0 ? `${tags.length} Tags` : 'Tags'}</span></div>
               <CaretRight size={14} className="opacity-40" />
             </button>
 
-            <button onClick={() => setIsMusicOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${musicPlaying ? 'bg-honey/10 border-honey/25 text-honey' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border/40 text-gray-text'}`}>
+            <button onClick={() => setIsMusicOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${musicPlaying ? 'bg-honey/10 border-honey/25 text-honey' : 'control-surface text-gray-text'}`}>
               <div className="flex items-center gap-3"><Headphones size={20} weight={musicPlaying ? "fill" : "regular"} /><span className="text-[13px] font-bold">{musicPlaying && activeMusicTrack ? activeMusicTrack.emoji : 'Sounds'}</span></div>
               <CaretRight size={14} className="opacity-40" />
             </button>
 
-            <button onClick={toggleWhisper} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${isWhispering ? 'bg-clay/10 border-clay/25 text-clay' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border/40 text-gray-text'}`}>
+            <button onClick={toggleWhisper} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${isWhispering ? 'bg-clay/10 border-clay/25 text-clay' : 'control-surface text-gray-text'}`}>
               <div className="flex items-center gap-3">{isWhispering ? <Microphone size={20} weight="fill" /> : <MicrophoneSlash size={20} weight="regular" />}<span className="text-[13px] font-bold">Whisper</span></div>
             </button>
 
-            <button onClick={() => setIsTasksOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border/40 text-gray-text'}`}>
+            <button onClick={() => setIsTasksOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>
               <div className="flex items-center gap-3"><ListChecks size={20} weight={tasks.some(t => !t.completed) ? "fill" : "regular"} /><span className="text-[13px] font-bold">{getTaskDrawerTriggerLabel(tasks).label}</span></div>
               <CaretRight size={14} className="opacity-40" />
             </button>
             
             <div className="grid grid-cols-2 gap-2 pt-2">
-              <label className="flex flex-col items-center justify-center p-4 rounded-[20px] bg-transparent hover:bg-white dark:hover:bg-white/5 text-gray-text transition-all cursor-pointer">
+              <label className="control-surface flex flex-col items-center justify-center p-4 rounded-[20px] text-gray-text transition-all cursor-pointer">
                 <Paperclip size={20} className="mb-2" /><span className="text-[10px] font-bold uppercase">Files</span>
                 <input type="file" multiple className="hidden" onChange={(e) => {
                   if (e.target.files) {
@@ -800,7 +800,7 @@ export const CreateNote: React.FC = () => {
                   }
                 }} />
               </label>
-              <label className="flex flex-col items-center justify-center p-4 rounded-[20px] bg-transparent hover:bg-white dark:hover:bg-white/5 text-gray-text transition-all cursor-pointer">
+              <label className="control-surface flex flex-col items-center justify-center p-4 rounded-[20px] text-gray-text transition-all cursor-pointer">
                 <ImageIcon size={20} className="mb-2" /><span className="text-[10px] font-bold uppercase">Cover</span>
                 <input type="file" className="hidden" accept="image/*" onChange={(e) => {
                   if (e.target.files?.[0]) setImagePreview(URL.createObjectURL(e.target.files[0]));
@@ -856,7 +856,7 @@ export const CreateNote: React.FC = () => {
               className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] transition-colors ${
                 isFocusModeEnabled
                   ? 'bg-green text-white'
-                  : 'bg-white/70 text-gray-text hover:bg-green/10 hover:text-green dark:bg-white/10'
+                  : 'control-surface text-gray-text hover:bg-green/10 hover:text-green'
               }`}
             >
               <Target size={12} weight={isFocusModeEnabled ? 'fill' : 'bold'} />
@@ -991,13 +991,13 @@ export const CreateNote: React.FC = () => {
         bodyClassName="pt-2"
       >
         <div className="grid grid-cols-2 gap-3">
-          <button onClick={() => { setIsMobileOptionsOpen(false); setIsMoodOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${mood ? getMoodConfig(mood)?.nav || 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><ActiveMoodIcon size={24} weight={mood ? "fill" : "regular"} /><span className="text-[14px] font-bold capitalize">{mood ? getMoodConfig(mood)?.label || mood : 'Mood'}</span></button>
-          <button onClick={() => { setIsMobileOptionsOpen(false); setIsTagsOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><TagIcon size={24} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-[14px] font-bold">Tags</span></button>
-          <button onClick={() => { setIsMobileOptionsOpen(false); setIsMusicOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${musicPlaying ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><Headphones size={24} weight={musicPlaying ? "fill" : "regular"} /><span className="text-[14px] font-bold">Sounds</span></button>
-          <button onClick={() => { setIsMobileOptionsOpen(false); setIsTasksOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><ListChecks size={24} weight={tasks.some(t => !t.completed) ? "fill" : "regular"} /><span className="text-[14px] font-bold">Tasks</span></button>
-          <button onClick={toggleWhisper} className={`flex items-center gap-3 rounded-2xl border p-4 ${isWhispering ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}>{isWhispering ? <Microphone size={24} weight="fill" /> : <MicrophoneSlash size={24} weight="regular" />}<span className="text-[14px] font-bold">Whisper</span></button>
+          <button onClick={() => { setIsMobileOptionsOpen(false); setIsMoodOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${mood ? getMoodConfig(mood)?.nav || 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><ActiveMoodIcon size={24} weight={mood ? "fill" : "regular"} /><span className="text-[14px] font-bold capitalize">{mood ? getMoodConfig(mood)?.label || mood : 'Mood'}</span></button>
+          <button onClick={() => { setIsMobileOptionsOpen(false); setIsTagsOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><TagIcon size={24} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-[14px] font-bold">Tags</span></button>
+          <button onClick={() => { setIsMobileOptionsOpen(false); setIsMusicOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${musicPlaying ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><Headphones size={24} weight={musicPlaying ? "fill" : "regular"} /><span className="text-[14px] font-bold">Sounds</span></button>
+          <button onClick={() => { setIsMobileOptionsOpen(false); setIsTasksOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><ListChecks size={24} weight={tasks.some(t => !t.completed) ? "fill" : "regular"} /><span className="text-[14px] font-bold">Tasks</span></button>
+          <button onClick={toggleWhisper} className={`flex items-center gap-3 rounded-2xl border p-4 ${isWhispering ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>{isWhispering ? <Microphone size={24} weight="fill" /> : <MicrophoneSlash size={24} weight="regular" />}<span className="text-[14px] font-bold">Whisper</span></button>
 
-          <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-border p-4 text-gray-text transition-colors hover:border-green/20 hover:bg-green/5">
+          <label className="control-surface flex cursor-pointer items-center gap-3 rounded-2xl p-4 text-gray-text transition-colors hover:border-green/20 hover:bg-green/5">
             <Paperclip size={24} weight="regular" /><span className="text-[14px] font-bold">Files</span>
             <input type="file" multiple className="hidden" onChange={(e) => {
               if (e.target.files) {
@@ -1006,7 +1006,7 @@ export const CreateNote: React.FC = () => {
               setIsMobileOptionsOpen(false);
             }} />
           </label>
-          <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-border p-4 text-gray-text transition-colors hover:border-green/20 hover:bg-green/5">
+          <label className="control-surface flex cursor-pointer items-center gap-3 rounded-2xl p-4 text-gray-text transition-colors hover:border-green/20 hover:bg-green/5">
             <ImageIcon size={24} weight="regular" /><span className="text-[14px] font-bold">Cover</span>
             <input type="file" className="hidden" accept="image/*" onChange={(e) => {
               if (e.target.files?.[0]) setImagePreview(URL.createObjectURL(e.target.files[0]));
@@ -1118,7 +1118,7 @@ export const CreateNote: React.FC = () => {
             type="text"
             value={tagInput}
             placeholder="Add tag and press Enter"
-            className="w-full rounded-[var(--radius-control)] border border-border bg-white px-4 py-3 text-[14px] font-semibold text-gray-text outline-none transition-[border-color,box-shadow] focus:border-green focus:ring-4 focus:ring-green/10 dark:bg-[var(--panel-bg)]"
+            className="input-surface w-full px-4 py-3 text-[14px] font-semibold text-gray-text"
             onChange={(event) => setTagInput(event.target.value)}
             onKeyDown={(event) => {
               if (event.key === 'Enter' && tagInput.trim()) {
@@ -1179,7 +1179,7 @@ export const CreateNote: React.FC = () => {
                 void handleTrackSelect(track);
               }}
               disabled={pendingTrackId !== null && pendingTrackId !== track.id}
-              className={`flex w-full items-center justify-between rounded-2xl border-2 p-4 text-left text-[14px] font-bold transition-opacity ${activeMusicTrack?.id === track.id || pendingTrackId === track.id ? 'border-green bg-green/10 text-green' : 'border-transparent text-gray-text hover:border-border hover:bg-green/5'} ${pendingTrackId !== null && pendingTrackId !== track.id ? 'opacity-60' : ''}`}
+              className={`flex w-full items-center justify-between rounded-2xl border-2 p-4 text-left text-[14px] font-bold transition-opacity ${activeMusicTrack?.id === track.id || pendingTrackId === track.id ? 'border-green bg-green/10 text-green' : 'control-surface text-gray-text hover:border-border hover:bg-green/5'} ${pendingTrackId !== null && pendingTrackId !== track.id ? 'opacity-60' : ''}`}
             >
               <span className="flex items-center gap-3">
                 <span className="text-[18px]">{track.emoji}</span>
@@ -1191,7 +1191,7 @@ export const CreateNote: React.FC = () => {
               ) : null}
 
               {activeMusicTrack?.id === track.id && pendingTrackId !== track.id ? (
-                <span className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-green">
+                <span className="metadata-pill metadata-pill--sage">
                   <Check size={14} weight="bold" />
                   <span className="leading-none">Playing</span>
                 </span>

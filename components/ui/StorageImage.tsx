@@ -54,7 +54,7 @@ export const StorageImage: React.FC<StorageImageProps> = ({
 
   if (loading && showLoading) {
     return (
-      <div className={`flex items-center justify-center bg-gray-50/5 dark:bg-white/5 ${className}`}>
+      <div className={`surface-inline-panel flex items-center justify-center rounded-none border-0 ${className}`}>
         <CircleNotch className="animate-spin text-gray-nav" size={20} weight="bold" />
       </div>
     );
@@ -62,7 +62,7 @@ export const StorageImage: React.FC<StorageImageProps> = ({
 
   if (!src) {
      return (
-       <div className={`flex items-center justify-center bg-gray-50/5 dark:bg-white/5 text-gray-nav ${className}`}>
+       <div className={`surface-inline-panel flex items-center justify-center rounded-none border-0 text-gray-nav ${className}`}>
          <ImageSquare size={24} weight="duotone" />
        </div>
      );

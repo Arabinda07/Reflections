@@ -356,7 +356,7 @@ export const Account: React.FC = () => {
 
   return (
     <>
-      <PageContainer className="pb-24 pt-6 md:pt-10">
+      <PageContainer className="surface-scope-paper pb-24 pt-6 md:pt-10">
         <div className="space-y-8">
           <SectionHeader
             eyebrow="Account"
@@ -387,7 +387,7 @@ export const Account: React.FC = () => {
             />
           ) : null}
 
-          <Surface variant="flat" tone="sage" className="overflow-hidden">
+          <Surface variant="flat" tone="paper" className="overflow-hidden">
             <form onSubmit={handleSubmit} className="divide-y divide-border/70">
               <div className="grid gap-10 p-8 lg:grid-cols-[180px_minmax(0,1fr)] lg:p-10">
                 <div className="flex flex-col items-center gap-4">
@@ -397,7 +397,7 @@ export const Account: React.FC = () => {
                     onClick={() => avatarInputRef.current?.click()}
                     aria-label="Upload a new profile photo"
                   >
-                    <div className="h-32 w-32 overflow-hidden rounded-full border-4 border-white bg-white/5 shadow-xl shadow-black/10">
+                    <div className="surface-inline-panel h-32 w-32 overflow-hidden rounded-full border-4 shadow-xl shadow-black/10">
                       {avatarPath ? (
                         <StorageImage path={avatarPath} alt="Profile" className="h-full w-full object-cover" />
                       ) : (
@@ -451,7 +451,7 @@ export const Account: React.FC = () => {
                         name="timezone"
                         value={formData.timezone}
                         onChange={handleChange}
-                        className="h-12 w-full rounded-[var(--radius-control)] border border-border bg-white px-4 text-[15px] font-semibold text-gray-text shadow-sm outline-none transition-[border-color,box-shadow,background-color] duration-200 focus:border-green focus:ring-4 focus:ring-green/10 dark:bg-[var(--panel-bg)]"
+                        className="input-surface h-12 w-full px-4 text-[15px] font-semibold text-gray-text"
                       >
                         <option value="UTC">UTC</option>
                         <option value="America/New_York">Eastern Time</option>
@@ -483,7 +483,7 @@ export const Account: React.FC = () => {
                       <MetadataPill tone="green">{access?.planTier === 'pro' ? 'Active' : 'Free tier'}</MetadataPill>
                     </div>
 
-                    <details className="mt-4 rounded-[var(--radius-panel)] border border-border/60 bg-white/5 px-4 py-3">
+                    <details className="surface-inline-panel mt-4 px-4 py-3">
                       <summary className="cursor-pointer text-[12px] font-black uppercase tracking-widest text-gray-nav">
                         Details
                       </summary>
@@ -514,7 +514,7 @@ export const Account: React.FC = () => {
                       <button
                         type="button"
                         onClick={handlePasswordReset}
-                        className="flex w-full items-center justify-between rounded-[var(--radius-panel)] border border-border bg-white/5 px-4 py-4 text-left transition-all hover:border-green/20 hover:bg-green/5"
+                        className="surface-inline-panel flex w-full items-center justify-between px-4 py-4 text-left transition-all hover:border-green/20 hover:bg-green/5"
                       >
                         <div className="flex items-center gap-3">
                           <Key size={20} weight="bold" className="text-green" />
@@ -525,7 +525,7 @@ export const Account: React.FC = () => {
                         <EnvelopeSimple size={18} weight="bold" className="text-gray-nav" />
                       </button>
 
-                      <div className="flex items-center justify-between rounded-[var(--radius-panel)] border border-border bg-white/5 px-4 py-4 opacity-70">
+                      <div className="surface-inline-panel flex items-center justify-between px-4 py-4 opacity-70">
                         <div className="flex items-center gap-3">
                           <DeviceMobile size={20} weight="bold" className="text-gray-nav" />
                           <div>
@@ -550,7 +550,7 @@ export const Account: React.FC = () => {
                       </div>
                     </div>
 
-                    <details className="mb-5 rounded-[var(--radius-panel)] border border-border/60 bg-white/5 px-4 py-3">
+                    <details className="surface-inline-panel mb-5 px-4 py-3">
                       <summary className="cursor-pointer text-[12px] font-black uppercase tracking-widest text-gray-nav">
                         Details
                       </summary>
@@ -575,7 +575,7 @@ export const Account: React.FC = () => {
                       </div>
                     </div>
 
-                    <details className="rounded-[var(--radius-panel)] border border-border/60 bg-white/5 px-4 py-3">
+                    <details className="surface-inline-panel px-4 py-3">
                       <summary className="cursor-pointer text-[12px] font-black uppercase tracking-widest text-gray-nav">
                         Details
                       </summary>
@@ -585,7 +585,7 @@ export const Account: React.FC = () => {
                     </details>
 
                     {greatIngestProgress ? (
-                      <div className="mt-5 rounded-[var(--radius-panel)] border border-green/15 bg-green/5 p-4">
+                      <div className="surface-inline-panel mt-5 p-4">
                         <p className="text-[11px] font-black uppercase tracking-widest text-green">
                           Preparing Sanctuary
                         </p>
@@ -619,7 +619,7 @@ export const Account: React.FC = () => {
                         className={`relative flex h-11 w-[156px] shrink-0 items-center rounded-[var(--radius-control)] border px-1.5 transition-all duration-500 ease-out-expo focus:outline-none focus-visible:ring-4 focus-visible:ring-green/15 disabled:pointer-events-none disabled:opacity-50 ${
                           access?.smartModeEnabled
                             ? 'border-green/30 bg-green/10 text-green'
-                            : 'border-border bg-white/5 text-gray-nav hover:border-green/20 hover:bg-green/5'
+                            : 'control-surface text-gray-nav hover:border-green/20 hover:bg-green/5'
                         }`}
                       >
                         <span
@@ -639,7 +639,7 @@ export const Account: React.FC = () => {
                 </Surface>
               </div>
 
-              <div className="bg-red/5 p-8 lg:p-10">
+              <div className="surface-inline-panel surface-tone-clay rounded-none border-x-0 border-b-0 p-8 lg:p-10">
                 <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                   <div className="space-y-2">
                     <p className="text-[11px] font-black uppercase tracking-widest text-red">Danger zone</p>

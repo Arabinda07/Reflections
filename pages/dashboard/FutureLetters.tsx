@@ -167,7 +167,7 @@ export const FutureLetters: React.FC = () => {
 
   return (
     <>
-      <PageContainer size="wide" className="pb-24 pt-6 md:pt-10">
+      <PageContainer size="wide" className="surface-scope-honey pb-24 pt-6 md:pt-10">
         <div className="space-y-8">
           <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.HOME)} className="-ml-2 min-h-11">
             <ArrowLeft size={16} weight="bold" className="mr-2" />
@@ -185,7 +185,7 @@ export const FutureLetters: React.FC = () => {
           />
 
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
-            <Surface variant="flat" tone="sky" className="overflow-hidden">
+            <Surface variant="flat" tone="paper" className="overflow-hidden">
               <form onSubmit={handleSchedule} className="space-y-6 p-6 sm:p-8">
                 <div className="space-y-2">
                   <label htmlFor="future-letter-title" className="label-caps text-gray-nav">
@@ -196,7 +196,7 @@ export const FutureLetters: React.FC = () => {
                     value={title}
                     onChange={(event) => setTitle(event.target.value)}
                     placeholder="A title for later"
-                    className="h-12 w-full rounded-[var(--radius-control)] border border-border bg-white px-4 text-[15px] font-semibold text-gray-text outline-none transition-all focus:border-green/30 focus:ring-4 focus:ring-green/10 dark:bg-white/5"
+                    className="input-surface h-12 w-full px-4 text-[15px] font-semibold text-gray-text"
                   />
                 </div>
 
@@ -209,7 +209,7 @@ export const FutureLetters: React.FC = () => {
                     value={content}
                     onChange={(event) => setContent(event.target.value)}
                     placeholder="Write what you want a future day to hold."
-                    className="min-h-[320px] w-full resize-none rounded-[22px] border border-border bg-white p-5 font-serif text-[19px] leading-8 text-gray-text outline-none transition-all placeholder:text-gray-nav/35 focus:border-green/30 focus:ring-4 focus:ring-green/10 dark:bg-white/5"
+                    className="input-surface min-h-[320px] w-full resize-none rounded-[22px] p-5 font-serif text-[19px] leading-8 text-gray-text placeholder:text-gray-nav/35"
                   />
                 </div>
 
@@ -225,7 +225,7 @@ export const FutureLetters: React.FC = () => {
                         className={`min-h-11 rounded-[var(--radius-control)] border px-3 text-[13px] font-black transition-all ${
                           selectedOption === option.id
                             ? 'border-green/30 bg-green/10 text-green'
-                            : 'border-border bg-white/5 text-gray-nav hover:border-green/20 hover:text-green'
+                            : 'control-surface text-gray-nav hover:border-green/20 hover:text-green'
                         }`}
                       >
                         {option.label}
@@ -239,7 +239,7 @@ export const FutureLetters: React.FC = () => {
                       min={minCustomDate}
                       onChange={(event) => setCustomDate(event.target.value)}
                       aria-label="Custom open date"
-                      className="h-12 w-full rounded-[var(--radius-control)] border border-border bg-white px-4 text-[15px] font-semibold text-gray-text outline-none focus:border-green/30 focus:ring-4 focus:ring-green/10 dark:bg-white/5"
+                      className="input-surface h-12 w-full px-4 text-[15px] font-semibold text-gray-text"
                     />
                   ) : null}
                 </fieldset>
@@ -273,7 +273,7 @@ export const FutureLetters: React.FC = () => {
 
                 {error ? (
                   <p
-                    className="rounded-[var(--radius-panel)] border border-red/15 bg-red/5 p-4 text-[13px] font-bold text-red"
+                    className="surface-inline-panel surface-tone-clay p-4 text-[13px] font-bold text-clay"
                     aria-live="polite"
                   >
                     {error}
@@ -294,7 +294,7 @@ export const FutureLetters: React.FC = () => {
                       return (
                         <div
                           key={letter.id}
-                          className="rounded-[var(--radius-panel)] border border-border/50 bg-white/5 p-4"
+                          className="surface-inline-panel p-4"
                         >
                           <div className="mb-3 flex items-start justify-between gap-3">
                             <div className="min-w-0">
@@ -352,7 +352,7 @@ export const FutureLetters: React.FC = () => {
             <p className="text-[12px] font-black uppercase tracking-widest text-gray-nav/60">
               Opened {openedLetter.openedAt ? formatDate(openedLetter.openedAt) : 'today'}
             </p>
-            <div className="whitespace-pre-wrap rounded-[22px] border border-border/50 bg-white/5 p-5 font-serif text-[19px] leading-8 text-gray-text">
+            <div className="surface-inline-panel whitespace-pre-wrap rounded-[22px] p-5 font-serif text-[19px] leading-8 text-gray-text">
               {openedLetter.content}
             </div>
           </div>

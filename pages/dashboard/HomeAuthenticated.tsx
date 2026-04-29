@@ -342,7 +342,7 @@ export const HomeAuthenticated: React.FC = () => {
   return (
     <>
       <div
-        className="relative min-h-full flex flex-col flex-1 bg-body selection:bg-green/10"
+        className="surface-scope-sage relative min-h-full flex flex-col flex-1 bg-body selection:bg-green/10"
         {...((showOnboarding ? { 'aria-hidden': 'true' } : {}) as any)}
       >
         <section className="relative isolate h-[60dvh] min-h-[450px] w-full overflow-hidden bg-body">
@@ -401,7 +401,7 @@ export const HomeAuthenticated: React.FC = () => {
           {/* Overview Card */}
           <motion.div 
             variants={bentoItemVariants}
-            className="surface-flat surface-tone-sage p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full"
+            className="surface-flat p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full"
           >
             <div>
               <div className="flex items-center gap-2 text-gray-nav mb-12">
@@ -447,7 +447,7 @@ export const HomeAuthenticated: React.FC = () => {
           {/* Daily Focus & Intentions Card */}
           <motion.div 
             variants={bentoItemVariants}
-            className="surface-flat surface-tone-sage p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full overflow-hidden"
+            className="surface-flat p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full overflow-hidden"
           >
             <div>
               <div className="flex items-center justify-between mb-8">

@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import { X } from '@phosphor-icons/react';
 import { registerAndroidBackAction } from '../../src/native/androidBack';
+import { SURFACE_TONE_CLASS, type SurfaceTone } from './surfaceTone';
 
 interface ModalSheetProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ interface ModalSheetProps {
   hideClose?: boolean;
   closeLabel?: string;
   mobilePlacement?: 'bottom' | 'center';
+  tone?: SurfaceTone;
 }
 
 const sizeClasses = {
@@ -43,6 +45,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
   hideClose = false,
   closeLabel = 'Close dialog',
   mobilePlacement = 'bottom',
+  tone = 'paper',
 }) => {
   const titleId = useId();
   const descriptionId = useId();
@@ -146,7 +149,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
               transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
               className={`modal-sheet-frame ${sizeClasses[size]} ${className}`.trim()}
             >
-              <div className="surface-bezel">
+              <div className={`surface-bezel ${SURFACE_TONE_CLASS[tone]}`}>
                 <div
                   ref={panelRef}
                   className={`surface-bezel-inner modal-sheet-panel ${panelClassName}`.trim()}

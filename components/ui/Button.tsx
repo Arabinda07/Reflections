@@ -22,7 +22,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
 
   const variants = {
     primary: "border border-transparent bg-green text-white shadow-none hover:bg-green-hover",
-    secondary: "border border-border/40 bg-white dark:bg-[var(--panel-bg)] text-gray-text shadow-none hover:border-green/20 hover:bg-green/5 dark:hover:bg-white/10",
+    secondary: "control-surface text-gray-text shadow-none hover:border-green/20 hover:bg-green/5",
     outline: "border border-border/40 bg-transparent text-gray-nav hover:border-green/20 hover:bg-green/5 hover:text-gray-text",
     ghost: "bg-transparent text-gray-nav hover:bg-green/5 hover:text-green",
     danger: "border border-transparent bg-red text-white shadow-none hover:brightness-105",

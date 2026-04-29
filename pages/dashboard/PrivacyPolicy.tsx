@@ -66,7 +66,7 @@ export const PrivacyPolicy: React.FC = () => {
   }, []);
 
   return (
-    <div className="relative min-h-full bg-body pb-28 text-gray-text transition-colors duration-300">
+    <div className="surface-scope-paper relative min-h-full bg-body pb-28 text-gray-text transition-colors duration-300">
       <section className="mx-auto grid w-full max-w-[1440px] gap-12 px-6 py-16 sm:px-10 lg:grid-cols-12 lg:items-end lg:px-16 lg:py-24">
         <div className="lg:col-span-8">
           <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.HOME)} className="-ml-2 mb-8">

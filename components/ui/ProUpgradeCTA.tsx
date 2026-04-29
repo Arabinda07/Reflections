@@ -180,7 +180,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
                 type="button"
                 onClick={() => setSelectedPlan('monthly')}
                 className={`flex flex-col items-start rounded-[var(--radius-control)] border p-4 text-left transition-colors duration-300 ease-out-expo ${
-                  selectedPlan === 'monthly' ? 'border-green bg-green/5' : 'border-border/60 bg-white/5 hover:border-green/30'
+                  selectedPlan === 'monthly' ? 'border-green bg-green/5' : 'control-surface hover:border-green/30'
                 }`}
               >
                 <span className={`text-[12px] font-black uppercase tracking-widest ${selectedPlan === 'monthly' ? 'text-green' : 'text-gray-nav'}`}>Monthly</span>
@@ -191,7 +191,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
                 type="button"
                 onClick={() => setSelectedPlan('yearly')}
                 className={`flex flex-col items-start rounded-[var(--radius-control)] border p-4 text-left transition-colors duration-300 ease-out-expo ${
-                  selectedPlan === 'yearly' ? 'border-green bg-green/5' : 'border-border/60 bg-white/5 hover:border-green/30'
+                  selectedPlan === 'yearly' ? 'border-green bg-green/5' : 'control-surface hover:border-green/30'
                 }`}
               >
                 <div className="flex w-full items-center justify-between gap-3">
@@ -213,7 +213,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
 
             <div>
               <label className="flex items-start gap-3 cursor-pointer group">
-                <div className="relative flex h-5 w-5 shrink-0 items-center justify-center rounded border border-border bg-white transition-colors group-hover:border-green dark:bg-white/5 mt-0.5">
+                <div className="control-surface relative flex h-5 w-5 shrink-0 items-center justify-center rounded transition-colors group-hover:border-green mt-0.5">
                   <input
                     type="checkbox"
                     checked={wantsNewsletter}
@@ -258,7 +258,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
 
   if (variant === 'fullscreen') {
     return (
-      <div className={`fixed inset-0 z-50 flex items-center justify-center bg-body p-6 ${className}`}>
+      <div className={`surface-scope-honey fixed inset-0 z-50 flex items-center justify-center bg-body p-6 ${className}`}>
         <div className="max-w-md w-full relative z-10 text-center space-y-8">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[var(--radius-panel)] border border-green/15 bg-green/5 text-green">
             <Crown size={40} weight="duotone" />

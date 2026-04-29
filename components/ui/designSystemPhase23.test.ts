@@ -76,11 +76,20 @@ describe('phase 2/3 design-system rollout', () => {
   it('keeps the brand color expansion token-driven and surface-based', () => {
     const css = read('index.css');
     const surface = read('components/ui/Surface.tsx');
+    const surfaceTone = read('components/ui/surfaceTone.ts');
     const metadataPill = read('components/ui/MetadataPill.tsx');
+    const design = read('DESIGN.md');
+    const brandDesign = read('docs/brand/DESIGN.md');
     const home = read('pages/dashboard/HomeAuthenticated.tsx');
     const insights = read('pages/dashboard/Insights.tsx');
 
     expect(css).toContain('--app-background-wash');
+    expect(css).toContain('--surface-paper-bg');
+    expect(css).toContain('--surface-current-bg');
+    expect(css).toContain('--surface-current-border');
+    expect(css).toContain('--surface-current-accent');
+    expect(css).toContain('.surface-scope-sage');
+    expect(css).toContain('.surface-tone-auto');
     expect(css).toContain('--surface-sage-bg');
     expect(css).toContain('--surface-sky-bg');
     expect(css).toContain('--surface-honey-bg');
@@ -91,11 +100,39 @@ describe('phase 2/3 design-system rollout', () => {
     expect(css).not.toMatch(/border-left:\s*(?:[2-9]|\d{2,})px/);
     expect(css).not.toContain('background-clip: text');
 
-    expect(surface).toContain("tone?: 'neutral' | 'sage' | 'sky' | 'honey' | 'clay'");
-    expect(surface).toContain('surface-tone-${tone}');
-    expect(metadataPill).toContain("'sage' | 'sky' | 'honey' | 'clay'");
-    expect(home).toContain('surface-tone-sage');
+    expect(surfaceTone).toContain("export type SurfaceTone = 'inherit' | 'neutral' | 'paper' | 'sage' | 'sky' | 'honey' | 'clay'");
+    expect(surfaceTone).toContain('SURFACE_TONE_CLASS');
+    expect(surfaceTone).toContain('SURFACE_SCOPE_CLASS');
+    expect(surface).toContain("tone = 'inherit'");
+    expect(surface).toContain('SURFACE_TONE_CLASS[tone]');
+    expect(surface).not.toContain('surface-tone-${tone}');
+    expect(metadataPill).toContain('METADATA_TONE_CLASS[tone]');
+    expect(design).toContain('Inherited Surface Rule');
+    expect(design).toContain('surface-scope-sage');
+    expect(brandDesign).toContain('Inherited Surface Rule');
+    expect(brandDesign).toContain('neutral` is only a backward-compatible alias');
+    expect(home).toContain('surface-scope-sage');
     expect(insights).toContain('tone="sky"');
     expect(insights).toContain('tone="honey"');
+  });
+
+  it('keeps card-like surfaces off raw white and panel background escape hatches', () => {
+    const cardSurfaceFiles = [
+      'components/ui/CompletionCardActions.tsx',
+      'components/ui/ReferralInvitePanel.tsx',
+      'pages/dashboard/NoteExportDialog.tsx',
+      'pages/dashboard/ReleaseMode.tsx',
+      'pages/dashboard/FutureLetters.tsx',
+      'pages/dashboard/LifeWiki.tsx',
+      'pages/dashboard/Account.tsx',
+    ];
+
+    for (const filePath of cardSurfaceFiles) {
+      const source = read(filePath);
+      expect(source, filePath).not.toContain('bg-panel-bg/80');
+      expect(source, filePath).not.toContain('bg-white/5');
+      expect(source, filePath).not.toContain('bg-white/60');
+      expect(source, filePath).toMatch(/surface-(?:inline-panel|scope-|tone-|flat|bezel)/);
+    }
   });
 });

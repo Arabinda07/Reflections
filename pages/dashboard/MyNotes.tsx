@@ -163,7 +163,7 @@ export const MyNotes: React.FC = () => {
                   />
                 </>
               ) : (
-                <div className="flex h-full w-full items-center justify-center bg-gray-50/5 dark:bg-white/5">
+                <div className="flex h-full w-full items-center justify-center surface-inline-panel rounded-none border-0">
                   <FileText className="text-border transition-colors group-hover:text-green/30" size={48} weight="duotone" />
                 </div>
               )}
@@ -172,7 +172,7 @@ export const MyNotes: React.FC = () => {
             <button
               onClick={(event) => initiateDelete(event, note.id)}
               disabled={isDeleting && noteIdToDelete === note.id}
-              className="absolute left-4 top-4 z-20 inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] border border-border/60 bg-white/90 text-gray-text shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-red/30 hover:text-red"
+              className="control-surface absolute left-4 top-4 z-20 inline-flex h-11 w-11 items-center justify-center text-gray-text shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-red/30 hover:text-red"
               aria-label={`Delete ${note.title}`}
             >
               {isDeleting && noteIdToDelete === note.id ? (
@@ -234,7 +234,7 @@ export const MyNotes: React.FC = () => {
                     event.stopPropagation();
                     downloadNoteExport(note, 'md');
                   }}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-control)] border border-border/40 text-gray-nav transition-all hover:border-green/25 hover:bg-green/5 hover:text-green"
+                  className="control-surface inline-flex h-10 w-10 items-center justify-center text-gray-nav transition-all hover:border-green/25 hover:bg-green/5 hover:text-green"
                   title={`Export ${note.title}`}
                   aria-label={`Export ${note.title}`}
                 >
@@ -270,7 +270,7 @@ export const MyNotes: React.FC = () => {
       />
 
       {!loading ? (
-        <PageContainer className="pb-14 pt-4 md:pt-8">
+        <PageContainer className="surface-scope-sage pb-14 pt-4 md:pt-8">
           <div className="space-y-10 animate-in fade-in duration-500">
             <SectionHeader
               title="Saved reflections"

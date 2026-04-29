@@ -242,7 +242,7 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
                     className={`w-full rounded-xl border-2 p-3 text-left transition-all duration-300 ease-out-quart ${
                       isPresetPlaying
                         ? 'border-green/25 bg-green/10 text-green shadow-sm dark:bg-green/12 dark:border-green/30 dark:text-green'
-                        : 'border-transparent bg-gray-50/80 text-gray-text hover:border-border hover:bg-gray-100 dark:bg-white/5 dark:text-slate-300 dark:hover:border-white/10 dark:hover:bg-white/10'
+                        : 'control-surface text-gray-text hover:border-border dark:text-slate-300 dark:hover:border-white/10'
                     }`}
                   >
                     <span className="flex items-center justify-between gap-3">
@@ -284,7 +284,7 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
                 className={`w-full rounded-xl border-2 p-4 text-left transition-all duration-300 ease-out-quart ${
                   isPresetPlaying
                     ? 'border-green/25 bg-green/10 text-green shadow-sm dark:bg-green/12 dark:border-green/30 dark:text-green'
-                    : 'border-transparent bg-gray-50/80 text-gray-text hover:border-border hover:bg-gray-100 dark:bg-white/5 dark:text-slate-300 dark:hover:border-white/10 dark:hover:bg-white/10'
+                    : 'control-surface text-gray-text hover:border-border dark:text-slate-300 dark:hover:border-white/10'
                 }`}
               >
                 <span className="flex items-center justify-between gap-3">

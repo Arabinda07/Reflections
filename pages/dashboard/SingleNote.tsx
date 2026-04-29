@@ -217,10 +217,10 @@ export const SingleNote: React.FC = () => {
     return (
       <div
         key={task.id}
-        className={`flex items-center gap-3 rounded-[var(--radius-panel)] border px-4 py-4 transition-all ${
+        className={`surface-inline-panel flex items-center gap-3 px-4 py-4 transition-all ${
           task.completed
             ? 'border-green/20 bg-green/5'
-            : 'border-border bg-white/5 hover:border-green/20'
+            : 'hover:border-green/20'
         }`}
       >
         <button
@@ -274,7 +274,7 @@ export const SingleNote: React.FC = () => {
 
   return (
     <>
-      <PageContainer className="pb-20 pt-4 md:pt-8">
+      <PageContainer className="surface-scope-paper pb-20 pt-4 md:pt-8">
         <div className="space-y-8 selection:bg-green/10">
           <div className="sticky-bar !px-2 sm:!px-4">
             <Button
@@ -338,10 +338,10 @@ export const SingleNote: React.FC = () => {
           <div className="mx-auto max-w-3xl">
 
 
-            <Surface variant="bezel" tone="sage">
+            <Surface variant="bezel" tone="paper">
               <article>
                 {note.thumbnailUrl ? (
-                  <div className="h-64 w-full border-b border-border/40 bg-white">
+                  <div className="h-64 w-full border-b border-border/40 bg-[var(--surface-current-control-bg)]">
                     <StorageImage path={note.thumbnailUrl} alt={note.title} className="h-full w-full object-cover" />
                   </div>
                 ) : null}
@@ -382,7 +382,7 @@ export const SingleNote: React.FC = () => {
                       className={`group flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-black uppercase tracking-widest transition-colors ${
                         noteMoodConfig
                           ? noteMoodConfig.selectedOption
-                          : 'border-border/60 bg-white/5 text-gray-nav hover:border-green/30 hover:bg-green/5 hover:text-green'
+                          : 'control-surface text-gray-nav hover:border-green/30 hover:bg-green/5 hover:text-green'
                       }`}
                     >
                       {note.mood ? getMoodIcon(note.mood) : <Smiley size={14} weight="bold" />}
@@ -394,7 +394,7 @@ export const SingleNote: React.FC = () => {
                       onClick={() => setIsTagsOpen(true)}
                       aria-haspopup="dialog"
                       aria-expanded={isTagsOpen}
-                      className="group flex items-center gap-1.5 rounded-full border border-border/60 bg-white/5 px-2.5 py-1 text-[11px] font-black uppercase tracking-widest text-gray-nav transition-colors hover:border-green/30 hover:bg-green/5 hover:text-green"
+                      className="control-surface group flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-black uppercase tracking-widest text-gray-nav transition-colors hover:border-green/30 hover:bg-green/5 hover:text-green"
                     >
                       <Tag size={14} weight="bold" />
                       <span className="mt-0.5">{note.tags?.length || 'Tags'}</span>
@@ -408,7 +408,7 @@ export const SingleNote: React.FC = () => {
                       className={`group flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-black uppercase tracking-widest transition-colors ${
                         pendingTaskCount > 0
                           ? 'border-green/30 bg-green/5 text-green'
-                          : 'border-border/60 bg-white/5 text-gray-nav hover:border-green/30 hover:bg-green/5 hover:text-green'
+                          : 'control-surface text-gray-nav hover:border-green/30 hover:bg-green/5 hover:text-green'
                       }`}
                     >
                       <ListChecks size={14} weight="bold" />
@@ -432,7 +432,7 @@ export const SingleNote: React.FC = () => {
                         {note.attachments.map((attachment, index) => (
                           <Surface key={index} variant="flat" tone="sky" className="overflow-hidden">
                             <div className="flex items-center gap-3 p-4">
-                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-white text-gray-nav shadow-sm">
+                              <div className="tone-icon tone-icon-sky flex h-10 w-10 shrink-0 rounded-xl text-gray-nav shadow-sm">
                                 <FileText size={20} weight="duotone" />
                               </div>
                               <div className="min-w-0 flex-1">

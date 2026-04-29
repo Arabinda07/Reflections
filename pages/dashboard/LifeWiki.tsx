@@ -110,45 +110,39 @@ const SUPPORTING_META: PageMeta[] = [
 
 const ROOM_TONE_CLASSES: Record<PageMeta['tone'], {
   accent: string;
-  border: string;
-  bg: string;
   hover: string;
+  surface: string;
   text: string;
 }> = {
   blue: {
-    accent: 'text-gray-nav',
-    border: 'border-border/60',
-    bg: 'bg-white/5',
-    hover: 'hover:border-green/25 hover:bg-green/5',
-    text: 'text-green',
+    accent: 'text-sky',
+    hover: 'hover:brightness-[1.02]',
+    surface: 'surface-tone-sky',
+    text: 'text-sky',
   },
   darkBlue: {
-    accent: 'text-gray-nav',
-    border: 'border-border/60',
-    bg: 'bg-white/5',
-    hover: 'hover:border-green/25 hover:bg-green/5',
-    text: 'text-green',
+    accent: 'text-sky',
+    hover: 'hover:brightness-[1.02]',
+    surface: 'surface-tone-sky',
+    text: 'text-sky',
   },
   golden: {
-    accent: 'text-gray-nav',
-    border: 'border-border/60',
-    bg: 'bg-white/5',
-    hover: 'hover:border-green/25 hover:bg-green/5',
-    text: 'text-green',
+    accent: 'text-honey',
+    hover: 'hover:brightness-[1.02]',
+    surface: 'surface-tone-honey',
+    text: 'text-honey',
   },
   green: {
     accent: 'text-green',
-    border: 'border-green/20',
-    bg: 'bg-green/5',
-    hover: 'hover:border-green/25 hover:bg-green/5',
+    hover: 'hover:brightness-[1.02]',
+    surface: 'surface-tone-sage',
     text: 'text-green',
   },
   orange: {
-    accent: 'text-gray-nav',
-    border: 'border-border/60',
-    bg: 'bg-white/5',
-    hover: 'hover:border-green/25 hover:bg-green/5',
-    text: 'text-green',
+    accent: 'text-clay',
+    hover: 'hover:brightness-[1.02]',
+    surface: 'surface-tone-clay',
+    text: 'text-clay',
   },
 };
 
@@ -364,7 +358,7 @@ export const LifeWiki: React.FC = () => {
 
     if (!note) {
       return (
-        <span className="inline-flex rounded-full border border-border/60 bg-white/5 px-2 py-0.5 text-[11px] font-black uppercase tracking-widest text-gray-light">
+        <span className="metadata-pill">
           {children}
         </span>
       );
@@ -391,7 +385,7 @@ export const LifeWiki: React.FC = () => {
     return (
       <div
         key={meta.pageType}
-        className={`group h-full rounded-[var(--radius-shell)] border ${isEmptyRoom ? tone.border : 'border-border/60'} bg-white/20 transition-colors duration-300 ease-out-expo ${tone.hover}`}
+        className={`surface-inline-panel ${tone.surface} group h-full rounded-[var(--radius-shell)] transition-colors duration-300 ease-out-expo ${tone.hover}`}
       >
         <Link
           to={articlePath(meta.pageType)}
@@ -484,7 +478,7 @@ export const LifeWiki: React.FC = () => {
         <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden bg-body">
           <div className="absolute inset-0 bg-gradient-to-b from-green/5 via-body to-body opacity-50" />
         </div>
-        <PageContainer size="narrow" className="pb-24 pt-6 md:pt-10 relative z-10">
+        <PageContainer size="narrow" className="surface-scope-sage pb-24 pt-6 md:pt-10 relative z-10">
           <div className="space-y-8">
             <button
               onClick={() => navigate(RoutePath.SANCTUARY)}
@@ -578,7 +572,7 @@ export const LifeWiki: React.FC = () => {
               <article className="space-y-8">
                 <header className="space-y-4 pb-2">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className={`metadata-pill ${articleTone.bg} ${articleTone.border} ${articleTone.text}`}>
+                    <span className={`metadata-pill ${articleTone.surface}`}>
                       {articleMeta?.label || articlePage.title}
                     </span>
                     <MetadataPill tone="green">Updated {new Date(articlePage.updatedAt).toLocaleDateString()}</MetadataPill>
@@ -652,7 +646,7 @@ export const LifeWiki: React.FC = () => {
                         ) : (
                           <span
                             key={sourceId}
-                            className="rounded-full border border-border/60 bg-white/5 px-3 py-2 text-[12px] font-bold text-gray-light"
+                            className="metadata-pill"
                           >
                             {sourceId}
                           </span>
@@ -680,7 +674,7 @@ export const LifeWiki: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-green/5 via-body to-body opacity-50" />
       </div>
 
-      <PageContainer className="pb-24 pt-6 md:pt-10 relative z-10">
+      <PageContainer className="surface-scope-sage pb-24 pt-6 md:pt-10 relative z-10">
         <div className="space-y-10">
           <div className="flex items-center justify-between gap-4">
             <button 
