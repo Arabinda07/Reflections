@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import Quill from 'quill';
-import 'quill/dist/quill.snow.css';
+import './quill-snow.css';
 
 
 interface EditorProps {
