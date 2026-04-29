@@ -69,7 +69,7 @@ export const Landing: React.FC = () => {
             fetchPriority="high"
             loading="eager"
             decoding="async"
-            className="absolute inset-0 h-full min-h-full w-full min-w-full object-cover object-[48%_center] opacity-90 sm:object-[64%_center] lg:object-center"
+            className={`absolute inset-0 h-full min-h-full w-full min-w-full object-cover object-[48%_center] sm:object-[64%_center] lg:object-center transition-opacity duration-700 ease-out-expo ${isHeroVideoReady ? 'opacity-0' : 'opacity-90'}`}
           />
 
           {shouldLoadHeroVideo ? (
@@ -97,7 +97,7 @@ export const Landing: React.FC = () => {
 
           <div className="flex flex-col gap-6 lg:w-[60%] lg:gap-8 xl:w-[55%]">
             <div
-              className="pointer-events-auto flex max-w-[11ch] flex-col text-mk-display font-display font-extrabold tracking-normal text-gray-text leading-[0.92] sm:max-w-[12ch] sm:leading-[0.94] lg:max-w-5xl lg:leading-[0.96] text-balance"
+              className="pointer-events-auto flex max-w-[11ch] flex-col text-mk-display font-display font-extrabold tracking-normal text-gray-text leading-[0.92] sm:max-w-[12ch] sm:leading-[0.94] lg:max-w-5xl lg:leading-[0.96]"
             >
               <span>
                 Your mind,
@@ -111,7 +111,7 @@ export const Landing: React.FC = () => {
             </div>
 
             <p
-              className="pointer-events-auto max-w-[26ch] sm:max-w-[32ch] lg:max-w-[40ch] font-sans text-base font-medium leading-relaxed text-gray-text sm:text-lg tracking-normal text-balance"
+              className="pointer-events-auto max-w-[26ch] sm:max-w-[32ch] lg:max-w-[40ch] font-sans text-base font-medium leading-relaxed text-gray-text sm:text-lg tracking-normal"
             >
               A private journal. Write what's on your mind, notice the patterns, and keep it to yourself
             </p>
