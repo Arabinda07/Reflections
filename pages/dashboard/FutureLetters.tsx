@@ -263,12 +263,12 @@ export const FutureLetters: React.FC = () => {
               <div className="space-y-5 p-6 sm:p-8">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="label-caps text-green">Letters</p>
+                    <p className="label-caps text-honey">Letters</p>
                     <h2 className="mt-1 text-[26px] font-display font-bold text-gray-text">
                       Waiting quietly
                     </h2>
                   </div>
-                  <CalendarBlank size={26} weight="duotone" className="text-green" />
+                  <CalendarBlank size={26} weight="duotone" className="text-honey" />
                 </div>
 
                 {error ? (

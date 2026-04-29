@@ -641,7 +641,7 @@ export const Account: React.FC = () => {
                 </Surface>
               </div>
 
-              <div className="surface-inline-panel surface-tone-clay rounded-none border-x-0 border-b-0 p-8 lg:p-10">
+              <div className="rounded-[var(--radius-panel)] border border-red/15 bg-red/[0.03] p-8 lg:p-10">
                 <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                   <div className="space-y-2">
                     <p className="text-[11px] font-black uppercase tracking-widest text-red">Danger zone</p>

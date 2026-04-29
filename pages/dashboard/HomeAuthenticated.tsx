@@ -2,6 +2,7 @@ import {
   Archive,
   ArrowsClockwise,
   Brain,
+  CaretRight,
   CheckCircle as CheckCircleIcon,
   Feather,
   FolderOpen,
@@ -130,6 +131,7 @@ export const HomeAuthenticated: React.FC = () => {
     buildHomeIntentionSummary([]),
   );
   const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);
+  const [isOverviewOpen, setIsOverviewOpen] = useState(false);
   const shouldReduceMotion = useReducedMotion();
   const { showToast } = useToast();
 
@@ -403,47 +405,77 @@ export const HomeAuthenticated: React.FC = () => {
           {/* Overview Card */}
           <motion.div 
             variants={bentoItemVariants}
-            className="surface-flat p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full"
+            className="surface-flat p-0 flex flex-col justify-between h-full overflow-hidden"
           >
-            <div>
-              <div className="flex items-center gap-2 text-gray-nav mb-12">
-                <FolderOpen size={18} weight="duotone" className="text-gray-nav/70" />
-                <span className="text-[11px] font-black uppercase tracking-[0.2em] opacity-60">
-                  Reflections Overview
-                </span>
-              </div>
-
-              <button
-                onClick={() => navigate(RoutePath.NOTES)}
-                className="group flex flex-col items-start gap-4 mb-16 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300"
-                aria-label="View all reflections"
-              >
-                <h2 className="text-5xl md:text-7xl font-display font-extrabold text-gray-text transition-colors tracking-normal tabular-nums">
-                  {isCountLoading ? '...' : displayCount}
-                </h2>
-                <p className="text-[13px] font-bold text-gray-nav uppercase tracking-normal">
-                  Reflections Archived
-                </p>
-              </button>
-            </div>
-
-            <motion.button
-              onClick={() => navigate(RoutePath.INSIGHTS)}
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
-              className="tone-panel tone-panel-sky group flex flex-col items-start gap-5 p-7 sm:p-8 hover:border-sky/30 transition-all text-left shadow-none"
-              aria-label="View writing patterns"
+            <button
+              type="button"
+              onClick={() => setIsOverviewOpen((prev) => !prev)}
+              aria-expanded={isOverviewOpen}
+              aria-controls="home-overview-panel"
+              className="flex w-full items-center justify-between gap-4 p-8 sm:p-10 lg:p-12 text-left"
             >
-              <div className="flex items-center gap-2 text-gray-nav mb-2">
-                <Brain size={16} weight="duotone" className="text-sky" />
-                <span className="text-[10px] font-black uppercase tracking-widest opacity-60">
-                  Writing Patterns
-                </span>
+              <div className="flex items-center gap-4">
+                <FolderOpen size={20} weight="duotone" className="text-gray-nav/70 shrink-0" />
+                <div>
+                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-nav/60">
+                    Reflections Overview
+                  </p>
+                  <p className="mt-1 text-3xl font-display font-extrabold text-gray-text tabular-nums md:text-4xl">
+                    {isCountLoading ? '...' : displayCount} <span className="text-lg font-bold text-gray-nav">archived</span>
+                  </p>
+                </div>
               </div>
-              <p className="text-[15px] font-serif italic text-gray-light leading-relaxed group-hover:text-gray-text transition-colors">
-                Patterns stay here quietly until you ask Reflections to build them.
-              </p>
-            </motion.button>
+              <CaretRight
+                size={18}
+                weight="regular"
+                className={`shrink-0 text-gray-nav transition-transform duration-300 ease-out-expo ${isOverviewOpen ? 'rotate-90' : ''}`}
+              />
+            </button>
+
+            <AnimatePresence initial={false}>
+              {isOverviewOpen ? (
+                <motion.div
+                  id="home-overview-panel"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                  className="overflow-hidden"
+                >
+                  <div className="space-y-4 border-t border-border/60 px-8 py-6 sm:px-10 lg:px-12">
+                    <button
+                      onClick={() => navigate(RoutePath.NOTES)}
+                      className="surface-inline-panel group flex w-full items-center justify-between p-5 text-left transition-colors hover:border-green/20"
+                      aria-label="View all reflections"
+                    >
+                      <div className="flex items-center gap-3">
+                        <FolderOpen size={18} weight="duotone" className="text-gray-nav group-hover:text-green transition-colors" />
+                        <div>
+                          <p className="text-[15px] font-bold text-gray-text">{isCountLoading ? '...' : displayCount} reflections</p>
+                          <p className="text-[12px] font-medium text-gray-nav">View all archived reflections</p>
+                        </div>
+                      </div>
+                      <CaretRight size={16} weight="regular" className="text-gray-nav/40 group-hover:text-green transition-colors" />
+                    </button>
+
+                    <button
+                      onClick={() => navigate(RoutePath.INSIGHTS)}
+                      className="surface-inline-panel group flex w-full items-center justify-between p-5 text-left transition-colors hover:border-sky/20"
+                      aria-label="View writing patterns"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Brain size={18} weight="duotone" className="text-sky group-hover:text-sky transition-colors" />
+                        <div>
+                          <p className="text-[15px] font-bold text-gray-text">Writing patterns</p>
+                          <p className="text-[12px] font-serif italic text-gray-nav">Mood, rhythm, and recurring themes</p>
+                        </div>
+                      </div>
+                      <CaretRight size={16} weight="regular" className="text-gray-nav/40 group-hover:text-sky transition-colors" />
+                    </button>
+                  </div>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
           </motion.div>
           
           {/* Daily Focus & Intentions Card */}

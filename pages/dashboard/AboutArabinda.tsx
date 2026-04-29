@@ -45,7 +45,7 @@ export const AboutArabinda: React.FC = () => {
           Back
         </Button>
 
-        <SectionHeader eyebrow="Founder Talk" title="A note from Arabinda" />
+        <SectionHeader title="A note from Arabinda" />
 
         <Surface variant="bezel" tone="sage">
           <div className="space-y-5 p-6 sm:p-10">

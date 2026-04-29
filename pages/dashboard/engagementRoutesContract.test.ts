@@ -6,7 +6,7 @@ const read = (filePath: string) =>
   readFileSync(path.resolve(process.cwd(), filePath), 'utf8');
 
 describe('engagement routes source contract', () => {
-  it('declares release, future letter, and founder routes without adding Founder Talk to primary nav', () => {
+  it('declares release, future letter, and founder routes without adding About to primary nav', () => {
     const app = read('App.tsx');
     const routes = read('types.ts');
     const layout = read('layouts/DashboardLayout.tsx');
@@ -21,12 +21,12 @@ describe('engagement routes source contract', () => {
     expect(app).toContain('path={RoutePath.FUTURE_LETTERS}');
     expect(app).toContain('path={RoutePath.ABOUT}');
 
-    expect(layout).toContain('Founder Talk');
+    expect(layout).toContain('About');
     expect(layout).toContain('to={RoutePath.ABOUT}');
     const authNavItems = layout.match(/const authNavItems = \[[\s\S]*?\];/)?.[0] || '';
     const guestNavItems = layout.match(/const guestNavItems = \[[\s\S]*?\];/)?.[0] || '';
-    expect(authNavItems).not.toContain('Founder Talk');
-    expect(guestNavItems).not.toContain('Founder Talk');
+    expect(authNavItems).not.toContain('About');
+    expect(guestNavItems).not.toContain('About');
   });
 
   it('keeps future letters on Home and moves Release into the note save choice', () => {
@@ -149,7 +149,7 @@ describe('engagement routes source contract', () => {
     expect(existsSync(path.resolve(process.cwd(), 'pages/dashboard/AboutArabinda.tsx'))).toBe(true);
     const about = read('pages/dashboard/AboutArabinda.tsx');
 
-    expect(about).toContain('Founder Talk');
+    expect(about).toContain('A note from Arabinda');
     expect(about).toContain('writing stay private');
     expect(about).toContain('AI should wait');
     expect(about).toContain('Private writing');

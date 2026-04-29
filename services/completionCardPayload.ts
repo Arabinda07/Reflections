@@ -13,6 +13,7 @@ interface CompletionCardInput {
   kind: CompletionCardKind;
   date: Date;
   weekLabel?: string;
+  customTitle?: string;
 }
 
 const formatDate = (date: Date) =>
@@ -47,7 +48,7 @@ export function buildCompletionCardPayload(input: CompletionCardInput): Completi
 
   return {
     brand: 'Reflections',
-    title: copy.title,
+    title: input.customTitle?.trim() || copy.title,
     subtitle: input.kind === 'weekly_recap' && input.weekLabel ? input.weekLabel : copy.subtitle,
     dateLabel,
     kind: input.kind,

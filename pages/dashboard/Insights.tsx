@@ -47,6 +47,10 @@ export const Insights: React.FC = () => {
   const [ritualEvents, setRitualEvents] = useState<RitualEvent[]>([]);
   const [access, setAccess] = useState<WellnessAccess | null>(null);
   const [isOverviewOpen, setIsOverviewOpen] = useState(false);
+  const [isMoodOpen, setIsMoodOpen] = useState(false);
+  const [isTagsOpen, setIsTagsOpen] = useState(false);
+  const [isCompletionOpen, setIsCompletionOpen] = useState(false);
+  const [cardTitle, setCardTitle] = useState('');
   const [isOpeningSanctuary, setIsOpeningSanctuary] = useState(false);
   const [loading, setLoading] = useState(true);
   const isOpeningSanctuaryRef = useRef(false);
@@ -140,7 +144,8 @@ export const Insights: React.FC = () => {
       month: 'short',
       day: 'numeric',
     })}`,
-  }), [weeklyRecap.weekEnd, weeklyRecap.weekStart]);
+    customTitle: cardTitle || undefined,
+  }), [cardTitle, weeklyRecap.weekEnd, weeklyRecap.weekStart]);
 
   const wikiGate = useMemo(() => {
     if (!access) return null;
@@ -292,86 +297,144 @@ export const Insights: React.FC = () => {
               </div>
             </div>
 
-            <div className="mt-8 grid gap-8 border-t border-border/60 pt-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-              <section>
-                <div className="mb-6 flex items-center gap-3">
-                  <div className="tone-icon tone-icon-sky h-12 w-12">
-                    <Heart size={17} weight="duotone" />
+            <div className="mt-8 border-t border-border/60 pt-0">
+              {/* Mood Frequency Accordion */}
+              <div className="border-b border-border/40">
+                <button
+                  type="button"
+                  onClick={() => setIsMoodOpen((prev) => !prev)}
+                  aria-expanded={isMoodOpen}
+                  aria-controls="insights-mood-panel"
+                  className="flex w-full items-center justify-between gap-4 py-6 text-left"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="tone-icon tone-icon-sky h-12 w-12">
+                      <Heart size={17} weight="duotone" />
+                    </div>
+                    <h3 className="text-[18px] font-display font-bold text-gray-text">Mood frequency</h3>
                   </div>
-                  <h3 className="text-[18px] font-display font-bold text-gray-text">Mood frequency</h3>
-                </div>
-
-                {weeklyRecap.moodData.length === 0 ? (
-                  <EmptyState
-                    surface="none"
-                    icon={<Heart size={22} weight="duotone" />}
-                    title="Mood labels will start to form a pattern here."
-                    description="Check in or add a mood to a reflection and this week will stay readable."
+                  <CaretRight
+                    size={18}
+                    weight="regular"
+                    className={`shrink-0 text-gray-nav transition-transform duration-300 ease-out-expo ${isMoodOpen ? 'rotate-90' : ''}`}
                   />
-                ) : (
-                  <div className="flex flex-col gap-4">
-                    {weeklyRecap.moodData.map((entry) => {
-                      const maxValue = weeklyRecap.moodData[0].value;
-                      const percent = Math.round((entry.value / maxValue) * 100);
-                      const moodConfig = getMoodConfig(entry.name);
-                      const tone = moodConfig || DEFAULT_MOOD_TONE;
+                </button>
 
-                      return (
-                        <div key={entry.name} className="flex items-center gap-4">
-                          <span className={`w-20 shrink-0 text-[11px] font-black tracking-widest ${tone.labelClass}`}>
-                            {moodConfig?.label || entry.name}
-                          </span>
-                          <div className={`relative h-8 flex-1 overflow-hidden rounded-full ${tone.trackClass}`}>
-                            <div
-                              className={`absolute inset-y-0 left-0 rounded-full ${tone.fillClass}`}
-                              style={{ width: `${percent}%` }}
-                            />
+                <AnimatePresence initial={false}>
+                  {isMoodOpen ? (
+                    <motion.div
+                      id="insights-mood-panel"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                      className="overflow-hidden"
+                    >
+                      <div className="pb-6">
+                        {weeklyRecap.moodData.length === 0 ? (
+                          <EmptyState
+                            surface="none"
+                            icon={<Heart size={22} weight="duotone" />}
+                            title="Mood labels will start to form a pattern here."
+                            description="Check in or add a mood to a reflection and this week will stay readable."
+                          />
+                        ) : (
+                          <div className="flex flex-col gap-4">
+                            {weeklyRecap.moodData.map((entry) => {
+                              const maxValue = weeklyRecap.moodData[0].value;
+                              const percent = Math.round((entry.value / maxValue) * 100);
+                              const moodConfig = getMoodConfig(entry.name);
+                              const tone = moodConfig || DEFAULT_MOOD_TONE;
+
+                              return (
+                                <div key={entry.name} className="flex items-center gap-4">
+                                  <span className={`w-20 shrink-0 text-[11px] font-black tracking-widest ${tone.labelClass}`}>
+                                    {moodConfig?.label || entry.name}
+                                  </span>
+                                  <div className={`relative h-8 flex-1 overflow-hidden rounded-full ${tone.trackClass}`}>
+                                    <div
+                                      className={`absolute inset-y-0 left-0 rounded-full ${tone.fillClass}`}
+                                      style={{ width: `${percent}%` }}
+                                    />
+                                  </div>
+                                  <span className="w-6 shrink-0 text-right text-[12px] font-extrabold text-gray-nav">
+                                    {entry.value}
+                                  </span>
+                                </div>
+                              );
+                            })}
                           </div>
-                          <span className="w-6 shrink-0 text-right text-[12px] font-extrabold text-gray-nav">
-                            {entry.value}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </section>
+                        )}
+                      </div>
+                    </motion.div>
+                  ) : null}
+                </AnimatePresence>
+              </div>
 
-              <section>
-                <div className="mb-6 flex items-center gap-3">
-                  <div className="tone-icon tone-icon-honey h-12 w-12">
-                    <Hash size={17} weight="duotone" />
+              {/* Recurring Tags Accordion */}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setIsTagsOpen((prev) => !prev)}
+                  aria-expanded={isTagsOpen}
+                  aria-controls="insights-tags-panel"
+                  className="flex w-full items-center justify-between gap-4 py-6 text-left"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="tone-icon tone-icon-honey h-12 w-12">
+                      <Hash size={17} weight="duotone" />
+                    </div>
+                    <h3 className="text-[18px] font-display font-bold text-gray-text">Recurring tags</h3>
                   </div>
-                  <h3 className="text-[18px] font-display font-bold text-gray-text">Recurring tags</h3>
-                </div>
-
-                {weeklyRecap.recurringTags.length === 0 ? (
-                  <EmptyState
-                    surface="none"
-                    icon={<Hash size={22} weight="duotone" />}
-                    title="Tags will appear here."
-                    description="Tag entries this week and the repeated subjects will collect here."
+                  <CaretRight
+                    size={18}
+                    weight="regular"
+                    className={`shrink-0 text-gray-nav transition-transform duration-300 ease-out-expo ${isTagsOpen ? 'rotate-90' : ''}`}
                   />
-                ) : (
-                  <div className="flex flex-wrap items-center gap-3">
-                    {weeklyRecap.recurringTags.map(({ tag, count }, index) => {
-                      const scale = Math.min(1.45, Math.max(0.92, count / 2.4));
-                      return (
-                        <span
-                          key={tag}
-                          className={`font-display font-bold lowercase ${TAG_TONE_CLASSES[index % TAG_TONE_CLASSES.length]}`}
-                          style={{
-                            fontSize: `${scale}rem`,
-                            lineHeight: '1',
-                          }}
-                        >
-                          #{tag}
-                        </span>
-                      );
-                    })}
-                  </div>
-                )}
-              </section>
+                </button>
+
+                <AnimatePresence initial={false}>
+                  {isTagsOpen ? (
+                    <motion.div
+                      id="insights-tags-panel"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                      className="overflow-hidden"
+                    >
+                      <div className="pb-6">
+                        {weeklyRecap.recurringTags.length === 0 ? (
+                          <EmptyState
+                            surface="none"
+                            icon={<Hash size={22} weight="duotone" />}
+                            title="Tags will appear here."
+                            description="Tag entries this week and the repeated subjects will collect here."
+                          />
+                        ) : (
+                          <div className="flex flex-wrap items-center gap-3">
+                            {weeklyRecap.recurringTags.map(({ tag, count }, index) => {
+                              const scale = Math.min(1.45, Math.max(0.92, count / 2.4));
+                              return (
+                                <span
+                                  key={tag}
+                                  className={`font-display font-bold lowercase ${TAG_TONE_CLASSES[index % TAG_TONE_CLASSES.length]}`}
+                                  style={{
+                                    fontSize: `${scale}rem`,
+                                    lineHeight: '1',
+                                  }}
+                                >
+                                  #{tag}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  ) : null}
+                </AnimatePresence>
+              </div>
             </div>
           </Surface>
 
@@ -430,14 +493,58 @@ export const Insights: React.FC = () => {
             </AnimatePresence>
           </Surface>
 
-          <Surface variant="flat" tone="honey" className="p-6 md:p-8">
-            <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+          <Surface variant="flat" tone="honey" className="overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setIsCompletionOpen((prev) => !prev)}
+              aria-expanded={isCompletionOpen}
+              aria-controls="insights-completion-panel"
+              className="flex w-full items-center justify-between gap-4 p-6 text-left md:p-8"
+            >
               <div>
                 <p className="text-[11px] font-black uppercase tracking-widest text-honey">Completion card</p>
                 <h2 className="mt-2 text-[22px] font-display font-bold text-gray-text">This week's card</h2>
               </div>
-              <CompletionCardActions payload={weeklyCardPayload} />
-            </div>
+              <CaretRight
+                size={18}
+                weight="regular"
+                className={`shrink-0 text-gray-nav transition-transform duration-300 ease-out-expo ${isCompletionOpen ? 'rotate-90' : ''}`}
+              />
+            </button>
+
+            <AnimatePresence initial={false}>
+              {isCompletionOpen ? (
+                <motion.div
+                  id="insights-completion-panel"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                  className="overflow-hidden"
+                >
+                  <div className="space-y-5 border-t border-border/60 p-6 md:p-8">
+                    <div className="space-y-2">
+                      <label htmlFor="completion-card-title" className="text-[11px] font-black uppercase tracking-widest text-gray-nav">
+                        Card message
+                      </label>
+                      <input
+                        id="completion-card-title"
+                        type="text"
+                        value={cardTitle}
+                        onChange={(e) => setCardTitle(e.target.value)}
+                        maxLength={80}
+                        placeholder="I returned to myself this week."
+                        className="input-surface h-12 w-full px-4 text-[15px] font-semibold text-gray-text"
+                      />
+                      <p className="text-[11px] font-medium text-gray-nav/60">
+                        {cardTitle.length}/80 — leave blank for the default
+                      </p>
+                    </div>
+                    <CompletionCardActions payload={weeklyCardPayload} />
+                  </div>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
           </Surface>
 
           <Surface

@@ -483,7 +483,7 @@ export const DashboardLayout: React.FC = () => {
                   to={RoutePath.ABOUT}
                   className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-all"
                 >
-                  Founder Talk
+                  About
                 </Link>
                 <Link 
                   to={RoutePath.PRIVACY}
