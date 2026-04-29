@@ -519,17 +519,17 @@ export const Account: React.FC = () => {
                         className="surface-inline-panel flex w-full items-center justify-between px-4 py-4 text-left transition-all hover:border-border/80"
                       >
                         <div className="flex items-center gap-3">
-                          <Key size={20} weight="bold" className="text-gray-nav" />
+                          <Key size={20} weight="regular" className="text-gray-nav" />
                           <div>
                             <p className="text-[14px] font-bold text-gray-text">Password reset</p>
                           </div>
                         </div>
-                        <EnvelopeSimple size={18} weight="bold" className="text-gray-nav" />
+                        <EnvelopeSimple size={18} weight="regular" className="text-gray-nav" />
                       </button>
 
                       <div className="surface-inline-panel flex items-center justify-between px-4 py-4 opacity-70">
                         <div className="flex items-center gap-3">
-                          <DeviceMobile size={20} weight="bold" className="text-gray-nav" />
+                          <DeviceMobile size={20} weight="regular" className="text-gray-nav" />
                           <div>
                             <p className="text-[14px] font-bold text-gray-text">Two-factor authentication</p>
                           </div>
@@ -665,7 +665,7 @@ export const Account: React.FC = () => {
                     className="flex items-center gap-2 text-[13px] font-bold uppercase tracking-widest text-gray-nav transition-colors hover:text-red"
                     aria-label="Sign out of your account"
                   >
-                    <SignOut size={20} weight="bold" />
+                    <SignOut size={20} weight="regular" />
                     <span className="hidden sm:inline">Sign out</span>
                   </button>
 
@@ -677,7 +677,7 @@ export const Account: React.FC = () => {
                       className="px-4 sm:px-6"
                       aria-label="Discard account changes"
                     >
-                      <X size={18} weight="bold" className="sm:mr-2" />
+                      <X size={18} weight="regular" className="sm:mr-2" />
                       <span className="hidden sm:inline">Cancel</span>
                     </Button>
                     <Button
@@ -689,9 +689,9 @@ export const Account: React.FC = () => {
                       {loading ? (
                         <CircleNotch size={18} className="animate-spin sm:mr-2" />
                       ) : isSaved ? (
-                        <Check size={18} weight="bold" className="sm:mr-2" />
+                        <Check size={18} weight="regular" className="sm:mr-2" />
                       ) : (
-                        <FloppyDisk size={18} weight="bold" className="sm:mr-2" />
+                        <FloppyDisk size={18} weight="regular" className="sm:mr-2" />
                       )}
                       <span className="hidden sm:inline">
                         {loading ? 'Saving...' : isSaved ? 'Saved' : 'Save changes'}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CopySimple, DownloadSimple, ShareNetwork } from '@phosphor-icons/react';
 import { Button } from './Button';
+import { CompletionCardPreview } from './CompletionCardPreview';
 import type { CompletionCardPayload } from '../../services/completionCardPayload';
 import { ritualEventService } from '../../services/engagementServices';
 
@@ -105,18 +106,23 @@ export const CompletionCardActions: React.FC<CompletionCardActionsProps> = ({
         <p className="text-[13px] font-medium text-gray-light">{payload.subtitle}</p>
       </div>
 
+      {/* Live card preview */}
+      <div className="mb-4">
+        <CompletionCardPreview payload={payload} />
+      </div>
+
       <div className="flex flex-col gap-3 sm:flex-row">
         <Button type="button" variant="primary" size="sm" onClick={handleShare} isLoading={isWorking} className="min-h-11 w-full sm:w-auto">
           Share card
-          <ShareNetwork size={16} weight="bold" className="ml-2" />
+          <ShareNetwork size={16} weight="regular" className="ml-2" />
         </Button>
         <Button type="button" variant="secondary" size="sm" onClick={handleCopy} disabled={isWorking} className="min-h-11 w-full sm:w-auto">
-          Copy image
-          <CopySimple size={16} weight="bold" className="ml-2" />
+          Copy
+          <CopySimple size={16} weight="regular" className="ml-2" />
         </Button>
         <Button type="button" variant="secondary" size="sm" onClick={handleDownload} disabled={isWorking} className="min-h-11 w-full sm:w-auto">
           Download
-          <DownloadSimple size={16} weight="bold" className="ml-2" />
+          <DownloadSimple size={16} weight="regular" className="ml-2" />
         </Button>
       </div>
 

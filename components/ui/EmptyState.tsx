@@ -7,6 +7,8 @@ interface EmptyStateProps {
   description?: React.ReactNode;
   icon?: React.ReactNode;
   illustration?: React.ReactNode;
+  /** URL path to an illustration image (alternative to `illustration` ReactNode) */
+  illustrationSrc?: string;
   action?: React.ReactNode;
   surface?: 'bezel' | 'flat' | 'none';
   tone?: SurfaceTone;
@@ -18,6 +20,7 @@ const EmptyStateBody: React.FC<Omit<EmptyStateProps, 'surface'>> = ({
   description,
   icon,
   illustration,
+  illustrationSrc,
   action,
   className = '',
 }) => (
@@ -25,6 +28,10 @@ const EmptyStateBody: React.FC<Omit<EmptyStateProps, 'surface'>> = ({
     {illustration ? (
       <div className="mb-4 h-48 w-48 max-w-full" aria-hidden="true">
         {illustration}
+      </div>
+    ) : illustrationSrc ? (
+      <div className="mb-4 h-48 w-48 max-w-full" aria-hidden="true">
+        <img src={illustrationSrc} alt="" loading="lazy" className="h-full w-full object-contain" />
       </div>
     ) : icon ? (
       <div className="empty-state-icon">{icon}</div>

@@ -405,7 +405,7 @@ export const HomeAuthenticated: React.FC = () => {
           >
             <div>
               <div className="flex items-center gap-2 text-gray-nav mb-12">
-                <FolderOpen size={18} weight="bold" className="text-gray-nav/70" />
+                <FolderOpen size={18} weight="duotone" className="text-gray-nav/70" />
                 <span className="text-[11px] font-black uppercase tracking-[0.2em] opacity-60">
                   Reflections Overview
                 </span>
@@ -433,7 +433,7 @@ export const HomeAuthenticated: React.FC = () => {
               aria-label="View writing patterns"
             >
               <div className="flex items-center gap-2 text-gray-nav mb-2">
-                <Brain size={16} weight="bold" className="text-sky" />
+                <Brain size={16} weight="duotone" className="text-sky" />
                 <span className="text-[10px] font-black uppercase tracking-widest opacity-60">
                   Writing Patterns
                 </span>
@@ -452,7 +452,7 @@ export const HomeAuthenticated: React.FC = () => {
             <div>
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-2 text-gray-nav">
-                  <Target size={18} weight="bold" className="text-green" />
+                  <Target size={18} weight="duotone" className="text-green" />
                   <span className="text-[11px] font-black uppercase tracking-widest opacity-60">
                     Daily Focus
                   </span>
@@ -464,7 +464,7 @@ export const HomeAuthenticated: React.FC = () => {
                   }`}
                   aria-label="Refresh daily focus prompt"
                 >
-                  <ArrowsClockwise size={20} weight="bold" />
+                  <ArrowsClockwise size={20} weight="regular" />
                 </button>
               </div>
 
@@ -485,7 +485,7 @@ export const HomeAuthenticated: React.FC = () => {
                     aria-label="Start a new reflection with this prompt"
                   >
                     Start Reflection
-                    <Plus size={18} weight="bold" className="ml-2" />
+                    <Plus size={18} weight="regular" className="ml-2" />
                   </Button>
                   <Button
                     variant="secondary"
@@ -517,7 +517,7 @@ export const HomeAuthenticated: React.FC = () => {
             <div className="tone-panel tone-panel-honey group flex flex-col gap-4 p-7 sm:p-8 hover:border-honey/25 transition-all text-left shadow-none">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-gray-nav">
-                  <ListChecks size={16} weight="bold" className="text-honey" />
+                  <ListChecks size={16} weight="duotone" className="text-honey" />
                   <span className="text-[10px] font-black uppercase tracking-widest opacity-60">
                     Your Intentions
                   </span>
@@ -591,7 +591,7 @@ export const HomeAuthenticated: React.FC = () => {
           >
             <div className="flex-grow">
               <div className="flex items-center gap-2 text-gray-nav mb-12">
-                <Sparkle size={18} weight="bold" className="text-orange" />
+                <Sparkle size={18} weight="duotone" className="text-orange" />
                 <span className="text-[11px] font-black uppercase tracking-widest opacity-60">
                   Writing note
                 </span>

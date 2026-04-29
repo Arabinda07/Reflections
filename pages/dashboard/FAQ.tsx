@@ -123,7 +123,7 @@ export const FAQ: React.FC = () => {
         </div>
 
         <div className="space-y-4 lg:col-span-4">
-          <p className="label-caps text-green">Plain answers</p>
+
           <p className="max-w-[36rem] font-serif text-[18px] leading-relaxed text-gray-light">
             Reflections is a calm, private writing space. This guide explains what the product does,
             what it avoids, and how optional AI fits around the writing
@@ -170,7 +170,7 @@ export const FAQ: React.FC = () => {
               return (
                 <div key={item.title} className="border-t border-border/60 py-7">
                   <div className="tone-icon tone-icon-sky mb-6 h-10 w-10 rounded-xl">
-                    <Icon size={20} weight="bold" />
+                    <Icon size={20} weight="duotone" />
                   </div>
                   <h3 className="mb-3 text-[19px] font-display font-bold text-gray-text">{item.title}</h3>
                   <p className="font-sans text-[16px] leading-relaxed text-gray-light">{item.body}</p>

@@ -244,7 +244,7 @@ export const Insights: React.FC = () => {
             className="flex items-center gap-2 text-[13px] font-bold text-gray-nav hover:text-green transition-colors w-fit"
             aria-label="Back to home"
           >
-            <ArrowLeft size={16} weight="bold" />
+            <ArrowLeft size={16} weight="regular" />
             <span>Back</span>
           </button>
 
@@ -258,7 +258,7 @@ export const Insights: React.FC = () => {
             <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
               <div className="space-y-5">
                 <div className="flex items-center gap-3 text-green">
-                  <CalendarCheck size={18} weight="bold" />
+                  <CalendarCheck size={18} weight="duotone" />
                   <p className="text-[11px] font-black uppercase tracking-widest">This week</p>
                 </div>
                 <h2 className="text-3xl font-display font-extrabold text-gray-text md:text-5xl">
@@ -387,7 +387,7 @@ export const Insights: React.FC = () => {
               </div>
               <CaretRight
                 size={18}
-                weight="bold"
+                weight="regular"
                 className={`shrink-0 text-gray-nav transition-transform duration-300 ease-out-expo ${isOverviewOpen ? 'rotate-90' : ''}`}
               />
             </button>
@@ -404,7 +404,7 @@ export const Insights: React.FC = () => {
                 >
                   <div className="space-y-5 border-t border-border/60 p-6 md:p-8">
                     <div className="flex flex-wrap items-center gap-2">
-                      <MetadataPill tone="sage" icon={<Book size={13} weight="bold" />}>
+                      <MetadataPill tone="sage" icon={<Book size={13} weight="regular" />}>
                         {stats.wordsWritten.toLocaleString()} words written
                       </MetadataPill>
                     </div>
@@ -466,7 +466,7 @@ export const Insights: React.FC = () => {
               
               <div className="relative flex h-12 shrink-0 items-center justify-center overflow-hidden rounded-[var(--radius-control)] border border-green bg-green text-white px-6 text-[13px] font-black uppercase tracking-widest transition-all duration-300 group-hover:bg-green/90 group-hover:shadow-lg group-hover:shadow-green/20">
                 Open Sanctuary
-                <CaretRight size={16} weight="bold" className="ml-2 transition-transform duration-500 ease-out-expo group-hover:translate-x-1" />
+                <CaretRight size={16} weight="regular" className="ml-2 transition-transform duration-500 ease-out-expo group-hover:translate-x-1" />
               </div>
             </Link>
           </Surface>

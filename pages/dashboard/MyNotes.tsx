@@ -164,7 +164,7 @@ export const MyNotes: React.FC = () => {
                 </>
               ) : (
                 <div className="flex h-full w-full items-center justify-center surface-inline-panel rounded-none border-0">
-                  <FileText className="text-border transition-colors group-hover:text-green/30" size={48} weight="duotone" />
+                  <FileText className="text-border transition-colors group-hover:text-green/30" size={48} weight="light" />
                 </div>
               )}
             </Link>
@@ -178,12 +178,12 @@ export const MyNotes: React.FC = () => {
               {isDeleting && noteIdToDelete === note.id ? (
                 <CircleNotch size={16} weight="bold" className="animate-spin text-red" />
               ) : (
-                <Trash size={16} weight="bold" />
+                <Trash size={16} weight="regular" />
               )}
             </button>
 
             <div className="absolute right-4 top-4 z-20 flex flex-wrap justify-end gap-2">
-              <MetadataPill icon={<CalendarIcon size={12} weight="bold" />}>
+              <MetadataPill icon={<CalendarIcon size={12} weight="regular" />}>
                 {new Date(note.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
               </MetadataPill>
               {note.mood ? (
@@ -238,7 +238,7 @@ export const MyNotes: React.FC = () => {
                   title={`Export ${note.title}`}
                   aria-label={`Export ${note.title}`}
                 >
-                  <Download size={15} weight="bold" />
+                  <Download size={15} weight="regular" />
                 </button>
 
                 <Link
@@ -284,7 +284,7 @@ export const MyNotes: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <Chip
                       active={viewMode === 'grid'}
-                      icon={<SquaresFour size={16} weight="bold" />}
+                      icon={<SquaresFour size={16} weight="regular" />}
                       onClick={() => setViewMode('grid')}
                       title="Grid view"
                     >
@@ -292,7 +292,7 @@ export const MyNotes: React.FC = () => {
                     </Chip>
                     <Chip
                       active={viewMode === 'calendar'}
-                      icon={<CalendarIcon size={16} weight="bold" />}
+                      icon={<CalendarIcon size={16} weight="regular" />}
                       onClick={() => setViewMode('calendar')}
                       title="Calendar view"
                     >
@@ -301,7 +301,7 @@ export const MyNotes: React.FC = () => {
                   </div>
 
                   <Button onClick={() => navigate(RoutePath.CREATE_NOTE)} variant="primary" className="px-6">
-                    <Plus className="mr-2 h-5 w-5" weight="bold" />
+                    <Plus className="mr-2 h-5 w-5" weight="regular" />
                     Create entry
                   </Button>
                 </div>
@@ -310,11 +310,11 @@ export const MyNotes: React.FC = () => {
 
             {tagFilter ? (
               <div className="flex flex-wrap items-center gap-2">
-                <Chip as="span" active icon={<Tag size={12} weight="bold" />}>
+                <Chip as="span" active icon={<Tag size={12} weight="regular" />}>
                   {tagFilter}
                 </Chip>
                 <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.NOTES)} className="text-red">
-                  <X size={12} weight="bold" className="mr-1" />
+                  <X size={12} weight="regular" className="mr-1" />
                   Clear filter
                 </Button>
               </div>
@@ -323,7 +323,7 @@ export const MyNotes: React.FC = () => {
                 {allTags.map((tag) => (
                   <Chip
                     key={tag}
-                    icon={<Tag size={12} weight="bold" />}
+                    icon={<Tag size={12} weight="regular" />}
                     onClick={() => navigate(`${RoutePath.NOTES}?tag=${encodeURIComponent(tag as string)}`)}
                   >
                     {tag}
@@ -355,7 +355,7 @@ export const MyNotes: React.FC = () => {
                 <div className="space-y-5 lg:col-span-5 xl:col-span-4">
                   <div className="flex items-center justify-between gap-3">
                     <h3 className="text-[14px] font-black text-gray-text flex items-center gap-2">
-                      <CalendarIcon size={18} weight="bold" className="text-green" />
+                      <CalendarIcon size={18} weight="regular" className="text-green" />
                       {format(selectedDate, 'MMMM do, yyyy')}
                     </h3>
                     <MetadataPill tone="green">

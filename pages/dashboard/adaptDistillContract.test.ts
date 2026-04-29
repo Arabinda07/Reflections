@@ -28,7 +28,7 @@ describe('adapt and distill source contract', () => {
     expect(faq).not.toContain('bezel-outer group');
     expect(faq).not.toContain('surface-flat');
     expect(faq).not.toContain('border-l border-border');
-    expect(faq).toContain('Plain answers');
+    expect(faq).not.toContain('Plain answers');
   });
 
   it('keeps the Life Wiki and Pro upgrade surfaces quiet after distill', () => {

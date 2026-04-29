@@ -24,6 +24,7 @@ describe('buildCompletionCardPayload', () => {
       subtitle: 'A quiet moment was completed.',
       dateLabel: 'Apr 29, 2026',
       kind: 'release_completed',
+      badge: 'Released',
     });
     expect(JSON.stringify(payload)).not.toMatch(/This should never|heavy|family|money|Private summary/);
   });
@@ -46,6 +47,7 @@ describe('buildCompletionCardPayload', () => {
 describe('drawCompletionCard', () => {
   it('draws only the safe card payload fields', () => {
     const calls: string[] = [];
+    const gradientMock = { addColorStop: vi.fn() };
     const context = {
       canvas: { width: 1200, height: 630 },
       fillStyle: '',
@@ -65,6 +67,8 @@ describe('drawCompletionCard', () => {
       arc: vi.fn(),
       measureText: vi.fn((text: string) => ({ width: text.length * 16 })),
       fillText: vi.fn((text: string) => calls.push(text)),
+      createLinearGradient: vi.fn(() => gradientMock),
+      createRadialGradient: vi.fn(() => gradientMock),
     } as unknown as CanvasRenderingContext2D;
 
     drawCompletionCard(context, {
@@ -73,6 +77,7 @@ describe('drawCompletionCard', () => {
       subtitle: 'A quiet moment was completed.',
       dateLabel: 'Apr 29, 2026',
       kind: 'release_completed',
+      badge: 'Released',
     });
 
     expect(calls.join(' ')).toContain('I let something go.');
@@ -84,6 +89,7 @@ describe('drawCompletionCard', () => {
 describe('renderCompletionCardPng', () => {
   it('renders a PNG blob from a canvas without reading private note fields', async () => {
     const blob = new Blob(['png'], { type: 'image/png' });
+    const gradientMock2 = { addColorStop: vi.fn() };
     const context = {
       canvas: { width: 1200, height: 630 },
       fillStyle: '',
@@ -103,6 +109,8 @@ describe('renderCompletionCardPng', () => {
       arc: vi.fn(),
       measureText: vi.fn((text: string) => ({ width: text.length * 16 })),
       fillText: vi.fn(),
+      createLinearGradient: vi.fn(() => gradientMock2),
+      createRadialGradient: vi.fn(() => gradientMock2),
     };
     const canvas = {
       width: 0,

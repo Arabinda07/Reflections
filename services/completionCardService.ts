@@ -62,42 +62,101 @@ export function drawCompletionCard(
 ): void {
   const { width, height } = context.canvas;
 
-  context.fillStyle = '#f7f8f4';
+  // ── Background: botanical gradient ──
+  const bgGradient = context.createLinearGradient(0, 0, width, height);
+  bgGradient.addColorStop(0, '#f0f4ec');
+  bgGradient.addColorStop(0.5, '#f7f8f4');
+  bgGradient.addColorStop(1, '#f4f6f0');
+  context.fillStyle = bgGradient;
   context.fillRect(0, 0, width, height);
 
-  context.fillStyle = '#fbfcf8';
-  roundRect(context, 64, 58, width - 128, height - 116, 44);
-  context.fill();
+  // Subtle radial glow (green tint, top-left)
+  const glow = context.createRadialGradient(200, 140, 60, 200, 140, 420);
+  glow.addColorStop(0, 'rgba(79, 111, 70, 0.07)');
+  glow.addColorStop(1, 'rgba(79, 111, 70, 0)');
+  context.fillStyle = glow;
+  context.fillRect(0, 0, width, height);
 
+  // ── Inner card ──
+  context.fillStyle = 'rgba(251, 252, 248, 0.85)';
+  roundRect(context, 48, 44, width - 96, height - 88, 36);
+  context.fill();
   context.strokeStyle = '#d8dfd1';
-  context.lineWidth = 3;
+  context.lineWidth = 2;
   context.stroke();
 
+  // ── Logo: green circle + wordmark ──
   context.fillStyle = '#4f6f46';
   context.beginPath();
-  context.arc(150, 142, 30, 0, Math.PI * 2);
+  context.arc(126, 120, 22, 0, Math.PI * 2);
   context.fill();
 
+  // Leaf icon in circle (simple leaf shape)
+  context.fillStyle = '#f7f8f4';
+  context.font = '700 18px serif';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.fillText('🍃', 126, 121);
+
+  // Wordmark
   context.fillStyle = '#4f6f46';
-  context.font = '700 28px Geist, Arial, sans-serif';
+  context.font = 'italic 600 26px Georgia, serif';
   context.textAlign = 'left';
   context.textBaseline = 'alphabetic';
-  context.fillText(payload.brand, 200, 154);
+  context.fillText('Reflections', 162, 130);
 
+  // ── Title (large serif) ──
   context.fillStyle = '#293127';
-  context.font = '700 78px Fraunces, Georgia, serif';
-  wrapText(context, payload.title, 850).forEach((line, index) => {
-    context.fillText(line, 128, 300 + index * 88);
+  context.font = '700 64px Fraunces, Georgia, serif';
+  const titleLines = wrapText(context, payload.title, 820);
+  titleLines.forEach((line, index) => {
+    context.fillText(line, 104, 260 + index * 76);
   });
 
+  // ── Subtitle ──
+  const subtitleY = 260 + titleLines.length * 76 + 28;
   context.fillStyle = '#65705e';
-  context.font = '500 30px Geist, Arial, sans-serif';
-  context.fillText(payload.subtitle, 128, 500);
+  context.font = '500 26px Geist, Arial, sans-serif';
+  context.fillText(payload.subtitle, 104, subtitleY);
 
+  // ── Badge pill ──
+  const badgeColors: Record<string, { bg: string; text: string; border: string }> = {
+    weekly_recap: { bg: '#e8f0e3', text: '#4f6f46', border: '#c4d8bb' },
+    release_completed: { bg: '#f2ece5', text: '#8a6a4a', border: '#ddd0c0' },
+    letter_scheduled: { bg: '#f4f0e2', text: '#8a7a40', border: '#e2d8b8' },
+  };
+  const colors = badgeColors[payload.kind] || badgeColors.weekly_recap;
+
+  context.font = '800 16px Geist, Arial, sans-serif';
+  const badgeText = payload.badge.toUpperCase();
+  const badgeWidth = context.measureText(badgeText).width + 40;
+  const badgeX = 104;
+  const badgeY = height - 132;
+
+  // Badge background
+  context.fillStyle = colors.bg;
+  roundRect(context, badgeX, badgeY, badgeWidth, 38, 19);
+  context.fill();
+  context.strokeStyle = colors.border;
+  context.lineWidth = 1.5;
+  context.stroke();
+
+  // Badge text
+  context.fillStyle = colors.text;
+  context.textAlign = 'left';
+  context.fillText(badgeText, badgeX + 20, badgeY + 25);
+
+  // ── Date label ──
   context.fillStyle = '#819076';
-  context.font = '700 22px Geist, Arial, sans-serif';
+  context.font = '700 20px Geist, Arial, sans-serif';
   context.textAlign = 'right';
-  context.fillText(payload.dateLabel, width - 128, 500);
+  context.fillText(payload.dateLabel, width - 104, badgeY + 25);
+
+  // ── Watermark ──
+  context.fillStyle = '#c4ccbe';
+  context.font = '500 16px Geist, Arial, sans-serif';
+  context.textAlign = 'center';
+  context.fillText('reflections.app', width / 2, height - 32);
 }
 
 export async function renderCompletionCardPng(

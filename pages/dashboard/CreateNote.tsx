@@ -729,7 +729,7 @@ export const CreateNote: React.FC = () => {
           style={{ top: NATIVE_TOP_CONTROL_OFFSET }}
           aria-label="Back to notes"
         >
-          <ArrowLeft size={20} weight="bold" />
+          <ArrowLeft size={20} weight="regular" />
         </button>
       )}
 
@@ -743,7 +743,7 @@ export const CreateNote: React.FC = () => {
           className="surface-floating fixed right-4 z-[85] inline-flex items-center gap-2 rounded-full px-4 py-2 text-[11px] font-black uppercase tracking-[0.18em] text-green hover:text-green"
           style={{ top: NATIVE_TOP_CONTROL_OFFSET }}
         >
-          <X size={12} weight="bold" />
+          <X size={12} weight="regular" />
           Exit focus
         </button>
       ) : null}
@@ -759,7 +759,7 @@ export const CreateNote: React.FC = () => {
               className="flex items-center gap-2 text-gray-nav hover:text-gray-text text-[13px] font-bold mb-8 group transition-colors"
             >
               <div className="control-surface flex h-8 w-8 items-center justify-center transition-colors group-hover:border-green/20 group-hover:bg-green/5">
-                <ArrowLeft size={14} weight="bold" />
+                <ArrowLeft size={14} weight="regular" />
               </div>
               Back to Notes
             </button>
@@ -827,7 +827,7 @@ export const CreateNote: React.FC = () => {
                 className="surface-floating surface-floating--media absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-[var(--radius-control)] opacity-0 transition-all group-hover:opacity-100"
                 aria-label="Remove cover image"
               >
-                <X size={20} weight="bold" />
+                <X size={20} weight="regular" />
               </button>
             </motion.div>
           )}
@@ -835,7 +835,7 @@ export const CreateNote: React.FC = () => {
           {/* Eyebrow Date */}
           <div className="mb-6 flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-green/10 text-green px-3 py-1 text-[10px] uppercase tracking-[0.2em] font-bold flex items-center gap-2">
-              <CalendarBlank size={12} weight="bold" />
+              <CalendarBlank size={12} weight="regular" />
               {new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'long', day: 'numeric' })}
             </span>
             <button
@@ -865,7 +865,7 @@ export const CreateNote: React.FC = () => {
             {canReflect && (
                <button onClick={handleAiReflect} disabled={isReflecting} className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-green/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-green transition-all hover:bg-green/20">
                  <span className="inline-flex h-3 w-3 shrink-0 items-center justify-center">
-                   {isReflecting ? <CircleNotch size={12} className="animate-spin" /> : <Brain size={12} weight="bold" />}
+                   {isReflecting ? <CircleNotch size={12} className="animate-spin" /> : <Brain size={12} weight="regular" />}
                  </span>
                  <span className="leading-none">Reflect with AI</span>
                </button>
@@ -918,6 +918,13 @@ export const CreateNote: React.FC = () => {
             hideToolbar={isMobile}
             className="text-[20px] md:text-[22px] font-serif leading-[1.8] text-gray-text/90" 
           />
+
+          {/* Word count — shown only after 50+ words */}
+          {wordCount >= 50 && (
+            <p className="mt-2 text-right text-[12px] font-medium text-gray-nav/40 select-none" aria-label={`${wordCount} words`}>
+              {wordCount} words
+            </p>
+          )}
         </div>
       </main>
 
@@ -1038,7 +1045,7 @@ export const CreateNote: React.FC = () => {
               <span className="block text-[15px] font-bold text-gray-text">Save reflection</span>
               <span className="mt-1 block text-[12px] font-medium text-gray-light">Keep this as a saved note.</span>
             </span>
-            {saving ? <CircleNotch size={20} className="animate-spin" /> : <FloppyDisk size={20} weight="bold" />}
+            {saving ? <CircleNotch size={20} className="animate-spin" /> : <FloppyDisk size={20} weight="regular" />}
           </button>
 
           <button
@@ -1085,7 +1092,7 @@ export const CreateNote: React.FC = () => {
           </div>
 
           <Button onClick={() => setTasks([...tasks, { id: Math.random().toString(36).substr(2, 9), text: '', completed: false }])} className="h-14 w-full rounded-2xl bg-green text-white font-bold">
-            <Plus size={20} weight="bold" className="mr-2" /> Add Task
+            <Plus size={20} weight="regular" className="mr-2" /> Add Task
           </Button>
         </div>
       </ModalSheet>

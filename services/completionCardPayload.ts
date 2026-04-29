@@ -6,6 +6,7 @@ export interface CompletionCardPayload {
   subtitle: string;
   dateLabel: string;
   kind: CompletionCardKind;
+  badge: string;
 }
 
 interface CompletionCardInput {
@@ -22,18 +23,21 @@ const formatDate = (date: Date) =>
     timeZone: 'UTC',
   }).format(date);
 
-const cardCopy: Record<CompletionCardKind, { title: string; subtitle: string }> = {
+const cardCopy: Record<CompletionCardKind, { title: string; subtitle: string; badge: string }> = {
   weekly_recap: {
     title: 'I returned to myself this week.',
     subtitle: 'A quiet week in Reflections.',
+    badge: 'Weekly Recap',
   },
   release_completed: {
     title: 'I let something go.',
     subtitle: 'A quiet moment was completed.',
+    badge: 'Released',
   },
   letter_scheduled: {
     title: 'I wrote something for a future day.',
     subtitle: 'A letter is waiting in Reflections.',
+    badge: 'Future Letter',
   },
 };
 
@@ -47,5 +51,6 @@ export function buildCompletionCardPayload(input: CompletionCardInput): Completi
     subtitle: input.kind === 'weekly_recap' && input.weekLabel ? input.weekLabel : copy.subtitle,
     dateLabel,
     kind: input.kind,
+    badge: copy.badge,
   };
 }

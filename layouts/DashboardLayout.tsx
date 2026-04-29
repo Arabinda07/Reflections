@@ -275,7 +275,7 @@ export const DashboardLayout: React.FC = () => {
                   className="gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
                 >
                   Invite
-                  <PaperPlaneTilt size={16} weight="bold" />
+                  <PaperPlaneTilt size={16} weight="regular" />
                 </Button>
                 <Button
                   variant="ghost"
@@ -325,7 +325,7 @@ export const DashboardLayout: React.FC = () => {
               aria-expanded={isMobileMenuOpen}
               aria-controls={mobileMenuId}
             >
-              {isMobileMenuOpen ? <X size={24} weight="bold" /> : <List size={24} weight="bold" />}
+              {isMobileMenuOpen ? <X size={24} weight="regular" /> : <List size={24} weight="regular" />}
             </button>
           </div>
         </div>
@@ -386,7 +386,7 @@ export const DashboardLayout: React.FC = () => {
                           className="w-full p-6 text-left text-[24px] font-black text-gray-text hover:text-green transition-all duration-300 active:bg-green/5 rounded-2xl flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset"
                         >
                           <span>{item.label}</span>
-                          <CaretRight weight="bold" className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                          <CaretRight weight="regular" className="opacity-0 group-hover:opacity-100 transition-opacity" />
                         </button>
                       ))}
                     </div>
@@ -401,7 +401,7 @@ export const DashboardLayout: React.FC = () => {
                           className="w-full flex items-center justify-center gap-3 p-5 rounded-2xl border-2 border-green/30 bg-green/5 text-green font-black text-[14px] transition-all duration-300 hover:bg-green/10 active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
                           aria-label="Add Reflections to your home screen"
                         >
-                          <DownloadSimple size={20} weight="bold" />
+                          <DownloadSimple size={20} weight="regular" />
                           Add to home screen
                         </button>
                       )}
@@ -415,7 +415,7 @@ export const DashboardLayout: React.FC = () => {
                         className="w-full h-16 font-black rounded-2xl"
                       >
                         Invite
-                        <PaperPlaneTilt size={18} weight="bold" className="ml-2" />
+                        <PaperPlaneTilt size={18} weight="regular" className="ml-2" />
                       </Button>
                       <Button
                         variant="ghost"
@@ -444,7 +444,7 @@ export const DashboardLayout: React.FC = () => {
                         className="w-full p-6 text-left text-[24px] font-black text-gray-text hover:text-green transition-all duration-300 ease-out-expo active:bg-green/5 rounded-2xl flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset"
                       >
                         <span>{item.label}</span>
-                        <CaretRight weight="bold" className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <CaretRight weight="regular" className="opacity-0 group-hover:opacity-100 transition-opacity" />
                       </button>
                     ))}
                   </div>
@@ -521,9 +521,9 @@ export const DashboardLayout: React.FC = () => {
             aria-label={isBugModalOpen ? "Close bug report" : "Report a bug"}
           >
             {isBugModalOpen ? (
-              <X size={20} weight="bold" />
+              <X size={20} weight="regular" />
             ) : (
-              <Bug size={20} weight="duotone" className="transition-transform group-hover:rotate-12" />
+              <Bug size={20} weight="regular" className="transition-transform group-hover:rotate-12" />
             )}
           </button>
 
@@ -543,7 +543,7 @@ export const DashboardLayout: React.FC = () => {
                       <form onSubmit={handleBugSubmit} className="space-y-5">
                         <div className="flex items-center gap-2.5 mb-2">
                           <div className="h-8 w-8 rounded-lg bg-green/10 text-green flex items-center justify-center">
-                            <Bug size={18} weight="duotone" />
+                            <Bug size={18} weight="regular" />
                           </div>
                           <h3 className="label-caps !text-gray-text">Report a bug</h3>
                         </div>
@@ -575,7 +575,7 @@ export const DashboardLayout: React.FC = () => {
                             className="w-full h-11 rounded-xl"
                           >
                             Send report
-                            <PaperPlaneTilt size={16} weight="bold" className="ml-2" />
+                            <PaperPlaneTilt size={16} weight="regular" className="ml-2" />
                           </Button>
                         </div>
                       </form>

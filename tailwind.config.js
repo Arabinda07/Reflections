@@ -61,6 +61,23 @@ export default {
         surface: 'var(--panel-bg)',
         white: 'rgb(var(--panel-bg-rgb) / <alpha-value>)',
         black: 'rgb(var(--black-rgb) / <alpha-value>)',
+        /* Semantic Tokens */
+        'surface-muted': 'var(--color-surface-muted)',
+        'text-primary': 'var(--color-text-primary)',
+        'text-secondary': 'var(--color-text-secondary)',
+        'border-soft': 'var(--color-border-soft)',
+        accent: {
+          DEFAULT: 'var(--color-accent)',
+          soft: 'var(--color-accent-soft)',
+        },
+        mood: {
+          happy: 'var(--color-mood-happy)',
+          calm: 'var(--color-mood-calm)',
+          anxious: 'var(--color-mood-anxious)',
+          sad: 'var(--color-mood-sad)',
+          angry: 'var(--color-mood-angry)',
+          tired: 'var(--color-mood-tired)',
+        },
       },
       backgroundColor: {
         body: 'var(--bg-color)',

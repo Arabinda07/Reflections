@@ -167,7 +167,7 @@ export const Landing: React.FC = () => {
                 className="surface-floating surface-floating--media h-11 min-h-11 w-11 min-w-11 !px-0 rounded-2xl !text-gray-nav hover:!text-green hover:border-green/40 transition-all duration-300 group"
                 aria-label={isMuted ? 'Unmute video' : 'Mute video'}
               >
-                {isMuted ? <SpeakerSlash size={20} weight="bold" /> : <SpeakerHigh size={20} weight="bold" />}
+                {isMuted ? <SpeakerSlash size={20} weight="regular" /> : <SpeakerHigh size={20} weight="regular" />}
               </Button>
             </div>
           </div>
