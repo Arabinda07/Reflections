@@ -83,8 +83,9 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
     expect(landing).not.toContain('Install app');
     expect(landing).toContain('Your mind,');
     expect(landing).toContain('beautifully');
-    expect(landing).toContain('organized.');
-    expect(landing).toContain('font-editor');
+    expect(landing).toContain('organized');
+    expect(landing).not.toContain('organized.');
+    expect(landing).toContain('font-sans text-[19px] font-bold');
     expect(tailwind).toContain("editor: ['var(--font-editor)']");
     expect(landing).not.toContain('Plain answers');
     expect(landing).not.toContain('Last updated April 26, 2026');
@@ -108,7 +109,8 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
     const faq = read('pages/dashboard/FAQ.tsx');
 
     expect(faq).toContain('Untangle your');
-    expect(faq).toContain('thoughts.');
+    expect(faq).toContain('thoughts</span>');
+    expect(faq).not.toContain('thoughts.</span>');
     expect(faq).toContain('const guideSections');
     expect(faq).toContain('const practiceItems');
     expect(faq).toContain('const detailItems');

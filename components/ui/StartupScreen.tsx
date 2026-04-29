@@ -14,7 +14,6 @@ interface StartupScreenProps {
  * Hardened with Portals to ensure it occupies the entire viewport.
  */
 export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
-  const [isPosterReady, setIsPosterReady] = useState(false);
   const [isVideoReady, setIsVideoReady] = useState(false);
 
   return (
@@ -41,10 +40,7 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
                 aria-hidden="true"
                 loading="eager"
                 decoding="async"
-                onLoad={() => setIsPosterReady(true)}
-                className={`absolute inset-0 z-0 h-full w-full object-cover transition-opacity duration-700 ease-out ${
-                  isPosterReady && !isVideoReady ? 'opacity-85' : 'opacity-0'
-                }`}
+                className="absolute inset-0 z-0 h-full w-full object-cover opacity-85"
               />
 
               {/* Crossfade with the poster so startup never stacks two bright media layers. */}

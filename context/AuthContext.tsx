@@ -132,9 +132,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         className="flex min-h-0 flex-1 flex-col"
         aria-hidden={showStartup}
         style={{
-          opacity: showStartup ? 0 : 1,
           pointerEvents: showStartup ? 'none' : 'auto',
-          transition: `opacity ${NATIVE_STARTUP_FADE_MS}ms cubic-bezier(0.32, 0.72, 0, 1)`
         }}
       >
         {children}

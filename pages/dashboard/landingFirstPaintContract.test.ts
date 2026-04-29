@@ -45,8 +45,22 @@ describe('landing first-paint contract', () => {
 
     expect(authContext).toContain("className=\"flex min-h-0 flex-1 flex-col\"");
     expect(authContext).toContain("pointerEvents: showStartup ? 'none' : 'auto'");
+    expect(authContext).not.toContain('opacity: showStartup ? 0 : 1');
+    expect(authContext).not.toContain('transition: `opacity ${NATIVE_STARTUP_FADE_MS}ms');
     expect(authContext).not.toContain("visibility: showStartup ? 'hidden' : 'visible'");
     expect(authContext).not.toContain('className="flex-1 contents"');
+  });
+
+  it('keeps the startup poster visible while video fades above it', () => {
+    const startup = read('components/ui/StartupScreen.tsx');
+
+    expect(startup).toContain('src="/assets/videos/sanctuary.png"');
+    expect(startup).toContain('poster="/assets/videos/sanctuary.png"');
+    expect(startup).toContain('className="absolute inset-0 z-0 h-full w-full object-cover opacity-85"');
+    expect(startup).toContain("isVideoReady ? 'opacity-85' : 'opacity-0'");
+    expect(startup).not.toContain('isPosterReady');
+    expect(startup).not.toContain('setIsPosterReady');
+    expect(startup).not.toContain("isPosterReady && !isVideoReady ? 'opacity-85' : 'opacity-0'");
   });
 
   it('pins the landing hero to the poster while the video crossfades over it', () => {
@@ -54,12 +68,15 @@ describe('landing first-paint contract', () => {
     const indexHtml = read('index.html');
 
     expect(indexHtml).toContain('rel="preload" href="/assets/videos/landing_video.png" as="image" fetchpriority="high"');
-    expect(landing).toContain('const [isHeroPosterReady, setIsHeroPosterReady] = useState(false);');
     expect(landing).toContain('const [shouldLoadHeroVideo, setShouldLoadHeroVideo] = useState(false);');
     expect(landing).toContain('const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);');
     expect(landing).toContain('fetchPriority="high"');
-    expect(landing).toContain('onLoad={() => setIsHeroPosterReady(true)}');
+    expect(landing).not.toContain('isHeroPosterReady');
+    expect(landing).not.toContain('setIsHeroPosterReady');
+    expect(landing).not.toContain('onLoad={() => setIsHeroPosterReady(true)}');
     expect(landing).toContain("navigator as Navigator & { connection?: { saveData?: boolean } }");
+    expect(landing).toContain('window.requestIdleCallback');
+    expect(landing).toContain('window.cancelIdleCallback');
     expect(landing).toContain('preload="metadata"');
     expect(landing).not.toContain('preload="auto"');
     expect(landing).toContain('opacity-90 sm:object-[64%_center]');
@@ -67,6 +84,18 @@ describe('landing first-paint contract', () => {
     expect(landing).toContain('onCanPlay={() => setIsHeroVideoReady(true)}');
     expect(landing).toContain('onPlaying={() => setIsHeroVideoReady(true)}');
     expect(landing).toContain("isHeroVideoReady ? 'opacity-90' : 'opacity-0'");
+  });
+
+  it('renders landing hero copy and calls to action on the first paint', () => {
+    const landing = read('pages/dashboard/Landing.tsx');
+
+    expect(landing).not.toContain('const staggerContainer');
+    expect(landing).not.toContain('const staggerLine');
+    expect(landing).not.toContain('initial="hidden"');
+    expect(landing).not.toContain('variants={staggerLine}');
+    expect(landing).not.toContain('initial={{ opacity: 0, y: 20 }}');
+    expect(landing).not.toContain('initial={{ opacity: 0, y: 24 }}');
+    expect(landing).not.toContain("willChange: 'transform, opacity'");
   });
 
   it('allows the landing content to grow vertically while clipping horizontal bleed', () => {

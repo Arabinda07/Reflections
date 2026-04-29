@@ -15,14 +15,14 @@ describe('focused product slice source contract', () => {
     expect(home).not.toContain('<HomeFallback />');
   });
 
-  it('makes the home intentions panel a visible task summary', () => {
+  it('makes the home intentions panel visible without reverting to old task-summary copy', () => {
     const homeAuthenticated = read('pages/dashboard/HomeAuthenticated.tsx');
 
-    expect(homeAuthenticated).toContain('Task summary');
+    expect(homeAuthenticated).toContain('Your Intentions');
+    expect(homeAuthenticated).not.toContain('Task summary');
     expect(homeAuthenticated).toContain('{intentionSummary.openCount}');
-    expect(homeAuthenticated).toContain(
-      "open {intentionSummary.openCount === 1 ? 'task' : 'tasks'}",
-    );
+    expect(homeAuthenticated).toContain('{intentionSummary.openCount} open');
+    expect(homeAuthenticated).toContain('intentionSummary.items.slice(0, 3).map');
   });
 
   it('keeps the landing media control touch-safe on mobile', () => {
@@ -33,22 +33,26 @@ describe('focused product slice source contract', () => {
     expect(landing).toContain('min-h-11');
   });
 
-  it('keeps note cards semantic and export-capable without nested card clicks', () => {
+  it('keeps note cards semantic and directly export-capable without nested card clicks', () => {
     const myNotes = read('pages/dashboard/MyNotes.tsx');
 
     expect(myNotes).toContain("import { Link");
+    expect(myNotes).toContain("import { downloadNoteExport } from './noteExport';");
     expect(myNotes).toContain('<article');
     expect(myNotes).toContain('to={noteDetailPath}');
     expect(myNotes).not.toContain('onClick={() => navigate(RoutePath.NOTE_DETAIL');
-    expect(myNotes).toContain('<NoteExportDialog');
+    expect(myNotes).not.toContain('<NoteExportDialog');
+    expect(myNotes).toContain("downloadNoteExport(note, 'md');");
     expect(myNotes).toContain('aria-label={`Export ${note.title}`}');
   });
 
-  it('keeps the single-note page wired to the shared export dialog', () => {
+  it('keeps the single-note page wired to direct markdown export', () => {
     const singleNote = read('pages/dashboard/SingleNote.tsx');
 
-    expect(singleNote).toContain('<NoteExportDialog');
-    expect(singleNote).toContain('setIsExportOpen(true)');
+    expect(singleNote).toContain("import { downloadNoteExport } from './noteExport';");
+    expect(singleNote).not.toContain('<NoteExportDialog');
+    expect(singleNote).not.toContain('setIsExportOpen(true)');
+    expect(singleNote).toContain("onClick={() => downloadNoteExport(note, 'md')}");
     expect(singleNote).toContain('aria-label="Export this reflection"');
   });
 

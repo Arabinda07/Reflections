@@ -1,30 +1,18 @@
 import { ArrowRight, SpeakerHigh, SpeakerSlash } from '@phosphor-icons/react';
-import { motion, Variants } from 'motion/react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { RoutePath } from '../../types';
 
-const staggerContainer: Variants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.11, delayChildren: 0.05 } },
-};
-
-const staggerLine: Variants = {
-  hidden: { opacity: 0, y: 60 },
-  show: { opacity: 1, y: 0, transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] } },
-};
-
 export const Landing: React.FC = () => {
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isMuted, setIsMuted] = useState(true);
-  const [isHeroPosterReady, setIsHeroPosterReady] = useState(false);
   const [shouldLoadHeroVideo, setShouldLoadHeroVideo] = useState(false);
   const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);
 
   useEffect(() => {
-    if (!isHeroPosterReady || shouldLoadHeroVideo) return;
+    if (shouldLoadHeroVideo) return;
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const saveData = Boolean(
@@ -33,9 +21,26 @@ export const Landing: React.FC = () => {
 
     if (prefersReducedMotion || saveData) return;
 
-    const timerId = window.setTimeout(() => setShouldLoadHeroVideo(true), 600);
-    return () => window.clearTimeout(timerId);
-  }, [isHeroPosterReady, shouldLoadHeroVideo]);
+    const loadVideo = () => setShouldLoadHeroVideo(true);
+    let idleId: number | undefined;
+    let timerId: number | undefined;
+
+    if (window.requestIdleCallback) {
+      idleId = window.requestIdleCallback(loadVideo, { timeout: 1600 });
+    } else {
+      timerId = window.setTimeout(loadVideo, 1200);
+    }
+
+    return () => {
+      if (idleId !== undefined) {
+        window.cancelIdleCallback(idleId);
+      }
+
+      if (timerId !== undefined) {
+        window.clearTimeout(timerId);
+      }
+    };
+  }, [shouldLoadHeroVideo]);
 
   const toggleMute = () => {
     if (!videoRef.current) {
@@ -64,7 +69,6 @@ export const Landing: React.FC = () => {
             fetchPriority="high"
             loading="eager"
             decoding="async"
-            onLoad={() => setIsHeroPosterReady(true)}
             className="absolute inset-0 h-full min-h-full w-full min-w-full object-cover object-[48%_center] opacity-90 sm:object-[64%_center] lg:object-center"
           />
 
@@ -92,37 +96,28 @@ export const Landing: React.FC = () => {
         <div className="relative z-20 flex min-h-[100dvh] flex-col px-6 pb-[calc(env(safe-area-inset-bottom)+1.75rem)] pt-[calc(env(safe-area-inset-top)+var(--header-height)+1.5rem)] sm:px-12 sm:pt-[calc(env(safe-area-inset-top)+var(--header-height)+2rem)] lg:justify-between lg:pt-[28vh] lg:pb-12 lg:px-16 xl:px-24 pointer-events-none">
 
           <div className="flex flex-col gap-6 lg:w-[60%] lg:gap-8 xl:w-[55%]">
-            <motion.div
-              variants={staggerContainer}
-              initial="hidden"
-              animate="show"
+            <div
               className="pointer-events-auto flex max-w-[11ch] flex-col text-mk-display font-display font-extrabold tracking-normal text-gray-text leading-[0.92] sm:max-w-[12ch] sm:leading-[0.94] lg:max-w-5xl lg:leading-[0.96] text-balance"
             >
-              <motion.span variants={staggerLine} style={{ willChange: 'transform, opacity' }}>
+              <span>
                 Your mind,
-              </motion.span>
-              <motion.span variants={staggerLine} className="font-serif italic font-normal text-green" style={{ lineHeight: 1.1, willChange: 'transform, opacity' }}>
+              </span>
+              <span className="font-serif italic font-normal text-green" style={{ lineHeight: 1.1 }}>
                 beautifully
-              </motion.span>
-              <motion.span variants={staggerLine} style={{ willChange: 'transform, opacity' }}>
+              </span>
+              <span>
                 organized
-              </motion.span>
-            </motion.div>
+              </span>
+            </div>
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.2, ease: [0.32, 0.72, 0, 1], delay: 0.5 }}
+            <p
               className="pointer-events-auto max-w-[26ch] sm:max-w-[32ch] lg:max-w-[40ch] font-sans text-base font-medium leading-relaxed text-gray-text sm:text-lg tracking-normal text-balance"
             >
               A private journal. Write what's on your mind, notice the patterns, and keep it to yourself
-            </motion.p>
+            </p>
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.7 }}
+          <div
             className="pointer-events-auto mt-auto flex w-full flex-col items-start gap-8 sm:max-w-none sm:flex-row sm:items-center sm:justify-between lg:mt-0"
           >
             <Button
@@ -175,7 +170,7 @@ export const Landing: React.FC = () => {
                 {isMuted ? <SpeakerSlash size={20} weight="bold" /> : <SpeakerHigh size={20} weight="bold" />}
               </Button>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </main>
