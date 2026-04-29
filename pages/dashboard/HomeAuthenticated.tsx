@@ -21,6 +21,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { AmbientMusicButton } from '../../components/ui/AmbientMusicButton';
 import { Button } from '../../components/ui/Button';
 import { ModalSheet } from '../../components/ui/ModalSheet';
+import { useToast } from '../../components/ui/Toast';
 import { useAuth } from '../../context/AuthContext';
 import { aiService } from '../../services/aiService';
 import { moodCheckinService } from '../../services/engagementServices';
@@ -297,6 +298,8 @@ export const HomeAuthenticated: React.FC = () => {
     navigate(RoutePath.CREATE_NOTE);
   };
 
+  const { showToast } = useToast();
+
   const handleMoodCheckIn = async (mood: string) => {
     if (isSavingCheckIn) return;
 
@@ -308,11 +311,8 @@ export const HomeAuthenticated: React.FC = () => {
         mood,
         source: 'home',
       });
-      setCheckInFeedback('Saved. This moment counts.');
-      window.setTimeout(() => {
-        setIsCheckInOpen(false);
-        setCheckInFeedback(null);
-      }, 900);
+      setIsCheckInOpen(false);
+      showToast('Saved. This moment counts.');
     } catch (error) {
       console.error('Could not save mood check-in:', error);
       setCheckInFeedback('Could not save that just now.');

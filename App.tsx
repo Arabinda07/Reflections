@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import { PWAInstallProvider } from './context/PWAInstallContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { RouteLoadingFrame } from './components/ui/RouteLoadingFrame';
+import { ToastProvider } from './components/ui/Toast';
 import { DashboardLayout } from './layouts/DashboardLayout';
 import { Home } from './pages/dashboard/Home';
 import { RouteErrorBoundary } from './pages/RouteErrorBoundary';
@@ -325,12 +326,14 @@ function App() {
   return (
     <PWAInstallProvider>
       <AuthProvider>
-        <DeferredVercelVitals />
-        <SyncWrapper>
-          <MotionConfig reducedMotion="user">
-            <RouterProvider router={router} />
-          </MotionConfig>
-        </SyncWrapper>
+        <ToastProvider>
+          <DeferredVercelVitals />
+          <SyncWrapper>
+            <MotionConfig reducedMotion="user">
+              <RouterProvider router={router} />
+            </MotionConfig>
+          </SyncWrapper>
+        </ToastProvider>
       </AuthProvider>
     </PWAInstallProvider>
   );

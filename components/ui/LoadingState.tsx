@@ -19,12 +19,11 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
   return (
     <OverlayFeedback isVisible={isVisible} overlayClassName="overlay-feedback--screen">
       <div className="flex flex-col items-center justify-center text-center">
-        {/* Scale up the Lottie container to h-64 (256px) to ensure internal "LOADING" text is legible */}
-        <div className="mb-8 h-64 w-64 max-w-full" aria-hidden="true">
+        <div className="mb-8 h-48 w-48 max-w-full" aria-hidden="true">
           <DotLottieReact data={animationData} autoplay loop />
         </div>
 
-        <div className="overlay-feedback-copy sr-only">
+        <div className="overlay-feedback-copy body-editorial sr-only">
           <h2 className="h2-section mb-0">{title}</h2>
         </div>
       </div>

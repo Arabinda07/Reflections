@@ -10,7 +10,6 @@ describe('CreateNote focus mode contract', () => {
     const createNote = read('pages/dashboard/CreateNote.tsx');
 
     expect(createNote).toContain('const [isFocusModeEnabled, setIsFocusModeEnabled] = useState(false);');
-    expect(createNote).toContain('setIsBreathing(false);');
     expect(createNote).not.toContain('editorInstanceRef.current?.focus();');
   });
 

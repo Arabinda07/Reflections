@@ -3,6 +3,8 @@ import { isRouteErrorResponse, useNavigate, useRouteError } from 'react-router-d
 import { Button } from '../components/ui/Button';
 import { RoutePath } from '../types';
 
+const error404Animation = '/assets/lottie/Error%20404.json';
+
 const LottieAnimation = lazy(() => import('../components/ui/LottieAnimation').then((module) => ({
   default: module.LottieAnimation,
 })));
@@ -46,12 +48,10 @@ export const RouteErrorBoundary: React.FC = () => {
 
   return (
     <div className="relative min-h-[100dvh] overflow-hidden bg-body text-gray-text">
-      <div className="grain-overlay" />
-
       <div className="relative z-10 flex min-h-[100dvh] flex-col items-center justify-center px-6 py-12 text-center">
         <div className="h-64 w-64 sm:h-80 sm:w-80">
           <Suspense fallback={<div className="h-full w-full rounded-[var(--radius-panel)] bg-green/5" />}>
-            <LottieAnimation src="/assets/lottie/Error%20404.json" autoplay loop />
+            <LottieAnimation src={error404Animation} autoplay loop />
           </Suspense>
         </div>
 

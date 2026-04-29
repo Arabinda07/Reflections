@@ -16,6 +16,7 @@ import { MetadataPill } from '../../components/ui/MetadataPill';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { Surface } from '../../components/ui/Surface';
+import { WeeklyRecapLoadingSkeleton } from '../../components/ui/skeletons/WeeklyRecapLoadingSkeleton';
 import { LifeTheme, MoodCheckin, Note, RitualEvent, RoutePath, WellnessAccess } from '../../types';
 import { noteService } from '../../services/noteService';
 import { wikiService } from '../../services/wikiService';
@@ -47,6 +48,7 @@ export const Insights: React.FC = () => {
   const [access, setAccess] = useState<WellnessAccess | null>(null);
   const [isOverviewOpen, setIsOverviewOpen] = useState(false);
   const [isOpeningSanctuary, setIsOpeningSanctuary] = useState(false);
+  const [loading, setLoading] = useState(true);
   const isOpeningSanctuaryRef = useRef(false);
   const openingTimerRef = useRef<number | null>(null);
 
@@ -68,6 +70,8 @@ export const Insights: React.FC = () => {
         setRitualEvents(events);
       } catch (error) {
         console.error('[Insights] Failed to load data:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -254,6 +258,11 @@ export const Insights: React.FC = () => {
             className="insights-section-header"
           />
 
+          {loading ? (
+            <Surface variant="flat" tone="sky" className="p-8 md:p-10">
+              <WeeklyRecapLoadingSkeleton />
+            </Surface>
+          ) : (<>
           <Surface variant="flat" tone="sky" className="p-8 md:p-10">
             <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
               <div className="space-y-5">
@@ -470,6 +479,7 @@ export const Insights: React.FC = () => {
               </div>
             </Link>
           </Surface>
+          </>)}
         </div>
       </PageContainer>
     </>

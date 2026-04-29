@@ -22,7 +22,7 @@ describe('lottie surface mapping contract', () => {
     expect(loadingState).toContain("from '@/src/lottie/loading.json'");
     expect(paperPlaneToast).toContain("from '@/src/lottie/paperplane.json'");
     expect(routeErrorBoundary).toContain("import('../components/ui/LottieAnimation')");
-    expect(routeErrorBoundary).toContain('/assets/lottie/Error%20404.json');
+    expect(routeErrorBoundary).toContain('error404Animation');
     expect(lottieAnimation).toContain("from '@lottiefiles/dotlottie-react'");
     expect(notFound).toContain('/assets/lottie/Error 404.json');
     expect(myNotes).toContain('/assets/lottie/empty%20notes.json');
