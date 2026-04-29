@@ -208,7 +208,7 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
                 e.stopPropagation();
                 stopPreset();
               }}
-              className="p-1 text-gray-nav hover:text-red hover:bg-red/5 rounded-lg transition-all duration-300 ease-out-quart"
+              className="flex h-11 w-11 shrink-0 items-center justify-center text-gray-nav hover:text-red hover:bg-red/5 rounded-[var(--radius-control)] transition-all duration-300 ease-out-quart"
               aria-label="Turn ambient sound off"
               title="Turn ambient sound off"
             >
