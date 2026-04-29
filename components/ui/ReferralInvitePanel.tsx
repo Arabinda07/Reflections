@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Check, CopySimple, PaperPlaneTilt } from '@phosphor-icons/react';
+import { Check, CopySimple, PaperPlaneTilt, WarningCircle } from '@phosphor-icons/react';
 import { Button } from './Button';
 import { MetadataPill } from './MetadataPill';
 import { buildReferralLink, referralService } from '../../services/engagementServices';
@@ -14,6 +14,7 @@ export const ReferralInvitePanel: React.FC<ReferralInvitePanelProps> = ({ compac
   const [acceptedCount, setAcceptedCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [status, setStatus] = useState<string | null>(null);
+  const isErrorStatus = status ? status.startsWith('I could not') || status.startsWith('Copy did not') : false;
 
   useEffect(() => {
     let isMounted = true;
@@ -131,8 +132,15 @@ export const ReferralInvitePanel: React.FC<ReferralInvitePanelProps> = ({ compac
       </div>
 
       {status ? (
-        <p className="flex items-center gap-2 text-[12px] font-bold text-gray-light" aria-live="polite">
-          <Check size={14} weight="bold" className="text-green" />
+        <p
+          className={`flex items-center gap-2 text-[12px] font-bold ${isErrorStatus ? 'text-red' : 'text-gray-light'}`}
+          aria-live="polite"
+        >
+          {isErrorStatus ? (
+            <WarningCircle size={14} weight="bold" className="text-red" />
+          ) : (
+            <Check size={14} weight="bold" className="text-green" />
+          )}
           {status}
         </p>
       ) : null}

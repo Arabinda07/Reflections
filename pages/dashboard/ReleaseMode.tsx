@@ -1,10 +1,10 @@
-import React, { useMemo, useState } from 'react';
-import { motion, useReducedMotion } from 'motion/react';
+import React, { useState } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { ArrowLeft, Feather, Wind } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { CompletionCardActions } from '../../components/ui/CompletionCardActions';
-import { buildCompletionCardPayload, type CompletionCardPayload } from '../../services/completionCardService';
+import { buildCompletionCardPayload, type CompletionCardPayload } from '../../services/completionCardPayload';
 import { ritualEventService } from '../../services/engagementServices';
 import { RoutePath } from '../../types';
 
@@ -19,15 +19,6 @@ export const ReleaseMode: React.FC = () => {
 
   const canRelease = text.trim().length > 0 && !isReleasing && !isReleased;
 
-  const releaseCardPayload = useMemo(
-    () =>
-      buildCompletionCardPayload({
-        kind: 'release_completed',
-        date: new Date(),
-      }),
-    [],
-  );
-
   const handleRelease = async () => {
     if (!canRelease) return;
 
@@ -36,13 +27,12 @@ export const ReleaseMode: React.FC = () => {
     try {
       await ritualEventService.recordReleaseCompleted();
       setIsReleased(true);
-      setCardPayload(releaseCardPayload);
-
-      if (shouldReduceMotion) {
-        setText('');
-      } else {
-        window.setTimeout(() => setText(''), 520);
-      }
+      setCardPayload(
+        buildCompletionCardPayload({
+          kind: 'release_completed',
+          date: new Date(),
+        }),
+      );
     } catch (releaseError) {
       console.error('Could not complete release:', releaseError);
       setError("I couldn't complete this release just now. Your words are still only here on this screen.");
@@ -70,7 +60,7 @@ export const ReleaseMode: React.FC = () => {
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-green/15 bg-green/10 text-green">
               <Feather size={24} weight="duotone" />
             </div>
-            <h1 className="font-display text-[clamp(2.2rem,7vw,5rem)] font-bold leading-none text-gray-text">
+            <h1 className="font-display text-[40px] font-bold leading-none text-gray-text sm:text-[64px] md:text-[72px]">
               Write it here. Let it leave.
             </h1>
             <p className="mx-auto max-w-2xl text-[15px] font-medium leading-7 text-gray-light">
@@ -78,53 +68,68 @@ export const ReleaseMode: React.FC = () => {
             </p>
           </div>
 
-          <motion.div
-            animate={isReleased && !shouldReduceMotion ? { opacity: 0, y: -18, filter: 'blur(10px)' } : { opacity: 1, y: 0, filter: 'blur(0px)' }}
-            transition={{ duration: shouldReduceMotion ? 0 : 0.52, ease: [0.16, 1, 0.3, 1] }}
-            className="rounded-[28px] border border-border/60 bg-panel-bg/80 p-4 shadow-sm sm:p-6"
-          >
-            <textarea
-              value={text}
-              onChange={(event) => setText(event.target.value)}
-              disabled={isReleased || isReleasing}
-              autoFocus
-              placeholder="Write what you are ready to put down."
-              className="min-h-[42dvh] w-full resize-none rounded-[22px] border border-border/40 bg-white/60 p-5 font-serif text-[20px] leading-9 text-gray-text outline-none transition-all placeholder:text-gray-nav/35 focus:border-green/30 focus:ring-4 focus:ring-green/10 disabled:opacity-60 dark:bg-white/5 sm:p-8 sm:text-[22px] sm:leading-10"
-            />
-          </motion.div>
-
-          {error ? (
-            <p className="text-center text-[13px] font-bold text-red" aria-live="polite">
-              {error}
-            </p>
-          ) : null}
-
-          {!isReleased ? (
-            <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Button variant="secondary" onClick={() => navigate(RoutePath.HOME)} className="w-full sm:w-auto">
-                Cancel
-              </Button>
-              <Button
-                variant="primary"
-                onClick={handleRelease}
-                disabled={!canRelease}
-                isLoading={isReleasing}
-                className="w-full px-10 sm:w-auto"
+          <AnimatePresence mode="wait" initial={false} onExitComplete={() => setText('')}>
+            {!isReleased ? (
+              <motion.div
+                key="release-writing"
+                exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -18, filter: 'blur(10px)' }}
+                transition={{ duration: shouldReduceMotion ? 0 : 0.52, ease: [0.16, 1, 0.3, 1] }}
+                className="space-y-7"
               >
-                Release
-              </Button>
-            </div>
-          ) : (
-            <div className="mx-auto w-full max-w-xl space-y-4 text-center">
-              <p className="font-serif text-[22px] italic leading-relaxed text-gray-text">
-                Released. This can stay quiet now.
-              </p>
-              {cardPayload ? <CompletionCardActions payload={cardPayload} /> : null}
-              <Button variant="ghost" onClick={() => navigate(RoutePath.HOME)} className="mx-auto">
-                Return home
-              </Button>
-            </div>
-          )}
+                <div className="rounded-[28px] border border-border/60 bg-panel-bg/80 p-4 shadow-sm sm:p-6">
+                  <label htmlFor="release-writing" className="sr-only">
+                    Release writing
+                  </label>
+                  <textarea
+                    id="release-writing"
+                    value={text}
+                    onChange={(event) => setText(event.target.value)}
+                    disabled={isReleasing}
+                    autoFocus
+                    placeholder="Write what you are ready to put down."
+                    className="min-h-[42dvh] w-full resize-none rounded-[22px] border border-border/40 bg-white/60 p-5 font-serif text-[20px] leading-9 text-gray-text outline-none transition-all placeholder:text-gray-nav/35 focus:border-green/30 focus:ring-4 focus:ring-green/10 disabled:opacity-60 dark:bg-white/5 sm:p-8 sm:text-[22px] sm:leading-10"
+                  />
+                </div>
+
+                {error ? (
+                  <p className="text-center text-[13px] font-bold text-red" aria-live="polite">
+                    {error}
+                  </p>
+                ) : null}
+
+                <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+                  <Button variant="secondary" onClick={() => navigate(RoutePath.HOME)} className="w-full sm:w-auto">
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="primary"
+                    onClick={handleRelease}
+                    disabled={!canRelease}
+                    isLoading={isReleasing}
+                    className="w-full px-10 sm:w-auto"
+                  >
+                    Release
+                  </Button>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="release-complete"
+                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: shouldReduceMotion ? 0 : 0.36, ease: [0.16, 1, 0.3, 1] }}
+                className="mx-auto w-full max-w-xl space-y-4 text-center"
+              >
+                <p className="font-serif text-[22px] italic leading-relaxed text-gray-text">
+                  Released. This can stay quiet now.
+                </p>
+                {cardPayload ? <CompletionCardActions payload={cardPayload} /> : null}
+                <Button variant="ghost" onClick={() => navigate(RoutePath.HOME)} className="mx-auto">
+                  Return home
+                </Button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </section>
       </div>
     </div>

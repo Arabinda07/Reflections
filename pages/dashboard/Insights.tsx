@@ -25,7 +25,7 @@ import { profileService } from '../../services/profileService';
 import { FREE_WIKI_MINIMUM_ENTRIES, getWikiInsightsGate } from '../../services/wellnessPolicy';
 import { buildWeeklyRecap } from '../../services/weeklyRecapService';
 import { moodCheckinService, ritualEventService } from '../../services/engagementServices';
-import { buildCompletionCardPayload } from '../../services/completionCardService';
+import { buildCompletionCardPayload } from '../../services/completionCardPayload';
 
 const MOOD_TONE_CLASSES: Record<string, { label: string; track: string; fill: string }> = {
   happy: { label: 'text-orange', track: 'bg-orange/10', fill: 'bg-orange' },

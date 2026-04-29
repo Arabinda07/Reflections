@@ -1,12 +1,7 @@
 import React, { useState } from 'react';
 import { CopySimple, DownloadSimple, ShareNetwork } from '@phosphor-icons/react';
 import { Button } from './Button';
-import {
-  copyCompletionCardToClipboard,
-  downloadCompletionCard,
-  shareCompletionCard,
-  type CompletionCardPayload,
-} from '../../services/completionCardService';
+import type { CompletionCardPayload } from '../../services/completionCardPayload';
 import { ritualEventService } from '../../services/engagementServices';
 
 interface CompletionCardActionsProps {
@@ -14,12 +9,15 @@ interface CompletionCardActionsProps {
   className?: string;
 }
 
+const loadCompletionCardService = () => import('../../services/completionCardService');
+
 export const CompletionCardActions: React.FC<CompletionCardActionsProps> = ({
   payload,
   className = '',
 }) => {
   const [status, setStatus] = useState<string | null>(null);
   const [isWorking, setIsWorking] = useState(false);
+  const isErrorStatus = status?.startsWith('I could not') ?? false;
 
   const recordCardCreated = async () => {
     try {
@@ -35,6 +33,7 @@ export const CompletionCardActions: React.FC<CompletionCardActionsProps> = ({
     setIsWorking(true);
     setStatus(null);
     try {
+      const { downloadCompletionCard, shareCompletionCard } = await loadCompletionCardService();
       const result = await shareCompletionCard(payload);
       if (result === 'unsupported') {
         await downloadCompletionCard(payload);
@@ -57,6 +56,7 @@ export const CompletionCardActions: React.FC<CompletionCardActionsProps> = ({
     setIsWorking(true);
     setStatus(null);
     try {
+      const { downloadCompletionCard } = await loadCompletionCardService();
       await downloadCompletionCard(payload);
       await recordCardCreated();
       setStatus('Card downloaded.');
@@ -74,6 +74,7 @@ export const CompletionCardActions: React.FC<CompletionCardActionsProps> = ({
     setIsWorking(true);
     setStatus(null);
     try {
+      const { copyCompletionCardToClipboard, downloadCompletionCard } = await loadCompletionCardService();
       const copied = await copyCompletionCardToClipboard(payload);
       if (!copied) {
         await downloadCompletionCard(payload);
@@ -120,7 +121,10 @@ export const CompletionCardActions: React.FC<CompletionCardActionsProps> = ({
       </div>
 
       {status ? (
-        <p className="mt-3 text-[12px] font-bold text-gray-light" aria-live="polite">
+        <p
+          className={`mt-3 text-[12px] font-bold ${isErrorStatus ? 'text-red' : 'text-gray-light'}`}
+          aria-live="polite"
+        >
           {status}
         </p>
       ) : null}

@@ -47,7 +47,12 @@ describe('engagement routes source contract', () => {
     expect(releaseMode).toContain("buildCompletionCardPayload");
     expect(releaseMode).toContain("Release");
     expect(releaseMode).toContain("setText('')");
+    expect(releaseMode).toContain('AnimatePresence');
+    expect(releaseMode).toContain('onExitComplete={() => setText(\'\')}');
+    expect(releaseMode).toContain('htmlFor="release-writing"');
+    expect(releaseMode).toContain('id="release-writing"');
     expect(releaseMode).toContain('useReducedMotion');
+    expect(releaseMode).not.toContain('setTimeout');
     expect(releaseMode).not.toContain('noteService');
     expect(releaseMode).not.toMatch(/create\s*\(/);
     expect(releaseMode).not.toMatch(/update\s*\(/);
@@ -69,6 +74,11 @@ describe('engagement routes source contract', () => {
     expect(letters).toContain('Custom');
     expect(letters).toContain('Locked until');
     expect(letters).toContain('buildCompletionCardPayload');
+    expect(letters).toContain('aria-live="polite"');
+    expect(letters).toContain('aria-label="Custom open date"');
+    expect(letters).toContain('isOpenDateValid');
+    expect(letters).toContain('openingLetterId');
+    expect(letters).toContain('break-words');
     expect(letters).not.toContain('noteService');
   });
 
@@ -82,7 +92,9 @@ describe('engagement routes source contract', () => {
 
     expect(actions).toContain('shareCompletionCard');
     expect(actions).toContain('downloadCompletionCard');
+    expect(actions).toContain("import('../../services/completionCardService')");
     expect(actions).toContain("ritualEventService.record('completion_card_created'");
+    expect(actions).toContain('isErrorStatus');
     expect(actions).not.toMatch(/note\.content|mood|tags|aiSummary|theme/i);
     expect(insights).toContain('<CompletionCardActions');
     expect(releaseMode).toContain('<CompletionCardActions');
@@ -100,6 +112,7 @@ describe('engagement routes source contract', () => {
     expect(account).toContain('<ReferralInvitePanel');
     expect(account).toContain('people joined from your invite');
     expect(signUp).toContain('referralService.recordAcceptedReferral');
+    expect(read('components/ui/ReferralInvitePanel.tsx')).toContain('WarningCircle');
     expect(`${layout}\n${account}`.toLowerCase()).not.toMatch(/\b(reward|badge|leaderboard|feed|friends)\b/);
   });
 
@@ -112,5 +125,19 @@ describe('engagement routes source contract', () => {
     expect(about).toContain('AI stays optional');
     expect(about).toContain('privacy');
     expect(about.toLowerCase()).not.toMatch(/\b(streak|score|xp|leaderboard|diagnose|therapy replacement)\b/);
+  });
+
+  it('keeps the new engagement pages away from viewport-scaled type', () => {
+    const files = [
+      'pages/dashboard/ReleaseMode.tsx',
+      'pages/dashboard/FutureLetters.tsx',
+      'pages/dashboard/AboutArabinda.tsx',
+      'components/ui/CompletionCardActions.tsx',
+      'components/ui/ReferralInvitePanel.tsx',
+    ];
+
+    for (const file of files) {
+      expect(read(file), file).not.toContain('clamp(');
+    }
   });
 });

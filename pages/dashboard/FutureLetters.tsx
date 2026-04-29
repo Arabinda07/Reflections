@@ -7,7 +7,7 @@ import { ModalSheet } from '../../components/ui/ModalSheet';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { Surface } from '../../components/ui/Surface';
-import { buildCompletionCardPayload, type CompletionCardPayload } from '../../services/completionCardService';
+import { buildCompletionCardPayload, type CompletionCardPayload } from '../../services/completionCardPayload';
 import {
   futureLetterService,
   getFutureLetterOpenState,
@@ -43,12 +43,14 @@ const toDateInputValue = (date: Date) => {
   return `${year}-${month}-${day}`;
 };
 
-const formatDate = (date: string) =>
-  new Intl.DateTimeFormat('en', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(new Date(date));
+const dateFormatter = new Intl.DateTimeFormat('en', {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+});
+
+const formatDate = (date: string | Date) =>
+  dateFormatter.format(date instanceof Date ? date : new Date(date));
 
 const getOpenDate = (optionId: DateOptionId, customDate: string) => {
   if (optionId === 'custom') {
@@ -70,40 +72,59 @@ export const FutureLetters: React.FC = () => {
   const [isScheduling, setIsScheduling] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [openedLetter, setOpenedLetter] = useState<FutureLetter | null>(null);
+  const [openingLetterId, setOpeningLetterId] = useState<string | null>(null);
   const [cardPayload, setCardPayload] = useState<CompletionCardPayload | null>(null);
 
+  const minCustomDate = useMemo(() => toDateInputValue(addDays(new Date(), 1)), []);
   const openDate = useMemo(
     () => getOpenDate(selectedOption, customDate),
     [customDate, selectedOption],
   );
-
-  const loadLetters = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const nextLetters = await futureLetterService.list();
-      setLetters(nextLetters);
-    } catch (loadError) {
-      console.error('Could not load future letters:', loadError);
-      setError('I could not load your letters just now.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const isOpenDateValid = Number.isFinite(openDate.getTime());
 
   useEffect(() => {
+    let isMounted = true;
+
+    const loadLetters = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const nextLetters = await futureLetterService.list();
+        if (isMounted) {
+          setLetters(nextLetters);
+        }
+      } catch (loadError) {
+        console.error('Could not load future letters:', loadError);
+        if (isMounted) {
+          setError('I could not load your letters just now.');
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
     void loadLetters();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleSchedule = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!content.trim() || isScheduling) return;
+    if (!isOpenDateValid) {
+      setError('Choose an open date before scheduling this letter.');
+      return;
+    }
 
     setIsScheduling(true);
     setError(null);
     try {
       const letter = await futureLetterService.create({
-        title: title.trim() || `Letter for ${formatDate(openDate.toISOString())}`,
+        title: title.trim() || `Letter for ${formatDate(openDate)}`,
         content: content.trim(),
         openAt: openDate.toISOString(),
       });
@@ -126,8 +147,9 @@ export const FutureLetters: React.FC = () => {
 
   const handleOpenLetter = async (letter: FutureLetter) => {
     const openState = getFutureLetterOpenState(letter);
-    if (openState.state === 'locked') return;
+    if (openState.state === 'locked' || openingLetterId) return;
 
+    setOpeningLetterId(letter.id);
     setError(null);
     try {
       const opened = await futureLetterService.open(letter.id);
@@ -138,6 +160,8 @@ export const FutureLetters: React.FC = () => {
     } catch (openError) {
       console.error('Could not open future letter:', openError);
       setError('I could not open this letter just now.');
+    } finally {
+      setOpeningLetterId(null);
     }
   };
 
@@ -212,8 +236,9 @@ export const FutureLetters: React.FC = () => {
                     <input
                       type="date"
                       value={customDate}
-                      min={toDateInputValue(addDays(new Date(), 1))}
+                      min={minCustomDate}
                       onChange={(event) => setCustomDate(event.target.value)}
+                      aria-label="Custom open date"
                       className="h-12 rounded-[var(--radius-control)] border border-border bg-white px-4 text-[15px] font-semibold text-gray-text outline-none focus:border-green/30 focus:ring-4 focus:ring-green/10 dark:bg-white/5"
                     />
                   ) : null}
@@ -221,9 +246,11 @@ export const FutureLetters: React.FC = () => {
 
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <p className="text-[13px] font-medium text-gray-light">
-                    This letter opens on {formatDate(openDate.toISOString())}.
+                    {isOpenDateValid
+                      ? `This letter opens on ${formatDate(openDate)}.`
+                      : 'Choose an open date before scheduling.'}
                   </p>
-                  <Button type="submit" disabled={!content.trim()} isLoading={isScheduling}>
+                  <Button type="submit" disabled={!content.trim() || !isOpenDateValid} isLoading={isScheduling}>
                     Schedule letter
                   </Button>
                 </div>
@@ -245,7 +272,10 @@ export const FutureLetters: React.FC = () => {
                 </div>
 
                 {error ? (
-                  <p className="rounded-[var(--radius-panel)] border border-red/15 bg-red/5 p-4 text-[13px] font-bold text-red">
+                  <p
+                    className="rounded-[var(--radius-panel)] border border-red/15 bg-red/5 p-4 text-[13px] font-bold text-red"
+                    aria-live="polite"
+                  >
                     {error}
                   </p>
                 ) : null}
@@ -260,14 +290,15 @@ export const FutureLetters: React.FC = () => {
                   <div className="space-y-3">
                     {letters.map((letter) => {
                       const openState = getFutureLetterOpenState(letter);
+                      const isOpening = openingLetterId === letter.id;
                       return (
                         <div
                           key={letter.id}
                           className="rounded-[var(--radius-panel)] border border-border/50 bg-white/5 p-4"
                         >
                           <div className="mb-3 flex items-start justify-between gap-3">
-                            <div>
-                              <h3 className="font-display text-[20px] font-bold text-gray-text">
+                            <div className="min-w-0">
+                              <h3 className="break-words font-display text-[20px] font-bold text-gray-text">
                                 {letter.title}
                               </h3>
                               <p className="mt-1 text-[12px] font-bold uppercase tracking-widest text-gray-nav/70">
@@ -275,22 +306,25 @@ export const FutureLetters: React.FC = () => {
                               </p>
                             </div>
                             {openState.state === 'locked' ? (
-                              <LockKey size={20} weight="duotone" className="mt-1 text-gray-nav" />
+                              <LockKey size={20} weight="duotone" className="mt-1 shrink-0 text-gray-nav" />
                             ) : (
-                              <EnvelopeOpen size={20} weight="duotone" className="mt-1 text-green" />
+                              <EnvelopeOpen size={20} weight="duotone" className="mt-1 shrink-0 text-green" />
                             )}
                           </div>
                           <Button
                             type="button"
                             variant={openState.state === 'locked' ? 'outline' : 'secondary'}
                             size="sm"
-                            disabled={openState.state === 'locked'}
+                            disabled={openState.state === 'locked' || Boolean(openingLetterId)}
+                            isLoading={isOpening}
                             onClick={() => handleOpenLetter(letter)}
                             className="w-full"
                             aria-label={
-                              openState.state === 'locked'
-                                ? `Locked until ${formatDate(letter.openAt)}`
-                                : openState.actionLabel
+                              isOpening
+                                ? `Opening ${letter.title}`
+                                : openState.state === 'locked'
+                                  ? `Locked until ${formatDate(letter.openAt)}`
+                                  : openState.actionLabel
                             }
                           >
                             {openState.actionLabel}
