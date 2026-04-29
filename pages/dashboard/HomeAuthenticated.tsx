@@ -221,6 +221,12 @@ export const HomeAuthenticated: React.FC = () => {
     setShowOnboarding(false);
   }, []);
 
+  const handleFinishOnboarding = useCallback(() => {
+    handleCloseOnboarding();
+    // Route directly to the editor with a gentle first-time prompt
+    navigate(RoutePath.CREATE_NOTE, { state: { initialPrompt: "What's on your mind?" } });
+  }, [handleCloseOnboarding, navigate]);
+
   const updateIntentionSummary = useCallback((notes: Note[]) => {
     setTaskNotes(notes);
     setIntentionSummary(buildHomeIntentionSummary(notes));
@@ -228,12 +234,12 @@ export const HomeAuthenticated: React.FC = () => {
 
   const handleNextOnboardingStep = useCallback(() => {
     if (isLastOnboardingStep) {
-      handleCloseOnboarding();
+      handleFinishOnboarding();
       return;
     }
 
     setOnboardingStep((current) => Math.min(current + 1, ONBOARDING_STEPS.length - 1));
-  }, [handleCloseOnboarding, isLastOnboardingStep]);
+  }, [handleFinishOnboarding, isLastOnboardingStep]);
 
   const handlePreviousOnboardingStep = useCallback(() => {
     setOnboardingStep((current) => Math.max(current - 1, 0));
@@ -345,7 +351,7 @@ export const HomeAuthenticated: React.FC = () => {
               className="max-w-4xl"
             >
               <h1 className="h1-hero hero-ink mb-12 text-balance">
-                Welcome back, <br />
+                <span className="whitespace-nowrap">Welcome back,</span> <br />
                 <span className="font-serif italic hero-ink-accent">
                   {user?.name?.split(' ')[0] || 'Reflector'}
                 </span>
@@ -569,7 +575,7 @@ export const HomeAuthenticated: React.FC = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={handleCloseOnboarding}
+              onClick={handleFinishOnboarding}
               aria-label="Skip onboarding"
               className="self-center px-3 text-gray-nav/75 hover:text-green"
             >
