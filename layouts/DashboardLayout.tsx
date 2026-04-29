@@ -256,16 +256,16 @@ export const DashboardLayout: React.FC = () => {
               {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
             </button>
             {navItems.map((item) => (
-              <button
+              <Link
                 key={item.label}
-                onClick={() => navigate(item.path)}
+                to={item.path}
                 aria-current={location.pathname === item.path ? 'page' : undefined}
-                className="px-4 py-2 text-[13px] font-extrabold text-gray-nav hover:text-green hover:bg-green/5 rounded-xl transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-1"
+                className="px-4 py-2 text-[13px] font-extrabold text-gray-nav hover:text-green hover:bg-green/5 rounded-xl transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-1"
               >
                 {item.label}
-              </button>
+              </Link>
             ))}
-            <div className="w-[1px] h-[24px] bg-border mx-2"></div>
+            <div className="w-[1px] h-[24px] bg-border mx-2" role="separator" aria-orientation="vertical"></div>
             {isAuthenticated ? (
               <>
                 <Button
@@ -498,7 +498,8 @@ export const DashboardLayout: React.FC = () => {
                   href="https://arabinda07.github.io/" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="hover:text-green transition-all duration-300"
+                  className="hover:text-green transition-colors duration-300"
+                  aria-label="Arabinda's portfolio (opens in new tab)"
                 >
                   Arabinda
                 </a>

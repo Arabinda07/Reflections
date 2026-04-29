@@ -325,14 +325,16 @@ export const SingleNote: React.FC = () => {
             </div>
           </div>
 
-          {error ? (
-            <Alert
-              variant="error"
-              icon={<WarningCircle size={20} weight="fill" />}
-              title="Something went off track"
-              description={error}
-            />
-          ) : null}
+          <div aria-live="polite">
+            {error ? (
+              <Alert
+                variant="error"
+                icon={<WarningCircle size={20} weight="fill" />}
+                title="Something went off track"
+                description={error}
+              />
+            ) : null}
+          </div>
 
           <div className="mx-auto max-w-3xl">
 

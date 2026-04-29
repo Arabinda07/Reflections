@@ -366,7 +366,9 @@ export const HomeAuthenticated: React.FC = () => {
             className={`absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center bg-transparent transition-opacity duration-700 ease-out-expo ${
               isHeroVideoReady ? 'opacity-95' : 'opacity-0'
             }`}
-          />
+          >
+            <track kind="captions" default />
+          </video>
           <div className="absolute inset-0 z-10 hero-scrim" />
           <div className="absolute inset-0 z-10 screen-scrim opacity-20" />
           <div className="absolute inset-0 bg-gradient-to-t from-body via-transparent to-transparent z-10" />

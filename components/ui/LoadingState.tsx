@@ -17,7 +17,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
   return (
     <OverlayFeedback isVisible={isVisible} overlayClassName="overlay-feedback--screen">
       <div className="flex flex-col items-center justify-center text-center">
-        <div className="mb-8 h-48 w-48 max-w-full" aria-hidden="true">
+        <div className="mb-8 h-72 w-72 max-w-full" aria-hidden="true">
           <DotLottieReact data={animationData} autoplay loop />
         </div>
 

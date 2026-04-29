@@ -19,13 +19,17 @@ export interface EditorRef {
 
 export const Editor = forwardRef<EditorRef, EditorProps>(({ value, onChange, onFocusChange, placeholder, ariaLabel = 'Reflection body', className = '', hideToolbar = false }, ref) => {
   const editorRef = useRef<HTMLDivElement>(null);
-  const quillInstance = useRef<any>(null);
+  const quillInstance = useRef<InstanceType<typeof Quill> | null>(null);
+
+  /** Stable refs for callbacks — prevents stale closures in the Quill event handlers. */
+  const onChangeRef = useRef(onChange);
+  const onFocusChangeRef = useRef(onFocusChange);
+  useEffect(() => { onChangeRef.current = onChange; }, [onChange]);
+  useEffect(() => { onFocusChangeRef.current = onFocusChange; }, [onFocusChange]);
 
   useImperativeHandle(ref, () => ({
     focus: () => {
-      if (quillInstance.current) {
-        quillInstance.current.focus();
-      }
+      quillInstance.current?.focus();
     }
   }));
 
@@ -52,13 +56,12 @@ export const Editor = forwardRef<EditorRef, EditorProps>(({ value, onChange, onF
         }
       });
 
-      // Handle changes
       const handleTextChange = () => {
-        const html = quillInstance.current.root.innerHTML;
-        onChange(html === '<p><br></p>' ? '' : html);
+        const html = quillInstance.current!.root.innerHTML;
+        onChangeRef.current(html === '<p><br></p>' ? '' : html);
       };
       const handleSelectionChange = (range: unknown) => {
-        onFocusChange?.(Boolean(range));
+        onFocusChangeRef.current?.(Boolean(range));
       };
 
       quillInstance.current.on('text-change', handleTextChange);

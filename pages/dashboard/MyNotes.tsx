@@ -382,7 +382,7 @@ export const MyNotes: React.FC = () => {
                 </div>
               </div>
             ) : filteredNotes.length > 0 ? (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-8">
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-8" aria-live="polite">
                 {filteredNotes.map((note, index) => renderNoteCard(note, index))}
               </div>
             ) : (
