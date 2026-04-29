@@ -9,22 +9,22 @@ import { RoutePath } from '../../types';
 
 const sections = [
   {
-    title: 'Why this exists',
+    title: 'The pace around us',
     icon: <Feather size={22} weight="duotone" />,
     body:
-      'I built Reflections because I wanted a place that lets writing stay private and ordinary. No performance. No pressure to keep up. Just a page that can hold a thought before it hardens into something louder.',
+      'I have always been fascinated by how consumed we are by work and by the pace of ordinary life now. Even rest has started to move quickly. Reels, episodes, feeds, messages, everything asks us to keep up. We hardly sit down to read, write, draw, or listen to the music we quietly like when it does not match the mainstream choice.',
   },
   {
-    title: 'Writing-first',
+    title: 'Why writing helps',
     icon: <Feather size={22} weight="duotone" />,
     body:
-      'The note is the main thing here. Moods, releases, letters, and the Life Wiki exist around the writing, not above it. They are small tools for noticing what keeps returning.',
+      'Therapy can help, and for many people it is the right support. It is also too expensive for a lot of us. Reflections is not a replacement for trained professionals. It is a smaller thing: a place to write feelings down, recognise what might be there, and take a little time out for yourself.',
   },
   {
-    title: 'Privacy intent',
+    title: 'Private writing',
     icon: <LockKey size={22} weight="duotone" />,
     body:
-      'Private writing needs plain promises. Your notes should not become engagement fuel. When the app remembers a release or a quiet check-in, it can do that without keeping the words you chose to let go.',
+      'I built Reflections to help writing stay private and ordinary. Your notes are yours. You can export them when you want. You can write for 2 minutes before bed, add music if it helps, keep a small rhythm if you like, or restart whenever life gets crowded again.',
   },
   {
     title: 'Optional AI',
@@ -50,10 +50,10 @@ export const AboutArabinda: React.FC = () => {
         <Surface variant="bezel" tone="sage">
           <div className="space-y-5 p-6 sm:p-10">
             <p className="font-serif text-[26px] italic leading-relaxed text-gray-text sm:text-[32px]">
-              Reflections is my attempt to make technology behave more quietly around private writing.
+              Reflections began as a reminder to take a few quiet minutes before the day ends.
             </p>
             <p className="text-[16px] font-medium leading-8 text-gray-light">
-              I am Arabinda. I care about tools that respect people when they are tired, uncertain, or trying to hear themselves think. This app exists because writing can be a sanctuary without turning into another thing to keep up with.
+              I am Arabinda. I made this app because we are all part of a mass movement that often prefers fitting in. I wanted a quieter counterweight: a place to check in with your emotions, write something down, and leave without being pushed to perform. Thank you for trusting me with a few minutes of your day.
             </p>
           </div>
         </Surface>

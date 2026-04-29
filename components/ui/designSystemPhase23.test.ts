@@ -70,7 +70,9 @@ describe('phase 2/3 design-system rollout', () => {
     expect(signIn).not.toContain('href="#"');
     expect(signUp).toContain('<SectionHeader');
     expect(privacyPolicy).toContain('max-w-[1440px]');
-    expect(privacyPolicy).toContain('Privacy and terms');
+    expect(privacyPolicy).toContain('What Reflections keeps');
+    expect(privacyPolicy).toContain('AI and Smart Mode');
+    expect(privacyPolicy).not.toContain('Privacy and terms');
   });
 
   it('keeps the brand color expansion token-driven and surface-based', () => {

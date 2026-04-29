@@ -1417,6 +1417,7 @@ select:focus-visible,
   }
 
   .onboarding-modal-panel {
+    background: var(--panel-bg);
     overflow: hidden;
   }
 
@@ -1438,8 +1439,7 @@ select:focus-visible,
   }
 
   .onboarding-modal-panel .modal-sheet-footer {
-    background:
-      linear-gradient(180deg, rgba(var(--panel-bg-rgb), 0.72), rgba(var(--panel-bg-rgb), 0.96));
+    background: var(--panel-bg);
   }
 
   .onboarding-modal-body {
@@ -1453,7 +1453,7 @@ select:focus-visible,
     border-radius: calc(var(--radius-shell) - 0.25rem);
     border: 1.5px solid oklch(from var(--green) l c h / 0.12);
     background:
-      linear-gradient(135deg, oklch(from var(--green) 0.96 0.018 h / 0.86), rgba(var(--panel-bg-rgb), 0.92));
+      linear-gradient(135deg, oklch(from var(--green) 0.96 0.018 h), var(--panel-bg));
     padding: 1.35rem;
   }
 
@@ -1481,7 +1481,7 @@ select:focus-visible,
     justify-content: center;
     border-radius: 1.25rem;
     border: 1.5px solid oklch(from var(--green) l c h / 0.2);
-    background: rgba(var(--panel-bg-rgb), 0.68);
+    background: var(--panel-bg);
     color: var(--green);
     box-shadow: 0 16px 28px -22px rgba(0, 0, 0, 0.24);
   }
@@ -1495,11 +1495,11 @@ select:focus-visible,
 
   .dark .onboarding-step-stage {
     background:
-      linear-gradient(135deg, oklch(from var(--green) 0.24 0.035 h / 0.42), rgba(var(--panel-bg-rgb), 0.88));
+      linear-gradient(135deg, oklch(from var(--green) 0.24 0.035 h), var(--panel-bg));
   }
 
   .dark .onboarding-step-icon {
-    background: rgba(var(--panel-bg-rgb), 0.78);
+    background: var(--panel-bg);
   }
 
   @media (max-width: 420px) {

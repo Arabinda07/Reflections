@@ -405,7 +405,7 @@ export const HomeAuthenticated: React.FC = () => {
           >
             <div>
               <div className="flex items-center gap-2 text-gray-nav mb-12">
-                <FolderOpen size={18} weight="bold" className="text-green" />
+                <FolderOpen size={18} weight="bold" className="text-gray-nav/70" />
                 <span className="text-[11px] font-black uppercase tracking-[0.2em] opacity-60">
                   Reflections Overview
                 </span>
@@ -416,7 +416,7 @@ export const HomeAuthenticated: React.FC = () => {
                 className="group flex flex-col items-start gap-4 mb-16 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300"
                 aria-label="View all reflections"
               >
-                <h2 className="text-5xl md:text-7xl font-display font-extrabold text-gray-text group-hover:text-green transition-colors tracking-normal tabular-nums">
+                <h2 className="text-5xl md:text-7xl font-display font-extrabold text-gray-text transition-colors tracking-normal tabular-nums">
                   {isCountLoading ? '...' : displayCount}
                 </h2>
                 <p className="text-[13px] font-bold text-gray-nav uppercase tracking-normal">
@@ -433,7 +433,7 @@ export const HomeAuthenticated: React.FC = () => {
               aria-label="View writing patterns"
             >
               <div className="flex items-center gap-2 text-gray-nav mb-2">
-                <Brain size={16} weight="bold" className="text-green" />
+                <Brain size={16} weight="bold" className="text-sky" />
                 <span className="text-[10px] font-black uppercase tracking-widest opacity-60">
                   Writing Patterns
                 </span>
@@ -517,7 +517,7 @@ export const HomeAuthenticated: React.FC = () => {
             <div className="tone-panel tone-panel-honey group flex flex-col gap-4 p-7 sm:p-8 hover:border-honey/25 transition-all text-left shadow-none">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-gray-nav">
-                  <ListChecks size={16} weight="bold" className="text-green" />
+                  <ListChecks size={16} weight="bold" className="text-honey" />
                   <span className="text-[10px] font-black uppercase tracking-widest opacity-60">
                     Your Intentions
                   </span>
@@ -544,7 +544,7 @@ export const HomeAuthenticated: React.FC = () => {
                         onClick={() => handleToggleIntention(intention.noteId, intention.id)}
                         aria-label={`Mark "${intention.text}" from ${intention.noteTitle} as complete`}
                       >
-                        <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 border-border group-hover/btn:border-green transition-colors">
+                        <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 border-border group-hover/btn:border-honey transition-colors">
                            <div className="h-2 w-2 rounded-full bg-honey opacity-0 group-hover/btn:opacity-100 transition-opacity" />
                         </div>
                         <span className="min-w-0">
@@ -575,7 +575,7 @@ export const HomeAuthenticated: React.FC = () => {
                 {(intentionSummary.hiddenCount > 0 || intentionSummary.items.length > 3) && (
                   <button 
                     onClick={() => navigate(RoutePath.NOTES)}
-                    className="w-full text-center text-[10px] font-black uppercase tracking-[0.25em] text-gray-nav/40 hover:text-green transition-colors pt-4"
+                    className="w-full text-center text-[10px] font-black uppercase tracking-[0.25em] text-gray-nav/40 hover:text-honey transition-colors pt-4"
                   >
                     + {intentionSummary.hiddenCount + Math.max(0, intentionSummary.items.length - 3)} more
                   </button>

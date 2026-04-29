@@ -349,7 +349,7 @@ export const Account: React.FC = () => {
   if (fetching) {
     return (
       <div className="flex min-h-[100dvh] w-full items-center justify-center bg-body">
-        <CircleNotch size={32} className="animate-spin text-green" />
+        <CircleNotch size={32} className="animate-spin text-gray-nav" />
       </div>
     );
   }
@@ -406,7 +406,7 @@ export const Account: React.FC = () => {
                         </div>
                       )}
                     </div>
-                    <div className="absolute bottom-1 right-1 flex h-11 w-11 items-center justify-center rounded-full border-4 border-white bg-green text-white shadow-xl shadow-green/40 transition-transform group-hover:scale-105">
+                    <div className="absolute bottom-1 right-1 flex h-11 w-11 items-center justify-center rounded-full border-4 border-white bg-gray-text text-white shadow-xl shadow-black/15 transition-transform group-hover:scale-105">
                       <Camera size={18} weight="bold" />
                     </div>
                   </button>
@@ -420,7 +420,7 @@ export const Account: React.FC = () => {
                   />
 
                   {lastSignIn ? (
-                    <MetadataPill tone="green">
+                    <MetadataPill>
                       Last sign-in {new Date(lastSignIn).toLocaleDateString()}
                     </MetadataPill>
                   ) : null}
@@ -465,14 +465,14 @@ export const Account: React.FC = () => {
               </div>
 
               <div className="grid gap-4 p-6 md:grid-cols-2 lg:p-8">
-                <Surface variant="bezel" tone="honey">
+                <Surface variant="bezel" tone="paper">
                   <div className="p-5">
                     <div className="mb-5 flex items-center gap-3">
                       <div className="icon-block icon-block-sm">
                         <Sparkle size={24} weight="duotone" />
                       </div>
                       <div>
-                        <p className="text-[11px] font-black uppercase tracking-widest text-green">Membership</p>
+                        <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">Membership</p>
                         <h3 className="text-[20px] font-display font-bold text-gray-text capitalize">
                           {access?.planTier || 'Free'} plan
                         </h3>
@@ -480,7 +480,9 @@ export const Account: React.FC = () => {
                     </div>
 
                     <div className="flex flex-wrap gap-2">
-                      <MetadataPill tone="green">{access?.planTier === 'pro' ? 'Active' : 'Free tier'}</MetadataPill>
+                      <MetadataPill tone={access?.planTier === 'pro' ? 'green' : undefined}>
+                        {access?.planTier === 'pro' ? 'Active' : 'Free tier'}
+                      </MetadataPill>
                     </div>
 
                     <details className="surface-inline-panel mt-4 px-4 py-3">
@@ -498,14 +500,14 @@ export const Account: React.FC = () => {
                   </div>
                 </Surface>
 
-                <Surface variant="bezel" tone="sage">
+                <Surface variant="bezel" tone="paper">
                   <div className="p-5">
                     <div className="mb-5 flex items-center gap-3">
                       <div className="icon-block icon-block-sm">
                         <ShieldCheck size={24} weight="duotone" />
                       </div>
                       <div>
-                        <p className="text-[11px] font-black uppercase tracking-widest text-green">Security</p>
+                        <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">Security</p>
                         <h3 className="text-[20px] font-display font-bold text-gray-text">Keep this private</h3>
                       </div>
                     </div>
@@ -514,10 +516,10 @@ export const Account: React.FC = () => {
                       <button
                         type="button"
                         onClick={handlePasswordReset}
-                        className="surface-inline-panel flex w-full items-center justify-between px-4 py-4 text-left transition-all hover:border-green/20 hover:bg-green/5"
+                        className="surface-inline-panel flex w-full items-center justify-between px-4 py-4 text-left transition-all hover:border-border/80"
                       >
                         <div className="flex items-center gap-3">
-                          <Key size={20} weight="bold" className="text-green" />
+                          <Key size={20} weight="bold" className="text-gray-nav" />
                           <div>
                             <p className="text-[14px] font-bold text-gray-text">Password reset</p>
                           </div>
@@ -538,14 +540,14 @@ export const Account: React.FC = () => {
                   </div>
                 </Surface>
 
-                <Surface variant="bezel" tone="sky">
+                <Surface variant="bezel" tone="paper">
                   <div className="p-5">
                     <div className="mb-5 flex items-center gap-3">
                       <div className="icon-block icon-block-sm">
                         <EnvelopeSimple size={24} weight="duotone" />
                       </div>
                       <div>
-                        <p className="text-[11px] font-black uppercase tracking-widest text-green">Invites</p>
+                        <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">Invites</p>
                         <h3 className="text-[20px] font-display font-bold text-gray-text">Share Reflections</h3>
                       </div>
                     </div>
@@ -563,14 +565,14 @@ export const Account: React.FC = () => {
                   </div>
                 </Surface>
 
-                <Surface variant="bezel" tone="sage">
+                <Surface variant="bezel" tone="paper">
                   <div className="p-5">
                     <div className="mb-5 flex items-center gap-3">
                       <div className="icon-block icon-block-sm">
                         <Sparkle size={24} weight="duotone" />
                       </div>
                       <div>
-                        <p className="text-[11px] font-black uppercase tracking-widest text-green">Sanctuary</p>
+                        <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">Sanctuary</p>
                         <h3 className="text-[20px] font-display font-bold text-gray-text">Smart Mode</h3>
                       </div>
                     </div>
@@ -586,7 +588,7 @@ export const Account: React.FC = () => {
 
                     {greatIngestProgress ? (
                       <div className="surface-inline-panel mt-5 p-4">
-                        <p className="text-[11px] font-black uppercase tracking-widest text-green">
+                        <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">
                           Preparing Sanctuary
                         </p>
                         <p className="mt-2 text-[14px] font-bold text-gray-text">
@@ -619,7 +621,7 @@ export const Account: React.FC = () => {
                         className={`relative flex h-11 w-[156px] shrink-0 items-center rounded-[var(--radius-control)] border px-1.5 transition-all duration-500 ease-out-expo focus:outline-none focus-visible:ring-4 focus-visible:ring-green/15 disabled:pointer-events-none disabled:opacity-50 ${
                           access?.smartModeEnabled
                             ? 'border-green/30 bg-green/10 text-green'
-                            : 'control-surface text-gray-nav hover:border-green/20 hover:bg-green/5'
+                            : 'control-surface text-gray-nav hover:border-border/80'
                         }`}
                       >
                         <span

@@ -1,60 +1,78 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  ArrowLeft,
-  Database,
-  Envelope,
-  Handshake,
-  Lock,
-  Shield,
-  Sparkle,
-  Warning,
-} from '@phosphor-icons/react';
+import { ArrowLeft, Envelope } from '@phosphor-icons/react';
 
 import { Button } from '../../components/ui/Button';
 import { RoutePath } from '../../types';
 
 const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
 
-const privacySections = [
+const policySections = [
   {
-    icon: Database,
-    title: 'What we keep',
-    body:
-      'We save your email address, profile details you choose to share, and your reflections, including notes, moods, tags, tasks, and attachments. Saved writing is tied to your login.',
+    title: 'What Reflections keeps',
+    body: [
+      'Reflections stores the account information needed to sign you in, including your email address and profile details you choose to save, such as your name, display name, timezone, and avatar.',
+      'The app stores the writing you create here: notes, moods, tags, tasks, attachments, note covers, future letters, mood check-ins, Life Wiki pages, referral invite status, and the small usage counters needed for Free and Pro access.',
+    ],
   },
   {
-    icon: Lock,
-    title: 'How AI works here',
-    body:
-      'AI runs only when you ask for it, or when you explicitly enable Smart Mode. We do not use your personal notes to train AI models, and generated insights stay private to your account.',
+    title: 'Local and offline copies',
+    body: [
+      'Reflections keeps a local copy of your notes in the browser or app database so writing can feel quick and can keep working through short connection drops.',
+      'Local copies are tied to the device and browser you use. Clearing browser data, uninstalling the app, or signing out may remove local copies from that device, but server copies remain until you delete them from your account.',
+    ],
   },
   {
-    icon: Shield,
-    title: 'Security and control',
-    body:
-      'Your data is encrypted in transit and at rest. Supabase Row Level Security keeps saved writing locked to your account. You can edit or delete your writing whenever you want.',
+    title: 'Attachments and files',
+    body: [
+      'Images, avatars, and note attachments are stored in a private Supabase Storage bucket. The app creates short-lived signed links when it needs to show those files back to you.',
+      'If you delete saved writing from Account, Reflections also tries to remove stored attachments and avatar files before signing you out.',
+    ],
   },
-];
-
-const termsSections = [
   {
-    icon: Handshake,
+    title: 'AI and Smart Mode',
+    body: [
+      'Most AI work runs when you choose an AI action, or when you explicitly turn on Smart Mode. If you use Reflect with AI, Refresh with AI, or Smart Mode, the relevant writing is sent to the AI service so it can return that result.',
+      'The Home dashboard may also refresh short Writing Note suggestions. If your Life Wiki has an index page, that index may be sent as context for those suggestions.',
+      'We do not use your personal notes to train AI models. AI reflections and Life Wiki updates are saved only to your account. They are for personal reflection, not medical advice.',
+      'Smart Mode can be turned off in Account. Turning it off stops future automatic Life Wiki refreshes. It does not delete Life Wiki pages that already exist.',
+    ],
+  },
+  {
+    title: 'Analytics',
+    body: [
+      'If analytics are configured, Reflections may record basic product events such as sign-in status, note saves, route groups, plan tier, counts of tags or attachments, and whether an AI refresh was used.',
+      'Analytics should not include the body of your notes, future letters, attachments, moods as private prose, or AI reflection text. These events help find broken flows and understand which parts of the product are used.',
+    ],
+  },
+  {
+    title: 'Payments and referrals',
+    body: [
+      'Payments are handled through Razorpay. Reflections stores enough payment and plan information to know whether your account has Pro access, but card and bank details are handled by Razorpay.',
+      'If you use an invite link, Reflections stores the invite code and whether someone joined from it. Invites do not create a public social graph, rewards feed, or public list.',
+    ],
+  },
+  {
+    title: 'Export, deletion, and account closure',
+    body: [
+      'Your notes belong to you. You can export saved notes from note pages in the formats currently available in the app.',
+      'You can delete individual notes, and you can delete saved writing and app data from Account. That removes saved notes, moods, tags, tasks, profile data, engagement data, and stored files that the app can find.',
+      'Deleting saved app data does not automatically close the sign-in account itself. If you want the sign-in account closed too, email support after deleting saved writing.',
+    ],
+  },
+  {
     title: 'Using Reflections',
-    body:
-      'By using Reflections, you agree to use it as a personal writing tool. You must be at least 13 years old, and if you are under 18, a parent or guardian should review these terms.',
+    body: [
+      'Use Reflections as a personal writing tool. Do not use it for anything illegal or harmful, and do not try to access another person\'s account or files.',
+      'You must be at least 13 years old to use Reflections. If you are under 18, a parent or guardian should review this page with you.',
+    ],
   },
   {
-    icon: Sparkle,
-    title: 'Your writing stays yours',
-    body:
-      'You own your notes and attachments. You allow Reflections to store and sync them so the app can show them back to you, but we do not claim ownership of your writing.',
-  },
-  {
-    icon: Warning,
-    title: 'Service expectations',
-    body:
-      'Do not use Reflections for anything illegal or harmful, and do not try to access another person\'s data. The app is provided as-is, and features or free limits may change as the product evolves.',
+    title: 'Security and service limits',
+    body: [
+      'Reflections uses Supabase account security, private storage, Row Level Security, and encrypted connections to protect saved writing. No online service can promise perfect security.',
+      'Some features require an internet connection. AI features, sync, payments, and exports can fail if a provider is unavailable. Features and Free or Pro limits may change as the product changes, but the app should explain limits plainly where they matter.',
+    ],
   },
 ];
 
@@ -78,67 +96,33 @@ export const PrivacyPolicy: React.FC = () => {
           </h1>
         </div>
 
-        <div className="space-y-4 lg:col-span-4">
-          <p className="label-caps text-green">Privacy and terms</p>
+        <div className="space-y-4 lg:col-span-4 lg:self-end">
           <p className="max-w-[36rem] font-serif text-[18px] leading-relaxed text-gray-light">
-            Plain expectations for private writing, account data, optional AI, and responsible use.
-          </p>
-          <p className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-nav/50">
-            Last updated April 26, 2026
+            This page explains what Reflections stores, when AI is used, how payments and analytics work, and how you can remove your writing.
           </p>
         </div>
       </section>
 
       <main className="mx-auto w-full max-w-[1440px] px-6 sm:px-10 lg:px-16">
-        <section className="mb-20 grid gap-4 md:grid-cols-3">
-          {privacySections.map((section) => {
-            const Icon = section.icon;
-
-            return (
-              <article key={section.title} className="border-t border-border/60 py-8">
-                <div className="flex h-full flex-col gap-6">
-                  <div className="tone-icon tone-icon-sage h-10 w-10">
-                    <Icon size={20} weight="duotone" />
-                  </div>
-                  <div className="space-y-3">
-                    <h2 className="text-[22px] font-display font-bold leading-tight text-gray-text">
-                      {section.title}
-                    </h2>
-                    <p className="font-sans text-[16px] leading-relaxed text-gray-light">
-                      {section.body}
-                    </p>
-                  </div>
-                </div>
-              </article>
-            );
-          })}
-        </section>
-
-        <section className="mb-20 border-y border-border py-20">
-          <div className="mb-12 space-y-4">
-            <p className="label-caps text-green">Terms</p>
-            <h2 className="text-mk-h2 font-display font-bold text-gray-text">The agreement in plain language</h2>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-3">
-            {termsSections.map((section) => {
-              const Icon = section.icon;
-
-              return (
-                <article key={section.title} className="tone-panel tone-panel-sky relative overflow-hidden p-7">
-                  <div className="tone-icon tone-icon-sky mb-6 h-11 w-11 rounded-2xl">
-                    <Icon size={22} weight="duotone" />
-                  </div>
-                  <h3 className="mb-3 text-[21px] font-display font-bold text-gray-text">{section.title}</h3>
-                  <p className="font-sans text-[15px] leading-relaxed text-gray-light">{section.body}</p>
-                </article>
-              );
-            })}
-          </div>
+        <section className="mb-20 grid gap-x-12 gap-y-12 md:grid-cols-2">
+          {policySections.map((section) => (
+            <article key={section.title} className="border-t border-border/60 py-8">
+              <h2 className="mb-5 text-[24px] font-display font-bold leading-tight text-gray-text">
+                {section.title}
+              </h2>
+              <div className="space-y-4">
+                {section.body.map((paragraph) => (
+                  <p key={paragraph} className="font-sans text-[16px] leading-relaxed text-gray-light">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            </article>
+          ))}
         </section>
 
         <section className="mb-28 grid gap-8 border-t border-border/60 py-10 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
-          <div className="tone-icon tone-icon-honey h-12 w-12 rounded-xl">
+          <div className="icon-block icon-block-sm h-12 w-12">
             <Envelope size={22} weight="duotone" />
           </div>
           <div className="max-w-2xl space-y-4">
@@ -148,7 +132,7 @@ export const PrivacyPolicy: React.FC = () => {
             </p>
             <a
               href={`mailto:${SUPPORT_EMAIL}`}
-              className="inline-flex items-center gap-2 text-[15px] font-bold text-green transition-colors hover:text-green-hover"
+              className="inline-flex items-center gap-2 text-[15px] font-bold text-gray-text transition-colors hover:text-gray-nav"
             >
               <Envelope size={16} weight="bold" />
               {SUPPORT_EMAIL}

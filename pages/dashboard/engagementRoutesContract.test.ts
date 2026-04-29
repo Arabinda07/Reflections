@@ -49,8 +49,10 @@ describe('engagement routes source contract', () => {
     expect(app).toContain('to={RoutePath.PRIVACY} replace');
     expect(app).not.toContain('TermsOfService');
     expect(layout).not.toContain('to={RoutePath.TERMS}');
-    expect(privacy).toContain('Privacy and terms');
-    expect(privacy).toContain('The agreement in plain language');
+    expect(privacy).toContain('What Reflections keeps');
+    expect(privacy).toContain('Using Reflections');
+    expect(privacy).toContain('Export, deletion, and account closure');
+    expect(privacy).not.toContain('The agreement in plain language');
   });
 
   it('keeps Release mode ephemeral and out of note persistence', () => {
@@ -151,6 +153,7 @@ describe('engagement routes source contract', () => {
     expect(about).toContain('writing stay private');
     expect(about).toContain('AI should wait');
     expect(about).toContain('Private writing');
+    expect(about).toContain('Thank you for trusting me with a few minutes of your day.');
     expect(about).toContain('className="-ml-2 min-h-11"');
     expect(about.toLowerCase()).not.toMatch(/\b(streak|score|xp|leaderboard|diagnose|therapy replacement)\b/);
   });
