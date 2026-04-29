@@ -244,11 +244,13 @@ export const SingleNote: React.FC = () => {
           type="button"
           onClick={() => toggleTask(task.id)}
           aria-label={task.completed ? `Mark "${taskLabel}" as open` : `Mark "${taskLabel}" as complete`}
-          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border-2 transition-all ${
-            task.completed ? 'border-green bg-green text-white' : 'border-border text-transparent'
-          }`}
+          className="group relative flex h-11 w-11 shrink-0 items-center justify-center"
         >
-          <Check size={14} weight="bold" />
+          <div className={`flex h-6 w-6 items-center justify-center rounded-lg border-2 transition-all ${
+            task.completed ? 'border-green bg-green text-white' : 'border-border text-transparent group-hover:border-green/40'
+          }`}>
+            <Check size={14} weight="bold" />
+          </div>
         </button>
 
         <input
@@ -266,9 +268,9 @@ export const SingleNote: React.FC = () => {
           type="button"
           onClick={() => removeTask(task.id)}
           aria-label={`Remove task: ${taskLabel}`}
-          className="rounded-[var(--radius-control)] p-2 text-gray-nav transition-colors hover:bg-red/5 hover:text-red"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] text-gray-nav transition-colors hover:bg-red/5 hover:text-red"
         >
-          <Trash size={14} weight="bold" />
+          <Trash size={16} weight="bold" />
         </button>
       </div>
     );
@@ -391,6 +393,8 @@ export const SingleNote: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setIsMoodOpen(true)}
+                      aria-haspopup="dialog"
+                      aria-expanded={isMoodOpen}
                       className="group flex items-center gap-1.5 rounded-full border border-border/60 bg-white/5 px-2.5 py-1 text-[11px] font-black uppercase tracking-widest text-gray-nav transition-colors hover:border-green/30 hover:bg-green/5 hover:text-green"
                     >
                       {note.mood ? getMoodIcon(note.mood) : <Smiley size={14} weight="bold" />}
@@ -400,6 +404,8 @@ export const SingleNote: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setIsTagsOpen(true)}
+                      aria-haspopup="dialog"
+                      aria-expanded={isTagsOpen}
                       className="group flex items-center gap-1.5 rounded-full border border-border/60 bg-white/5 px-2.5 py-1 text-[11px] font-black uppercase tracking-widest text-gray-nav transition-colors hover:border-green/30 hover:bg-green/5 hover:text-green"
                     >
                       <Tag size={14} weight="bold" />
@@ -409,6 +415,8 @@ export const SingleNote: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setIsTasksOpen(true)}
+                      aria-haspopup="dialog"
+                      aria-expanded={isTasksOpen}
                       className={`group flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-black uppercase tracking-widest transition-colors ${
                         pendingTaskCount > 0
                           ? 'border-green/30 bg-green/5 text-green'
@@ -507,6 +515,7 @@ export const SingleNote: React.FC = () => {
               value={tagDraft}
               onChange={(event) => setTagDraft(event.target.value)}
               placeholder="Add a tag"
+              aria-label="Add a tag"
               className="sm:flex-1"
             />
             <Button onClick={addTag} variant="primary" className="sm:min-w-[120px]">
@@ -551,6 +560,7 @@ export const SingleNote: React.FC = () => {
               value={taskDraft}
               onChange={(event) => setTaskDraft(event.target.value)}
               placeholder="Add a task"
+              aria-label="Add a task"
               className="sm:flex-1"
             />
             <Button onClick={addTask} variant="primary" className="sm:min-w-[140px]">
