@@ -23,12 +23,15 @@ describe('polish contract', () => {
     const startupScreen = read('components/ui/StartupScreen.tsx');
     const appLaunch = read('src/native/appLaunch.ts');
 
+    expect(startupScreen).toContain('src="/assets/videos/sanctuary.png"');
+    expect(startupScreen).toContain('poster="/assets/videos/sanctuary.png"');
+    expect(startupScreen).toContain('className="absolute inset-0 z-0 h-full w-full object-cover opacity-85"');
     expect(startupScreen).toContain('isVideoReady');
-    expect(startupScreen).toContain('isPosterReady');
-    expect(startupScreen).toContain('onLoad={() => setIsPosterReady(true)}');
     expect(startupScreen).toContain('onLoadedData={() => setIsVideoReady(true)}');
-    expect(startupScreen).toContain("isPosterReady && !isVideoReady ? 'opacity-85' : 'opacity-0'");
     expect(startupScreen).toContain("isVideoReady ? 'opacity-85' : 'opacity-0'");
+    expect(startupScreen).not.toContain('isPosterReady');
+    expect(startupScreen).not.toContain('setIsPosterReady');
+    expect(startupScreen).not.toContain("isPosterReady && !isVideoReady ? 'opacity-85' : 'opacity-0'");
     expect(startupScreen).toContain('opacity-0');
     expect(startupScreen).toContain('bg-[radial-gradient');
     expect(startupScreen).not.toContain('animate-pulse');
