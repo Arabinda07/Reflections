@@ -11,11 +11,6 @@ import {
   FileText,
   Download,
   Smiley,
-  Sun,
-  Cloud,
-  SmileySad,
-  Lightning,
-  Moon,
   Tag,
   ListChecks,
   Check,
@@ -38,8 +33,7 @@ import { storageService } from '../../services/storageService';
 import { Note, RoutePath, Task } from '../../types';
 import { sanitizeNoteHtml } from './noteContent';
 import { downloadNoteExport } from './noteExport';
-
-const MOOD_OPTIONS = ['happy', 'calm', 'anxious', 'sad', 'angry', 'tired'] as const;
+import { MOOD_OPTIONS, getMoodConfig } from './moodConfig';
 
 export const SingleNote: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -185,22 +179,11 @@ export const SingleNote: React.FC = () => {
   };
 
   const getMoodIcon = (mood?: string) => {
-    switch (mood) {
-      case 'happy':
-        return <Smiley size={16} weight="fill" className="text-orange" />;
-      case 'calm':
-        return <Sun size={16} weight="fill" className="text-green" />;
-      case 'anxious':
-        return <Cloud size={16} weight="fill" className="text-blue" />;
-      case 'sad':
-        return <SmileySad size={16} weight="fill" className="text-blue" />;
-      case 'angry':
-        return <Lightning size={16} weight="fill" className="text-red" />;
-      case 'tired':
-        return <Moon size={16} weight="fill" className="text-gray-nav" />;
-      default:
-        return null;
-    }
+    const moodConfig = getMoodConfig(mood);
+    if (!moodConfig) return null;
+    const Icon = moodConfig.icon;
+
+    return <Icon size={16} weight="fill" className={moodConfig.labelClass} />;
   };
 
   const downloadAttachment = async (path: string) => {
@@ -287,6 +270,7 @@ export const SingleNote: React.FC = () => {
   }
 
   if (!note) return null;
+  const noteMoodConfig = getMoodConfig(note.mood);
 
   return (
     <>
@@ -354,7 +338,7 @@ export const SingleNote: React.FC = () => {
           <div className="mx-auto max-w-3xl">
 
 
-            <Surface variant="bezel" className="bg-white">
+            <Surface variant="bezel" tone="sage">
               <article>
                 {note.thumbnailUrl ? (
                   <div className="h-64 w-full border-b border-border/40 bg-white">
@@ -395,7 +379,11 @@ export const SingleNote: React.FC = () => {
                       onClick={() => setIsMoodOpen(true)}
                       aria-haspopup="dialog"
                       aria-expanded={isMoodOpen}
-                      className="group flex items-center gap-1.5 rounded-full border border-border/60 bg-white/5 px-2.5 py-1 text-[11px] font-black uppercase tracking-widest text-gray-nav transition-colors hover:border-green/30 hover:bg-green/5 hover:text-green"
+                      className={`group flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-black uppercase tracking-widest transition-colors ${
+                        noteMoodConfig
+                          ? noteMoodConfig.selectedOption
+                          : 'border-border/60 bg-white/5 text-gray-nav hover:border-green/30 hover:bg-green/5 hover:text-green'
+                      }`}
                     >
                       {note.mood ? getMoodIcon(note.mood) : <Smiley size={14} weight="bold" />}
                       <span className="mt-0.5">{note.mood || 'Mood'}</span>
@@ -442,7 +430,7 @@ export const SingleNote: React.FC = () => {
 
                       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         {note.attachments.map((attachment, index) => (
-                          <Surface key={index} variant="flat" className="overflow-hidden">
+                          <Surface key={index} variant="flat" tone="sky" className="overflow-hidden">
                             <div className="flex items-center gap-3 p-4">
                               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-white text-gray-nav shadow-sm">
                                 <FileText size={20} weight="duotone" />
@@ -478,28 +466,31 @@ export const SingleNote: React.FC = () => {
       <ModalSheet
         isOpen={isMoodOpen}
         onClose={() => setIsMoodOpen(false)}
-        title="Reflection mood"
+        title="Mood"
         size="sm"
       >
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {MOOD_OPTIONS.map((moodOption) => (
-            <button
-              key={moodOption}
-              type="button"
-              onClick={async () => {
-                await persistNote({ mood: note.mood === moodOption ? undefined : moodOption });
-                setIsMoodOpen(false);
-              }}
-              className={`flex flex-col items-center rounded-[var(--radius-panel)] border px-4 py-5 transition-all ${
-                note.mood === moodOption
-                  ? 'border-green/30 bg-green/10 text-green'
-                  : 'border-border bg-white/5 text-gray-text hover:border-green/20 hover:bg-green/5'
-              }`}
-            >
-              <span className="mb-2">{getMoodIcon(moodOption)}</span>
-              <span className="text-[12px] font-bold capitalize">{moodOption}</span>
-            </button>
-          ))}
+          {MOOD_OPTIONS.map((moodOption) => {
+            const moodConfig = getMoodConfig(moodOption);
+            const Icon = moodConfig?.icon || Smiley;
+
+            return (
+              <button
+                key={moodOption}
+                type="button"
+                onClick={async () => {
+                  await persistNote({ mood: note.mood === moodOption ? undefined : moodOption });
+                  setIsMoodOpen(false);
+                }}
+                className={`flex flex-col items-center rounded-[var(--radius-panel)] border px-4 py-5 transition-all ${
+                  note.mood === moodOption ? moodConfig?.selectedOption : moodConfig?.option
+                }`}
+              >
+                <Icon size={16} weight={note.mood === moodOption ? 'fill' : 'regular'} className={`mb-2 ${moodConfig?.labelClass || ''}`} />
+                <span className="text-[12px] font-bold">{moodConfig?.label || moodOption}</span>
+              </button>
+            );
+          })}
         </div>
       </ModalSheet>
 

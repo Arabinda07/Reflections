@@ -72,11 +72,12 @@ describe('focused product slice source contract', () => {
 
     expect(homeAuthenticated).toContain('moodCheckinService.create');
     expect(homeAuthenticated).toContain('Check in');
-    expect(homeAuthenticated).toContain('steady');
-    expect(homeAuthenticated).toContain('scattered');
+    expect(homeAuthenticated).toContain('MOOD_OPTIONS.map');
+    expect(read('pages/dashboard/moodConfig.ts')).toContain("['happy', 'calm', 'anxious', 'sad', 'angry', 'tired']");
     expect(homeAuthenticated.toLowerCase()).not.toContain('score');
 
-    expect(createNote).toContain('Reflection mood');
+    expect(createNote).toContain('title="Mood"');
+    expect(createNote).not.toContain('Reflection mood');
   });
 
   it('includes Android Verified Email logic in auth pages', () => {

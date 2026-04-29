@@ -387,7 +387,7 @@ export const Account: React.FC = () => {
             />
           ) : null}
 
-          <Surface variant="flat" className="overflow-hidden">
+          <Surface variant="flat" tone="sage" className="overflow-hidden">
             <form onSubmit={handleSubmit} className="divide-y divide-border/70">
               <div className="grid gap-10 p-8 lg:grid-cols-[180px_minmax(0,1fr)] lg:p-10">
                 <div className="flex flex-col items-center gap-4">
@@ -464,44 +464,49 @@ export const Account: React.FC = () => {
                 </div>
               </div>
 
-              <div className="grid gap-6 p-8 md:grid-cols-2 lg:p-10">
-                <Surface variant="bezel">
-                  <div className="p-6">
-                    <div className="mb-6 flex items-center gap-4">
-                      <div className="icon-block icon-block-md">
+              <div className="grid gap-4 p-6 md:grid-cols-2 lg:p-8">
+                <Surface variant="bezel" tone="honey">
+                  <div className="p-5">
+                    <div className="mb-5 flex items-center gap-3">
+                      <div className="icon-block icon-block-sm">
                         <Sparkle size={24} weight="duotone" />
                       </div>
                       <div>
                         <p className="text-[11px] font-black uppercase tracking-widest text-green">Membership</p>
-                        <h3 className="text-[24px] font-display font-bold text-gray-text capitalize">
+                        <h3 className="text-[20px] font-display font-bold text-gray-text capitalize">
                           {access?.planTier || 'Free'} plan
                         </h3>
                       </div>
                     </div>
 
-                    <p className="text-[14px] font-medium leading-relaxed text-gray-light">{membershipCopy}</p>
-
-                    <div className="mt-6 flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <MetadataPill tone="green">{access?.planTier === 'pro' ? 'Active' : 'Free tier'}</MetadataPill>
                     </div>
 
+                    <details className="mt-4 rounded-[var(--radius-panel)] border border-border/60 bg-white/5 px-4 py-3">
+                      <summary className="cursor-pointer text-[12px] font-black uppercase tracking-widest text-gray-nav">
+                        Details
+                      </summary>
+                      <p className="mt-3 text-[14px] font-medium leading-relaxed text-gray-light">{membershipCopy}</p>
+                    </details>
+
                     {access?.planTier !== 'pro' ? (
-                      <div className="mt-8">
+                      <div className="mt-6">
                         <ProUpgradeCTA />
                       </div>
                     ) : null}
                   </div>
                 </Surface>
 
-                <Surface variant="bezel">
-                  <div className="p-6">
-                    <div className="mb-6 flex items-center gap-4">
-                      <div className="icon-block icon-block-md">
+                <Surface variant="bezel" tone="sage">
+                  <div className="p-5">
+                    <div className="mb-5 flex items-center gap-3">
+                      <div className="icon-block icon-block-sm">
                         <ShieldCheck size={24} weight="duotone" />
                       </div>
                       <div>
                         <p className="text-[11px] font-black uppercase tracking-widest text-green">Security</p>
-                        <h3 className="text-[24px] font-display font-bold text-gray-text">Keep this private</h3>
+                        <h3 className="text-[20px] font-display font-bold text-gray-text">Keep this private</h3>
                       </div>
                     </div>
 
@@ -533,41 +538,51 @@ export const Account: React.FC = () => {
                   </div>
                 </Surface>
 
-                <Surface variant="bezel">
-                  <div className="p-6">
-                    <div className="mb-6 flex items-center gap-4">
-                      <div className="icon-block icon-block-md">
+                <Surface variant="bezel" tone="sky">
+                  <div className="p-5">
+                    <div className="mb-5 flex items-center gap-3">
+                      <div className="icon-block icon-block-sm">
                         <EnvelopeSimple size={24} weight="duotone" />
                       </div>
                       <div>
                         <p className="text-[11px] font-black uppercase tracking-widest text-green">Invites</p>
-                        <h3 className="text-[24px] font-display font-bold text-gray-text">Share Reflections</h3>
+                        <h3 className="text-[20px] font-display font-bold text-gray-text">Share Reflections</h3>
                       </div>
                     </div>
 
-                    <p className="mb-5 text-[14px] font-medium leading-relaxed text-gray-light">
-                      Account tracks how many people joined from your invite. There is no prize or public list.
-                    </p>
+                    <details className="mb-5 rounded-[var(--radius-panel)] border border-border/60 bg-white/5 px-4 py-3">
+                      <summary className="cursor-pointer text-[12px] font-black uppercase tracking-widest text-gray-nav">
+                        Details
+                      </summary>
+                      <p className="mt-3 text-[14px] font-medium leading-relaxed text-gray-light">
+                        Account tracks how many people joined from your invite. There is no prize or public list.
+                      </p>
+                    </details>
 
                     <ReferralInvitePanel />
                   </div>
                 </Surface>
 
-                <Surface variant="bezel">
-                  <div className="p-6">
-                    <div className="mb-6 flex items-center gap-4">
-                      <div className="icon-block icon-block-md">
+                <Surface variant="bezel" tone="sage">
+                  <div className="p-5">
+                    <div className="mb-5 flex items-center gap-3">
+                      <div className="icon-block icon-block-sm">
                         <Sparkle size={24} weight="duotone" />
                       </div>
                       <div>
                         <p className="text-[11px] font-black uppercase tracking-widest text-green">Sanctuary</p>
-                        <h3 className="text-[24px] font-display font-bold text-gray-text">Smart Mode</h3>
+                        <h3 className="text-[20px] font-display font-bold text-gray-text">Smart Mode</h3>
                       </div>
                     </div>
 
-                    <p className="text-[14px] font-medium leading-relaxed text-gray-light">
-                      Keep AI on demand by default, or let Smart Mode refresh the Life Wiki after saves. Your writing screen stays quiet either way.
-                    </p>
+                    <details className="rounded-[var(--radius-panel)] border border-border/60 bg-white/5 px-4 py-3">
+                      <summary className="cursor-pointer text-[12px] font-black uppercase tracking-widest text-gray-nav">
+                        Details
+                      </summary>
+                      <p className="mt-3 text-[14px] font-medium leading-relaxed text-gray-light">
+                        Keep AI on demand by default, or let Smart Mode refresh the Life Wiki after saves. Your writing screen stays quiet either way.
+                      </p>
+                    </details>
 
                     {greatIngestProgress ? (
                       <div className="mt-5 rounded-[var(--radius-panel)] border border-green/15 bg-green/5 p-4">

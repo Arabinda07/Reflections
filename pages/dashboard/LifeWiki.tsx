@@ -497,7 +497,7 @@ export const LifeWiki: React.FC = () => {
 
             {!articlePage ? (
               !hasLoadedLibrary ? (
-                <Surface variant="flat" className="p-8 md:p-10">
+                <Surface variant="flat" tone="sky" className="p-8 md:p-10">
                   <div className="mx-auto max-w-xl text-center">
                     <p className="text-[11px] font-black uppercase tracking-widest text-green">
                       Opening room
@@ -508,7 +508,7 @@ export const LifeWiki: React.FC = () => {
                   </div>
                 </Surface>
               ) : !canShowSanctuaryRooms ? (
-                <Surface variant="bezel" innerClassName="p-8 md:p-10">
+                <Surface variant="bezel" tone="sage" innerClassName="p-8 md:p-10">
                   <div className="mx-auto max-w-2xl text-center">
                     <p className="text-[11px] font-black uppercase tracking-widest text-green">
                       Life Wiki unlocks after 3 entries
@@ -542,7 +542,7 @@ export const LifeWiki: React.FC = () => {
                     </p>
                   </header>
 
-                  <Surface variant="flat" className="p-6 md:p-9">
+                  <Surface variant="flat" tone="sky" className="p-6 md:p-9">
                     <div className="flex flex-col gap-7 md:flex-row md:items-end md:justify-between">
                       <div className="max-w-2xl space-y-3">
                         <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">
@@ -592,7 +592,7 @@ export const LifeWiki: React.FC = () => {
                   </p>
                 </header>
 
-                <Surface variant="flat" className="p-6 md:p-10">
+                <Surface variant="flat" tone="sage" className="p-6 md:p-10">
                   <div className="mx-auto max-w-[68ch] space-y-5 font-serif text-[18px] leading-loose text-gray-text">
                     <ReactMarkdown
                       skipHtml
@@ -628,7 +628,7 @@ export const LifeWiki: React.FC = () => {
                   </div>
                 </Surface>
 
-                <Surface variant="flat" className="p-6">
+                <Surface variant="flat" tone="sky" className="p-6">
                   <div className="mb-4 flex items-center gap-2">
                     <Book size={18} weight="duotone" className="text-green" />
                     <h2 className="text-[13px] font-black uppercase tracking-widest text-gray-nav">
@@ -756,7 +756,7 @@ export const LifeWiki: React.FC = () => {
           </section>
 
           {!hasEnoughEntriesForWiki ? (
-            <Surface variant="bezel" innerClassName="p-7 md:p-9">
+            <Surface variant="bezel" tone="sage" innerClassName="p-7 md:p-9">
               <div className="flex flex-col gap-7 md:flex-row md:items-end md:justify-between">
                 <div className="max-w-2xl space-y-5">
                   <p className="text-[11px] font-black uppercase tracking-widest text-green">
@@ -793,7 +793,7 @@ export const LifeWiki: React.FC = () => {
           ) : null}
 
           {hasEnoughEntriesForWiki && primaryPages.length === 0 ? (
-            <Surface variant="bezel" innerClassName="p-7 md:p-9">
+            <Surface variant="bezel" tone="honey" innerClassName="p-7 md:p-9">
               <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                 <div className="max-w-2xl space-y-3">
                   <p className="text-[11px] font-black uppercase tracking-widest text-green">

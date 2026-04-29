@@ -54,10 +54,9 @@ describe('buildWeeklyRecap', () => {
     expect(recap.releaseMoments).toBe(1);
     expect(recap.lettersScheduled).toBe(1);
     expect(recap.lettersOpened).toBe(1);
-    expect(recap.commonMood).toBe('steady');
+    expect(recap.moodData).toEqual([{ name: 'steady', value: 2 }, { name: 'heavy', value: 1 }]);
     expect(recap.recurringTags).toEqual([{ tag: 'rest', count: 2 }, { tag: 'family', count: 1 }]);
     expect(recap.writingDays).toBe(6);
-    expect(recap.nextQuestion).toBe('What would feel kind to return to next?');
   });
 
   it('falls back to note moods only when standalone mood check-ins are absent', () => {
@@ -71,7 +70,7 @@ describe('buildWeeklyRecap', () => {
       now: new Date('2026-04-29T12:00:00'),
     });
 
-    expect(recap.commonMood).toBe('calm');
+    expect(recap.moodData).toEqual([{ name: 'calm', value: 2 }]);
   });
 });
 

@@ -1,5 +1,5 @@
 import React, { Suspense, lazy, useEffect, useState } from 'react';
-import { Route, RouterProvider, createHashRouter, createRoutesFromElements } from 'react-router-dom';
+import { Navigate, Route, RouterProvider, createHashRouter, createRoutesFromElements } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { PWAInstallProvider } from './context/PWAInstallContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
@@ -27,7 +27,6 @@ const LifeWiki = lazy(() => import('./pages/dashboard/LifeWiki').then(m => ({ de
 const FAQ = lazy(() => import('./pages/dashboard/FAQ').then(m => ({ default: m.FAQ })));
 const AboutArabinda = lazy(() => import('./pages/dashboard/AboutArabinda').then(m => ({ default: m.AboutArabinda })));
 const PrivacyPolicy = lazy(() => import('./pages/dashboard/PrivacyPolicy').then(m => ({ default: m.PrivacyPolicy })));
-const TermsOfService = lazy(() => import('./pages/dashboard/TermsOfService').then(m => ({ default: m.TermsOfService })));
 const NotFound = lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })));
 const LazyVercelVitals = lazy(async () => {
   const [{ Analytics }, { SpeedInsights }] = await Promise.all([
@@ -56,7 +55,7 @@ const router = createHashRouter(
       <Route path={RoutePath.FAQ} element={withRouteFallback(<FAQ />)} />
       <Route path={RoutePath.ABOUT} element={withRouteFallback(<AboutArabinda />)} />
       <Route path={RoutePath.PRIVACY} element={withRouteFallback(<PrivacyPolicy />)} />
-      <Route path={RoutePath.TERMS} element={withRouteFallback(<TermsOfService />)} />
+      <Route path={RoutePath.TERMS} element={<Navigate to={RoutePath.PRIVACY} replace />} />
 
       <Route path={RoutePath.LOGIN} element={withRouteFallback(<SignIn />)} />
       <Route path={RoutePath.SIGNUP} element={withRouteFallback(<SignUp />)} />

@@ -5,12 +5,6 @@ import {
   FileText,
   ArrowUpRight,
   Calendar as CalendarIcon,
-  Smiley,
-  SmileySad,
-  Sun,
-  Cloud,
-  Moon,
-  Lightning,
   Trash,
   CircleNotch,
   Download,
@@ -35,6 +29,7 @@ import { noteService } from '../../services/noteService';
 import { Note, RoutePath } from '../../types';
 import { buildNotePreviewText } from './noteContent';
 import { downloadNoteExport } from './noteExport';
+import { getMoodConfig } from './moodConfig';
 
 const MyNotesCalendar = lazy(() =>
   import('./MyNotesCalendar').then((module) => ({ default: module.MyNotesCalendar })),
@@ -103,22 +98,11 @@ export const MyNotes: React.FC = () => {
   };
 
   const getMoodIcon = (mood?: string) => {
-    switch (mood) {
-      case 'happy':
-        return <Smiley size={14} weight="fill" className="text-orange" />;
-      case 'calm':
-        return <Sun size={14} weight="fill" className="text-green" />;
-      case 'anxious':
-        return <Cloud size={14} weight="fill" className="text-blue" />;
-      case 'sad':
-        return <SmileySad size={14} weight="fill" className="text-blue" />;
-      case 'angry':
-        return <Lightning size={14} weight="fill" className="text-red" />;
-      case 'tired':
-        return <Moon size={14} weight="fill" className="text-gray-light" />;
-      default:
-        return null;
-    }
+    const moodConfig = getMoodConfig(mood);
+    if (!moodConfig) return null;
+
+    const Icon = moodConfig.icon;
+    return <Icon size={14} weight="fill" className={moodConfig.labelClass} />;
   };
 
   const tileContent = ({ date, view }: { date: Date; view: string }) => {
@@ -151,6 +135,7 @@ export const MyNotes: React.FC = () => {
 
   const renderNoteCard = (note: Note, index: number) => {
     const noteDetailPath = RoutePath.NOTE_DETAIL.replace(':id', note.id);
+    const moodConfig = getMoodConfig(note.mood);
 
     return (
       <Surface
@@ -202,8 +187,8 @@ export const MyNotes: React.FC = () => {
                 {new Date(note.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
               </MetadataPill>
               {note.mood ? (
-                <MetadataPill icon={getMoodIcon(note.mood)} tone="green">
-                  <span className="capitalize">{note.mood}</span>
+                <MetadataPill icon={getMoodIcon(note.mood)} className={moodConfig?.nav || ''}>
+                  <span>{moodConfig?.label || note.mood}</span>
                 </MetadataPill>
               ) : null}
             </div>

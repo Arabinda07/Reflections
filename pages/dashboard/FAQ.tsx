@@ -140,7 +140,7 @@ export const FAQ: React.FC = () => {
             return (
               <article key={section.title} className="border-t border-border/60 py-8">
                 <div className="flex h-full flex-col gap-6">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-[var(--radius-panel)] border border-green/10 bg-green/5 text-green">
+                  <div className="tone-icon tone-icon-sage h-10 w-10">
                     <Icon size={20} weight="duotone" />
                   </div>
                   <div className="space-y-3">
@@ -169,7 +169,7 @@ export const FAQ: React.FC = () => {
               const Icon = item.icon;
               return (
                 <div key={item.title} className="border-t border-border/60 py-7">
-                  <div className="mb-6 flex h-10 w-10 items-center justify-center rounded-xl bg-body border border-border text-gray-light">
+                  <div className="tone-icon tone-icon-sky mb-6 h-10 w-10 rounded-xl">
                     <Icon size={20} weight="bold" />
                   </div>
                   <h3 className="mb-3 text-[19px] font-display font-bold text-gray-text">{item.title}</h3>
@@ -191,9 +191,9 @@ export const FAQ: React.FC = () => {
             {detailItems.map((item) => {
               const Icon = item.icon;
               return (
-                <div key={item.title} className="relative overflow-hidden rounded-[var(--radius-panel)] border border-border bg-white/5 p-8">
+                <div key={item.title} className="tone-panel tone-panel-sky relative overflow-hidden p-8">
                   <div className="flex gap-6">
-                    <div className="flex-none flex h-12 w-12 items-center justify-center rounded-2xl bg-green/10 text-green">
+                    <div className="tone-icon tone-icon-sky flex h-12 w-12 flex-none rounded-2xl">
                       <Icon size={24} weight="duotone" />
                     </div>
                     <div className="space-y-4">
@@ -217,7 +217,7 @@ export const FAQ: React.FC = () => {
               const Icon = feature.icon;
               return (
                 <div key={feature.title} className="space-y-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-surface border border-border/40 text-green shadow-sm">
+                  <div className="tone-icon tone-icon-honey h-10 w-10 rounded-xl">
                     <Icon size={20} weight="duotone" />
                   </div>
                   <div className="space-y-2">

@@ -109,12 +109,63 @@
   --red: oklch(0.55 0.18 20);
   --red-shadow: oklch(0.45 0.18 20);
   --orange: oklch(0.57 0.16 50);
-  --golden: oklch(0.85 0.15 80);
+  --golden: oklch(0.59 0.13 80);
+  --sky: var(--blue);
+  --honey: var(--golden);
+  --clay: oklch(0.53 0.13 35);
 
   --bg-color: oklch(0.99 0.01 135);
   --panel-bg: oklch(0.98 0.01 135);
   --panel-bg-rgb: 247 248 246;
   --black-rgb: 0 0 0;
+  --app-background-wash:
+    linear-gradient(145deg,
+      oklch(from var(--green) 0.97 0.018 h / 0.78) 0%,
+      var(--bg-color) 42%,
+      oklch(from var(--blue) 0.97 0.018 h / 0.58) 100%);
+  --surface-sage-bg:
+    linear-gradient(145deg,
+      oklch(from var(--green) 0.965 0.022 h / 0.92),
+      rgba(var(--panel-bg-rgb), 0.94));
+  --surface-sage-border: oklch(from var(--green) l c h / 0.2);
+  --surface-sage-accent: var(--green);
+  --surface-sage-bezel:
+    linear-gradient(145deg,
+      oklch(from var(--green) 0.78 0.08 h / 0.34),
+      rgba(255, 255, 255, 0.18));
+  --surface-sky-bg:
+    linear-gradient(145deg,
+      oklch(from var(--blue) 0.965 0.024 h / 0.9),
+      rgba(var(--panel-bg-rgb), 0.94));
+  --surface-sky-border: oklch(from var(--blue) l c h / 0.2);
+  --surface-sky-accent: var(--blue);
+  --surface-sky-bezel:
+    linear-gradient(145deg,
+      oklch(from var(--blue) 0.78 0.08 h / 0.3),
+      rgba(255, 255, 255, 0.18));
+  --surface-honey-bg:
+    linear-gradient(145deg,
+      oklch(from var(--honey) 0.96 0.026 h / 0.86),
+      rgba(var(--panel-bg-rgb), 0.94));
+  --surface-honey-border: oklch(from var(--honey) l c h / 0.24);
+  --surface-honey-accent: var(--honey);
+  --surface-honey-bezel:
+    linear-gradient(145deg,
+      oklch(from var(--honey) 0.78 0.08 h / 0.32),
+      rgba(255, 255, 255, 0.18));
+  --surface-clay-bg:
+    linear-gradient(145deg,
+      oklch(from var(--clay) 0.955 0.022 h / 0.82),
+      rgba(var(--panel-bg-rgb), 0.94));
+  --surface-clay-border: oklch(from var(--clay) l c h / 0.22);
+  --surface-clay-accent: var(--clay);
+  --surface-clay-bezel:
+    linear-gradient(145deg,
+      oklch(from var(--clay) 0.74 0.07 h / 0.28),
+      rgba(255, 255, 255, 0.18));
+  --surface-tinted-shadow:
+    0 20px 44px -30px rgba(0, 0, 0, 0.2),
+    0 8px 18px -14px rgba(0, 0, 0, 0.08);
   --hero-ink: oklch(0.98 0.01 135);
   --hero-shadow:
     0 10px 30px rgba(20, 24, 19, 0.22),
@@ -215,6 +266,8 @@
   --blue-shadow: oklch(0.44 0.15 245);
   /* CONTRAST FIX: dark mode red L=0.58 → ~3.9:1 on dark bg. Lightened to L=0.67 → ~5.2:1 ✓ */
   --red: oklch(0.67 0.18 20);
+  --golden: oklch(0.72 0.13 80);
+  --clay: oklch(0.70 0.12 35);
 
   /* Tinted Neutrals - Dark Mode (Chroma 0.02 leaning toward hue 135) */
   --gray-text: oklch(0.85 0.02 135);
@@ -227,6 +280,50 @@
   --panel-bg: oklch(0.22 0.012 135);
   --panel-bg-rgb: 40 42 39;
   --black-rgb: 0 0 0;
+  --app-background-wash:
+    linear-gradient(145deg,
+      oklch(from var(--green) 0.19 0.03 h / 0.64) 0%,
+      var(--bg-color) 46%,
+      oklch(from var(--blue) 0.19 0.032 h / 0.5) 100%);
+  --surface-sage-bg:
+    linear-gradient(145deg,
+      oklch(from var(--green) 0.24 0.035 h / 0.46),
+      rgba(var(--panel-bg-rgb), 0.9));
+  --surface-sage-border: oklch(from var(--green) l c h / 0.28);
+  --surface-sage-bezel:
+    linear-gradient(145deg,
+      oklch(from var(--green) 0.42 0.08 h / 0.28),
+      rgba(255, 255, 255, 0.05));
+  --surface-sky-bg:
+    linear-gradient(145deg,
+      oklch(from var(--blue) 0.24 0.036 h / 0.42),
+      rgba(var(--panel-bg-rgb), 0.9));
+  --surface-sky-border: oklch(from var(--blue) l c h / 0.26);
+  --surface-sky-bezel:
+    linear-gradient(145deg,
+      oklch(from var(--blue) 0.42 0.08 h / 0.25),
+      rgba(255, 255, 255, 0.05));
+  --surface-honey-bg:
+    linear-gradient(145deg,
+      oklch(from var(--honey) 0.24 0.036 h / 0.38),
+      rgba(var(--panel-bg-rgb), 0.9));
+  --surface-honey-border: oklch(from var(--honey) l c h / 0.28);
+  --surface-honey-bezel:
+    linear-gradient(145deg,
+      oklch(from var(--honey) 0.42 0.08 h / 0.24),
+      rgba(255, 255, 255, 0.05));
+  --surface-clay-bg:
+    linear-gradient(145deg,
+      oklch(from var(--clay) 0.24 0.036 h / 0.38),
+      rgba(var(--panel-bg-rgb), 0.9));
+  --surface-clay-border: oklch(from var(--clay) l c h / 0.28);
+  --surface-clay-bezel:
+    linear-gradient(145deg,
+      oklch(from var(--clay) 0.42 0.08 h / 0.24),
+      rgba(255, 255, 255, 0.05));
+  --surface-tinted-shadow:
+    0 24px 54px -32px rgba(0, 0, 0, 0.48),
+    0 8px 20px -14px rgba(0, 0, 0, 0.3);
   --hero-ink: oklch(0.95 0.02 135);
   --hero-shadow:
     0 12px 32px rgba(3, 5, 4, 0.42),
@@ -252,10 +349,20 @@ body {
   font-family: var(--font-sans);
   color: var(--gray-text);
   background-color: var(--bg-color);
+  background-image: var(--app-background-wash);
+  background-attachment: fixed;
+  background-size: cover;
   font-weight: 400;
   transition: background-color 0.35s var(--ease-out-expo), color 0.35s var(--ease-out-expo);
   overscroll-behavior-y: none;
   /* PWA: Prevents native pull-to-refresh bounce */
+}
+
+.bg-body {
+  background-color: var(--bg-color);
+  background-image: var(--app-background-wash);
+  background-attachment: fixed;
+  background-size: cover;
 }
 
 .sr-only {
@@ -404,6 +511,169 @@ select:focus-visible,
     box-shadow:
       0 24px 52px -28px rgba(0, 0, 0, 0.45),
       0 8px 18px -10px rgba(0, 0, 0, 0.24);
+  }
+
+  .surface-tone-sage.surface-flat,
+  .surface-tone-sage.surface-floating,
+  .surface-tone-sage > .surface-bezel-inner {
+    background: var(--surface-sage-bg);
+    border-color: var(--surface-sage-border);
+    box-shadow: var(--surface-tinted-shadow);
+  }
+
+  .surface-tone-sage.surface-bezel {
+    background: var(--surface-sage-bezel);
+  }
+
+  .surface-tone-sky.surface-flat,
+  .surface-tone-sky.surface-floating,
+  .surface-tone-sky > .surface-bezel-inner {
+    background: var(--surface-sky-bg);
+    border-color: var(--surface-sky-border);
+    box-shadow: var(--surface-tinted-shadow);
+  }
+
+  .surface-tone-sky.surface-bezel {
+    background: var(--surface-sky-bezel);
+  }
+
+  .surface-tone-honey.surface-flat,
+  .surface-tone-honey.surface-floating,
+  .surface-tone-honey > .surface-bezel-inner {
+    background: var(--surface-honey-bg);
+    border-color: var(--surface-honey-border);
+    box-shadow: var(--surface-tinted-shadow);
+  }
+
+  .surface-tone-honey.surface-bezel {
+    background: var(--surface-honey-bezel);
+  }
+
+  .surface-tone-clay.surface-flat,
+  .surface-tone-clay.surface-floating,
+  .surface-tone-clay > .surface-bezel-inner {
+    background: var(--surface-clay-bg);
+    border-color: var(--surface-clay-border);
+    box-shadow: var(--surface-tinted-shadow);
+  }
+
+  .surface-tone-clay.surface-bezel {
+    background: var(--surface-clay-bezel);
+  }
+
+  .tone-panel {
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-panel);
+    background: rgba(var(--panel-bg-rgb), 0.74);
+    box-shadow: 0 18px 38px -30px rgba(0, 0, 0, 0.18);
+  }
+
+  .tone-panel-sage {
+    border-color: var(--surface-sage-border);
+    background: var(--surface-sage-bg);
+  }
+
+  .tone-panel-sky {
+    border-color: var(--surface-sky-border);
+    background: var(--surface-sky-bg);
+  }
+
+  .tone-panel-honey {
+    border-color: var(--surface-honey-border);
+    background: var(--surface-honey-bg);
+  }
+
+  .tone-panel-clay {
+    border-color: var(--surface-clay-border);
+    background: var(--surface-clay-bg);
+  }
+
+  .surface-panel-sage {
+    background: var(--surface-sage-bg);
+  }
+
+  .surface-panel-sky {
+    background: var(--surface-sky-bg);
+  }
+
+  .surface-panel-honey {
+    background: var(--surface-honey-bg);
+  }
+
+  .surface-panel-clay {
+    background: var(--surface-clay-bg);
+  }
+
+  .tone-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-panel);
+    border: 1.5px solid var(--border-color);
+    background: rgba(var(--panel-bg-rgb), 0.72);
+    color: var(--green);
+  }
+
+  .tone-icon-sage {
+    border-color: var(--surface-sage-border);
+    background: oklch(from var(--green) l c h / 0.09);
+    color: var(--surface-sage-accent);
+  }
+
+  .tone-icon-sky {
+    border-color: var(--surface-sky-border);
+    background: oklch(from var(--blue) l c h / 0.09);
+    color: var(--surface-sky-accent);
+  }
+
+  .tone-icon-honey {
+    border-color: var(--surface-honey-border);
+    background: oklch(from var(--honey) l c h / 0.1);
+    color: var(--surface-honey-accent);
+  }
+
+  .tone-icon-clay {
+    border-color: var(--surface-clay-border);
+    background: oklch(from var(--clay) l c h / 0.09);
+    color: var(--surface-clay-accent);
+  }
+
+  .tone-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    border-radius: var(--radius-control);
+    border: 1.5px solid var(--border-color);
+    background: rgba(var(--panel-bg-rgb), 0.72);
+    padding: 0.55rem 0.75rem;
+    color: var(--gray-text);
+    font-size: 0.74rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .tone-chip-sage {
+    border-color: var(--surface-sage-border);
+    background: oklch(from var(--green) l c h / 0.08);
+    color: var(--surface-sage-accent);
+  }
+
+  .tone-chip-sky {
+    border-color: var(--surface-sky-border);
+    background: oklch(from var(--blue) l c h / 0.08);
+    color: var(--surface-sky-accent);
+  }
+
+  .tone-chip-honey {
+    border-color: var(--surface-honey-border);
+    background: oklch(from var(--honey) l c h / 0.1);
+    color: var(--surface-honey-accent);
+  }
+
+  .tone-chip-clay {
+    border-color: var(--surface-clay-border);
+    background: oklch(from var(--clay) l c h / 0.08);
+    color: var(--surface-clay-accent);
   }
 
   .hero-scrim {
@@ -763,6 +1033,30 @@ select:focus-visible,
     border-color: oklch(from var(--blue) l c h / 0.22);
     background: oklch(from var(--blue) l c h / 0.08);
     color: var(--blue);
+  }
+
+  .metadata-pill--sage {
+    border-color: var(--surface-sage-border);
+    background: oklch(from var(--green) l c h / 0.08);
+    color: var(--surface-sage-accent);
+  }
+
+  .metadata-pill--sky {
+    border-color: var(--surface-sky-border);
+    background: oklch(from var(--blue) l c h / 0.08);
+    color: var(--surface-sky-accent);
+  }
+
+  .metadata-pill--honey {
+    border-color: var(--surface-honey-border);
+    background: oklch(from var(--honey) l c h / 0.1);
+    color: var(--surface-honey-accent);
+  }
+
+  .metadata-pill--clay {
+    border-color: var(--surface-clay-border);
+    background: oklch(from var(--clay) l c h / 0.08);
+    color: var(--surface-clay-accent);
   }
 
   .metadata-pill-icon {

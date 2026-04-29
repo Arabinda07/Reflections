@@ -11,11 +11,6 @@ import {
   CalendarBlank, 
   Paperclip, 
   Smiley, 
-  SmileySad,
-  Sun,
-  Cloud,
-  Lightning,
-  Moon,
   Tag as TagIcon, 
   Check, 
   Plus, 
@@ -29,6 +24,7 @@ import {
   Brain,
   Target,
   DotsThreeCircle,
+  Wind,
 } from '@phosphor-icons/react';
 import { Magnetic } from '../../components/ui/Magnetic';
 import { useAmbientAudio, AMBIENT_TRACKS } from '../../hooks/useAmbientAudio';
@@ -37,6 +33,7 @@ import { Button } from '../../components/ui/Button';
 import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
 import { Editor, EditorRef } from '../../components/ui/Editor';
 import { noteService } from '../../services/noteService';
+import { ritualEventService } from '../../services/engagementServices';
 import { storageService } from '../../services/storageService';
 import { RoutePath, NoteAttachment, Task } from '../../types';
 import { supabase } from '../../src/supabaseClient';
@@ -64,15 +61,7 @@ import {
 } from './createNoteDraftState';
 import { extractTasksFromContent, mergeTasks } from '../../src/utils/taskParser';
 import trailLoadingAnimation from '@/src/lottie/trail-loading.json';
-
-const MOOD_CONFIG: Record<string, { nav: string, modal: string, icon: any }> = {
-  happy: { nav: 'bg-golden/10 border-golden/20 text-golden', modal: 'border-golden bg-golden/10 text-golden', icon: Smiley },
-  calm: { nav: 'bg-green/10 border-green/20 text-green', modal: 'border-green bg-green/10 text-green', icon: Sun },
-  anxious: { nav: 'bg-blue/10 border-blue/20 text-blue', modal: 'border-blue bg-blue/10 text-blue', icon: Cloud },
-  sad: { nav: 'bg-dark-blue/10 border-dark-blue/20 text-dark-blue', modal: 'border-dark-blue bg-dark-blue/10 text-dark-blue', icon: SmileySad },
-  angry: { nav: 'bg-red/10 border-red/20 text-red', modal: 'border-red bg-red/10 text-red', icon: Lightning },
-  tired: { nav: 'bg-gray-light/10 border-gray-light/20 text-gray-text', modal: 'border-gray-light bg-gray-light/10 text-gray-text', icon: Moon },
-};
+import { MOOD_CONFIG, MOOD_OPTIONS, getMoodConfig } from './moodConfig';
 
 // --- Sub-Component: TaskRow ---
 interface TaskRowProps {
@@ -206,6 +195,9 @@ export const CreateNote: React.FC = () => {
   const [isTagsOpen, setIsTagsOpen] = useState(false);
   const [isMusicOpen, setIsMusicOpen] = useState(false);
   const [isTasksOpen, setIsTasksOpen] = useState(false);
+  const [isSaveChoiceOpen, setIsSaveChoiceOpen] = useState(false);
+  const [isReleasing, setIsReleasing] = useState(false);
+  const [releaseError, setReleaseError] = useState<string | null>(null);
   
   const [isWhispering, setIsWhispering] = useState(false);
   const [interimTranscript, setInterimTranscript] = useState('');
@@ -231,7 +223,7 @@ export const CreateNote: React.FC = () => {
   );
 
   const { isPlaying: musicPlaying, activeTrack: activeMusicTrack, playTrack: playMusicTrack, stopAll: stopMusic } = useAmbientAudio();
-  const ActiveMoodIcon = mood ? MOOD_CONFIG[mood]?.icon || Smiley : Smiley;
+  const ActiveMoodIcon = getMoodConfig(mood)?.icon || Smiley;
   const recognitionRef = useRef<any>(null);
   const isWhisperingRef = useRef(false);
   const editorInstanceRef = useRef<EditorRef>(null);
@@ -251,7 +243,7 @@ export const CreateNote: React.FC = () => {
     newAttachments,
   });
   const hasUnsavedChanges = !loading && hasUnsavedCreateNoteChanges(currentDraftSnapshot, baselineDraftSnapshot);
-  const blocker = useBlocker(() => hasUnsavedChanges && !saving && !allowNavigationRef.current);
+  const blocker = useBlocker(() => hasUnsavedChanges && !saving && !isReleasing && !allowNavigationRef.current);
   const navigateWithBypass = useCallback(
     (to: string, options?: { replace?: boolean; state?: unknown }) => {
       allowNavigationRef.current = true;
@@ -399,7 +391,7 @@ export const CreateNote: React.FC = () => {
   }, [whisperFeedback]);
 
   useEffect(() => {
-    if (!hasUnsavedChanges || saving) return;
+    if (!hasUnsavedChanges || saving || isReleasing) return;
 
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
       if (allowNavigationRef.current) return;
@@ -409,12 +401,13 @@ export const CreateNote: React.FC = () => {
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [hasUnsavedChanges, saving]);
+  }, [hasUnsavedChanges, isReleasing, saving]);
 
   // --- NUCLEAR SAVE LOGIC ---
   const handleSave = async () => {
     if (!currentDraftSnapshot.title && !currentDraftSnapshot.content) return;
 
+    setIsSaveChoiceOpen(false);
     setSaving(true);
     setShowPlane(true);
     setWhisperFeedback(null);
@@ -535,6 +528,48 @@ export const CreateNote: React.FC = () => {
       if (!isUnmounted.current) {
         setSaving(false);
         setShowPlane(false);
+      }
+    }
+  };
+
+  const handleReleaseDraft = async () => {
+    if (!currentDraftSnapshot.title && !currentDraftSnapshot.content) return;
+
+    setIsReleasing(true);
+    setReleaseError(null);
+
+    try {
+      await ritualEventService.recordReleaseCompleted();
+
+      const emptyDraftSnapshot = buildCreateNoteDraftSnapshot({
+        title: '',
+        content: '',
+        mood: undefined,
+        tags: [],
+        tasks: [],
+        imagePreview: null,
+        existingAttachments: [],
+        newAttachments: [],
+      });
+
+      setTitle('');
+      setContent('');
+      setMood(undefined);
+      setTags([]);
+      setTagInput('');
+      setTasks([]);
+      setImagePreview(null);
+      setExistingAttachments([]);
+      setNewAttachments([]);
+      setBaselineDraftSnapshot(emptyDraftSnapshot);
+      setIsSaveChoiceOpen(false);
+      navigateWithBypass(RoutePath.HOME, { state: { fromSave: true } });
+    } catch (error) {
+      console.error('[CreateNote] Could not release draft:', error);
+      setReleaseError('Release could not finish just now. Your words are still only here on this screen.');
+    } finally {
+      if (!isUnmounted.current) {
+        setIsReleasing(false);
       }
     }
   };
@@ -715,7 +750,7 @@ export const CreateNote: React.FC = () => {
 
       {/* ── Desktop Sidebar ── */}
       {!isMobile && (
-        <aside className={`flex flex-col min-h-0 bg-white/50 dark:bg-panel-bg z-40 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] border-r border-border/40 ${isFocusModeActive ? 'w-0 opacity-0 -translate-x-full overflow-hidden border-r-0' : 'w-[240px] opacity-100 translate-x-0'}`}>
+        <aside className={`surface-panel-sage flex flex-col min-h-0 z-40 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] border-r border-green/15 ${isFocusModeActive ? 'w-0 opacity-0 -translate-x-full overflow-hidden border-r-0' : 'w-[240px] opacity-100 translate-x-0'}`}>
           <div className="pt-8 px-6 pb-6 flex-1 overflow-y-auto custom-scrollbar space-y-4">
             
             {/* Desktop Back Button */}
@@ -732,22 +767,22 @@ export const CreateNote: React.FC = () => {
             <span className="text-[10px] font-black text-gray-nav tracking-widest uppercase opacity-40 ml-2">Personalize</span>
             
             {/* Options */}
-            <button onClick={() => setIsMoodOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${mood ? MOOD_CONFIG[mood]?.nav || 'bg-green/10 border-green/20 text-green' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border/40 text-gray-text'}`}>
-              <div className="flex items-center gap-3"><ActiveMoodIcon size={20} weight={mood ? "fill" : "regular"} /><span className="text-[13px] font-bold capitalize">{mood ? mood : 'Reflection mood'}</span></div>
+            <button onClick={() => setIsMoodOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${mood ? getMoodConfig(mood)?.nav || 'bg-green/10 border-green/20 text-green' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border/40 text-gray-text'}`}>
+              <div className="flex items-center gap-3"><ActiveMoodIcon size={20} weight={mood ? "fill" : "regular"} /><span className="text-[13px] font-bold capitalize">{mood ? getMoodConfig(mood)?.label || mood : 'Mood'}</span></div>
               <CaretRight size={14} className="opacity-40" />
             </button>
 
-            <button onClick={() => setIsTagsOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border/40 text-gray-text'}`}>
+            <button onClick={() => setIsTagsOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${tags.length > 0 ? 'bg-sky/10 border-sky/20 text-sky' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border/40 text-gray-text'}`}>
               <div className="flex items-center gap-3"><TagIcon size={20} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-[13px] font-bold">{tags.length > 0 ? `${tags.length} Tags` : 'Tags'}</span></div>
               <CaretRight size={14} className="opacity-40" />
             </button>
 
-            <button onClick={() => setIsMusicOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${musicPlaying ? 'bg-green/10 border-green/20 text-green' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border/40 text-gray-text'}`}>
+            <button onClick={() => setIsMusicOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${musicPlaying ? 'bg-honey/10 border-honey/25 text-honey' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border/40 text-gray-text'}`}>
               <div className="flex items-center gap-3"><Headphones size={20} weight={musicPlaying ? "fill" : "regular"} /><span className="text-[13px] font-bold">{musicPlaying && activeMusicTrack ? activeMusicTrack.emoji : 'Sounds'}</span></div>
               <CaretRight size={14} className="opacity-40" />
             </button>
 
-            <button onClick={toggleWhisper} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${isWhispering ? 'bg-green/10 border-green/20 text-green' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border/40 text-gray-text'}`}>
+            <button onClick={toggleWhisper} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${isWhispering ? 'bg-clay/10 border-clay/25 text-clay' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border/40 text-gray-text'}`}>
               <div className="flex items-center gap-3">{isWhispering ? <Microphone size={20} weight="fill" /> : <MicrophoneSlash size={20} weight="regular" />}<span className="text-[13px] font-bold">Whisper</span></div>
             </button>
 
@@ -931,13 +966,16 @@ export const CreateNote: React.FC = () => {
                 exit={{ opacity: 0, scale: 0.8 }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={handleSave}
-                disabled={saving}
+                onClick={() => {
+                  setReleaseError(null);
+                  setIsSaveChoiceOpen(true);
+                }}
+                disabled={saving || isReleasing}
                 className="group relative h-16 w-16 rounded-full bg-green text-white shadow-2xl shadow-green/40 flex items-center justify-center transition-all"
-                aria-label="Save reflection"
+                aria-label="Choose what to do with this reflection"
               >
                 <div className="absolute inset-2 rounded-full bg-white/12 group-hover:scale-110 transition-transform duration-500 ease-out" />
-                {saving ? <CircleNotch size={28} className="animate-spin" /> : <FloppyDisk size={26} weight="fill" className="relative z-10" />}
+                {saving || isReleasing ? <CircleNotch size={28} className="animate-spin" /> : <FloppyDisk size={26} weight="fill" className="relative z-10" />}
               </motion.button>
             </Magnetic>
           )}
@@ -953,7 +991,7 @@ export const CreateNote: React.FC = () => {
         bodyClassName="pt-2"
       >
         <div className="grid grid-cols-2 gap-3">
-          <button onClick={() => { setIsMobileOptionsOpen(false); setIsMoodOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${mood ? MOOD_CONFIG[mood]?.nav || 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><ActiveMoodIcon size={24} weight={mood ? "fill" : "regular"} /><span className="text-[14px] font-bold capitalize">{mood ? mood : 'Reflection mood'}</span></button>
+          <button onClick={() => { setIsMobileOptionsOpen(false); setIsMoodOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${mood ? getMoodConfig(mood)?.nav || 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><ActiveMoodIcon size={24} weight={mood ? "fill" : "regular"} /><span className="text-[14px] font-bold capitalize">{mood ? getMoodConfig(mood)?.label || mood : 'Mood'}</span></button>
           <button onClick={() => { setIsMobileOptionsOpen(false); setIsTagsOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><TagIcon size={24} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-[14px] font-bold">Tags</span></button>
           <button onClick={() => { setIsMobileOptionsOpen(false); setIsMusicOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${musicPlaying ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><Headphones size={24} weight={musicPlaying ? "fill" : "regular"} /><span className="text-[14px] font-bold">Sounds</span></button>
           <button onClick={() => { setIsMobileOptionsOpen(false); setIsTasksOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><ListChecks size={24} weight={tasks.some(t => !t.completed) ? "fill" : "regular"} /><span className="text-[14px] font-bold">Tasks</span></button>
@@ -975,6 +1013,53 @@ export const CreateNote: React.FC = () => {
               setIsMobileOptionsOpen(false);
             }} />
           </label>
+        </div>
+      </ModalSheet>
+
+      <ModalSheet
+        isOpen={isSaveChoiceOpen}
+        onClose={() => {
+          if (!saving && !isReleasing) setIsSaveChoiceOpen(false);
+        }}
+        title="Choose what this becomes"
+        icon={<FloppyDisk size={20} weight="duotone" />}
+        size="sm"
+        bodyClassName="pt-2"
+      >
+        <div className="space-y-4">
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving || isReleasing}
+            aria-label="Save reflection"
+            className="flex min-h-16 w-full items-center justify-between rounded-2xl border border-green/20 bg-green/5 p-4 text-left text-green transition-all hover:border-green/35 hover:bg-green/10 disabled:opacity-60"
+          >
+            <span>
+              <span className="block text-[15px] font-bold text-gray-text">Save reflection</span>
+              <span className="mt-1 block text-[12px] font-medium text-gray-light">Keep this as a saved note.</span>
+            </span>
+            {saving ? <CircleNotch size={20} className="animate-spin" /> : <FloppyDisk size={20} weight="bold" />}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleReleaseDraft}
+            disabled={saving || isReleasing}
+            aria-label="Release this writing without saving a note"
+            className="flex min-h-16 w-full items-center justify-between rounded-2xl border border-clay/20 bg-clay/5 p-4 text-left text-clay transition-all hover:border-clay/35 hover:bg-clay/10 disabled:opacity-60"
+          >
+            <span>
+              <span className="block text-[15px] font-bold text-gray-text">Release</span>
+              <span className="mt-1 block text-[12px] font-medium text-gray-light">Let it go without creating a note.</span>
+            </span>
+            {isReleasing ? <CircleNotch size={20} className="animate-spin" /> : <Wind size={20} weight="duotone" />}
+          </button>
+
+          {releaseError ? (
+            <p className="text-[13px] font-bold leading-relaxed text-red" aria-live="polite">
+              {releaseError}
+            </p>
+          ) : null}
         </div>
       </ModalSheet>
 
@@ -1049,13 +1134,14 @@ export const CreateNote: React.FC = () => {
       <ModalSheet
         isOpen={isMoodOpen}
         onClose={() => setIsMoodOpen(false)}
-        title="Reflection mood"
+        title="Mood"
         size="sm"
         bodyClassName="pt-2"
       >
         <div className="grid grid-cols-3 gap-3">
-          {['happy', 'calm', 'anxious', 'sad', 'angry', 'tired'].map((entry) => {
-            const Icon = MOOD_CONFIG[entry]?.icon || Smiley;
+          {MOOD_OPTIONS.map((entry) => {
+            const moodConfig = MOOD_CONFIG[entry];
+            const Icon = moodConfig.icon;
 
             return (
               <button
@@ -1068,10 +1154,10 @@ export const CreateNote: React.FC = () => {
                   }
                   setIsMoodOpen(false);
                 }}
-                className={`flex flex-col items-center rounded-2xl border-2 p-4 transition-all ${mood === entry ? MOOD_CONFIG[entry]?.modal || 'border-green bg-green/10 text-green' : 'border-border bg-white text-gray-text hover:border-border/60 dark:bg-white/5'}`}
+                className={`flex flex-col items-center rounded-2xl border-2 p-4 transition-all ${mood === entry ? moodConfig.modal : `${moodConfig.option} dark:bg-white/5`}`}
               >
                 <Icon size={32} weight={mood === entry ? 'fill' : 'regular'} className="mb-2" />
-                <span className="text-[12px] font-bold capitalize">{entry}</span>
+                <span className="text-[12px] font-bold">{moodConfig.label}</span>
               </button>
             );
           })}

@@ -55,11 +55,16 @@ export default {
         red: 'var(--red)',
         orange: 'var(--orange)',
         golden: 'var(--golden)',
+        sky: 'var(--sky)',
+        honey: 'var(--honey)',
+        clay: 'var(--clay)',
+        surface: 'var(--panel-bg)',
         white: 'rgb(var(--panel-bg-rgb) / <alpha-value>)',
         black: 'rgb(var(--black-rgb) / <alpha-value>)',
       },
       backgroundColor: {
         body: 'var(--bg-color)',
+        surface: 'var(--panel-bg)',
       },
       spacing: {
         'space-05': 'var(--space-05)',

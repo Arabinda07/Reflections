@@ -11,7 +11,6 @@ describe('Insights layout contract', () => {
     const css = read('index.css');
 
     expect(insights).toContain('className="insights-section-header"');
-    expect(insights).toContain('whitespace-nowrap');
     expect(css).toContain('.insights-section-header .section-header-title');
     expect(css).toContain('white-space: nowrap');
   });
@@ -23,8 +22,12 @@ describe('Insights layout contract', () => {
     expect(insights).toContain('moodCheckinService.list');
     expect(insights).toContain('ritualEventService.listSince');
     expect(insights).toContain('This week');
-    expect(insights).toContain('Mood check-ins');
-    expect(insights).toContain('Moods named in entries');
+    expect(insights).toContain('Mood frequency');
+    expect(insights).toContain('weeklyRecap.moodData');
+    expect(insights).toContain('Overview');
+    expect(insights).toContain('Completion card');
+    expect(insights).not.toContain('nextQuestion');
+    expect(insights).not.toContain('Common mood');
     expect(insights.toLowerCase()).not.toMatch(/\b(streak|lost|xp|leaderboard)\b/);
     expect(insights).not.toMatch(/>\s*Failed/i);
   });

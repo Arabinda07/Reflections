@@ -483,19 +483,13 @@ export const DashboardLayout: React.FC = () => {
                   to={RoutePath.ABOUT}
                   className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-all"
                 >
-                  About Arabinda
+                  Founder Talk
                 </Link>
                 <Link 
                   to={RoutePath.PRIVACY}
                   className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-all"
                 >
                   Privacy
-                </Link>
-                <Link 
-                  to={RoutePath.TERMS}
-                  className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-all"
-                >
-                  Terms
                 </Link>
               </nav>
 

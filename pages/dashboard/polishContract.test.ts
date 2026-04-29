@@ -46,7 +46,7 @@ describe('polish surface contract', () => {
 
     expect(insights).not.toContain('style={{ color }}');
     expect(insights).not.toContain('style={{ background }}');
-    expect(insights).toContain('MOOD_TONE_CLASSES');
+    expect(insights).toContain('getMoodConfig');
 
     expect(audioHook).not.toContain('#fb923c');
     expect(audioHook).not.toContain('#4ade80');

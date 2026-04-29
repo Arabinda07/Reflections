@@ -50,12 +50,10 @@ describe('phase 1 product contract and clarity', () => {
     expect(account).toContain('Saved writing and app data will be removed.');
     expect(account).not.toContain('Delete your notes, moods, tags, tasks, and saved profile details here.');
 
-    expect(proUpgrade).toContain('Join the Pro waitlist');
-    expect(proUpgrade).toContain('Razorpay checkout is coming soon');
-    expect(proUpgrade).not.toContain("from '../../src/supabaseClient'");
-    expect(proUpgrade).not.toContain(".from('profiles')");
+    expect(proUpgrade).toContain('Join Pro');
+    expect(proUpgrade).toContain('VITE_RAZORPAY_MONTHLY_PLAN_ID');
+    expect(proUpgrade).toContain('verify-razorpay-payment');
     expect(proUpgrade).not.toContain("plan: 'pro'");
-    expect(proUpgrade).not.toContain('Secured by Razorpay (Test Mode)');
 
     expect(signIn).toContain('Password reset email sent.');
     expect(signIn).not.toContain('href="#"');

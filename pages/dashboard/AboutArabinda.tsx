@@ -12,25 +12,25 @@ const sections = [
     title: 'Why this exists',
     icon: <Feather size={22} weight="duotone" />,
     body:
-      'I wanted Reflections to feel like a quiet room for writing, not another app asking you to perform. The first promise is simple: open the page, write what is true enough for now, and leave with a little more room.',
+      'I built Reflections because I wanted a place that lets writing stay private and ordinary. No performance. No pressure to keep up. Just a page that can hold a thought before it hardens into something louder.',
   },
   {
     title: 'Writing-first',
     icon: <Feather size={22} weight="duotone" />,
     body:
-      'The app is writing-first by design. Notes, moods, releases, and letters are here to support your own attention. They are not competitions or proof that you are doing life correctly.',
+      'The note is the main thing here. Moods, releases, letters, and the Life Wiki exist around the writing, not above it. They are small tools for noticing what keeps returning.',
   },
   {
     title: 'Privacy intent',
     icon: <LockKey size={22} weight="duotone" />,
     body:
-      'Private writing deserves plain privacy promises. Your notes belong to you, and private text should not be used as engagement fuel. Some features keep content-free markers so the app can remember that you showed up without exposing what you wrote.',
+      'Private writing needs plain promises. Your notes should not become engagement fuel. When the app remembers a release or a quiet check-in, it can do that without keeping the words you chose to let go.',
   },
   {
     title: 'Optional AI',
     icon: <Sparkle size={22} weight="duotone" />,
     body:
-      'AI stays optional. It should appear only when you ask for help seeing a pattern, and it should speak like a careful reader of your words, not an authority over your life.',
+      'AI should wait until you invite it. When it does appear, the job is simple: read carefully, reflect gently, and never act like it knows your life better than you do.',
   },
 ];
 
@@ -45,25 +45,25 @@ export const AboutArabinda: React.FC = () => {
           Back
         </Button>
 
-        <SectionHeader eyebrow="About Arabinda" title="A note from the maker" />
+        <SectionHeader eyebrow="Founder Talk" title="A note from Arabinda" />
 
-        <Surface variant="bezel">
+        <Surface variant="bezel" tone="sage">
           <div className="space-y-5 p-6 sm:p-10">
             <p className="font-serif text-[26px] italic leading-relaxed text-gray-text sm:text-[32px]">
-              Reflections is my attempt to build a softer kind of technology around private writing.
+              Reflections is my attempt to make technology behave more quietly around private writing.
             </p>
             <p className="text-[16px] font-medium leading-8 text-gray-light">
-              I am Arabinda. I care about tools that respect people when they are tired, uncertain, or simply trying to hear themselves think. This app exists because writing can be a sanctuary without becoming a performance loop.
+              I am Arabinda. I care about tools that respect people when they are tired, uncertain, or trying to hear themselves think. This app exists because writing can be a sanctuary without turning into another thing to keep up with.
             </p>
           </div>
         </Surface>
 
         <div className="space-y-5">
-          {sections.map((section) => (
-            <Surface key={section.title} variant="flat">
+          {sections.map((section, index) => (
+            <Surface key={section.title} variant="flat" tone={index % 2 === 0 ? 'sky' : 'honey'}>
               <div className="p-6 sm:p-8">
                 <div className="mb-4 flex items-center gap-3">
-                  <div className="icon-block icon-block-sm">{section.icon}</div>
+                  <div className={`tone-icon h-12 w-12 ${index % 2 === 0 ? 'tone-icon-sky' : 'tone-icon-honey'}`}>{section.icon}</div>
                   <h2 className="text-[21px] font-display font-bold text-gray-text">
                     {section.title}
                   </h2>

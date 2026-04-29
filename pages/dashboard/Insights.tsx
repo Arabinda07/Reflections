@@ -7,9 +7,7 @@ import {
   Book,
   CaretRight,
   CalendarCheck,
-  Feather,
   Hash,
-  EnvelopeSimple,
 } from '@phosphor-icons/react';
 import { DotLottieReact, type DotLottie } from '@lottiefiles/dotlottie-react';
 import { EmptyState } from '../../components/ui/EmptyState';
@@ -26,21 +24,7 @@ import { FREE_WIKI_MINIMUM_ENTRIES, getWikiInsightsGate } from '../../services/w
 import { buildWeeklyRecap } from '../../services/weeklyRecapService';
 import { moodCheckinService, ritualEventService } from '../../services/engagementServices';
 import { buildCompletionCardPayload } from '../../services/completionCardPayload';
-
-const MOOD_TONE_CLASSES: Record<string, { label: string; track: string; fill: string }> = {
-  happy: { label: 'text-orange', track: 'bg-orange/10', fill: 'bg-orange' },
-  calm: { label: 'text-green', track: 'bg-green/10', fill: 'bg-green' },
-  anxious: { label: 'text-blue', track: 'bg-blue/10', fill: 'bg-blue' },
-  sad: { label: 'text-dark-blue', track: 'bg-dark-blue/10', fill: 'bg-dark-blue' },
-  angry: { label: 'text-red', track: 'bg-red/10', fill: 'bg-red' },
-  tired: { label: 'text-gray-light', track: 'bg-gray-light/20', fill: 'bg-gray-light' },
-};
-
-const DEFAULT_MOOD_TONE = {
-  label: 'text-gray-light',
-  track: 'bg-gray-light/20',
-  fill: 'bg-gray-light',
-};
+import { DEFAULT_MOOD_TONE, getMoodConfig } from './moodConfig';
 
 const TAG_TONE_CLASSES = ['text-green', 'text-blue', 'text-orange', 'text-gray-text'];
 const SANCTUARY_ENTRANCE_LOTTIE = '/assets/lottie/Level%20Up%20Animation.json';
@@ -61,6 +45,7 @@ export const Insights: React.FC = () => {
   const [moodCheckins, setMoodCheckins] = useState<MoodCheckin[]>([]);
   const [ritualEvents, setRitualEvents] = useState<RitualEvent[]>([]);
   const [access, setAccess] = useState<WellnessAccess | null>(null);
+  const [isOverviewOpen, setIsOverviewOpen] = useState(false);
   const [isOpeningSanctuary, setIsOpeningSanctuary] = useState(false);
   const isOpeningSanctuaryRef = useRef(false);
   const openingTimerRef = useRef<number | null>(null);
@@ -98,7 +83,6 @@ export const Insights: React.FC = () => {
     const daysSet = new Set<string>();
     const noteMoodCounts: Record<string, number> = {};
     const checkinMoodCounts: Record<string, number> = {};
-    const tagCounts: Record<string, number> = {};
     let wordsWritten = 0;
 
     notes.forEach((note) => {
@@ -110,12 +94,6 @@ export const Insights: React.FC = () => {
 
       if (note.mood) {
         noteMoodCounts[note.mood] = (noteMoodCounts[note.mood] || 0) + 1;
-      }
-
-      if (note.tags) {
-        note.tags.forEach((tag) => {
-          tagCounts[tag] = (tagCounts[tag] || 0) + 1;
-        });
       }
 
       const plainText = note.content.replace(/<[^>]*>/g, ' ').trim();
@@ -132,21 +110,12 @@ export const Insights: React.FC = () => {
     const hasStandaloneMoodSignal = Object.keys(checkinMoodCounts).length > 0;
     const moodCounts = hasStandaloneMoodSignal ? checkinMoodCounts : noteMoodCounts;
     const topMood = Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
-    const moodData = Object.entries(moodCounts)
-      .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value);
-    const topTags = Object.entries(tagCounts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 10);
 
     return {
       monthNotes,
       totalNotes: notes.length,
       daysCheckedIn: daysSet.size,
       topMood,
-      moodData,
-      moodSignalLabel: hasStandaloneMoodSignal ? 'Mood check-ins' : 'Moods named in entries',
-      topTags,
       wordsWritten,
     };
   }, [moodCheckins, notes]);
@@ -285,21 +254,16 @@ export const Insights: React.FC = () => {
             className="insights-section-header"
           />
 
-          <Surface variant="flat" innerClassName="p-8 md:p-10">
-            <div className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-end">
+          <Surface variant="flat" tone="sky" className="p-8 md:p-10">
+            <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
               <div className="space-y-5">
                 <div className="flex items-center gap-3 text-green">
                   <CalendarCheck size={18} weight="bold" />
                   <p className="text-[11px] font-black uppercase tracking-widest">This week</p>
                 </div>
-                <div className="space-y-3">
-                  <h2 className="text-3xl font-display font-extrabold text-gray-text md:text-5xl">
-                    You returned {weeklyRecap.writingDays} {weeklyRecap.writingDays === 1 ? 'day' : 'days'}
-                  </h2>
-                  <p className="max-w-[44rem] text-[17px] font-serif italic leading-relaxed text-gray-light">
-                    {weeklyRecap.nextQuestion}
-                  </p>
-                </div>
+                <h2 className="text-3xl font-display font-extrabold text-gray-text md:text-5xl">
+                  You returned {weeklyRecap.writingDays} {weeklyRecap.writingDays === 1 ? 'day' : 'days'}
+                </h2>
               </div>
 
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -311,7 +275,7 @@ export const Insights: React.FC = () => {
                   ['Letters opened', weeklyRecap.lettersOpened],
                   ['Active days', weeklyRecap.activityDays.length],
                 ].map(([label, value]) => (
-                  <div key={label} className="rounded-[var(--radius-panel)] border border-border/50 bg-white/5 p-4">
+                  <div key={label} className="tone-chip tone-chip-sky flex-col items-start p-4">
                     <p className="text-2xl font-display font-bold text-gray-text">{value}</p>
                     <p className="mt-1 text-[10px] font-black uppercase tracking-widest text-gray-nav">{label}</p>
                   </div>
@@ -319,136 +283,157 @@ export const Insights: React.FC = () => {
               </div>
             </div>
 
-            <div className="mt-8 grid gap-4 border-t border-border/60 pt-6 md:grid-cols-2">
-              <div className="flex items-start gap-3">
-                <div className="icon-block icon-block-sm">
-                  <Heart size={17} weight="duotone" />
+            <div className="mt-8 grid gap-8 border-t border-border/60 pt-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+              <section>
+                <div className="mb-6 flex items-center gap-3">
+                  <div className="tone-icon tone-icon-sky h-12 w-12">
+                    <Heart size={17} weight="duotone" />
+                  </div>
+                  <h3 className="text-[18px] font-display font-bold text-gray-text">Mood frequency</h3>
                 </div>
-                <div>
-                  <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Common mood</p>
-                  <p className="mt-1 text-[15px] font-bold capitalize text-gray-text">
-                    {weeklyRecap.commonMood || 'Not named yet'}
-                  </p>
+
+                {weeklyRecap.moodData.length === 0 ? (
+                  <EmptyState
+                    surface="none"
+                    icon={<Heart size={22} weight="duotone" />}
+                    title="Mood labels will start to form a pattern here."
+                    description="Check in or add a mood to a reflection and this week will stay readable."
+                  />
+                ) : (
+                  <div className="flex flex-col gap-4">
+                    {weeklyRecap.moodData.map((entry) => {
+                      const maxValue = weeklyRecap.moodData[0].value;
+                      const percent = Math.round((entry.value / maxValue) * 100);
+                      const moodConfig = getMoodConfig(entry.name);
+                      const tone = moodConfig || DEFAULT_MOOD_TONE;
+
+                      return (
+                        <div key={entry.name} className="flex items-center gap-4">
+                          <span className={`w-20 shrink-0 text-[11px] font-black tracking-widest ${tone.labelClass}`}>
+                            {moodConfig?.label || entry.name}
+                          </span>
+                          <div className={`relative h-8 flex-1 overflow-hidden rounded-full ${tone.trackClass}`}>
+                            <div
+                              className={`absolute inset-y-0 left-0 rounded-full ${tone.fillClass}`}
+                              style={{ width: `${percent}%` }}
+                            />
+                          </div>
+                          <span className="w-6 shrink-0 text-right text-[12px] font-extrabold text-gray-nav">
+                            {entry.value}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </section>
+
+              <section>
+                <div className="mb-6 flex items-center gap-3">
+                  <div className="tone-icon tone-icon-honey h-12 w-12">
+                    <Hash size={17} weight="duotone" />
+                  </div>
+                  <h3 className="text-[18px] font-display font-bold text-gray-text">Recurring tags</h3>
                 </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="icon-block icon-block-sm">
-                  <Feather size={17} weight="duotone" />
-                </div>
-                <div>
-                  <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Recurring tags</p>
-                  <p className="mt-1 text-[15px] font-bold text-gray-text">
-                    {weeklyRecap.recurringTags.length
-                      ? weeklyRecap.recurringTags.map(({ tag }) => `#${tag}`).join(' ')
-                      : 'No recurring tags yet'}
-                  </p>
-                </div>
-              </div>
+
+                {weeklyRecap.recurringTags.length === 0 ? (
+                  <EmptyState
+                    surface="none"
+                    icon={<Hash size={22} weight="duotone" />}
+                    title="Tags will appear here."
+                    description="Tag entries this week and the repeated subjects will collect here."
+                  />
+                ) : (
+                  <div className="flex flex-wrap items-center gap-3">
+                    {weeklyRecap.recurringTags.map(({ tag, count }, index) => {
+                      const scale = Math.min(1.45, Math.max(0.92, count / 2.4));
+                      return (
+                        <span
+                          key={tag}
+                          className={`font-display font-bold lowercase ${TAG_TONE_CLASSES[index % TAG_TONE_CLASSES.length]}`}
+                          style={{
+                            fontSize: `${scale}rem`,
+                            lineHeight: '1',
+                          }}
+                        >
+                          #{tag}
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+              </section>
             </div>
-            <div className="mt-6">
+          </Surface>
+
+          <Surface variant="bezel" tone="sage">
+            <button
+              type="button"
+              onClick={() => setIsOverviewOpen((current) => !current)}
+              aria-expanded={isOverviewOpen}
+              aria-controls="insights-overview-panel"
+              className="flex w-full items-center justify-between gap-4 p-6 text-left md:p-8"
+            >
+              <div className="flex items-center gap-3">
+                <div className="tone-icon tone-icon-sage h-12 w-12">
+                  <Book size={17} weight="duotone" />
+                </div>
+                <div>
+                  <p className="text-[11px] font-black uppercase tracking-widest text-green">Overview</p>
+                  <h2 className="mt-1 text-[22px] font-display font-bold text-gray-text">
+                    {stats.monthNotes} reflections this month
+                  </h2>
+                </div>
+              </div>
+              <CaretRight
+                size={18}
+                weight="bold"
+                className={`shrink-0 text-gray-nav transition-transform duration-300 ease-out-expo ${isOverviewOpen ? 'rotate-90' : ''}`}
+              />
+            </button>
+
+            <AnimatePresence initial={false}>
+              {isOverviewOpen ? (
+                <motion.div
+                  id="insights-overview-panel"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                  className="overflow-hidden"
+                >
+                  <div className="space-y-5 border-t border-border/60 p-6 md:p-8">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <MetadataPill tone="sage" icon={<Book size={13} weight="bold" />}>
+                        {stats.wordsWritten.toLocaleString()} words written
+                      </MetadataPill>
+                    </div>
+                    <p className="max-w-2xl text-[18px] font-serif italic leading-relaxed text-gray-light md:text-[20px]">
+                      This month, you checked in on {stats.daysCheckedIn} different days, and the current emotional tone leans{' '}
+                      <span className="font-bold not-italic text-green">
+                        {getMoodConfig(stats.topMood)?.label || stats.topMood || 'toward clarity'}
+                      </span>
+                      .
+                    </p>
+                  </div>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
+          </Surface>
+
+          <Surface variant="flat" tone="honey" className="p-6 md:p-8">
+            <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="text-[11px] font-black uppercase tracking-widest text-honey">Completion card</p>
+                <h2 className="mt-2 text-[22px] font-display font-bold text-gray-text">This week's card</h2>
+              </div>
               <CompletionCardActions payload={weeklyCardPayload} />
             </div>
           </Surface>
 
-          <Surface variant="bezel" innerClassName="p-8 md:p-12">
-            <div className="flex flex-col gap-6 md:gap-8">
-              <div className="flex flex-wrap items-center gap-2">
-                <MetadataPill icon={<Book size={13} weight="bold" />}>
-                  {stats.wordsWritten.toLocaleString()} words written
-                </MetadataPill>
-              </div>
-              
-              <div className="space-y-4 max-w-2xl">
-                <h2 className="whitespace-nowrap text-xl sm:text-3xl md:text-5xl font-display font-extrabold text-gray-text tracking-normal leading-tight">
-                  {stats.monthNotes} reflections
-                </h2>
-                <p className="text-[18px] md:text-[20px] font-serif italic text-gray-light leading-relaxed">
-                  This month, you checked in on {stats.daysCheckedIn} different days, and the current emotional tone leans{' '}
-                  <span className="capitalize text-green font-bold not-italic">
-                    {stats.topMood || 'toward clarity'}
-                  </span>
-                  .
-                </p>
-              </div>
-            </div>
-          </Surface>
-
-          <div className="grid gap-6 md:grid-cols-2">
-            <Surface variant="bezel" innerClassName="p-8">
-              <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-                <h3 className="text-[18px] font-display font-bold text-gray-text">Mood frequency</h3>
-                <MetadataPill icon={<EnvelopeSimple size={13} weight="bold" />}>
-                  {stats.moodSignalLabel}
-                </MetadataPill>
-              </div>
-              {stats.moodData.length === 0 ? (
-                <EmptyState
-                  surface="none"
-                  icon={<Heart size={22} weight="duotone" />}
-                  title="Mood labels will start to form a pattern here."
-                  description="Add moods to your reflections and this panel will stay soft and readable."
-                />
-              ) : (
-                <div className="flex flex-col gap-4">
-                  {stats.moodData.map((entry) => {
-                    const maxValue = stats.moodData[0].value;
-                    const percent = Math.round((entry.value / maxValue) * 100);
-                    const tone = MOOD_TONE_CLASSES[entry.name] || DEFAULT_MOOD_TONE;
-
-                    return (
-                      <div key={entry.name} className="flex items-center gap-4">
-                        <span className={`w-16 shrink-0 text-[11px] font-black capitalize tracking-widest ${tone.label}`}>
-                          {entry.name}
-                        </span>
-                        <div className={`relative h-8 flex-1 overflow-hidden rounded-full ${tone.track}`}>
-                          <div
-                            className={`absolute inset-y-0 left-0 rounded-full ${tone.fill}`}
-                            style={{ width: `${percent}%` }}
-                          />
-                        </div>
-                        <span className="w-6 shrink-0 text-right text-[12px] font-extrabold text-gray-nav">
-                          {entry.value}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </Surface>
-
-            <Surface variant="bezel" innerClassName="p-8">
-              <h3 className="text-[18px] font-display font-bold text-gray-text mb-6">Recurring tags</h3>
-              {stats.topTags.length === 0 ? (
-                <EmptyState
-                  surface="none"
-                  icon={<Hash size={22} weight="duotone" />}
-                  title="Tags will appear here."
-                  description="As you tag your entries, this view will help you spot recurring subjects."
-                />
-              ) : (
-                <div className="flex flex-wrap items-center gap-3">
-                  {stats.topTags.map(([tag, count], index) => {
-                    const scale = Math.min(1.75, Math.max(0.92, count / 2.4));
-                    return (
-                      <span
-                        key={tag}
-                        className={`font-display font-bold lowercase ${TAG_TONE_CLASSES[index % TAG_TONE_CLASSES.length]}`}
-                        style={{
-                          fontSize: `${scale}rem`,
-                          lineHeight: '1',
-                        }}
-                      >
-                        #{tag}
-                      </span>
-                    );
-                  })}
-                </div>
-              )}
-            </Surface>
-          </div>
-
           <Surface
             variant="flat"
+            tone="sage"
             className="overflow-hidden border border-transparent transition-all duration-500 hover:border-green/20"
           >
             <Link
@@ -465,7 +450,7 @@ export const Insights: React.FC = () => {
                     <DotLottieReact src={SANCTUARY_ENTRANCE_LOTTIE} autoplay loop />
                   </div>
                 ) : (
-                  <div className="icon-block icon-block-md">
+                  <div className="tone-icon tone-icon-sage h-14 w-14 rounded-[var(--radius-panel)]">
                     <Book size={26} weight="duotone" />
                   </div>
                 )}

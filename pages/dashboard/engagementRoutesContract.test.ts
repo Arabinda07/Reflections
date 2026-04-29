@@ -6,7 +6,7 @@ const read = (filePath: string) =>
   readFileSync(path.resolve(process.cwd(), filePath), 'utf8');
 
 describe('engagement routes source contract', () => {
-  it('declares release, future letter, and about routes without adding About to primary nav', () => {
+  it('declares release, future letter, and founder routes without adding Founder Talk to primary nav', () => {
     const app = read('App.tsx');
     const routes = read('types.ts');
     const layout = read('layouts/DashboardLayout.tsx');
@@ -21,22 +21,36 @@ describe('engagement routes source contract', () => {
     expect(app).toContain('path={RoutePath.FUTURE_LETTERS}');
     expect(app).toContain('path={RoutePath.ABOUT}');
 
-    expect(layout).toContain('About Arabinda');
+    expect(layout).toContain('Founder Talk');
     expect(layout).toContain('to={RoutePath.ABOUT}');
     const authNavItems = layout.match(/const authNavItems = \[[\s\S]*?\];/)?.[0] || '';
     const guestNavItems = layout.match(/const guestNavItems = \[[\s\S]*?\];/)?.[0] || '';
-    expect(authNavItems).not.toContain('About Arabinda');
-    expect(guestNavItems).not.toContain('About Arabinda');
+    expect(authNavItems).not.toContain('Founder Talk');
+    expect(guestNavItems).not.toContain('Founder Talk');
   });
 
-  it('adds calm Home entry points for Release mode and future letters', () => {
+  it('keeps future letters on Home and moves Release into the note save choice', () => {
     const homeAuthenticated = read('pages/dashboard/HomeAuthenticated.tsx');
+    const createNote = read('pages/dashboard/CreateNote.tsx');
 
-    expect(homeAuthenticated).toContain('RoutePath.RELEASE');
     expect(homeAuthenticated).toContain('RoutePath.FUTURE_LETTERS');
-    expect(homeAuthenticated).toContain('Release');
     expect(homeAuthenticated).toContain('Future letter');
+    expect(homeAuthenticated).not.toContain('RoutePath.RELEASE');
+    expect(createNote).toContain('recordReleaseCompleted');
+    expect(createNote).toContain('Choose what this becomes');
     expect(homeAuthenticated.toLowerCase()).not.toMatch(/\b(streak|xp|leaderboard|lost|failed)\b/);
+  });
+
+  it('folds Terms into the canonical Privacy page', () => {
+    const app = read('App.tsx');
+    const layout = read('layouts/DashboardLayout.tsx');
+    const privacy = read('pages/dashboard/PrivacyPolicy.tsx');
+
+    expect(app).toContain('to={RoutePath.PRIVACY} replace');
+    expect(app).not.toContain('TermsOfService');
+    expect(layout).not.toContain('to={RoutePath.TERMS}');
+    expect(privacy).toContain('Privacy and terms');
+    expect(privacy).toContain('The agreement in plain language');
   });
 
   it('keeps Release mode ephemeral and out of note persistence', () => {
@@ -129,14 +143,14 @@ describe('engagement routes source contract', () => {
     expect(`${layout}\n${account}`.toLowerCase()).not.toMatch(/\b(reward|badge|leaderboard|feed|friends)\b/);
   });
 
-  it('adds a footer-only About Arabinda page in a human founder voice', () => {
+  it('adds a footer-only Founder Talk page in a human founder voice', () => {
     expect(existsSync(path.resolve(process.cwd(), 'pages/dashboard/AboutArabinda.tsx'))).toBe(true);
     const about = read('pages/dashboard/AboutArabinda.tsx');
 
-    expect(about).toContain('About Arabinda');
-    expect(about).toContain('writing-first');
-    expect(about).toContain('AI stays optional');
-    expect(about).toContain('privacy');
+    expect(about).toContain('Founder Talk');
+    expect(about).toContain('writing stay private');
+    expect(about).toContain('AI should wait');
+    expect(about).toContain('Private writing');
     expect(about).toContain('className="-ml-2 min-h-11"');
     expect(about.toLowerCase()).not.toMatch(/\b(streak|score|xp|leaderboard|diagnose|therapy replacement)\b/);
   });

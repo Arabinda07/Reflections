@@ -185,7 +185,7 @@ export const FutureLetters: React.FC = () => {
           />
 
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
-            <Surface variant="flat" className="overflow-hidden">
+            <Surface variant="flat" tone="sky" className="overflow-hidden">
               <form onSubmit={handleSchedule} className="space-y-6 p-6 sm:p-8">
                 <div className="space-y-2">
                   <label htmlFor="future-letter-title" className="label-caps text-gray-nav">
@@ -259,7 +259,7 @@ export const FutureLetters: React.FC = () => {
               </form>
             </Surface>
 
-            <Surface variant="bezel">
+            <Surface variant="bezel" tone="honey">
               <div className="space-y-5 p-6 sm:p-8">
                 <div className="flex items-center justify-between gap-3">
                   <div>

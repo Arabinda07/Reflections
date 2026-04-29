@@ -79,7 +79,8 @@ describe('landing first-paint contract', () => {
     expect(landing).toContain('window.cancelIdleCallback');
     expect(landing).toContain('preload="metadata"');
     expect(landing).not.toContain('preload="auto"');
-    expect(landing).toContain('opacity-90 sm:object-[64%_center]');
+    expect(landing).toContain("isHeroVideoReady ? 'opacity-0' : 'opacity-90'");
+    expect(landing).toContain('sm:object-[64%_center]');
     expect(landing).not.toContain("isHeroPosterReady && !isHeroVideoReady ? 'opacity-90' : 'opacity-0'");
     expect(landing).toContain('onCanPlay={() => setIsHeroVideoReady(true)}');
     expect(landing).toContain('onPlaying={() => setIsHeroVideoReady(true)}');

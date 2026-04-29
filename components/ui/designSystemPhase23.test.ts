@@ -69,7 +69,33 @@ describe('phase 2/3 design-system rollout', () => {
 
     expect(signIn).not.toContain('href="#"');
     expect(signUp).toContain('<SectionHeader');
-    expect(privacyPolicy).toContain('<PageContainer');
-    expect(privacyPolicy).toContain('<SectionHeader');
+    expect(privacyPolicy).toContain('max-w-[1440px]');
+    expect(privacyPolicy).toContain('Privacy and terms');
+  });
+
+  it('keeps the brand color expansion token-driven and surface-based', () => {
+    const css = read('index.css');
+    const surface = read('components/ui/Surface.tsx');
+    const metadataPill = read('components/ui/MetadataPill.tsx');
+    const home = read('pages/dashboard/HomeAuthenticated.tsx');
+    const insights = read('pages/dashboard/Insights.tsx');
+
+    expect(css).toContain('--app-background-wash');
+    expect(css).toContain('--surface-sage-bg');
+    expect(css).toContain('--surface-sky-bg');
+    expect(css).toContain('--surface-honey-bg');
+    expect(css).toContain('--surface-clay-bg');
+    expect(css).toContain('.tone-panel-sage');
+    expect(css).toContain('.tone-icon-sky');
+    expect(css).toContain('.tone-chip-honey');
+    expect(css).not.toMatch(/border-left:\s*(?:[2-9]|\d{2,})px/);
+    expect(css).not.toContain('background-clip: text');
+
+    expect(surface).toContain("tone?: 'neutral' | 'sage' | 'sky' | 'honey' | 'clay'");
+    expect(surface).toContain('surface-tone-${tone}');
+    expect(metadataPill).toContain("'sage' | 'sky' | 'honey' | 'clay'");
+    expect(home).toContain('surface-tone-sage');
+    expect(insights).toContain('tone="sky"');
+    expect(insights).toContain('tone="honey"');
   });
 });

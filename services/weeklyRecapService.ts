@@ -97,7 +97,8 @@ export function buildWeeklyRecap(input: WeeklyRecapInput): WeeklyRecap {
   const moodSource = weekCheckins.length
     ? weekCheckins.map((checkin) => checkin.mood)
     : weekNotes.map((note) => note.mood || '');
-  const commonMood = topEntries(countBy(moodSource.filter(Boolean)), 1)[0]?.[0];
+  const moodData = topEntries(countBy(moodSource.filter(Boolean)), 8)
+    .map(([name, value]) => ({ name, value }));
   const recurringTags = topEntries(countBy(weekNotes.flatMap((note) => note.tags || [])), 5)
     .map(([tag, count]) => ({ tag, count }));
 
@@ -110,11 +111,8 @@ export function buildWeeklyRecap(input: WeeklyRecapInput): WeeklyRecap {
     releaseMoments: weekEvents.filter((event) => event.eventType === 'release_completed').length,
     lettersScheduled: weekEvents.filter((event) => event.eventType === 'letter_scheduled').length,
     lettersOpened: weekEvents.filter((event) => event.eventType === 'letter_opened').length,
-    commonMood,
+    moodData,
     recurringTags,
-    nextQuestion: activityDays.length
-      ? 'What would feel kind to return to next?'
-      : 'What is one small thing you can name today?',
     activityDays,
   };
 }

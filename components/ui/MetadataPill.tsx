@@ -3,7 +3,7 @@ import React from 'react';
 interface MetadataPillProps {
   children: React.ReactNode;
   icon?: React.ReactNode;
-  tone?: 'default' | 'green' | 'orange' | 'red' | 'blue';
+  tone?: 'default' | 'green' | 'orange' | 'red' | 'blue' | 'sage' | 'sky' | 'honey' | 'clay';
   className?: string;
 }
 

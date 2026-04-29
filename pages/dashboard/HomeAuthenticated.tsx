@@ -13,7 +13,6 @@ import {
   Plus,
   Sparkle,
   Target,
-  Wind,
 } from '@phosphor-icons/react';
 import { animate, motion, useReducedMotion, AnimatePresence, Variants } from 'motion/react';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -34,6 +33,7 @@ import {
   getHomeIntentionToggleUpdate,
   type HomeIntentionSummary,
 } from './homeIntentions';
+import { MOOD_CONFIG, MOOD_OPTIONS } from './moodConfig';
 const bentoContainerVariants: Variants = {
   hidden: { opacity: 0 },
   show: {
@@ -107,15 +107,6 @@ const ONBOARDING_STEPS = [
 ];
 
 const onboardingStepIcons = [NotePencil, Feather, LockKey, Archive] as const;
-
-const MOOD_CHECKIN_OPTIONS = [
-  { mood: 'steady', label: 'Steady' },
-  { mood: 'light', label: 'Light' },
-  { mood: 'heavy', label: 'Heavy' },
-  { mood: 'tender', label: 'Tender' },
-  { mood: 'scattered', label: 'Scattered' },
-  { mood: 'grateful', label: 'Grateful' },
-];
 
 export const HomeAuthenticated: React.FC = () => {
   const navigate = useNavigate();
@@ -410,7 +401,7 @@ export const HomeAuthenticated: React.FC = () => {
           {/* Overview Card */}
           <motion.div 
             variants={bentoItemVariants}
-            className="p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full bg-white/50 dark:bg-white/5 rounded-3xl border border-border/40"
+            className="surface-flat surface-tone-sage p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full"
           >
             <div>
               <div className="flex items-center gap-2 text-gray-nav mb-12">
@@ -438,7 +429,7 @@ export const HomeAuthenticated: React.FC = () => {
               onClick={() => navigate(RoutePath.INSIGHTS)}
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.99 }}
-              className="group flex flex-col items-start gap-5 p-7 sm:p-8 rounded-3xl bg-panel-bg border border-border/40 hover:border-green/30 transition-all text-left shadow-none"
+              className="tone-panel tone-panel-sky group flex flex-col items-start gap-5 p-7 sm:p-8 hover:border-sky/30 transition-all text-left shadow-none"
               aria-label="View writing patterns"
             >
               <div className="flex items-center gap-2 text-gray-nav mb-2">
@@ -456,7 +447,7 @@ export const HomeAuthenticated: React.FC = () => {
           {/* Daily Focus & Intentions Card */}
           <motion.div 
             variants={bentoItemVariants}
-            className="p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full bg-white/40 dark:bg-white/5 rounded-3xl border border-border/40 overflow-hidden"
+            className="surface-flat surface-tone-sage p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full overflow-hidden"
           >
             <div>
               <div className="flex items-center justify-between mb-8">
@@ -508,35 +499,22 @@ export const HomeAuthenticated: React.FC = () => {
                     <Heart size={18} weight="duotone" className="ml-2" />
                   </Button>
                 </div>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <Button
-                    variant="outline"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="h-12 w-full justify-center rounded-xl text-[14px] font-bold"
-                    onClick={() => navigate(RoutePath.RELEASE)}
-                    aria-label="Open Release mode"
-                  >
-                    Release
-                    <Wind size={18} weight="duotone" className="ml-2" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="h-12 w-full justify-center rounded-xl text-[14px] font-bold"
-                    onClick={() => navigate(RoutePath.FUTURE_LETTERS)}
-                    aria-label="Write a future letter"
-                  >
-                    Future letter
-                    <EnvelopeSimple size={18} weight="duotone" className="ml-2" />
-                  </Button>
-                </div>
+                <Button
+                  variant="outline"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                    className="h-12 w-full justify-center rounded-xl border-sky/25 bg-sky/5 text-sky hover:bg-sky/10 sm:w-auto"
+                  onClick={() => navigate(RoutePath.FUTURE_LETTERS)}
+                  aria-label="Write a future letter"
+                >
+                  Future letter
+                  <EnvelopeSimple size={18} weight="duotone" className="ml-2" />
+                </Button>
               </div>
             </div>
 
             {/* Nested Intentions Card */}
-            <div className="group flex flex-col gap-4 p-7 sm:p-8 rounded-3xl bg-panel-bg border border-border/40 hover:border-green/20 transition-all text-left shadow-none">
+            <div className="tone-panel tone-panel-honey group flex flex-col gap-4 p-7 sm:p-8 hover:border-honey/25 transition-all text-left shadow-none">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-gray-nav">
                   <ListChecks size={16} weight="bold" className="text-green" />
@@ -562,15 +540,15 @@ export const HomeAuthenticated: React.FC = () => {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         whileTap={{ scale: 0.98 }}
-                        className="w-full flex items-start gap-4 p-4 rounded-2xl bg-white/5 border border-border/40 hover:border-green/20 transition-all text-left shadow-none group/btn"
+                        className="w-full flex items-start gap-4 p-4 rounded-2xl border border-honey/15 bg-honey/5 hover:border-honey/30 transition-all text-left shadow-none group/btn"
                         onClick={() => handleToggleIntention(intention.noteId, intention.id)}
                         aria-label={`Mark "${intention.text}" from ${intention.noteTitle} as complete`}
                       >
                         <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 border-border group-hover/btn:border-green transition-colors">
-                          <div className="h-2 w-2 rounded-full bg-green opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+                           <div className="h-2 w-2 rounded-full bg-honey opacity-0 group-hover/btn:opacity-100 transition-opacity" />
                         </div>
                         <span className="min-w-0">
-                          <span className="block font-serif italic text-[15px] text-gray-text group-hover/btn:text-green transition-colors line-clamp-2 leading-snug">
+                            <span className="block font-serif italic text-[15px] text-gray-text group-hover/btn:text-honey transition-colors line-clamp-2 leading-snug">
                             {intention.text}
                           </span>
                         </span>
@@ -609,7 +587,7 @@ export const HomeAuthenticated: React.FC = () => {
           {/* Quote Card */}
           <motion.div 
             variants={bentoItemVariants}
-            className="p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full bg-white/60 dark:bg-white/5 rounded-3xl border border-border/40"
+            className="surface-flat surface-tone-honey p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full"
           >
             <div className="flex-grow">
               <div className="flex items-center gap-2 text-gray-nav mb-12">
@@ -742,17 +720,23 @@ export const HomeAuthenticated: React.FC = () => {
             Name the weather of this moment without writing a full reflection.
           </p>
           <div className="grid grid-cols-2 gap-3">
-            {MOOD_CHECKIN_OPTIONS.map((option) => (
-              <button
-                key={option.mood}
-                type="button"
-                onClick={() => handleMoodCheckIn(option.mood)}
-                disabled={isSavingCheckIn}
-                className="rounded-2xl border border-border bg-white/5 p-4 text-left transition-all hover:border-green/25 hover:bg-green/5 disabled:opacity-60"
-              >
-                <span className="text-[15px] font-bold text-gray-text">{option.label}</span>
-              </button>
-            ))}
+            {MOOD_OPTIONS.map((moodOption) => {
+              const moodConfig = MOOD_CONFIG[moodOption];
+              const Icon = moodConfig.icon;
+
+              return (
+                <button
+                  key={moodOption}
+                  type="button"
+                  onClick={() => handleMoodCheckIn(moodOption)}
+                  disabled={isSavingCheckIn}
+                  className={`rounded-2xl border p-4 text-left transition-all disabled:opacity-60 ${moodConfig.option}`}
+                >
+                  <Icon size={22} weight="duotone" className={`mb-3 ${moodConfig.labelClass}`} />
+                  <span className="text-[15px] font-bold text-gray-text">{moodConfig.label}</span>
+                </button>
+              );
+            })}
           </div>
           {checkInFeedback ? (
             <p className="text-[13px] font-bold text-green" aria-live="polite">
