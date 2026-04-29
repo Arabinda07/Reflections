@@ -5,12 +5,15 @@ import {
   CheckCircle as CheckCircleIcon,
   Feather,
   FolderOpen,
+  Heart,
   ListChecks,
   LockKey,
   NotePencil,
+  EnvelopeSimple,
   Plus,
   Sparkle,
   Target,
+  Wind,
 } from '@phosphor-icons/react';
 import { animate, motion, useReducedMotion, AnimatePresence, Variants } from 'motion/react';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -21,6 +24,7 @@ import { Button } from '../../components/ui/Button';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { useAuth } from '../../context/AuthContext';
 import { aiService } from '../../services/aiService';
+import { moodCheckinService } from '../../services/engagementServices';
 import { noteService } from '../../services/noteService';
 import { DEFAULT_WELLNESS_PROMPTS } from '../../services/wellnessPrompts';
 import { supabase } from '../../src/supabaseClient';
@@ -104,6 +108,15 @@ const ONBOARDING_STEPS = [
 
 const onboardingStepIcons = [NotePencil, Feather, LockKey, Archive] as const;
 
+const MOOD_CHECKIN_OPTIONS = [
+  { mood: 'steady', label: 'Steady' },
+  { mood: 'light', label: 'Light' },
+  { mood: 'heavy', label: 'Heavy' },
+  { mood: 'tender', label: 'Tender' },
+  { mood: 'scattered', label: 'Scattered' },
+  { mood: 'grateful', label: 'Grateful' },
+];
+
 export const HomeAuthenticated: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -116,6 +129,9 @@ export const HomeAuthenticated: React.FC = () => {
   const [onboardingStep, setOnboardingStep] = useState(0);
   const [dailyPrompt, setDailyPrompt] = useState(DEFAULT_WELLNESS_PROMPTS[0]);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isCheckInOpen, setIsCheckInOpen] = useState(false);
+  const [isSavingCheckIn, setIsSavingCheckIn] = useState(false);
+  const [checkInFeedback, setCheckInFeedback] = useState<string | null>(null);
   const [quote, setQuote] = useState({ text: '', author: '' });
   const [taskNotes, setTaskNotes] = useState<Note[]>([]);
   const [intentionSummary, setIntentionSummary] = useState<HomeIntentionSummary>(() =>
@@ -149,7 +165,7 @@ export const HomeAuthenticated: React.FC = () => {
             quotesPool = [...WRITING_NOTES, ...parsed];
           }
         } catch (e) {
-          console.error('Failed to parse cached quotes', e);
+          console.error('Could not parse cached quotes', e);
         }
       } else {
         // Fetch new quotes from AI
@@ -161,7 +177,7 @@ export const HomeAuthenticated: React.FC = () => {
             quotesPool = [...WRITING_NOTES, ...freshQuotes];
           }
         } catch (e) {
-          console.error('Failed to fetch dynamic quotes', e);
+          console.error('Could not fetch dynamic quotes', e);
         }
       }
 
@@ -290,6 +306,30 @@ export const HomeAuthenticated: React.FC = () => {
     navigate(RoutePath.CREATE_NOTE);
   };
 
+  const handleMoodCheckIn = async (mood: string) => {
+    if (isSavingCheckIn) return;
+
+    setIsSavingCheckIn(true);
+    setCheckInFeedback(null);
+
+    try {
+      await moodCheckinService.create({
+        mood,
+        source: 'home',
+      });
+      setCheckInFeedback('Saved. This moment counts.');
+      window.setTimeout(() => {
+        setIsCheckInOpen(false);
+        setCheckInFeedback(null);
+      }, 900);
+    } catch (error) {
+      console.error('Could not save mood check-in:', error);
+      setCheckInFeedback('Could not save that just now.');
+    } finally {
+      setIsSavingCheckIn(false);
+    }
+  };
+
   const handleToggleIntention = async (noteId: string, taskId: string) => {
     try {
       const note = taskNotes.find((item) => item.id === noteId) || await noteService.getById(noteId);
@@ -304,7 +344,7 @@ export const HomeAuthenticated: React.FC = () => {
         : [...taskNotes, updatedNote];
       updateIntentionSummary(nextNotes);
     } catch (err) {
-      console.error('Failed to toggle intention:', err);
+      console.error('Could not update intention:', err);
     }
   };
 
@@ -444,17 +484,54 @@ export const HomeAuthenticated: React.FC = () => {
                 >
                   {dailyPrompt}
                 </p>
-                <Button
-                  variant="primary"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="h-14 w-full md:w-auto px-8 rounded-xl text-[15px] font-bold bg-green text-white hover:bg-green/90 transition-colors shadow-none"
-                  onClick={() => handleCreateClick(dailyPrompt)}
-                  aria-label="Start a new reflection with this prompt"
-                >
-                  Start Reflection
-                  <Plus size={18} weight="bold" className="ml-2" />
-                </Button>
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <Button
+                    variant="primary"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="h-14 w-full md:w-auto px-8 rounded-xl text-[15px] font-bold bg-green text-white hover:bg-green/90 transition-colors shadow-none"
+                    onClick={() => handleCreateClick(dailyPrompt)}
+                    aria-label="Start a new reflection with this prompt"
+                  >
+                    Start Reflection
+                    <Plus size={18} weight="bold" className="ml-2" />
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="h-14 w-full md:w-auto px-8 rounded-xl text-[15px] font-bold"
+                    onClick={() => setIsCheckInOpen(true)}
+                    aria-label="Save a standalone mood check-in"
+                  >
+                    Check in
+                    <Heart size={18} weight="duotone" className="ml-2" />
+                  </Button>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <Button
+                    variant="outline"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="h-12 w-full justify-center rounded-xl text-[14px] font-bold"
+                    onClick={() => navigate(RoutePath.RELEASE)}
+                    aria-label="Open Release mode"
+                  >
+                    Release
+                    <Wind size={18} weight="duotone" className="ml-2" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="h-12 w-full justify-center rounded-xl text-[14px] font-bold"
+                    onClick={() => navigate(RoutePath.FUTURE_LETTERS)}
+                    aria-label="Write a future letter"
+                  >
+                    Future letter
+                    <EnvelopeSimple size={18} weight="duotone" className="ml-2" />
+                  </Button>
+                </div>
               </div>
             </div>
 
@@ -647,6 +724,42 @@ export const HomeAuthenticated: React.FC = () => {
             </div>
           </motion.div>
         </AnimatePresence>
+      </ModalSheet>
+
+      <ModalSheet
+        isOpen={isCheckInOpen}
+        onClose={() => {
+          setIsCheckInOpen(false);
+          setCheckInFeedback(null);
+        }}
+        title="Check in"
+        icon={<Heart size={20} weight="duotone" />}
+        size="sm"
+        bodyClassName="pt-2"
+      >
+        <div className="space-y-5">
+          <p className="text-[15px] font-medium leading-relaxed text-gray-light">
+            Name the weather of this moment without writing a full reflection.
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            {MOOD_CHECKIN_OPTIONS.map((option) => (
+              <button
+                key={option.mood}
+                type="button"
+                onClick={() => handleMoodCheckIn(option.mood)}
+                disabled={isSavingCheckIn}
+                className="rounded-2xl border border-border bg-white/5 p-4 text-left transition-all hover:border-green/25 hover:bg-green/5 disabled:opacity-60"
+              >
+                <span className="text-[15px] font-bold text-gray-text">{option.label}</span>
+              </button>
+            ))}
+          </div>
+          {checkInFeedback ? (
+            <p className="text-[13px] font-bold text-green" aria-live="polite">
+              {checkInFeedback}
+            </p>
+          ) : null}
+        </div>
       </ModalSheet>
 
       <div

@@ -98,6 +98,81 @@ export interface MonthlyWellnessSummary {
   nextStep: string;
 }
 
+export interface MoodCheckin {
+  id: string;
+  userId: string;
+  mood: string;
+  label?: string;
+  source?: string;
+  createdAt: string;
+}
+
+export type FutureLetterStatus = 'scheduled' | 'opened' | 'archived';
+
+export interface FutureLetter {
+  id: string;
+  userId: string;
+  title: string;
+  content: string;
+  openAt: string;
+  openedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  status: FutureLetterStatus;
+}
+
+export type RitualEventType =
+  | 'release_completed'
+  | 'letter_scheduled'
+  | 'letter_opened'
+  | 'completion_card_created';
+
+export interface RitualEvent {
+  id: string;
+  userId: string;
+  eventType: RitualEventType;
+  sourceId?: string;
+  createdAt: string;
+}
+
+export interface WeeklyRecap {
+  weekStart: string;
+  weekEnd: string;
+  writingDays: number;
+  reflectionsSaved: number;
+  moodCheckins: number;
+  releaseMoments: number;
+  lettersScheduled: number;
+  lettersOpened: number;
+  commonMood?: string;
+  recurringTags: Array<{ tag: string; count: number }>;
+  nextQuestion: string;
+  activityDays: string[];
+}
+
+export interface WritingRhythm {
+  daysThisWeek: number;
+  showedUpToday: boolean;
+  activityDays: string[];
+  message: string;
+}
+
+export interface ReferralInvite {
+  id: string;
+  userId: string;
+  code: string;
+  createdAt: string;
+  lastSharedAt?: string;
+}
+
+export interface Referral {
+  id: string;
+  inviterUserId: string;
+  referredUserId: string;
+  code: string;
+  acceptedAt: string;
+}
+
 export enum RoutePath {
   HOME = '/',
   NOTES = '/notes',
@@ -109,7 +184,10 @@ export enum RoutePath {
   SIGNUP = '/signup',
   RESET_PASSWORD = '/reset-password',
   INSIGHTS = '/insights',
+  RELEASE = '/release',
+  FUTURE_LETTERS = '/letters',
   FAQ = '/faq',
+  ABOUT = '/about',
   PRIVACY = '/privacy',
   TERMS = '/terms',
   WIKI = '/wiki',

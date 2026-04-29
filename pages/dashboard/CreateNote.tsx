@@ -733,7 +733,7 @@ export const CreateNote: React.FC = () => {
             
             {/* Options */}
             <button onClick={() => setIsMoodOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${mood ? MOOD_CONFIG[mood]?.nav || 'bg-green/10 border-green/20 text-green' : 'bg-transparent border-transparent hover:bg-white dark:hover:bg-white/5 hover:border-border/40 text-gray-text'}`}>
-              <div className="flex items-center gap-3"><ActiveMoodIcon size={20} weight={mood ? "fill" : "regular"} /><span className="text-[13px] font-bold capitalize">{mood ? mood : 'Mood'}</span></div>
+              <div className="flex items-center gap-3"><ActiveMoodIcon size={20} weight={mood ? "fill" : "regular"} /><span className="text-[13px] font-bold capitalize">{mood ? mood : 'Reflection mood'}</span></div>
               <CaretRight size={14} className="opacity-40" />
             </button>
 
@@ -953,7 +953,7 @@ export const CreateNote: React.FC = () => {
         bodyClassName="pt-2"
       >
         <div className="grid grid-cols-2 gap-3">
-          <button onClick={() => { setIsMobileOptionsOpen(false); setIsMoodOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${mood ? MOOD_CONFIG[mood]?.nav || 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><ActiveMoodIcon size={24} weight={mood ? "fill" : "regular"} /><span className="text-[14px] font-bold capitalize">{mood ? mood : 'Mood'}</span></button>
+          <button onClick={() => { setIsMobileOptionsOpen(false); setIsMoodOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${mood ? MOOD_CONFIG[mood]?.nav || 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><ActiveMoodIcon size={24} weight={mood ? "fill" : "regular"} /><span className="text-[14px] font-bold capitalize">{mood ? mood : 'Reflection mood'}</span></button>
           <button onClick={() => { setIsMobileOptionsOpen(false); setIsTagsOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><TagIcon size={24} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-[14px] font-bold">Tags</span></button>
           <button onClick={() => { setIsMobileOptionsOpen(false); setIsMusicOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${musicPlaying ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><Headphones size={24} weight={musicPlaying ? "fill" : "regular"} /><span className="text-[14px] font-bold">Sounds</span></button>
           <button onClick={() => { setIsMobileOptionsOpen(false); setIsTasksOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'border-border text-gray-text'}`}><ListChecks size={24} weight={tasks.some(t => !t.completed) ? "fill" : "regular"} /><span className="text-[14px] font-bold">Tasks</span></button>
@@ -1049,7 +1049,7 @@ export const CreateNote: React.FC = () => {
       <ModalSheet
         isOpen={isMoodOpen}
         onClose={() => setIsMoodOpen(false)}
-        title="Mood"
+        title="Reflection mood"
         size="sm"
         bodyClassName="pt-2"
       >

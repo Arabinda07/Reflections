@@ -19,10 +19,13 @@ const ResetPassword = lazy(() => import('./pages/auth/ResetPassword').then(m => 
 const MyNotes = lazy(() => import('./pages/dashboard/MyNotes').then(m => ({ default: m.MyNotes })));
 const CreateNote = lazy(() => import('./pages/dashboard/CreateNote').then(m => ({ default: m.CreateNote })));
 const SingleNote = lazy(() => import('./pages/dashboard/SingleNote').then(m => ({ default: m.SingleNote })));
+const ReleaseMode = lazy(() => import('./pages/dashboard/ReleaseMode').then(m => ({ default: m.ReleaseMode })));
+const FutureLetters = lazy(() => import('./pages/dashboard/FutureLetters').then(m => ({ default: m.FutureLetters })));
 const Account = lazy(() => import('./pages/dashboard/Account').then(m => ({ default: m.Account })));
 const Insights = lazy(() => import('./pages/dashboard/Insights').then(m => ({ default: m.Insights })));
 const LifeWiki = lazy(() => import('./pages/dashboard/LifeWiki').then(m => ({ default: m.LifeWiki })));
 const FAQ = lazy(() => import('./pages/dashboard/FAQ').then(m => ({ default: m.FAQ })));
+const AboutArabinda = lazy(() => import('./pages/dashboard/AboutArabinda').then(m => ({ default: m.AboutArabinda })));
 const PrivacyPolicy = lazy(() => import('./pages/dashboard/PrivacyPolicy').then(m => ({ default: m.PrivacyPolicy })));
 const TermsOfService = lazy(() => import('./pages/dashboard/TermsOfService').then(m => ({ default: m.TermsOfService })));
 const NotFound = lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })));
@@ -51,6 +54,7 @@ const router = createHashRouter(
     <Route element={<DashboardLayout />} errorElement={<RouteErrorBoundary />}>
       <Route path={RoutePath.HOME} element={<Home />} />
       <Route path={RoutePath.FAQ} element={withRouteFallback(<FAQ />)} />
+      <Route path={RoutePath.ABOUT} element={withRouteFallback(<AboutArabinda />)} />
       <Route path={RoutePath.PRIVACY} element={withRouteFallback(<PrivacyPolicy />)} />
       <Route path={RoutePath.TERMS} element={withRouteFallback(<TermsOfService />)} />
 
@@ -87,6 +91,22 @@ const router = createHashRouter(
         element={
           <ProtectedRoute>
             {withRouteFallback(<SingleNote />)}
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={RoutePath.RELEASE}
+        element={
+          <ProtectedRoute>
+            {withRouteFallback(<ReleaseMode />)}
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path={RoutePath.FUTURE_LETTERS}
+        element={
+          <ProtectedRoute>
+            {withRouteFallback(<FutureLetters />)}
           </ProtectedRoute>
         }
       />

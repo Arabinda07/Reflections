@@ -195,7 +195,165 @@ create policy "Users can delete their own absorb log"
 
 
 -- ─────────────────────────────────────────────
--- 5. STORAGE POLICIES (app-files bucket)
+-- 5. ENGAGEMENT LAYER
+-- ─────────────────────────────────────────────
+
+create table if not exists mood_checkins (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) on delete cascade not null,
+  mood text not null,
+  label text,
+  source text,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+alter table mood_checkins enable row level security;
+
+drop policy if exists "Users can view their own mood check-ins" on mood_checkins;
+create policy "Users can view their own mood check-ins"
+  on mood_checkins for select using (auth.uid() = user_id);
+
+drop policy if exists "Users can insert their own mood check-ins" on mood_checkins;
+create policy "Users can insert their own mood check-ins"
+  on mood_checkins for insert with check (auth.uid() = user_id);
+
+drop policy if exists "Users can delete their own mood check-ins" on mood_checkins;
+create policy "Users can delete their own mood check-ins"
+  on mood_checkins for delete using (auth.uid() = user_id);
+
+create table if not exists future_letters (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) on delete cascade not null,
+  title text default '',
+  content text default '',
+  open_at timestamp with time zone not null,
+  opened_at timestamp with time zone,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  status text default 'scheduled' check (status in ('scheduled', 'opened', 'archived'))
+);
+
+alter table future_letters enable row level security;
+
+drop policy if exists "Users can view their own future letters" on future_letters;
+create policy "Users can view their own future letters"
+  on future_letters for select using (auth.uid() = user_id);
+
+drop policy if exists "Users can insert their own future letters" on future_letters;
+create policy "Users can insert their own future letters"
+  on future_letters for insert with check (auth.uid() = user_id);
+
+drop policy if exists "Users can update their own future letters" on future_letters;
+create policy "Users can update their own future letters"
+  on future_letters for update using (auth.uid() = user_id);
+
+drop policy if exists "Users can delete their own future letters" on future_letters;
+create policy "Users can delete their own future letters"
+  on future_letters for delete using (auth.uid() = user_id);
+
+create table if not exists ritual_events (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) on delete cascade not null,
+  event_type text not null check (event_type in ('release_completed', 'letter_scheduled', 'letter_opened', 'completion_card_created')),
+  source_id uuid,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+alter table ritual_events enable row level security;
+
+drop policy if exists "Users can view their own ritual events" on ritual_events;
+create policy "Users can view their own ritual events"
+  on ritual_events for select using (auth.uid() = user_id);
+
+drop policy if exists "Users can insert their own ritual events" on ritual_events;
+create policy "Users can insert their own ritual events"
+  on ritual_events for insert with check (auth.uid() = user_id);
+
+drop policy if exists "Users can delete their own ritual events" on ritual_events;
+create policy "Users can delete their own ritual events"
+  on ritual_events for delete using (auth.uid() = user_id);
+
+create table if not exists referral_invites (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) on delete cascade not null,
+  code text not null unique,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  last_shared_at timestamp with time zone,
+  unique(user_id)
+);
+
+alter table referral_invites enable row level security;
+
+drop policy if exists "Users can view their own referral invite" on referral_invites;
+create policy "Users can view their own referral invite"
+  on referral_invites for select using (auth.uid() = user_id);
+
+drop policy if exists "Users can insert their own referral invite" on referral_invites;
+create policy "Users can insert their own referral invite"
+  on referral_invites for insert with check (auth.uid() = user_id);
+
+drop policy if exists "Users can update their own referral invite" on referral_invites;
+create policy "Users can update their own referral invite"
+  on referral_invites for update using (auth.uid() = user_id);
+
+drop policy if exists "Users can delete their own referral invite" on referral_invites;
+create policy "Users can delete their own referral invite"
+  on referral_invites for delete using (auth.uid() = user_id);
+
+create table if not exists referrals (
+  id uuid default gen_random_uuid() primary key,
+  inviter_user_id uuid references auth.users(id) on delete cascade not null,
+  referred_user_id uuid references auth.users(id) on delete cascade not null unique,
+  code text not null,
+  accepted_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  unique(inviter_user_id, referred_user_id)
+);
+
+alter table referrals enable row level security;
+
+drop policy if exists "Users can view referrals they are part of" on referrals;
+create policy "Users can view referrals they are part of"
+  on referrals for select using (auth.uid() = inviter_user_id or auth.uid() = referred_user_id);
+
+drop policy if exists "Referred users can record accepted referrals" on referrals;
+create policy "Referred users can record accepted referrals"
+  on referrals for insert with check (auth.uid() = referred_user_id and inviter_user_id <> auth.uid());
+
+create or replace function public.accept_referral_invite(referral_code text)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  inviter_id uuid;
+begin
+  if auth.uid() is null then
+    return false;
+  end if;
+
+  select user_id into inviter_id
+  from public.referral_invites
+  where code = referral_code
+  limit 1;
+
+  if inviter_id is null or inviter_id = auth.uid() then
+    return false;
+  end if;
+
+  insert into public.referrals (inviter_user_id, referred_user_id, code)
+  values (inviter_id, auth.uid(), referral_code)
+  on conflict (referred_user_id) do nothing;
+
+  return true;
+end;
+$$;
+
+grant execute on function public.accept_referral_invite(text) to authenticated;
+
+
+-- ─────────────────────────────────────────────
+-- 6. STORAGE POLICIES (app-files bucket)
 -- ─────────────────────────────────────────────
 -- Assumes the bucket 'app-files' already exists.
 -- Create it manually in Supabase Dashboard → Storage if not.
@@ -222,7 +380,7 @@ create policy "Users can delete own files"
 
 
 -- ─────────────────────────────────────────────
--- 6. TRIGGERS & FUNCTIONS
+-- 7. TRIGGERS & FUNCTIONS
 -- ─────────────────────────────────────────────
 
 -- 6a. Auto-create profile on signup
@@ -277,6 +435,11 @@ begin
   delete from public.theme_citations
     where theme_id in (select id from public.life_themes where user_id = auth.uid());
   delete from public.life_themes where user_id = auth.uid();
+  delete from public.mood_checkins where user_id = auth.uid();
+  delete from public.future_letters where user_id = auth.uid();
+  delete from public.ritual_events where user_id = auth.uid();
+  delete from public.referrals where inviter_user_id = auth.uid() or referred_user_id = auth.uid();
+  delete from public.referral_invites where user_id = auth.uid();
   delete from public.notes where user_id = auth.uid();
   delete from public.profiles where id = auth.uid();
 end;
@@ -284,7 +447,7 @@ $$ language plpgsql security definer;
 
 
 -- ─────────────────────────────────────────────
--- 7. MIGRATION HELPERS
+-- 8. MIGRATION HELPERS
 -- ─────────────────────────────────────────────
 -- If tables already exist but are missing columns,
 -- these will add them safely.

@@ -15,4 +15,17 @@ describe('Insights layout contract', () => {
     expect(css).toContain('.insights-section-header .section-header-title');
     expect(css).toContain('white-space: nowrap');
   });
+
+  it('adds the weekly recap from standalone engagement signals without streak copy', () => {
+    const insights = read('pages/dashboard/Insights.tsx');
+
+    expect(insights).toContain('buildWeeklyRecap');
+    expect(insights).toContain('moodCheckinService.list');
+    expect(insights).toContain('ritualEventService.listSince');
+    expect(insights).toContain('This week');
+    expect(insights).toContain('Mood check-ins');
+    expect(insights).toContain('Moods named in entries');
+    expect(insights.toLowerCase()).not.toMatch(/\b(streak|lost|xp|leaderboard)\b/);
+    expect(insights).not.toMatch(/>\s*Failed/i);
+  });
 });

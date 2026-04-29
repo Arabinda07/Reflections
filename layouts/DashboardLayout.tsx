@@ -22,7 +22,9 @@ import { usePWAInstall } from '../context/PWAInstallContext';
 import { AnalyticsRouteTracker } from '../src/analytics/AnalyticsRouteTracker';
 import { Button } from '../components/ui/Button';
 import { ModalSheet } from '../components/ui/ModalSheet';
+import { ReferralInvitePanel } from '../components/ui/ReferralInvitePanel';
 import { SyncBanner } from '../components/ui/SyncBanner';
+import { referralService } from '../services/engagementServices';
 import { registerAndroidBackAction } from '../src/native/androidBack';
 import { NATIVE_PAGE_TOP_PADDING, NATIVE_TOP_CONTROL_OFFSET } from '../src/native/safeArea';
 import { useAndroidBackHandler } from '../src/native/useAndroidBackHandler';
@@ -59,12 +61,17 @@ export const DashboardLayout: React.FC = () => {
 
   // Bug Report State
   const [isBugModalOpen, setIsBugModalOpen] = useState(false);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [bugMessage, setBugMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   useAndroidBackHandler();
+
+  useEffect(() => {
+    referralService.captureReferralCode(location.search);
+  }, [location.search]);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -199,6 +206,7 @@ export const DashboardLayout: React.FC = () => {
 
   const navItems = isAuthenticated ? authNavItems : guestNavItems;
   const isWritingRoute =
+    location.pathname === RoutePath.RELEASE ||
     location.pathname.includes('/new') ||
     location.pathname.includes('/edit') ||
     (location.pathname.startsWith('/notes/') && location.pathname !== '/notes/');
@@ -259,14 +267,25 @@ export const DashboardLayout: React.FC = () => {
             ))}
             <div className="w-[1px] h-[24px] bg-border mx-2"></div>
             {isAuthenticated ? (
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => logout()}
-                className="text-red hover:bg-red/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red"
-              >
-                Logout
-              </Button>
+              <>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setIsInviteModalOpen(true)}
+                  className="gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+                >
+                  Invite
+                  <PaperPlaneTilt size={16} weight="bold" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => logout()}
+                  className="text-red hover:bg-red/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red"
+                >
+                  Logout
+                </Button>
+              </>
             ) : (
               <div className="flex gap-2">
                 <Button 
@@ -387,6 +406,18 @@ export const DashboardLayout: React.FC = () => {
                         </button>
                       )}
                       <Button
+                        variant="secondary"
+                        size="lg"
+                        onClick={() => {
+                          setIsInviteModalOpen(true);
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="w-full h-16 font-black rounded-2xl"
+                      >
+                        Invite
+                        <PaperPlaneTilt size={18} weight="bold" className="ml-2" />
+                      </Button>
+                      <Button
                         variant="ghost"
                         size="lg"
                         onClick={() => {
@@ -447,6 +478,12 @@ export const DashboardLayout: React.FC = () => {
                   className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-all"
                 >
                   FAQ
+                </Link>
+                <Link
+                  to={RoutePath.ABOUT}
+                  className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-all"
+                >
+                  About Arabinda
                 </Link>
                 <Link 
                   to={RoutePath.PRIVACY}
@@ -563,6 +600,17 @@ export const DashboardLayout: React.FC = () => {
         </AnimatePresence>,
         document.body
       )}
+
+      <ModalSheet
+        isOpen={isInviteModalOpen}
+        onClose={() => setIsInviteModalOpen(false)}
+        title="Invite someone"
+        description="Share Reflections with someone who might want a quiet space to write."
+        icon={<PaperPlaneTilt size={20} weight="duotone" />}
+        size="md"
+      >
+        <ReferralInvitePanel compact />
+      </ModalSheet>
     </div>
   );
 };

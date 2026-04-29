@@ -6,19 +6,26 @@ import {
   Heart,
   Book,
   CaretRight,
+  CalendarCheck,
+  Feather,
   Hash,
+  EnvelopeSimple,
 } from '@phosphor-icons/react';
 import { DotLottieReact, type DotLottie } from '@lottiefiles/dotlottie-react';
 import { EmptyState } from '../../components/ui/EmptyState';
+import { CompletionCardActions } from '../../components/ui/CompletionCardActions';
 import { MetadataPill } from '../../components/ui/MetadataPill';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { Surface } from '../../components/ui/Surface';
-import { LifeTheme, Note, RoutePath, WellnessAccess } from '../../types';
+import { LifeTheme, MoodCheckin, Note, RitualEvent, RoutePath, WellnessAccess } from '../../types';
 import { noteService } from '../../services/noteService';
 import { wikiService } from '../../services/wikiService';
 import { profileService } from '../../services/profileService';
 import { FREE_WIKI_MINIMUM_ENTRIES, getWikiInsightsGate } from '../../services/wellnessPolicy';
+import { buildWeeklyRecap } from '../../services/weeklyRecapService';
+import { moodCheckinService, ritualEventService } from '../../services/engagementServices';
+import { buildCompletionCardPayload } from '../../services/completionCardService';
 
 const MOOD_TONE_CLASSES: Record<string, { label: string; track: string; fill: string }> = {
   happy: { label: 'text-orange', track: 'bg-orange/10', fill: 'bg-orange' },
@@ -39,11 +46,20 @@ const TAG_TONE_CLASSES = ['text-green', 'text-blue', 'text-orange', 'text-gray-t
 const SANCTUARY_ENTRANCE_LOTTIE = '/assets/lottie/Level%20Up%20Animation.json';
 const SANCTUARY_ENTRANCE_FALLBACK_MS = 2200;
 
+const getWeekSignalSince = () => {
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+  start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+  return start.toISOString();
+};
+
 export const Insights: React.FC = () => {
   const navigate = useNavigate();
   const shouldReduceMotion = useReducedMotion();
   const [notes, setNotes] = useState<Note[]>([]);
   const [themes, setThemes] = useState<LifeTheme[]>([]);
+  const [moodCheckins, setMoodCheckins] = useState<MoodCheckin[]>([]);
+  const [ritualEvents, setRitualEvents] = useState<RitualEvent[]>([]);
   const [access, setAccess] = useState<WellnessAccess | null>(null);
   const [isOpeningSanctuary, setIsOpeningSanctuary] = useState(false);
   const isOpeningSanctuaryRef = useRef(false);
@@ -52,15 +68,19 @@ export const Insights: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [allNotes, allThemes, accessData] = await Promise.all([
+        const [allNotes, allThemes, accessData, checkins, events] = await Promise.all([
           noteService.getAll(),
           wikiService.getAllThemes(),
           profileService.getWellnessAccess(),
+          moodCheckinService.list(),
+          ritualEventService.listSince(getWeekSignalSince()),
         ]);
 
         setNotes(allNotes);
         setThemes(allThemes);
         setAccess(accessData);
+        setMoodCheckins(checkins);
+        setRitualEvents(events);
       } catch (error) {
         console.error('[Insights] Failed to load data:', error);
       }
@@ -76,7 +96,8 @@ export const Insights: React.FC = () => {
 
     let monthNotes = 0;
     const daysSet = new Set<string>();
-    const moodCounts: Record<string, number> = {};
+    const noteMoodCounts: Record<string, number> = {};
+    const checkinMoodCounts: Record<string, number> = {};
     const tagCounts: Record<string, number> = {};
     let wordsWritten = 0;
 
@@ -88,7 +109,7 @@ export const Insights: React.FC = () => {
       }
 
       if (note.mood) {
-        moodCounts[note.mood] = (moodCounts[note.mood] || 0) + 1;
+        noteMoodCounts[note.mood] = (noteMoodCounts[note.mood] || 0) + 1;
       }
 
       if (note.tags) {
@@ -101,7 +122,16 @@ export const Insights: React.FC = () => {
       wordsWritten += plainText ? plainText.split(/\s+/).filter(Boolean).length : 0;
     });
 
-    const topMood = Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'undefined';
+    moodCheckins.forEach((checkin) => {
+      const date = new Date(checkin.createdAt);
+      if (date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
+        checkinMoodCounts[checkin.mood] = (checkinMoodCounts[checkin.mood] || 0) + 1;
+      }
+    });
+
+    const hasStandaloneMoodSignal = Object.keys(checkinMoodCounts).length > 0;
+    const moodCounts = hasStandaloneMoodSignal ? checkinMoodCounts : noteMoodCounts;
+    const topMood = Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
     const moodData = Object.entries(moodCounts)
       .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value);
@@ -115,10 +145,29 @@ export const Insights: React.FC = () => {
       daysCheckedIn: daysSet.size,
       topMood,
       moodData,
+      moodSignalLabel: hasStandaloneMoodSignal ? 'Mood check-ins' : 'Moods named in entries',
       topTags,
       wordsWritten,
     };
-  }, [notes]);
+  }, [moodCheckins, notes]);
+
+  const weeklyRecap = useMemo(() => buildWeeklyRecap({
+    notes,
+    moodCheckins,
+    ritualEvents,
+  }), [moodCheckins, notes, ritualEvents]);
+
+  const weeklyCardPayload = useMemo(() => buildCompletionCardPayload({
+    kind: 'weekly_recap',
+    date: new Date(weeklyRecap.weekEnd),
+    weekLabel: `${new Date(weeklyRecap.weekStart).toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+    })} - ${new Date(weeklyRecap.weekEnd).toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+    })}`,
+  }), [weeklyRecap.weekEnd, weeklyRecap.weekStart]);
 
   const wikiGate = useMemo(() => {
     if (!access) return null;
@@ -236,6 +285,71 @@ export const Insights: React.FC = () => {
             className="insights-section-header"
           />
 
+          <Surface variant="flat" innerClassName="p-8 md:p-10">
+            <div className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:items-end">
+              <div className="space-y-5">
+                <div className="flex items-center gap-3 text-green">
+                  <CalendarCheck size={18} weight="bold" />
+                  <p className="text-[11px] font-black uppercase tracking-widest">This week</p>
+                </div>
+                <div className="space-y-3">
+                  <h2 className="text-3xl font-display font-extrabold text-gray-text md:text-5xl">
+                    You returned {weeklyRecap.writingDays} {weeklyRecap.writingDays === 1 ? 'day' : 'days'}
+                  </h2>
+                  <p className="max-w-[44rem] text-[17px] font-serif italic leading-relaxed text-gray-light">
+                    {weeklyRecap.nextQuestion}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {[
+                  ['Reflections', weeklyRecap.reflectionsSaved],
+                  ['Check-ins', weeklyRecap.moodCheckins],
+                  ['Release moments', weeklyRecap.releaseMoments],
+                  ['Letters scheduled', weeklyRecap.lettersScheduled],
+                  ['Letters opened', weeklyRecap.lettersOpened],
+                  ['Active days', weeklyRecap.activityDays.length],
+                ].map(([label, value]) => (
+                  <div key={label} className="rounded-[var(--radius-panel)] border border-border/50 bg-white/5 p-4">
+                    <p className="text-2xl font-display font-bold text-gray-text">{value}</p>
+                    <p className="mt-1 text-[10px] font-black uppercase tracking-widest text-gray-nav">{label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-8 grid gap-4 border-t border-border/60 pt-6 md:grid-cols-2">
+              <div className="flex items-start gap-3">
+                <div className="icon-block icon-block-sm">
+                  <Heart size={17} weight="duotone" />
+                </div>
+                <div>
+                  <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Common mood</p>
+                  <p className="mt-1 text-[15px] font-bold capitalize text-gray-text">
+                    {weeklyRecap.commonMood || 'Not named yet'}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="icon-block icon-block-sm">
+                  <Feather size={17} weight="duotone" />
+                </div>
+                <div>
+                  <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Recurring tags</p>
+                  <p className="mt-1 text-[15px] font-bold text-gray-text">
+                    {weeklyRecap.recurringTags.length
+                      ? weeklyRecap.recurringTags.map(({ tag }) => `#${tag}`).join(' ')
+                      : 'No recurring tags yet'}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="mt-6">
+              <CompletionCardActions payload={weeklyCardPayload} />
+            </div>
+          </Surface>
+
           <Surface variant="bezel" innerClassName="p-8 md:p-12">
             <div className="flex flex-col gap-6 md:gap-8">
               <div className="flex flex-wrap items-center gap-2">
@@ -251,7 +365,7 @@ export const Insights: React.FC = () => {
                 <p className="text-[18px] md:text-[20px] font-serif italic text-gray-light leading-relaxed">
                   This month, you checked in on {stats.daysCheckedIn} different days, and the current emotional tone leans{' '}
                   <span className="capitalize text-green font-bold not-italic">
-                    {stats.topMood === 'undefined' ? 'toward clarity' : stats.topMood}
+                    {stats.topMood || 'toward clarity'}
                   </span>
                   .
                 </p>
@@ -261,7 +375,12 @@ export const Insights: React.FC = () => {
 
           <div className="grid gap-6 md:grid-cols-2">
             <Surface variant="bezel" innerClassName="p-8">
-              <h3 className="text-[18px] font-display font-bold text-gray-text mb-6">Mood frequency</h3>
+              <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+                <h3 className="text-[18px] font-display font-bold text-gray-text">Mood frequency</h3>
+                <MetadataPill icon={<EnvelopeSimple size={13} weight="bold" />}>
+                  {stats.moodSignalLabel}
+                </MetadataPill>
+              </div>
               {stats.moodData.length === 0 ? (
                 <EmptyState
                   surface="none"

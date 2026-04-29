@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -26,6 +26,7 @@ import {
   requestVerifiedEmail,
 } from '../../src/auth/credentialManager';
 import { CheckCircle } from '@phosphor-icons/react';
+import { referralService } from '../../services/engagementServices';
 
 export const SignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -37,6 +38,19 @@ export const SignUp: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const postLoginPath = resolvePostAuthRedirectPath(location.state?.from);
+  const referralRecordedRef = useRef(false);
+
+  const recordAcceptedReferral = useCallback(async () => {
+    if (referralRecordedRef.current) return;
+
+    referralRecordedRef.current = true;
+    try {
+      await referralService.recordAcceptedReferral();
+    } catch (referralError) {
+      referralRecordedRef.current = false;
+      console.error('Could not record accepted referral:', referralError);
+    }
+  }, []);
 
   useEffect(() => {
     const flashError = consumeGoogleAuthError(RoutePath.SIGNUP);
@@ -50,8 +64,13 @@ export const SignUp: React.FC = () => {
       return;
     }
 
-    navigate(consumePendingGoogleAuthRedirectPath(RoutePath.SIGNUP) || postLoginPath, { replace: true });
-  }, [isAuthenticated, isInitialCheckDone, navigate, postLoginPath]);
+    const completeRedirect = async () => {
+      await recordAcceptedReferral();
+      navigate(consumePendingGoogleAuthRedirectPath(RoutePath.SIGNUP) || postLoginPath, { replace: true });
+    };
+
+    void completeRedirect();
+  }, [isAuthenticated, isInitialCheckDone, navigate, postLoginPath, recordAcceptedReferral]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -79,6 +98,7 @@ export const SignUp: React.FC = () => {
           },
         });
       } else if (data.session) {
+        await recordAcceptedReferral();
         navigate(postLoginPath, { replace: true });
       }
     } catch (err) {
@@ -131,6 +151,7 @@ export const SignUp: React.FC = () => {
         setError(authError || 'Failed to sign up with verified email.');
         setLoading(false);
       } else {
+        await recordAcceptedReferral();
         navigate(postLoginPath, { replace: true });
       }
     } catch (err) {

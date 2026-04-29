@@ -66,6 +66,19 @@ describe('focused product slice source contract', () => {
     expect(homeAuthenticated).toContain('text-2xl md:text-3xl text-gray-text font-serif italic leading-relaxed');
   });
 
+  it('adds standalone mood check-ins without turning moods into scores', () => {
+    const homeAuthenticated = read('pages/dashboard/HomeAuthenticated.tsx');
+    const createNote = read('pages/dashboard/CreateNote.tsx');
+
+    expect(homeAuthenticated).toContain('moodCheckinService.create');
+    expect(homeAuthenticated).toContain('Check in');
+    expect(homeAuthenticated).toContain('steady');
+    expect(homeAuthenticated).toContain('scattered');
+    expect(homeAuthenticated.toLowerCase()).not.toContain('score');
+
+    expect(createNote).toContain('Reflection mood');
+  });
+
   it('includes Android Verified Email logic in auth pages', () => {
     const signIn = read('pages/auth/SignIn.tsx');
     const signUp = read('pages/auth/SignUp.tsx');

@@ -22,6 +22,7 @@ import { Alert } from '../../components/ui/Alert';
 import { MetadataPill } from '../../components/ui/MetadataPill';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { PageContainer } from '../../components/ui/PageContainer';
+import { ReferralInvitePanel } from '../../components/ui/ReferralInvitePanel';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { StorageImage } from '../../components/ui/StorageImage';
 import { Surface } from '../../components/ui/Surface';
@@ -529,6 +530,26 @@ export const Account: React.FC = () => {
                         <MetadataPill>Coming soon</MetadataPill>
                       </div>
                     </div>
+                  </div>
+                </Surface>
+
+                <Surface variant="bezel">
+                  <div className="p-6">
+                    <div className="mb-6 flex items-center gap-4">
+                      <div className="icon-block icon-block-md">
+                        <EnvelopeSimple size={24} weight="duotone" />
+                      </div>
+                      <div>
+                        <p className="text-[11px] font-black uppercase tracking-widest text-green">Invites</p>
+                        <h3 className="text-[24px] font-display font-bold text-gray-text">Share Reflections</h3>
+                      </div>
+                    </div>
+
+                    <p className="mb-5 text-[14px] font-medium leading-relaxed text-gray-light">
+                      Account tracks how many people joined from your invite. There is no prize or public list.
+                    </p>
+
+                    <ReferralInvitePanel />
                   </div>
                 </Surface>
 
