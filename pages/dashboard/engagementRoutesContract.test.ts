@@ -51,6 +51,12 @@ describe('engagement routes source contract', () => {
     expect(releaseMode).toContain('onExitComplete={() => setText(\'\')}');
     expect(releaseMode).toContain('htmlFor="release-writing"');
     expect(releaseMode).toContain('id="release-writing"');
+    expect(releaseMode).toContain('justify-start');
+    expect(releaseMode).toContain('sm:justify-center');
+    expect(releaseMode).toContain('min-h-[34dvh]');
+    expect(releaseMode).toContain('sm:min-h-[42dvh]');
+    expect(releaseMode).toContain('className="-ml-2 min-h-11"');
+    expect(read('layouts/DashboardLayout.tsx')).toContain('{!isWritingRoute && (');
     expect(releaseMode).toContain('useReducedMotion');
     expect(releaseMode).not.toContain('setTimeout');
     expect(releaseMode).not.toContain('noteService');
@@ -79,6 +85,9 @@ describe('engagement routes source contract', () => {
     expect(letters).toContain('isOpenDateValid');
     expect(letters).toContain('openingLetterId');
     expect(letters).toContain('break-words');
+    expect(letters).toContain('aria-label="Custom open date"');
+    expect(letters).toContain('className="w-full sm:w-auto"');
+    expect(letters).toContain('className="min-h-11 w-full"');
     expect(letters).not.toContain('noteService');
   });
 
@@ -95,6 +104,7 @@ describe('engagement routes source contract', () => {
     expect(actions).toContain("import('../../services/completionCardService')");
     expect(actions).toContain("ritualEventService.record('completion_card_created'");
     expect(actions).toContain('isErrorStatus');
+    expect(actions).toContain('min-h-11 w-full sm:w-auto');
     expect(actions).not.toMatch(/note\.content|mood|tags|aiSummary|theme/i);
     expect(insights).toContain('<CompletionCardActions');
     expect(releaseMode).toContain('<CompletionCardActions');
@@ -109,10 +119,13 @@ describe('engagement routes source contract', () => {
     expect(layout).toContain('referralService.captureReferralCode');
     expect(layout).toContain('Invite');
     expect(layout).toContain('<ReferralInvitePanel');
+    expect(layout).toContain('flex flex-wrap items-center justify-center gap-x-6 gap-y-4 sm:gap-10');
     expect(account).toContain('<ReferralInvitePanel');
     expect(account).toContain('people joined from your invite');
     expect(signUp).toContain('referralService.recordAcceptedReferral');
-    expect(read('components/ui/ReferralInvitePanel.tsx')).toContain('WarningCircle');
+    const referralPanel = read('components/ui/ReferralInvitePanel.tsx');
+    expect(referralPanel).toContain('WarningCircle');
+    expect(referralPanel).toContain('min-h-11 w-full sm:w-auto');
     expect(`${layout}\n${account}`.toLowerCase()).not.toMatch(/\b(reward|badge|leaderboard|feed|friends)\b/);
   });
 
@@ -124,6 +137,7 @@ describe('engagement routes source contract', () => {
     expect(about).toContain('writing-first');
     expect(about).toContain('AI stays optional');
     expect(about).toContain('privacy');
+    expect(about).toContain('className="-ml-2 min-h-11"');
     expect(about.toLowerCase()).not.toMatch(/\b(streak|score|xp|leaderboard|diagnose|therapy replacement)\b/);
   });
 

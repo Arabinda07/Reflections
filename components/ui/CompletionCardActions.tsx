@@ -106,15 +106,15 @@ export const CompletionCardActions: React.FC<CompletionCardActionsProps> = ({
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        <Button type="button" variant="primary" size="sm" onClick={handleShare} isLoading={isWorking}>
+        <Button type="button" variant="primary" size="sm" onClick={handleShare} isLoading={isWorking} className="min-h-11 w-full sm:w-auto">
           Share card
           <ShareNetwork size={16} weight="bold" className="ml-2" />
         </Button>
-        <Button type="button" variant="secondary" size="sm" onClick={handleCopy} disabled={isWorking}>
+        <Button type="button" variant="secondary" size="sm" onClick={handleCopy} disabled={isWorking} className="min-h-11 w-full sm:w-auto">
           Copy image
           <CopySimple size={16} weight="bold" className="ml-2" />
         </Button>
-        <Button type="button" variant="secondary" size="sm" onClick={handleDownload} disabled={isWorking}>
+        <Button type="button" variant="secondary" size="sm" onClick={handleDownload} disabled={isWorking} className="min-h-11 w-full sm:w-auto">
           Download
           <DownloadSimple size={16} weight="bold" className="ml-2" />
         </Button>

@@ -169,7 +169,7 @@ export const FutureLetters: React.FC = () => {
     <>
       <PageContainer size="wide" className="pb-24 pt-6 md:pt-10">
         <div className="space-y-8">
-          <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.HOME)} className="-ml-2">
+          <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.HOME)} className="-ml-2 min-h-11">
             <ArrowLeft size={16} weight="bold" className="mr-2" />
             Back
           </Button>
@@ -186,7 +186,7 @@ export const FutureLetters: React.FC = () => {
 
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
             <Surface variant="flat" className="overflow-hidden">
-              <form onSubmit={handleSchedule} className="space-y-6 p-7 sm:p-8">
+              <form onSubmit={handleSchedule} className="space-y-6 p-6 sm:p-8">
                 <div className="space-y-2">
                   <label htmlFor="future-letter-title" className="label-caps text-gray-nav">
                     Title
@@ -239,7 +239,7 @@ export const FutureLetters: React.FC = () => {
                       min={minCustomDate}
                       onChange={(event) => setCustomDate(event.target.value)}
                       aria-label="Custom open date"
-                      className="h-12 rounded-[var(--radius-control)] border border-border bg-white px-4 text-[15px] font-semibold text-gray-text outline-none focus:border-green/30 focus:ring-4 focus:ring-green/10 dark:bg-white/5"
+                      className="h-12 w-full rounded-[var(--radius-control)] border border-border bg-white px-4 text-[15px] font-semibold text-gray-text outline-none focus:border-green/30 focus:ring-4 focus:ring-green/10 dark:bg-white/5"
                     />
                   ) : null}
                 </fieldset>
@@ -250,7 +250,7 @@ export const FutureLetters: React.FC = () => {
                       ? `This letter opens on ${formatDate(openDate)}.`
                       : 'Choose an open date before scheduling.'}
                   </p>
-                  <Button type="submit" disabled={!content.trim() || !isOpenDateValid} isLoading={isScheduling}>
+                  <Button type="submit" disabled={!content.trim() || !isOpenDateValid} isLoading={isScheduling} className="w-full sm:w-auto">
                     Schedule letter
                   </Button>
                 </div>
@@ -260,7 +260,7 @@ export const FutureLetters: React.FC = () => {
             </Surface>
 
             <Surface variant="bezel">
-              <div className="space-y-5 p-7 sm:p-8">
+              <div className="space-y-5 p-6 sm:p-8">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="label-caps text-green">Letters</p>
@@ -318,7 +318,7 @@ export const FutureLetters: React.FC = () => {
                             disabled={openState.state === 'locked' || Boolean(openingLetterId)}
                             isLoading={isOpening}
                             onClick={() => handleOpenLetter(letter)}
-                            className="w-full"
+                            className="min-h-11 w-full"
                             aria-label={
                               isOpening
                                 ? `Opening ${letter.title}`

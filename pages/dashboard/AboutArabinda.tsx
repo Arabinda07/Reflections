@@ -40,7 +40,7 @@ export const AboutArabinda: React.FC = () => {
   return (
     <PageContainer size="narrow" className="py-12 sm:py-16">
       <div className="space-y-10">
-        <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.HOME)} className="-ml-2">
+        <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.HOME)} className="-ml-2 min-h-11">
           <ArrowLeft size={16} weight="bold" className="mr-2" />
           Back
         </Button>
@@ -48,7 +48,7 @@ export const AboutArabinda: React.FC = () => {
         <SectionHeader eyebrow="About Arabinda" title="A note from the maker" />
 
         <Surface variant="bezel">
-          <div className="space-y-5 p-8 sm:p-10">
+          <div className="space-y-5 p-6 sm:p-10">
             <p className="font-serif text-[26px] italic leading-relaxed text-gray-text sm:text-[32px]">
               Reflections is my attempt to build a softer kind of technology around private writing.
             </p>
@@ -61,7 +61,7 @@ export const AboutArabinda: React.FC = () => {
         <div className="space-y-5">
           {sections.map((section) => (
             <Surface key={section.title} variant="flat">
-              <div className="p-7 sm:p-8">
+              <div className="p-6 sm:p-8">
                 <div className="mb-4 flex items-center gap-3">
                   <div className="icon-block icon-block-sm">{section.icon}</div>
                   <h2 className="text-[21px] font-display font-bold text-gray-text">

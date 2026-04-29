@@ -121,11 +121,11 @@ export const ReferralInvitePanel: React.FC<ReferralInvitePanelProps> = ({ compac
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        <Button type="button" size="sm" onClick={handleShare} disabled={!inviteLink}>
+        <Button type="button" size="sm" onClick={handleShare} disabled={!inviteLink} className="min-h-11 w-full sm:w-auto">
           Invite
           <PaperPlaneTilt size={16} weight="bold" className="ml-2" />
         </Button>
-        <Button type="button" variant="secondary" size="sm" onClick={handleCopy} disabled={!inviteLink}>
+        <Button type="button" variant="secondary" size="sm" onClick={handleCopy} disabled={!inviteLink} className="min-h-11 w-full sm:w-auto">
           Copy link
           <CopySimple size={16} weight="bold" className="ml-2" />
         </Button>

@@ -45,7 +45,7 @@ export const ReleaseMode: React.FC = () => {
     <div className="flex min-h-[100dvh] flex-1 flex-col bg-body">
       <div className="mx-auto flex min-h-[100dvh] w-full max-w-4xl flex-col px-5 py-5 sm:px-8 sm:py-8">
         <div className="mb-5 flex items-center justify-between">
-          <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.HOME)} className="-ml-2">
+          <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.HOME)} className="-ml-2 min-h-11">
             <ArrowLeft size={16} weight="bold" className="mr-2" />
             Home
           </Button>
@@ -55,7 +55,7 @@ export const ReleaseMode: React.FC = () => {
           </div>
         </div>
 
-        <section className="flex flex-1 flex-col justify-center gap-7">
+        <section className="flex flex-1 flex-col justify-start gap-5 pb-10 pt-2 sm:justify-center sm:gap-7 sm:pb-0 sm:pt-0">
           <div className="space-y-3 text-center">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-green/15 bg-green/10 text-green">
               <Feather size={24} weight="duotone" />
@@ -87,7 +87,7 @@ export const ReleaseMode: React.FC = () => {
                     disabled={isReleasing}
                     autoFocus
                     placeholder="Write what you are ready to put down."
-                    className="min-h-[42dvh] w-full resize-none rounded-[22px] border border-border/40 bg-white/60 p-5 font-serif text-[20px] leading-9 text-gray-text outline-none transition-all placeholder:text-gray-nav/35 focus:border-green/30 focus:ring-4 focus:ring-green/10 disabled:opacity-60 dark:bg-white/5 sm:p-8 sm:text-[22px] sm:leading-10"
+                    className="min-h-[34dvh] w-full resize-none rounded-[22px] border border-border/40 bg-white/60 p-5 font-serif text-[20px] leading-9 text-gray-text outline-none transition-all placeholder:text-gray-nav/35 focus:border-green/30 focus:ring-4 focus:ring-green/10 disabled:opacity-60 dark:bg-white/5 sm:min-h-[42dvh] sm:p-8 sm:text-[22px] sm:leading-10"
                   />
                 </div>
 

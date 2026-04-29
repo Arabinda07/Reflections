@@ -466,7 +466,7 @@ export const DashboardLayout: React.FC = () => {
         {!isWritingRoute && (
           <footer className="screen-scrim screen-scrim--strong mt-auto w-full border-t border-border py-12 transition-all duration-300">
             <div className="max-w-[1440px] mx-auto px-6 md:px-16 flex flex-col sm:flex-row items-center justify-between gap-8">
-              <nav aria-label="Footer navigation" className="flex items-center gap-10">
+              <nav aria-label="Footer navigation" className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 sm:gap-10">
                 <Link 
                   to={RoutePath.HOME}
                   className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-all"
@@ -514,91 +514,95 @@ export const DashboardLayout: React.FC = () => {
         )}
       </main>
 
-      {/* Floating Bug Report Button */}
-      <button
-        onClick={() => setIsBugModalOpen(!isBugModalOpen)}
-        className={`fixed bottom-3 left-6 z-[110] flex h-11 w-11 items-center justify-center rounded-2xl transition-all duration-300 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/20 group shadow-sm ${
-          isBugModalOpen 
-            ? 'bg-green text-white border-[1.5px] border-green' 
-            : 'surface-floating hover:text-green'
-        }`}
-        aria-label={isBugModalOpen ? "Close bug report" : "Report a bug"}
-      >
-        {isBugModalOpen ? (
-          <X size={20} weight="bold" />
-        ) : (
-          <Bug size={20} weight="duotone" className="transition-transform group-hover:rotate-12" />
-        )}
-      </button>
+      {!isWritingRoute && (
+        <>
+          {/* Floating Bug Report Button */}
+          <button
+            onClick={() => setIsBugModalOpen(!isBugModalOpen)}
+            className={`fixed bottom-3 left-6 z-[110] flex h-11 w-11 items-center justify-center rounded-2xl transition-all duration-300 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/20 group shadow-sm ${
+              isBugModalOpen
+                ? 'bg-green text-white border-[1.5px] border-green'
+                : 'surface-floating hover:text-green'
+            }`}
+            aria-label={isBugModalOpen ? "Close bug report" : "Report a bug"}
+          >
+            {isBugModalOpen ? (
+              <X size={20} weight="bold" />
+            ) : (
+              <Bug size={20} weight="duotone" className="transition-transform group-hover:rotate-12" />
+            )}
+          </button>
 
-      {/* Floating Bug Report Toast */}
-      {typeof document !== 'undefined' && createPortal(
-        <AnimatePresence>
-          {isBugModalOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.95 }}
-              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="fixed bottom-[68px] left-6 z-[105] w-[calc(100vw-48px)] sm:w-[380px] surface-floating surface-floating--strong !rounded-[24px] overflow-hidden"
-            >
-              <div className="p-6">
-                {!isSubmitted ? (
-                  <form onSubmit={handleBugSubmit} className="space-y-5">
-                    <div className="flex items-center gap-2.5 mb-2">
-                      <div className="h-8 w-8 rounded-lg bg-green/10 text-green flex items-center justify-center">
-                        <Bug size={18} weight="duotone" />
-                      </div>
-                      <h3 className="label-caps !text-gray-text">Report a bug</h3>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <textarea
-                        id="bug-message"
-                        autoFocus
-                        required
-                        placeholder="Describe what happened..."
-                        value={bugMessage}
-                        onChange={(e) => setBugMessage(e.target.value)}
-                        className="w-full min-h-[160px] p-5 rounded-[20px] border border-border/40 bg-body/50 text-gray-text font-serif text-[17px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-green/10 focus:border-green/30 transition-all resize-none placeholder:text-gray-nav/30"
-                      />
-                      {submitError && (
-                        <p className="text-[12px] font-bold text-red animate-in fade-in slide-in-from-top-1">
-                          {submitError}
+          {/* Floating Bug Report Toast */}
+          {typeof document !== 'undefined' && createPortal(
+            <AnimatePresence>
+              {isBugModalOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                  className="fixed bottom-[68px] left-6 z-[105] w-[calc(100vw-48px)] sm:w-[380px] surface-floating surface-floating--strong !rounded-[24px] overflow-hidden"
+                >
+                  <div className="p-6">
+                    {!isSubmitted ? (
+                      <form onSubmit={handleBugSubmit} className="space-y-5">
+                        <div className="flex items-center gap-2.5 mb-2">
+                          <div className="h-8 w-8 rounded-lg bg-green/10 text-green flex items-center justify-center">
+                            <Bug size={18} weight="duotone" />
+                          </div>
+                          <h3 className="label-caps !text-gray-text">Report a bug</h3>
+                        </div>
+
+                        <div className="space-y-2">
+                          <textarea
+                            id="bug-message"
+                            autoFocus
+                            required
+                            placeholder="Describe what happened..."
+                            value={bugMessage}
+                            onChange={(e) => setBugMessage(e.target.value)}
+                            className="w-full min-h-[160px] p-5 rounded-[20px] border border-border/40 bg-body/50 text-gray-text font-serif text-[17px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-green/10 focus:border-green/30 transition-all resize-none placeholder:text-gray-nav/30"
+                          />
+                          {submitError && (
+                            <p className="text-[12px] font-bold text-red animate-in fade-in slide-in-from-top-1">
+                              {submitError}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="flex justify-end gap-2 pt-1">
+                          <Button
+                            type="submit"
+                            variant="primary"
+                            size="sm"
+                            isLoading={isSubmitting}
+                            disabled={!bugMessage.trim()}
+                            className="w-full h-11 rounded-xl"
+                          >
+                            Send report
+                            <PaperPlaneTilt size={16} weight="bold" className="ml-2" />
+                          </Button>
+                        </div>
+                      </form>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center py-6 text-center animate-in fade-in zoom-in duration-500">
+                        <div className="h-16 w-16 rounded-full bg-green/10 text-green flex items-center justify-center mb-5">
+                          <CheckCircle size={36} weight="fill" />
+                        </div>
+                        <h3 className="label-caps mb-2">Thank you</h3>
+                        <p className="font-serif italic text-[16px] text-gray-light leading-relaxed">
+                          We've received your report. <br /> Your feedback helps a lot.
                         </p>
-                      )}
-                    </div>
-
-                    <div className="flex justify-end gap-2 pt-1">
-                      <Button 
-                        type="submit" 
-                        variant="primary" 
-                        size="sm"
-                        isLoading={isSubmitting}
-                        disabled={!bugMessage.trim()}
-                        className="w-full h-11 rounded-xl"
-                      >
-                        Send report
-                        <PaperPlaneTilt size={16} weight="bold" className="ml-2" />
-                      </Button>
-                    </div>
-                  </form>
-                ) : (
-                  <div className="flex flex-col items-center justify-center py-6 text-center animate-in fade-in zoom-in duration-500">
-                    <div className="h-16 w-16 rounded-full bg-green/10 text-green flex items-center justify-center mb-5">
-                      <CheckCircle size={36} weight="fill" />
-                    </div>
-                    <h3 className="label-caps mb-2">Thank you</h3>
-                    <p className="font-serif italic text-[16px] text-gray-light leading-relaxed">
-                      We've received your report. <br /> Your feedback helps a lot.
-                    </p>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>,
+            document.body
           )}
-        </AnimatePresence>,
-        document.body
+        </>
       )}
 
       <ModalSheet
