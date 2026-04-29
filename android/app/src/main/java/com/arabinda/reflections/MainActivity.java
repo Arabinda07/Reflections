@@ -19,27 +19,4 @@ public class MainActivity extends BridgeActivity {
     }
 }
 
-@CapacitorPlugin(name = "NativeToast")
-class NativeToastPlugin extends Plugin {
-    @PluginMethod
-    public void show(PluginCall call) {
-        String text = call.getString("text", "").trim();
-        String durationValue = call.getString("duration", "short");
 
-        if (text.isEmpty()) {
-            call.resolve();
-            return;
-        }
-
-        Activity activity = getActivity();
-        if (activity == null) {
-            call.resolve();
-            return;
-        }
-
-        int duration = "long".equals(durationValue) ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT;
-
-        activity.runOnUiThread(() -> Toast.makeText(activity, text, duration).show());
-        call.resolve();
-    }
-}
