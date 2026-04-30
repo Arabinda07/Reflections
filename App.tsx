@@ -1,5 +1,5 @@
 import React, { Suspense, lazy, useState, useEffect } from 'react';
-import { Navigate, Route, RouterProvider, createHashRouter, createRoutesFromElements } from 'react-router-dom';
+import { Navigate, Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { PWAInstallProvider } from './context/PWAInstallContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
@@ -50,7 +50,7 @@ const withRouteFallback = (element: React.ReactNode) => (
   <Suspense fallback={<RouteLoadingFrame />}>{element}</Suspense>
 );
 
-const router = createHashRouter(
+const router = createBrowserRouter(
   createRoutesFromElements(
     <Route element={<DashboardLayout />} errorElement={<RouteErrorBoundary />}>
       <Route path={RoutePath.HOME} element={<Home />} />

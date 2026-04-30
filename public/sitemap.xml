@@ -8,13 +8,13 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://reflections-ebon.vercel.app/#/faq</loc>
+    <loc>https://reflections-ebon.vercel.app/faq</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://reflections-ebon.vercel.app/#/privacy</loc>
+    <loc>https://reflections-ebon.vercel.app/privacy</loc>
     <lastmod>2026-04-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
