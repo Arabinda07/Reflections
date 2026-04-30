@@ -1,7 +1,5 @@
 apply plugin: 'com.android.application'
 
-import java.util.Properties
-
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('keystore.properties')
 
