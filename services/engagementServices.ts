@@ -7,6 +7,7 @@ import type {
   RitualEvent,
   RitualEventType,
 } from '../types';
+import { getAuthenticatedUser } from './authUtils';
 
 interface MoodCheckinInput {
   mood: string;
@@ -28,13 +29,44 @@ interface ReferralStorage {
 
 const REFERRAL_CODE_STORAGE_KEY = 'reflections.referral_code';
 
-const getAuthenticatedUser = async () => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('User not authenticated');
-  return user;
-};
+export interface SupabaseMoodCheckinRow {
+  id: string;
+  user_id: string;
+  mood: string;
+  label: string | null;
+  source: string | null;
+  created_at: string;
+}
 
-const mapMoodCheckin = (data: any): MoodCheckin => ({
+export interface SupabaseFutureLetterRow {
+  id: string;
+  user_id: string;
+  title: string | null;
+  content: string | null;
+  open_at: string;
+  opened_at: string | null;
+  created_at: string;
+  updated_at: string;
+  status: string;
+}
+
+export interface SupabaseRitualEventRow {
+  id: string;
+  user_id: string;
+  event_type: string;
+  source_id: string | null;
+  created_at: string;
+}
+
+export interface SupabaseReferralInviteRow {
+  id: string;
+  user_id: string;
+  code: string;
+  created_at: string;
+  last_shared_at: string | null;
+}
+
+const mapMoodCheckin = (data: SupabaseMoodCheckinRow): MoodCheckin => ({
   id: data.id,
   userId: data.user_id,
   mood: data.mood,
@@ -43,7 +75,7 @@ const mapMoodCheckin = (data: any): MoodCheckin => ({
   createdAt: data.created_at,
 });
 
-const mapFutureLetter = (data: any): FutureLetter => ({
+const mapFutureLetter = (data: SupabaseFutureLetterRow): FutureLetter => ({
   id: data.id,
   userId: data.user_id,
   title: data.title || '',
@@ -55,7 +87,7 @@ const mapFutureLetter = (data: any): FutureLetter => ({
   status: data.status as FutureLetterStatus,
 });
 
-const mapRitualEvent = (data: any): RitualEvent => ({
+const mapRitualEvent = (data: SupabaseRitualEventRow): RitualEvent => ({
   id: data.id,
   userId: data.user_id,
   eventType: data.event_type as RitualEventType,
@@ -63,7 +95,7 @@ const mapRitualEvent = (data: any): RitualEvent => ({
   createdAt: data.created_at,
 });
 
-const mapReferralInvite = (data: any): ReferralInvite => ({
+const mapReferralInvite = (data: SupabaseReferralInviteRow): ReferralInvite => ({
   id: data.id,
   userId: data.user_id,
   code: data.code,

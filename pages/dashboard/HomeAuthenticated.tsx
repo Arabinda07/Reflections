@@ -346,7 +346,7 @@ export const HomeAuthenticated: React.FC = () => {
         className="surface-scope-sage relative min-h-full flex flex-col flex-1 bg-body selection:bg-green/10"
         {...((showOnboarding ? { 'aria-hidden': 'true' } : {}) as any)}
       >
-        <section className="relative isolate h-[60dvh] min-h-[450px] w-full overflow-hidden bg-body">
+        <section className="relative isolate h-[56dvh] min-h-[360px] w-full overflow-hidden bg-body sm:h-[60dvh] sm:min-h-[450px]">
           <img
             src="/assets/videos/field.png"
             alt=""

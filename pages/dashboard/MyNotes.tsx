@@ -234,7 +234,7 @@ export const MyNotes: React.FC = () => {
                     event.stopPropagation();
                     downloadNoteExport(note, 'md');
                   }}
-                  className="control-surface inline-flex h-10 w-10 items-center justify-center text-gray-nav transition-all hover:border-green/25 hover:bg-green/5 hover:text-green"
+                  className="control-surface inline-flex h-11 w-11 items-center justify-center text-gray-nav transition-all hover:border-green/25 hover:bg-green/5 hover:text-green"
                   title={`Export ${note.title}`}
                   aria-label={`Export ${note.title}`}
                 >
@@ -243,7 +243,7 @@ export const MyNotes: React.FC = () => {
 
                 <Link
                   to={noteDetailPath}
-                  className="inline-flex min-h-10 items-center rounded-[var(--radius-control)] px-2 text-[12px] font-bold text-green transition-all duration-300 hover:bg-green/5 group-hover:opacity-70 focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
+                  className="inline-flex min-h-11 items-center rounded-[var(--radius-control)] px-3 text-[12px] font-bold text-green transition-all duration-300 hover:bg-green/5 group-hover:opacity-70 focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
                   aria-label={`Open ${note.title}`}
                 >
                   <span>Open</span>

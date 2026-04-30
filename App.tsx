@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect, useState } from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Navigate, Route, RouterProvider, createHashRouter, createRoutesFromElements } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { PWAInstallProvider } from './context/PWAInstallContext';
@@ -11,7 +11,8 @@ import { RouteErrorBoundary } from './pages/RouteErrorBoundary';
 import { RoutePath } from './types';
 import { useSync } from './hooks/useSync';
 import { MotionConfig } from 'motion/react';
-import { trackGoogleAuthFailedDeferred, trackGoogleAuthSucceededDeferred } from './src/analytics/deferredEvents';
+import { useNativeStatusBar } from './hooks/useNativeStatusBar';
+import { useNativeOAuthListener } from './hooks/useNativeOAuthListener';
 
 // Lazy load non-critical routes to reduce initial bundle size
 const SignIn = lazy(() => import('./pages/auth/SignIn').then(m => ({ default: m.SignIn })));
@@ -197,131 +198,8 @@ const DeferredVercelVitals: React.FC = () => {
 };
 
 function App() {
-  useEffect(() => {
-    let isActive = true;
-    let observer: MutationObserver | null = null;
-
-    const applyNativeChrome = async () => {
-      const { Capacitor } = await import('@capacitor/core');
-
-      if (!isActive || !Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'android') {
-        return;
-      }
-
-      const { StatusBar, Style } = await import('@capacitor/status-bar');
-
-      const updateStatusBar = async () => {
-        if (!isActive) return;
-        const isDark = document.documentElement.classList.contains('dark');
-        try {
-          await StatusBar.setOverlaysWebView({ overlay: false });
-          await StatusBar.setStyle({ style: isDark ? Style.Dark : Style.Light });
-          await StatusBar.setBackgroundColor({ color: isDark ? '#282a27' : '#f7f8f6' });
-          await StatusBar.show();
-        } catch (error) {
-          console.warn('[native] Failed to align the Android status bar.', error);
-        }
-      };
-
-      await updateStatusBar();
-
-      observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-          if (mutation.attributeName === 'class') {
-            void updateStatusBar();
-          }
-        });
-      });
-
-      observer.observe(document.documentElement, { attributes: true });
-    };
-
-    void applyNativeChrome();
-
-    return () => {
-      isActive = false;
-      if (observer) {
-        observer.disconnect();
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    let isActive = true;
-    let removeNativeUrlListener: (() => Promise<void>) | null = null;
-    let lastHandledNativeUrl: string | null = null;
-    
-    const setupNativeOAuth = async () => {
-      const { Capacitor } = await import('@capacitor/core');
-
-      if (!isActive || !Capacitor.isNativePlatform()) {
-        return;
-      }
-
-      const { App: CapacitorApp } = await import('@capacitor/app');
-      const googleOAuth = await import('./src/auth/googleOAuth');
-      const { Browser } = await import('@capacitor/browser');
-
-      if (!isActive) {
-        return;
-      }
-
-      const handleNativeOAuthUrl = async (url: string) => {
-        if (!url || url === lastHandledNativeUrl) {
-          return;
-        }
-
-        lastHandledNativeUrl = url;
-        const pendingSourcePath = googleOAuth.getPendingGoogleAuthPath() || RoutePath.LOGIN;
-        const result = await googleOAuth.consumeNativeGoogleOAuthCallback(url);
-
-        if (!isActive || !result.handled) {
-          return;
-        }
-
-        if ('error' in result) {
-          trackGoogleAuthFailedDeferred({
-            sourcePath: pendingSourcePath,
-            isNative: true,
-            errorCode: result.error,
-          });
-          googleOAuth.stashGoogleAuthError(result.error);
-        } else {
-          trackGoogleAuthSucceededDeferred({
-            sourcePath: pendingSourcePath,
-            redirectPath: RoutePath.HOME,
-            isNative: true,
-          });
-        }
-
-        void Browser.close().catch(() => undefined);
-
-        const completionPath =
-          'error' in result
-            ? pendingSourcePath
-            : googleOAuth.consumeNativeGoogleAuthSuccessRedirectPath(pendingSourcePath);
-
-        googleOAuth.redirectToAppRoute(completionPath);
-      };
-
-      const listener = await CapacitorApp.addListener('appUrlOpen', ({ url }) => {
-        void handleNativeOAuthUrl(url);
-      });
-      removeNativeUrlListener = () => listener.remove();
-
-      const launchData = await CapacitorApp.getLaunchUrl();
-      if (launchData?.url) {
-        await handleNativeOAuthUrl(launchData.url);
-      }
-    };
-
-    void setupNativeOAuth();
-
-    return () => {
-      isActive = false;
-      void removeNativeUrlListener?.();
-    };
-  }, []);
+  useNativeStatusBar();
+  useNativeOAuthListener();
 
   return (
     <PWAInstallProvider>

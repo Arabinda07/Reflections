@@ -1,11 +1,32 @@
 import { supabase } from '../src/supabaseClient';
 import { LifeTheme, ThemeCitation, Note } from '../types';
 import { WikiPageType, STRUCTURED_WIKI_PAGES } from './wikiTypes';
+import { getAuthenticatedUser } from './authUtils';
+import { mapToNote, type SupabaseNoteRow } from './noteService';
+
+export interface SupabaseLifeThemeRow {
+  id: string;
+  user_id: string;
+  title: string;
+  content: string;
+  state: string;
+  page_type: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SupabaseThemeCitationRow {
+  id: string;
+  theme_id: string;
+  note_id: string;
+  context_snippet: string;
+  created_at: string;
+}
 
 // ─────────────────────────────────────────────
 // Mappers
 // ─────────────────────────────────────────────
-const mapToLifeTheme = (data: any): LifeTheme => ({
+const mapToLifeTheme = (data: SupabaseLifeThemeRow): LifeTheme => ({
   id: data.id,
   userId: data.user_id,
   title: data.title,
@@ -16,7 +37,7 @@ const mapToLifeTheme = (data: any): LifeTheme => ({
   updatedAt: data.updated_at,
 });
 
-const mapToThemeCitation = (data: any): ThemeCitation => ({
+const mapToThemeCitation = (data: SupabaseThemeCitationRow): ThemeCitation => ({
   id: data.id,
   themeId: data.theme_id,
   noteId: data.note_id,
@@ -250,17 +271,6 @@ export const wikiService = {
 
     if (noteError) throw noteError;
 
-    return (notes || []).map((data: any) => ({
-      id: data.id,
-      title: data.title || '',
-      content: data.content || '',
-      createdAt: data.created_at,
-      updatedAt: data.updated_at,
-      thumbnailUrl: data.thumbnail_url || undefined,
-      tags: data.tags || [],
-      attachments: data.attachments || [],
-      mood: data.mood || undefined,
-      tasks: data.tasks || [],
-    }));
+    return (notes as unknown as SupabaseNoteRow[] || []).map(mapToNote);
   },
 };

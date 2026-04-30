@@ -102,8 +102,8 @@ describe('landing first-paint contract', () => {
   it('allows the landing content to grow vertically while clipping horizontal bleed', () => {
     const landing = read('pages/dashboard/Landing.tsx');
 
-    expect(landing).toContain('<main className="relative min-h-[100dvh] overflow-x-hidden');
-    expect(landing).not.toContain('<main className="relative min-h-[100dvh] overflow-hidden');
+    expect(landing).toContain('<div role="region" aria-label="Welcome" className="relative min-h-[100dvh] overflow-x-hidden');
+    expect(landing).not.toContain('<div role="region" aria-label="Welcome" className="relative min-h-[100dvh] overflow-hidden');
   });
 
   it('clips hero media to the page frame instead of letting it bleed into the shell', () => {
@@ -115,7 +115,7 @@ describe('landing first-paint contract', () => {
     expect(layout).toContain('min-h-0 w-full flex-1 flex-col overflow-y-auto');
     expect(landing).toContain('relative isolate min-h-[100dvh] w-full overflow-hidden bg-body');
     expect(landing).toContain('h-full min-h-full w-full min-w-full object-cover');
-    expect(homeAuthenticated).toContain('relative isolate h-[60dvh] min-h-[450px] w-full overflow-hidden bg-body');
+    expect(homeAuthenticated).toContain('relative isolate h-[56dvh] min-h-[360px] w-full overflow-hidden bg-body sm:h-[60dvh] sm:min-h-[450px]');
     expect(homeAuthenticated).toContain('src="/assets/videos/field.png"');
     expect(homeAuthenticated).toContain('h-full min-h-full w-full min-w-full object-cover object-center');
     expect(homeAuthenticated).toContain('object-cover object-center opacity-100');

@@ -67,7 +67,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
             </div>
             <button
               onClick={handleDismiss}
-              className="shrink-0 p-1 text-gray-nav hover:text-gray-text transition-colors"
+              className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] text-gray-nav transition-colors hover:bg-green/5 hover:text-gray-text"
               aria-label="Dismiss install prompt"
             >
               <X size={16} weight="regular" />

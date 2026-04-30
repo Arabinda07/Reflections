@@ -30,7 +30,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   };
 
   const sizes = {
-    sm: "h-10 px-4 text-[13px] rounded-[var(--radius-control)]",
+    sm: "min-h-11 px-4 py-2 text-[13px] rounded-[var(--radius-control)]",
     md: "h-12 px-6 text-[15px] rounded-[var(--radius-control)]",
     lg: "h-14 px-8 text-[16px] rounded-[var(--radius-control)]",
   };

@@ -1,4 +1,5 @@
 import { useCallback, useRef } from 'react';
+import { prefersReducedMotion } from './accessibilityUtils';
 
 /**
  * Audio feedback hook.
@@ -14,10 +15,6 @@ const SOUND_PATHS = {
 } as const;
 
 const STORAGE_KEY = 'reflections_sounds_enabled';
-
-const prefersReducedMotion = () =>
-  typeof window !== 'undefined' &&
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const isSoundEnabled = () => {
   if (prefersReducedMotion()) return false;
@@ -72,10 +69,10 @@ export function useSound() {
     playCompletionSound: useCallback(() => playFile(SOUND_PATHS.completion), [playFile]),
     playPageTurn: useCallback(() => playFile(SOUND_PATHS.pageTurn), [playFile]),
     playRecapReveal: useCallback(() => playFile(SOUND_PATHS.recapReveal), [playFile]),
-    setSoundEnabled: (enabled: boolean) => {
+    setSoundEnabled: useCallback((enabled: boolean) => {
       try {
         localStorage.setItem(STORAGE_KEY, String(enabled));
       } catch {}
-    },
+    }, []),
   };
 }

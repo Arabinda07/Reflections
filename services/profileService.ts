@@ -1,13 +1,15 @@
 import { supabase } from '../src/supabaseClient';
 import { PlanTier, WellnessAccess } from '../types';
+import { getAuthenticatedUser } from './authUtils';
 
-const getAuthenticatedUser = async () => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('User not authenticated');
-  return user;
-};
+export interface SupabaseProfileRow {
+  plan: string | null;
+  free_ai_reflections_used: number | null;
+  free_wiki_insights_used: number | null;
+  smart_mode_enabled: boolean | null;
+}
 
-const mapWellnessAccess = (userId: string, data: any): WellnessAccess => ({
+const mapWellnessAccess = (userId: string, data: SupabaseProfileRow | null): WellnessAccess => ({
   userId,
   planTier: (data?.plan as PlanTier) || 'free',
   freeAiReflectionsUsed: data?.free_ai_reflections_used || 0,

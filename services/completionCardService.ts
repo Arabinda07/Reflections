@@ -56,107 +56,139 @@ const wrapText = (
   return lines.slice(0, 3);
 };
 
+const CARD_LAYOUT = {
+  padding: 48,
+  innerPaddingY: 44,
+  innerRadius: 36,
+  contentLeft: 104,
+  logoCircleX: 126,
+  logoCircleY: 120,
+  logoCircleRadius: 22,
+  wordmarkX: 162,
+  wordmarkY: 130,
+  titleY: 260,
+  titleLineHeight: 76,
+  titleMaxWidth: 820,
+  subtitleOffsetY: 28,
+  badgeBottomOffset: 132,
+  badgePillHeight: 38,
+  badgePillRadius: 19,
+  badgePaddingX: 20,
+  watermarkBottomOffset: 32,
+} as const;
+
+const BADGE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
+  weekly_recap: { bg: '#e8f0e3', text: '#4f6f46', border: '#c4d8bb' },
+  release_completed: { bg: '#f2ece5', text: '#8a6a4a', border: '#ddd0c0' },
+  letter_scheduled: { bg: '#f4f0e2', text: '#8a7a40', border: '#e2d8b8' },
+};
+
+const drawCardBackground = (ctx: CanvasRenderingContext2D) => {
+  const { width, height } = ctx.canvas;
+
+  const bgGradient = ctx.createLinearGradient(0, 0, width, height);
+  bgGradient.addColorStop(0, '#f0f4ec');
+  bgGradient.addColorStop(0.5, '#f7f8f4');
+  bgGradient.addColorStop(1, '#f4f6f0');
+  ctx.fillStyle = bgGradient;
+  ctx.fillRect(0, 0, width, height);
+
+  const glow = ctx.createRadialGradient(200, 140, 60, 200, 140, 420);
+  glow.addColorStop(0, 'rgba(79, 111, 70, 0.07)');
+  glow.addColorStop(1, 'rgba(79, 111, 70, 0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.fillStyle = 'rgba(251, 252, 248, 0.85)';
+  roundRect(ctx, CARD_LAYOUT.padding, CARD_LAYOUT.innerPaddingY, width - CARD_LAYOUT.padding * 2, height - CARD_LAYOUT.innerPaddingY * 2, CARD_LAYOUT.innerRadius);
+  ctx.fill();
+  ctx.strokeStyle = '#d8dfd1';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+};
+
+const drawCardLogo = (ctx: CanvasRenderingContext2D) => {
+  ctx.fillStyle = '#4f6f46';
+  ctx.beginPath();
+  ctx.arc(CARD_LAYOUT.logoCircleX, CARD_LAYOUT.logoCircleY, CARD_LAYOUT.logoCircleRadius, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = '#f7f8f4';
+  ctx.font = '700 18px serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('🍃', CARD_LAYOUT.logoCircleX, CARD_LAYOUT.logoCircleY + 1);
+
+  ctx.fillStyle = '#4f6f46';
+  ctx.font = 'italic 600 26px Georgia, serif';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText('Reflections', CARD_LAYOUT.wordmarkX, CARD_LAYOUT.wordmarkY);
+};
+
+const drawCardTitle = (ctx: CanvasRenderingContext2D, payload: CompletionCardPayload): number => {
+  ctx.fillStyle = '#293127';
+  ctx.font = '700 64px Fraunces, Georgia, serif';
+  const titleLines = wrapText(ctx, payload.title, CARD_LAYOUT.titleMaxWidth);
+  titleLines.forEach((line, index) => {
+    ctx.fillText(line, CARD_LAYOUT.contentLeft, CARD_LAYOUT.titleY + index * CARD_LAYOUT.titleLineHeight);
+  });
+
+  const subtitleY = CARD_LAYOUT.titleY + titleLines.length * CARD_LAYOUT.titleLineHeight + CARD_LAYOUT.subtitleOffsetY;
+  ctx.fillStyle = '#65705e';
+  ctx.font = '500 26px Geist, Arial, sans-serif';
+  ctx.fillText(payload.subtitle, CARD_LAYOUT.contentLeft, subtitleY);
+
+  return subtitleY;
+};
+
+const drawCardBadge = (ctx: CanvasRenderingContext2D, payload: CompletionCardPayload) => {
+  const { height } = ctx.canvas;
+  const colors = BADGE_COLORS[payload.kind] || BADGE_COLORS.weekly_recap;
+
+  ctx.font = '800 16px Geist, Arial, sans-serif';
+  const badgeText = payload.badge.toUpperCase();
+  const badgeWidth = ctx.measureText(badgeText).width + CARD_LAYOUT.badgePaddingX * 2;
+  const badgeX = CARD_LAYOUT.contentLeft;
+  const badgeY = height - CARD_LAYOUT.badgeBottomOffset;
+
+  ctx.fillStyle = colors.bg;
+  roundRect(ctx, badgeX, badgeY, badgeWidth, CARD_LAYOUT.badgePillHeight, CARD_LAYOUT.badgePillRadius);
+  ctx.fill();
+  ctx.strokeStyle = colors.border;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  ctx.fillStyle = colors.text;
+  ctx.textAlign = 'left';
+  ctx.fillText(badgeText, badgeX + CARD_LAYOUT.badgePaddingX, badgeY + 25);
+
+  return badgeY;
+};
+
+const drawCardFooter = (ctx: CanvasRenderingContext2D, payload: CompletionCardPayload, badgeY: number) => {
+  const { width, height } = ctx.canvas;
+
+  ctx.fillStyle = '#819076';
+  ctx.font = '700 20px Geist, Arial, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText(payload.dateLabel, width - CARD_LAYOUT.contentLeft, badgeY + 25);
+
+  ctx.fillStyle = '#c4ccbe';
+  ctx.font = '500 16px Geist, Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('reflections.app', width / 2, height - CARD_LAYOUT.watermarkBottomOffset);
+};
+
 export function drawCompletionCard(
   context: CanvasRenderingContext2D,
   payload: CompletionCardPayload,
 ): void {
-  const { width, height } = context.canvas;
-
-  // ── Background: botanical gradient ──
-  const bgGradient = context.createLinearGradient(0, 0, width, height);
-  bgGradient.addColorStop(0, '#f0f4ec');
-  bgGradient.addColorStop(0.5, '#f7f8f4');
-  bgGradient.addColorStop(1, '#f4f6f0');
-  context.fillStyle = bgGradient;
-  context.fillRect(0, 0, width, height);
-
-  // Subtle radial glow (green tint, top-left)
-  const glow = context.createRadialGradient(200, 140, 60, 200, 140, 420);
-  glow.addColorStop(0, 'rgba(79, 111, 70, 0.07)');
-  glow.addColorStop(1, 'rgba(79, 111, 70, 0)');
-  context.fillStyle = glow;
-  context.fillRect(0, 0, width, height);
-
-  // ── Inner card ──
-  context.fillStyle = 'rgba(251, 252, 248, 0.85)';
-  roundRect(context, 48, 44, width - 96, height - 88, 36);
-  context.fill();
-  context.strokeStyle = '#d8dfd1';
-  context.lineWidth = 2;
-  context.stroke();
-
-  // ── Logo: green circle + wordmark ──
-  context.fillStyle = '#4f6f46';
-  context.beginPath();
-  context.arc(126, 120, 22, 0, Math.PI * 2);
-  context.fill();
-
-  // Leaf icon in circle (simple leaf shape)
-  context.fillStyle = '#f7f8f4';
-  context.font = '700 18px serif';
-  context.textAlign = 'center';
-  context.textBaseline = 'middle';
-  context.fillText('🍃', 126, 121);
-
-  // Wordmark
-  context.fillStyle = '#4f6f46';
-  context.font = 'italic 600 26px Georgia, serif';
-  context.textAlign = 'left';
-  context.textBaseline = 'alphabetic';
-  context.fillText('Reflections', 162, 130);
-
-  // ── Title (large serif) ──
-  context.fillStyle = '#293127';
-  context.font = '700 64px Fraunces, Georgia, serif';
-  const titleLines = wrapText(context, payload.title, 820);
-  titleLines.forEach((line, index) => {
-    context.fillText(line, 104, 260 + index * 76);
-  });
-
-  // ── Subtitle ──
-  const subtitleY = 260 + titleLines.length * 76 + 28;
-  context.fillStyle = '#65705e';
-  context.font = '500 26px Geist, Arial, sans-serif';
-  context.fillText(payload.subtitle, 104, subtitleY);
-
-  // ── Badge pill ──
-  const badgeColors: Record<string, { bg: string; text: string; border: string }> = {
-    weekly_recap: { bg: '#e8f0e3', text: '#4f6f46', border: '#c4d8bb' },
-    release_completed: { bg: '#f2ece5', text: '#8a6a4a', border: '#ddd0c0' },
-    letter_scheduled: { bg: '#f4f0e2', text: '#8a7a40', border: '#e2d8b8' },
-  };
-  const colors = badgeColors[payload.kind] || badgeColors.weekly_recap;
-
-  context.font = '800 16px Geist, Arial, sans-serif';
-  const badgeText = payload.badge.toUpperCase();
-  const badgeWidth = context.measureText(badgeText).width + 40;
-  const badgeX = 104;
-  const badgeY = height - 132;
-
-  // Badge background
-  context.fillStyle = colors.bg;
-  roundRect(context, badgeX, badgeY, badgeWidth, 38, 19);
-  context.fill();
-  context.strokeStyle = colors.border;
-  context.lineWidth = 1.5;
-  context.stroke();
-
-  // Badge text
-  context.fillStyle = colors.text;
-  context.textAlign = 'left';
-  context.fillText(badgeText, badgeX + 20, badgeY + 25);
-
-  // ── Date label ──
-  context.fillStyle = '#819076';
-  context.font = '700 20px Geist, Arial, sans-serif';
-  context.textAlign = 'right';
-  context.fillText(payload.dateLabel, width - 104, badgeY + 25);
-
-  // ── Watermark ──
-  context.fillStyle = '#c4ccbe';
-  context.font = '500 16px Geist, Arial, sans-serif';
-  context.textAlign = 'center';
-  context.fillText('reflections.app', width / 2, height - 32);
+  drawCardBackground(context);
+  drawCardLogo(context);
+  drawCardTitle(context, payload);
+  const badgeY = drawCardBadge(context, payload);
+  drawCardFooter(context, payload, badgeY);
 }
 
 export async function renderCompletionCardPng(

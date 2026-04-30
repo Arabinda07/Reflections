@@ -1,11 +1,5 @@
 import { db, LocalNote } from './db';
-export interface SyncOperation {
-  id?: number;
-  action: 'create' | 'update' | 'delete';
-  entityId: string;
-  data: any;
-  timestamp: number;
-}
+
 export const offlineStorage = {
   // --- Note Operations ---
 
@@ -63,22 +57,5 @@ export const offlineStorage = {
   async clearUserData(userId: string): Promise<void> {
     await db.notes.where('userId').equals(userId).delete();
   },
-
-  // Legacy compatibility methods (if used by other parts of the app during transition)
-  async getQueuedOperations(): Promise<any[]> {
-    const pending = await this.getPendingOperations();
-    return pending.map(n => ({
-      id: 0, // Mock id for legacy interface
-      action: n.syncStatus.replace('pending_', '') as 'create' | 'update' | 'delete',
-      entityId: n.id,
-      data: n,
-      timestamp: new Date(n.updatedAt).getTime()
-    }));
-  },
-
-  async removeFromQueue(id: number): Promise<void> {
-    // This was used for the separate sync_queue table. 
-    // In the new system, markAsSynced handles this.
-    console.warn('removeFromQueue is legacy. Use markAsSynced instead.');
-  }
 };
+

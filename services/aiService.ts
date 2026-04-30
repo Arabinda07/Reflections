@@ -3,6 +3,7 @@ import { wikiService } from './wikiService';
 import { type WikiPageType } from './wikiTypes';
 import { aiClient } from './aiClient';
 import { absorbLogService } from './absorbLogService';
+import { stripHtml } from './collectionUtils';
 
 export type WikiRefreshSource = 'themes' | 'notes' | 'none';
 
@@ -73,8 +74,6 @@ Every grounded claim must carry an inline source marker in this exact format: [S
   },
 ];
 
-const stripHtml = (value = '') =>
-  value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 
 const noteHasSignal = (note: Note) =>
   Boolean(

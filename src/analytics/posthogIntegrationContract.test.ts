@@ -24,6 +24,7 @@ describe('PostHog integration contract', () => {
     const signIn = read('pages/auth/SignIn.tsx');
     const signUp = read('pages/auth/SignUp.tsx');
     const app = read('App.tsx');
+    const oauthHook = read('hooks/useNativeOAuthListener.ts');
     const createNote = read('pages/dashboard/CreateNote.tsx');
     const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
     const authContext = read('context/AuthContext.tsx');
@@ -32,8 +33,9 @@ describe('PostHog integration contract', () => {
     expect(signIn).toContain('trackGoogleAuthStarted');
     expect(signUp).toContain('trackGoogleAuthStarted');
     expect(app).not.toContain("from './src/analytics/events'");
-    expect(app).toContain('trackGoogleAuthSucceededDeferred');
-    expect(app).toContain('trackGoogleAuthFailedDeferred');
+    expect(app).toContain('useNativeOAuthListener');
+    expect(oauthHook).toContain('trackGoogleAuthSucceededDeferred');
+    expect(oauthHook).toContain('trackGoogleAuthFailedDeferred');
     expect(createNote).toContain('trackNoteSaved');
     expect(lifeWiki).toContain('trackLifeWikiRefreshed');
     expect(authContext).not.toContain("from '../src/analytics/events'");

@@ -191,8 +191,8 @@ export const FAQ: React.FC = () => {
             {detailItems.map((item) => {
               const Icon = item.icon;
               return (
-                <div key={item.title} className="tone-panel tone-panel-sky relative overflow-hidden p-8">
-                  <div className="flex gap-6">
+                <div key={item.title} className="tone-panel tone-panel-sky relative overflow-hidden p-6 sm:p-8">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
                     <div className="tone-icon tone-icon-sky flex h-12 w-12 flex-none rounded-2xl">
                       <Icon size={24} weight="duotone" />
                     </div>

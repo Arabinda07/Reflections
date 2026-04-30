@@ -9,6 +9,8 @@ describe('optimize audit contract', () => {
   it('keeps the app shell off speculative preloading and native-only boot code', () => {
     const app = read('App.tsx');
     const vite = read('vite.config.ts');
+    const statusBarHook = read('hooks/useNativeStatusBar.ts');
+    const oauthHook = read('hooks/useNativeOAuthListener.ts');
 
     expect(app).not.toContain('requestIdleCallback(preloadRoutes)');
     expect(app).not.toContain('setTimeout(preloadRoutes, 2000)');
@@ -17,9 +19,10 @@ describe('optimize audit contract', () => {
     expect(app).not.toContain("from '@capacitor/core'");
     expect(app).not.toContain("from './src/auth/googleOAuth'");
 
-    expect(app).toContain("await import('@capacitor/core')");
-    expect(app).toContain("import('@capacitor/app')");
-    expect(app).toContain("import('./src/auth/googleOAuth')");
+    expect(statusBarHook).toContain("await import('@capacitor/core')");
+    expect(oauthHook).toContain("await import('@capacitor/core')");
+    expect(oauthHook).toContain("import('@capacitor/app')");
+    expect(oauthHook).toContain("import('../src/auth/googleOAuth')");
 
     expect(vite).toContain("return 'vendor-core'");
     expect(vite).toContain("return 'vendor-routing'");

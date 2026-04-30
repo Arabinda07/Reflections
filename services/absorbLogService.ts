@@ -1,11 +1,6 @@
 import type { Note } from '../types';
 import { supabase } from '../src/supabaseClient';
-
-const getAuthenticatedUser = async () => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('User not authenticated');
-  return user;
-};
+import { getAuthenticatedUser } from './authUtils';
 
 const stableNoteFingerprint = (note: Note) =>
   JSON.stringify({

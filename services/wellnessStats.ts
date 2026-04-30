@@ -1,23 +1,7 @@
 import type { MonthlyWellnessSummary, Note } from '../types';
 import { getMonthRange } from './wellnessPolicy';
+import { stripHtml, countBy, topEntries } from './collectionUtils';
 
-function stripHtml(html: string) {
-  return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-}
-
-function countBy(values: string[]) {
-  return values.reduce<Record<string, number>>((acc, value) => {
-    if (!value) return acc;
-    acc[value] = (acc[value] || 0) + 1;
-    return acc;
-  }, {});
-}
-
-function topEntries(counts: Record<string, number>, limit: number) {
-  return Object.entries(counts)
-    .sort(([aKey, aValue], [bKey, bValue]) => bValue - aValue || aKey.localeCompare(bKey))
-    .slice(0, limit);
-}
 
 function fallbackThemes(notes: Note[]) {
   const ignored = new Set(['about', 'after', 'again', 'also', 'because', 'been', 'from', 'have', 'just', 'that', 'this', 'today', 'with']);

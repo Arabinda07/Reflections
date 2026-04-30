@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { prefersReducedMotion } from './accessibilityUtils';
 
 /**
  * Haptic feedback hook.
@@ -13,10 +14,6 @@ const VIBRATION_PATTERNS: Record<HapticPreset, number | number[]> = {
   soft: 20,
   confirming: 30,
 };
-
-const prefersReducedMotion = () =>
-  typeof window !== 'undefined' &&
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 export function useHaptics() {
   const trigger = useCallback(async (preset: HapticPreset = 'light') => {

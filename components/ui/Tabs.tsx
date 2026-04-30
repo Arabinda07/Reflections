@@ -60,7 +60,7 @@ export const TabsTrigger: React.FC<TabsTriggerProps> = ({
       role="tab"
       aria-selected={isActive}
       onClick={() => ctx.onValueChange(value)}
-      className={`inline-flex items-center gap-2 rounded-[var(--radius-chip)] px-4 py-2 text-[12px] font-extrabold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/30 ${
+      className={`inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-chip)] px-4 py-2 text-[12px] font-extrabold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/30 ${
         isActive
           ? 'bg-green/10 text-green border border-green/20 shadow-sm'
           : 'text-gray-nav hover:text-green hover:bg-green/5 border border-transparent'

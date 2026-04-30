@@ -528,7 +528,7 @@ export const LifeWiki: React.FC = () => {
                     <p className={`text-[11px] font-black uppercase tracking-widest ${articleTone.text}`}>
                       Room awaiting signal
                     </p>
-                    <h1 className="max-w-3xl text-5xl font-display font-extrabold text-gray-text md:text-6xl">
+                    <h1 className="max-w-3xl text-4xl font-display font-extrabold text-gray-text sm:text-5xl md:text-6xl">
                       {articleMeta?.label || 'This page'}
                     </h1>
                     <p className="max-w-2xl font-serif text-[20px] italic leading-relaxed text-gray-text/75">
@@ -578,7 +578,7 @@ export const LifeWiki: React.FC = () => {
                     <MetadataPill tone="green">Updated {new Date(articlePage.updatedAt).toLocaleDateString()}</MetadataPill>
                     <MetadataPill tone="green">{sourceIds.length} source{sourceIds.length === 1 ? '' : 's'}</MetadataPill>
                   </div>
-                  <h1 className="max-w-3xl text-5xl font-display font-extrabold text-gray-text md:text-6xl">
+                  <h1 className="max-w-3xl text-4xl font-display font-extrabold text-gray-text sm:text-5xl md:text-6xl">
                     {articlePage.title}
                   </h1>
                   <p className="max-w-2xl text-[16px] font-medium leading-relaxed text-gray-light">
@@ -679,7 +679,7 @@ export const LifeWiki: React.FC = () => {
           <div className="flex items-center justify-between gap-4">
             <button 
               onClick={() => navigate(RoutePath.INSIGHTS)}
-              className="flex items-center gap-2 text-[13px] font-bold text-gray-nav hover:text-green transition-colors w-fit"
+              className="flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-[13px] font-bold text-gray-nav transition-colors hover:bg-green/5 hover:text-green"
               aria-label="Back to Insights"
             >
               <ArrowLeft size={16} weight="bold" />
@@ -690,7 +690,7 @@ export const LifeWiki: React.FC = () => {
               <button
                 onClick={handleRefreshWiki}
                 disabled={isRefreshingWiki || !gate?.canGenerate}
-                className="flex items-center justify-center gap-2 rounded-full border border-green/20 bg-green/5 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-green transition-all hover:bg-green/10 hover:border-green/40 disabled:opacity-50"
+                className="flex min-h-11 items-center justify-center gap-2 rounded-full border border-green/20 bg-green/5 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-green transition-all hover:border-green/40 hover:bg-green/10 disabled:opacity-50"
               >
                 <Sparkle size={16} weight="fill" />
                 <span className="hidden sm:inline">Refresh with AI</span>
@@ -699,7 +699,7 @@ export const LifeWiki: React.FC = () => {
           </div>
 
           <header className="mx-auto max-w-4xl space-y-5 pb-3 text-center">
-            <h1 className="text-5xl font-display font-extrabold text-gray-text md:text-6xl">
+            <h1 className="text-4xl font-display font-extrabold text-gray-text sm:text-5xl md:text-6xl">
               Your Life Wiki
             </h1>
             <p className="mx-auto max-w-2xl text-[17px] font-medium leading-relaxed text-gray-light">

@@ -421,6 +421,13 @@ body {
   background-size: cover;
 }
 
+@media (max-width: 768px) {
+  body,
+  .bg-body {
+    background-attachment: scroll;
+  }
+}
+
 .sr-only {
   position: absolute;
   width: 1px;

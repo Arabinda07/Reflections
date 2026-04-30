@@ -740,7 +740,7 @@ export const CreateNote: React.FC = () => {
             setIsFlowing(false);
             setIsFocusModeEnabled(false);
           }}
-          className="surface-floating fixed right-4 z-[85] inline-flex items-center gap-2 rounded-full px-4 py-2 text-[11px] font-black uppercase tracking-[0.18em] text-green hover:text-green"
+          className="surface-floating fixed right-4 z-[85] inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 text-[11px] font-black uppercase tracking-[0.18em] text-green hover:text-green"
           style={{ top: NATIVE_TOP_CONTROL_OFFSET }}
         >
           <X size={12} weight="regular" />
@@ -824,7 +824,7 @@ export const CreateNote: React.FC = () => {
               <img src={imagePreview} alt="Cover" className="w-full h-full object-cover" />
               <button
                 onClick={() => setImagePreview(null)}
-                className="surface-floating surface-floating--media absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-[var(--radius-control)] opacity-0 transition-all group-hover:opacity-100"
+                className="surface-floating surface-floating--media absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] opacity-0 transition-all group-hover:opacity-100 focus-visible:opacity-100"
                 aria-label="Remove cover image"
               >
                 <X size={20} weight="regular" />
@@ -853,7 +853,7 @@ export const CreateNote: React.FC = () => {
                   return next;
                 });
               }}
-              className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] transition-colors ${
+              className={`inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] transition-colors sm:min-h-0 sm:px-3 sm:py-1 sm:text-[10px] ${
                 isFocusModeEnabled
                   ? 'bg-green text-white'
                   : 'control-surface text-gray-text hover:bg-green/10 hover:text-green'
@@ -863,12 +863,12 @@ export const CreateNote: React.FC = () => {
               Focus mode
             </button>
             {canReflect && (
-               <button onClick={handleAiReflect} disabled={isReflecting} className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-green/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-green transition-all hover:bg-green/20">
-                 <span className="inline-flex h-3 w-3 shrink-0 items-center justify-center">
-                   {isReflecting ? <CircleNotch size={12} className="animate-spin" /> : <Brain size={12} weight="regular" />}
-                 </span>
-                 <span className="leading-none">Reflect with AI</span>
-               </button>
+              <button onClick={handleAiReflect} disabled={isReflecting} className="inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-full bg-green/10 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-green transition-all hover:bg-green/20 disabled:opacity-60 sm:min-h-0 sm:px-3 sm:py-1 sm:text-[10px]">
+                <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center sm:h-3 sm:w-3">
+                  {isReflecting ? <CircleNotch size={14} className="animate-spin" /> : <Brain size={14} weight="regular" />}
+                </span>
+                <span className="leading-none">Reflect with AI</span>
+              </button>
             )}
           </div>
 
@@ -892,7 +892,7 @@ export const CreateNote: React.FC = () => {
             onChange={e => setTitle(e.target.value)}
             onFocus={() => { setIsFocused(true); setIsTitleFocused(true); setIsFlowing(false); }}
             onBlur={() => { setIsFocused(false); setIsTitleFocused(false); }}
-            className="w-full bg-transparent border-none outline-none font-serif text-[42px] md:text-[56px] leading-tight text-gray-text placeholder:text-border/40 mb-8 p-0"
+            className="w-full bg-transparent border-none outline-none font-serif text-[36px] sm:text-[42px] md:text-[56px] leading-tight text-gray-text placeholder:text-border/40 mb-8 p-0"
           />
 
           <AnimatePresence>

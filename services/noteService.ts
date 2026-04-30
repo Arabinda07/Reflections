@@ -1,9 +1,23 @@
 import { supabase } from '../src/supabaseClient';
 import { Note, NoteAttachment } from '../types';
 import { offlineStorage } from './offlineStorage';
+import type { LocalNote } from './db';
+
+export interface SupabaseNoteRow {
+  id: string;
+  title: string | null;
+  content: string | null;
+  created_at: string;
+  updated_at: string;
+  thumbnail_url: string | null;
+  tags: string[] | null;
+  attachments: NoteAttachment[] | null;
+  mood: string | null;
+  tasks: any[] | null;
+}
 
 // Helper to map Supabase DB naming (snake_case) to App naming (camelCase)
-const mapToNote = (data: any): Note => ({
+export const mapToNote = (data: SupabaseNoteRow): Note => ({
   id: data.id,
   title: data.title || '',
   content: data.content || '',
@@ -141,12 +155,12 @@ export const noteService = {
     if (!current) throw new Error('Note not found locally');
     
     const now = new Date().toISOString();
-    const updatedNote = { 
+    const updatedNote: LocalNote = { 
       ...current, 
       ...updates, 
       updatedAt: now,
-      syncStatus: current.syncStatus === 'pending_insert' ? 'pending_insert' : 'pending_update'
-    } as any;
+      syncStatus: current.syncStatus === 'pending_insert' ? 'pending_insert' as const : 'pending_update' as const,
+    };
 
     // 2. Save to Dexie immediately
     await offlineStorage.saveNote(updatedNote);
