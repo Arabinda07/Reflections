@@ -281,9 +281,8 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
           </div>
 
           <Button
-            variant="primary"
-            className="w-full h-14 text-[16px] rounded-xl"
-            style={{ backgroundColor: 'var(--honey)', borderColor: 'var(--honey)', color: '#fff' }}
+            variant="secondary"
+            className="w-full h-14 text-[16px] rounded-xl !border-honey !bg-honey !text-white hover:!border-honey hover:!bg-honey/90"
             onClick={() => setIsModalOpen(true)}
           >
             Join Pro
@@ -297,26 +296,27 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
 
   return (
     <>
-      <div className={`border-t border-border/50 pt-6 ${className}`}>
-        <div className="flex flex-col justify-between gap-5 md:flex-row md:items-center">
-          <div className="space-y-2">
+      <div className={`surface-floating surface-tone-honey rounded-[var(--radius-panel)] border border-border/50 p-6 md:p-7 ${className}`}>
+        <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
+          <div className="max-w-md space-y-3">
             <div className="flex items-center gap-2 text-honey">
-              <Crown size={18} weight="fill" />
+              <Crown size={20} weight="fill" />
               <span className="text-[11px] font-black uppercase tracking-widest">Reflections Pro</span>
             </div>
-            <p className="text-[14px] font-medium leading-relaxed text-gray-light">
+            <p className="text-[15px] font-medium leading-relaxed text-gray-light">
               More on-demand reflections, Life Wiki refreshes, and early Pro features.
             </p>
           </div>
 
-          <Button
-            variant="primary"
-            className="w-full md:w-auto h-12 px-8 rounded-xl shrink-0"
-            style={{ backgroundColor: 'var(--honey)', borderColor: 'var(--honey)', color: '#fff' }}
-            onClick={() => setIsModalOpen(true)}
-          >
-            Join Pro
-          </Button>
+          <div className="flex flex-col gap-2 md:items-end">
+            <Button
+              variant="secondary"
+              className="w-full md:w-auto h-12 px-6 rounded-xl !border-honey !bg-honey !text-white hover:!border-honey hover:!bg-honey/90"
+              onClick={() => setIsModalOpen(true)}
+            >
+              Join Pro
+            </Button>
+          </div>
         </div>
       </div>
       {renderSubscriptionModal()}

@@ -406,7 +406,7 @@ export const Account: React.FC = () => {
                         </div>
                       )}
                     </div>
-                    <div className="absolute bottom-1 right-1 flex h-11 w-11 items-center justify-center rounded-full border-4 border-surface bg-green text-white shadow-xl shadow-black/15 transition-transform group-hover:scale-105">
+                    <div className="absolute bottom-1 right-1 flex h-11 w-11 items-center justify-center rounded-full border-4 border-white bg-gray-text text-white shadow-xl shadow-black/15 transition-transform group-hover:scale-105">
                       <Camera size={18} weight="bold" />
                     </div>
                   </button>
