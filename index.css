@@ -1340,6 +1340,9 @@ select:focus-visible,
     background: rgba(var(--panel-bg-rgb), 0.72);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
+    transform: translateZ(0);
+    will-change: opacity, backdrop-filter;
+    backface-visibility: hidden;
   }
 
   .modal-sheet-shell {

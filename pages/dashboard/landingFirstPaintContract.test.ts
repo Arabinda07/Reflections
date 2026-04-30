@@ -114,7 +114,7 @@ describe('landing first-paint contract', () => {
     expect(layout).toContain('h-[100dvh] min-h-[100dvh]');
     expect(layout).toContain('min-h-0 w-full flex-1 flex-col overflow-y-auto');
     expect(landing).toContain('relative isolate min-h-[100dvh] w-full overflow-hidden bg-body');
-    expect(landing).toContain('h-full min-h-full w-full min-w-full object-cover');
+    expect(landing).toContain('h-full min-h-full w-full min-w-full transform-gpu object-cover');
     expect(homeAuthenticated).toContain('relative isolate h-[56dvh] min-h-[360px] w-full overflow-hidden bg-body sm:h-[60dvh] sm:min-h-[450px]');
     expect(homeAuthenticated).toContain('src="/assets/videos/field.png"');
     expect(homeAuthenticated).toContain('h-full min-h-full w-full min-w-full object-cover object-center');
