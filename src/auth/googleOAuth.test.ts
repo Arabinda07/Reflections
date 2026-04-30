@@ -60,7 +60,7 @@ class SessionStorageMock {
   }
 }
 
-const createWindow = (href = 'https://reflections-ebon.vercel.app/#/login') => ({
+const createWindow = (href = 'https://reflections-ebon.vercel.app/login') => ({
   location: {
     origin: 'https://reflections-ebon.vercel.app',
     pathname: '/',
@@ -108,7 +108,7 @@ describe('googleOAuth', () => {
     expect(mockSignInWithOAuth).toHaveBeenCalledWith({
       provider: 'google',
       options: {
-        redirectTo: 'https://reflections-ebon.vercel.app/#/login',
+        redirectTo: 'https://reflections-ebon.vercel.app/login',
       },
     });
   });

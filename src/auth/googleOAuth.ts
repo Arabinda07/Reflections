@@ -49,7 +49,7 @@ export const getGoogleOAuthRedirectTo = (sourcePath: GoogleAuthSourcePath) => {
 
   return Capacitor.isNativePlatform()
     ? NATIVE_GOOGLE_AUTH_REDIRECT_URL
-    : `${window.location.origin}/#${sourcePath}`;
+    : `${window.location.origin}${sourcePath}`;
 };
 
 export const resolvePostAuthRedirectPath = (value?: unknown) => {
@@ -203,9 +203,8 @@ export const redirectToAppRoute = (path: string) => {
     return;
   }
 
-  const baseUrl = `${window.location.origin}${window.location.pathname}`;
-  const hash = path === RoutePath.HOME ? '#/' : `#${path}`;
-  window.location.replace(`${baseUrl}${hash}`);
+  const targetPath = path === RoutePath.HOME ? '/' : path;
+  window.location.replace(`${window.location.origin}${targetPath}`);
 };
 
 const launchGoogleOAuth = async (sourcePath: GoogleAuthSourcePath) => {

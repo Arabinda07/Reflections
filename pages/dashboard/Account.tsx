@@ -213,7 +213,7 @@ export const Account: React.FC = () => {
     setFeedback(null);
     try {
       await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/#${RoutePath.RESET_PASSWORD}`,
+        redirectTo: `${window.location.origin}${RoutePath.RESET_PASSWORD}`,
       });
       setFeedback({
         variant: 'info',

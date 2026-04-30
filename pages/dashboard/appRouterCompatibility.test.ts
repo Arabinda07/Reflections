@@ -11,7 +11,7 @@ describe('app router compatibility', () => {
     const createNote = read('pages/dashboard/CreateNote.tsx');
 
     expect(createNote).toContain('useBlocker(');
-    expect(app).toContain('createHashRouter');
+    expect(app).toContain('createBrowserRouter');
     expect(app).toContain('RouterProvider');
     expect(app).not.toContain('HashRouter as Router');
   });
