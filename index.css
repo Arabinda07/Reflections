@@ -598,6 +598,8 @@ select:focus-visible,
     background: var(--surface-current-bg);
     border-radius: calc(var(--radius-shell) - 1px);
     border: 1.5px solid var(--surface-current-border);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     height: 100%;
     width: 100%;
   }
@@ -1337,7 +1339,9 @@ select:focus-visible,
   .modal-sheet-backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(var(--panel-bg-rgb), 0.88);
+    background: rgba(var(--panel-bg-rgb), 0.72);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
 
   .modal-sheet-shell {
