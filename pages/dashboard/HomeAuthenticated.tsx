@@ -598,7 +598,7 @@ export const HomeAuthenticated: React.FC = () => {
               className="surface-flat surface-tone-honey p-6 sm:p-8"
             >
               <div className="mb-8 flex items-center gap-2 text-gray-nav">
-                <Sparkle size={18} weight="duotone" className="text-orange" />
+                <Sparkle size={18} weight="duotone" className="text-honey" />
                 <span className="text-[11px] font-black uppercase tracking-widest opacity-60">
                   Before you write
                 </span>
@@ -609,13 +609,13 @@ export const HomeAuthenticated: React.FC = () => {
                   <p className="text-[13px] font-bold text-green">Reflection saved.</p>
                 ) : null}
                 <p className="relative font-serif text-xl italic leading-relaxed text-gray-text">
-                  <span className="absolute -left-4 -top-5 font-serif text-5xl text-orange/10 pointer-events-none">
+                  <span className="absolute -left-4 -top-5 font-serif text-5xl text-honey/10 pointer-events-none">
                     "
                   </span>
                   {quote.text}
                 </p>
                 <div className="flex items-center gap-4">
-                  <div className="h-px w-8 bg-orange/20" />
+                  <div className="h-px w-8 bg-honey/20" />
                   <p className="text-[12px] font-bold text-gray-nav uppercase tracking-widest">
                     {quote.author}
                   </p>

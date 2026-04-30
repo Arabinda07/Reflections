@@ -39,6 +39,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       size="sm"
+      tone={variant === 'danger' ? 'clay' : 'paper'}
       title={resolvedTitle}
       description={resolvedDescription}
       icon={

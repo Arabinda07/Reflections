@@ -133,11 +133,11 @@ export const ReferralInvitePanel: React.FC<ReferralInvitePanelProps> = ({ compac
 
       {status ? (
         <p
-          className={`flex items-center gap-2 text-[12px] font-bold ${isErrorStatus ? 'text-red' : 'text-gray-light'}`}
+          className={`flex items-center gap-2 text-[12px] font-bold ${isErrorStatus ? 'text-clay' : 'text-gray-light'}`}
           aria-live="polite"
         >
           {isErrorStatus ? (
-            <WarningCircle size={14} weight="bold" className="text-red" />
+            <WarningCircle size={14} weight="bold" className="text-clay" />
           ) : (
             <Check size={14} weight="bold" className="text-green" />
           )}

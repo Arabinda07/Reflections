@@ -641,11 +641,11 @@ export const Account: React.FC = () => {
                 </Surface>
               </div>
 
-              <div className="rounded-[var(--radius-panel)] border border-red/15 bg-red/[0.03] p-8 lg:p-10">
+              <div className="surface-tone-clay rounded-[var(--radius-panel)] border border-clay/15 bg-clay/[0.03] p-8 lg:p-10">
                 <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                   <div className="space-y-2">
-                    <p className="text-[11px] font-black uppercase tracking-widest text-red">Danger zone</p>
-                    <h3 className="text-[24px] font-display font-bold text-red">Delete account</h3>
+                    <p className="text-[11px] font-black uppercase tracking-widest text-clay">Danger zone</p>
+                    <h3 className="text-[24px] font-display font-bold text-clay">Delete account</h3>
                     <p className="max-w-xl text-[14px] font-medium leading-relaxed text-gray-light">
                       Saved writing and app data will be removed.
                     </p>
@@ -662,7 +662,7 @@ export const Account: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleSignOut}
-                    className="flex items-center gap-2 text-[13px] font-bold uppercase tracking-widest text-gray-nav transition-colors hover:text-red"
+                    className="flex items-center gap-2 text-[13px] font-bold uppercase tracking-widest text-gray-nav transition-colors hover:text-clay"
                     aria-label="Sign out of your account"
                   >
                     <SignOut size={20} weight="regular" />
@@ -711,6 +711,7 @@ export const Account: React.FC = () => {
         title="Delete your saved writing"
         icon={<Trash size={20} weight="duotone" />}
         size="md"
+        tone="clay"
         footer={
           <div className="flex flex-col gap-3">
             <Button variant="danger" onClick={handleDeleteSavedData} isLoading={isDeletingData}>

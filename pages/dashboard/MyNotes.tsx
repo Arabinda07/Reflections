@@ -121,7 +121,7 @@ export const MyNotes: React.FC = () => {
               ) : (
                 <div
                   className={`h-1.5 w-1.5 rounded-full ${
-                    index === 0 ? 'bg-green' : index === 1 ? 'bg-blue' : 'bg-orange'
+                    index === 0 ? 'bg-green' : index === 1 ? 'bg-sky' : 'bg-honey'
                   }`}
                 />
               )}
@@ -172,11 +172,11 @@ export const MyNotes: React.FC = () => {
             <button
               onClick={(event) => initiateDelete(event, note.id)}
               disabled={isDeleting && noteIdToDelete === note.id}
-              className="control-surface absolute left-4 top-4 z-20 inline-flex h-11 w-11 items-center justify-center text-gray-text shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-red/30 hover:text-red"
+              className="control-surface absolute left-4 top-4 z-20 inline-flex h-11 w-11 items-center justify-center text-gray-text shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-clay/30 hover:text-clay"
               aria-label={`Delete ${note.title}`}
             >
               {isDeleting && noteIdToDelete === note.id ? (
-                <CircleNotch size={16} weight="bold" className="animate-spin text-red" />
+                <CircleNotch size={16} weight="bold" className="animate-spin text-clay" />
               ) : (
                 <Trash size={16} weight="regular" />
               )}
@@ -312,7 +312,7 @@ export const MyNotes: React.FC = () => {
                 <Chip as="span" active icon={<Tag size={12} weight="regular" />}>
                   {tagFilter}
                 </Chip>
-                <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.NOTES)} className="text-red">
+                <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.NOTES)} className="text-clay">
                   <X size={12} weight="regular" className="mr-1" />
                   Clear filter
                 </Button>

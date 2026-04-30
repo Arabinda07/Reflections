@@ -135,7 +135,7 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
         type="button"
         onClick={() => removeTask(task.id)}
         aria-label={`Remove task: ${taskLabel}`}
-        className="opacity-0 group-hover:opacity-100 p-2 text-gray-nav hover:text-red transition-all"
+        className="opacity-0 group-hover:opacity-100 p-2 text-gray-nav hover:text-clay transition-all"
       >
         <Trash size={16} />
       </button>
@@ -772,7 +772,7 @@ export const CreateNote: React.FC = () => {
               <CaretRight size={14} className="opacity-40" />
             </button>
 
-            <button onClick={() => setIsTagsOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${tags.length > 0 ? 'bg-sky/10 border-sky/20 text-sky' : 'control-surface text-gray-text'}`}>
+            <button onClick={() => setIsTagsOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>
               <div className="flex items-center gap-3"><TagIcon size={20} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-[13px] font-bold">{tags.length > 0 ? `${tags.length} Tags` : 'Tags'}</span></div>
               <CaretRight size={14} className="opacity-40" />
             </button>
@@ -782,7 +782,7 @@ export const CreateNote: React.FC = () => {
               <CaretRight size={14} className="opacity-40" />
             </button>
 
-            <button onClick={toggleWhisper} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${isWhispering ? 'bg-clay/10 border-clay/25 text-clay' : 'control-surface text-gray-text'}`}>
+            <button onClick={toggleWhisper} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-all border border-border/40 ${isWhispering ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>
               <div className="flex items-center gap-3">{isWhispering ? <Microphone size={20} weight="fill" /> : <MicrophoneSlash size={20} weight="regular" />}<span className="text-[13px] font-bold">Whisper</span></div>
             </button>
 
@@ -863,7 +863,7 @@ export const CreateNote: React.FC = () => {
               Focus mode
             </button>
             {canReflect && (
-              <button onClick={handleAiReflect} disabled={isReflecting} className="inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-full bg-green/10 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-green transition-all hover:bg-green/20 disabled:opacity-60 sm:min-h-0 sm:px-3 sm:py-1 sm:text-[10px]">
+              <button onClick={handleAiReflect} disabled={isReflecting} className="inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-[var(--radius-control)] bg-green px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-white transition-all hover:bg-green-hover disabled:opacity-60 sm:min-h-0 sm:px-3 sm:py-1 sm:text-[10px]">
                 <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center sm:h-3 sm:w-3">
                   {isReflecting ? <CircleNotch size={14} className="animate-spin" /> : <Brain size={14} weight="regular" />}
                 </span>
@@ -1039,11 +1039,11 @@ export const CreateNote: React.FC = () => {
             onClick={handleSave}
             disabled={saving || isReleasing}
             aria-label="Save reflection"
-            className="flex min-h-16 w-full items-center justify-between rounded-2xl border border-green/20 bg-green/5 p-4 text-left text-green transition-all hover:border-green/35 hover:bg-green/10 disabled:opacity-60"
+            className="flex min-h-16 w-full items-center justify-between rounded-2xl border border-green bg-green p-4 text-left text-white transition-all hover:bg-green-hover disabled:opacity-60"
           >
             <span>
-              <span className="block text-[15px] font-bold text-gray-text">Save reflection</span>
-              <span className="mt-1 block text-[12px] font-medium text-gray-light">Keep this as a saved note.</span>
+              <span className="block text-[15px] font-bold text-white">Save reflection</span>
+              <span className="mt-1 block text-[12px] font-medium text-white/75">Keep this as a saved note.</span>
             </span>
             {saving ? <CircleNotch size={20} className="animate-spin" /> : <FloppyDisk size={20} weight="regular" />}
           </button>
@@ -1063,7 +1063,7 @@ export const CreateNote: React.FC = () => {
           </button>
 
           {releaseError ? (
-            <p className="text-[13px] font-bold leading-relaxed text-red" aria-live="polite">
+            <p className="text-[13px] font-bold leading-relaxed text-clay" aria-live="polite">
               {releaseError}
             </p>
           ) : null}
@@ -1112,7 +1112,7 @@ export const CreateNote: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setTags(tags.filter((item) => item !== tag))}
-                  className="text-green/70 hover:text-red"
+                  className="text-green/70 hover:text-clay"
                   aria-label={`Remove ${tag} tag`}
                 >
                   <X size={12} />
@@ -1206,7 +1206,7 @@ export const CreateNote: React.FC = () => {
             </button>
           ))}
 
-          <button onClick={handleStopMusic} className="mt-2 w-full rounded-2xl border-2 border-transparent p-4 font-bold text-red transition-colors hover:bg-red/5">Stop All</button>
+          <button onClick={handleStopMusic} className="mt-2 w-full rounded-2xl border-2 border-transparent p-4 font-bold text-clay transition-colors hover:bg-clay/5">Stop All</button>
         </div>
       </ModalSheet>
 
@@ -1216,10 +1216,13 @@ export const CreateNote: React.FC = () => {
         title="AI reflection"
         icon={<Brain size={24} weight="duotone" className="text-green" />}
         size="lg"
+        tone="sage"
         bodyClassName="pt-4"
       >
         <div className="space-y-8">
-          <p className="text-[20px] leading-relaxed text-gray-light font-serif italic">"{aiReflection}"</p>
+          <div className="surface-inline-panel surface-tone-sage p-5 sm:p-6">
+            <p className="text-[20px] leading-relaxed text-gray-text font-serif italic">"{aiReflection}"</p>
+          </div>
           <Button variant="primary" className="h-14 w-full rounded-2xl" onClick={() => setAiReflection(null)}>
             Back to writing
           </Button>

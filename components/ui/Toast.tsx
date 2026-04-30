@@ -24,8 +24,8 @@ const AUTO_DISMISS_MS = 3200;
 
 const variantStyles: Record<ToastVariant, string> = {
   success: 'border-green/20 bg-green/5 text-green',
-  info: 'border-blue/20 bg-blue/5 text-blue',
-  warning: 'border-golden/20 bg-golden/5 text-golden',
+  info: 'border-sky/20 bg-sky/5 text-sky',
+  warning: 'border-honey/20 bg-honey/5 text-honey',
 };
 
 const ToastItem: React.FC<{ toast: ToastData; onDismiss: (id: string) => void }> = ({

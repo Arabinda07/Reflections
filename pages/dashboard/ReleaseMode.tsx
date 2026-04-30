@@ -92,7 +92,7 @@ export const ReleaseMode: React.FC = () => {
                 </div>
 
                 {error ? (
-                  <p className="text-center text-[13px] font-bold text-red" aria-live="polite">
+                  <p className="text-center text-[13px] font-bold text-clay" aria-live="polite">
                     {error}
                   </p>
                 ) : null}

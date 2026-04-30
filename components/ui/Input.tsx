@@ -24,11 +24,11 @@ export const Input: React.FC<InputProps> = ({ label, error, icon: Icon, classNam
         <input
           className={`input-surface w-full h-12 px-4 text-[15px] font-semibold placeholder:text-gray-nav placeholder:font-medium disabled:cursor-not-allowed disabled:opacity-50 focus:border-green focus:ring-2 focus:ring-green/10 ${
             Icon ? 'pl-12' : ''
-          } ${error ? 'border-red focus:border-red focus:ring-red/10' : ''} ${className}`}
+          } ${error ? 'border-clay' : ''} ${className}`}
           {...props}
         />
       </div>
-      {error && <p className="mt-1.5 text-xs font-bold text-red ml-1">{error}</p>}
+      {error && <p className="mt-1.5 text-xs font-bold text-clay ml-1">{error}</p>}
     </div>
   );
 };

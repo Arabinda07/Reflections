@@ -483,7 +483,7 @@ select:focus-visible,
 [role="button"]:focus-visible,
 [tabindex="0"]:focus-visible {
   outline: 2px solid var(--green);
-  outline-offset: 4px;
+  outline-offset: 2px;
   border-radius: 4px;
   /* Strict geometric focus for clarity */
   box-shadow: 0 0 0 4px oklch(from var(--green) l c h / 0.1);
@@ -1103,21 +1103,21 @@ select:focus-visible,
   }
 
   .metadata-pill--orange {
-    border-color: oklch(from var(--orange) l c h / 0.22);
-    background: oklch(from var(--orange) l c h / 0.08);
-    color: var(--orange);
+    border-color: oklch(from var(--honey) l c h / 0.22);
+    background: oklch(from var(--honey) l c h / 0.08);
+    color: var(--honey);
   }
 
   .metadata-pill--red {
-    border-color: oklch(from var(--red) l c h / 0.2);
-    background: oklch(from var(--red) l c h / 0.08);
-    color: var(--red);
+    border-color: oklch(from var(--clay) l c h / 0.2);
+    background: oklch(from var(--clay) l c h / 0.08);
+    color: var(--clay);
   }
 
   .metadata-pill--blue {
-    border-color: oklch(from var(--blue) l c h / 0.22);
-    background: oklch(from var(--blue) l c h / 0.08);
-    color: var(--blue);
+    border-color: oklch(from var(--sky) l c h / 0.22);
+    background: oklch(from var(--sky) l c h / 0.08);
+    color: var(--sky);
   }
 
   .metadata-pill--sage {
@@ -1293,14 +1293,14 @@ select:focus-visible,
     font-family: 'Spectral', serif;
     font-size: 1.6rem;
     line-height: 1.3;
-    color: var(--gray-text);
+    color: oklch(from var(--green) l c h / 0.64);
     font-style: italic;
   }
 
   .empty-state-description {
     font-size: 0.9rem;
     line-height: 1.7;
-    color: var(--gray-light);
+    color: oklch(from var(--green) l c h / 0.46);
     font-weight: 500;
   }
 

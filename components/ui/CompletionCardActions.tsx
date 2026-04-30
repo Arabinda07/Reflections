@@ -97,7 +97,7 @@ export const CompletionCardActions: React.FC<CompletionCardActionsProps> = ({
       className={`surface-inline-panel surface-tone-honey p-5 ${className}`.trim()}
     >
       <div className="mb-4 space-y-1">
-        <p className="text-[11px] font-black uppercase tracking-widest text-green">
+        <p className="text-[11px] font-black uppercase tracking-widest text-honey">
           Completion card
         </p>
         <p className="text-[15px] font-semibold leading-relaxed text-gray-text">
@@ -128,7 +128,7 @@ export const CompletionCardActions: React.FC<CompletionCardActionsProps> = ({
 
       {status ? (
         <p
-          className={`mt-3 text-[12px] font-bold ${isErrorStatus ? 'text-red' : 'text-gray-light'}`}
+          className={`mt-3 text-[12px] font-bold ${isErrorStatus ? 'text-clay' : 'text-gray-light'}`}
           aria-live="polite"
         >
           {status}

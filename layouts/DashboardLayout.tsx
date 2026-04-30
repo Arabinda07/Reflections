@@ -255,16 +255,21 @@ export const DashboardLayout: React.FC = () => {
             >
               {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
             </button>
-            {navItems.map((item) => (
-              <Link
-                key={item.label}
-                to={item.path}
-                aria-current={location.pathname === item.path ? 'page' : undefined}
-                className="px-4 py-2 text-[13px] font-extrabold text-gray-nav hover:text-green hover:bg-green/5 rounded-xl transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-1"
-              >
-                {item.label}
-              </Link>
-            ))}
+            {navItems.map((item) => {
+              const isActive = location.pathname === item.path;
+              return (
+                <Link
+                  key={item.label}
+                  to={item.path}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`rounded-xl border-b-2 px-4 py-2 text-[13px] font-extrabold transition-colors duration-200 hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-1 ${
+                    isActive ? 'border-green bg-green/5 text-green' : 'border-transparent text-gray-nav'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
             <div className="w-[1px] h-[24px] bg-border mx-2" role="separator" aria-orientation="vertical"></div>
             {isAuthenticated ? (
               <>
@@ -281,7 +286,7 @@ export const DashboardLayout: React.FC = () => {
                   variant="ghost"
                   size="sm"
                   onClick={() => logout()}
-                  className="text-red hover:bg-red/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red"
+                  className="text-clay hover:bg-clay/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
                 >
                   Logout
                 </Button>
@@ -379,16 +384,22 @@ export const DashboardLayout: React.FC = () => {
                 {isAuthenticated ? (
                   <>
                     <div className="flex flex-col gap-2">
-                      {navItems.map((item) => (
-                        <button
-                          key={item.label}
-                          onClick={() => handleNavigation(item.path)}
-                          className="w-full p-6 text-left text-[24px] font-black text-gray-text hover:text-green transition-all duration-300 active:bg-green/5 rounded-2xl flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset"
-                        >
-                          <span>{item.label}</span>
-                          <CaretRight weight="regular" className="opacity-0 group-hover:opacity-100 transition-opacity" />
-                        </button>
-                      ))}
+                      {navItems.map((item) => {
+                        const isActive = location.pathname === item.path;
+                        return (
+                          <button
+                            key={item.label}
+                            onClick={() => handleNavigation(item.path)}
+                            aria-current={isActive ? 'page' : undefined}
+                            className={`flex w-full items-center justify-between rounded-2xl border-l-2 p-6 text-left text-[24px] font-black transition-all duration-300 active:bg-green/5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset ${
+                              isActive ? 'border-green bg-green/5 text-green' : 'border-transparent text-gray-text hover:text-green'
+                            }`}
+                          >
+                            <span>{item.label}</span>
+                            <CaretRight weight="regular" className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                          </button>
+                        );
+                      })}
                     </div>
                     <div className="mt-8 flex flex-col gap-4" style={{ paddingBottom: 'calc(2.5rem + env(safe-area-inset-bottom))' }}>
                       {/* PWA Install Button — only visible when browser supports it */}
@@ -424,7 +435,7 @@ export const DashboardLayout: React.FC = () => {
                           logout();
                           setIsMobileMenuOpen(false);
                         }}
-                        className="w-full text-red hover:bg-red/5 h-16 font-black border-2 border-red/10 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red focus-visible:ring-offset-1"
+                        className="w-full text-clay hover:bg-clay/5 h-16 font-black border-2 border-clay/10 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-1"
                       >
                         Logout
                       </Button>
@@ -437,16 +448,22 @@ export const DashboardLayout: React.FC = () => {
                       { label: 'FAQ', path: RoutePath.FAQ },
                       { label: 'Sign In', path: RoutePath.LOGIN },
                       { label: 'Sign Up', path: RoutePath.SIGNUP },
-                    ].map((item) => (
-                      <button
-                        key={item.label}
-                        onClick={() => handleNavigation(item.path)}
-                        className="w-full p-6 text-left text-[24px] font-black text-gray-text hover:text-green transition-all duration-300 ease-out-expo active:bg-green/5 rounded-2xl flex items-center justify-between group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset"
-                      >
-                        <span>{item.label}</span>
-                        <CaretRight weight="regular" className="opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </button>
-                    ))}
+                    ].map((item) => {
+                      const isActive = location.pathname === item.path;
+                      return (
+                        <button
+                          key={item.label}
+                          onClick={() => handleNavigation(item.path)}
+                          aria-current={isActive ? 'page' : undefined}
+                          className={`flex w-full items-center justify-between rounded-2xl border-l-2 p-6 text-left text-[24px] font-black transition-all duration-300 ease-out-expo active:bg-green/5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset ${
+                            isActive ? 'border-green bg-green/5 text-green' : 'border-transparent text-gray-text hover:text-green'
+                          }`}
+                        >
+                          <span>{item.label}</span>
+                          <CaretRight weight="regular" className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -560,7 +577,7 @@ export const DashboardLayout: React.FC = () => {
                             className="w-full min-h-[160px] p-5 rounded-[20px] border border-border/40 bg-body/50 text-gray-text font-serif text-[17px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-green/10 focus:border-green/30 transition-all resize-none placeholder:text-gray-nav/30"
                           />
                           {submitError && (
-                            <p className="text-[12px] font-bold text-red animate-in fade-in slide-in-from-top-1">
+                            <p className="text-[12px] font-bold text-clay animate-in fade-in slide-in-from-top-1">
                               {submitError}
                             </p>
                           )}

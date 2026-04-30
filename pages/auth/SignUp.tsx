@@ -224,7 +224,7 @@ export const SignUp: React.FC = () => {
                       initial={{ opacity: 0, y: -5 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -5 }}
-                      className="text-[13px] font-bold text-red text-center"
+                      className="text-[13px] font-bold text-clay text-center"
                     >
                       {error}
                     </motion.p>

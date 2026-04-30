@@ -128,7 +128,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
           }
         },
         theme: {
-          color: '#2A3F33' // green
+          color: '#936F1F' // honey
         }
       };
 
@@ -164,6 +164,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
       title="Join Pro"
       icon={<Crown size={20} weight="duotone" />}
       size="md"
+      tone="honey"
       bodyClassName="px-6 pb-6 pt-2 sm:px-8"
     >
       <div className="space-y-6">
@@ -180,10 +181,10 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
                 type="button"
                 onClick={() => setSelectedPlan('monthly')}
                 className={`flex flex-col items-start rounded-[var(--radius-control)] border p-4 text-left transition-colors duration-300 ease-out-expo ${
-                  selectedPlan === 'monthly' ? 'border-green bg-green/5' : 'control-surface hover:border-green/30'
+                  selectedPlan === 'monthly' ? 'border-honey bg-honey/5' : 'control-surface hover:border-honey/30'
                 }`}
               >
-                <span className={`text-[12px] font-black uppercase tracking-widest ${selectedPlan === 'monthly' ? 'text-green' : 'text-gray-nav'}`}>Monthly</span>
+                <span className={`text-[12px] font-black uppercase tracking-widest ${selectedPlan === 'monthly' ? 'text-honey' : 'text-gray-nav'}`}>Monthly</span>
                 <span className="text-2xl font-serif italic text-gray-text mt-1">₹99<span className="text-[14px] not-italic text-gray-light">/mo</span></span>
               </button>
 
@@ -191,12 +192,12 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
                 type="button"
                 onClick={() => setSelectedPlan('yearly')}
                 className={`flex flex-col items-start rounded-[var(--radius-control)] border p-4 text-left transition-colors duration-300 ease-out-expo ${
-                  selectedPlan === 'yearly' ? 'border-green bg-green/5' : 'control-surface hover:border-green/30'
+                  selectedPlan === 'yearly' ? 'border-honey bg-honey/5' : 'control-surface hover:border-honey/30'
                 }`}
               >
                 <div className="flex w-full items-center justify-between gap-3">
-                  <span className={`text-[12px] font-black uppercase tracking-widest ${selectedPlan === 'yearly' ? 'text-green' : 'text-gray-nav'}`}>Yearly</span>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-green">Save 15%</span>
+                  <span className={`text-[12px] font-black uppercase tracking-widest ${selectedPlan === 'yearly' ? 'text-honey' : 'text-gray-nav'}`}>Yearly</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-honey">Save 15%</span>
                 </div>
                 <span className="text-2xl font-serif italic text-gray-text mt-1">₹999<span className="text-[14px] not-italic text-gray-light">/yr</span></span>
               </button>
@@ -205,7 +206,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
             <ul className="space-y-2 border-y border-border/50 py-4">
               {features.map((feature) => (
                 <li key={feature} className="flex items-center gap-3 text-[14px] font-semibold text-gray-text">
-                  <CheckCircle size={16} weight="fill" className="text-green" />
+                  <CheckCircle size={16} weight="fill" className="text-honey" />
                   {feature}
                 </li>
               ))}
@@ -213,14 +214,14 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
 
             <div>
               <label className="flex items-start gap-3 cursor-pointer group">
-                <div className="control-surface relative flex h-5 w-5 shrink-0 items-center justify-center rounded transition-colors group-hover:border-green mt-0.5">
+                <div className="control-surface relative flex h-5 w-5 shrink-0 items-center justify-center rounded transition-colors group-hover:border-honey mt-0.5">
                   <input
                     type="checkbox"
                     checked={wantsNewsletter}
                     onChange={(e) => setWantsNewsletter(e.target.checked)}
                     className="peer absolute h-full w-full cursor-pointer opacity-0"
                   />
-                  <div className="pointer-events-none opacity-0 transition-opacity peer-checked:opacity-100 text-green">
+                  <div className="pointer-events-none opacity-0 transition-opacity peer-checked:opacity-100 text-honey">
                     <Check size={14} weight="bold" />
                   </div>
                 </div>
@@ -230,11 +231,11 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
               </label>
             </div>
 
-            {error && <p className="text-red text-[13px] font-bold">{error}</p>}
+            {error && <p className="text-clay text-[13px] font-bold">{error}</p>}
 
             <Button
-              variant="primary"
-              className="w-full h-14 text-[16px] rounded-xl"
+              variant="secondary"
+              className="w-full h-14 text-[16px] rounded-xl !border-honey !bg-honey !text-white hover:!border-honey hover:!bg-honey/90"
               isLoading={isProcessing}
               onClick={handleSubscribe}
             >
@@ -243,7 +244,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
           </>
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center animate-in fade-in zoom-in duration-700">
-            <div className="mb-8 flex h-20 w-20 items-center justify-center rounded-[var(--radius-panel)] bg-green text-white">
+            <div className="mb-8 flex h-20 w-20 items-center justify-center rounded-[var(--radius-panel)] bg-honey text-white">
               <CheckCircle size={40} weight="fill" />
             </div>
             <h3 className="text-3xl font-display font-extrabold text-gray-text mb-3">Welcome to Pro</h3>
@@ -260,7 +261,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
     return (
       <div className={`surface-scope-honey fixed inset-0 z-50 flex items-center justify-center bg-body p-6 ${className}`}>
         <div className="max-w-md w-full relative z-10 text-center space-y-8">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[var(--radius-panel)] border border-green/15 bg-green/5 text-green">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[var(--radius-panel)] border border-honey/15 bg-honey/5 text-honey">
             <Crown size={40} weight="duotone" />
           </div>
           <div>
@@ -273,15 +274,15 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
           <div className="border-y border-border/50 py-5 text-left space-y-4">
             {features.map((feature) => (
               <div key={feature} className="flex items-center gap-3">
-                <CheckCircle size={20} weight="fill" className="text-green" />
+                <CheckCircle size={20} weight="fill" className="text-honey" />
                 <span className="text-[14px] font-bold text-gray-text">{feature}</span>
               </div>
             ))}
           </div>
 
           <Button
-            variant="primary"
-            className="w-full h-14 text-[16px] rounded-xl"
+            variant="secondary"
+            className="w-full h-14 text-[16px] rounded-xl !border-honey !bg-honey !text-white hover:!border-honey hover:!bg-honey/90"
             onClick={() => setIsModalOpen(true)}
           >
             Join Pro
@@ -295,10 +296,10 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
 
   return (
     <>
-      <div className={`surface-floating rounded-[var(--radius-panel)] border border-border/50 p-6 md:p-7 ${className}`}>
+      <div className={`surface-floating surface-tone-honey rounded-[var(--radius-panel)] border border-border/50 p-6 md:p-7 ${className}`}>
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
           <div className="max-w-md space-y-3">
-            <div className="flex items-center gap-2 text-green">
+            <div className="flex items-center gap-2 text-honey">
               <Crown size={20} weight="fill" />
               <span className="text-[11px] font-black uppercase tracking-widest">Reflections Pro</span>
             </div>
@@ -309,8 +310,8 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
 
           <div className="flex flex-col gap-2 md:items-end">
             <Button
-              variant="primary"
-              className="w-full md:w-auto h-12 px-6 rounded-xl"
+              variant="secondary"
+              className="w-full md:w-auto h-12 px-6 rounded-xl !border-honey !bg-honey !text-white hover:!border-honey hover:!bg-honey/90"
               onClick={() => setIsModalOpen(true)}
             >
               Join Pro

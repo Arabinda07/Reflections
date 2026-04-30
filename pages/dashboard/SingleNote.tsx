@@ -251,7 +251,7 @@ export const SingleNote: React.FC = () => {
           type="button"
           onClick={() => removeTask(task.id)}
           aria-label={`Remove task: ${taskLabel}`}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] text-gray-nav transition-colors hover:bg-red/5 hover:text-red"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] text-gray-nav transition-colors hover:bg-clay/5 hover:text-clay"
         >
           <Trash size={16} weight="bold" />
         </button>
@@ -316,10 +316,10 @@ export const SingleNote: React.FC = () => {
                 onClick={() => setIsConfirmOpen(true)}
                 isLoading={isDeleting}
                 disabled={isDeleting}
-                className="shadow-sm text-red hover:bg-red/5 hover:border-red/30 !px-3 sm:!px-4"
+                className="shadow-sm text-clay hover:bg-clay/5 hover:border-clay/30 !px-3 sm:!px-4"
                 aria-label="Delete this reflection"
               >
-                <Trash weight="bold" className="h-5 w-5 shrink-0 text-red sm:mr-2" />
+                <Trash weight="bold" className="h-5 w-5 shrink-0 text-clay sm:mr-2" />
                 <span className="hidden sm:inline">Delete</span>
               </Button>
             </div>
