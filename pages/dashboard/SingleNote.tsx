@@ -217,7 +217,7 @@ export const SingleNote: React.FC = () => {
     return (
       <div
         key={task.id}
-        className={`surface-inline-panel flex items-center gap-3 px-4 py-4 transition-all ${
+        className={`surface-inline-panel flex items-center gap-3 px-4 py-4 transition-colors ${
           task.completed
             ? 'border-green/20 bg-green/5'
             : 'hover:border-green/20'
@@ -229,7 +229,7 @@ export const SingleNote: React.FC = () => {
           aria-label={task.completed ? `Mark "${taskLabel}" as open` : `Mark "${taskLabel}" as complete`}
           className="group relative flex h-11 w-11 shrink-0 items-center justify-center"
         >
-          <div className={`flex h-6 w-6 items-center justify-center rounded-lg border-2 transition-all ${
+          <div className={`flex h-6 w-6 items-center justify-center rounded-lg border-2 transition-colors ${
             task.completed ? 'border-green bg-green text-white' : 'border-border text-transparent group-hover:border-green/40'
           }`}>
             <Check size={14} weight="bold" />
@@ -483,7 +483,7 @@ export const SingleNote: React.FC = () => {
                   await persistNote({ mood: note.mood === moodOption ? undefined : moodOption });
                   setIsMoodOpen(false);
                 }}
-                className={`flex flex-col items-center rounded-[var(--radius-panel)] border px-4 py-5 transition-all ${
+                className={`flex flex-col items-center rounded-[var(--radius-panel)] border px-4 py-5 transition-colors ${
                   note.mood === moodOption ? moodConfig?.selectedOption : moodConfig?.option
                 }`}
               >

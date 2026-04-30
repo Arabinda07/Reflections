@@ -222,7 +222,7 @@ export const FutureLetters: React.FC = () => {
                         type="button"
                         onClick={() => setSelectedOption(option.id)}
                         aria-pressed={selectedOption === option.id}
-                        className={`min-h-11 rounded-[var(--radius-control)] border px-3 text-[13px] font-black transition-all ${
+                        className={`min-h-11 rounded-[var(--radius-control)] border px-3 text-[13px] font-black transition-colors ${
                           selectedOption === option.id
                             ? 'border-green/30 bg-green/10 text-green'
                             : 'control-surface text-gray-nav hover:border-green/20 hover:text-green'

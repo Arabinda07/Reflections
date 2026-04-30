@@ -497,7 +497,7 @@ export const HomeAuthenticated: React.FC = () => {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         whileTap={{ scale: 0.98 }}
-                        className="w-full flex items-start gap-4 p-4 rounded-2xl border border-honey/15 bg-honey/5 hover:border-honey/30 transition-all text-left shadow-none group/btn"
+                        className="w-full flex items-start gap-4 p-4 rounded-2xl border border-honey/15 bg-honey/5 hover:border-honey/30 transition-colors text-left shadow-none group/btn"
                         onClick={() => handleToggleIntention(intention.noteId, intention.id)}
                         aria-label={`Mark "${intention.text}" from ${intention.noteTitle} as complete`}
                       >
@@ -740,7 +740,7 @@ export const HomeAuthenticated: React.FC = () => {
                   type="button"
                   onClick={() => handleMoodCheckIn(moodOption)}
                   disabled={isSavingCheckIn}
-                  className={`rounded-2xl border p-4 text-left transition-all disabled:opacity-60 ${moodConfig.option}`}
+                  className={`rounded-2xl border p-4 text-left transition-colors disabled:opacity-60 ${moodConfig.option}`}
                 >
                   <Icon size={22} weight="duotone" className={`mb-3 ${moodConfig.labelClass}`} />
                   <span className="text-[15px] font-bold text-gray-text">{moodConfig.label}</span>

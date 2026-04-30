@@ -141,7 +141,7 @@ export const MyNotes: React.FC = () => {
       <Surface
         key={note.id}
         variant="flat"
-        className="group overflow-hidden hover:border-green/25 hover:shadow-xl hover:shadow-black/5 transition-all duration-500"
+        className="group overflow-hidden hover:border-green/25 hover:shadow-xl hover:shadow-[var(--surface-tinted-shadow)] transition-[border-color,box-shadow,transform] duration-500"
       >
         <article
           className="flex h-full flex-col"
@@ -172,7 +172,7 @@ export const MyNotes: React.FC = () => {
             <button
               onClick={(event) => initiateDelete(event, note.id)}
               disabled={isDeleting && noteIdToDelete === note.id}
-              className="control-surface absolute left-4 top-4 z-20 inline-flex h-11 w-11 items-center justify-center text-gray-text shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-clay/30 hover:text-clay"
+              className="control-surface absolute left-4 top-4 z-20 inline-flex h-11 w-11 items-center justify-center text-gray-text shadow-sm backdrop-blur-xl transition-colors duration-300 hover:border-clay/30 hover:text-clay"
               aria-label={`Delete ${note.title}`}
             >
               {isDeleting && noteIdToDelete === note.id ? (
@@ -234,7 +234,7 @@ export const MyNotes: React.FC = () => {
                     event.stopPropagation();
                     downloadNoteExport(note, 'md');
                   }}
-                  className="control-surface inline-flex h-11 w-11 items-center justify-center text-gray-nav transition-all hover:border-green/25 hover:bg-green/5 hover:text-green"
+                  className="control-surface inline-flex h-11 w-11 items-center justify-center text-gray-nav transition-colors hover:border-green/25 hover:bg-green/5 hover:text-green"
                   title={`Export ${note.title}`}
                   aria-label={`Export ${note.title}`}
                 >
@@ -243,7 +243,7 @@ export const MyNotes: React.FC = () => {
 
                 <Link
                   to={noteDetailPath}
-                  className="inline-flex min-h-11 items-center rounded-[var(--radius-control)] px-3 text-[12px] font-bold text-green transition-all duration-300 hover:bg-green/5 group-hover:opacity-70 focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
+                  className="inline-flex min-h-11 items-center rounded-[var(--radius-control)] px-3 text-[12px] font-bold text-green transition-[background-color,opacity,box-shadow] duration-300 hover:bg-green/5 group-hover:opacity-70 focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
                   aria-label={`Open ${note.title}`}
                 >
                   <span>Open</span>
