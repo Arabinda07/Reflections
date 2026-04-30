@@ -1,6 +1,18 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Envelope } from '@phosphor-icons/react';
+import { 
+  ArrowLeft, 
+  Envelope, 
+  Database, 
+  DeviceMobile, 
+  Image as ImageIcon, 
+  Robot, 
+  ChartBar, 
+  CreditCard, 
+  Trash, 
+  User, 
+  ShieldCheck 
+} from '@phosphor-icons/react';
 
 import { Button } from '../../components/ui/Button';
 import { RoutePath } from '../../types';
@@ -10,6 +22,8 @@ const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
 const policySections = [
   {
     title: 'What Reflections keeps',
+    icon: Database,
+    color: 'tone-icon-sky',
     body: [
       'Reflections stores the account information needed to sign you in, including your email address and profile details you choose to save, such as your name, display name, timezone, and avatar.',
       'The app stores the writing you create here: notes, moods, tags, tasks, attachments, note covers, future letters, mood check-ins, Life Wiki pages, referral invite status, and the small usage counters needed for Free and Pro access.',
@@ -17,6 +31,8 @@ const policySections = [
   },
   {
     title: 'Local and offline copies',
+    icon: DeviceMobile,
+    color: 'tone-icon-sage',
     body: [
       'Reflections keeps a local copy of your notes in the browser or app database so writing can feel quick and can keep working through short connection drops.',
       'Local copies are tied to the device and browser you use. Clearing browser data, uninstalling the app, or signing out may remove local copies from that device, but server copies remain until you delete them from your account.',
@@ -24,6 +40,8 @@ const policySections = [
   },
   {
     title: 'Attachments and files',
+    icon: ImageIcon,
+    color: 'tone-icon-honey',
     body: [
       'Images, avatars, and note attachments are stored in a private Supabase Storage bucket. The app creates short-lived signed links when it needs to show those files back to you.',
       'If you delete saved writing from Account, Reflections also tries to remove stored attachments and avatar files before signing you out.',
@@ -31,6 +49,8 @@ const policySections = [
   },
   {
     title: 'AI and Smart Mode',
+    icon: Robot,
+    color: 'tone-icon-sky',
     body: [
       'Most AI work runs when you choose an AI action, or when you explicitly turn on Smart Mode. If you use Reflect with AI, Refresh with AI, or Smart Mode, the relevant writing is sent to the AI service so it can return that result.',
       'The Home dashboard may also refresh short Writing Note suggestions. If your Life Wiki has an index page, that index may be sent as context for those suggestions.',
@@ -40,6 +60,8 @@ const policySections = [
   },
   {
     title: 'Analytics',
+    icon: ChartBar,
+    color: 'tone-icon-clay',
     body: [
       'If analytics are configured, Reflections may record basic product events such as sign-in status, note saves, route groups, plan tier, counts of tags or attachments, and whether an AI refresh was used.',
       'Analytics should not include the body of your notes, future letters, attachments, moods as private prose, or AI reflection text. These events help find broken flows and understand which parts of the product are used.',
@@ -47,6 +69,8 @@ const policySections = [
   },
   {
     title: 'Payments and referrals',
+    icon: CreditCard,
+    color: 'tone-icon-honey',
     body: [
       'Payments are handled through Razorpay. Reflections stores enough payment and plan information to know whether your account has Pro access, but card and bank details are handled by Razorpay.',
       'If you use an invite link, Reflections stores the invite code and whether someone joined from it. Invites do not create a public social graph, rewards feed, or public list.',
@@ -54,6 +78,8 @@ const policySections = [
   },
   {
     title: 'Export, deletion, and account closure',
+    icon: Trash,
+    color: 'tone-icon-sage',
     body: [
       'Your notes belong to you. You can export saved notes from note pages in the formats currently available in the app.',
       'You can delete individual notes, and you can delete saved writing and app data from Account. That removes saved notes, moods, tags, tasks, profile data, engagement data, and stored files that the app can find.',
@@ -62,6 +88,8 @@ const policySections = [
   },
   {
     title: 'Using Reflections',
+    icon: User,
+    color: 'tone-icon-sky',
     body: [
       'Use Reflections as a personal writing tool. Do not use it for anything illegal or harmful, and do not try to access another person\'s account or files.',
       'You must be at least 13 years old to use Reflections. If you are under 18, a parent or guardian should review this page with you.',
@@ -69,6 +97,8 @@ const policySections = [
   },
   {
     title: 'Security and service limits',
+    icon: ShieldCheck,
+    color: 'tone-icon-honey',
     body: [
       'Reflections uses Supabase account security, private storage, Row Level Security, and encrypted connections to protect saved writing. No online service can promise perfect security.',
       'Some features require an internet connection. AI features, sync, payments, and exports can fail if a provider is unavailable. Features and Free or Pro limits may change as the product changes, but the app should explain limits plainly where they matter.',
@@ -104,26 +134,36 @@ export const PrivacyPolicy: React.FC = () => {
       </section>
 
       <main className="mx-auto w-full max-w-[1440px] px-6 sm:px-10 lg:px-16">
-        <section className="mb-20 grid gap-x-12 gap-y-12 md:grid-cols-2">
-          {policySections.map((section) => (
-            <article key={section.title} className="border-t border-border/60 py-8">
-              <h2 className="mb-5 text-[24px] font-display font-bold leading-tight text-gray-text">
-                {section.title}
-              </h2>
-              <div className="space-y-4">
-                {section.body.map((paragraph) => (
-                  <p key={paragraph} className="font-sans text-[16px] leading-relaxed text-gray-light">
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
-            </article>
-          ))}
+        <section className="mb-20 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {policySections.map((section) => {
+            const Icon = section.icon;
+            return (
+              <article key={section.title} className="group relative flex flex-col justify-between overflow-hidden rounded-[2rem] bg-body-surface border border-border/40 p-8 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-green/20 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                <div className="relative z-10">
+                  <div className={`tone-icon ${section.color} mb-8 h-12 w-12 rounded-2xl transition-transform duration-500 ease-out group-hover:scale-110 group-hover:-rotate-6`}>
+                    <Icon size={24} weight="duotone" />
+                  </div>
+                  <h2 className="mb-4 text-[22px] font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green">
+                    {section.title}
+                  </h2>
+                  <div className="space-y-3">
+                    {section.body.map((paragraph) => (
+                      <p key={paragraph} className="font-sans text-[15px] leading-relaxed text-gray-light">
+                        {paragraph}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+                {/* Subtle background glow effect on hover */}
+                <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-green/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+              </article>
+            );
+          })}
         </section>
 
-        <section className="mb-28 grid gap-8 border-t border-border/60 py-10 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
-          <div className="icon-block icon-block-sm h-12 w-12">
-            <Envelope size={22} weight="duotone" />
+        <section className="mb-28 grid gap-8 rounded-[2rem] bg-body-surface border border-border/40 p-10 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] transition-all duration-500 hover:border-green/20 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] group">
+          <div className="tone-icon tone-icon-sage h-14 w-14 rounded-2xl transition-transform duration-500 ease-out group-hover:scale-110 group-hover:rotate-6">
+            <Envelope size={24} weight="duotone" />
           </div>
           <div className="max-w-2xl space-y-4">
             <h2 className="text-[24px] font-display font-bold text-gray-text">Questions or account deletion</h2>
