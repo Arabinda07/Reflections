@@ -96,6 +96,17 @@ export default defineConfig(({ mode }) => {
             ],
             runtimeCaching: [
               {
+                urlPattern: ({ event }) => event.request.mode === 'navigate',
+                handler: 'NetworkFirst',
+                options: {
+                  cacheName: 'app-navigation',
+                  networkTimeoutSeconds: 3,
+                  cacheableResponse: {
+                    statuses: [0, 200],
+                  },
+                },
+              },
+              {
                 urlPattern: /^https:\/\/.*\.supabase\.co\/auth\/.*/i,
                 handler: 'NetworkOnly',
               },

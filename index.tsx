@@ -65,6 +65,14 @@ const bootstrapApp = async () => {
   } catch (error) {
     const detail = error instanceof Error ? error.message : "Unknown startup error";
 
+    // Detect dynamic import failures which usually indicate a version mismatch 
+    // due to service worker caching or rapid redeployments.
+    if (detail.includes("Failed to fetch dynamically imported module")) {
+      console.warn("Detected dynamic import failure. Force-reloading the app to fetch the latest bundle.");
+      window.location.reload();
+      return;
+    }
+
     console.error("App bootstrap failed.", error);
     renderBootstrapState(
       "Reflections couldn't start.",
