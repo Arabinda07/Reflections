@@ -594,9 +594,10 @@ export const HomeAuthenticated: React.FC = () => {
                   <CaretRight size={16} weight="regular" className="text-gray-nav/40 group-hover:text-sky transition-colors" />
                 </button>
               </div>
-              {/* Subtle background glow effect on hover */}
-              <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-sky-500/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-            </motion.div>
+            </div>
+            {/* Subtle background glow effect on hover */}
+            <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-sky-500/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+          </motion.div>
 
             <motion.div
               variants={bentoItemVariants}
@@ -625,6 +626,7 @@ export const HomeAuthenticated: React.FC = () => {
                   <p className="text-xs font-bold text-gray-nav uppercase tracking-widest">
                     {quote.author}
                   </p>
+                </div>
                 </div>
               </div>
               {/* Subtle sweep effect on hover */}

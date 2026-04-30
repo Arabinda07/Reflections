@@ -620,6 +620,7 @@ export const DashboardLayout: React.FC = () => {
         title="Invite someone"
         description="Share Reflections with someone who might want a quiet space to write."
         icon={<PaperPlaneTilt size={20} weight="duotone" />}
+        tone="honey"
         size="md"
       >
         <ReferralInvitePanel compact />
