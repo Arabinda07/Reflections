@@ -202,7 +202,7 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
         </button>
         {isPlaying && (
           <div className="flex items-center pr-2">
-            <div className="w-[2px] h-4 bg-border dark:bg-white/20 mx-1"></div>
+            <div className="w-[2px] h-4 bg-border mx-1"></div>
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -241,8 +241,8 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
                     }}
                     className={`w-full rounded-xl border-2 p-3 text-left transition-all duration-300 ease-out-quart ${
                       isPresetPlaying
-                        ? 'border-green/25 bg-green/10 text-green shadow-sm dark:bg-green/12 dark:border-green/30 dark:text-green'
-                        : 'control-surface text-gray-text hover:border-border dark:text-slate-300 dark:hover:border-white/10'
+                        ? 'border-green/25 bg-green/10 text-green shadow-sm'
+                        : 'control-surface text-gray-text hover:border-border'
                     }`}
                   >
                     <span className="flex items-center justify-between gap-3">
@@ -283,8 +283,8 @@ export const AmbientPlayer: React.FC<AmbientPlayerProps> = ({ isEditorFocused })
                 }}
                 className={`w-full rounded-xl border-2 p-4 text-left transition-all duration-300 ease-out-quart ${
                   isPresetPlaying
-                    ? 'border-green/25 bg-green/10 text-green shadow-sm dark:bg-green/12 dark:border-green/30 dark:text-green'
-                    : 'control-surface text-gray-text hover:border-border dark:text-slate-300 dark:hover:border-white/10'
+                    ? 'border-green/25 bg-green/10 text-green shadow-sm'
+                    : 'control-surface text-gray-text hover:border-border'
                 }`}
               >
                 <span className="flex items-center justify-between gap-3">

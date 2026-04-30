@@ -156,6 +156,8 @@ export const CreateNote: React.FC = () => {
   const [tagInput, setTagInput] = useState('');
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [lottieReady, setLottieReady] = useState(false);
+  const [minTimeElapsed, setMinTimeElapsed] = useState(false);
   const [activePlaceholder, setActivePlaceholder] = useState<string | null>(
     initialPrompt || getCurrentWellnessPrompt(0, DEFAULT_WELLNESS_PROMPTS),
   );
@@ -325,7 +327,7 @@ export const CreateNote: React.FC = () => {
             }),
           );
           setTimeout(() => {
-            if (!isUnmounted.current) setLoading(false);
+            if (!isUnmounted.current) setMinTimeElapsed(true);
           }, 1200);
           
           // Check note limit for new notes
@@ -357,7 +359,7 @@ export const CreateNote: React.FC = () => {
           setExistingAttachments(note.attachments || []);
           setBaselineDraftSnapshot(initialDraftSnapshot);
           setTimeout(() => {
-            if (!isUnmounted.current) setLoading(false);
+            if (!isUnmounted.current) setMinTimeElapsed(true);
           }, 1200);
         } else {
           navigate(RoutePath.HOME);
@@ -677,7 +679,7 @@ export const CreateNote: React.FC = () => {
   const wordCount = currentDraftSnapshot.content.replace(/<[^>]*>/g, '').trim().split(/\s+/).filter(Boolean).length;
   const canReflect = wordCount >= 100;
   const isFocusModeActive = isFocusModeEnabled && isFlowing && !isTitleFocused;
-  const showEntryExperience = loading;
+  const showEntryExperience = loading || !lottieReady || !minTimeElapsed;
   const handleStayOnDraft = () => {
     setShowLeaveDialog(false);
     if (blocker.state === 'blocked') {
@@ -700,8 +702,19 @@ export const CreateNote: React.FC = () => {
           transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
           className="relative z-10 flex max-w-md flex-col items-center"
         >
-          <div className="mb-8 h-48 w-48 max-w-full" aria-hidden="true">
-            <DotLottieReact data={trailLoadingAnimation} autoplay loop />
+          <div className="mb-8 h-48 w-48 max-w-full" aria-hidden="true" style={{ willChange: 'transform' }}>
+            <DotLottieReact
+              data={trailLoadingAnimation}
+              autoplay
+              loop
+              dotLottieRefCallback={(dotLottie) => {
+                if (dotLottie) {
+                  dotLottie.addEventListener('frame', () => {
+                    if (!lottieReady) setLottieReady(true);
+                  });
+                }
+              }}
+            />
           </div>
 
           <h2 className="h2-section mb-4">Take a breath.</h2>
@@ -1161,7 +1174,7 @@ export const CreateNote: React.FC = () => {
                   }
                   setIsMoodOpen(false);
                 }}
-                className={`flex flex-col items-center rounded-2xl border-2 p-4 transition-all ${mood === entry ? moodConfig.modal : `${moodConfig.option} dark:bg-white/5`}`}
+                className={`flex flex-col items-center rounded-2xl border-2 p-4 transition-all ${mood === entry ? moodConfig.modal : moodConfig.option}`}
               >
                 <Icon size={32} weight={mood === entry ? 'fill' : 'regular'} className="mb-2" />
                 <span className="text-[12px] font-bold">{moodConfig.label}</span>

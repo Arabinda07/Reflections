@@ -71,7 +71,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
     if (!isOpen) return;
 
     const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = 'clip';
     previousFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
 
     const handleKeyDown = (event: KeyboardEvent) => {

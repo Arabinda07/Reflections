@@ -223,13 +223,13 @@
   --color-accent: var(--green);
   --color-accent-soft: oklch(from var(--green) 0.965 0.022 h);
 
-  /* Mood Tokens */
-  --color-mood-happy: var(--green);
+  /* Mood Tokens — semantic colour per mood */
+  --color-mood-happy: var(--golden);
   --color-mood-calm: var(--green);
-  --color-mood-anxious: var(--green);
-  --color-mood-sad: var(--green);
-  --color-mood-angry: var(--green);
-  --color-mood-tired: var(--green);
+  --color-mood-anxious: var(--blue);
+  --color-mood-sad: var(--dark-blue);
+  --color-mood-angry: var(--red);
+  --color-mood-tired: var(--gray-light);
 
   /* Status Tokens */
   --color-success-soft: oklch(from var(--green) 0.955 0.03 h);
@@ -293,108 +293,125 @@
 }
 
 .dark {
-  /* PERCEPTUAL ADJUSTMENT: Hue nudged +3° warmer (135 -> 138) in dark mode
-     to counteract the cooling effect of dark backgrounds and maintain brand temperature. */
-  --green: oklch(0.68 0.15 138);
-  --green-hover: oklch(0.74 0.17 138);
-  --green-shadow: oklch(0.45 0.14 138);
+  /* ── Deep-Forest Dark Mode ──
+     Base L=0.10 (deep forest, not flat black) with C=0.014 botanical tint.
+     Scope surfaces use flat opaque OKLCH instead of alpha-composited gradients
+     so each scope retains distinct character in the dark. */
 
-  /* CONTRAST FIX: original L=0.62 → ~4.72:1 on dark bg. Already passes AA. */
+  /* Brand Botanical — kept on hue 135 (aligned with light mode) */
+  --green: oklch(0.60 0.16 135);
+  --green-hover: oklch(0.66 0.17 135);
+  --green-shadow: oklch(0.40 0.14 135);
 
   --dark-blue: oklch(0.85 0.05 260);
-  /* CONTRAST FIX: dark mode blue L=0.60 → ~4.1:1 on dark bg. Lightened to L=0.67 → ~5.2:1 ✓ */
-  --blue: oklch(0.67 0.15 245);
-  --blue-shadow: oklch(0.44 0.15 245);
-  /* CONTRAST FIX: dark mode red L=0.58 → ~3.9:1 on dark bg. Lightened to L=0.67 → ~5.2:1 ✓ */
-  --red: oklch(0.67 0.18 20);
-  --golden: oklch(0.72 0.13 80);
-  --clay: oklch(0.70 0.12 35);
+  /* Sky accent — lightened for legibility on dark surfaces */
+  --blue: oklch(0.75 0.13 245);
+  --blue-shadow: oklch(0.44 0.13 245);
+  /* Error red — lightened to ~5:1 on dark base */
+  --red: oklch(0.65 0.16 20);
+  /* Honey & clay unchanged from light mode — they sit on their own scope surfaces */
+  --golden: oklch(0.59 0.13 80);
+  --clay: oklch(0.53 0.13 35);
 
-  /* Tinted Neutrals - Dark Mode (Chroma 0.02 leaning toward hue 135) */
-  --gray-text: oklch(0.85 0.02 135);
-  --gray-light: oklch(0.65 0.02 135);
-  --border-color: oklch(0.25 0.02 135);
-  --nav-text: oklch(0.70 0.02 135);
+  /* Tinted Neutrals — three-tier text hierarchy */
+  --gray-text: oklch(0.93 0.010 135);   /* Primary: headings, body, journal content */
+  --gray-light: oklch(0.62 0.012 135);  /* Secondary: metadata, helper text, labels */
+  --border-color: oklch(0.26 0.020 135);
+  --nav-text: oklch(0.58 0.012 135);    /* Nav labels, eyebrows, tertiary UI text */
 
-  /* Pure black #000 explicitly banned, utilizing dark gray base */
-  --bg-color: oklch(0.18 0.012 135);
-  --panel-bg: oklch(0.22 0.012 135);
-  --panel-bg-rgb: 40 42 39;
+  /* Deep-forest base surfaces */
+  --bg-color: oklch(0.10 0.014 135);
+  --panel-bg: oklch(0.145 0.020 135);
+  --panel-bg-rgb: 24 28 22;
   --black-rgb: 0 0 0;
+
   --app-background-wash:
     linear-gradient(145deg,
-      oklch(from var(--green) 0.19 0.03 h / 0.64) 0%,
+      oklch(0.12 0.028 135 / 0.64) 0%,
       var(--bg-color) 46%,
-      oklch(from var(--blue) 0.19 0.032 h / 0.5) 100%);
+      oklch(0.12 0.028 245 / 0.48) 100%);
+
+  /* ── Scope Surface Backgrounds (flat opaque, subtle gradient for depth) ── */
   --surface-paper-bg:
     linear-gradient(145deg,
-      oklch(0.225 0.014 135 / 0.96),
-      rgba(var(--panel-bg-rgb), 0.94));
-  --surface-paper-border: oklch(0.28 0.018 135);
+      oklch(0.155 0.016 135),
+      oklch(0.145 0.014 135));
+  --surface-paper-border: oklch(0.24 0.022 135);
   --surface-paper-bezel:
     linear-gradient(145deg,
-      oklch(from var(--green) 0.34 0.055 h / 0.18),
-      rgba(255, 255, 255, 0.05));
+      oklch(0.24 0.040 135 / 0.16),
+      rgba(255, 255, 255, 0.02));
+
   --surface-sage-bg:
     linear-gradient(145deg,
-      oklch(from var(--green) 0.24 0.035 h / 0.46),
-      rgba(var(--panel-bg-rgb), 0.9));
-  --surface-sage-border: oklch(from var(--green) l c h / 0.28);
+      oklch(0.13 0.028 135),
+      oklch(0.12 0.024 135));
+  --surface-sage-border: oklch(0.22 0.040 135);
   --surface-sage-bezel:
     linear-gradient(145deg,
-      oklch(from var(--green) 0.42 0.08 h / 0.28),
-      rgba(255, 255, 255, 0.05));
+      oklch(0.22 0.060 135 / 0.22),
+      rgba(255, 255, 255, 0.02));
+
   --surface-sky-bg:
     linear-gradient(145deg,
-      oklch(from var(--blue) 0.24 0.036 h / 0.42),
-      rgba(var(--panel-bg-rgb), 0.9));
-  --surface-sky-border: oklch(from var(--blue) l c h / 0.26);
+      oklch(0.14 0.032 245),
+      oklch(0.13 0.028 245));
+  --surface-sky-border: oklch(0.22 0.040 245);
   --surface-sky-bezel:
     linear-gradient(145deg,
-      oklch(from var(--blue) 0.42 0.08 h / 0.25),
-      rgba(255, 255, 255, 0.05));
+      oklch(0.22 0.060 245 / 0.20),
+      rgba(255, 255, 255, 0.02));
+
   --surface-honey-bg:
     linear-gradient(145deg,
-      oklch(from var(--honey) 0.24 0.036 h / 0.38),
-      rgba(var(--panel-bg-rgb), 0.9));
-  --surface-honey-border: oklch(from var(--honey) l c h / 0.28);
+      oklch(0.15 0.040 80),
+      oklch(0.14 0.036 80));
+  --surface-honey-border: oklch(0.24 0.050 80);
   --surface-honey-bezel:
     linear-gradient(145deg,
-      oklch(from var(--honey) 0.42 0.08 h / 0.24),
-      rgba(255, 255, 255, 0.05));
+      oklch(0.24 0.060 80 / 0.18),
+      rgba(255, 255, 255, 0.02));
+
   --surface-clay-bg:
     linear-gradient(145deg,
-      oklch(from var(--clay) 0.24 0.036 h / 0.38),
-      rgba(var(--panel-bg-rgb), 0.9));
-  --surface-clay-border: oklch(from var(--clay) l c h / 0.28);
+      oklch(0.15 0.040 35),
+      oklch(0.14 0.036 35));
+  --surface-clay-border: oklch(0.24 0.050 35);
   --surface-clay-bezel:
     linear-gradient(145deg,
-      oklch(from var(--clay) 0.42 0.08 h / 0.24),
-      rgba(255, 255, 255, 0.05));
+      oklch(0.24 0.060 35 / 0.18),
+      rgba(255, 255, 255, 0.02));
+
   --surface-tinted-shadow:
-    0 24px 54px -32px rgba(0, 0, 0, 0.48),
-    0 8px 20px -14px rgba(0, 0, 0, 0.3);
+    0 24px 54px -32px rgba(0, 0, 0, 0.56),
+    0 8px 20px -14px rgba(0, 0, 0, 0.36);
+
+  /* Hero & scrim */
   --hero-ink: oklch(0.95 0.02 135);
   --hero-shadow:
-    0 12px 32px rgba(3, 5, 4, 0.42),
-    0 30px 72px rgba(3, 5, 4, 0.2);
+    0 12px 32px rgba(3, 5, 4, 0.52),
+    0 30px 72px rgba(3, 5, 4, 0.28);
   --hero-scrim: linear-gradient(180deg,
-      oklch(0.13 0.02 135 / 0.22),
-      oklch(0.1 0.02 135 / 0.48));
-  --screen-scrim-soft: rgba(var(--panel-bg-rgb), 0.72);
-  --screen-scrim-strong: rgba(var(--panel-bg-rgb), 0.86);
-  --floating-panel-media-border: rgba(255, 255, 255, 0.12);
-  --ambient-hint-shadow: 0 18px 24px -18px rgba(0, 0, 0, 0.42);
+      oklch(0.08 0.02 135 / 0.28),
+      oklch(0.06 0.02 135 / 0.56));
+  --screen-scrim-soft: rgba(var(--panel-bg-rgb), 0.74);
+  --screen-scrim-strong: rgba(var(--panel-bg-rgb), 0.88);
 
-  /* System Hardening Tokens - Dark Mode */
-  --chip-shadow: rgba(0, 0, 0, 0.3);
-  --popover-bg: #1E1E1E;
+  /* Floating panels */
+  --floating-panel-bg: rgba(var(--panel-bg-rgb), 0.86);
+  --floating-panel-bg-strong: rgba(var(--panel-bg-rgb), 0.94);
+  --floating-panel-media-border: rgba(255, 255, 255, 0.10);
+  --ambient-hint-shadow: 0 18px 24px -18px rgba(0, 0, 0, 0.52);
+
+  /* System Hardening Tokens */
+  --chip-shadow: rgba(0, 0, 0, 0.36);
+  --popover-bg: oklch(0.19 0.022 135);
 
   /* ── Semantic Overrides ── */
-  --color-surface-muted: oklch(0.24 0.012 135);
-  --color-success-soft: oklch(from var(--green) 0.24 0.04 h);
-  --color-warning-soft: oklch(from var(--honey) 0.24 0.04 h);
-  --color-danger-soft: oklch(from var(--clay) 0.24 0.04 h);
+  --color-surface-muted: oklch(0.18 0.016 135);
+  --color-success-soft: oklch(0.16 0.04 135);
+  --color-warning-soft: oklch(0.17 0.04 80);
+  --color-danger-soft: oklch(0.17 0.04 35);
 }
 
 html {
@@ -1934,7 +1951,8 @@ select:focus-visible,
   }
 
   .chooser-chip {
-    @apply flex flex-row items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 bg-white border-border text-gray-nav transition-all duration-300 dark:bg-white/5 dark:border-white/10 dark:text-slate-300;
+    @apply flex flex-row items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 border-border text-gray-nav transition-all duration-300;
+    background: var(--surface-current-control-bg);
     font-weight: 900;
     white-space: nowrap;
     flex-shrink: 0;
@@ -1946,21 +1964,20 @@ select:focus-visible,
     background-color: oklch(from var(--green) l c h / 0.05);
   }
 
-  .dark .chooser-chip:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
-  }
-
   .chooser-chip.active {
-    @apply text-green dark:bg-white/10 dark:border-white/20 dark:text-white;
-    background-color: oklch(from var(--green) l c h / 0.05);
+    color: var(--green);
+    background-color: oklch(from var(--green) l c h / 0.08);
     border-color: oklch(from var(--green) l c h / 0.3);
     box-shadow: 0 2px 0 0 var(--chip-shadow);
   }
 
   .chooser-popover {
-    @apply p-5 rounded-3xl z-[100] border border-white/40 shadow-xl bg-white dark:shadow-xl dark:shadow-black/50 dark:border-white/10;
-    background-color: var(--popover-bg, #ffffff);
+    padding: 1.25rem;
+    border-radius: var(--radius-shell);
+    z-index: 100;
+    border: 1.5px solid var(--border-color);
+    background-color: var(--popover-bg, var(--panel-bg));
+    box-shadow: var(--surface-tinted-shadow);
   }
 }
 
