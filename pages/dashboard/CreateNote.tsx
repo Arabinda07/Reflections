@@ -63,6 +63,29 @@ import { extractTasksFromContent, mergeTasks } from '../../src/utils/taskParser'
 import trailLoadingAnimation from '@/src/lottie/trail-loading.json';
 import { MOOD_CONFIG, MOOD_OPTIONS, getMoodConfig } from './moodConfig';
 
+const getSurfaceScopeForMood = (mood?: string) => {
+  switch (mood) {
+    case 'happy': return 'surface-scope-sky';
+    case 'calm': return 'surface-scope-sage';
+    case 'anxious': return 'surface-scope-neutral';
+    case 'sad': return 'surface-scope-sky';
+    case 'angry': return 'surface-scope-neutral';
+    case 'tired': return 'surface-scope-paper';
+    default: return 'surface-scope-paper';
+  }
+};
+
+const getSurfacePanelForMood = (mood?: string) => {
+  switch (mood) {
+    case 'happy': return 'surface-panel-sky';
+    case 'calm': return 'surface-panel-sage';
+    case 'anxious': return 'surface-panel-neutral';
+    case 'sad': return 'surface-panel-sky';
+    case 'angry': return 'surface-panel-neutral';
+    case 'tired': return 'surface-panel-paper';
+    default: return 'surface-panel-sage';
+  }
+};
 // --- Sub-Component: TaskRow ---
 interface TaskRowProps {
   task: Task;
@@ -720,7 +743,7 @@ export const CreateNote: React.FC = () => {
   }
 
   return (
-    <div className="surface-scope-paper relative flex-1 flex min-h-0 bg-body overflow-hidden">
+    <div className={`${getSurfaceScopeForMood(mood)} relative flex-1 flex min-h-0 bg-body overflow-hidden`}>
       {/* â”€â”€ Mobile Back Button â”€â”€ */}
       {isMobile && (
         <button 
@@ -748,9 +771,9 @@ export const CreateNote: React.FC = () => {
         </button>
       ) : null}
 
-      {/* â”€â”€ Desktop Sidebar â”€â”€ */}
+      {/* ── Desktop Sidebar ── */}
       {!isMobile && (
-        <aside className={`surface-panel-sage flex flex-col min-h-0 z-40 transition-[width,opacity,transform,border] duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] border-r border-green/15 ${isFocusModeActive ? 'w-0 opacity-0 -translate-x-full overflow-hidden border-r-0' : 'w-[240px] opacity-100 translate-x-0'}`}>
+        <aside className={`${getSurfacePanelForMood(mood)} flex flex-col min-h-0 z-40 transition-[width,opacity,transform,border] duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] border-r border-green/15 ${isFocusModeActive ? 'w-0 opacity-0 -translate-x-full overflow-hidden border-r-0' : 'w-[240px] opacity-100 translate-x-0'}`}>
           <div className="pt-8 px-6 pb-6 flex-1 overflow-y-auto custom-scrollbar space-y-4">
             
             {/* Desktop Back Button */}
