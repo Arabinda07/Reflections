@@ -22,6 +22,7 @@ describe('phase 4 design-system normalization', () => {
     expect(ambientPlayer).toContain("from '../ui/ModalSheet'");
     expect(ambientPlayer).not.toContain("from 'react-dom'");
     expect(ambientPlayer).not.toContain('text-blue');
+    expect(ambientPlayer).not.toContain('text-red');
     expect(ambientPlayer).not.toContain('border-sky');
 
     expect(startupScreen).toContain("from './OverlayFeedback'");

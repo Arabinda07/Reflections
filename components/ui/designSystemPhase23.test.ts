@@ -99,12 +99,16 @@ describe('phase 2/3 design-system rollout', () => {
     expect(css).toContain('.tone-panel-sage');
     expect(css).toContain('.tone-icon-sky');
     expect(css).toContain('.tone-chip-honey');
+    expect(css).toContain('outline-offset: 2px;');
+    expect(css).toContain('color: oklch(from var(--green) l c h / 0.46);');
+    expect(css).toContain('border-color: oklch(from var(--clay) l c h / 0.2);');
     expect(css).not.toMatch(/border-left:\s*(?:[2-9]|\d{2,})px/);
     expect(css).not.toContain('background-clip: text');
 
     expect(surfaceTone).toContain("export type SurfaceTone = 'inherit' | 'neutral' | 'paper' | 'sage' | 'sky' | 'honey' | 'clay'");
     expect(surfaceTone).toContain('SURFACE_TONE_CLASS');
     expect(surfaceTone).toContain('SURFACE_SCOPE_CLASS');
+    expect(surfaceTone).toContain("clay: 'metadata-pill--clay'");
     expect(surface).toContain("tone = 'inherit'");
     expect(surface).toContain('SURFACE_TONE_CLASS[tone]');
     expect(surface).not.toContain('surface-tone-${tone}');
@@ -116,6 +120,55 @@ describe('phase 2/3 design-system rollout', () => {
     expect(home).toContain('surface-scope-sage');
     expect(insights).toContain('tone="sky"');
     expect(insights).toContain('tone="honey"');
+  });
+
+  it('applies the Reflections semantic color roles to primitives and route surfaces', () => {
+    const button = read('components/ui/Button.tsx');
+    const input = read('components/ui/Input.tsx');
+    const toast = read('components/ui/Toast.tsx');
+    const confirmationDialog = read('components/ui/ConfirmationDialog.tsx');
+    const proUpgrade = read('components/ui/ProUpgradeCTA.tsx');
+    const dashboardLayout = read('layouts/DashboardLayout.tsx');
+    const createNote = read('pages/dashboard/CreateNote.tsx');
+    const moodConfig = read('pages/dashboard/moodConfig.ts');
+    const insights = read('pages/dashboard/Insights.tsx');
+
+    expect(button).toContain('primary: "border border-transparent bg-green text-white');
+    expect(button).toContain('danger: "border border-transparent bg-clay text-white');
+    expect(button).not.toContain('bg-red text-white');
+
+    expect(input).toContain('focus:border-green focus:ring-2 focus:ring-green/10');
+    expect(input).toContain('border-clay');
+    expect(input).not.toContain('ring-red');
+
+    expect(toast).toContain("info: 'border-sky/20 bg-sky/5 text-sky'");
+    expect(toast).toContain("warning: 'border-honey/20 bg-honey/5 text-honey'");
+    expect(confirmationDialog).toContain("tone={variant === 'danger' ? 'clay' : 'paper'}");
+
+    expect(proUpgrade).toContain('tone="honey"');
+    expect(proUpgrade).toContain('surface-tone-honey');
+    expect(proUpgrade).toContain('!bg-honey');
+    expect(proUpgrade).not.toContain("selectedPlan === 'monthly' ? 'border-green bg-green/5'");
+
+    expect(dashboardLayout).toContain("aria-current={isActive ? 'page' : undefined}");
+    expect(dashboardLayout).toContain('border-green bg-green/5 text-green');
+    expect(dashboardLayout).toContain('text-clay hover:bg-clay/5');
+
+    expect(createNote).toContain('Reflect with AI');
+    expect(createNote).toContain('bg-green px-4 py-2');
+    expect(createNote).toContain('text-white');
+    expect(createNote).toContain('title="AI reflection"');
+    expect(createNote).toContain('tone="sage"');
+
+    expect(moodConfig).toContain('bg-green/10 border-green/20 text-green');
+    expect(moodConfig).not.toContain('bg-blue/10');
+    expect(moodConfig).not.toContain('text-red');
+    expect(moodConfig).not.toContain('bg-golden/10');
+    expect(moodConfig).not.toContain('text-dark-blue');
+
+    expect(insights).toContain('surface-scope-sky');
+    expect(insights).toContain('tone="sky"');
+    expect(insights).toContain("const TAG_TONE_CLASSES = ['text-green', 'text-green/80', 'text-green/70', 'text-green/60'];");
   });
 
   it('keeps card-like surfaces off raw white and panel background escape hatches', () => {

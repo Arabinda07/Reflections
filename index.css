@@ -224,17 +224,17 @@
   --color-accent-soft: oklch(from var(--green) 0.965 0.022 h);
 
   /* Mood Tokens */
-  --color-mood-happy: var(--golden);
+  --color-mood-happy: var(--green);
   --color-mood-calm: var(--green);
-  --color-mood-anxious: var(--blue);
-  --color-mood-sad: var(--dark-blue);
-  --color-mood-angry: var(--red);
-  --color-mood-tired: var(--gray-light);
+  --color-mood-anxious: var(--green);
+  --color-mood-sad: var(--green);
+  --color-mood-angry: var(--green);
+  --color-mood-tired: var(--green);
 
   /* Status Tokens */
   --color-success-soft: oklch(from var(--green) 0.955 0.03 h);
   --color-warning-soft: oklch(from var(--honey) 0.955 0.03 h);
-  --color-danger-soft: oklch(from var(--red) 0.955 0.03 h);
+  --color-danger-soft: oklch(from var(--clay) 0.955 0.03 h);
 
   /* Phased Typography Scale (1.25 Ratio / 18px Base) */
   --text-base: 1.125rem;
@@ -394,7 +394,7 @@
   --color-surface-muted: oklch(0.24 0.012 135);
   --color-success-soft: oklch(from var(--green) 0.24 0.04 h);
   --color-warning-soft: oklch(from var(--honey) 0.24 0.04 h);
-  --color-danger-soft: oklch(from var(--red) 0.24 0.04 h);
+  --color-danger-soft: oklch(from var(--clay) 0.24 0.04 h);
 }
 
 html {
