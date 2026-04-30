@@ -403,9 +403,9 @@ export const HomeAuthenticated: React.FC = () => {
         >
           <motion.div
             variants={bentoItemVariants}
-            className="surface-flat p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full overflow-hidden"
+            className="group relative surface-flat overflow-hidden rounded-[2.5rem] p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full transition-all duration-500 hover:shadow-[0_20px_50px_rgba(34,197,94,0.05)] hover:border-green/10"
           >
-            <div>
+            <div className="relative z-10">
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-2 text-gray-nav">
                   <Target size={18} weight="duotone" className="text-green" />
@@ -539,13 +539,16 @@ export const HomeAuthenticated: React.FC = () => {
                 )}
               </div>
             </div>
+            {/* Subtle background glow effect on hover */}
+            <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-green/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
           </motion.div>
 
           <div className="grid gap-6">
             <motion.div
               variants={bentoItemVariants}
-              className="surface-flat p-6 sm:p-8"
+              className="group relative surface-flat overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(14,165,233,0.05)] hover:border-sky/10"
             >
+              <div className="relative z-10">
               <div className="mb-6 flex items-center gap-2 text-gray-nav">
                 <FolderOpen size={18} weight="duotone" className="text-gray-nav/70" />
                 <p className="label-caps opacity-60">
@@ -591,12 +594,15 @@ export const HomeAuthenticated: React.FC = () => {
                   <CaretRight size={16} weight="regular" className="text-gray-nav/40 group-hover:text-sky transition-colors" />
                 </button>
               </div>
+              {/* Subtle background glow effect on hover */}
+              <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-sky-500/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
             </motion.div>
 
             <motion.div
               variants={bentoItemVariants}
-              className="surface-flat surface-tone-honey p-6 sm:p-8"
+              className="group relative surface-flat surface-tone-honey overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(245,158,11,0.05)]"
             >
+              <div className="relative z-10">
               <div className="mb-8 flex items-center gap-2 text-gray-nav">
                 <Sparkle size={18} weight="duotone" className="text-honey" />
                 <span className="label-caps opacity-60">
@@ -621,6 +627,8 @@ export const HomeAuthenticated: React.FC = () => {
                   </p>
                 </div>
               </div>
+              {/* Subtle sweep effect on hover */}
+              <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-honey/0 via-honey/5 to-honey/0 translate-x-[-100%] transition-transform duration-1000 group-hover:translate-x-[100%]" />
             </motion.div>
           </div>
         </motion.section>
@@ -740,10 +748,12 @@ export const HomeAuthenticated: React.FC = () => {
                   type="button"
                   onClick={() => handleMoodCheckIn(moodOption)}
                   disabled={isSavingCheckIn}
-                  className={`rounded-2xl border p-4 text-left transition-colors disabled:opacity-60 ${moodConfig.option}`}
+                  className={`group rounded-[1.5rem] border p-5 text-left transition-all duration-300 disabled:opacity-60 hover:scale-[1.02] hover:shadow-lg ${moodConfig.option}`}
                 >
-                  <Icon size={22} weight="duotone" className={`mb-3 ${moodConfig.labelClass}`} />
-                  <span className="text-base font-bold text-gray-text">{moodConfig.label}</span>
+                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-body/50 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-12">
+                    <Icon size={24} weight="duotone" className={moodConfig.labelClass} />
+                  </div>
+                  <span className="text-base font-bold text-gray-text transition-colors group-hover:text-green">{moodConfig.label}</span>
                 </button>
               );
             })}

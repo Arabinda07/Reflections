@@ -385,40 +385,50 @@ export const LifeWiki: React.FC = () => {
     return (
       <div
         key={meta.pageType}
-        className={`surface-inline-panel ${tone.surface} group h-full rounded-[var(--radius-shell)] transition-colors duration-300 ease-out-expo ${tone.hover}`}
+        className={`group relative h-full overflow-hidden rounded-[2.5rem] bg-body-surface border border-border/40 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-green/20 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)]`}
       >
         <Link
           to={articlePath(meta.pageType)}
-          className="flex h-full min-h-[244px] flex-col justify-between p-6 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 md:p-7"
+          className="relative z-10 flex h-full min-h-[260px] flex-col justify-between p-8 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 md:p-10"
           aria-label={`Open ${meta.label} Sanctuary page`}
         >
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="flex items-center justify-between gap-4">
-              <span className={`label-caps ${tone.accent}`}>
+              <span className={`label-caps text-[10px] ${tone.accent}`}>
                 {isSupporting ? 'Supporting page' : isEmptyRoom ? 'Room awaiting signal' : 'Generated page'}
               </span>
-              <CaretRight size={16} weight="bold" className={`${tone.text} transition-transform duration-300 ease-out-expo group-hover:translate-x-1`} />
+              <CaretRight size={18} weight="bold" className={`${tone.text} transition-all duration-500 ease-out-expo group-hover:translate-x-1`} />
             </div>
-            <div className="space-y-3">
-              <h2 className="text-3xl font-display font-bold text-gray-text md:text-4xl">{meta.label}</h2>
-              <p className="line-clamp-4 text-base font-serif italic leading-relaxed text-gray-text/75">
+            <div className="space-y-4">
+              <h2 className="text-3xl font-display font-extrabold text-gray-text md:text-4xl transition-colors duration-300 group-hover:text-green">{meta.label}</h2>
+              <p className="line-clamp-4 font-serif text-[17px] italic leading-relaxed text-gray-text/70 transition-colors duration-300 group-hover:text-gray-text">
                 {isEmptyRoom ? meta.emptyLine || meta.description : previewText(page.content)}
               </p>
-              {isEmptyRoom ? (
-                <p className="max-w-[28ch] text-xs font-bold uppercase tracking-widest text-gray-nav">
-                  This Sanctuary room is ready, but it has not been written yet.
-                </p>
-              ) : null}
+              {isEmptyRoom && (
+                <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-gray-nav/60">
+                  <Sparkle size={12} weight="fill" className="text-green" />
+                  <span>Awaiting signal</span>
+                </div>
+              )}
             </div>
           </div>
 
-          <div className="mt-7 flex flex-wrap gap-2">
-            <MetadataPill tone={isEmptyRoom ? undefined : 'green'}>
-              {isEmptyRoom ? 'No sources yet' : `${sources.length} source${sources.length === 1 ? '' : 's'}`}
+          <div className="mt-8 flex flex-wrap gap-2">
+            <MetadataPill tone={isEmptyRoom ? undefined : 'green'} className="transition-transform group-hover:scale-105">
+              {isEmptyRoom ? 'Empty room' : `${sources.length} source${sources.length === 1 ? '' : 's'}`}
             </MetadataPill>
-            <MetadataPill>{isEmptyRoom ? 'Ready room' : new Date(page.updatedAt).toLocaleDateString()}</MetadataPill>
+            <MetadataPill className="transition-transform group-hover:scale-105">
+              {isEmptyRoom ? 'Ready' : new Date(page.updatedAt).toLocaleDateString()}
+            </MetadataPill>
           </div>
         </Link>
+        {/* Dynamic background glow based on tone */}
+        <div className={`pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br opacity-0 transition-opacity duration-500 group-hover:opacity-100 ${
+          meta.tone === 'blue' || meta.tone === 'darkBlue' ? 'from-sky-500/5 to-transparent' :
+          meta.tone === 'golden' ? 'from-amber-500/5 to-transparent' :
+          meta.tone === 'orange' ? 'from-clay/5 to-transparent' :
+          'from-green/5 to-transparent'
+        }`} />
       </div>
     );
   };
@@ -482,10 +492,10 @@ export const LifeWiki: React.FC = () => {
           <div className="space-y-8">
             <button
               onClick={() => navigate(RoutePath.SANCTUARY)}
-              className="flex items-center gap-2 text-sm font-bold text-gray-nav hover:text-green transition-colors w-fit"
+              className="group flex items-center gap-2 text-sm font-bold text-gray-nav hover:text-green transition-all duration-300 w-fit hover:-translate-x-1"
               aria-label="Back to Sanctuary"
             >
-              <ArrowLeft size={16} weight="bold" />
+              <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
               <span>Back</span>
             </button>
 

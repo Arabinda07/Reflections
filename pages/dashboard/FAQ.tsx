@@ -133,18 +133,18 @@ export const FAQ: React.FC = () => {
 
       <main className="mx-auto w-full max-w-[1440px] px-6 sm:px-10 lg:px-16">
         {/* Core Guide Sections */}
-        <section className="mb-20 grid gap-4 md:grid-cols-3">
+        <section className="mb-20 grid gap-6 md:grid-cols-3">
           {guideSections.map((section) => {
             const Icon = section.icon;
 
             return (
-              <article key={section.title} className="border-t border-border/60 py-8">
-                <div className="flex h-full flex-col gap-6">
-                  <div className="tone-icon tone-icon-sage h-10 w-10">
-                    <Icon size={20} weight="duotone" />
+              <article key={section.title} className="group relative flex flex-col justify-between overflow-hidden rounded-[2rem] bg-body-surface border border-border/40 p-8 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-green/20 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                <div className="relative z-10">
+                  <div className="tone-icon tone-icon-sage mb-8 h-12 w-12 rounded-2xl transition-transform duration-500 ease-out group-hover:scale-110 group-hover:-rotate-6">
+                    <Icon size={24} weight="duotone" />
                   </div>
-                  <div className="space-y-3">
-                    <h2 className="text-[22px] font-display font-bold leading-tight text-gray-text">
+                  <div className="space-y-4">
+                    <h2 className="text-[22px] font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green">
                       {section.title}
                     </h2>
                     <p className="font-sans text-[16px] leading-relaxed text-gray-light">
@@ -152,6 +152,8 @@ export const FAQ: React.FC = () => {
                     </p>
                   </div>
                 </div>
+                {/* Subtle background glow effect on hover */}
+                <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-green/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
               </article>
             );
           })}
@@ -164,16 +166,19 @@ export const FAQ: React.FC = () => {
             <h2 className="text-mk-h2 font-display font-bold text-gray-text">A space to write, one reflection at a time</h2>
           </div>
           
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {practiceItems.map((item) => {
               const Icon = item.icon;
               return (
-                <div key={item.title} className="border-t border-border/60 py-7">
-                  <div className="tone-icon tone-icon-sky mb-6 h-10 w-10 rounded-xl">
-                    <Icon size={20} weight="duotone" />
+                <div key={item.title} className="group relative flex flex-col justify-between overflow-hidden rounded-[2rem] bg-body-surface border border-border/40 p-8 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-green/20 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                  <div className="relative z-10">
+                    <div className="tone-icon tone-icon-sky mb-6 h-12 w-12 rounded-2xl transition-transform duration-500 ease-out group-hover:scale-110 group-hover:rotate-6">
+                      <Icon size={24} weight="duotone" />
+                    </div>
+                    <h3 className="mb-3 text-[20px] font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">{item.title}</h3>
+                    <p className="font-sans text-[16px] leading-relaxed text-gray-light">{item.body}</p>
                   </div>
-                  <h3 className="mb-3 text-[19px] font-display font-bold text-gray-text">{item.title}</h3>
-                  <p className="font-sans text-[16px] leading-relaxed text-gray-light">{item.body}</p>
+                  <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-sky-500/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                 </div>
               );
             })}
@@ -191,19 +196,21 @@ export const FAQ: React.FC = () => {
             {detailItems.map((item) => {
               const Icon = item.icon;
               return (
-                <div key={item.title} className="tone-panel tone-panel-sky relative overflow-hidden p-6 sm:p-8">
-                  <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
-                    <div className="tone-icon tone-icon-sky flex h-12 w-12 flex-none rounded-2xl">
-                      <Icon size={24} weight="duotone" />
+                <div key={item.title} className="tone-panel tone-panel-sky group relative overflow-hidden rounded-[2rem] p-8 transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_8px_40px_rgba(14,165,233,0.08)]">
+                  <div className="relative z-10 flex flex-col gap-4 sm:flex-row sm:gap-6">
+                    <div className="tone-icon tone-icon-sky flex h-14 w-14 flex-none rounded-2xl transition-transform duration-500 ease-out group-hover:scale-110 group-hover:-rotate-12">
+                      <Icon size={28} weight="duotone" />
                     </div>
                     <div className="space-y-4">
                       <div className="space-y-1">
-                        <h3 className="text-[24px] font-display font-bold text-gray-text">{item.title}</h3>
+                        <h3 className="text-[24px] font-display font-bold text-gray-text group-hover:text-green transition-colors duration-300">{item.title}</h3>
                         {item.label && <p className="text-[11px] font-black uppercase tracking-widest text-green/60">{item.label}</p>}
                       </div>
                       <p className="font-sans text-[17px] leading-relaxed text-gray-light">{item.body}</p>
                     </div>
                   </div>
+                  {/* Subtle sweep effect on hover */}
+                  <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-sky-400/0 via-sky-400/5 to-sky-400/0 translate-x-[-100%] transition-transform duration-1000 group-hover:translate-x-[100%]" />
                 </div>
               );
             })}
@@ -212,18 +219,21 @@ export const FAQ: React.FC = () => {
 
         {/* Feature Grid */}
         <section className="mb-28">
-          <div className="grid gap-x-12 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {featureGrid.map((feature) => {
               const Icon = feature.icon;
               return (
-                <div key={feature.title} className="space-y-4">
-                  <div className="tone-icon tone-icon-honey h-10 w-10 rounded-xl">
-                    <Icon size={20} weight="duotone" />
+                <div key={feature.title} className="group relative rounded-[2rem] bg-body-surface border border-border/40 p-8 transition-all duration-500 hover:border-green/20 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1">
+                  <div className="space-y-6">
+                    <div className="tone-icon tone-icon-honey h-12 w-12 rounded-2xl transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
+                      <Icon size={24} weight="duotone" />
+                    </div>
+                    <div className="space-y-3">
+                      <h4 className="text-[14px] font-black uppercase tracking-widest text-gray-text group-hover:text-green transition-colors duration-300">{feature.title}</h4>
+                      <p className="font-sans text-[16px] leading-relaxed text-gray-light">{feature.body}</p>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <h4 className="text-[14px] font-black uppercase tracking-widest text-gray-text">{feature.title}</h4>
-                    <p className="font-sans text-[16px] leading-relaxed text-gray-light">{feature.body}</p>
-                  </div>
+                  <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-tr from-amber-500/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                 </div>
               );
             })}

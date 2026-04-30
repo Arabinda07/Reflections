@@ -251,10 +251,10 @@ export const Insights: React.FC = () => {
         <div className="space-y-10">
           <button 
             onClick={() => navigate(RoutePath.HOME)}
-            className="flex items-center gap-2 text-sm font-bold text-gray-nav hover:text-green transition-colors w-fit"
+            className="group flex items-center gap-2 text-sm font-bold text-gray-nav hover:text-green transition-all duration-300 w-fit hover:-translate-x-1"
             aria-label="Back to home"
           >
-            <ArrowLeft size={16} weight="regular" />
+            <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
             <span>Back</span>
           </button>
 
@@ -269,7 +269,8 @@ export const Insights: React.FC = () => {
               <WeeklyRecapLoadingSkeleton />
             </Surface>
           ) : (<>
-          <Surface variant="flat" tone="sky" className="p-8 md:p-10">
+          <Surface variant="flat" tone="sky" className="group relative overflow-hidden rounded-[2.5rem] p-8 md:p-10 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(14,165,233,0.05)]">
+            <div className="relative z-10">
             <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
               <div className="space-y-5">
                 <div className="flex items-center gap-3 text-green">
@@ -300,24 +301,23 @@ export const Insights: React.FC = () => {
 
             <div className="mt-8 border-t border-border/60 pt-0">
               {/* Mood Frequency Accordion */}
-              <div className="border-b border-border/40">
                 <button
                   type="button"
                   onClick={() => setIsMoodOpen((prev) => !prev)}
                   aria-expanded={isMoodOpen}
                   aria-controls="insights-mood-panel"
-                  className="flex w-full items-center justify-between gap-4 py-6 text-left"
+                  className="group/acc flex w-full items-center justify-between gap-4 py-6 text-left"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="tone-icon tone-icon-sky h-12 w-12">
-                      <Heart size={17} weight="duotone" />
+                    <div className="tone-icon tone-icon-sky h-12 w-12 rounded-2xl transition-transform duration-500 ease-out-expo group-hover/acc:scale-110 group-hover/acc:rotate-6">
+                      <Heart size={18} weight="duotone" />
                     </div>
-                    <h3 className="text-lg font-display font-bold text-gray-text">Mood frequency</h3>
+                    <h3 className="text-lg font-display font-bold text-gray-text transition-colors group-hover/acc:text-sky">Mood frequency</h3>
                   </div>
                   <CaretRight
                     size={18}
-                    weight="regular"
-                    className={`shrink-0 text-gray-nav transition-transform duration-300 ease-out-expo ${isMoodOpen ? 'rotate-90' : ''}`}
+                    weight="bold"
+                    className={`shrink-0 text-gray-nav/40 transition-all duration-500 ease-out-expo ${isMoodOpen ? 'rotate-90 text-sky' : 'group-hover/acc:translate-x-1'}`}
                   />
                 </button>
 
@@ -328,10 +328,10 @@ export const Insights: React.FC = () => {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                       className="overflow-hidden"
                     >
-                      <div className="pb-6">
+                      <div className="pb-8">
                         {weeklyRecap.moodData.length === 0 ? (
                           <EmptyState
                             surface="none"
@@ -340,7 +340,7 @@ export const Insights: React.FC = () => {
                             description="Check in or add a mood to a reflection and this week will stay readable."
                           />
                         ) : (
-                          <div className="flex flex-col gap-4">
+                          <div className="flex flex-col gap-5">
                             {weeklyRecap.moodData.map((entry) => {
                               const maxValue = weeklyRecap.moodData[0].value;
                               const percent = Math.round((entry.value / maxValue) * 100);
@@ -348,17 +348,20 @@ export const Insights: React.FC = () => {
                               const tone = moodConfig || DEFAULT_MOOD_TONE;
 
                               return (
-                                <div key={entry.name} className="flex items-center gap-4">
-                                  <span className={`w-20 shrink-0 label-caps ${tone.labelClass}`}>
+                                <div key={entry.name} className="flex items-center gap-4 group/bar">
+                                  <span className={`w-20 shrink-0 label-caps transition-colors group-hover/bar:text-gray-text ${tone.labelClass}`}>
                                     {moodConfig?.label || entry.name}
                                   </span>
-                                  <div className={`relative h-8 flex-1 overflow-hidden rounded-full ${tone.trackClass}`}>
-                                    <div
-                                      className={`absolute inset-y-0 left-0 rounded-full ${tone.fillClass}`}
-                                      style={{ width: `${percent}%` }}
+                                  <div className={`relative h-10 flex-1 overflow-hidden rounded-2xl ${tone.trackClass}`}>
+                                    <motion.div
+                                      initial={{ width: 0 }}
+                                      animate={{ width: `${percent}%` }}
+                                      transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+                                      className={`absolute inset-y-0 left-0 rounded-2xl ${tone.fillClass}`}
                                     />
+                                    <div className="absolute inset-0 bg-white/5 opacity-0 transition-opacity group-hover/bar:opacity-100" />
                                   </div>
-                                  <span className="w-6 shrink-0 text-right text-xs font-extrabold tabular-nums text-gray-nav">
+                                  <span className="w-8 shrink-0 text-right text-sm font-bold tabular-nums text-gray-nav">
                                     {entry.value}
                                   </span>
                                 </div>
@@ -379,18 +382,18 @@ export const Insights: React.FC = () => {
                   onClick={() => setIsTagsOpen((prev) => !prev)}
                   aria-expanded={isTagsOpen}
                   aria-controls="insights-tags-panel"
-                  className="flex w-full items-center justify-between gap-4 py-6 text-left"
+                  className="group/acc flex w-full items-center justify-between gap-4 py-6 text-left"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="tone-icon tone-icon-honey h-12 w-12">
-                      <Hash size={17} weight="duotone" />
+                    <div className="tone-icon tone-icon-honey h-12 w-12 rounded-2xl transition-transform duration-500 ease-out-expo group-hover/acc:scale-110 group-hover/acc:-rotate-6">
+                      <Hash size={18} weight="duotone" />
                     </div>
-                    <h3 className="text-lg font-display font-bold text-gray-text">Recurring tags</h3>
+                    <h3 className="text-lg font-display font-bold text-gray-text transition-colors group-hover/acc:text-honey">Recurring tags</h3>
                   </div>
                   <CaretRight
                     size={18}
-                    weight="regular"
-                    className={`shrink-0 text-gray-nav transition-transform duration-300 ease-out-expo ${isTagsOpen ? 'rotate-90' : ''}`}
+                    weight="bold"
+                    className={`shrink-0 text-gray-nav/40 transition-all duration-500 ease-out-expo ${isTagsOpen ? 'rotate-90 text-honey' : 'group-hover/acc:translate-x-1'}`}
                   />
                 </button>
 
@@ -401,10 +404,10 @@ export const Insights: React.FC = () => {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                       className="overflow-hidden"
                     >
-                      <div className="pb-6">
+                      <div className="pb-8">
                         {weeklyRecap.recurringTags.length === 0 ? (
                           <EmptyState
                             surface="none"
@@ -413,20 +416,23 @@ export const Insights: React.FC = () => {
                             description="Tag entries this week and the repeated subjects will collect here."
                           />
                         ) : (
-                          <div className="flex flex-wrap items-center gap-3">
+                          <div className="flex flex-wrap items-center gap-4">
                             {weeklyRecap.recurringTags.map(({ tag, count }, index) => {
                               const scale = Math.min(1.45, Math.max(0.92, count / 2.4));
                               return (
-                                <span
+                                <motion.span
                                   key={tag}
-                                  className={`font-display font-bold lowercase ${TAG_TONE_CLASSES[index % TAG_TONE_CLASSES.length]}`}
+                                  initial={{ opacity: 0, scale: 0.9 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  transition={{ delay: index * 0.05 }}
+                                  className={`font-display font-bold lowercase transition-all hover:scale-110 cursor-default ${TAG_TONE_CLASSES[index % TAG_TONE_CLASSES.length]}`}
                                   style={{
                                     fontSize: `${scale}rem`,
                                     lineHeight: '1',
                                   }}
                                 >
                                   #{tag}
-                                </span>
+                                </motion.span>
                               );
                             })}
                           </div>
@@ -437,9 +443,11 @@ export const Insights: React.FC = () => {
                 </AnimatePresence>
               </div>
             </div>
+            {/* Subtle background glow effect on hover */}
+            <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-sky-500/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
           </Surface>
 
-          <Surface variant="bezel" tone="sage">
+          <Surface variant="bezel" tone="sage" className="group relative overflow-hidden rounded-[2.5rem] transition-all duration-500 hover:shadow-[0_20px_50px_rgba(34,197,94,0.05)]">
             <button
               type="button"
               onClick={() => setIsOverviewOpen((current) => !current)}
@@ -448,20 +456,20 @@ export const Insights: React.FC = () => {
               className="flex w-full items-center justify-between gap-4 p-6 text-left md:p-8"
             >
               <div className="flex items-center gap-3">
-                <div className="tone-icon tone-icon-sage h-12 w-12">
-                  <Book size={17} weight="duotone" />
+                <div className="tone-icon tone-icon-sage h-12 w-12 rounded-2xl transition-transform duration-500 ease-out-expo group-hover:scale-110 group-hover:rotate-6">
+                  <Book size={18} weight="duotone" />
                 </div>
                 <div>
                   <p className="label-caps text-green">Overview</p>
-                  <h2 className="mt-1 text-2xl font-display font-bold text-gray-text">
+                  <h2 className="mt-1 text-2xl font-display font-bold text-gray-text group-hover:text-green transition-colors duration-300">
                     {stats.monthNotes} reflections this month
                   </h2>
                 </div>
               </div>
               <CaretRight
                 size={18}
-                weight="regular"
-                className={`shrink-0 text-gray-nav transition-transform duration-300 ease-out-expo ${isOverviewOpen ? 'rotate-90' : ''}`}
+                weight="bold"
+                className={`shrink-0 text-gray-nav/40 transition-all duration-500 ease-out-expo ${isOverviewOpen ? 'rotate-90 text-green' : 'group-hover:translate-x-1'}`}
               />
             </button>
 
@@ -494,7 +502,7 @@ export const Insights: React.FC = () => {
             </AnimatePresence>
           </Surface>
 
-          <Surface variant="flat" tone="honey" className="overflow-hidden">
+          <Surface variant="flat" tone="honey" className="group relative overflow-hidden rounded-[2.5rem] transition-all duration-500 hover:shadow-[0_20px_50px_rgba(245,158,11,0.05)]">
             <button
               type="button"
               onClick={() => setIsCompletionOpen((prev) => !prev)}
@@ -502,17 +510,19 @@ export const Insights: React.FC = () => {
               aria-controls="insights-completion-panel"
               className="flex w-full items-center justify-between gap-4 p-6 text-left md:p-8"
             >
-              <div>
-                <div className="flex items-center gap-2">
-                  <Leaf size={14} weight="fill" className="text-honey" />
-                  <p className="label-caps text-honey">Completion card</p>
+              <div className="flex items-center gap-3">
+                <div className="tone-icon tone-icon-honey h-12 w-12 rounded-2xl transition-transform duration-500 ease-out-expo group-hover:scale-110 group-hover:-rotate-12">
+                  <Leaf size={18} weight="fill" />
                 </div>
-                <h2 className="mt-2 text-2xl font-display font-bold text-gray-text">This week's card</h2>
+                <div>
+                  <p className="label-caps text-honey">Completion card</p>
+                  <h2 className="mt-1 text-2xl font-display font-bold text-gray-text group-hover:text-amber-600 transition-colors duration-300">This week's card</h2>
+                </div>
               </div>
               <CaretRight
                 size={18}
-                weight="regular"
-                className={`shrink-0 text-gray-nav transition-transform duration-300 ease-out-expo ${isCompletionOpen ? 'rotate-90' : ''}`}
+                weight="bold"
+                className={`shrink-0 text-gray-nav/40 transition-all duration-500 ease-out-expo ${isCompletionOpen ? 'rotate-90 text-honey' : 'group-hover:translate-x-1'}`}
               />
             </button>
 
@@ -554,34 +564,36 @@ export const Insights: React.FC = () => {
           <Surface
             variant="flat"
             tone="sage"
-            className="overflow-hidden border border-transparent transition-colors duration-500 hover:border-green/20"
+            className="group relative overflow-hidden rounded-[2.5rem] border border-transparent transition-all duration-500 hover:border-green/20 hover:shadow-[0_20px_50px_rgba(34,197,94,0.05)]"
           >
             <Link
               to={RoutePath.SANCTUARY}
               state={{ fromInsights: true }}
               onClick={handleOpenSanctuary}
-              className="group flex w-full flex-col items-center justify-between gap-8 p-8 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 md:flex-row md:p-12"
+              className="relative z-10 flex w-full flex-col items-center justify-between gap-8 p-8 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 md:flex-row md:p-12"
               aria-label="Open your Life Wiki"
               aria-busy={isOpeningSanctuary}
             >
-              <div className="space-y-4">
+              <div className="space-y-5">
                 {isWikiReadyToBuild ? (
-                  <div className="h-24 w-24 overflow-hidden rounded-[var(--radius-panel)] bg-[oklch(from_var(--color-accent)_l_c_h_/_0.16)]">
+                  <div className="h-28 w-28 overflow-hidden rounded-[2rem] bg-[oklch(from_var(--color-accent)_l_c_h_/_0.16)] transition-transform duration-500 group-hover:scale-105 group-hover:rotate-3">
                     <DotLottieReact src={SANCTUARY_ENTRANCE_LOTTIE} autoplay loop />
                   </div>
                 ) : (
-                  <div className="tone-icon tone-icon-sage h-14 w-14 rounded-[var(--radius-panel)]">
+                  <div className="tone-icon tone-icon-sage h-14 w-14 rounded-2xl transition-transform duration-500 ease-out-expo group-hover:scale-110 group-hover:rotate-6">
                     <Book size={26} weight="duotone" />
                   </div>
                 )}
-                <h2 className="text-2xl font-display font-bold text-gray-text">
-                  {isWikiReadyToBuild ? 'Your wiki is ready for insights' : 'Your Life Wiki'}
-                </h2>
-                <p className="text-gray-light max-w-lg leading-relaxed">
-                  {isWikiReadyToBuild
-                    ? 'You have enough writing to build your first Life Wiki refresh when you choose.'
-                    : 'A private reading room where AI-generated wiki pages stay grounded in your saved notes.'}
-                </p>
+                <div className="space-y-3">
+                  <h2 className="text-3xl font-display font-bold text-gray-text group-hover:text-green transition-colors duration-300">
+                    {isWikiReadyToBuild ? 'Your wiki is ready for insights' : 'Your Life Wiki'}
+                  </h2>
+                  <p className="text-gray-light max-w-lg text-lg leading-relaxed font-serif italic">
+                    {isWikiReadyToBuild
+                      ? 'You have enough writing to build your first Life Wiki refresh when you choose.'
+                      : 'A private reading room where AI-generated wiki pages stay grounded in your saved notes.'}
+                  </p>
+                </div>
               </div>
               
               <div className="relative flex h-12 shrink-0 items-center justify-center overflow-hidden rounded-[var(--radius-control)] border border-green bg-green text-white px-6 label-caps transition-colors duration-300 group-hover:bg-green/90 group-hover:shadow-lg group-hover:shadow-green/20">
