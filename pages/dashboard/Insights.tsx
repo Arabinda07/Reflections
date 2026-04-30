@@ -233,13 +233,13 @@ export const Insights: React.FC = () => {
               transition={{ delay: 0.12, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
               className="relative z-10 flex max-w-[42rem] flex-col items-center text-center"
             >
-              <p className="text-[11px] font-black uppercase tracking-widest text-green">
+              <p className="label-caps text-green">
                 Private reading room
               </p>
               <h2 className="mt-4 text-4xl font-display font-bold leading-tight text-gray-text md:text-5xl">
                 Opening Sanctuary
               </h2>
-              <p className="mt-4 max-w-[36ch] text-[15px] font-medium leading-relaxed text-gray-light">
+              <p className="mt-4 max-w-[65ch] text-base font-medium leading-relaxed text-gray-light">
                 Crossing into the library without breaking the calm of the page.
               </p>
             </motion.div>
@@ -251,7 +251,7 @@ export const Insights: React.FC = () => {
         <div className="space-y-10">
           <button 
             onClick={() => navigate(RoutePath.HOME)}
-            className="flex items-center gap-2 text-[13px] font-bold text-gray-nav hover:text-green transition-colors w-fit"
+            className="flex items-center gap-2 text-sm font-bold text-gray-nav hover:text-green transition-colors w-fit"
             aria-label="Back to home"
           >
             <ArrowLeft size={16} weight="regular" />
@@ -274,7 +274,7 @@ export const Insights: React.FC = () => {
               <div className="space-y-5">
                 <div className="flex items-center gap-3 text-green">
                   <CalendarCheck size={18} weight="duotone" />
-                  <p className="text-[11px] font-black uppercase tracking-widest">This week</p>
+                  <p className="label-caps">This week</p>
                 </div>
                 <h2 className="text-3xl font-display font-extrabold text-gray-text md:text-5xl">
                   You returned {weeklyRecap.writingDays} {weeklyRecap.writingDays === 1 ? 'day' : 'days'}
@@ -292,7 +292,7 @@ export const Insights: React.FC = () => {
                 ].map(([label, value]) => (
                   <div key={label} className="tone-chip tone-chip-sky flex-col items-start p-4">
                     <p className="text-2xl font-display font-bold text-gray-text">{value}</p>
-                    <p className="mt-1 text-[10px] font-black uppercase tracking-widest text-gray-nav">{label}</p>
+                    <p className="mt-1 text-xs font-black uppercase tracking-widest text-gray-nav">{label}</p>
                   </div>
                 ))}
               </div>
@@ -312,7 +312,7 @@ export const Insights: React.FC = () => {
                     <div className="tone-icon tone-icon-sky h-12 w-12">
                       <Heart size={17} weight="duotone" />
                     </div>
-                    <h3 className="text-[18px] font-display font-bold text-gray-text">Mood frequency</h3>
+                    <h3 className="text-lg font-display font-bold text-gray-text">Mood frequency</h3>
                   </div>
                   <CaretRight
                     size={18}
@@ -349,7 +349,7 @@ export const Insights: React.FC = () => {
 
                               return (
                                 <div key={entry.name} className="flex items-center gap-4">
-                                  <span className={`w-20 shrink-0 text-[11px] font-black tracking-widest ${tone.labelClass}`}>
+                                  <span className={`w-20 shrink-0 label-caps ${tone.labelClass}`}>
                                     {moodConfig?.label || entry.name}
                                   </span>
                                   <div className={`relative h-8 flex-1 overflow-hidden rounded-full ${tone.trackClass}`}>
@@ -358,7 +358,7 @@ export const Insights: React.FC = () => {
                                       style={{ width: `${percent}%` }}
                                     />
                                   </div>
-                                  <span className="w-6 shrink-0 text-right text-[12px] font-extrabold text-gray-nav">
+                                  <span className="w-6 shrink-0 text-right text-xs font-extrabold tabular-nums text-gray-nav">
                                     {entry.value}
                                   </span>
                                 </div>
@@ -385,7 +385,7 @@ export const Insights: React.FC = () => {
                     <div className="tone-icon tone-icon-honey h-12 w-12">
                       <Hash size={17} weight="duotone" />
                     </div>
-                    <h3 className="text-[18px] font-display font-bold text-gray-text">Recurring tags</h3>
+                    <h3 className="text-lg font-display font-bold text-gray-text">Recurring tags</h3>
                   </div>
                   <CaretRight
                     size={18}
@@ -452,8 +452,8 @@ export const Insights: React.FC = () => {
                   <Book size={17} weight="duotone" />
                 </div>
                 <div>
-                  <p className="text-[11px] font-black uppercase tracking-widest text-green">Overview</p>
-                  <h2 className="mt-1 text-[22px] font-display font-bold text-gray-text">
+                  <p className="label-caps text-green">Overview</p>
+                  <h2 className="mt-1 text-2xl font-display font-bold text-gray-text">
                     {stats.monthNotes} reflections this month
                   </h2>
                 </div>
@@ -481,7 +481,7 @@ export const Insights: React.FC = () => {
                         {stats.wordsWritten.toLocaleString()} words written
                       </MetadataPill>
                     </div>
-                    <p className="max-w-2xl text-[18px] font-serif italic leading-relaxed text-gray-light md:text-[20px]">
+                    <p className="max-w-[65ch] text-lg font-serif italic leading-relaxed text-gray-light md:text-xl">
                       This month, you checked in on {stats.daysCheckedIn} different days, and the current emotional tone leans{' '}
                       <span className="font-bold not-italic text-green">
                         {getMoodConfig(stats.topMood)?.label || stats.topMood || 'toward clarity'}
@@ -505,9 +505,9 @@ export const Insights: React.FC = () => {
               <div>
                 <div className="flex items-center gap-2">
                   <Leaf size={14} weight="fill" className="text-honey" />
-                  <p className="text-[11px] font-black uppercase tracking-widest text-honey">Completion card</p>
+                  <p className="label-caps text-honey">Completion card</p>
                 </div>
-                <h2 className="mt-2 text-[22px] font-display font-bold text-gray-text">This week's card</h2>
+                <h2 className="mt-2 text-2xl font-display font-bold text-gray-text">This week's card</h2>
               </div>
               <CaretRight
                 size={18}
@@ -528,7 +528,7 @@ export const Insights: React.FC = () => {
                 >
                   <div className="space-y-5 border-t border-border/60 p-6 md:p-8">
                     <div className="space-y-2">
-                      <label htmlFor="completion-card-title" className="text-[11px] font-black uppercase tracking-widest text-gray-nav">
+                      <label htmlFor="completion-card-title" className="label-caps text-gray-nav">
                         Card message
                       </label>
                       <input
@@ -538,9 +538,9 @@ export const Insights: React.FC = () => {
                         onChange={(e) => setCardTitle(e.target.value)}
                         maxLength={80}
                         placeholder="Write a message for your card..."
-                        className="input-surface h-12 w-full px-4 text-[15px] font-semibold text-gray-text"
+                        className="input-surface h-12 w-full px-4 text-base font-semibold text-gray-text"
                       />
-                      <p className="text-[11px] font-medium text-gray-nav/60">
+                      <p className="text-xs font-medium text-gray-nav/60">
                         {cardTitle.length}/80 — leave blank for the default
                       </p>
                     </div>
@@ -584,7 +584,7 @@ export const Insights: React.FC = () => {
                 </p>
               </div>
               
-              <div className="relative flex h-12 shrink-0 items-center justify-center overflow-hidden rounded-[var(--radius-control)] border border-green bg-green text-white px-6 text-[13px] font-black uppercase tracking-widest transition-colors duration-300 group-hover:bg-green/90 group-hover:shadow-lg group-hover:shadow-green/20">
+              <div className="relative flex h-12 shrink-0 items-center justify-center overflow-hidden rounded-[var(--radius-control)] border border-green bg-green text-white px-6 label-caps transition-colors duration-300 group-hover:bg-green/90 group-hover:shadow-lg group-hover:shadow-green/20">
                 Open Sanctuary
                 <CaretRight size={16} weight="regular" className="ml-2 transition-transform duration-500 ease-out-expo group-hover:translate-x-1" />
               </div>

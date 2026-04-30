@@ -242,7 +242,7 @@ export const SingleNote: React.FC = () => {
           onChange={(event) => setTaskTextLocal(task.id, event.target.value)}
           onBlur={(event) => updateTaskText(task.id, event.target.value)}
           aria-label={`Edit task: ${taskLabel}`}
-          className={`flex-1 bg-transparent text-[14px] font-bold outline-none ${
+          className={`flex-1 bg-transparent text-sm font-bold outline-none ${
             task.completed ? 'text-gray-nav line-through' : 'text-gray-text'
           }`}
         />
@@ -280,7 +280,7 @@ export const SingleNote: React.FC = () => {
               variant="ghost"
               size="sm"
               onClick={() => navigate(RoutePath.NOTES)}
-              className="text-gray-nav hover:text-gray-text font-bold text-[12px] !px-2 sm:!px-3"
+              className="text-gray-nav hover:text-gray-text font-bold text-xs !px-2 sm:!px-3"
               aria-label="Go back to my reflections"
             >
               <ArrowLeft className="h-5 w-5 shrink-0 sm:mr-2" weight="bold" />
@@ -380,7 +380,7 @@ export const SingleNote: React.FC = () => {
                       onClick={() => setIsMoodOpen(true)}
                       aria-haspopup="dialog"
                       aria-expanded={isMoodOpen}
-                      className={`group flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-black uppercase tracking-widest transition-colors ${
+                      className={`group flex items-center gap-1.5 rounded-full border px-2.5 py-1 label-caps transition-colors ${
                         noteMoodConfig
                           ? noteMoodConfig.selectedOption
                           : 'control-surface text-gray-nav hover:border-green/30 hover:bg-green/5 hover:text-green'
@@ -395,7 +395,7 @@ export const SingleNote: React.FC = () => {
                       onClick={() => setIsTagsOpen(true)}
                       aria-haspopup="dialog"
                       aria-expanded={isTagsOpen}
-                      className="control-surface group flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-black uppercase tracking-widest text-gray-nav transition-colors hover:border-green/30 hover:bg-green/5 hover:text-green"
+                      className="control-surface group flex items-center gap-1.5 rounded-full px-2.5 py-1 label-caps text-gray-nav transition-colors hover:border-green/30 hover:bg-green/5 hover:text-green"
                     >
                       <Tag size={14} weight="bold" />
                       <span className="mt-0.5">{note.tags?.length || 'Tags'}</span>
@@ -406,7 +406,7 @@ export const SingleNote: React.FC = () => {
                       onClick={() => setIsTasksOpen(true)}
                       aria-haspopup="dialog"
                       aria-expanded={isTasksOpen}
-                      className={`group flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-black uppercase tracking-widest transition-colors ${
+                      className={`group flex items-center gap-1.5 rounded-full border px-2.5 py-1 label-caps transition-colors ${
                         pendingTaskCount > 0
                           ? 'border-green/30 bg-green/5 text-green'
                           : 'control-surface text-gray-nav hover:border-green/30 hover:bg-green/5 hover:text-green'
@@ -424,7 +424,7 @@ export const SingleNote: React.FC = () => {
 
                   {note.attachments && note.attachments.length > 0 ? (
                     <div className="mt-12 border-t border-border/40 pt-8">
-                      <h3 className="mb-4 flex items-center gap-2 text-[13px] font-extrabold text-gray-text">
+                      <h3 className="mb-4 flex items-center gap-2 text-sm font-extrabold text-gray-text">
                         <Paperclip size={16} weight="bold" className="text-gray-nav" />
                         Attachments
                       </h3>
@@ -437,8 +437,8 @@ export const SingleNote: React.FC = () => {
                                 <FileText size={20} weight="duotone" />
                               </div>
                               <div className="min-w-0 flex-1">
-                                <p className="truncate text-[13px] font-bold text-gray-text">{attachment.name}</p>
-                                <p className="text-[11px] font-bold text-gray-nav">
+                                <p className="truncate text-sm font-bold text-gray-text">{attachment.name}</p>
+                                <p className="text-xs font-bold text-gray-nav">
                                   {(attachment.size / 1024).toFixed(1)} KB
                                 </p>
                               </div>
@@ -488,7 +488,7 @@ export const SingleNote: React.FC = () => {
                 }`}
               >
                 <Icon size={16} weight={note.mood === moodOption ? 'fill' : 'regular'} className={`mb-2 ${moodConfig?.labelClass || ''}`} />
-                <span className="text-[12px] font-bold">{moodConfig?.label || moodOption}</span>
+                <span className="text-xs font-bold">{moodConfig?.label || moodOption}</span>
               </button>
             );
           })}
@@ -534,7 +534,7 @@ export const SingleNote: React.FC = () => {
             ))}
           </div>
         ) : (
-          <p className="text-[13px] font-medium text-gray-light">
+          <p className="text-sm font-medium text-gray-light">
             No tags yet. Add one below to keep this reflection organized.
           </p>
         )}
@@ -567,7 +567,7 @@ export const SingleNote: React.FC = () => {
             {note.tasks.map(renderTaskRow)}
           </div>
         ) : (
-          <p className="text-[13px] font-medium text-gray-light">
+          <p className="text-sm font-medium text-gray-light">
             No tasks yet. Add one below if this reflection points to a next step.
           </p>
         )}

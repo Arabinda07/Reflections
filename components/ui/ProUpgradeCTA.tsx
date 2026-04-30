@@ -171,7 +171,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
         {!isUnlocked ? (
           <>
             <div className="space-y-2">
-              <p className="text-[15px] font-medium leading-relaxed text-gray-light">
+              <p className="text-base font-medium leading-relaxed text-gray-light">
                 Keep writing unlimited. Add more on-demand reflections and Life Wiki refreshes when you need them.
               </p>
             </div>
@@ -184,8 +184,8 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
                   selectedPlan === 'monthly' ? 'border-honey bg-honey/5' : 'control-surface hover:border-honey/30'
                 }`}
               >
-                <span className={`text-[12px] font-black uppercase tracking-widest ${selectedPlan === 'monthly' ? 'text-honey' : 'text-gray-nav'}`}>Monthly</span>
-                <span className="text-2xl font-serif italic text-gray-text mt-1">₹99<span className="text-[14px] not-italic text-gray-light">/mo</span></span>
+                <span className={`label-caps ${selectedPlan === 'monthly' ? 'text-honey' : 'text-gray-nav'}`}>Monthly</span>
+                <span className="text-2xl font-serif italic text-gray-text mt-1">₹99<span className="text-sm not-italic text-gray-light">/mo</span></span>
               </button>
 
               <button
@@ -196,16 +196,16 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
                 }`}
               >
                 <div className="flex w-full items-center justify-between gap-3">
-                  <span className={`text-[12px] font-black uppercase tracking-widest ${selectedPlan === 'yearly' ? 'text-honey' : 'text-gray-nav'}`}>Yearly</span>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-honey">Save 15%</span>
+                  <span className={`label-caps ${selectedPlan === 'yearly' ? 'text-honey' : 'text-gray-nav'}`}>Yearly</span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-honey">Save 15%</span>
                 </div>
-                <span className="text-2xl font-serif italic text-gray-text mt-1">₹999<span className="text-[14px] not-italic text-gray-light">/yr</span></span>
+                <span className="text-2xl font-serif italic text-gray-text mt-1">₹999<span className="text-sm not-italic text-gray-light">/yr</span></span>
               </button>
             </div>
 
             <ul className="space-y-2 border-y border-border/50 py-4">
               {features.map((feature) => (
-                <li key={feature} className="flex items-center gap-3 text-[14px] font-semibold text-gray-text">
+                <li key={feature} className="flex items-center gap-3 text-sm font-semibold text-gray-text">
                   <CheckCircle size={16} weight="fill" className="text-honey" />
                   {feature}
                 </li>
@@ -225,17 +225,17 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
                     <Check size={14} weight="bold" />
                   </div>
                 </div>
-                <span className="text-[14px] font-medium leading-relaxed text-gray-light">
+                <span className="text-sm font-medium leading-relaxed text-gray-light">
                   Send me occasional journaling ideas and product updates.
                 </span>
               </label>
             </div>
 
-            {error && <p className="text-clay text-[13px] font-bold">{error}</p>}
+            {error && <p className="text-clay text-sm font-bold">{error}</p>}
 
             <Button
               variant="primary"
-              className="w-full h-14 text-[16px] rounded-[var(--radius-control)] !bg-honey !text-white border-none hover:opacity-90 whitespace-nowrap"
+              className="w-full h-14 text-base rounded-[var(--radius-control)] !bg-honey !text-white border-none hover:opacity-90 whitespace-nowrap"
               isLoading={isProcessing}
               onClick={handleSubscribe}
             >
@@ -248,7 +248,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
               <CheckCircle size={40} weight="fill" />
             </div>
             <h3 className="text-3xl font-display font-extrabold text-gray-text mb-3">Welcome to Pro</h3>
-            <p className="text-[15px] font-medium text-gray-light leading-relaxed max-w-[280px]">
+            <p className="text-base font-medium text-gray-light leading-relaxed max-w-[280px]">
               Writing stays unlimited. You can refresh your Life Wiki whenever you ask.
             </p>
           </div>
@@ -266,7 +266,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
           </div>
           <div>
             <h2 className="text-4xl font-display font-extrabold text-gray-text mb-4">Reflections Pro</h2>
-            <p className="text-[16px] text-gray-light leading-relaxed">
+            <p className="text-base text-gray-light leading-relaxed">
               Unlimited writing and on-demand Life Wiki refreshes.
             </p>
           </div>
@@ -275,14 +275,14 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
             {features.map((feature) => (
               <div key={feature} className="flex items-center gap-3">
                 <CheckCircle size={20} weight="fill" className="text-honey" />
-                <span className="text-[14px] font-bold text-gray-text">{feature}</span>
+                <span className="text-sm font-bold text-gray-text">{feature}</span>
               </div>
             ))}
           </div>
 
           <Button
             variant="primary"
-            className="w-full h-14 text-[16px] rounded-[var(--radius-control)] !bg-honey !text-white border-none hover:opacity-90 whitespace-nowrap"
+            className="w-full h-14 text-base rounded-[var(--radius-control)] !bg-honey !text-white border-none hover:opacity-90 whitespace-nowrap"
             onClick={() => setIsModalOpen(true)}
           >
             Join Pro
@@ -301,9 +301,9 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-honey">
               <Crown size={18} weight="fill" />
-              <span className="text-[11px] font-black uppercase tracking-widest">Reflections Pro</span>
+              <span className="label-caps">Reflections Pro</span>
             </div>
-            <p className="text-[14px] font-medium leading-relaxed text-gray-light">
+            <p className="text-sm font-medium leading-relaxed text-gray-light">
               More on-demand reflections, Life Wiki refreshes, and early Pro features.
             </p>
           </div>

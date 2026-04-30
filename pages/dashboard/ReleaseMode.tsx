@@ -49,7 +49,7 @@ export const ReleaseMode: React.FC = () => {
             <ArrowLeft size={16} weight="bold" className="mr-2" />
             Home
           </Button>
-          <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-gray-nav/70">
+          <div className="flex items-center gap-2 label-caps text-gray-nav/70">
             <Wind size={16} weight="duotone" className="text-green" />
             Release mode
           </div>
@@ -60,10 +60,10 @@ export const ReleaseMode: React.FC = () => {
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-green/15 bg-green/10 text-green">
               <Feather size={24} weight="duotone" />
             </div>
-            <h1 className="font-display text-[40px] font-bold leading-none text-gray-text sm:text-[64px] md:text-[72px]">
+            <h1 className="h1-hero !leading-none">
               Write it here. Let it leave.
             </h1>
-            <p className="mx-auto max-w-2xl text-[15px] font-medium leading-7 text-gray-light">
+            <p className="mx-auto max-w-[65ch] text-base font-medium leading-relaxed text-gray-light">
               Release mode does not create a note. When you release, the written text disappears and only a content-free marker remains.
             </p>
           </div>
@@ -87,12 +87,12 @@ export const ReleaseMode: React.FC = () => {
                     disabled={isReleasing}
                     autoFocus
                     placeholder="Write what you are ready to put down."
-                    className="input-surface min-h-[34dvh] w-full resize-none rounded-[22px] p-5 font-serif text-[20px] leading-9 text-gray-text placeholder:text-gray-nav/35 disabled:opacity-60 sm:min-h-[42dvh] sm:p-8 sm:text-[22px] sm:leading-10"
+                    className="input-surface min-h-[34dvh] w-full resize-none rounded-[22px] p-5 font-serif text-xl leading-relaxed text-gray-text placeholder:text-gray-nav/35 disabled:opacity-60 sm:min-h-[42dvh] sm:p-8 sm:text-2xl"
                   />
                 </div>
 
                 {error ? (
-                  <p className="text-center text-[13px] font-bold text-clay" aria-live="polite">
+                  <p className="text-center text-sm font-bold text-clay" aria-live="polite">
                     {error}
                   </p>
                 ) : null}
@@ -120,7 +120,7 @@ export const ReleaseMode: React.FC = () => {
                 transition={{ duration: shouldReduceMotion ? 0 : 0.36, ease: [0.16, 1, 0.3, 1] }}
                 className="mx-auto w-full max-w-xl space-y-4 text-center"
               >
-                <p className="font-serif text-[22px] italic leading-relaxed text-gray-text">
+                <p className="font-serif text-2xl italic leading-relaxed text-gray-text">
                   Released. This can stay quiet now.
                 </p>
                 {cardPayload ? <CompletionCardActions payload={cardPayload} /> : null}

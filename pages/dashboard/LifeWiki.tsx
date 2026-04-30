@@ -368,7 +368,7 @@ export const LifeWiki: React.FC = () => {
       <button
         type="button"
         onClick={() => navigate(notePath(noteId))}
-        className="inline-flex rounded-full border border-green/20 bg-green/5 px-2 py-0.5 text-[11px] font-black uppercase tracking-widest text-green transition-colors hover:border-green/40 hover:bg-green/10"
+        className="inline-flex rounded-full border border-green/20 bg-green/5 px-2 py-0.5 label-caps text-green transition-colors hover:border-green/40 hover:bg-green/10"
       >
         {children}
       </button>
@@ -394,18 +394,18 @@ export const LifeWiki: React.FC = () => {
         >
           <div className="space-y-4">
             <div className="flex items-center justify-between gap-4">
-              <span className={`text-[11px] font-black uppercase tracking-widest ${tone.accent}`}>
+              <span className={`label-caps ${tone.accent}`}>
                 {isSupporting ? 'Supporting page' : isEmptyRoom ? 'Room awaiting signal' : 'Generated page'}
               </span>
               <CaretRight size={16} weight="bold" className={`${tone.text} transition-transform duration-300 ease-out-expo group-hover:translate-x-1`} />
             </div>
             <div className="space-y-3">
               <h2 className="text-3xl font-display font-bold text-gray-text md:text-4xl">{meta.label}</h2>
-              <p className="line-clamp-4 text-[16px] font-serif italic leading-relaxed text-gray-text/75">
+              <p className="line-clamp-4 text-base font-serif italic leading-relaxed text-gray-text/75">
                 {isEmptyRoom ? meta.emptyLine || meta.description : previewText(page.content)}
               </p>
               {isEmptyRoom ? (
-                <p className="max-w-[28ch] text-[12px] font-bold uppercase tracking-widest text-gray-nav">
+                <p className="max-w-[28ch] text-xs font-bold uppercase tracking-widest text-gray-nav">
                   This Sanctuary room is ready, but it has not been written yet.
                 </p>
               ) : null}
@@ -452,13 +452,13 @@ export const LifeWiki: React.FC = () => {
             transition={{ delay: shouldReduceMotion ? 0 : 0.12, duration: shouldReduceMotion ? 0 : 0.45, ease: [0.16, 1, 0.3, 1] }}
             className="relative z-10 flex max-w-[42rem] flex-col items-center text-center"
           >
-            <p className="text-[11px] font-black uppercase tracking-widest text-green">
+            <p className="label-caps text-green">
               {isRefreshingWiki ? 'Reading only your saved notes' : 'Private reading room'}
             </p>
             <h2 className="mt-4 text-4xl font-display font-bold leading-tight text-gray-text md:text-5xl">
               {isRefreshingWiki ? 'Refreshing your Life Wiki...' : 'Opening Sanctuary'}
             </h2>
-            <p className="mt-4 max-w-[36ch] text-[15px] font-medium leading-relaxed text-gray-light">
+            <p className="mt-4 max-w-[65ch] text-base font-medium leading-relaxed text-gray-light">
               {isRefreshingWiki
                 ? 'The library is rebuilding from the writing you saved here.'
                 : 'Crossing into the library without leaving the calm of the page.'}
@@ -482,7 +482,7 @@ export const LifeWiki: React.FC = () => {
           <div className="space-y-8">
             <button
               onClick={() => navigate(RoutePath.SANCTUARY)}
-              className="flex items-center gap-2 text-[13px] font-bold text-gray-nav hover:text-green transition-colors w-fit"
+              className="flex items-center gap-2 text-sm font-bold text-gray-nav hover:text-green transition-colors w-fit"
               aria-label="Back to Sanctuary"
             >
               <ArrowLeft size={16} weight="bold" />
@@ -493,7 +493,7 @@ export const LifeWiki: React.FC = () => {
               !hasLoadedLibrary ? (
                 <Surface variant="flat" tone="sky" className="p-8 md:p-10">
                   <div className="mx-auto max-w-xl text-center">
-                    <p className="text-[11px] font-black uppercase tracking-widest text-green">
+                    <p className="label-caps text-green">
                       Opening room
                     </p>
                     <h1 className="mt-3 text-4xl font-display font-bold text-gray-text">
@@ -504,18 +504,18 @@ export const LifeWiki: React.FC = () => {
               ) : !canShowSanctuaryRooms ? (
                 <Surface variant="bezel" tone="sage" innerClassName="p-8 md:p-10">
                   <div className="mx-auto max-w-2xl text-center">
-                    <p className="text-[11px] font-black uppercase tracking-widest text-green">
+                    <p className="label-caps text-green">
                       Life Wiki unlocks after 3 entries
                     </p>
                     <h1 className="mt-3 text-4xl font-display font-bold text-gray-text">
                       Still gathering enough signal.
                     </h1>
-                    <p className="mx-auto mt-4 max-w-[46ch] text-[15px] font-medium leading-relaxed text-gray-light">
+                    <p className="mx-auto mt-4 max-w-[65ch] text-base font-medium leading-relaxed text-gray-light">
                       Write {entriesNeededForWiki} more {entriesNeededForWiki === 1 ? 'entry' : 'entries'} before this Sanctuary room opens.
                     </p>
                     <Button
                       variant="primary"
-                      className="mt-7 h-12 px-6 text-[12px] font-black uppercase tracking-widest"
+                      className="mt-7 h-12 px-6 label-caps"
                       onClick={() => navigate(RoutePath.CREATE_NOTE)}
                     >
                       {notes.length === 0 ? 'Begin your first entry' : 'Write another entry'}
@@ -525,13 +525,13 @@ export const LifeWiki: React.FC = () => {
               ) : (
                 <article className="space-y-8">
                   <header className="space-y-4 pb-2">
-                    <p className={`text-[11px] font-black uppercase tracking-widest ${articleTone.text}`}>
+                    <p className={`label-caps ${articleTone.text}`}>
                       Room awaiting signal
                     </p>
                     <h1 className="max-w-3xl text-4xl font-display font-extrabold text-gray-text sm:text-5xl md:text-6xl">
                       {articleMeta?.label || 'This page'}
                     </h1>
-                    <p className="max-w-2xl font-serif text-[20px] italic leading-relaxed text-gray-text/75">
+                    <p className="max-w-[65ch] font-serif text-xl italic leading-relaxed text-gray-text/75">
                       {articleMeta?.emptyLine || 'This room will collect the notes that belong together.'}
                     </p>
                   </header>
@@ -539,13 +539,13 @@ export const LifeWiki: React.FC = () => {
                   <Surface variant="flat" tone="sky" className="p-6 md:p-9">
                     <div className="flex flex-col gap-7 md:flex-row md:items-end md:justify-between">
                       <div className="max-w-2xl space-y-3">
-                        <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">
+                        <p className="label-caps text-gray-nav">
                           Not written yet
                         </p>
                         <h2 className="text-3xl font-display font-bold text-gray-text">
                           This Sanctuary room is ready, but it has not been written yet.
                         </h2>
-                        <p className="text-[15px] font-medium leading-relaxed text-gray-light">
+                        <p className="text-base font-medium leading-relaxed text-gray-light">
                           Refresh with AI from the library when you want this room drafted from your saved reflections.
                         </p>
                       </div>
@@ -581,13 +581,13 @@ export const LifeWiki: React.FC = () => {
                   <h1 className="max-w-3xl text-4xl font-display font-extrabold text-gray-text sm:text-5xl md:text-6xl">
                     {articlePage.title}
                   </h1>
-                  <p className="max-w-2xl text-[16px] font-medium leading-relaxed text-gray-light">
+                  <p className="max-w-[65ch] text-base font-medium leading-relaxed text-gray-light">
                     This AI-generated wiki page is based on notes you saved here. Source badges point back to the entries that can support a claim.
                   </p>
                 </header>
 
                 <Surface variant="flat" tone="sage" className="p-6 md:p-10">
-                  <div className="mx-auto max-w-[68ch] space-y-5 font-serif text-[18px] leading-loose text-gray-text">
+                  <div className="mx-auto max-w-[68ch] space-y-5 font-serif text-lg leading-loose text-gray-text">
                     <ReactMarkdown
                       skipHtml
                       components={{
@@ -625,7 +625,7 @@ export const LifeWiki: React.FC = () => {
                 <Surface variant="flat" tone="sky" className="p-6">
                   <div className="mb-4 flex items-center gap-2">
                     <Book size={18} weight="duotone" className="text-green" />
-                    <h2 className="text-[13px] font-black uppercase tracking-widest text-gray-nav">
+                    <h2 className="label-caps text-gray-nav">
                       Source notes
                     </h2>
                   </div>
@@ -639,7 +639,7 @@ export const LifeWiki: React.FC = () => {
                             key={sourceId}
                             type="button"
                             onClick={() => navigate(notePath(sourceId))}
-                            className="rounded-full border border-green/20 bg-green/5 px-3 py-2 text-[12px] font-bold text-green transition-colors hover:border-green/40 hover:bg-green/10"
+                            className="rounded-full border border-green/20 bg-green/5 px-3 py-2 text-xs font-bold text-green transition-colors hover:border-green/40 hover:bg-green/10"
                           >
                             {note.title || 'Untitled reflection'}
                           </button>
@@ -654,7 +654,7 @@ export const LifeWiki: React.FC = () => {
                       })}
                     </div>
                   ) : (
-                    <p className="text-[13px] font-medium text-gray-light">
+                    <p className="text-sm font-medium text-gray-light">
                       This older page does not include inline source badges yet.
                     </p>
                   )}
@@ -679,7 +679,7 @@ export const LifeWiki: React.FC = () => {
           <div className="flex items-center justify-between gap-4">
             <button 
               onClick={() => navigate(RoutePath.INSIGHTS)}
-              className="flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-[13px] font-bold text-gray-nav transition-colors hover:bg-green/5 hover:text-green"
+              className="flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-colors hover:bg-green/5 hover:text-green"
               aria-label="Back to Insights"
             >
               <ArrowLeft size={16} weight="bold" />
@@ -691,7 +691,7 @@ export const LifeWiki: React.FC = () => {
                 type="button"
                 onClick={handleRefreshWiki}
                 disabled={isRefreshingWiki || !gate?.canGenerate}
-                className="flex min-h-11 items-center justify-center gap-2 rounded-full border border-green/20 bg-green/5 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-green transition-colors hover:border-green/40 hover:bg-green/10 disabled:opacity-50"
+                className="flex min-h-11 items-center justify-center gap-2 rounded-full border border-green/20 bg-green/5 px-4 py-2 label-caps text-green transition-colors hover:border-green/40 hover:bg-green/10 disabled:opacity-50"
               >
                 <Sparkle size={16} weight="fill" />
                 <span className="hidden sm:inline">Refresh with AI</span>
@@ -703,7 +703,7 @@ export const LifeWiki: React.FC = () => {
             <h1 className="text-4xl font-display font-extrabold text-gray-text sm:text-5xl md:text-6xl">
               Your Life Wiki
             </h1>
-            <p className="mx-auto max-w-2xl text-[17px] font-medium leading-relaxed text-gray-light">
+            <p className="mx-auto max-w-[65ch] text-lg font-medium leading-relaxed text-gray-light">
               A dedicated Sanctuary library of AI-generated wiki pages, refreshed only when you ask.
             </p>
           </header>
@@ -740,8 +740,8 @@ export const LifeWiki: React.FC = () => {
                 ['Rooms ready', roomsReadyLabel],
               ].map(([label, value]) => (
                 <div key={label} className="px-0 py-4 first:pt-0 last:pb-0 md:px-5 md:py-0 md:first:pl-0 md:last:pr-0">
-                  <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav">{label}</p>
-                  <p className="mt-2 text-[15px] font-bold leading-relaxed text-gray-text">{value}</p>
+                  <p className="label-caps text-gray-nav">{label}</p>
+                  <p className="mt-2 text-base font-bold tabular-nums leading-relaxed text-gray-text">{value}</p>
                 </div>
               ))}
             </div>
@@ -751,14 +751,14 @@ export const LifeWiki: React.FC = () => {
             <Surface variant="bezel" tone="sage" innerClassName="p-7 md:p-9">
               <div className="flex flex-col gap-7 md:flex-row md:items-end md:justify-between">
                 <div className="max-w-2xl space-y-5">
-                  <p className="text-[11px] font-black uppercase tracking-widest text-green">
+                  <p className="label-caps text-green">
                     Life Wiki unlocks after 3 entries
                   </p>
                   <div className="space-y-3">
                     <h2 className="text-3xl font-display font-bold leading-tight text-gray-text md:text-4xl">
                       Still gathering enough signal.
                     </h2>
-                    <p className="text-[16px] font-medium leading-relaxed text-gray-light">
+                    <p className="text-base font-medium leading-relaxed text-gray-light">
                       Write {entriesNeededForWiki} more {entriesNeededForWiki === 1 ? 'entry' : 'entries'} before the Sanctuary can build pages that are grounded in your notes.
                     </p>
                   </div>
@@ -775,7 +775,7 @@ export const LifeWiki: React.FC = () => {
                 </div>
                 <Button
                   variant="primary"
-                  className="h-12 shrink-0 px-6 text-[12px] font-black uppercase tracking-widest"
+                  className="h-12 shrink-0 px-6 label-caps"
                   onClick={() => navigate(RoutePath.CREATE_NOTE)}
                 >
                   {notes.length === 0 ? 'Begin your first entry' : 'Write another entry'}
@@ -788,13 +788,13 @@ export const LifeWiki: React.FC = () => {
             <Surface variant="bezel" tone="honey" innerClassName="p-7 md:p-9">
               <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                 <div className="max-w-2xl space-y-3">
-                  <p className="text-[11px] font-black uppercase tracking-widest text-green">
+                  <p className="label-caps text-green">
                     Sanctuary ready
                   </p>
                   <h2 className="text-3xl font-display font-bold text-gray-text">
                     {gate?.requiresUpgrade ? 'Future Life Wiki refreshes are locked.' : 'Your first Life Wiki refresh is ready.'}
                   </h2>
-                  <p className="text-[15px] font-medium leading-relaxed text-gray-light">
+                  <p className="text-base font-medium leading-relaxed text-gray-light">
                     {gate?.requiresUpgrade
                       ? 'This account has used its free Life Wiki refresh. Existing generated pages stay readable; another refresh needs Pro.'
                       : 'Refresh with AI to create the five Sanctuary pages from the entries you have saved here.'}
@@ -827,7 +827,7 @@ export const LifeWiki: React.FC = () => {
               <div className="max-w-2xl">
                 <div>
                   <h2 className="text-2xl font-display font-bold text-gray-text">Sanctuary pages</h2>
-                  <p className="mt-2 text-[14px] font-medium text-gray-light">
+                  <p className="mt-2 text-sm font-medium text-gray-light">
                     The five main rooms for this library, kept visible once your Life Wiki is unlocked.
                   </p>
                 </div>
@@ -843,7 +843,7 @@ export const LifeWiki: React.FC = () => {
             <section className="space-y-5">
               <div>
                 <h2 className="text-2xl font-display font-bold text-gray-text">Supporting shelf</h2>
-                <p className="mt-2 text-[14px] font-medium text-gray-light">
+                <p className="mt-2 text-sm font-medium text-gray-light">
                   Earlier generated summaries remain readable, but the five Sanctuary pages are the main surface.
                 </p>
               </div>

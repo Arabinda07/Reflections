@@ -197,7 +197,7 @@ export const MyNotes: React.FC = () => {
           <div className="flex flex-1 flex-col p-6">
             <div className="mb-3 flex flex-wrap gap-2">
               {note.tags?.map((tag) => (
-                <Chip key={tag} as="span" active className="text-[10px]">
+                <Chip key={tag} as="span" active className="text-xs">
                   #{tag}
                 </Chip>
               ))}
@@ -208,21 +208,21 @@ export const MyNotes: React.FC = () => {
               className="rounded-[var(--radius-control)] focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
               aria-label={`Open ${note.title}`}
             >
-              <h3 className="mb-2 text-[18px] font-bold tracking-normal text-gray-text leading-snug transition-colors group-hover:text-green text-balance">
+              <h3 className="mb-2 text-lg font-bold tracking-normal text-gray-text leading-snug transition-colors group-hover:text-green text-balance">
                 {note.title}
               </h3>
 
-              <p className="mb-5 text-[14px] font-medium leading-relaxed text-gray-light line-clamp-3 font-serif italic">
+              <p className="mb-5 text-sm font-medium leading-relaxed text-gray-light line-clamp-3 font-serif italic">
                 {getPreviewText(note.content)}
               </p>
             </Link>
 
             <div className="mt-auto flex items-center justify-between gap-3 border-t border-border/40 pt-4">
               <div className="flex min-w-0 items-center gap-2">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green text-[10px] font-extrabold text-white shadow-sm">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green text-xs font-extrabold text-white shadow-sm">
                   {user?.name?.charAt(0) || 'U'}
                 </div>
-                <span className="truncate text-[12px] font-bold text-gray-nav">
+                <span className="truncate text-xs font-bold text-gray-nav">
                   Edited {format(new Date(note.updatedAt), 'MMM d')}
                 </span>
               </div>
@@ -243,7 +243,7 @@ export const MyNotes: React.FC = () => {
 
                 <Link
                   to={noteDetailPath}
-                  className="inline-flex min-h-11 items-center rounded-[var(--radius-control)] px-3 text-[12px] font-bold text-green transition-[background-color,opacity,box-shadow] duration-300 hover:bg-green/5 group-hover:opacity-70 focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
+                  className="inline-flex min-h-11 items-center rounded-[var(--radius-control)] px-3 text-xs font-bold text-green transition-[background-color,opacity,box-shadow] duration-300 hover:bg-green/5 group-hover:opacity-70 focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
                   aria-label={`Open ${note.title}`}
                 >
                   <span>Open</span>
@@ -353,7 +353,7 @@ export const MyNotes: React.FC = () => {
 
                 <div className="space-y-5 lg:col-span-5 xl:col-span-4">
                   <div className="flex items-center justify-between gap-3">
-                    <h3 className="text-[14px] font-black text-gray-text flex items-center gap-2">
+                    <h3 className="text-sm font-black text-gray-text flex items-center gap-2">
                       <CalendarIcon size={18} weight="regular" className="text-green" />
                       {format(selectedDate, 'MMMM do, yyyy')}
                     </h3>

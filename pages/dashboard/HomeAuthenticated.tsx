@@ -409,7 +409,7 @@ export const HomeAuthenticated: React.FC = () => {
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-2 text-gray-nav">
                   <Target size={18} weight="duotone" className="text-green" />
-                  <span className="text-[11px] font-black uppercase tracking-widest opacity-60">
+                  <span className="label-caps opacity-60">
                     Today's Reflection
                   </span>
                 </div>
@@ -436,7 +436,7 @@ export const HomeAuthenticated: React.FC = () => {
                     variant="primary"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="h-14 w-full px-8 rounded-xl text-[15px] font-bold bg-green text-white hover:bg-green/90 transition-colors shadow-none sm:w-fit"
+                    className="h-14 w-full px-8 rounded-xl text-base font-bold bg-green text-white hover:bg-green/90 transition-colors shadow-none sm:w-fit"
                     onClick={() => handleCreateClick(dailyPrompt)}
                     aria-label="Begin writing with today's prompt"
                   >
@@ -448,7 +448,7 @@ export const HomeAuthenticated: React.FC = () => {
                       variant="secondary"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className="h-12 w-full rounded-xl px-6 text-[15px] font-bold"
+                      className="h-12 w-full rounded-xl px-6 text-base font-bold"
                       onClick={() => setIsCheckInOpen(true)}
                       aria-label="Save a quick mood check-in"
                     >
@@ -475,12 +475,12 @@ export const HomeAuthenticated: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-gray-nav">
                   <ListChecks size={16} weight="duotone" className="text-honey" />
-                  <span className="text-[10px] font-black uppercase tracking-widest opacity-60">
+                  <span className="label-caps opacity-60">
                     Your Intentions
                   </span>
                 </div>
                 {intentionSummary.openCount > 0 && (
-                  <span className="text-[11px] font-bold text-gray-nav/60">
+                  <span className="text-xs font-bold text-gray-nav/60">
                     {intentionSummary.openCount} open
                   </span>
                 )}
@@ -505,7 +505,7 @@ export const HomeAuthenticated: React.FC = () => {
                            <div className="h-2 w-2 rounded-full bg-honey opacity-0 group-hover/btn:opacity-100 transition-opacity" />
                         </div>
                         <span className="min-w-0">
-                            <span className="block font-serif italic text-[15px] text-gray-text group-hover/btn:text-honey transition-colors line-clamp-2 leading-snug">
+                            <span className="block font-serif italic text-base text-gray-text group-hover/btn:text-honey transition-colors line-clamp-2 leading-snug">
                             {intention.text}
                           </span>
                         </span>
@@ -522,7 +522,7 @@ export const HomeAuthenticated: React.FC = () => {
                           <CheckCircleIcon size={18} weight="duotone" />
                         </div>
                       </div>
-                      <p className="text-[15px] font-semibold text-gray-nav/70">
+                      <p className="text-base font-semibold text-gray-nav/70">
                         No intentions yet
                       </p>
                     </motion.div>
@@ -532,7 +532,7 @@ export const HomeAuthenticated: React.FC = () => {
                 {(intentionSummary.hiddenCount > 0 || intentionSummary.items.length > 3) && (
                   <button 
                     onClick={() => navigate(RoutePath.NOTES)}
-                    className="w-full text-center text-[10px] font-black uppercase tracking-[0.25em] text-gray-nav/40 hover:text-honey transition-colors pt-4"
+                    className="w-full text-center label-caps text-gray-nav/40 hover:text-honey transition-colors pt-4"
                   >
                     + {intentionSummary.hiddenCount + Math.max(0, intentionSummary.items.length - 3)} more
                   </button>
@@ -548,7 +548,7 @@ export const HomeAuthenticated: React.FC = () => {
             >
               <div className="mb-6 flex items-center gap-2 text-gray-nav">
                 <FolderOpen size={18} weight="duotone" className="text-gray-nav/70" />
-                <p className="text-[11px] font-black uppercase tracking-widest opacity-60">
+                <p className="label-caps opacity-60">
                   Your Rhythm
                 </p>
               </div>
@@ -557,7 +557,7 @@ export const HomeAuthenticated: React.FC = () => {
                 <p className="text-3xl font-display font-extrabold text-gray-text tabular-nums">
                   {isCountLoading ? '...' : displayCount}
                 </p>
-                <p className="mt-1 text-[14px] font-semibold text-gray-nav">reflections saved</p>
+                <p className="mt-1 text-sm font-semibold text-gray-nav">reflections saved</p>
               </div>
 
               <div className="space-y-3">
@@ -569,8 +569,8 @@ export const HomeAuthenticated: React.FC = () => {
                   <div className="flex items-center gap-3">
                     <FolderOpen size={18} weight="duotone" className="text-gray-nav group-hover:text-green transition-colors" />
                     <div>
-                      <p className="text-[15px] font-bold text-gray-text">View archive</p>
-                      <p className="text-[12px] font-medium text-gray-nav">Read saved reflections</p>
+                      <p className="text-base font-bold text-gray-text">View archive</p>
+                      <p className="text-xs font-medium text-gray-nav">Read saved reflections</p>
                     </div>
                   </div>
                   <CaretRight size={16} weight="regular" className="text-gray-nav/40 group-hover:text-green transition-colors" />
@@ -584,8 +584,8 @@ export const HomeAuthenticated: React.FC = () => {
                   <div className="flex items-center gap-3">
                     <Brain size={18} weight="duotone" className="text-sky group-hover:text-sky transition-colors" />
                     <div>
-                      <p className="text-[15px] font-bold text-gray-text">Writing patterns</p>
-                      <p className="text-[12px] font-serif italic text-gray-nav">Mood, rhythm, and recurring themes</p>
+                      <p className="text-base font-bold text-gray-text">Writing patterns</p>
+                      <p className="text-xs font-serif italic text-gray-nav">Mood, rhythm, and recurring themes</p>
                     </div>
                   </div>
                   <CaretRight size={16} weight="regular" className="text-gray-nav/40 group-hover:text-sky transition-colors" />
@@ -599,14 +599,14 @@ export const HomeAuthenticated: React.FC = () => {
             >
               <div className="mb-8 flex items-center gap-2 text-gray-nav">
                 <Sparkle size={18} weight="duotone" className="text-honey" />
-                <span className="text-[11px] font-black uppercase tracking-widest opacity-60">
+                <span className="label-caps opacity-60">
                   Before you write
                 </span>
               </div>
 
               <div className="space-y-5">
                 {isFromSave ? (
-                  <p className="text-[13px] font-bold text-green">Reflection saved.</p>
+                  <p className="text-sm font-bold text-green">Reflection saved.</p>
                 ) : null}
                 <p className="relative font-serif text-xl italic leading-relaxed text-gray-text">
                   <span className="absolute -left-4 -top-5 font-serif text-5xl text-honey/10 pointer-events-none">
@@ -616,7 +616,7 @@ export const HomeAuthenticated: React.FC = () => {
                 </p>
                 <div className="flex items-center gap-4">
                   <div className="h-px w-8 bg-honey/20" />
-                  <p className="text-[12px] font-bold text-gray-nav uppercase tracking-widest">
+                  <p className="text-xs font-bold text-gray-nav uppercase tracking-widest">
                     {quote.author}
                   </p>
                 </div>
@@ -701,7 +701,7 @@ export const HomeAuthenticated: React.FC = () => {
                   <CurrentOnboardingIcon size={28} weight="duotone" />
                 </div>
                 <div className="space-y-4">
-                  <p className="max-w-[32rem] text-[1.05rem] font-semibold leading-8 text-gray-text sm:text-ui-lg sm:leading-[1.7]">
+                  <p className="max-w-[65ch] text-base font-semibold leading-relaxed text-gray-text sm:text-lg">
                     {currentOnboardingStep.body}
                   </p>
                   <p className="onboarding-step-note font-serif italic">
@@ -726,7 +726,7 @@ export const HomeAuthenticated: React.FC = () => {
         bodyClassName="pt-2"
       >
         <div className="space-y-5">
-          <p className="text-[15px] font-medium leading-relaxed text-gray-light">
+          <p className="text-base font-medium leading-relaxed text-gray-light">
             Name the weather of this moment without writing a full reflection.
           </p>
           <div className="grid grid-cols-2 gap-3">
@@ -743,13 +743,13 @@ export const HomeAuthenticated: React.FC = () => {
                   className={`rounded-2xl border p-4 text-left transition-colors disabled:opacity-60 ${moodConfig.option}`}
                 >
                   <Icon size={22} weight="duotone" className={`mb-3 ${moodConfig.labelClass}`} />
-                  <span className="text-[15px] font-bold text-gray-text">{moodConfig.label}</span>
+                  <span className="text-base font-bold text-gray-text">{moodConfig.label}</span>
                 </button>
               );
             })}
           </div>
           {checkInFeedback ? (
-            <p className="text-[13px] font-bold text-green" aria-live="polite">
+            <p className="text-sm font-bold text-green" aria-live="polite">
               {checkInFeedback}
             </p>
           ) : null}

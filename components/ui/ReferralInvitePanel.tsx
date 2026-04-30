@@ -99,7 +99,7 @@ export const ReferralInvitePanel: React.FC<ReferralInvitePanelProps> = ({ compac
   };
 
   if (isLoading) {
-    return <p className="text-[14px] font-medium text-gray-light">Preparing your invite...</p>;
+    return <p className="text-sm font-medium text-gray-light">Preparing your invite...</p>;
   }
 
   return (
@@ -112,10 +112,10 @@ export const ReferralInvitePanel: React.FC<ReferralInvitePanelProps> = ({ compac
       </div>
 
       <div className="surface-inline-panel p-4">
-        <p className="mb-2 text-[11px] font-black uppercase tracking-widest text-gray-nav">
+        <p className="mb-2 label-caps text-gray-nav">
           Invite link
         </p>
-        <p className="break-all font-mono text-[13px] leading-relaxed text-gray-text">
+        <p className="break-all font-mono text-sm leading-relaxed text-gray-text">
           {inviteLink || 'Invite link unavailable'}
         </p>
       </div>
@@ -133,7 +133,7 @@ export const ReferralInvitePanel: React.FC<ReferralInvitePanelProps> = ({ compac
 
       {status ? (
         <p
-          className={`flex items-center gap-2 text-[12px] font-bold ${isErrorStatus ? 'text-clay' : 'text-gray-light'}`}
+          className={`flex items-center gap-2 text-xs font-bold ${isErrorStatus ? 'text-clay' : 'text-gray-light'}`}
           aria-live="polite"
         >
           {isErrorStatus ? (

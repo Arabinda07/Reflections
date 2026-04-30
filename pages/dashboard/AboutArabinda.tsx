@@ -45,15 +45,15 @@ export const AboutArabinda: React.FC = () => {
           Back
         </Button>
 
-        <SectionHeader title={<>A note from <span className="font-serif italic font-normal text-green">Arabinda</span></>} />
+        <SectionHeader title={<>A note from <span className="text-emphasis">Arabinda</span></>} />
 
         <Surface variant="bezel" tone="sage">
           <div className="space-y-5 p-6 sm:p-10">
-            <p className="font-serif text-[26px] italic leading-relaxed text-gray-text sm:text-[32px]">
+            <p className="max-w-[65ch] font-serif text-2xl italic leading-relaxed text-gray-text sm:text-4xl">
               Reflections began as a reminder to take a few quiet minutes before the day ends.
             </p>
-            <p className="text-[16px] font-medium leading-8 text-gray-light">
-              I am <span className="font-serif italic font-normal text-green">Arabinda</span>. I made this app because we are all part of a mass movement that often prefers fitting in. I wanted a quieter counterweight: a place to check in with your emotions, write something down, and leave without being pushed to perform. Thank you for trusting me with a few minutes of your day.
+            <p className="max-w-[65ch] text-base font-medium leading-relaxed text-gray-light">
+              I am <span className="text-emphasis">Arabinda</span>. I made this app because we are all part of a mass movement that often prefers fitting in. I wanted a quieter counterweight: a place to check in with your emotions, write something down, and leave without being pushed to perform. Thank you for trusting me with a few minutes of your day.
             </p>
           </div>
         </Surface>
@@ -64,11 +64,11 @@ export const AboutArabinda: React.FC = () => {
               <div className="p-6 sm:p-8">
                 <div className="mb-4 flex items-center gap-3">
                   <div className={`tone-icon h-12 w-12 ${index % 2 === 0 ? 'tone-icon-sky' : 'tone-icon-honey'}`}>{section.icon}</div>
-                  <h2 className="text-[21px] font-display font-bold text-gray-text">
+                  <h2 className="text-xl font-display font-bold text-gray-text">
                     {section.title}
                   </h2>
                 </div>
-                <p className="text-[15px] font-medium leading-8 text-gray-light">{section.body}</p>
+                <p className="max-w-[65ch] text-base font-medium leading-relaxed text-gray-light">{section.body}</p>
               </div>
             </Surface>
           ))}
