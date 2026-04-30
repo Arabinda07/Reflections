@@ -115,7 +115,7 @@ export const PrivacyPolicy: React.FC = () => {
 
   return (
     <div className="surface-scope-paper relative min-h-full bg-body pb-28 text-gray-text transition-colors duration-300">
-      <section className="mx-auto grid w-full max-w-[1440px] gap-12 px-6 py-16 sm:px-10 lg:grid-cols-12 lg:items-end lg:px-16 lg:py-24">
+      <section className="mx-auto grid w-full max-w-[1440px] gap-12 px-6 py-20 sm:px-10 lg:grid-cols-12 lg:items-end lg:px-16 lg:py-28">
         <div className="lg:col-span-8">
           <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.HOME)} className="-ml-2 mb-8">
             <ArrowLeft size={16} weight="bold" className="mr-2" />
@@ -126,7 +126,7 @@ export const PrivacyPolicy: React.FC = () => {
           </h1>
         </div>
 
-        <div className="space-y-4 lg:col-span-4 lg:self-end">
+        <div className="space-y-4 lg:col-span-4">
           <p className="max-w-[36rem] font-serif text-[18px] leading-relaxed text-gray-light">
             This page explains what Reflections stores, when AI is used, how payments and analytics work, and how you can remove your writing.
           </p>
@@ -159,25 +159,31 @@ export const PrivacyPolicy: React.FC = () => {
               </article>
             );
           })}
-        </section>
 
-        <section className="mb-28 grid gap-8 rounded-[2rem] bg-body-surface border border-border/40 p-10 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] transition-all duration-500 hover:border-green/20 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] group">
-          <div className="tone-icon tone-icon-sage h-14 w-14 rounded-2xl transition-transform duration-500 ease-out group-hover:scale-110 group-hover:rotate-6">
-            <Envelope size={24} weight="duotone" />
-          </div>
-          <div className="max-w-2xl space-y-4">
-            <h2 className="text-[24px] font-display font-bold text-gray-text">Questions or account deletion</h2>
-            <p className="font-sans text-[16px] leading-relaxed text-gray-light">
-              If you have questions, want everything deleted, or need the sign-in account closed, email us directly.
-            </p>
-            <a
-              href={`mailto:${SUPPORT_EMAIL}`}
-              className="inline-flex items-center gap-2 text-[15px] font-bold text-gray-text transition-colors hover:text-gray-nav"
-            >
-              <Envelope size={16} weight="bold" />
-              {SUPPORT_EMAIL}
-            </a>
-          </div>
+          {/* Questions & Contact Card */}
+          <article className="group relative flex flex-col justify-between overflow-hidden rounded-[2rem] bg-body-surface border border-border/40 p-8 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-green/20 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] md:col-span-2 xl:col-span-3">
+            <div className="relative z-10 flex flex-col gap-6 md:flex-row md:items-center md:gap-12">
+              <div className="tone-icon tone-icon-sage h-14 w-14 flex-none rounded-2xl transition-transform duration-500 ease-out group-hover:scale-110 group-hover:rotate-6">
+                <Envelope size={26} weight="duotone" />
+              </div>
+              <div className="space-y-4">
+                <h2 className="text-[24px] font-display font-bold text-gray-text group-hover:text-green transition-colors duration-300">
+                  Questions or account deletion
+                </h2>
+                <p className="max-w-2xl font-sans text-[16px] leading-relaxed text-gray-light">
+                  If you have questions, want everything deleted, or need the sign-in account closed, email us directly.
+                </p>
+                <a
+                  href={`mailto:${SUPPORT_EMAIL}`}
+                  className="inline-flex items-center gap-2 text-[15px] font-black uppercase tracking-widest text-green transition-colors hover:text-gray-text"
+                >
+                  <Envelope size={16} weight="bold" />
+                  {SUPPORT_EMAIL}
+                </a>
+              </div>
+            </div>
+            <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-green/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+          </article>
         </section>
       </main>
     </div>
