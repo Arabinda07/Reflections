@@ -15,6 +15,7 @@ import {
   Check,
   CircleNotch,
   EnvelopeSimple,
+  CaretDown,
 } from '@phosphor-icons/react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
@@ -466,57 +467,60 @@ export const Account: React.FC = () => {
 
               <div className="grid gap-4 p-6 md:grid-cols-2 lg:p-8">
                 <Surface variant="bezel" tone="paper">
-                  <div className="p-5">
-                    <div className="mb-5 flex items-center gap-3">
-                      <div className="icon-block icon-block-sm">
-                        <Sparkle size={24} weight="duotone" />
+                  <details className="group marker:content-['']">
+                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors hover:bg-black/5 focus-visible:bg-black/5">
+                      <div className="flex items-center gap-3">
+                        <div className="icon-block icon-block-sm">
+                          <Sparkle size={24} weight="duotone" />
+                        </div>
+                        <div>
+                          <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">Membership</p>
+                          <h3 className="text-[20px] font-display font-bold text-gray-text capitalize">
+                            {access?.planTier || 'Free'} plan
+                          </h3>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">Membership</p>
-                        <h3 className="text-[20px] font-display font-bold text-gray-text capitalize">
-                          {access?.planTier || 'Free'} plan
-                        </h3>
+                      <div className="text-gray-nav transition-transform duration-300 group-open:rotate-180">
+                        <CaretDown size={20} weight="bold" />
                       </div>
+                    </summary>
+                    <div className="border-t border-border/50 p-5 pt-4 space-y-4">
+                      <div className="flex flex-wrap gap-2">
+                        <MetadataPill tone={access?.planTier === 'pro' ? 'green' : undefined}>
+                          {access?.planTier === 'pro' ? 'Active' : 'Free tier'}
+                        </MetadataPill>
+                      </div>
+                      <p className="text-[14px] font-medium leading-relaxed text-gray-light">{membershipCopy}</p>
+                      {access?.planTier !== 'pro' ? (
+                        <div className="pt-2">
+                          <ProUpgradeCTA />
+                        </div>
+                      ) : null}
                     </div>
-
-                    <div className="flex flex-wrap gap-2">
-                      <MetadataPill tone={access?.planTier === 'pro' ? 'green' : undefined}>
-                        {access?.planTier === 'pro' ? 'Active' : 'Free tier'}
-                      </MetadataPill>
-                    </div>
-
-                    <details className="surface-inline-panel mt-4 px-4 py-3">
-                      <summary className="cursor-pointer text-[12px] font-black uppercase tracking-widest text-gray-nav">
-                        Details
-                      </summary>
-                      <p className="mt-3 text-[14px] font-medium leading-relaxed text-gray-light">{membershipCopy}</p>
-                    </details>
-
-                    {access?.planTier !== 'pro' ? (
-                      <div className="mt-6">
-                        <ProUpgradeCTA />
-                      </div>
-                    ) : null}
-                  </div>
+                  </details>
                 </Surface>
 
                 <Surface variant="bezel" tone="paper">
-                  <div className="p-5">
-                    <div className="mb-5 flex items-center gap-3">
-                      <div className="icon-block icon-block-sm">
-                        <ShieldCheck size={24} weight="duotone" />
+                  <details className="group marker:content-['']">
+                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors hover:bg-black/5 focus-visible:bg-black/5">
+                      <div className="flex items-center gap-3">
+                        <div className="icon-block icon-block-sm">
+                          <ShieldCheck size={24} weight="duotone" />
+                        </div>
+                        <div>
+                          <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">Security</p>
+                          <h3 className="text-[20px] font-display font-bold text-gray-text">Keep this private</h3>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">Security</p>
-                        <h3 className="text-[20px] font-display font-bold text-gray-text">Keep this private</h3>
+                      <div className="text-gray-nav transition-transform duration-300 group-open:rotate-180">
+                        <CaretDown size={20} weight="bold" />
                       </div>
-                    </div>
-
-                    <div className="space-y-4">
+                    </summary>
+                    <div className="border-t border-border/50 p-5 pt-4 space-y-4">
                       <button
                         type="button"
                         onClick={handlePasswordReset}
-                        className="surface-inline-panel flex w-full items-center justify-between px-4 py-4 text-left transition-all hover:border-border/80"
+                        className="surface-inline-panel flex w-full items-center justify-between px-4 py-4 text-left transition-colors hover:border-border/80"
                       >
                         <div className="flex items-center gap-3">
                           <Key size={20} weight="regular" className="text-gray-nav" />
@@ -537,124 +541,138 @@ export const Account: React.FC = () => {
                         <MetadataPill>Coming soon</MetadataPill>
                       </div>
                     </div>
-                  </div>
+                  </details>
                 </Surface>
 
                 <Surface variant="bezel" tone="paper">
-                  <div className="p-5">
-                    <div className="mb-5 flex items-center gap-3">
-                      <div className="icon-block icon-block-sm">
-                        <EnvelopeSimple size={24} weight="duotone" />
+                  <details className="group marker:content-['']">
+                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors hover:bg-black/5 focus-visible:bg-black/5">
+                      <div className="flex items-center gap-3">
+                        <div className="icon-block icon-block-sm">
+                          <EnvelopeSimple size={24} weight="duotone" />
+                        </div>
+                        <div>
+                          <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">Invites</p>
+                          <h3 className="text-[20px] font-display font-bold text-gray-text">Share Reflections</h3>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">Invites</p>
-                        <h3 className="text-[20px] font-display font-bold text-gray-text">Share Reflections</h3>
+                      <div className="text-gray-nav transition-transform duration-300 group-open:rotate-180">
+                        <CaretDown size={20} weight="bold" />
                       </div>
-                    </div>
-
-                    <details className="surface-inline-panel mb-5 px-4 py-3">
-                      <summary className="cursor-pointer text-[12px] font-black uppercase tracking-widest text-gray-nav">
-                        Details
-                      </summary>
-                      <p className="mt-3 text-[14px] font-medium leading-relaxed text-gray-light">
+                    </summary>
+                    <div className="border-t border-border/50 p-5 pt-4 space-y-4">
+                      <p className="text-[14px] font-medium leading-relaxed text-gray-light">
                         Account tracks how many people joined from your invite. There is no prize or public list.
                       </p>
-                    </details>
-
-                    <ReferralInvitePanel />
-                  </div>
+                      <ReferralInvitePanel />
+                    </div>
+                  </details>
                 </Surface>
 
                 <Surface variant="bezel" tone="paper">
-                  <div className="p-5">
-                    <div className="mb-5 flex items-center gap-3">
-                      <div className="icon-block icon-block-sm">
-                        <Sparkle size={24} weight="duotone" />
+                  <details className="group marker:content-['']">
+                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors hover:bg-black/5 focus-visible:bg-black/5">
+                      <div className="flex items-center gap-3">
+                        <div className="icon-block icon-block-sm">
+                          <Sparkle size={24} weight="duotone" />
+                        </div>
+                        <div>
+                          <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">Sanctuary</p>
+                          <h3 className="text-[20px] font-display font-bold text-gray-text">Smart Mode</h3>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">Sanctuary</p>
-                        <h3 className="text-[20px] font-display font-bold text-gray-text">Smart Mode</h3>
+                      <div className="text-gray-nav transition-transform duration-300 group-open:rotate-180">
+                        <CaretDown size={20} weight="bold" />
                       </div>
-                    </div>
-
-                    <details className="surface-inline-panel px-4 py-3">
-                      <summary className="cursor-pointer text-[12px] font-black uppercase tracking-widest text-gray-nav">
-                        Details
-                      </summary>
-                      <p className="mt-3 text-[14px] font-medium leading-relaxed text-gray-light">
+                    </summary>
+                    <div className="border-t border-border/50 p-5 pt-4 space-y-4">
+                      <p className="text-[14px] font-medium leading-relaxed text-gray-light">
                         Keep AI on demand by default, or let Smart Mode refresh the Life Wiki after saves. Your writing screen stays quiet either way.
                       </p>
-                    </details>
 
-                    {greatIngestProgress ? (
-                      <div className="surface-inline-panel mt-5 p-4">
-                        <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">
-                          Preparing Sanctuary
-                        </p>
-                        <p className="mt-2 text-[14px] font-bold text-gray-text">
-                          Processing entry {greatIngestProgress.processedCount} of {greatIngestProgress.totalCount}
-                        </p>
-                      </div>
-                    ) : null}
+                      {greatIngestProgress ? (
+                        <div className="surface-inline-panel p-4">
+                          <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">
+                            Preparing Sanctuary
+                          </p>
+                          <p className="mt-2 text-[14px] font-bold text-gray-text">
+                            Processing entry {greatIngestProgress.processedCount} of {greatIngestProgress.totalCount}
+                          </p>
+                        </div>
+                      ) : null}
 
-                    <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="space-y-1">
-                        <MetadataPill tone={access?.smartModeEnabled ? 'green' : undefined}>
-                          {access?.smartModeEnabled ? 'Enabled' : 'Off'}
-                        </MetadataPill>
-                        <p className="text-[12px] font-medium text-gray-light" id="smart-mode-state">
-                          {isSmartModeChanging
-                            ? 'Updating Smart Mode...'
-                            : access?.smartModeEnabled
-                              ? 'Future saves can refresh the Life Wiki while Smart Mode is on.'
-                              : 'AI stays on demand until you switch this on.'}
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        role="switch"
-                        aria-checked={Boolean(access?.smartModeEnabled)}
-                        aria-label={access?.smartModeEnabled ? 'Turn off Smart Mode' : 'Enable Smart Mode'}
-                        aria-describedby="smart-mode-state"
-                        onClick={handleSmartModeToggle}
-                        disabled={!access || isSmartModeChanging}
-                        className={`relative flex h-11 w-[156px] shrink-0 items-center rounded-[var(--radius-control)] border px-1.5 transition-all duration-500 ease-out-expo focus:outline-none focus-visible:ring-4 focus-visible:ring-green/15 disabled:pointer-events-none disabled:opacity-50 ${
-                          access?.smartModeEnabled
-                            ? 'border-green/30 bg-green/10 text-green'
-                            : 'control-surface text-gray-nav hover:border-border/80'
-                        }`}
-                      >
-                        <span
-                          className={`absolute h-8 w-8 rounded-[var(--radius-chip)] bg-white shadow-sm shadow-black/10 transition-transform duration-500 ease-out-expo ${
-                            access?.smartModeEnabled ? 'translate-x-[110px]' : 'translate-x-0'
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pt-2">
+                        <div className="space-y-1">
+                          <MetadataPill tone={access?.smartModeEnabled ? 'green' : undefined}>
+                            {access?.smartModeEnabled ? 'Enabled' : 'Off'}
+                          </MetadataPill>
+                          <p className="text-[12px] font-medium text-gray-light" id="smart-mode-state">
+                            {isSmartModeChanging
+                              ? 'Updating Smart Mode...'
+                              : access?.smartModeEnabled
+                                ? 'Future saves can refresh the Life Wiki while Smart Mode is on.'
+                                : 'AI stays on demand until you switch this on.'}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={Boolean(access?.smartModeEnabled)}
+                          aria-label={access?.smartModeEnabled ? 'Turn off Smart Mode' : 'Enable Smart Mode'}
+                          aria-describedby="smart-mode-state"
+                          onClick={handleSmartModeToggle}
+                          disabled={!access || isSmartModeChanging}
+                          className={`relative flex h-11 w-[156px] shrink-0 items-center rounded-[var(--radius-control)] border px-1.5 transition-[border-color,background-color,opacity] duration-500 ease-out-expo focus:outline-none focus-visible:ring-4 focus-visible:ring-green/15 disabled:pointer-events-none disabled:opacity-50 ${
+                            access?.smartModeEnabled
+                              ? 'border-green/30 bg-green/10 text-green'
+                              : 'control-surface text-gray-nav hover:border-border/80'
                           }`}
-                        />
-                        <span className="relative z-10 flex w-full items-center justify-between px-2 text-[11px] font-black uppercase tracking-widest">
-                          <span>{access?.smartModeEnabled ? 'On' : 'Off'}</span>
-                          <span className="text-gray-text">
-                            {isSmartModeChanging ? 'Saving' : 'Smart Mode'}
+                        >
+                          <span
+                            className={`absolute h-8 w-8 rounded-[var(--radius-chip)] bg-white shadow-sm shadow-black/10 transition-transform duration-500 ease-out-expo ${
+                              access?.smartModeEnabled ? 'translate-x-[110px]' : 'translate-x-0'
+                            }`}
+                          />
+                          <span className="relative z-10 flex w-full items-center justify-between px-2 text-[11px] font-black uppercase tracking-widest">
+                            <span>{access?.smartModeEnabled ? 'On' : 'Off'}</span>
+                            <span className="text-gray-text">
+                              {isSmartModeChanging ? 'Saving' : 'Smart Mode'}
+                            </span>
                           </span>
-                        </span>
-                      </button>
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  </details>
                 </Surface>
               </div>
 
-              <div className="surface-tone-clay rounded-[var(--radius-panel)] border border-clay/15 bg-clay/[0.03] p-8 lg:p-10">
-                <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-                  <div className="space-y-2">
-                    <p className="text-[11px] font-black uppercase tracking-widest text-clay">Danger zone</p>
-                    <h3 className="text-[24px] font-display font-bold text-clay">Delete account</h3>
-                    <p className="max-w-xl text-[14px] font-medium leading-relaxed text-gray-light">
-                      Saved writing and app data will be removed.
-                    </p>
-                  </div>
-
-                  <Button type="button" variant="danger" className="px-8" onClick={() => setShowDeleteConfirm(true)}>
-                    Delete
-                  </Button>
-                </div>
+              <div className="p-6 lg:p-8 pt-0 lg:pt-0">
+                <Surface variant="bezel" tone="clay">
+                  <details className="group marker:content-['']">
+                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors hover:bg-black/5 focus-visible:bg-black/5">
+                      <div className="flex items-center gap-3">
+                        <div className="icon-block icon-block-sm">
+                          <Warning size={24} weight="duotone" className="text-clay" />
+                        </div>
+                        <div>
+                          <p className="text-[11px] font-black uppercase tracking-widest text-clay/60">Danger zone</p>
+                          <h3 className="text-[20px] font-display font-bold text-clay">Delete account</h3>
+                        </div>
+                      </div>
+                      <div className="text-clay/60 transition-transform duration-300 group-open:rotate-180">
+                        <CaretDown size={20} weight="bold" />
+                      </div>
+                    </summary>
+                    <div className="border-t border-clay/10 p-5 pt-4 space-y-4">
+                      <p className="max-w-xl text-[14px] font-medium leading-relaxed text-clay/80">
+                        Saved writing and app data will be removed.
+                      </p>
+                      <Button type="button" variant="danger" onClick={() => setShowDeleteConfirm(true)}>
+                        Delete my data
+                      </Button>
+                    </div>
+                  </details>
+                </Surface>
               </div>
 
               <div className="p-6 lg:p-8">

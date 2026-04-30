@@ -16,7 +16,7 @@ export default {
       fontFamily: {
         sans: ['"Manrope"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
         serif: ['"Spectral"', 'serif'],
-        display: ['"Sora"', '"Manrope"', 'sans-serif'],
+        display: ['"Nunito"', '"Manrope"', 'sans-serif'],
         editor: ['var(--font-editor)'],
         mono: ['"Geist Mono"', 'monospace'],
       },

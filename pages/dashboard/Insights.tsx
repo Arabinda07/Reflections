@@ -208,7 +208,7 @@ export const Insights: React.FC = () => {
             aria-live="polite"
             aria-label="Opening Sanctuary"
           >
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,oklch(0.70_0.05_135_/_0.16),transparent_54%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,oklch(from_var(--color-accent)_l_c_h_/_0.16),transparent_54%)]" />
             <div className="absolute inset-0 bg-gradient-to-b from-green/10 via-body/95 to-body" />
             <motion.div
               aria-hidden="true"
@@ -550,7 +550,7 @@ export const Insights: React.FC = () => {
           <Surface
             variant="flat"
             tone="sage"
-            className="overflow-hidden border border-transparent transition-all duration-500 hover:border-green/20"
+            className="overflow-hidden border border-transparent transition-colors duration-500 hover:border-green/20"
           >
             <Link
               to={RoutePath.SANCTUARY}
@@ -562,7 +562,7 @@ export const Insights: React.FC = () => {
             >
               <div className="space-y-4">
                 {isWikiReadyToBuild ? (
-                  <div className="h-24 w-24 overflow-hidden rounded-[var(--radius-panel)] bg-green/5">
+                  <div className="h-24 w-24 overflow-hidden rounded-[var(--radius-panel)] bg-[oklch(from_var(--color-accent)_l_c_h_/_0.16)]">
                     <DotLottieReact src={SANCTUARY_ENTRANCE_LOTTIE} autoplay loop />
                   </div>
                 ) : (
@@ -580,7 +580,7 @@ export const Insights: React.FC = () => {
                 </p>
               </div>
               
-              <div className="relative flex h-12 shrink-0 items-center justify-center overflow-hidden rounded-[var(--radius-control)] border border-green bg-green text-white px-6 text-[13px] font-black uppercase tracking-widest transition-all duration-300 group-hover:bg-green/90 group-hover:shadow-lg group-hover:shadow-green/20">
+              <div className="relative flex h-12 shrink-0 items-center justify-center overflow-hidden rounded-[var(--radius-control)] border border-green bg-green text-white px-6 text-[13px] font-black uppercase tracking-widest transition-colors duration-300 group-hover:bg-green/90 group-hover:shadow-lg group-hover:shadow-green/20">
                 Open Sanctuary
                 <CaretRight size={16} weight="regular" className="ml-2 transition-transform duration-500 ease-out-expo group-hover:translate-x-1" />
               </div>

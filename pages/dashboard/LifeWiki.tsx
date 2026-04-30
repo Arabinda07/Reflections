@@ -433,7 +433,7 @@ export const LifeWiki: React.FC = () => {
           transition={{ duration: shouldReduceMotion ? 0 : 0.35, ease: [0.16, 1, 0.3, 1] }}
           className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-body px-6"
         >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,oklch(0.70_0.05_135_/_0.18),transparent_54%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,oklch(from_var(--color-accent)_l_c_h_/_0.18),transparent_54%)]" />
           <div className="absolute inset-0 bg-gradient-to-b from-green/10 via-body/95 to-body" />
           <motion.div
             aria-hidden="true"
@@ -688,9 +688,10 @@ export const LifeWiki: React.FC = () => {
 
             {!gate?.requiresUpgrade ? (
               <button
+                type="button"
                 onClick={handleRefreshWiki}
                 disabled={isRefreshingWiki || !gate?.canGenerate}
-                className="flex min-h-11 items-center justify-center gap-2 rounded-full border border-green/20 bg-green/5 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-green transition-all hover:border-green/40 hover:bg-green/10 disabled:opacity-50"
+                className="flex min-h-11 items-center justify-center gap-2 rounded-full border border-green/20 bg-green/5 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-green transition-colors hover:border-green/40 hover:bg-green/10 disabled:opacity-50"
               >
                 <Sparkle size={16} weight="fill" />
                 <span className="hidden sm:inline">Refresh with AI</span>

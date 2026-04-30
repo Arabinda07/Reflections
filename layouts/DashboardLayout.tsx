@@ -233,7 +233,7 @@ export const DashboardLayout: React.FC = () => {
               className="flex items-center gap-2 group"
               aria-label="Reflections — go to home"
             >
-              <div className="h-10 w-10 rounded-xl bg-green flex items-center justify-center text-white shadow-sm transition-all duration-300 group-hover:scale-105 group-hover:-rotate-12">
+              <div className="h-10 w-10 rounded-xl bg-green flex items-center justify-center text-white shadow-sm transition-transform duration-300 group-hover:scale-105 group-hover:-rotate-12">
                 <Leaf size={24} weight="fill" />
               </div>
               <span className="font-serif italic text-[22px] sm:text-[26px] text-green tracking-normal truncate max-w-[150px] sm:max-w-none">
@@ -364,7 +364,7 @@ export const DashboardLayout: React.FC = () => {
                 <button
                   ref={mobileMenuCloseRef}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="surface-floating surface-floating--strong absolute right-4 z-[110] rounded-2xl p-3 text-gray-nav transition-all duration-300 ease-out-expo hover:text-green active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
+                  className="surface-floating surface-floating--strong absolute right-4 z-[110] rounded-2xl p-3 text-gray-nav transition-colors duration-300 ease-out-expo hover:text-green active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
                   style={{ top: NATIVE_TOP_CONTROL_OFFSET }}
                   aria-label="Close menu"
                 >
@@ -388,8 +388,8 @@ export const DashboardLayout: React.FC = () => {
                             key={item.label}
                             onClick={() => handleNavigation(item.path)}
                             aria-current={isActive ? 'page' : undefined}
-                            className={`flex w-full items-center justify-between rounded-2xl border-l-2 p-6 text-left text-[24px] font-black transition-all duration-300 active:bg-green/5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset ${
-                              isActive ? 'border-green bg-green/5 text-green' : 'border-transparent text-gray-text hover:text-green'
+                            className={`flex w-full items-center justify-between rounded-2xl p-6 text-left text-[24px] font-black transition-colors duration-300 active:bg-green/5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset ${
+                              isActive ? 'bg-green/10 text-green' : 'text-gray-text hover:text-green'
                             }`}
                           >
                             <span>{item.label}</span>
@@ -406,7 +406,7 @@ export const DashboardLayout: React.FC = () => {
                             await triggerInstall();
                             setIsMobileMenuOpen(false);
                           }}
-                          className="w-full flex items-center justify-center gap-3 p-5 rounded-2xl border-2 border-green/30 bg-green/5 text-green font-black text-[14px] transition-all duration-300 hover:bg-green/10 active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+                          className="w-full flex items-center justify-center gap-3 p-5 rounded-2xl border-2 border-green/30 bg-green/5 text-green font-black text-[14px] transition-colors duration-300 hover:bg-green/10 active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
                           aria-label="Add Reflections to your home screen"
                         >
                           <DownloadSimple size={20} weight="regular" />
@@ -452,8 +452,8 @@ export const DashboardLayout: React.FC = () => {
                           key={item.label}
                           onClick={() => handleNavigation(item.path)}
                           aria-current={isActive ? 'page' : undefined}
-                          className={`flex w-full items-center justify-between rounded-2xl border-l-2 p-6 text-left text-[24px] font-black transition-all duration-300 ease-out-expo active:bg-green/5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset ${
-                            isActive ? 'border-green bg-green/5 text-green' : 'border-transparent text-gray-text hover:text-green'
+                          className={`flex w-full items-center justify-between rounded-2xl p-6 text-left text-[24px] font-black transition-colors duration-300 ease-out-expo active:bg-green/5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset ${
+                            isActive ? 'bg-green/10 text-green' : 'text-gray-text hover:text-green'
                           }`}
                         >
                           <span>{item.label}</span>
@@ -478,30 +478,30 @@ export const DashboardLayout: React.FC = () => {
         
         {/* Global Footer - Positioned for full-width background with centered content */}
         {!isWritingRoute && (
-          <footer className="screen-scrim screen-scrim--strong mt-auto w-full border-t border-border py-12 transition-all duration-300">
+          <footer className="screen-scrim screen-scrim--strong mt-auto w-full border-t border-border py-12 transition-colors duration-300">
             <div className="max-w-[1440px] mx-auto px-6 md:px-16 flex flex-col sm:flex-row items-center justify-between gap-8">
               <nav aria-label="Footer navigation" className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 sm:gap-10">
                 <Link 
                   to={RoutePath.HOME}
-                  className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-all"
+                  className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-colors"
                 >
                   Home
                 </Link>
                 <Link 
                   to={RoutePath.FAQ}
-                  className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-all"
+                  className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-colors"
                 >
                   FAQ
                 </Link>
                 <Link
                   to={RoutePath.ABOUT}
-                  className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-all"
+                  className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-colors"
                 >
                   About
                 </Link>
                 <Link 
                   to={RoutePath.PRIVACY}
-                  className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-all"
+                  className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-colors"
                 >
                   Privacy
                 </Link>
@@ -528,7 +528,7 @@ export const DashboardLayout: React.FC = () => {
           {/* Floating Bug Report Button */}
           <button
             onClick={() => setIsBugModalOpen(!isBugModalOpen)}
-            className={`fixed bottom-3 left-6 z-[110] flex h-11 w-11 items-center justify-center rounded-2xl transition-all duration-300 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/20 group shadow-sm ${
+            className={`fixed bottom-3 left-6 z-[110] flex h-11 w-11 items-center justify-center rounded-2xl transition duration-300 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/20 group shadow-sm ${
               isBugModalOpen
                 ? 'bg-green text-white border-[1.5px] border-green'
                 : 'surface-floating hover:text-green'
@@ -571,7 +571,7 @@ export const DashboardLayout: React.FC = () => {
                             placeholder="Describe what happened..."
                             value={bugMessage}
                             onChange={(e) => setBugMessage(e.target.value)}
-                            className="w-full min-h-[160px] p-5 rounded-[20px] border border-border/40 bg-body/50 text-gray-text font-serif text-[17px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-green/10 focus:border-green/30 transition-all resize-none placeholder:text-gray-nav/30"
+                            className="w-full min-h-[160px] p-5 rounded-[20px] border border-border/40 bg-body/50 text-gray-text font-serif text-[17px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-green/10 focus:border-green/30 transition-colors resize-none placeholder:text-gray-nav/30"
                           />
                           {submitError && (
                             <p className="text-[12px] font-bold text-clay animate-in fade-in slide-in-from-top-1">
