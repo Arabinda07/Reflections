@@ -212,7 +212,7 @@ export const DashboardLayout: React.FC = () => {
     location.pathname.startsWith(RoutePath.SANCTUARY);
   const isLandingRoute = location.pathname === RoutePath.HOME && !isAuthenticated;
   const landingControlClass = isLandingRoute
-    ? 'surface-floating surface-floating--media'
+    ? 'text-hero-ink hover:text-green hover:bg-white/10'
     : 'text-gray-nav hover:text-green hover:bg-green/5';
 
   return (

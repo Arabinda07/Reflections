@@ -21,7 +21,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   const baseStyles = "inline-flex items-center justify-center font-bold transition-all focus:outline-none disabled:opacity-50 disabled:pointer-events-none select-none relative";
 
   const variants = {
-    primary: "border border-transparent bg-green text-white shadow-none hover:bg-green-hover",
+    primary: "border border-transparent bg-green text-white shadow-lg shadow-green/20 hover:bg-green-hover hover:shadow-xl hover:shadow-green/30",
     secondary: "control-surface text-gray-text shadow-none hover:border-green/20 hover:bg-green/5",
     outline: "border border-border/40 bg-transparent text-gray-nav hover:border-green/20 hover:bg-green/5 hover:text-gray-text",
     ghost: "bg-transparent text-gray-nav hover:bg-green/5 hover:text-green",
