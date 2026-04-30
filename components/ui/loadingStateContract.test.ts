@@ -12,7 +12,7 @@ describe('loading state source contract', () => {
     expect(loadingState).toContain("from '@lottiefiles/dotlottie-react'");
     expect(loadingState).toContain("from '@/src/lottie/loading.json'");
     expect(loadingState).toContain('<DotLottieReact');
-    expect(loadingState).toContain('h-48 w-48');
+    expect(loadingState).toContain('h-72 w-72');
     expect(loadingState).toContain('body-editorial');
     expect(loadingState).not.toContain('CircleNotch');
   });

@@ -296,14 +296,14 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
 
   return (
     <>
-      <div className={`surface-floating surface-tone-honey rounded-[var(--radius-panel)] border border-border/50 p-6 md:p-7 ${className}`}>
-        <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
-          <div className="max-w-md space-y-3">
+      <div className={`border-t border-border/50 pt-6 surface-tone-honey ${className}`}>
+        <div className="flex flex-col justify-between gap-5 md:flex-row md:items-center">
+          <div className="space-y-2">
             <div className="flex items-center gap-2 text-honey">
-              <Crown size={20} weight="fill" />
+              <Crown size={18} weight="fill" />
               <span className="text-[11px] font-black uppercase tracking-widest">Reflections Pro</span>
             </div>
-            <p className="text-[15px] font-medium leading-relaxed text-gray-light">
+            <p className="text-[14px] font-medium leading-relaxed text-gray-light">
               More on-demand reflections, Life Wiki refreshes, and early Pro features.
             </p>
           </div>
