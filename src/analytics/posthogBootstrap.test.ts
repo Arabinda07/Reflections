@@ -32,6 +32,9 @@ describe('getPostHogBootstrapConfig', () => {
         api_host: 'https://us.i.posthog.com',
         defaults: '2026-01-30',
         capture_pageview: false,
+        autocapture: false,
+        capture_pageleave: false,
+        disable_session_recording: true,
       },
     });
   });

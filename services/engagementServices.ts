@@ -66,6 +66,16 @@ export interface SupabaseReferralInviteRow {
   last_shared_at: string | null;
 }
 
+const VALID_LETTER_STATUSES = new Set<FutureLetterStatus>(['scheduled', 'opened', 'archived']);
+const parseLetterStatus = (raw: string): FutureLetterStatus =>
+  VALID_LETTER_STATUSES.has(raw as FutureLetterStatus) ? (raw as FutureLetterStatus) : 'scheduled';
+
+const VALID_RITUAL_EVENT_TYPES = new Set<RitualEventType>([
+  'release_completed', 'letter_scheduled', 'letter_opened', 'completion_card_created',
+]);
+const parseRitualEventType = (raw: string): RitualEventType =>
+  VALID_RITUAL_EVENT_TYPES.has(raw as RitualEventType) ? (raw as RitualEventType) : 'release_completed';
+
 const mapMoodCheckin = (data: SupabaseMoodCheckinRow): MoodCheckin => ({
   id: data.id,
   userId: data.user_id,
@@ -84,13 +94,13 @@ const mapFutureLetter = (data: SupabaseFutureLetterRow): FutureLetter => ({
   openedAt: data.opened_at || undefined,
   createdAt: data.created_at,
   updatedAt: data.updated_at,
-  status: data.status as FutureLetterStatus,
+  status: parseLetterStatus(data.status),
 });
 
 const mapRitualEvent = (data: SupabaseRitualEventRow): RitualEvent => ({
   id: data.id,
   userId: data.user_id,
-  eventType: data.event_type as RitualEventType,
+  eventType: parseRitualEventType(data.event_type),
   sourceId: data.source_id || undefined,
   createdAt: data.created_at,
 });

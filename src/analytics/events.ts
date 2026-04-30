@@ -159,11 +159,8 @@ export const trackLifeWikiRefreshed = ({
     used_free_refresh: usedFreeRefresh,
   });
 
-export const identifyAnalyticsUser = (user: Pick<User, 'id' | 'email' | 'name'>) => {
-  return queueAnalytics((posthog) => posthog.identify(user.id, {
-    email: user.email,
-    name: user.name,
-  }));
+export const identifyAnalyticsUser = (user: Pick<User, 'id'>) => {
+  return queueAnalytics((posthog) => posthog.identify(user.id));
 };
 
 export const resetAnalyticsUser = () => {

@@ -154,21 +154,14 @@ describe('analytics events', () => {
     });
   });
 
-  it('identifies and resets the authenticated analytics user', async () => {
+  it('identifies with user ID only — no PII sent', async () => {
     enablePostHogEnv();
 
-    identifyAnalyticsUser({
-      id: 'user-123',
-      email: 'hello@example.com',
-      name: 'Arabinda',
-    });
+    identifyAnalyticsUser({ id: 'user-123' });
     resetAnalyticsUser();
 
     await vi.waitFor(() => {
-      expect(mockIdentify).toHaveBeenCalledWith('user-123', {
-        email: 'hello@example.com',
-        name: 'Arabinda',
-      });
+      expect(mockIdentify).toHaveBeenCalledWith('user-123');
       expect(mockReset).toHaveBeenCalled();
     });
   });

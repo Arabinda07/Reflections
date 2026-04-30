@@ -26,7 +26,7 @@ export const useSync = () => {
     if (pending.length === 0) return;
 
     isSyncing.current = true;
-    console.log(`[SyncEngine] Processing ${pending.length} pending changes...`);
+    console.debug(`[SyncEngine] Processing ${pending.length} pending changes...`);
 
     // 4. Sequential Sync to maintain causal order
     for (const note of pending) {
@@ -80,7 +80,7 @@ export const useSync = () => {
     }
 
     isSyncing.current = false;
-    console.log('[SyncEngine] Sync cycle complete.');
+    console.debug('[SyncEngine] Sync cycle complete.');
   }, [isOnline]);
 
   useEffect(() => {

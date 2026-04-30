@@ -41,12 +41,12 @@ export const PWAInstallProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const handleBeforeInstallPrompt = (e: Event) => {
       // Must preventDefault synchronously to suppress the mini-infobar
       e.preventDefault();
-      console.log('[PWA] beforeinstallprompt captured — install button ready');
+      console.debug('[PWA] beforeinstallprompt captured — install button ready');
       setInstallPrompt(e as BeforeInstallPromptEvent);
     };
 
     const handleAppInstalled = () => {
-      console.log('[PWA] appinstalled event fired');
+      console.debug('[PWA] appinstalled event fired');
       setInstallPrompt(null);
       setIsInstalled(true);
     };
@@ -81,7 +81,7 @@ export const PWAInstallProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     await installPrompt.prompt();
     const { outcome } = await installPrompt.userChoice;
 
-    console.log(`[PWA] Install prompt outcome: ${outcome}`);
+    console.debug(`[PWA] Install prompt outcome: ${outcome}`);
 
     if (outcome === 'accepted') {
       setInstallPrompt(null);

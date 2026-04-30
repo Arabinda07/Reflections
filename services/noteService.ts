@@ -1,5 +1,5 @@
 import { supabase } from '../src/supabaseClient';
-import { Note, NoteAttachment } from '../types';
+import type { Note, NoteAttachment, Task } from '../types';
 import { offlineStorage } from './offlineStorage';
 import type { LocalNote } from './db';
 
@@ -13,7 +13,7 @@ export interface SupabaseNoteRow {
   tags: string[] | null;
   attachments: NoteAttachment[] | null;
   mood: string | null;
-  tasks: any[] | null;
+  tasks: Task[] | null;
 }
 
 // Helper to map Supabase DB naming (snake_case) to App naming (camelCase)
@@ -135,7 +135,7 @@ export const noteService = {
       const { error } = await supabase.from('notes').insert(mapToDbNote(newNote, user.id));
       if (!error) {
         await offlineStorage.markAsSynced(tempId);
-        console.log('Note synced to Supabase (Create)');
+        console.debug('Note synced to Supabase (Create)');
       }
     } catch (err) {
       console.warn('Supabase create sync failed, leaving note pending:', err);
@@ -166,7 +166,7 @@ export const noteService = {
     await offlineStorage.saveNote(updatedNote);
 
     // 3. Attempt Supabase Sync
-    const dbUpdates: any = { updated_at: now };
+    const dbUpdates: Record<string, unknown> = { updated_at: now };
     if (updates.title !== undefined) dbUpdates.title = updates.title;
     if (updates.content !== undefined) dbUpdates.content = updates.content;
     if (updates.thumbnailUrl !== undefined) dbUpdates.thumbnail_url = updates.thumbnailUrl;
@@ -180,7 +180,7 @@ export const noteService = {
         const { error } = await supabase.from('notes').upsert(mapToDbNote(updatedNote, user.id));
         if (!error) {
           await offlineStorage.markAsSynced(id);
-          console.log('Note synced to Supabase (Upsert)');
+          console.debug('Note synced to Supabase (Upsert)');
         }
       } else {
         const { error } = await supabase.from('notes')
@@ -190,7 +190,7 @@ export const noteService = {
 
         if (!error) {
           await offlineStorage.markAsSynced(id);
-          console.log('Note synced to Supabase (Update)');
+          console.debug('Note synced to Supabase (Update)');
         }
       }
     } catch (err) {
@@ -216,7 +216,7 @@ export const noteService = {
       .then(({ error }) => {
         if (!error) {
           offlineStorage.markAsSynced(id);
-          console.log('Note synced to Supabase (Delete)');
+          console.debug('Note synced to Supabase (Delete)');
         }
       });
   },

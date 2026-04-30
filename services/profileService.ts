@@ -9,9 +9,13 @@ export interface SupabaseProfileRow {
   smart_mode_enabled: boolean | null;
 }
 
+const VALID_PLAN_TIERS = new Set<PlanTier>(['free', 'pro']);
+const parsePlanTier = (raw?: string | null): PlanTier =>
+  raw && VALID_PLAN_TIERS.has(raw as PlanTier) ? (raw as PlanTier) : 'free';
+
 const mapWellnessAccess = (userId: string, data: SupabaseProfileRow | null): WellnessAccess => ({
   userId,
-  planTier: (data?.plan as PlanTier) || 'free',
+  planTier: parsePlanTier(data?.plan),
   freeAiReflectionsUsed: data?.free_ai_reflections_used || 0,
   freeWikiInsightsUsed: data?.free_wiki_insights_used || 0,
   smartModeEnabled: Boolean(data?.smart_mode_enabled),

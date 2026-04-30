@@ -35,7 +35,7 @@ export const captureAnalyticsEventDeferred = (
 };
 
 export const identifyAnalyticsUserDeferred = (
-  user: Pick<User, 'id' | 'email' | 'name'>,
+  user: Pick<User, 'id'>,
 ) => {
   queueDeferredAnalytics(({ identifyAnalyticsUser }) => {
     identifyAnalyticsUser(user);
