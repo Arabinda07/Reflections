@@ -2,7 +2,7 @@ import React from 'react';
 
 interface SectionHeaderProps {
   eyebrow?: string;
-  title: React.ReactNode;
+  title: string;
   description?: React.ReactNode;
   icon?: React.ReactNode;
   actions?: React.ReactNode;
