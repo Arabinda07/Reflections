@@ -70,6 +70,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
   useEffect(() => {
     if (!isOpen) return;
 
+    document.body.classList.add('no-scroll');
     previousFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -113,6 +114,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
+      document.body.classList.remove('no-scroll');
       window.removeEventListener('keydown', handleKeyDown);
       window.clearTimeout(focusTimer);
       previousFocusRef.current?.focus();

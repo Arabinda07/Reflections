@@ -720,7 +720,7 @@ export const CreateNote: React.FC = () => {
   }
 
   return (
-    <div className="surface-scope-paper relative flex-1 flex min-h-0 bg-body transition-colors duration-700 ease-out-quart overflow-hidden">
+    <div className="surface-scope-paper relative flex-1 flex min-h-0 bg-body overflow-hidden">
       {/* ── Mobile Back Button ── */}
       {isMobile && (
         <button 
