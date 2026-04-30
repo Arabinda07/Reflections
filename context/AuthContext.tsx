@@ -7,6 +7,9 @@ import { StartupScreen } from '../components/ui/StartupScreen';
 import { identifyAnalyticsUserDeferred, resetAnalyticsUserDeferred } from '../src/analytics/deferredEvents';
 import { NATIVE_STARTUP_FADE_MS, NATIVE_STARTUP_MIN_MS } from '../src/native/appLaunch';
 
+/** Duration of the OverlayFeedback exit animation (ms). */
+const STARTUP_EXIT_ANIMATION_MS = 350;
+
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
@@ -32,6 +35,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return !sessionStorage.getItem('startup_shown');
   });
   const [minTimeReached, setMinTimeReached] = useState(false);
+  // Tracks whether the exit animation has finished so pointer events
+  // don't switch to 'auto' while the startup screen is still fading.
+  const [startupExitDone, setStartupExitDone] = useState(!showStartup);
 
   // Keep the in-app launch moment visible long enough to feel intentional without stalling.
   useEffect(() => {
@@ -118,6 +124,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [loading, minTimeReached, showStartup, isHydrated]);
 
+  // Wait for the exit animation to finish before enabling pointer events
+  useEffect(() => {
+    if (showStartup) {
+      setStartupExitDone(false);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setStartupExitDone(true);
+    }, STARTUP_EXIT_ANIMATION_MS);
+
+    return () => clearTimeout(timer);
+  }, [showStartup]);
+
+  const isStartupBlocking = showStartup || !startupExitDone;
+
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -130,9 +152,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       <div 
         className="flex min-h-0 flex-1 flex-col"
-        aria-hidden={showStartup}
+        aria-hidden={isStartupBlocking}
         style={{
-          pointerEvents: showStartup ? 'none' : 'auto',
+          pointerEvents: isStartupBlocking ? 'none' : 'auto',
         }}
       >
         {children}

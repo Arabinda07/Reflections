@@ -1337,12 +1337,7 @@ select:focus-visible,
   .modal-sheet-backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(var(--panel-bg-rgb), 0.72);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    transform: translateZ(0);
-    will-change: opacity, backdrop-filter;
-    backface-visibility: hidden;
+    background: rgba(var(--panel-bg-rgb), 0.88);
   }
 
   .modal-sheet-shell {
@@ -1362,6 +1357,7 @@ select:focus-visible,
     flex-direction: column;
     max-height: min(88vh, 760px);
     overflow: hidden;
+    transform: translateZ(0);
   }
 
   .modal-sheet-handle {

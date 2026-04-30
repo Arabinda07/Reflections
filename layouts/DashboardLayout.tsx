@@ -84,8 +84,6 @@ export const DashboardLayout: React.FC = () => {
   useEffect(() => {
     if (!isMobileMenuOpen) return;
 
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
     previousFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -125,7 +123,6 @@ export const DashboardLayout: React.FC = () => {
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      document.body.style.overflow = previousOverflow;
       window.removeEventListener('keydown', handleKeyDown);
       window.clearTimeout(focusTimer);
       previousFocusRef.current?.focus();
