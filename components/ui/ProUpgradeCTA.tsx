@@ -234,8 +234,8 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
             {error && <p className="text-clay text-[13px] font-bold">{error}</p>}
 
             <Button
-              variant="secondary"
-              className="w-full h-14 text-[16px] rounded-xl !border-honey !bg-honey !text-white hover:!border-honey hover:!bg-honey/90"
+              variant="primary"
+              className="w-full h-14 text-[16px] rounded-[var(--radius-control)] !bg-honey !text-white border-none hover:opacity-90 whitespace-nowrap"
               isLoading={isProcessing}
               onClick={handleSubscribe}
             >
@@ -281,8 +281,8 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
           </div>
 
           <Button
-            variant="secondary"
-            className="w-full h-14 text-[16px] rounded-xl !border-honey !bg-honey !text-white hover:!border-honey hover:!bg-honey/90"
+            variant="primary"
+            className="w-full h-14 text-[16px] rounded-[var(--radius-control)] !bg-honey !text-white border-none hover:opacity-90 whitespace-nowrap"
             onClick={() => setIsModalOpen(true)}
           >
             Join Pro
@@ -310,8 +310,8 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
 
           <div className="flex flex-col gap-2 md:items-end">
             <Button
-              variant="secondary"
-              className="w-full md:w-auto h-12 px-6 rounded-xl !border-honey !bg-honey !text-white hover:!border-honey hover:!bg-honey/90"
+              variant="primary"
+              className="w-full md:w-auto h-12 px-6 rounded-[var(--radius-control)] !bg-honey !text-white border-none hover:opacity-90 whitespace-nowrap"
               onClick={() => setIsModalOpen(true)}
             >
               Join Pro

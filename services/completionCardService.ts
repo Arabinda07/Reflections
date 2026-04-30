@@ -114,10 +114,23 @@ const drawCardLogo = (ctx: CanvasRenderingContext2D) => {
   ctx.fill();
 
   ctx.fillStyle = '#f7f8f4';
-  ctx.font = '700 18px serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('🍃', CARD_LAYOUT.logoCircleX, CARD_LAYOUT.logoCircleY + 1);
+  const lx = CARD_LAYOUT.logoCircleX;
+  const ly = CARD_LAYOUT.logoCircleY;
+  const size = 10;
+  
+  ctx.beginPath();
+  ctx.moveTo(lx, ly - size);
+  ctx.quadraticCurveTo(lx + size * 1.2, ly, lx, ly + size);
+  ctx.quadraticCurveTo(lx - size * 1.2, ly, lx, ly - size);
+  ctx.fill();
+  
+  // Stem
+  ctx.strokeStyle = '#f7f8f4';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(lx, ly + size);
+  ctx.lineTo(lx, ly + size + 4);
+  ctx.stroke();
 
   ctx.fillStyle = '#4f6f46';
   ctx.font = 'italic 600 26px Georgia, serif';
@@ -136,7 +149,7 @@ const drawCardTitle = (ctx: CanvasRenderingContext2D, payload: CompletionCardPay
 
   const subtitleY = CARD_LAYOUT.titleY + titleLines.length * CARD_LAYOUT.titleLineHeight + CARD_LAYOUT.subtitleOffsetY;
   ctx.fillStyle = '#65705e';
-  ctx.font = '500 26px Geist, Arial, sans-serif';
+  ctx.font = '500 26px Manrope, Arial, sans-serif';
   ctx.fillText(payload.subtitle, CARD_LAYOUT.contentLeft, subtitleY);
 
   return subtitleY;
@@ -146,7 +159,7 @@ const drawCardBadge = (ctx: CanvasRenderingContext2D, payload: CompletionCardPay
   const { height } = ctx.canvas;
   const colors = BADGE_COLORS[payload.kind] || BADGE_COLORS.weekly_recap;
 
-  ctx.font = '800 16px Geist, Arial, sans-serif';
+  ctx.font = '800 16px Manrope, Arial, sans-serif';
   const badgeText = payload.badge.toUpperCase();
   const badgeWidth = ctx.measureText(badgeText).width + CARD_LAYOUT.badgePaddingX * 2;
   const badgeX = CARD_LAYOUT.contentLeft;
@@ -167,17 +180,12 @@ const drawCardBadge = (ctx: CanvasRenderingContext2D, payload: CompletionCardPay
 };
 
 const drawCardFooter = (ctx: CanvasRenderingContext2D, payload: CompletionCardPayload, badgeY: number) => {
-  const { width, height } = ctx.canvas;
+  const { width } = ctx.canvas;
 
   ctx.fillStyle = '#819076';
-  ctx.font = '700 20px Geist, Arial, sans-serif';
+  ctx.font = '700 20px Manrope, Arial, sans-serif';
   ctx.textAlign = 'right';
   ctx.fillText(payload.dateLabel, width - CARD_LAYOUT.contentLeft, badgeY + 25);
-
-  ctx.fillStyle = '#c4ccbe';
-  ctx.font = '500 16px Geist, Arial, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('reflections.app', width / 2, height - CARD_LAYOUT.watermarkBottomOffset);
 };
 
 export function drawCompletionCard(

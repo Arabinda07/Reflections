@@ -731,10 +731,7 @@ export const LifeWiki: React.FC = () => {
             />
           ) : null}
 
-          <section className="border-y border-border/60 py-5" aria-labelledby="life-wiki-signals">
-            <h2 id="life-wiki-signals" className="mb-5 text-[13px] font-black uppercase tracking-widest text-gray-nav">
-                Signals
-            </h2>
+          <section className="border-y border-border/60 py-5">
             <div className="grid gap-0 divide-y divide-border/60 md:grid-cols-4 md:divide-x md:divide-y-0">
               {[
                 ['Entries', notes.length.toString()],

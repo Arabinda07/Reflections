@@ -20,6 +20,7 @@ import {
   resolvePostAuthRedirectPath,
   startGoogleOAuthFlow,
   signInWithVerifiedEmail,
+  isGoogleOAuthCallbackUrl,
 } from '../../src/auth/googleOAuth';
 import {
   isVerifiedEmailAvailable,
@@ -32,7 +33,7 @@ export const SignUp: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, isInitialCheckDone } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(() => isGoogleOAuthCallbackUrl(window.location.href));
   const [error, setError] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');

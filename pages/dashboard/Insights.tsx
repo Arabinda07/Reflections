@@ -8,6 +8,7 @@ import {
   CaretRight,
   CalendarCheck,
   Hash,
+  Leaf,
 } from '@phosphor-icons/react';
 import { DotLottieReact, type DotLottie } from '@lottiefiles/dotlottie-react';
 import { EmptyState } from '../../components/ui/EmptyState';
@@ -502,7 +503,10 @@ export const Insights: React.FC = () => {
               className="flex w-full items-center justify-between gap-4 p-6 text-left md:p-8"
             >
               <div>
-                <p className="text-[11px] font-black uppercase tracking-widest text-honey">Completion card</p>
+                <div className="flex items-center gap-2">
+                  <Leaf size={14} weight="fill" className="text-honey" />
+                  <p className="text-[11px] font-black uppercase tracking-widest text-honey">Completion card</p>
+                </div>
                 <h2 className="mt-2 text-[22px] font-display font-bold text-gray-text">This week's card</h2>
               </div>
               <CaretRight
@@ -533,7 +537,7 @@ export const Insights: React.FC = () => {
                         value={cardTitle}
                         onChange={(e) => setCardTitle(e.target.value)}
                         maxLength={80}
-                        placeholder="I returned to myself this week."
+                        placeholder="Write a message for your card..."
                         className="input-surface h-12 w-full px-4 text-[15px] font-semibold text-gray-text"
                       />
                       <p className="text-[11px] font-medium text-gray-nav/60">

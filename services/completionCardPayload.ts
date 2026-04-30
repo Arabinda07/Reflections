@@ -26,7 +26,7 @@ const formatDate = (date: Date) =>
 
 const cardCopy: Record<CompletionCardKind, { title: string; subtitle: string; badge: string }> = {
   weekly_recap: {
-    title: 'I returned to myself this week.',
+    title: 'My Reflections',
     subtitle: 'A quiet week in Reflections.',
     badge: 'Weekly Recap',
   },
