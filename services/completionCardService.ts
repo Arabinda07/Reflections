@@ -133,7 +133,7 @@ const drawCardLogo = (ctx: CanvasRenderingContext2D) => {
   ctx.stroke();
 
   ctx.fillStyle = '#4f6f46';
-  ctx.font = 'italic 600 26px Georgia, serif';
+  ctx.font = 'italic 700 26px Spectral, serif';
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
   ctx.fillText('Reflections', CARD_LAYOUT.wordmarkX, CARD_LAYOUT.wordmarkY);
@@ -141,7 +141,7 @@ const drawCardLogo = (ctx: CanvasRenderingContext2D) => {
 
 const drawCardTitle = (ctx: CanvasRenderingContext2D, payload: CompletionCardPayload): number => {
   ctx.fillStyle = '#293127';
-  ctx.font = '700 64px Fraunces, Georgia, serif';
+  ctx.font = '800 64px Nunito, sans-serif';
   const titleLines = wrapText(ctx, payload.title, CARD_LAYOUT.titleMaxWidth);
   titleLines.forEach((line, index) => {
     ctx.fillText(line, CARD_LAYOUT.contentLeft, CARD_LAYOUT.titleY + index * CARD_LAYOUT.titleLineHeight);
@@ -149,7 +149,7 @@ const drawCardTitle = (ctx: CanvasRenderingContext2D, payload: CompletionCardPay
 
   const subtitleY = CARD_LAYOUT.titleY + titleLines.length * CARD_LAYOUT.titleLineHeight + CARD_LAYOUT.subtitleOffsetY;
   ctx.fillStyle = '#65705e';
-  ctx.font = '500 26px Manrope, Arial, sans-serif';
+  ctx.font = '500 26px Manrope, sans-serif';
   ctx.fillText(payload.subtitle, CARD_LAYOUT.contentLeft, subtitleY);
 
   return subtitleY;
@@ -159,7 +159,7 @@ const drawCardBadge = (ctx: CanvasRenderingContext2D, payload: CompletionCardPay
   const { height } = ctx.canvas;
   const colors = BADGE_COLORS[payload.kind] || BADGE_COLORS.weekly_recap;
 
-  ctx.font = '800 16px Manrope, Arial, sans-serif';
+  ctx.font = '800 16px Nunito, sans-serif';
   const badgeText = payload.badge.toUpperCase();
   const badgeWidth = ctx.measureText(badgeText).width + CARD_LAYOUT.badgePaddingX * 2;
   const badgeX = CARD_LAYOUT.contentLeft;
@@ -183,7 +183,7 @@ const drawCardFooter = (ctx: CanvasRenderingContext2D, payload: CompletionCardPa
   const { width } = ctx.canvas;
 
   ctx.fillStyle = '#819076';
-  ctx.font = '700 20px Manrope, Arial, sans-serif';
+  ctx.font = '700 20px Nunito, sans-serif';
   ctx.textAlign = 'right';
   ctx.fillText(payload.dateLabel, width - CARD_LAYOUT.contentLeft, badgeY + 25);
 };

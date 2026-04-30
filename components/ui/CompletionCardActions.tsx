@@ -96,14 +96,10 @@ export const CompletionCardActions: React.FC<CompletionCardActionsProps> = ({
     <div
       className={`surface-inline-panel surface-tone-honey p-5 ${className}`.trim()}
     >
-      <div className="mb-4 space-y-1">
-        <p className="text-[11px] font-black uppercase tracking-widest text-honey">
+      <div className="mb-4">
+        <p className="text-[11px] font-display font-extrabold uppercase tracking-widest text-honey">
           Completion card
         </p>
-        <p className="text-[15px] font-semibold leading-relaxed text-gray-text">
-          {payload.title}
-        </p>
-        <p className="text-[13px] font-medium text-gray-light">{payload.subtitle}</p>
       </div>
 
       {/* Live card preview */}

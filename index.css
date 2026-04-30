@@ -48,8 +48,16 @@
 
 @font-face {
   font-family: 'Nunito';
+  src: url('/assets/fonts/Nunito-ExtraBold.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nunito';
   src: url('/assets/fonts/Nunito-Black.woff2') format('woff2');
-  font-weight: 800 900;
+  font-weight: 900;
   font-style: normal;
   font-display: swap;
 }
@@ -68,9 +76,9 @@
 
 @layer base {
   :root {
-    --font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-sans: 'Manrope', sans-serif;
     --font-serif: 'Spectral', serif;
-    --font-display: 'Nunito', 'Manrope', sans-serif;
+    --font-display: 'Nunito', sans-serif;
     --font-mono: 'Geist Mono', monospace;
     --font-editor: var(--font-serif);
   }
