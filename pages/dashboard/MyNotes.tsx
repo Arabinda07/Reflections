@@ -141,7 +141,7 @@ export const MyNotes: React.FC = () => {
       <Surface
         key={note.id}
         variant="flat"
-        className="group overflow-hidden hover:border-green/25 hover:shadow-xl hover:shadow-[var(--surface-tinted-shadow)] transition-[border-color,box-shadow,transform] duration-500"
+        className="group relative overflow-hidden rounded-[2.5rem] border border-border/40 transition-all duration-500 hover:-translate-y-1 hover:border-green/20 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)]"
       >
         <article
           className="flex h-full flex-col"
@@ -159,7 +159,7 @@ export const MyNotes: React.FC = () => {
                   <StorageImage
                     path={note.thumbnailUrl}
                     alt={note.title}
-                    className="h-full w-full object-cover transition-transform duration-700 ease-out will-change-transform group-hover:scale-105"
+                    className="h-full w-full object-cover transition-transform duration-700 ease-out will-change-transform group-hover:scale-110"
                   />
                 </>
               ) : (
@@ -172,13 +172,13 @@ export const MyNotes: React.FC = () => {
             <button
               onClick={(event) => initiateDelete(event, note.id)}
               disabled={isDeleting && noteIdToDelete === note.id}
-              className="control-surface absolute left-4 top-4 z-20 inline-flex h-11 w-11 items-center justify-center text-gray-text shadow-sm backdrop-blur-xl transition-colors duration-300 hover:border-clay/30 hover:text-clay"
+              className="control-surface absolute left-4 top-4 z-20 inline-flex h-11 w-11 items-center justify-center rounded-2xl text-gray-text shadow-sm backdrop-blur-xl transition-all duration-500 hover:scale-110 hover:border-clay/30 hover:text-clay"
               aria-label={`Delete ${note.title}`}
             >
               {isDeleting && noteIdToDelete === note.id ? (
                 <CircleNotch size={16} weight="bold" className="animate-spin text-clay" />
               ) : (
-                <Trash size={16} weight="regular" />
+                <Trash size={16} weight="bold" className="transition-transform group-hover:rotate-12" />
               )}
             </button>
 
@@ -205,14 +205,14 @@ export const MyNotes: React.FC = () => {
 
             <Link
               to={noteDetailPath}
-              className="rounded-[var(--radius-control)] focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
+              className="group/title rounded-[var(--radius-control)] focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
               aria-label={`Open ${note.title}`}
             >
-              <h3 className="mb-2 text-lg font-bold tracking-normal text-gray-text leading-snug transition-colors group-hover:text-green text-balance">
+              <h3 className="mb-2 text-xl font-display font-extrabold tracking-tight text-gray-text leading-tight transition-colors group-hover:text-green text-balance">
                 {note.title}
               </h3>
 
-              <p className="mb-5 text-sm font-medium leading-relaxed text-gray-light line-clamp-3 font-serif italic">
+              <p className="mb-5 font-serif text-[15px] italic leading-relaxed text-gray-text/70 transition-colors group-hover:text-gray-text line-clamp-3">
                 {getPreviewText(note.content)}
               </p>
             </Link>
@@ -234,23 +234,23 @@ export const MyNotes: React.FC = () => {
                     event.stopPropagation();
                     downloadNoteExport(note, 'md');
                   }}
-                  className="control-surface inline-flex h-11 w-11 items-center justify-center text-gray-nav transition-colors hover:border-green/25 hover:bg-green/5 hover:text-green"
+                  className="control-surface inline-flex h-11 w-11 items-center justify-center rounded-2xl text-gray-nav transition-all duration-500 hover:scale-110 hover:border-green/25 hover:bg-green/5 hover:text-green"
                   title={`Export ${note.title}`}
                   aria-label={`Export ${note.title}`}
                 >
-                  <Download size={15} weight="regular" />
+                  <Download size={15} weight="bold" />
                 </button>
 
                 <Link
                   to={noteDetailPath}
-                  className="inline-flex min-h-11 items-center rounded-[var(--radius-control)] px-3 text-xs font-bold text-green transition-[background-color,opacity,box-shadow] duration-300 hover:bg-green/5 group-hover:opacity-70 focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
+                  className="inline-flex min-h-11 items-center rounded-2xl bg-green px-4 text-xs font-black uppercase tracking-widest text-white shadow-lg shadow-green/10 transition-all duration-300 hover:bg-green/90 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
                   aria-label={`Open ${note.title}`}
                 >
                   <span>Open</span>
                   <ArrowUpRight
                     size={14}
                     weight="bold"
-                    className="ml-1 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    className="ml-2 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                   />
                 </Link>
               </div>

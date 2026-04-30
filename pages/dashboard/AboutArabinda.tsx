@@ -40,10 +40,14 @@ export const AboutArabinda: React.FC = () => {
   return (
     <PageContainer size="narrow" className="surface-scope-sage py-12 sm:py-16">
       <div className="space-y-10">
-        <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.HOME)} className="-ml-2 min-h-11">
-          <ArrowLeft size={16} weight="bold" className="mr-2" />
-          Back
-        </Button>
+        <button
+          onClick={() => navigate(RoutePath.HOME)}
+          className="group flex items-center gap-2 text-sm font-bold text-gray-nav hover:text-green transition-all duration-300 w-fit hover:-translate-x-1"
+          aria-label="Back to home"
+        >
+          <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
+          <span>Back</span>
+        </button>
 
         <SectionHeader title={<>A note from <span className="text-emphasis">Arabinda</span></>} />
 
@@ -58,18 +62,29 @@ export const AboutArabinda: React.FC = () => {
           </div>
         </Surface>
 
-        <div className="space-y-5">
+        <div className="space-y-6">
           {sections.map((section, index) => (
-            <Surface key={section.title} variant="flat" tone={index % 2 === 0 ? 'sky' : 'honey'}>
-              <div className="p-6 sm:p-8">
-                <div className="mb-4 flex items-center gap-3">
-                  <div className={`tone-icon h-12 w-12 ${index % 2 === 0 ? 'tone-icon-sky' : 'tone-icon-honey'}`}>{section.icon}</div>
-                  <h2 className="text-xl font-display font-bold text-gray-text">
+            <Surface
+              key={section.title}
+              variant="flat"
+              tone={index % 2 === 0 ? 'sky' : 'honey'}
+              className="group relative overflow-hidden rounded-[2.5rem] transition-all duration-500 hover:-translate-y-1 hover:shadow-lg"
+            >
+              <div className="relative z-10 p-8 sm:p-10">
+                <div className="mb-6 flex items-center gap-4">
+                  <div className={`tone-icon h-12 w-12 rounded-2xl transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6 ${index % 2 === 0 ? 'tone-icon-sky' : 'tone-icon-honey'}`}>
+                    {section.icon}
+                  </div>
+                  <h2 className="text-2xl font-display font-bold text-gray-text group-hover:text-green transition-colors duration-300">
                     {section.title}
                   </h2>
                 </div>
-                <p className="max-w-[65ch] text-base font-medium leading-relaxed text-gray-light">{section.body}</p>
+                <p className="max-w-[65ch] text-lg font-medium leading-relaxed text-gray-light font-serif italic">
+                  {section.body}
+                </p>
               </div>
+              {/* Subtle glow effect */}
+              <div className={`pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-500 group-hover:opacity-100 bg-gradient-to-br ${index % 2 === 0 ? 'from-sky-500/5 to-transparent' : 'from-honey/5 to-transparent'}`} />
             </Surface>
           ))}
         </div>

@@ -394,21 +394,21 @@ export const Account: React.FC = () => {
                 <div className="flex flex-col items-center gap-4">
                   <button
                     type="button"
-                    className="relative group"
+                    className="relative group transition-transform duration-500 hover:scale-105"
                     onClick={() => avatarInputRef.current?.click()}
                     aria-label="Upload a new profile photo"
                   >
-                    <div className="surface-inline-panel h-32 w-32 overflow-hidden rounded-full border-4 shadow-xl shadow-black/10">
+                    <div className="surface-inline-panel h-32 w-32 overflow-hidden rounded-full border-4 border-white/50 shadow-xl shadow-black/10 transition-all duration-500 group-hover:border-green/50 group-hover:shadow-green/10">
                       {avatarPath ? (
-                        <StorageImage path={avatarPath} alt="Profile" className="h-full w-full object-cover" />
+                        <StorageImage path={avatarPath} alt="Profile" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
                       ) : (
-                        <div className="flex h-full w-full items-center justify-center text-gray-nav">
+                        <div className="flex h-full w-full items-center justify-center text-gray-nav transition-colors group-hover:text-green">
                           <User size={48} weight="duotone" />
                         </div>
                       )}
                     </div>
-                    <div className="absolute bottom-1 right-1 flex h-11 w-11 items-center justify-center rounded-full border-4 border-white bg-gray-text text-white shadow-xl shadow-black/15 transition-transform group-hover:scale-105">
-                      <Camera size={18} weight="bold" />
+                    <div className="absolute bottom-1 right-1 flex h-11 w-11 items-center justify-center rounded-full border-4 border-white bg-gray-text text-white shadow-xl shadow-black/15 transition-all duration-500 group-hover:bg-green group-hover:scale-110">
+                      <Camera size={18} weight="bold" className="transition-transform group-hover:rotate-12" />
                     </div>
                   </button>
                   <input
@@ -468,19 +468,19 @@ export const Account: React.FC = () => {
               <div className="grid gap-4 p-6 md:grid-cols-2 lg:p-8">
                 <Surface variant="bezel" tone="paper">
                   <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors hover:bg-black/5 focus-visible:bg-black/5">
+                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-all duration-300 hover:bg-black/[0.02] focus-visible:bg-black/5">
                       <div className="flex items-center gap-3">
-                        <div className="icon-block icon-block-sm">
-                          <Sparkle size={24} weight="duotone" />
+                        <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
+                          <Sparkle size={24} weight="duotone" className="text-green" />
                         </div>
                         <div>
                           <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">Membership</p>
-                          <h3 className="text-[20px] font-display font-bold text-gray-text capitalize">
+                          <h3 className="text-[20px] font-display font-bold text-gray-text capitalize group-hover:text-green transition-colors">
                             {access?.planTier || 'Free'} plan
                           </h3>
                         </div>
                       </div>
-                      <div className="text-gray-nav transition-transform duration-300 group-open:rotate-180">
+                      <div className="text-gray-nav/40 transition-all duration-500 group-open:rotate-180 group-hover:text-green">
                         <CaretDown size={20} weight="bold" />
                       </div>
                     </summary>
@@ -502,17 +502,17 @@ export const Account: React.FC = () => {
 
                 <Surface variant="bezel" tone="paper">
                   <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors hover:bg-black/5 focus-visible:bg-black/5">
+                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-all duration-300 hover:bg-black/[0.02] focus-visible:bg-black/5">
                       <div className="flex items-center gap-3">
-                        <div className="icon-block icon-block-sm">
-                          <ShieldCheck size={24} weight="duotone" />
+                        <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
+                          <ShieldCheck size={24} weight="duotone" className="text-sky" />
                         </div>
                         <div>
                           <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">Security</p>
-                          <h3 className="text-[20px] font-display font-bold text-gray-text">Keep this private</h3>
+                          <h3 className="text-[20px] font-display font-bold text-gray-text group-hover:text-sky transition-colors">Keep this private</h3>
                         </div>
                       </div>
-                      <div className="text-gray-nav transition-transform duration-300 group-open:rotate-180">
+                      <div className="text-gray-nav/40 transition-all duration-500 group-open:rotate-180 group-hover:text-sky">
                         <CaretDown size={20} weight="bold" />
                       </div>
                     </summary>
@@ -546,17 +546,17 @@ export const Account: React.FC = () => {
 
                 <Surface variant="bezel" tone="paper">
                   <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors hover:bg-black/5 focus-visible:bg-black/5">
+                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-all duration-300 hover:bg-black/[0.02] focus-visible:bg-black/5">
                       <div className="flex items-center gap-3">
-                        <div className="icon-block icon-block-sm">
-                          <EnvelopeSimple size={24} weight="duotone" />
+                        <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12">
+                          <EnvelopeSimple size={24} weight="duotone" className="text-honey" />
                         </div>
                         <div>
                           <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">Invites</p>
-                          <h3 className="text-[20px] font-display font-bold text-gray-text">Share Reflections</h3>
+                          <h3 className="text-[20px] font-display font-bold text-gray-text group-hover:text-honey transition-colors">Share Reflections</h3>
                         </div>
                       </div>
-                      <div className="text-gray-nav transition-transform duration-300 group-open:rotate-180">
+                      <div className="text-gray-nav/40 transition-all duration-500 group-open:rotate-180 group-hover:text-honey">
                         <CaretDown size={20} weight="bold" />
                       </div>
                     </summary>
@@ -571,17 +571,17 @@ export const Account: React.FC = () => {
 
                 <Surface variant="bezel" tone="paper">
                   <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors hover:bg-black/5 focus-visible:bg-black/5">
+                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-all duration-300 hover:bg-black/[0.02] focus-visible:bg-black/5">
                       <div className="flex items-center gap-3">
-                        <div className="icon-block icon-block-sm">
-                          <Sparkle size={24} weight="duotone" />
+                        <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-12">
+                          <Sparkle size={24} weight="duotone" className="text-green" />
                         </div>
                         <div>
                           <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">Sanctuary</p>
-                          <h3 className="text-[20px] font-display font-bold text-gray-text">Smart Mode</h3>
+                          <h3 className="text-[20px] font-display font-bold text-gray-text group-hover:text-green transition-colors">Smart Mode</h3>
                         </div>
                       </div>
-                      <div className="text-gray-nav transition-transform duration-300 group-open:rotate-180">
+                      <div className="text-gray-nav/40 transition-all duration-500 group-open:rotate-180 group-hover:text-green">
                         <CaretDown size={20} weight="bold" />
                       </div>
                     </summary>

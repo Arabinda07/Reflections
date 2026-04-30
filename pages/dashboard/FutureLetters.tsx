@@ -169,10 +169,14 @@ export const FutureLetters: React.FC = () => {
     <>
       <PageContainer size="wide" className="surface-scope-honey pb-24 pt-6 md:pt-10">
         <div className="space-y-8">
-          <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.HOME)} className="-ml-2 min-h-11">
-            <ArrowLeft size={16} weight="bold" className="mr-2" />
-            Back
-          </Button>
+          <button
+            onClick={() => navigate(RoutePath.HOME)}
+            className="group flex items-center gap-2 text-sm font-bold text-gray-nav hover:text-green transition-all duration-300 w-fit hover:-translate-x-1"
+            aria-label="Back to home"
+          >
+            <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
+            <span>Back</span>
+          </button>
 
           <SectionHeader
             eyebrow="Future letter"
@@ -185,7 +189,7 @@ export const FutureLetters: React.FC = () => {
           />
 
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
-            <Surface variant="flat" tone="paper" className="overflow-hidden">
+            <Surface variant="flat" tone="paper" className="rounded-[2.5rem] overflow-hidden">
               <form onSubmit={handleSchedule} className="space-y-6 p-6 sm:p-8">
                 <div className="space-y-2">
                   <label htmlFor="future-letter-title" className="label-caps text-gray-nav">
@@ -259,7 +263,7 @@ export const FutureLetters: React.FC = () => {
               </form>
             </Surface>
 
-            <Surface variant="bezel" tone="honey">
+            <Surface variant="bezel" tone="honey" className="rounded-[2.5rem] overflow-hidden">
               <div className="space-y-5 p-6 sm:p-8">
                 <div className="flex items-center justify-between gap-3">
                   <div>
@@ -287,52 +291,60 @@ export const FutureLetters: React.FC = () => {
                     No letters yet. Write one when there is something you want to return to later.
                   </p>
                 ) : (
-                  <div className="space-y-3">
-                    {letters.map((letter) => {
-                      const openState = getFutureLetterOpenState(letter);
-                      const isOpening = openingLetterId === letter.id;
-                      return (
-                        <div
-                          key={letter.id}
-                          className="surface-inline-panel p-4"
-                        >
-                          <div className="mb-3 flex items-start justify-between gap-3">
-                            <div className="min-w-0">
-                              <h3 className="break-words font-display text-[20px] font-bold text-gray-text">
-                                {letter.title}
-                              </h3>
-                              <p className="mt-1 text-[12px] font-bold uppercase tracking-widest text-gray-nav/70">
-                                Opens {formatDate(letter.openAt)}
-                              </p>
-                            </div>
-                            {openState.state === 'locked' ? (
-                              <LockKey size={20} weight="duotone" className="mt-1 shrink-0 text-gray-nav" />
-                            ) : (
-                              <EnvelopeOpen size={20} weight="duotone" className="mt-1 shrink-0 text-green" />
-                            )}
-                          </div>
-                          <Button
-                            type="button"
-                            variant={openState.state === 'locked' ? 'outline' : 'secondary'}
-                            size="sm"
-                            disabled={openState.state === 'locked' || Boolean(openingLetterId)}
-                            isLoading={isOpening}
-                            onClick={() => handleOpenLetter(letter)}
-                            className="min-h-11 w-full"
-                            aria-label={
-                              isOpening
-                                ? `Opening ${letter.title}`
-                                : openState.state === 'locked'
-                                  ? `Locked until ${formatDate(letter.openAt)}`
-                                  : openState.actionLabel
-                            }
+                    <div className="space-y-4">
+                      {letters.map((letter) => {
+                        const openState = getFutureLetterOpenState(letter);
+                        const isOpening = openingLetterId === letter.id;
+                        const isLocked = openState.state === 'locked';
+
+                        return (
+                          <div
+                            key={letter.id}
+                            className="group relative surface-inline-panel overflow-hidden rounded-3xl p-5 transition-all duration-300 hover:border-honey/40 hover:shadow-lg"
                           >
-                            {openState.actionLabel}
-                          </Button>
-                        </div>
-                      );
-                    })}
-                  </div>
+                            <div className="relative z-10">
+                              <div className="mb-4 flex items-start justify-between gap-3">
+                                <div className="min-w-0">
+                                  <h3 className="break-words font-display text-[20px] font-bold text-gray-text group-hover:text-green transition-colors duration-300">
+                                    {letter.title}
+                                  </h3>
+                                  <p className="mt-1 text-[11px] font-bold uppercase tracking-widest text-gray-nav/60">
+                                    Opens {formatDate(letter.openAt)}
+                                  </p>
+                                </div>
+                                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-500 group-hover:scale-110 ${isLocked ? 'bg-body/50 text-gray-nav' : 'bg-green/10 text-green group-hover:rotate-12'}`}>
+                                  {isLocked ? (
+                                    <LockKey size={20} weight="duotone" />
+                                  ) : (
+                                    <EnvelopeOpen size={20} weight="duotone" />
+                                  )}
+                                </div>
+                              </div>
+                              <Button
+                                type="button"
+                                variant={isLocked ? 'outline' : 'secondary'}
+                                size="sm"
+                                disabled={isLocked || Boolean(openingLetterId)}
+                                isLoading={isOpening}
+                                onClick={() => handleOpenLetter(letter)}
+                                className="min-h-11 w-full rounded-2xl font-bold transition-all group-hover:bg-green group-hover:text-white group-hover:border-transparent"
+                                aria-label={
+                                  isOpening
+                                    ? `Opening ${letter.title}`
+                                    : isLocked
+                                      ? `Locked until ${formatDate(letter.openAt)}`
+                                      : openState.actionLabel
+                                }
+                              >
+                                {openState.actionLabel}
+                              </Button>
+                            </div>
+                            {/* Subtle background glow on hover */}
+                            <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-honey/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                          </div>
+                        );
+                      })}
+                    </div>
                 )}
               </div>
             </Surface>
