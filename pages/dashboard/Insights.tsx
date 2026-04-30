@@ -16,6 +16,7 @@ import { MetadataPill } from '../../components/ui/MetadataPill';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { Surface } from '../../components/ui/Surface';
+import { Accordion } from '../../components/ui/Accordion';
 import { WeeklyRecapLoadingSkeleton } from '../../components/ui/skeletons/WeeklyRecapLoadingSkeleton';
 import { LifeTheme, MoodCheckin, Note, RitualEvent, RoutePath, WellnessAccess } from '../../types';
 import { noteService } from '../../services/noteService';
@@ -297,146 +298,95 @@ export const Insights: React.FC = () => {
               </div>
             </div>
 
-            <div className="mt-8 border-t border-border/60 pt-0">
-              {/* Mood Frequency Accordion */}
-              <div className="border-b border-border/40">
-                <button
-                  type="button"
-                  onClick={() => setIsMoodOpen((prev) => !prev)}
-                  aria-expanded={isMoodOpen}
-                  aria-controls="insights-mood-panel"
-                  className="flex w-full items-center justify-between gap-4 py-6 text-left"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="tone-icon tone-icon-sky h-12 w-12">
-                      <Heart size={17} weight="duotone" />
-                    </div>
-                    <h3 className="text-[18px] font-display font-bold text-gray-text">Mood frequency</h3>
+            <div className="mt-8 border-t border-border/60">
+              <Accordion
+                title="Mood frequency"
+                icon={
+                  <div className="tone-icon tone-icon-sky h-11 w-11">
+                    <Heart size={16} weight="duotone" />
                   </div>
-                  <CaretRight
-                    size={18}
-                    weight="regular"
-                    className={`shrink-0 text-gray-nav transition-transform duration-300 ease-out-expo ${isMoodOpen ? 'rotate-90' : ''}`}
+                }
+                isOpen={isMoodOpen}
+                onToggle={() => setIsMoodOpen((prev) => !prev)}
+                triggerClassName="py-6"
+              >
+                {weeklyRecap.moodData.length === 0 ? (
+                  <EmptyState
+                    surface="none"
+                    icon={<Heart size={22} weight="duotone" />}
+                    title="Mood labels will start to form a pattern here."
+                    description="Check in or add a mood to a reflection and this week will stay readable."
                   />
-                </button>
+                ) : (
+                  <div className="flex flex-col gap-4">
+                    {weeklyRecap.moodData.map((entry) => {
+                      const maxValue = weeklyRecap.moodData[0].value;
+                      const percent = Math.round((entry.value / maxValue) * 100);
+                      const moodConfig = getMoodConfig(entry.name);
+                      const tone = moodConfig || DEFAULT_MOOD_TONE;
 
-                <AnimatePresence initial={false}>
-                  {isMoodOpen ? (
-                    <motion.div
-                      id="insights-mood-panel"
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                      className="overflow-hidden"
-                    >
-                      <div className="pb-6">
-                        {weeklyRecap.moodData.length === 0 ? (
-                          <EmptyState
-                            surface="none"
-                            icon={<Heart size={22} weight="duotone" />}
-                            title="Mood labels will start to form a pattern here."
-                            description="Check in or add a mood to a reflection and this week will stay readable."
-                          />
-                        ) : (
-                          <div className="flex flex-col gap-4">
-                            {weeklyRecap.moodData.map((entry) => {
-                              const maxValue = weeklyRecap.moodData[0].value;
-                              const percent = Math.round((entry.value / maxValue) * 100);
-                              const moodConfig = getMoodConfig(entry.name);
-                              const tone = moodConfig || DEFAULT_MOOD_TONE;
-
-                              return (
-                                <div key={entry.name} className="flex items-center gap-4">
-                                  <span className={`w-20 shrink-0 text-[11px] font-black tracking-widest ${tone.labelClass}`}>
-                                    {moodConfig?.label || entry.name}
-                                  </span>
-                                  <div className={`relative h-8 flex-1 overflow-hidden rounded-full ${tone.trackClass}`}>
-                                    <div
-                                      className={`absolute inset-y-0 left-0 rounded-full ${tone.fillClass}`}
-                                      style={{ width: `${percent}%` }}
-                                    />
-                                  </div>
-                                  <span className="w-6 shrink-0 text-right text-[12px] font-extrabold text-gray-nav">
-                                    {entry.value}
-                                  </span>
-                                </div>
-                              );
-                            })}
+                      return (
+                        <div key={entry.name} className="flex items-center gap-4">
+                          <span className={`w-20 shrink-0 text-[11px] font-black tracking-widest ${tone.labelClass}`}>
+                            {moodConfig?.label || entry.name}
+                          </span>
+                          <div className={`relative h-8 flex-1 overflow-hidden rounded-full ${tone.trackClass}`}>
+                            <div
+                              className={`absolute inset-y-0 left-0 rounded-full ${tone.fillClass}`}
+                              style={{ width: `${percent}%` }}
+                            />
                           </div>
-                        )}
-                      </div>
-                    </motion.div>
-                  ) : null}
-                </AnimatePresence>
-              </div>
-
-              {/* Recurring Tags Accordion */}
-              <div>
-                <button
-                  type="button"
-                  onClick={() => setIsTagsOpen((prev) => !prev)}
-                  aria-expanded={isTagsOpen}
-                  aria-controls="insights-tags-panel"
-                  className="flex w-full items-center justify-between gap-4 py-6 text-left"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="tone-icon tone-icon-honey h-12 w-12">
-                      <Hash size={17} weight="duotone" />
-                    </div>
-                    <h3 className="text-[18px] font-display font-bold text-gray-text">Recurring tags</h3>
+                          <span className="w-6 shrink-0 text-right text-[12px] font-extrabold text-gray-nav">
+                            {entry.value}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
-                  <CaretRight
-                    size={18}
-                    weight="regular"
-                    className={`shrink-0 text-gray-nav transition-transform duration-300 ease-out-expo ${isTagsOpen ? 'rotate-90' : ''}`}
-                  />
-                </button>
+                )}
+              </Accordion>
 
-                <AnimatePresence initial={false}>
-                  {isTagsOpen ? (
-                    <motion.div
-                      id="insights-tags-panel"
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                      className="overflow-hidden"
-                    >
-                      <div className="pb-6">
-                        {weeklyRecap.recurringTags.length === 0 ? (
-                          <EmptyState
-                            surface="none"
-                            icon={<Hash size={22} weight="duotone" />}
-                            title="Tags will appear here."
-                            description="Tag entries this week and the repeated subjects will collect here."
-                          />
-                        ) : (
-                          <div className="flex flex-wrap items-center gap-3">
-                            {weeklyRecap.recurringTags.map(({ tag, count }, index) => {
-                              const scale = Math.min(1.45, Math.max(0.92, count / 2.4));
-                              return (
-                                <span
-                                  key={tag}
-                                  className={`font-display font-bold lowercase ${TAG_TONE_CLASSES[index % TAG_TONE_CLASSES.length]}`}
-                                  style={{
-                                    fontSize: `${scale}rem`,
-                                    lineHeight: '1',
-                                  }}
-                                >
-                                  #{tag}
-                                </span>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    </motion.div>
-                  ) : null}
-                </AnimatePresence>
-              </div>
+              <Accordion
+                title="Recurring tags"
+                icon={
+                  <div className="tone-icon tone-icon-honey h-11 w-11">
+                    <Hash size={16} weight="duotone" />
+                  </div>
+                }
+                isOpen={isTagsOpen}
+                onToggle={() => setIsTagsOpen((prev) => !prev)}
+                triggerClassName="py-6"
+              >
+                {weeklyRecap.recurringTags.length === 0 ? (
+                  <EmptyState
+                    surface="none"
+                    icon={<Hash size={22} weight="duotone" />}
+                    title="Tags will appear here."
+                    description="Tag entries this week and the repeated subjects will collect here."
+                  />
+                ) : (
+                  <div className="flex flex-wrap items-center gap-3">
+                    {weeklyRecap.recurringTags.map(({ tag, count }, index) => {
+                      const scale = Math.min(1.45, Math.max(0.92, count / 2.4));
+                      return (
+                        <span
+                          key={tag}
+                          className={`font-display font-bold lowercase ${TAG_TONE_CLASSES[index % TAG_TONE_CLASSES.length]}`}
+                          style={{
+                            fontSize: `${scale}rem`,
+                            lineHeight: '1',
+                          }}
+                        >
+                          #{tag}
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+              </Accordion>
             </div>
           </Surface>
+
 
           <Surface variant="bezel" tone="sage">
             <button

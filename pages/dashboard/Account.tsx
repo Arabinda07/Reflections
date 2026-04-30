@@ -26,6 +26,7 @@ import { ReferralInvitePanel } from '../../components/ui/ReferralInvitePanel';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { StorageImage } from '../../components/ui/StorageImage';
 import { Surface } from '../../components/ui/Surface';
+import { Accordion } from '../../components/ui/Accordion';
 import { supabase } from '../../src/supabaseClient';
 import { RoutePath, WellnessAccess } from '../../types';
 import { noteService } from '../../services/noteService';
@@ -389,8 +390,8 @@ export const Account: React.FC = () => {
 
           <Surface variant="flat" tone="paper" className="overflow-hidden">
             <form onSubmit={handleSubmit} className="divide-y divide-border/70">
-              <div className="grid gap-10 p-8 lg:grid-cols-[180px_minmax(0,1fr)] lg:p-10">
-                <div className="flex flex-col items-center gap-4">
+              <div className="grid gap-12 p-8 lg:grid-cols-[200px_minmax(0,1fr)] lg:p-12">
+                <div className="flex flex-col items-center gap-6">
                   <button
                     type="button"
                     className="relative group"
@@ -406,7 +407,7 @@ export const Account: React.FC = () => {
                         </div>
                       )}
                     </div>
-                    <div className="absolute bottom-1 right-1 flex h-11 w-11 items-center justify-center rounded-full border-4 border-white bg-gray-text text-white shadow-xl shadow-black/15 transition-transform group-hover:scale-105">
+                    <div className="absolute bottom-1 right-1 flex h-11 w-11 items-center justify-center rounded-full border-4 border-white bg-gray-text text-white shadow-xl shadow-black/15 transition-transform group-hover:scale-110">
                       <Camera size={18} weight="bold" />
                     </div>
                   </button>
@@ -426,8 +427,8 @@ export const Account: React.FC = () => {
                   ) : null}
                 </div>
 
-                <div className="space-y-8">
-                  <div className="grid gap-6 md:grid-cols-2">
+                <div className="space-y-10">
+                  <div className="grid gap-8 md:grid-cols-2">
                     <Input
                       label="Full Name"
                       name="fullName"
@@ -442,11 +443,11 @@ export const Account: React.FC = () => {
                     />
                   </div>
 
-                  <div className="grid gap-6 md:grid-cols-2">
+                  <div className="grid gap-8 md:grid-cols-2">
                     <Input label="Email" name="email" value={email} disabled />
 
-                    <div className="w-full space-y-2">
-                      <label className="ml-1 block text-[11px] font-extrabold text-gray-nav">Timezone</label>
+                    <div className="w-full space-y-3">
+                      <label className="ml-1 block text-[11px] font-black uppercase tracking-widest text-gray-nav/60">Timezone</label>
                       <select
                         name="timezone"
                         value={formData.timezone}
@@ -464,10 +465,10 @@ export const Account: React.FC = () => {
                 </div>
               </div>
 
-              <div className="grid gap-4 p-6 md:grid-cols-2 lg:p-8">
+              <div className="grid gap-6 p-6 md:grid-cols-2 lg:gap-8 lg:p-10">
                 <Surface variant="bezel" tone="paper">
-                  <div className="p-5">
-                    <div className="mb-5 flex items-center gap-3">
+                  <div className="p-6 md:p-8">
+                    <div className="mb-6 flex items-center gap-3">
                       <div className="icon-block icon-block-sm">
                         <Sparkle size={24} weight="duotone" />
                       </div>
@@ -485,15 +486,17 @@ export const Account: React.FC = () => {
                       </MetadataPill>
                     </div>
 
-                    <details className="surface-inline-panel mt-4 px-4 py-3">
-                      <summary className="cursor-pointer text-[12px] font-black uppercase tracking-widest text-gray-nav">
-                        Details
-                      </summary>
-                      <p className="mt-3 text-[14px] font-medium leading-relaxed text-gray-light">{membershipCopy}</p>
-                    </details>
+                    <Accordion
+                      title="Details"
+                      className="mt-6 border-0"
+                      triggerClassName="surface-inline-panel px-4 py-3 min-h-0"
+                      contentClassName="mt-3 px-4"
+                    >
+                      <p className="text-[14px] font-medium leading-relaxed text-gray-light">{membershipCopy}</p>
+                    </Accordion>
 
                     {access?.planTier !== 'pro' ? (
-                      <div className="mt-6">
+                      <div className="mt-8">
                         <ProUpgradeCTA />
                       </div>
                     ) : null}
@@ -501,8 +504,8 @@ export const Account: React.FC = () => {
                 </Surface>
 
                 <Surface variant="bezel" tone="paper">
-                  <div className="p-5">
-                    <div className="mb-5 flex items-center gap-3">
+                  <div className="p-6 md:p-8">
+                    <div className="mb-6 flex items-center gap-3">
                       <div className="icon-block icon-block-sm">
                         <ShieldCheck size={24} weight="duotone" />
                       </div>
@@ -541,8 +544,8 @@ export const Account: React.FC = () => {
                 </Surface>
 
                 <Surface variant="bezel" tone="paper">
-                  <div className="p-5">
-                    <div className="mb-5 flex items-center gap-3">
+                  <div className="p-6 md:p-8">
+                    <div className="mb-6 flex items-center gap-3">
                       <div className="icon-block icon-block-sm">
                         <EnvelopeSimple size={24} weight="duotone" />
                       </div>
@@ -552,22 +555,24 @@ export const Account: React.FC = () => {
                       </div>
                     </div>
 
-                    <details className="surface-inline-panel mb-5 px-4 py-3">
-                      <summary className="cursor-pointer text-[12px] font-black uppercase tracking-widest text-gray-nav">
-                        Details
-                      </summary>
-                      <p className="mt-3 text-[14px] font-medium leading-relaxed text-gray-light">
+                    <Accordion
+                      title="Details"
+                      className="mb-6 border-0"
+                      triggerClassName="surface-inline-panel px-4 py-3 min-h-0"
+                      contentClassName="mt-3 px-4"
+                    >
+                      <p className="text-[14px] font-medium leading-relaxed text-gray-light">
                         Account tracks how many people joined from your invite. There is no prize or public list.
                       </p>
-                    </details>
+                    </Accordion>
 
                     <ReferralInvitePanel />
                   </div>
                 </Surface>
 
                 <Surface variant="bezel" tone="paper">
-                  <div className="p-5">
-                    <div className="mb-5 flex items-center gap-3">
+                  <div className="p-6 md:p-8">
+                    <div className="mb-6 flex items-center gap-3">
                       <div className="icon-block icon-block-sm">
                         <Sparkle size={24} weight="duotone" />
                       </div>
@@ -577,17 +582,19 @@ export const Account: React.FC = () => {
                       </div>
                     </div>
 
-                    <details className="surface-inline-panel px-4 py-3">
-                      <summary className="cursor-pointer text-[12px] font-black uppercase tracking-widest text-gray-nav">
-                        Details
-                      </summary>
-                      <p className="mt-3 text-[14px] font-medium leading-relaxed text-gray-light">
+                    <Accordion
+                      title="Details"
+                      className="mb-6 border-0"
+                      triggerClassName="surface-inline-panel px-4 py-3 min-h-0"
+                      contentClassName="mt-3 px-4"
+                    >
+                      <p className="text-[14px] font-medium leading-relaxed text-gray-light">
                         Keep AI on demand by default, or let Smart Mode refresh the Life Wiki after saves. Your writing screen stays quiet either way.
                       </p>
-                    </details>
+                    </Accordion>
 
                     {greatIngestProgress ? (
-                      <div className="surface-inline-panel mt-5 p-4">
+                      <div className="surface-inline-panel mb-6 p-4">
                         <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">
                           Preparing Sanctuary
                         </p>
@@ -597,7 +604,7 @@ export const Account: React.FC = () => {
                       </div>
                     ) : null}
 
-                    <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                       <div className="space-y-1">
                         <MetadataPill tone={access?.smartModeEnabled ? 'green' : undefined}>
                           {access?.smartModeEnabled ? 'Enabled' : 'Off'}

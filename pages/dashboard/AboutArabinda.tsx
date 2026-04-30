@@ -45,7 +45,7 @@ export const AboutArabinda: React.FC = () => {
           Back
         </Button>
 
-        <SectionHeader title="A note from Arabinda" />
+        <SectionHeader title={<>A note from <span className="font-serif italic font-normal text-green">Arabinda</span></>} />
 
         <Surface variant="bezel" tone="sage">
           <div className="space-y-5 p-6 sm:p-10">
@@ -53,7 +53,7 @@ export const AboutArabinda: React.FC = () => {
               Reflections began as a reminder to take a few quiet minutes before the day ends.
             </p>
             <p className="text-[16px] font-medium leading-8 text-gray-light">
-              I am Arabinda. I made this app because we are all part of a mass movement that often prefers fitting in. I wanted a quieter counterweight: a place to check in with your emotions, write something down, and leave without being pushed to perform. Thank you for trusting me with a few minutes of your day.
+              I am <span className="font-serif italic text-green">Arabinda</span>. I made this app because we are all part of a mass movement that often prefers fitting in. I wanted a quieter counterweight: a place to check in with your emotions, write something down, and leave without being pushed to perform. Thank you for trusting me with a few minutes of your day.
             </p>
           </div>
         </Surface>
