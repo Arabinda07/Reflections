@@ -131,7 +131,6 @@ export const HomeAuthenticated: React.FC = () => {
     buildHomeIntentionSummary([]),
   );
   const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);
-  const [isOverviewOpen, setIsOverviewOpen] = useState(false);
   const shouldReduceMotion = useReducedMotion();
   const { showToast } = useToast();
 
@@ -395,91 +394,14 @@ export const HomeAuthenticated: React.FC = () => {
           </div>
         </section>
 
-        <motion.section 
+        <motion.section
           variants={bentoContainerVariants}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-100px" }}
-          className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6 md:p-10 max-w-[1440px] mx-auto min-h-[500px]"
+          className="grid grid-cols-1 gap-6 p-6 md:p-10 lg:grid-cols-[minmax(0,2fr)_minmax(20rem,0.95fr)] max-w-[1440px] mx-auto min-h-[500px]"
         >
-          {/* Overview Card */}
-          <motion.div 
-            variants={bentoItemVariants}
-            className="surface-flat p-0 flex flex-col justify-between h-full overflow-hidden"
-          >
-            <button
-              type="button"
-              onClick={() => setIsOverviewOpen((prev) => !prev)}
-              aria-expanded={isOverviewOpen}
-              aria-controls="home-overview-panel"
-              className="flex w-full items-center justify-between gap-4 p-8 sm:p-10 lg:p-12 text-left"
-            >
-              <div className="flex items-center gap-4">
-                <FolderOpen size={20} weight="duotone" className="text-gray-nav/70 shrink-0" />
-                <div>
-                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-nav/60">
-                    Reflections Overview
-                  </p>
-                  <p className="mt-1 text-3xl font-display font-extrabold text-gray-text tabular-nums md:text-4xl">
-                    {isCountLoading ? '...' : displayCount} <span className="text-lg font-bold text-gray-nav">archived</span>
-                  </p>
-                </div>
-              </div>
-              <CaretRight
-                size={18}
-                weight="regular"
-                className={`shrink-0 text-gray-nav transition-transform duration-300 ease-out-expo ${isOverviewOpen ? 'rotate-90' : ''}`}
-              />
-            </button>
-
-            <AnimatePresence initial={false}>
-              {isOverviewOpen ? (
-                <motion.div
-                  id="home-overview-panel"
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                  className="overflow-hidden"
-                >
-                  <div className="space-y-4 border-t border-border/60 px-8 py-6 sm:px-10 lg:px-12">
-                    <button
-                      onClick={() => navigate(RoutePath.NOTES)}
-                      className="surface-inline-panel group flex w-full items-center justify-between p-5 text-left transition-colors hover:border-green/20"
-                      aria-label="View all reflections"
-                    >
-                      <div className="flex items-center gap-3">
-                        <FolderOpen size={18} weight="duotone" className="text-gray-nav group-hover:text-green transition-colors" />
-                        <div>
-                          <p className="text-[15px] font-bold text-gray-text">{isCountLoading ? '...' : displayCount} reflections</p>
-                          <p className="text-[12px] font-medium text-gray-nav">View all archived reflections</p>
-                        </div>
-                      </div>
-                      <CaretRight size={16} weight="regular" className="text-gray-nav/40 group-hover:text-green transition-colors" />
-                    </button>
-
-                    <button
-                      onClick={() => navigate(RoutePath.INSIGHTS)}
-                      className="surface-inline-panel group flex w-full items-center justify-between p-5 text-left transition-colors hover:border-sky/20"
-                      aria-label="View writing patterns"
-                    >
-                      <div className="flex items-center gap-3">
-                        <Brain size={18} weight="duotone" className="text-sky group-hover:text-sky transition-colors" />
-                        <div>
-                          <p className="text-[15px] font-bold text-gray-text">Writing patterns</p>
-                          <p className="text-[12px] font-serif italic text-gray-nav">Mood, rhythm, and recurring themes</p>
-                        </div>
-                      </div>
-                      <CaretRight size={16} weight="regular" className="text-gray-nav/40 group-hover:text-sky transition-colors" />
-                    </button>
-                  </div>
-                </motion.div>
-              ) : null}
-            </AnimatePresence>
-          </motion.div>
-          
-          {/* Daily Focus & Intentions Card */}
-          <motion.div 
+          <motion.div
             variants={bentoItemVariants}
             className="surface-flat p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full overflow-hidden"
           >
@@ -488,7 +410,7 @@ export const HomeAuthenticated: React.FC = () => {
                 <div className="flex items-center gap-2 text-gray-nav">
                   <Target size={18} weight="duotone" className="text-green" />
                   <span className="text-[11px] font-black uppercase tracking-widest opacity-60">
-                    Daily Focus
+                    Today's Reflection
                   </span>
                 </div>
                 <button
@@ -496,59 +418,60 @@ export const HomeAuthenticated: React.FC = () => {
                   className={`flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] text-gray-nav transition-colors hover:text-green ${
                     isRefreshing ? 'animate-spin' : ''
                   }`}
-                  aria-label="Refresh daily focus prompt"
+                  aria-label="Refresh today's reflection prompt"
                 >
                   <ArrowsClockwise size={20} weight="regular" />
                 </button>
               </div>
 
-              <div className="space-y-8 mb-12">
+              <div className="mb-12 space-y-8">
                 <p
                   className="text-2xl md:text-3xl text-gray-text font-serif italic leading-relaxed"
                   style={{ opacity: isRefreshing ? 0 : 1, transition: 'opacity 0.4s ease' }}
                 >
                   {dailyPrompt}
                 </p>
-                <div className="flex flex-col gap-3 sm:flex-row">
+                <div className="flex max-w-xl flex-col gap-3">
                   <Button
                     variant="primary"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="h-14 w-full md:w-auto px-8 rounded-xl text-[15px] font-bold bg-green text-white hover:bg-green/90 transition-colors shadow-none"
+                    className="h-14 w-full px-8 rounded-xl text-[15px] font-bold bg-green text-white hover:bg-green/90 transition-colors shadow-none sm:w-fit"
                     onClick={() => handleCreateClick(dailyPrompt)}
-                    aria-label="Start a new reflection with this prompt"
+                    aria-label="Begin writing with today's prompt"
                   >
-                    Start Reflection
+                    Begin Writing
                     <Plus size={18} weight="regular" className="ml-2" />
                   </Button>
-                  <Button
-                    variant="secondary"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="h-14 w-full md:w-auto px-8 rounded-xl text-[15px] font-bold"
-                    onClick={() => setIsCheckInOpen(true)}
-                    aria-label="Save a standalone mood check-in"
-                  >
-                    Check in
-                    <Heart size={18} weight="duotone" className="ml-2" />
-                  </Button>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <Button
+                      variant="secondary"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="h-12 w-full rounded-xl px-6 text-[15px] font-bold"
+                      onClick={() => setIsCheckInOpen(true)}
+                      aria-label="Save a quick mood check-in"
+                    >
+                      Quick check-in
+                      <Heart size={18} weight="duotone" className="ml-2" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="h-12 w-full justify-center rounded-xl border-sky/25 bg-sky/5 px-6 text-sky hover:bg-sky/10"
+                      onClick={() => navigate(RoutePath.FUTURE_LETTERS)}
+                      aria-label="Write a future letter"
+                    >
+                      Future letter
+                      <EnvelopeSimple size={18} weight="duotone" className="ml-2" />
+                    </Button>
+                  </div>
                 </div>
-                <Button
-                  variant="outline"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                    className="h-12 w-full justify-center rounded-xl border-sky/25 bg-sky/5 text-sky hover:bg-sky/10 sm:w-auto"
-                  onClick={() => navigate(RoutePath.FUTURE_LETTERS)}
-                  aria-label="Write a future letter"
-                >
-                  Future letter
-                  <EnvelopeSimple size={18} weight="duotone" className="ml-2" />
-                </Button>
               </div>
             </div>
 
-            {/* Nested Intentions Card */}
-            <div className="tone-panel tone-panel-honey group flex flex-col gap-4 p-7 sm:p-8 hover:border-honey/25 transition-all text-left shadow-none">
+            <div className="border-t border-border/60 pt-8 text-left">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-gray-nav">
                   <ListChecks size={16} weight="duotone" className="text-honey" />
@@ -592,15 +515,15 @@ export const HomeAuthenticated: React.FC = () => {
                     <motion.div 
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="py-6 text-center"
+                      className="py-5"
                     >
-                      <div className="mb-3 flex justify-center">
+                      <div className="mb-3 flex">
                         <div className="h-8 w-8 rounded-full border border-border flex items-center justify-center text-gray-nav/20">
                           <CheckCircleIcon size={18} weight="duotone" />
                         </div>
                       </div>
-                      <p className="text-[11px] font-black text-gray-nav/30 uppercase tracking-[0.2em]">
-                        {intentionSummary.hasAnyTasks ? 'All settled' : 'No intentions yet'}
+                      <p className="text-[15px] font-semibold text-gray-nav/70">
+                        No intentions yet
                       </p>
                     </motion.div>
                   )}
@@ -618,35 +541,88 @@ export const HomeAuthenticated: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* Quote Card */}
-          <motion.div 
-            variants={bentoItemVariants}
-            className="surface-flat surface-tone-honey p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full"
-          >
-            <div className="flex-grow">
-              <div className="flex items-center gap-2 text-gray-nav mb-12">
+          <div className="grid gap-6">
+            <motion.div
+              variants={bentoItemVariants}
+              className="surface-flat p-6 sm:p-8"
+            >
+              <div className="mb-6 flex items-center gap-2 text-gray-nav">
+                <FolderOpen size={18} weight="duotone" className="text-gray-nav/70" />
+                <p className="text-[11px] font-black uppercase tracking-widest opacity-60">
+                  Your Rhythm
+                </p>
+              </div>
+
+              <div className="mb-6">
+                <p className="text-3xl font-display font-extrabold text-gray-text tabular-nums">
+                  {isCountLoading ? '...' : displayCount}
+                </p>
+                <p className="mt-1 text-[14px] font-semibold text-gray-nav">reflections saved</p>
+              </div>
+
+              <div className="space-y-3">
+                <button
+                  onClick={() => navigate(RoutePath.NOTES)}
+                  className="surface-inline-panel group flex w-full items-center justify-between p-4 text-left transition-colors hover:border-green/20"
+                  aria-label="View all reflections"
+                >
+                  <div className="flex items-center gap-3">
+                    <FolderOpen size={18} weight="duotone" className="text-gray-nav group-hover:text-green transition-colors" />
+                    <div>
+                      <p className="text-[15px] font-bold text-gray-text">View archive</p>
+                      <p className="text-[12px] font-medium text-gray-nav">Read saved reflections</p>
+                    </div>
+                  </div>
+                  <CaretRight size={16} weight="regular" className="text-gray-nav/40 group-hover:text-green transition-colors" />
+                </button>
+
+                <button
+                  onClick={() => navigate(RoutePath.INSIGHTS)}
+                  className="surface-inline-panel group flex w-full items-center justify-between p-4 text-left transition-colors hover:border-sky/20"
+                  aria-label="View writing patterns"
+                >
+                  <div className="flex items-center gap-3">
+                    <Brain size={18} weight="duotone" className="text-sky group-hover:text-sky transition-colors" />
+                    <div>
+                      <p className="text-[15px] font-bold text-gray-text">Writing patterns</p>
+                      <p className="text-[12px] font-serif italic text-gray-nav">Mood, rhythm, and recurring themes</p>
+                    </div>
+                  </div>
+                  <CaretRight size={16} weight="regular" className="text-gray-nav/40 group-hover:text-sky transition-colors" />
+                </button>
+              </div>
+            </motion.div>
+
+            <motion.div
+              variants={bentoItemVariants}
+              className="surface-flat surface-tone-honey p-6 sm:p-8"
+            >
+              <div className="mb-8 flex items-center gap-2 text-gray-nav">
                 <Sparkle size={18} weight="duotone" className="text-orange" />
                 <span className="text-[11px] font-black uppercase tracking-widest opacity-60">
-                  Writing note
+                  Before you write
                 </span>
               </div>
 
-              <div className="space-y-8 pr-4">
-                <p className="text-2xl md:text-3xl font-serif italic text-gray-text leading-relaxed relative">
-                  <span className="absolute -left-8 -top-6 text-7xl text-orange/10 font-serif pointer-events-none">
+              <div className="space-y-5">
+                {isFromSave ? (
+                  <p className="text-[13px] font-bold text-green">Reflection saved.</p>
+                ) : null}
+                <p className="relative font-serif text-xl italic leading-relaxed text-gray-text">
+                  <span className="absolute -left-4 -top-5 font-serif text-5xl text-orange/10 pointer-events-none">
                     "
                   </span>
                   {quote.text}
                 </p>
                 <div className="flex items-center gap-4">
                   <div className="h-px w-8 bg-orange/20" />
-                  <p className="text-[13px] font-bold text-gray-nav uppercase tracking-widest">
+                  <p className="text-[12px] font-bold text-gray-nav uppercase tracking-widest">
                     {quote.author}
                   </p>
                 </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
         </motion.section>
       </div>
 
@@ -744,7 +720,7 @@ export const HomeAuthenticated: React.FC = () => {
           setIsCheckInOpen(false);
           setCheckInFeedback(null);
         }}
-        title="Check in"
+        title="Quick check-in"
         icon={<Heart size={20} weight="duotone" />}
         size="sm"
         bodyClassName="pt-2"

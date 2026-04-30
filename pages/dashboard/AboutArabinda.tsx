@@ -12,7 +12,7 @@ const sections = [
     title: 'The pace around us',
     icon: <Feather size={22} weight="duotone" />,
     body:
-      'I have always been fascinated by how consumed we are by work and by the pace of ordinary life now. Even rest has started to move quickly. Reels, episodes, feeds, messages, everything asks us to keep up. We hardly sit down to read, write, draw, or listen to the music we quietly like when it does not match the mainstream choice.',
+      'I have always been fascinated by how consumed we are by work and by the pace of ordinary life now. Even rest has started to move quickly. Reels, episodes, feeds, messages, everything asks us to keep up. We hardly sit down to read, write, draw, or listen to the music we like when it does not match the mainstream choice.',
   },
   {
     title: 'Why writing helps',

@@ -262,7 +262,7 @@ export const Account: React.FC = () => {
           title: result.pageCount > 0 ? 'Smart Mode is ready.' : 'Smart Mode is on.',
           description:
             result.pageCount > 0
-              ? 'Your Sanctuary has been refreshed from your saved notes. New saves can keep it up to date quietly.'
+              ? 'Your Sanctuary has been refreshed from your saved notes. New saves can keep it up to date while Smart Mode is on.'
               : 'There was not enough writing to build the Sanctuary yet. It will try again after future saves.',
         });
       } catch (ingestError) {
@@ -270,7 +270,7 @@ export const Account: React.FC = () => {
         setFeedback({
           variant: 'warning',
           title: 'Smart Mode is on.',
-          description: 'The first Sanctuary refresh could not finish. Future saves will try again quietly.',
+          description: 'The first Sanctuary refresh could not finish. It will try again after future saves.',
         });
       }
     } catch (err) {
@@ -606,7 +606,7 @@ export const Account: React.FC = () => {
                           {isSmartModeChanging
                             ? 'Updating Smart Mode...'
                             : access?.smartModeEnabled
-                              ? 'Future saves can refresh the Life Wiki quietly.'
+                              ? 'Future saves can refresh the Life Wiki while Smart Mode is on.'
                               : 'AI stays on demand until you switch this on.'}
                         </p>
                       </div>

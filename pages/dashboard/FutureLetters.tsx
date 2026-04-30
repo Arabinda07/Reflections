@@ -265,7 +265,7 @@ export const FutureLetters: React.FC = () => {
                   <div>
                     <p className="label-caps text-honey">Letters</p>
                     <h2 className="mt-1 text-[26px] font-display font-bold text-gray-text">
-                      Waiting quietly
+                      Waiting to open
                     </h2>
                   </div>
                   <CalendarBlank size={26} weight="duotone" className="text-honey" />

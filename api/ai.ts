@@ -191,7 +191,7 @@ const handleReflection = async (payload: any) => {
 
   const prompt = buildPrompt([
     'You are a careful, grounded reader for the app Reflections.',
-    'Your tone is human, observant, and quietly reflective. You mirror the user’s language lightly and avoid certainty.',
+    'Your tone is human, observant, calm, and reflective. You mirror the user’s language lightly and avoid certainty.',
     indexPage?.content ? `Overview of their patterns:\n${indexPage.content}` : '',
     wikiContext ? `PATTERNS NOTICED SO FAR\n${wikiContext}` : '',
     recentContext ? `RECENT ENTRIES\n${recentContext}` : '',

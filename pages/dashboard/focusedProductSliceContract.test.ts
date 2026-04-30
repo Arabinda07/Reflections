@@ -19,7 +19,9 @@ describe('focused product slice source contract', () => {
     const homeAuthenticated = read('pages/dashboard/HomeAuthenticated.tsx');
 
     expect(homeAuthenticated).toContain('Your Intentions');
+    expect(homeAuthenticated).toContain('No intentions yet');
     expect(homeAuthenticated).not.toContain('Task summary');
+    expect(homeAuthenticated).not.toContain('All settled');
     expect(homeAuthenticated).toContain('{intentionSummary.openCount}');
     expect(homeAuthenticated).toContain('{intentionSummary.openCount} open');
     expect(homeAuthenticated).toContain('intentionSummary.items.slice(0, 3).map');
@@ -56,14 +58,40 @@ describe('focused product slice source contract', () => {
     expect(singleNote).toContain('aria-label="Export this reflection"');
   });
 
-  it('keeps the daily focus card labels while removing poetic styling from prompts', () => {
+  it('keeps the home dashboard organized around the primary writing action', () => {
     const homeAuthenticated = read('pages/dashboard/HomeAuthenticated.tsx');
 
-    expect(homeAuthenticated).toContain('Daily Focus');
-    expect(homeAuthenticated).toContain('Start Reflection');
+    expect(homeAuthenticated).toContain("Today's Reflection");
+    expect(homeAuthenticated).toContain('Begin Writing');
+    expect(homeAuthenticated).toContain('Quick check-in');
+    expect(homeAuthenticated).toContain('Future letter');
+    expect(homeAuthenticated).toContain('Your Rhythm');
+    expect(homeAuthenticated).toContain('Before you write');
+    expect(homeAuthenticated).toContain('lg:grid-cols-[minmax(0,2fr)_minmax(20rem,0.95fr)]');
+    expect(homeAuthenticated).not.toContain('Daily Focus');
+    expect(homeAuthenticated).not.toContain('Start Reflection');
+    expect(homeAuthenticated).not.toContain('Reflections Overview');
+    expect(homeAuthenticated).not.toContain('Writing note');
+    expect(homeAuthenticated).not.toContain('lg:grid-cols-3');
     
     // Check for the specific combination of classes that was removed from the prompt
     expect(homeAuthenticated).toContain('text-2xl md:text-3xl text-gray-text font-serif italic leading-relaxed');
+  });
+
+  it('removes quietly from live app and AI copy', () => {
+    const liveCopyFiles = [
+      'pages/dashboard/AboutArabinda.tsx',
+      'pages/dashboard/FutureLetters.tsx',
+      'pages/dashboard/Account.tsx',
+      'api/ai.ts',
+    ];
+
+    liveCopyFiles.forEach((filePath) => {
+      expect(read(filePath).toLowerCase()).not.toContain('quietly');
+    });
+    expect(read('pages/dashboard/FutureLetters.tsx')).toContain('Waiting to open');
+    expect(read('pages/dashboard/Account.tsx')).toContain('while Smart Mode is on');
+    expect(read('api/ai.ts')).toContain('calm, and reflective');
   });
 
   it('adds standalone mood check-ins without turning moods into scores', () => {
@@ -71,7 +99,7 @@ describe('focused product slice source contract', () => {
     const createNote = read('pages/dashboard/CreateNote.tsx');
 
     expect(homeAuthenticated).toContain('moodCheckinService.create');
-    expect(homeAuthenticated).toContain('Check in');
+    expect(homeAuthenticated).toContain('Quick check-in');
     expect(homeAuthenticated).toContain('MOOD_OPTIONS.map');
     expect(read('pages/dashboard/moodConfig.ts')).toContain("['happy', 'calm', 'anxious', 'sad', 'angry', 'tired']");
     expect(homeAuthenticated.toLowerCase()).not.toContain('score');
