@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useState, useEffect } from 'react';
 import { Navigate, Route, RouterProvider, createHashRouter, createRoutesFromElements } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { PWAInstallProvider } from './context/PWAInstallContext';

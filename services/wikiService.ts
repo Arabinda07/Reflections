@@ -1,8 +1,12 @@
 import { supabase } from '../src/supabaseClient';
-import { LifeTheme, ThemeCitation, Note } from '../types';
+import type { LifeTheme, ThemeCitation, Note } from '../types';
 import { WikiPageType, STRUCTURED_WIKI_PAGES } from './wikiTypes';
 import { getAuthenticatedUser } from './authUtils';
 import { mapToNote, type SupabaseNoteRow } from './noteService';
+
+const VALID_THEME_STATES = new Set<LifeTheme['state']>(['active', 'archived', 'resolved']);
+const parseThemeState = (raw: string): LifeTheme['state'] =>
+  VALID_THEME_STATES.has(raw as LifeTheme['state']) ? (raw as LifeTheme['state']) : 'active';
 
 export interface SupabaseLifeThemeRow {
   id: string;
@@ -31,7 +35,7 @@ const mapToLifeTheme = (data: SupabaseLifeThemeRow): LifeTheme => ({
   userId: data.user_id,
   title: data.title,
   content: data.content,
-  state: data.state,
+  state: parseThemeState(data.state),
   pageType: data.page_type as WikiPageType,
   createdAt: data.created_at,
   updatedAt: data.updated_at,
@@ -261,7 +265,7 @@ export const wikiService = {
     if (citeError) throw citeError;
     if (!citations || citations.length === 0) return [];
 
-    const noteIds = citations.map((c: any) => c.note_id);
+    const noteIds = citations.map((c: { note_id: string }) => c.note_id);
 
     const { data: notes, error: noteError } = await supabase
       .from('notes')
@@ -271,6 +275,6 @@ export const wikiService = {
 
     if (noteError) throw noteError;
 
-    return (notes as unknown as SupabaseNoteRow[] || []).map(mapToNote);
+    return ((notes || []) as SupabaseNoteRow[]).map(mapToNote);
   },
 };

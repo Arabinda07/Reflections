@@ -18,6 +18,9 @@ export const getPostHogBootstrapConfig = (env: PostHogPublicEnv) => {
       api_host: apiHost,
       defaults: '2026-01-30' as const,
       capture_pageview: false,
+      autocapture: false,
+      capture_pageleave: false,
+      disable_session_recording: true,
     },
   };
 };
