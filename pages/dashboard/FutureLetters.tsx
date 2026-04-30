@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { motion } from 'motion/react';
 import { ArrowLeft, CalendarBlank, EnvelopeOpen, LockKey, PaperPlaneTilt } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
@@ -73,6 +74,7 @@ export const FutureLetters: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [openedLetter, setOpenedLetter] = useState<FutureLetter | null>(null);
   const [openingLetterId, setOpeningLetterId] = useState<string | null>(null);
+  const [shakeLetterId, setShakeLetterId] = useState<string | null>(null);
   const [cardPayload, setCardPayload] = useState<CompletionCardPayload | null>(null);
 
   const minCustomDate = useMemo(() => toDateInputValue(addDays(new Date(), 1)), []);
@@ -147,7 +149,13 @@ export const FutureLetters: React.FC = () => {
 
   const handleOpenLetter = async (letter: FutureLetter) => {
     const openState = getFutureLetterOpenState(letter);
-    if (openState.state === 'locked' || openingLetterId) return;
+    if (openingLetterId) return;
+
+    if (openState.state === 'locked') {
+      setShakeLetterId(letter.id);
+      setTimeout(() => setShakeLetterId(null), 400);
+      return;
+    }
 
     setOpeningLetterId(letter.id);
     setError(null);
@@ -314,7 +322,12 @@ export const FutureLetters: React.FC = () => {
                                 </div>
                                 <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-500 group-hover:scale-110 ${isLocked ? 'bg-body/50 text-gray-nav' : 'bg-green/10 text-green group-hover:rotate-12'}`}>
                                   {isLocked ? (
-                                    <LockKey size={20} weight="duotone" />
+                                    <motion.div
+                                      animate={shakeLetterId === letter.id ? { x: [-4, 4, -4, 4, 0] } : {}}
+                                      transition={{ duration: 0.4, ease: "easeInOut" }}
+                                    >
+                                      <LockKey size={20} weight="duotone" />
+                                    </motion.div>
                                   ) : (
                                     <EnvelopeOpen size={20} weight="duotone" />
                                   )}
@@ -324,10 +337,10 @@ export const FutureLetters: React.FC = () => {
                                 type="button"
                                 variant={isLocked ? 'outline' : 'secondary'}
                                 size="sm"
-                                disabled={isLocked || Boolean(openingLetterId)}
+                                disabled={Boolean(openingLetterId)}
                                 isLoading={isOpening}
                                 onClick={() => handleOpenLetter(letter)}
-                                className="min-h-11 w-full rounded-2xl font-bold transition-all group-hover:bg-green group-hover:text-white group-hover:border-transparent"
+                                className={`min-h-11 w-full rounded-2xl font-bold transition-all ${isLocked ? 'opacity-60' : 'group-hover:bg-green group-hover:text-white group-hover:border-transparent'}`}
                                 aria-label={
                                   isOpening
                                     ? `Opening ${letter.title}`

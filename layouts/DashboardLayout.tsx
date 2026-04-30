@@ -246,11 +246,21 @@ export const DashboardLayout: React.FC = () => {
           <div className={`${isMobileNavSuppressedRoute ? 'hidden md:flex' : 'flex'} hidden md:flex items-center gap-2`}>
             <button 
               onClick={toggleDarkMode}
-              className={`p-2 rounded-xl transition-colors ${landingControlClass}`}
+              className={`relative flex items-center justify-center w-9 h-9 rounded-xl transition-colors ${landingControlClass}`}
               title="Toggle Dark Mode"
               aria-label={isDarkMode ? 'Use light mode' : 'Use dark mode'}
             >
-              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+              <AnimatePresence mode="popLayout" initial={false}>
+                <motion.div
+                  key={isDarkMode ? 'dark' : 'light'}
+                  initial={{ rotate: -90, opacity: 0, scale: 0.5 }}
+                  animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                  exit={{ rotate: 90, opacity: 0, scale: 0.5 }}
+                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+                </motion.div>
+              </AnimatePresence>
             </button>
             {navItems.map((item) => {
               const isActive = location.pathname === item.path;
@@ -314,11 +324,21 @@ export const DashboardLayout: React.FC = () => {
           <div className={`${isMobileNavSuppressedRoute ? 'hidden' : 'flex'} md:hidden items-center gap-2`}>
             <button 
               onClick={toggleDarkMode}
-              className={`p-2 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green ${landingControlClass}`}
+              className={`relative flex items-center justify-center w-9 h-9 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green ${landingControlClass}`}
               title="Toggle Dark Mode"
               aria-label={isDarkMode ? 'Use light mode' : 'Use dark mode'}
             >
-              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+              <AnimatePresence mode="popLayout" initial={false}>
+                <motion.div
+                  key={isDarkMode ? 'dark' : 'light'}
+                  initial={{ rotate: -90, opacity: 0, scale: 0.5 }}
+                  animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                  exit={{ rotate: 90, opacity: 0, scale: 0.5 }}
+                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+                </motion.div>
+              </AnimatePresence>
             </button>
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
