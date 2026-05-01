@@ -137,6 +137,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
             className="modal-sheet-backdrop"
+            style={{ transform: 'translateZ(0)', willChange: 'opacity, backdrop-filter' }}
             onClick={onClose}
           />
 

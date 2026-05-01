@@ -110,6 +110,8 @@ const ONBOARDING_STEPS = [
 
 const onboardingStepIcons = [NotePencil, Feather, LockKey, Archive] as const;
 
+const BENTO_VIEWPORT_CONFIG = { once: true, margin: "-100px" };
+
 export const HomeAuthenticated: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -398,7 +400,7 @@ export const HomeAuthenticated: React.FC = () => {
           variants={bentoContainerVariants}
           initial="hidden"
           whileInView="show"
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={BENTO_VIEWPORT_CONFIG}
           className="grid grid-cols-1 gap-6 p-6 md:p-10 lg:grid-cols-[minmax(0,2fr)_minmax(20rem,0.95fr)] max-w-[1440px] mx-auto min-h-[500px]"
         >
           <motion.div
