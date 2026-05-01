@@ -769,14 +769,7 @@ export const HomeAuthenticated: React.FC = () => {
         </div>
       </ModalSheet>
 
-      <div
-        style={{
-          position: 'fixed',
-          bottom: 'calc(24px + env(safe-area-inset-bottom))',
-          right: '20px',
-          zIndex: 8000,
-        }}
-      >
+      <div className="floating-audio-container">
         <AmbientMusicButton />
       </div>
     </>

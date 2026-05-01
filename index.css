@@ -1009,7 +1009,20 @@ select:focus-visible,
     color: var(--green);
   }
 
+  .floating-audio-container {
+    position: fixed;
+    right: 20px;
+    bottom: calc(24px + env(safe-area-inset-bottom));
+    z-index: 8000;
+    transition: bottom 0.4s var(--ease-out-expo);
+  }
+
+  html.no-scroll .floating-audio-container {
+    bottom: calc(160px + env(safe-area-inset-bottom));
+  }
+
   .mobile-sidebar-close:active {
+    background: oklch(from var(--border-color) l c h / 0.15);
     transform: scale(0.98);
   }
 
