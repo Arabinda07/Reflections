@@ -529,11 +529,11 @@ select:focus-visible,
 
   /* Typography Standard */
   .h1-hero {
-    @apply text-[clamp(3rem,8vw,6.25rem)] font-display font-extrabold tracking-[-0.04em] text-gray-text leading-tight text-balance;
+    @apply text-[clamp(3rem,8vw,6.25rem)] font-display font-extrabold tracking-normal text-gray-text leading-tight text-balance;
   }
 
   .h2-section {
-    @apply text-[clamp(2.25rem,5vw,3.5rem)] font-display font-bold tracking-[-0.04em] text-gray-text leading-tight text-balance;
+    @apply text-[clamp(2.25rem,5vw,3.5rem)] font-display font-bold tracking-normal text-gray-text leading-tight text-balance;
   }
 
   .body-editorial {

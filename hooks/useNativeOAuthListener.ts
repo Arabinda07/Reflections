@@ -20,6 +20,7 @@ export function useNativeOAuthListener() {
 
       const { App: CapacitorApp } = await import('@capacitor/app');
       const googleOAuth = await import('../src/auth/googleOAuth');
+      const analytics = await import('../src/analytics/deferredEvents');
       const { Browser } = await import('@capacitor/browser');
 
       if (!isActive) {
@@ -42,6 +43,11 @@ export function useNativeOAuthListener() {
 
         if ('error' in result) {
           googleOAuth.stashGoogleAuthError(result.error);
+          analytics.trackGoogleAuthFailedDeferred({
+            sourcePath: pendingSourcePath,
+            isNative: true,
+            errorCode: result.error,
+          });
         }
 
         const completionPath =
@@ -49,6 +55,13 @@ export function useNativeOAuthListener() {
             ? pendingSourcePath
             : googleOAuth.consumeNativeGoogleAuthSuccessRedirectPath(pendingSourcePath);
 
+        if (!('error' in result)) {
+          analytics.trackGoogleAuthSucceededDeferred({
+            sourcePath: pendingSourcePath,
+            redirectPath: completionPath,
+            isNative: true,
+          });
+        }
 
         void Browser.close().catch(() => undefined);
         googleOAuth.redirectToAppRoute(completionPath);

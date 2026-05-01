@@ -63,6 +63,7 @@ import {
 import { extractTasksFromContent, mergeTasks } from '../../src/utils/taskParser';
 import trailLoadingAnimation from '@/src/lottie/trail-loading.json';
 import { MOOD_CONFIG, MOOD_OPTIONS, getMoodConfig } from './moodConfig';
+import { trackNoteSavedDeferred } from '../../src/analytics/deferredEvents';
 
 const getSurfaceScopeForMood = (mood?: string) => {
   switch (mood) {
@@ -464,6 +465,8 @@ export const CreateNote: React.FC = () => {
       const syncedTasks = mergeTasks(tasks, extractedTasks);
       setTasks(syncedTasks); // Sync local state for UI consistency
 
+      const saveMode = noteId ? 'edit' : 'new';
+
       if (!noteId) {
         const newNote = await noteService.create({ title, content, tags, mood, tasks: syncedTasks });
         noteId = newNote.id;
@@ -492,6 +495,12 @@ export const CreateNote: React.FC = () => {
         title, content, mood, tags, tasks: syncedTasks,
         thumbnailUrl: finalThumbnailUrl || undefined,
         attachments: mergedAttachments
+      });
+      trackNoteSavedDeferred({
+        mode: saveMode,
+        attachmentCount: mergedAttachments.length,
+        tagCount: tags.length,
+        taskCount: syncedTasks.length,
       });
 
       const savedDraftSnapshot = buildCreateNoteDraftSnapshot({

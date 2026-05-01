@@ -58,7 +58,7 @@ describe('adapt and distill source contract', () => {
 
     expect(lifeWiki).not.toContain('tone.wash');
     expect(lifeWiki).not.toContain('Hash');
-    expect(lifeWiki).toContain('life-wiki-signals');
+    expect(lifeWiki).toContain('SANCTUARY_ENTRANCE_LOTTIE');
     expect(proUpgrade).not.toContain('cycling.mp4');
     expect(proUpgrade).toContain('Keep writing unlimited.');
   });

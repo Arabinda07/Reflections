@@ -208,7 +208,7 @@ export const MyNotes: React.FC = () => {
               className="group/title rounded-[var(--radius-control)] focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
               aria-label={`Open ${note.title}`}
             >
-              <h3 className="mb-2 text-xl font-display font-extrabold tracking-tight text-gray-text leading-tight transition-colors group-hover:text-green text-balance">
+              <h3 className="mb-2 text-xl font-display font-extrabold tracking-normal text-gray-text leading-tight transition-colors group-hover:text-green text-balance">
                 {note.title}
               </h3>
 

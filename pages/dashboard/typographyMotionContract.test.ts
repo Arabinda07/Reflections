@@ -23,7 +23,7 @@ describe('Typography and motion contract', () => {
 
     expect(indexCss).toContain("--font-sans: 'Manrope'");
     expect(indexCss).toContain("--font-serif: 'Spectral'");
-    expect(indexCss).toContain("--font-display: 'Sora'");
+    expect(indexCss).toContain("--font-display: 'Nunito'");
     expect(indexCss).toContain('font-family: var(--font-sans)');
     expect(indexCss).not.toContain("font-family: 'Geist', sans-serif");
     expect(indexCss).not.toContain("font-family: 'Feather Bold'");

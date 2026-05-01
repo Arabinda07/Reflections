@@ -45,7 +45,7 @@ const parseAuthParams = (urlString: string) => {
     };
 };
 
-export const getGoogleOAuthRedirectTo = (sourcePath: GoogleAuthSourcePath) => {
+export const getGoogleOAuthRedirectTo = () => {
   if (!hasWindow()) {
     return NATIVE_GOOGLE_AUTH_REDIRECT_URL;
   }
@@ -218,7 +218,7 @@ const launchGoogleOAuth = async (sourcePath: GoogleAuthSourcePath) => {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: getGoogleOAuthRedirectTo(sourcePath),
+      redirectTo: getGoogleOAuthRedirectTo(),
       ...(isNative ? { skipBrowserRedirect: true } : {}),
     },
   });

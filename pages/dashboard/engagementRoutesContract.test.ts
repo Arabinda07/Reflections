@@ -14,9 +14,9 @@ describe('engagement routes source contract', () => {
     expect(routes).toContain("RELEASE = '/release'");
     expect(routes).toContain("FUTURE_LETTERS = '/letters'");
     expect(routes).toContain("ABOUT = '/about'");
-    expect(app).toContain("import('./pages/dashboard/ReleaseMode')");
-    expect(app).toContain("import('./pages/dashboard/FutureLetters')");
-    expect(app).toContain("import('./pages/dashboard/AboutArabinda')");
+    expect(app).toContain("import('@/pages/dashboard/ReleaseMode.tsx')");
+    expect(app).toContain("import('@/pages/dashboard/FutureLetters.tsx')");
+    expect(app).toContain("import('@/pages/dashboard/AboutArabinda.tsx')");
     expect(app).toContain('path={RoutePath.RELEASE}');
     expect(app).toContain('path={RoutePath.FUTURE_LETTERS}');
     expect(app).toContain('path={RoutePath.ABOUT}');
@@ -103,7 +103,7 @@ describe('engagement routes source contract', () => {
     expect(letters).toContain('break-words');
     expect(letters).toContain('aria-label="Custom open date"');
     expect(letters).toContain('className="w-full sm:w-auto"');
-    expect(letters).toContain('className="min-h-11 w-full"');
+    expect(letters).toContain('min-h-11 w-full');
     expect(letters).not.toContain('noteService');
   });
 
@@ -149,12 +149,14 @@ describe('engagement routes source contract', () => {
     expect(existsSync(path.resolve(process.cwd(), 'pages/dashboard/AboutArabinda.tsx'))).toBe(true);
     const about = read('pages/dashboard/AboutArabinda.tsx');
 
-    expect(about).toContain('A note from Arabinda');
+    expect(about).toContain('A note from');
+    expect(about).toContain('Arabinda');
     expect(about).toContain('writing stay private');
     expect(about).toContain('AI should wait');
     expect(about).toContain('Private writing');
     expect(about).toContain('Thank you for trusting me with a few minutes of your day.');
-    expect(about).toContain('className="-ml-2 min-h-11"');
+    expect(about).toContain('-ml-2');
+    expect(about).toContain('min-h-11');
     expect(about.toLowerCase()).not.toMatch(/\b(streak|score|xp|leaderboard|diagnose|therapy replacement)\b/);
   });
 

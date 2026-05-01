@@ -108,7 +108,7 @@ describe('googleOAuth', () => {
     expect(mockSignInWithOAuth).toHaveBeenCalledWith({
       provider: 'google',
       options: {
-        redirectTo: 'https://reflections-ebon.vercel.app/login',
+        redirectTo: 'https://reflections-ebon.vercel.app/auth/callback',
       },
     });
   });
@@ -170,9 +170,9 @@ describe('googleOAuth', () => {
   });
 
   it('defaults post-auth redirects to notes when the requested path is unsafe', () => {
-    expect(resolvePostAuthRedirectPath(undefined)).toBe(RoutePath.HOME);
-    expect(resolvePostAuthRedirectPath({ pathname: RoutePath.LOGIN })).toBe(RoutePath.HOME);
-    expect(resolvePostAuthRedirectPath({ pathname: 'https://evil.example.com' })).toBe(RoutePath.HOME);
+    expect(resolvePostAuthRedirectPath(undefined)).toBe(RoutePath.DASHBOARD);
+    expect(resolvePostAuthRedirectPath({ pathname: RoutePath.LOGIN })).toBe(RoutePath.DASHBOARD);
+    expect(resolvePostAuthRedirectPath({ pathname: 'https://evil.example.com' })).toBe(RoutePath.DASHBOARD);
   });
 
   it('consumes a matching stored Google auth error and clears the pending state', () => {
@@ -219,12 +219,12 @@ describe('googleOAuth', () => {
     expect(sessionStorage.getItem('reflections.pending-google-auth-redirect-path')).toBeNull();
   });
 
-  it('sends a successful native Google return to home and clears the pending redirect state', () => {
+  it('sends a successful native Google return to the safe requested path and clears the pending redirect state', () => {
     const sessionStorage = getSessionStorage();
     sessionStorage.setItem('reflections.pending-google-auth-path', RoutePath.LOGIN);
     sessionStorage.setItem('reflections.pending-google-auth-redirect-path', '/notes/new');
 
-    expect(consumeNativeGoogleAuthSuccessRedirectPath(RoutePath.LOGIN)).toBe(RoutePath.HOME);
+    expect(consumeNativeGoogleAuthSuccessRedirectPath(RoutePath.LOGIN)).toBe('/notes/new');
     expect(sessionStorage.getItem('reflections.pending-google-auth-path')).toBeNull();
     expect(sessionStorage.getItem('reflections.pending-google-auth-redirect-path')).toBeNull();
   });

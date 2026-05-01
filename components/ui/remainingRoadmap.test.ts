@@ -45,7 +45,7 @@ describe('remaining roadmap contract', () => {
     expect(notFound).toContain('DotLottieReact');
     expect(notFound).toContain('/assets/lottie/Error 404.json');
     expect(myNotes).toContain('/assets/lottie/empty%20notes.json');
-    expect(lifeWiki).toContain('/assets/lottie/Level Up Animation.json');
+    expect(lifeWiki).toContain('/assets/lottie/Level%20Up%20Animation.json');
   });
 
   it('keeps the library page on the shared loader and lazy calendar path', () => {

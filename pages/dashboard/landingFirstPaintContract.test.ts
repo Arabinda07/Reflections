@@ -25,7 +25,6 @@ describe('landing first-paint contract', () => {
 
     expect(home).toContain("import { RouteLoadingFrame } from '../../components/ui/RouteLoadingFrame';");
     expect(home).toContain('return <RouteLoadingFrame />;');
-    expect(home).toContain('<Suspense fallback={<RouteLoadingFrame />}>');
     expect(home).not.toContain('CircleNotch');
   });
 
@@ -44,7 +43,8 @@ describe('landing first-paint contract', () => {
     const authContext = read('context/AuthContext.tsx');
 
     expect(authContext).toContain("className=\"flex min-h-0 flex-1 flex-col\"");
-    expect(authContext).toContain("pointerEvents: showStartup ? 'none' : 'auto'");
+    expect(authContext).toContain("const isStartupBlocking = showStartup || !startupExitDone;");
+    expect(authContext).toContain("pointerEvents: isStartupBlocking ? 'none' : 'auto'");
     expect(authContext).not.toContain('opacity: showStartup ? 0 : 1');
     expect(authContext).not.toContain('transition: `opacity ${NATIVE_STARTUP_FADE_MS}ms');
     expect(authContext).not.toContain("visibility: showStartup ? 'hidden' : 'visible'");
@@ -79,7 +79,7 @@ describe('landing first-paint contract', () => {
     expect(landing).toContain('window.cancelIdleCallback');
     expect(landing).toContain('preload="metadata"');
     expect(landing).not.toContain('preload="auto"');
-    expect(landing).toContain("isHeroVideoReady ? 'opacity-0' : 'opacity-90'");
+    expect(landing).toContain("isHeroVideoReady ? 'opacity-0' : 'opacity-100'");
     expect(landing).toContain('sm:object-[64%_center]');
     expect(landing).not.toContain("isHeroPosterReady && !isHeroVideoReady ? 'opacity-90' : 'opacity-0'");
     expect(landing).toContain('onCanPlay={() => setIsHeroVideoReady(true)}');

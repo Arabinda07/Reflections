@@ -27,6 +27,7 @@ import {
   isUserVisibleWikiPage,
   type WikiPageType,
 } from '../../services/wikiTypes';
+import { trackLifeWikiRefreshedDeferred } from '../../src/analytics/deferredEvents';
 
 type RefreshFeedback = {
   variant: 'warning' | 'error';
@@ -317,6 +318,13 @@ export const LifeWiki: React.FC = () => {
       }
 
       if (refreshResult.pageCount > 0) {
+        trackLifeWikiRefreshedDeferred({
+          planTier: access?.planTier || 'free',
+          entryCount: notes.length,
+          pageCount: refreshResult.pageCount,
+          source: refreshResult.source,
+          usedFreeRefresh: claimedFreeRefresh,
+        });
       }
 
       await loadData();

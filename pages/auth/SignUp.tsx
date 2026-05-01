@@ -25,6 +25,7 @@ import {
 import { NEWSLETTER_SIGNUP_LABEL, buildNewsletterOptInMetadata } from '@/src/newsletter';
 import { CheckCircle } from '@phosphor-icons/react';
 import { referralService } from '@/services/engagementServices';
+import { trackGoogleAuthStartedDeferred } from '@/src/analytics/deferredEvents';
 
 export const SignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -113,6 +114,11 @@ export const SignUp: React.FC = () => {
     const isNative = Capacitor.isNativePlatform();
     setError(null);
     setLoading(true);
+    trackGoogleAuthStartedDeferred({
+      sourcePath: RoutePath.SIGNUP,
+      redirectPath: postLoginPath || RoutePath.DASHBOARD,
+      isNative,
+    });
     const launchError = await startGoogleOAuthFlow({
       sourcePath: RoutePath.SIGNUP,
       redirectPath: postLoginPath || RoutePath.DASHBOARD,

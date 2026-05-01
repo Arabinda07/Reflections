@@ -23,6 +23,7 @@ import {
   isVerifiedEmailAvailable,
   requestVerifiedEmail,
 } from '@/src/auth/credentialManager';
+import { trackGoogleAuthStartedDeferred } from '@/src/analytics/deferredEvents';
 
 export const SignIn: React.FC = () => {
   const navigate = useNavigate();
@@ -82,6 +83,11 @@ export const SignIn: React.FC = () => {
     setError(null);
     setResetMessage(null);
     setLoading(true);
+    trackGoogleAuthStartedDeferred({
+      sourcePath: RoutePath.LOGIN,
+      redirectPath: postLoginPath || RoutePath.DASHBOARD,
+      isNative,
+    });
     const launchError = await startGoogleOAuthFlow({
       sourcePath: RoutePath.LOGIN,
       redirectPath: postLoginPath || RoutePath.DASHBOARD,

@@ -38,7 +38,7 @@ describe('buildCompletionCardPayload', () => {
       commonMood: 'anxious',
     } as any);
 
-    expect(payload.title).toBe('I returned to myself this week.');
+    expect(payload.title).toBe('My Reflections');
     expect(payload.subtitle).toBe('Apr 27 - May 3');
     expect(JSON.stringify(payload)).not.toMatch(/work|anxious/);
   });

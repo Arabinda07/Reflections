@@ -5,6 +5,10 @@ import { Session } from '@supabase/supabase-js';
 import { useAuthStore } from '../hooks/useAuthStore';
 import { StartupScreen } from '../components/ui/StartupScreen';
 import { NATIVE_STARTUP_FADE_MS, NATIVE_STARTUP_MIN_MS } from '../src/native/appLaunch';
+import {
+  identifyAnalyticsUserDeferred,
+  resetAnalyticsUserDeferred,
+} from '../src/analytics/deferredEvents';
 
 /** Duration of the OverlayFeedback exit animation (ms). */
 const STARTUP_EXIT_ANIMATION_MS = 350;
@@ -36,6 +40,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Tracks whether the exit animation has finished so pointer events
   // don't switch to 'auto' while the startup screen is still fading.
   const [startupExitDone, setStartupExitDone] = useState(!showStartup);
+  const lastAnalyticsUserIdRef = useRef<string | null>(null);
+
+  const syncAnalyticsSession = (session: Session | null) => {
+    if (session) {
+      if (lastAnalyticsUserIdRef.current !== session.user.id) {
+        identifyAnalyticsUserDeferred({ id: session.user.id });
+        lastAnalyticsUserIdRef.current = session.user.id;
+      }
+      return;
+    }
+
+    if (lastAnalyticsUserIdRef.current) {
+      resetAnalyticsUserDeferred();
+      lastAnalyticsUserIdRef.current = null;
+    }
+  };
 
   // Keep the in-app launch moment visible long enough to feel intentional without stalling.
   useEffect(() => {
@@ -58,17 +78,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (mounted) {
           if (session) {
             setUser(mapSessionToUser(session));
+            syncAnalyticsSession(session);
           } else if (error) {
             console.warn('Supabase session check failed:', error);
             if (error.status && error.status >= 400 && error.status < 500) {
               // 4xx errors mean the session is invalid or expired
               setUser(null);
+              syncAnalyticsSession(null);
             } else {
               console.warn('Likely offline. Using local persisted session.');
               // Session remains as it was in the persisted Zustand store
             }
           } else {
             setUser(null);
+            syncAnalyticsSession(null);
           }
           setLoading(false);
           setHydrated(true);
@@ -88,8 +111,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (!mounted) return;
       if (session) {
         setUser(mapSessionToUser(session));
+        syncAnalyticsSession(session);
       } else {
         setUser(null);
+        syncAnalyticsSession(null);
       }
       setLoading(false);
     });

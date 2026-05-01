@@ -11,7 +11,7 @@ describe('remaining surfaces source contract', () => {
     const myNotes = read('pages/dashboard/MyNotes.tsx');
     const loadingState = read('components/ui/LoadingState.tsx');
 
-    expect(home).toContain("import('./HomeAuthenticated')");
+    expect(read('App.tsx')).toContain("import('@/pages/dashboard/HomeAuthenticated.tsx')");
     expect(home).not.toContain("from '../../services/noteService'");
     expect(home).not.toContain("from '../../src/supabaseClient'");
 

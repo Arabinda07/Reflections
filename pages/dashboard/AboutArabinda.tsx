@@ -35,7 +35,7 @@ export const AboutArabinda: React.FC = () => {
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
         <button
           onClick={() => navigate(RoutePath.HOME)}
-          className="group mb-12 flex items-center gap-2 text-sm font-bold text-gray-nav hover:text-green transition-all duration-300 w-fit hover:-translate-x-1"
+          className="group -ml-2 mb-12 flex min-h-11 w-fit items-center gap-2 px-2 text-sm font-bold text-gray-nav transition-all duration-300 hover:-translate-x-1 hover:text-green"
           aria-label="Back to home"
         >
           <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
