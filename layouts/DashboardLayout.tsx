@@ -226,6 +226,8 @@ export const DashboardLayout: React.FC = () => {
     { label: 'Sign Up', path: RoutePath.SIGNUP, icon: UserPlus, description: 'Create a writing space.' },
   ];
   const sidebarNavItems = isAuthenticated ? authNavItems : guestSidebarNavItems;
+  const primarySidebarItems = sidebarNavItems.filter(item => item.path !== RoutePath.ACCOUNT);
+  const accountSidebarItem = sidebarNavItems.find(item => item.path === RoutePath.ACCOUNT);
   const isWritingRoute =
     location.pathname === RoutePath.RELEASE ||
     location.pathname.includes('/new') ||
@@ -415,7 +417,6 @@ export const DashboardLayout: React.FC = () => {
                 className="mobile-sidebar-shell fixed right-0 top-0 bottom-0 z-[110] h-[100dvh]"
                 style={{
                   paddingTop: NATIVE_PAGE_TOP_PADDING,
-                  paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom))',
                   width: 'min(86vw, 352px)',
                 }}
               >
@@ -426,8 +427,7 @@ export const DashboardLayout: React.FC = () => {
                   <p id={mobileMenuDescriptionId} className="sr-only">
                     Use this menu to move around Reflections and close it when you are ready to return to the page.
                   </p>
-
-                  <div className="flex shrink-0 items-start justify-between gap-4 px-5 pb-5 sm:px-6">
+                  <div className="flex shrink-0 items-start justify-between gap-4 px-5 pb-4 sm:px-6">
                     <div className="flex min-w-0 items-center gap-3 pt-1">
                       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-chip)] bg-green text-[rgb(var(--panel-bg-rgb))] shadow-sm shadow-green/10">
                         <Leaf size={20} weight="fill" />
@@ -449,9 +449,26 @@ export const DashboardLayout: React.FC = () => {
                     </button>
                   </div>
 
-                  <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-5 sm:px-5">
-                    <nav aria-label="Mobile navigation" className="flex flex-col gap-2">
-                      {sidebarNavItems.map((item) => {
+                  {/* User Header Section */}
+                  {isAuthenticated && user && (
+                    <div className="mobile-sidebar-user-header">
+                      <div className="mobile-sidebar-user-avatar">
+                        {user.avatarUrl ? (
+                          <img src={user.avatarUrl} alt="" className="h-full w-full rounded-full object-cover" />
+                        ) : (
+                          <span>{user.name?.charAt(0).toUpperCase()}</span>
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[15px] font-extrabold leading-tight text-gray-text">{user.name}</p>
+                        <p className="truncate text-[12px] font-semibold text-gray-nav">{user.email}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5 sm:px-5">
+                    <nav aria-label="Mobile navigation" className="flex flex-col gap-1.5">
+                      {primarySidebarItems.map((item) => {
                         const isActive = location.pathname === item.path;
                         const Icon = item.icon;
 
@@ -484,68 +501,68 @@ export const DashboardLayout: React.FC = () => {
                         );
                       })}
                     </nav>
+                  </div>
 
-                    <div className="mt-6 flex flex-col gap-3 border-t border-border/70 pt-5">
-                      {canInstall && !isInstalled && (
+                  {/* Footer Actions Section */}
+                  <div className="mobile-sidebar-footer">
+                    {accountSidebarItem && (
+                      <button
+                        onClick={() => handleNavigation(accountSidebarItem.path)}
+                        className="mobile-sidebar-link group"
+                        data-active={location.pathname === accountSidebarItem.path ? 'true' : 'false'}
+                      >
+                        <span className="mobile-sidebar-link-icon">
+                          <accountSidebarItem.icon size={20} weight={location.pathname === accountSidebarItem.path ? 'fill' : 'regular'} />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-[15px] font-extrabold leading-tight">Settings</span>
+                          <span className="mt-0.5 block text-[11px] font-semibold leading-snug text-gray-nav">Manage profile and plan.</span>
+                        </span>
+                        <CaretRight size={16} weight="regular" className="mobile-sidebar-link-caret" />
+                      </button>
+                    )}
+
+                    {canInstall && !isInstalled && (
+                      <button
+                        onClick={async () => {
+                          await triggerInstall();
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="mobile-sidebar-link mobile-sidebar-link--action"
+                      >
+                        <span className="mobile-sidebar-link-icon">
+                          <DownloadSimple size={20} weight="regular" />
+                        </span>
+                        <span className="min-w-0 flex-1 text-left">
+                          <span className="block text-[15px] font-extrabold leading-tight">Install app</span>
+                        </span>
+                      </button>
+                    )}
+
+                    {isAuthenticated && (
+                      <div className="flex gap-2 mt-1">
                         <button
-                          onClick={async () => {
-                            await triggerInstall();
+                          onClick={() => {
+                            setIsInviteModalOpen(true);
                             setIsMobileMenuOpen(false);
                           }}
-                          className="mobile-sidebar-link mobile-sidebar-link--action"
-                          aria-label="Add Reflections to your home screen"
+                          className="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl bg-green/5 text-green text-[13px] font-extrabold hover:bg-green/10 transition-colors"
                         >
-                          <span className="mobile-sidebar-link-icon">
-                            <DownloadSimple size={20} weight="regular" />
-                          </span>
-                          <span className="min-w-0 flex-1 text-left">
-                            <span className="block text-[15px] font-extrabold leading-tight">Add to home screen</span>
-                            <span className="mt-1 block text-[12px] font-semibold leading-snug text-gray-nav">
-                              Keep Reflections close by.
-                            </span>
-                          </span>
+                          <PaperPlaneTilt size={18} weight="regular" />
+                          Invite
                         </button>
-                      )}
-
-                      {isAuthenticated && (
-                        <>
-                          <button
-                            onClick={() => {
-                              setIsInviteModalOpen(true);
-                              setIsMobileMenuOpen(false);
-                            }}
-                            className="mobile-sidebar-link mobile-sidebar-link--action"
-                          >
-                            <span className="mobile-sidebar-link-icon">
-                              <PaperPlaneTilt size={20} weight="regular" />
-                            </span>
-                            <span className="min-w-0 flex-1 text-left">
-                              <span className="block text-[15px] font-extrabold leading-tight">Invite</span>
-                              <span className="mt-1 block text-[12px] font-semibold leading-snug text-gray-nav">
-                                Share a writing space.
-                              </span>
-                            </span>
-                          </button>
-                          <button
-                            onClick={() => {
-                              logout();
-                              setIsMobileMenuOpen(false);
-                            }}
-                            className="mobile-sidebar-link mobile-sidebar-link--danger"
-                          >
-                            <span className="mobile-sidebar-link-icon">
-                              <SignOut size={20} weight="regular" />
-                            </span>
-                            <span className="min-w-0 flex-1 text-left">
-                              <span className="block text-[15px] font-extrabold leading-tight">Logout</span>
-                              <span className="mt-1 block text-[12px] font-semibold leading-snug text-gray-nav">
-                                Leave this session.
-                              </span>
-                            </span>
-                          </button>
-                        </>
-                      )}
-                    </div>
+                        <button
+                          onClick={() => {
+                            logout();
+                            setIsMobileMenuOpen(false);
+                          }}
+                          className="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl bg-clay/5 text-clay text-[13px] font-extrabold hover:bg-clay/10 transition-colors"
+                        >
+                          <SignOut size={18} weight="regular" />
+                          Logout
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </motion.div>
