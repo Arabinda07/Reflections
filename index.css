@@ -786,8 +786,8 @@ select:focus-visible,
         rgba(var(--panel-bg-rgb), 0.94) 0%,
         rgba(var(--panel-bg-rgb), 0.72) 56%,
         rgba(var(--panel-bg-rgb), 0) 100%);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
   }
 
   .screen-scrim {
