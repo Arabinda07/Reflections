@@ -4,7 +4,6 @@ import { supabase } from '../src/supabaseClient';
 import { Session } from '@supabase/supabase-js';
 import { useAuthStore } from '../hooks/useAuthStore';
 import { StartupScreen } from '../components/ui/StartupScreen';
-import { identifyAnalyticsUserDeferred, resetAnalyticsUserDeferred } from '../src/analytics/deferredEvents';
 import { NATIVE_STARTUP_FADE_MS, NATIVE_STARTUP_MIN_MS } from '../src/native/appLaunch';
 
 /** Duration of the OverlayFeedback exit animation (ms). */
@@ -30,7 +29,6 @@ const mapSessionToUser = (session: Session): User => ({
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, isAuthenticated, setHydrated, setUser, logout, isHydrated } = useAuthStore();
   const [loading, setLoading] = useState(true);
-  const hasIdentifiedAnalyticsUserRef = useRef(false);
   const [showStartup, setShowStartup] = useState(() => {
     return !sessionStorage.getItem('startup_shown');
   });
@@ -102,22 +100,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, [setUser, setHydrated]);
 
-  useEffect(() => {
-    if (loading || !isHydrated) {
-      return;
-    }
-
-    if (user) {
-      hasIdentifiedAnalyticsUserRef.current = true;
-      identifyAnalyticsUserDeferred(user);
-      return;
-    }
-
-    if (hasIdentifiedAnalyticsUserRef.current) {
-      hasIdentifiedAnalyticsUserRef.current = false;
-      resetAnalyticsUserDeferred();
-    }
-  }, [user, loading, isHydrated]);
 
   // Hide startup screen
   useEffect(() => {

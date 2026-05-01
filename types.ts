@@ -174,6 +174,8 @@ export interface Referral {
 
 export enum RoutePath {
   HOME = '/',
+  DASHBOARD = '/home',
+  AUTH_CALLBACK = '/auth/callback',
   NOTES = '/notes',
   CREATE_NOTE = '/notes/new',
   EDIT_NOTE = '/notes/:id/edit',

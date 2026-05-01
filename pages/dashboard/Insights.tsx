@@ -29,7 +29,7 @@ import { buildCompletionCardPayload } from '../../services/completionCardPayload
 import { DEFAULT_MOOD_TONE, getMoodConfig } from './moodConfig';
 
 const TAG_TONE_CLASSES = ['text-green', 'text-green/80', 'text-green/70', 'text-green/60'];
-const SANCTUARY_ENTRANCE_LOTTIE = '/assets/lottie/Level%20Up%20Animation.json';
+const SANCTUARY_ENTRANCE_LOTTIE = '/assets/lottie/Level Up Animation.json';
 const SANCTUARY_ENTRANCE_FALLBACK_MS = 2200;
 
 const getWeekSignalSince = () => {
@@ -166,7 +166,7 @@ export const Insights: React.FC = () => {
       openingTimerRef.current = null;
     }
 
-    navigate(RoutePath.SANCTUARY);
+    navigate(RoutePath.SANCTUARY, { state: { fromInsights: true } });
   }, [navigate]);
 
   const handleOpenSanctuary = useCallback((event: React.MouseEvent<HTMLAnchorElement>) => {

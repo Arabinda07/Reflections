@@ -15,21 +15,23 @@ import { useNativeStatusBar } from './hooks/useNativeStatusBar';
 import { useNativeOAuthListener } from './hooks/useNativeOAuthListener';
 
 // Lazy load non-critical routes to reduce initial bundle size
-const SignIn = lazy(() => import('./pages/auth/SignIn').then(m => ({ default: m.SignIn })));
-const SignUp = lazy(() => import('./pages/auth/SignUp').then(m => ({ default: m.SignUp })));
-const ResetPassword = lazy(() => import('./pages/auth/ResetPassword').then(m => ({ default: m.ResetPassword })));
-const MyNotes = lazy(() => import('./pages/dashboard/MyNotes').then(m => ({ default: m.MyNotes })));
-const CreateNote = lazy(() => import('./pages/dashboard/CreateNote').then(m => ({ default: m.CreateNote })));
-const SingleNote = lazy(() => import('./pages/dashboard/SingleNote').then(m => ({ default: m.SingleNote })));
-const ReleaseMode = lazy(() => import('./pages/dashboard/ReleaseMode').then(m => ({ default: m.ReleaseMode })));
-const FutureLetters = lazy(() => import('./pages/dashboard/FutureLetters').then(m => ({ default: m.FutureLetters })));
-const Account = lazy(() => import('./pages/dashboard/Account').then(m => ({ default: m.Account })));
-const Insights = lazy(() => import('./pages/dashboard/Insights').then(m => ({ default: m.Insights })));
-const LifeWiki = lazy(() => import('./pages/dashboard/LifeWiki').then(m => ({ default: m.LifeWiki })));
-const FAQ = lazy(() => import('./pages/dashboard/FAQ').then(m => ({ default: m.FAQ })));
-const AboutArabinda = lazy(() => import('./pages/dashboard/AboutArabinda').then(m => ({ default: m.AboutArabinda })));
-const PrivacyPolicy = lazy(() => import('./pages/dashboard/PrivacyPolicy').then(m => ({ default: m.PrivacyPolicy })));
-const NotFound = lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })));
+const SignIn = lazy(() => import('@/pages/auth/SignIn.tsx').then(m => ({ default: m.SignIn })));
+const SignUp = lazy(() => import('@/pages/auth/SignUp.tsx').then(m => ({ default: m.SignUp })));
+const ResetPassword = lazy(() => import('@/pages/auth/ResetPassword.tsx').then(m => ({ default: m.ResetPassword })));
+const MyNotes = lazy(() => import('@/pages/dashboard/MyNotes.tsx').then(m => ({ default: m.MyNotes })));
+const CreateNote = lazy(() => import('@/pages/dashboard/CreateNote.tsx').then(m => ({ default: m.CreateNote })));
+const SingleNote = lazy(() => import('@/pages/dashboard/SingleNote.tsx').then(m => ({ default: m.SingleNote })));
+const ReleaseMode = lazy(() => import('@/pages/dashboard/ReleaseMode.tsx').then(m => ({ default: m.ReleaseMode })));
+const FutureLetters = lazy(() => import('@/pages/dashboard/FutureLetters.tsx').then(m => ({ default: m.FutureLetters })));
+const Account = lazy(() => import('@/pages/dashboard/Account.tsx').then(m => ({ default: m.Account })));
+const Insights = lazy(() => import('@/pages/dashboard/Insights.tsx').then(m => ({ default: m.Insights })));
+const LifeWiki = lazy(() => import('@/pages/dashboard/LifeWiki.tsx').then(m => ({ default: m.LifeWiki })));
+const FAQ = lazy(() => import('@/pages/dashboard/FAQ.tsx').then(m => ({ default: m.FAQ })));
+const AboutArabinda = lazy(() => import('@/pages/dashboard/AboutArabinda.tsx').then(m => ({ default: m.AboutArabinda })));
+const PrivacyPolicy = lazy(() => import('@/pages/dashboard/PrivacyPolicy.tsx').then(m => ({ default: m.PrivacyPolicy })));
+const AuthCallback = lazy(() => import('@/pages/auth/AuthCallback.tsx').then(m => ({ default: m.AuthCallback })));
+const HomeAuthenticated = lazy(() => import('@/pages/dashboard/HomeAuthenticated.tsx').then(m => ({ default: m.HomeAuthenticated })));
+const NotFound = lazy(() => import('@/pages/NotFound.tsx').then(m => ({ default: m.NotFound })));
 const LazyVercelVitals = lazy(async () => {
   const [{ Analytics }, { SpeedInsights }] = await Promise.all([
     import('@vercel/analytics/react'),
@@ -62,6 +64,16 @@ const router = createBrowserRouter(
       <Route path={RoutePath.LOGIN} element={withRouteFallback(<SignIn />)} />
       <Route path={RoutePath.SIGNUP} element={withRouteFallback(<SignUp />)} />
       <Route path={RoutePath.RESET_PASSWORD} element={withRouteFallback(<ResetPassword />)} />
+      <Route path={RoutePath.AUTH_CALLBACK} element={withRouteFallback(<AuthCallback />)} />
+
+      <Route
+        path={RoutePath.DASHBOARD}
+        element={
+          <ProtectedRoute>
+            {withRouteFallback(<HomeAuthenticated />)}
+          </ProtectedRoute>
+        }
+      />
 
       <Route
         path={RoutePath.NOTES}

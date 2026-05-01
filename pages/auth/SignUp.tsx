@@ -3,17 +3,13 @@ import { Capacitor } from '@capacitor/core';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Envelope, Lock, User, UserPlus } from '@phosphor-icons/react';
-import { Input } from '../../components/ui/Input';
-import { Button } from '../../components/ui/Button';
-import { SectionHeader } from '../../components/ui/SectionHeader';
-import { Surface } from '../../components/ui/Surface';
-import { RoutePath } from '../../types';
-import { useAuth } from '../../context/AuthContext';
-import { supabase } from '../../src/supabaseClient';
-import {
-  trackGoogleAuthFailed,
-  trackGoogleAuthStarted,
-} from '../../src/analytics/events';
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
+import { SectionHeader } from '@/components/ui/SectionHeader';
+import { Surface } from '@/components/ui/Surface';
+import { RoutePath } from '@/types';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/src/supabaseClient';
 import {
   consumeGoogleAuthError,
   consumePendingGoogleAuthRedirectPath,
@@ -21,13 +17,13 @@ import {
   startGoogleOAuthFlow,
   signInWithVerifiedEmail,
   isGoogleOAuthCallbackUrl,
-} from '../../src/auth/googleOAuth';
+} from '@/src/auth/googleOAuth';
 import {
   isVerifiedEmailAvailable,
   requestVerifiedEmail,
-} from '../../src/auth/credentialManager';
+} from '@/src/auth/credentialManager';
 import { CheckCircle } from '@phosphor-icons/react';
-import { referralService } from '../../services/engagementServices';
+import { referralService } from '@/services/engagementServices';
 
 export const SignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -116,22 +112,12 @@ export const SignUp: React.FC = () => {
     const isNative = Capacitor.isNativePlatform();
     setError(null);
     setLoading(true);
-    trackGoogleAuthStarted({
-      sourcePath: RoutePath.SIGNUP,
-      redirectPath: postLoginPath,
-      isNative,
-    });
     const launchError = await startGoogleOAuthFlow({
       sourcePath: RoutePath.SIGNUP,
-      redirectPath: postLoginPath,
+      redirectPath: postLoginPath || RoutePath.DASHBOARD,
     });
 
     if (launchError) {
-      trackGoogleAuthFailed({
-        sourcePath: RoutePath.SIGNUP,
-        isNative,
-        errorCode: launchError,
-      });
       setError(launchError);
       setLoading(false);
     }

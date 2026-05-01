@@ -44,7 +44,6 @@ import { ModalSheet } from '../../components/ui/ModalSheet';
 import { PaperPlaneToast } from '../../components/ui/PaperPlaneToast';
 import { InlineLoadingBadge } from '../../components/ui/InlineLoadingBadge';
 import { observationService } from '../../services/observationService';
-import { trackNoteSaved } from '../../src/analytics/events';
 import { DEFAULT_WELLNESS_PROMPTS, getCurrentWellnessPrompt, getNextWellnessPromptState } from '../../services/wellnessPrompts';
 import { aiService } from '../../services/aiService';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
@@ -516,12 +515,6 @@ export const CreateNote: React.FC = () => {
       setBaselineDraftSnapshot(savedDraftSnapshot);
       setSaving(false);
       setShowPlane(false);
-      trackNoteSaved({
-        mode: id ? 'edit' : 'new',
-        attachmentCount: mergedAttachments.length,
-        tagCount: tags.length,
-        taskCount: tasks.length,
-      });
 
       haptics.confirming();
       playSaveChime();

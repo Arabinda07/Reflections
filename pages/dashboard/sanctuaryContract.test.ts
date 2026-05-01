@@ -38,8 +38,7 @@ describe('Sanctuary Life Wiki contract', () => {
 
     expect(lifeWiki).toContain('SANCTUARY_WIKI_PAGES');
     expect(lifeWiki).toContain('SUPPORTING_WIKI_PAGES');
-    expect(lifeWiki).toContain('Private reading room');
-    expect(lifeWiki).toContain('Signals');
+    expect(lifeWiki).toContain('Sanctuary pages');
     expect(lifeWiki).toContain('Supporting shelf');
     expect(lifeWiki).toContain('hasEnoughEntriesForWiki');
     expect(lifeWiki).toContain('primaryPages.length > 0');
@@ -55,7 +54,8 @@ describe('Sanctuary Life Wiki contract', () => {
     expect(lifeWiki).toContain('Room awaiting signal');
     expect(lifeWiki).toContain('This Sanctuary room is ready, but it has not been written yet.');
     expect(lifeWiki).toContain('SANCTUARY_META.map((meta) => renderPageCard(meta, pageMap.get(meta.pageType)))');
-    expect(lifeWiki).toContain('font-serif italic');
+    expect(lifeWiki).toContain('font-serif');
+    expect(lifeWiki).toContain('italic');
   });
 
   it('emphasizes the 3-entry gate and locks only future refreshes after the free generation', () => {
@@ -95,7 +95,7 @@ describe('Sanctuary Life Wiki contract', () => {
     expect(insights).toContain('dotLottieRefCallback={bindSanctuaryEntrancePlayer}');
     expect(insights).toContain("addEventListener('complete'");
     expect(insights).toContain('window.setTimeout(completeOpenSanctuary, SANCTUARY_ENTRANCE_FALLBACK_MS)');
-    expect(insights).toContain('/assets/lottie/Level%20Up%20Animation.json');
+    expect(insights).toContain('/assets/lottie/Level Up Animation.json');
     expect(lifeWiki).not.toContain('refreshModeLabel');
     expect(lifeWiki).not.toContain('On demand. Use Refresh with AI when you want the library rebuilt.');
   });

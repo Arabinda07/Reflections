@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { RoutePath } from '../types';
-import { trackGoogleAuthFailedDeferred, trackGoogleAuthSucceededDeferred } from '../src/analytics/deferredEvents';
 
 /**
  * Listens for native deep-link OAuth callbacks on Capacitor.
@@ -42,27 +41,16 @@ export function useNativeOAuthListener() {
         }
 
         if ('error' in result) {
-          trackGoogleAuthFailedDeferred({
-            sourcePath: pendingSourcePath,
-            isNative: true,
-            errorCode: result.error,
-          });
           googleOAuth.stashGoogleAuthError(result.error);
-        } else {
-          trackGoogleAuthSucceededDeferred({
-            sourcePath: pendingSourcePath,
-            redirectPath: RoutePath.HOME,
-            isNative: true,
-          });
         }
-
-        void Browser.close().catch(() => undefined);
 
         const completionPath =
           'error' in result
             ? pendingSourcePath
             : googleOAuth.consumeNativeGoogleAuthSuccessRedirectPath(pendingSourcePath);
 
+
+        void Browser.close().catch(() => undefined);
         googleOAuth.redirectToAppRoute(completionPath);
       };
 

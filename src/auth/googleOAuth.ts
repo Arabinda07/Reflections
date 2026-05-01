@@ -52,12 +52,12 @@ export const getGoogleOAuthRedirectTo = (sourcePath: GoogleAuthSourcePath) => {
 
   return Capacitor.isNativePlatform()
     ? NATIVE_GOOGLE_AUTH_REDIRECT_URL
-    : `${window.location.origin}${sourcePath}`;
+    : `${window.location.origin}${RoutePath.AUTH_CALLBACK}`;
 };
 
 export const resolvePostAuthRedirectPath = (value?: unknown) => {
   if (typeof value !== 'object' || value === null) {
-    return RoutePath.HOME;
+    return RoutePath.DASHBOARD;
   }
 
   const candidate = value as {
@@ -69,10 +69,14 @@ export const resolvePostAuthRedirectPath = (value?: unknown) => {
   const pathname =
     typeof candidate.pathname === 'string' && candidate.pathname.startsWith('/')
       ? candidate.pathname
-      : RoutePath.HOME;
+      : RoutePath.DASHBOARD;
 
-  if (pathname === RoutePath.LOGIN || pathname === RoutePath.SIGNUP) {
-    return RoutePath.HOME;
+  if (
+    pathname === RoutePath.LOGIN ||
+    pathname === RoutePath.SIGNUP ||
+    pathname === RoutePath.AUTH_CALLBACK
+  ) {
+    return RoutePath.DASHBOARD;
   }
 
   const search = typeof candidate.search === 'string' ? candidate.search : '';
@@ -151,8 +155,7 @@ export const consumePendingGoogleAuthRedirectPath = (sourcePath: GoogleAuthSourc
 export const consumeNativeGoogleAuthSuccessRedirectPath = (
   sourcePath: GoogleAuthSourcePath,
 ) => {
-  consumePendingGoogleAuthRedirectPath(sourcePath);
-  return RoutePath.HOME;
+  return consumePendingGoogleAuthRedirectPath(sourcePath) || RoutePath.DASHBOARD;
 };
 
 export const stashGoogleAuthError = (message: string) => {

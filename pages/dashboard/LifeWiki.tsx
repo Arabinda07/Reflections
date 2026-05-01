@@ -21,7 +21,6 @@ import { wikiService } from '../../services/wikiService';
 import { aiService } from '../../services/aiService';
 import { profileService } from '../../services/profileService';
 import { FREE_WIKI_MINIMUM_ENTRIES, getWikiInsightsGate } from '../../services/wellnessPolicy';
-import { trackLifeWikiRefreshed } from '../../src/analytics/events';
 import {
   SANCTUARY_WIKI_PAGES,
   SUPPORTING_WIKI_PAGES,
@@ -323,13 +322,6 @@ export const LifeWiki: React.FC = () => {
       }
 
       if (refreshResult.pageCount > 0) {
-        trackLifeWikiRefreshed({
-          planTier: access?.planTier || 'free',
-          entryCount: notes.length,
-          pageCount: refreshResult.pageCount,
-          source: refreshResult.source,
-          usedFreeRefresh: claimedFreeRefresh,
-        });
       }
 
       await loadData();
