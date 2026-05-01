@@ -32,6 +32,7 @@ import { Button } from '../components/ui/Button';
 import { ModalSheet } from '../components/ui/ModalSheet';
 import { ReferralInvitePanel } from '../components/ui/ReferralInvitePanel';
 import { SyncBanner } from '../components/ui/SyncBanner';
+import { StorageImage } from '../components/ui/StorageImage';
 import { referralService } from '../services/engagementServices';
 import { registerAndroidBackAction } from '../src/native/androidBack';
 import { NATIVE_PAGE_TOP_PADDING, NATIVE_TOP_CONTROL_OFFSET } from '../src/native/safeArea';
@@ -454,7 +455,12 @@ export const DashboardLayout: React.FC = () => {
                     <div className="mobile-sidebar-user-header">
                       <div className="mobile-sidebar-user-avatar">
                         {user.avatarUrl ? (
-                          <img src={user.avatarUrl} alt="" className="h-full w-full rounded-full object-cover" />
+                          <StorageImage 
+                            path={user.avatarUrl} 
+                            alt="" 
+                            className="h-full w-full rounded-full object-cover" 
+                            showLoading={false}
+                          />
                         ) : (
                           <span>{user.name?.charAt(0).toUpperCase()}</span>
                         )}
