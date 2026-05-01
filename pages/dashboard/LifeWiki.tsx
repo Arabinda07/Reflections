@@ -372,7 +372,7 @@ export const LifeWiki: React.FC = () => {
     return (
       <div
         key={meta.pageType}
-        className={`group relative h-full overflow-hidden rounded-[2.5rem] bg-body-surface border border-border/40 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-green/20 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)]`}
+        className={`group relative h-full overflow-hidden rounded-[2.5rem] surface-flat ${tone.surface} dashboard-tone-card transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)]`}
       >
         <Link
           to={articlePath(meta.pageType)}
@@ -381,18 +381,18 @@ export const LifeWiki: React.FC = () => {
         >
           <div className="space-y-6">
             <div className="flex items-center justify-between gap-4">
-              <span className={`label-caps text-[10px] ${tone.accent}`}>
+              <span className={`dashboard-caption ${tone.accent}`}>
                 {isSupporting ? 'Supporting page' : isEmptyRoom ? 'Room awaiting signal' : 'Generated page'}
               </span>
               <CaretRight size={18} weight="bold" className={`${tone.text} transition-all duration-500 ease-out-expo group-hover:translate-x-1`} />
             </div>
             <div className="space-y-4">
-              <h2 className="text-3xl font-display font-extrabold text-gray-text md:text-4xl transition-colors duration-300 group-hover:text-green">{meta.label}</h2>
-              <p className="line-clamp-4 font-serif text-[17px] italic leading-relaxed text-gray-text/70 transition-colors duration-300 group-hover:text-gray-text">
+              <h2 className="dashboard-card-title-lg dashboard-hover-title">{meta.label}</h2>
+              <p className="dashboard-editorial-preview line-clamp-4 transition-colors duration-300 group-hover:text-gray-text">
                 {isEmptyRoom ? meta.emptyLine || meta.description : previewText(page.content)}
               </p>
               {isEmptyRoom && (
-                <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-gray-nav/60">
+                <div className="dashboard-caption flex items-center gap-2 opacity-70">
                   <Sparkle size={12} weight="fill" className="text-green" />
                   <span>Awaiting signal</span>
                 </div>
@@ -409,13 +409,7 @@ export const LifeWiki: React.FC = () => {
             </MetadataPill>
           </div>
         </Link>
-        {/* Dynamic background glow based on tone */}
-        <div className={`pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br opacity-0 transition-opacity duration-500 group-hover:opacity-100 ${
-          meta.tone === 'blue' || meta.tone === 'darkBlue' ? 'from-sky-500/5 to-transparent' :
-          meta.tone === 'golden' ? 'from-amber-500/5 to-transparent' :
-          meta.tone === 'orange' ? 'from-clay/5 to-transparent' :
-          'from-green/5 to-transparent'
-        }`} />
+        <div className="dashboard-accent-glow pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
       </div>
     );
   };

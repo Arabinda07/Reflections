@@ -444,7 +444,7 @@ export const Insights: React.FC = () => {
               </div>
             </div>
             {/* Subtle background glow effect on hover */}
-            <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-sky-500/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+            <div className="dashboard-accent-glow pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
           </Surface>
 
           <Surface variant="bezel" tone="sage" className="group relative overflow-hidden rounded-[2.5rem] transition-all duration-500 hover:shadow-[0_20px_50px_rgba(34,197,94,0.05)]">
@@ -516,7 +516,7 @@ export const Insights: React.FC = () => {
                 </div>
                 <div>
                   <p className="label-caps text-honey">Completion card</p>
-                  <h2 className="mt-1 text-2xl font-display font-bold text-gray-text group-hover:text-amber-600 transition-colors duration-300">This week's card</h2>
+                  <h2 className="mt-1 text-2xl font-display font-bold text-gray-text group-hover:text-honey transition-colors duration-300">This week's card</h2>
                 </div>
               </div>
               <CaretRight

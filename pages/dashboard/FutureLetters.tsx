@@ -207,7 +207,7 @@ export const FutureLetters: React.FC = () => {
                     value={title}
                     onChange={(event) => setTitle(event.target.value)}
                     placeholder="A title for later"
-                    className="input-surface h-12 w-full px-4 text-[15px] font-semibold text-gray-text"
+                    className="input-surface dashboard-field-text h-12 w-full px-4"
                   />
                 </div>
 
@@ -220,7 +220,7 @@ export const FutureLetters: React.FC = () => {
                     value={content}
                     onChange={(event) => setContent(event.target.value)}
                     placeholder="Write what you want a future day to hold."
-                    className="input-surface min-h-[320px] w-full resize-none rounded-[22px] p-5 font-serif text-[19px] leading-8 text-gray-text placeholder:text-gray-nav/35"
+                    className="input-surface dashboard-letter-text min-h-[320px] w-full resize-none rounded-[22px] p-5 placeholder:text-gray-nav/35"
                   />
                 </div>
 
@@ -233,7 +233,7 @@ export const FutureLetters: React.FC = () => {
                         type="button"
                         onClick={() => setSelectedOption(option.id)}
                         aria-pressed={selectedOption === option.id}
-                        className={`min-h-11 rounded-[var(--radius-control)] border px-3 text-[13px] font-black transition-colors ${
+                        className={`dashboard-caption min-h-11 rounded-[var(--radius-control)] border px-3 transition-colors ${
                           selectedOption === option.id
                             ? 'border-green/30 bg-green/10 text-green'
                             : 'control-surface text-gray-nav hover:border-green/20 hover:text-green'
@@ -250,13 +250,13 @@ export const FutureLetters: React.FC = () => {
                       min={minCustomDate}
                       onChange={(event) => setCustomDate(event.target.value)}
                       aria-label="Custom open date"
-                      className="input-surface h-12 w-full px-4 text-[15px] font-semibold text-gray-text"
+                      className="input-surface dashboard-field-text h-12 w-full px-4"
                     />
                   ) : null}
                 </fieldset>
 
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <p className="text-[13px] font-medium text-gray-light">
+                  <p className="dashboard-supporting-text">
                     {isOpenDateValid
                       ? `This letter opens on ${formatDate(openDate)}.`
                       : 'Choose an open date before scheduling.'}
@@ -274,7 +274,7 @@ export const FutureLetters: React.FC = () => {
               <div className="space-y-5 p-6 sm:p-8">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <h2 className="text-[26px] font-display font-bold text-gray-text">
+                    <h2 className="dashboard-card-title-lg">
                       Waiting to open
                     </h2>
                   </div>
@@ -283,7 +283,7 @@ export const FutureLetters: React.FC = () => {
 
                 {error ? (
                   <p
-                    className="surface-inline-panel surface-tone-clay p-4 text-[13px] font-bold text-clay"
+                    className="surface-inline-panel surface-tone-clay dashboard-supporting-text p-4 font-bold text-clay"
                     aria-live="polite"
                   >
                     {error}
@@ -291,9 +291,9 @@ export const FutureLetters: React.FC = () => {
                 ) : null}
 
                 {isLoading ? (
-                  <p className="text-[14px] font-medium text-gray-light">Loading letters...</p>
+                  <p className="dashboard-supporting-text">Loading letters...</p>
                 ) : letters.length === 0 ? (
-                  <p className="text-[14px] font-medium leading-relaxed text-gray-light">
+                  <p className="dashboard-supporting-text">
                     No letters yet. Write one when there is something you want to return to later.
                   </p>
                 ) : (
@@ -306,15 +306,15 @@ export const FutureLetters: React.FC = () => {
                         return (
                           <div
                             key={letter.id}
-                            className="group relative surface-inline-panel overflow-hidden rounded-3xl p-5 transition-all duration-300 hover:border-honey/40 hover:shadow-lg"
+                            className="group relative surface-inline-panel dashboard-tone-card overflow-hidden rounded-3xl p-5 transition-all duration-300 hover:shadow-lg"
                           >
                             <div className="relative z-10">
                               <div className="mb-4 flex items-start justify-between gap-3">
                                 <div className="min-w-0">
-                                  <h3 className="break-words font-display text-[20px] font-bold text-gray-text group-hover:text-green transition-colors duration-300">
+                                  <h3 className="dashboard-card-title break-words dashboard-hover-title">
                                     {letter.title}
                                   </h3>
-                                  <p className="mt-1 text-[11px] font-bold uppercase tracking-widest text-gray-nav/60">
+                                  <p className="dashboard-caption mt-1 opacity-70">
                                     Opens {formatDate(letter.openAt)}
                                   </p>
                                 </div>
@@ -350,8 +350,7 @@ export const FutureLetters: React.FC = () => {
                                 {openState.actionLabel}
                               </Button>
                             </div>
-                            {/* Subtle background glow on hover */}
-                            <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-honey/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                            <div className="dashboard-accent-glow pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                           </div>
                         );
                       })}
@@ -372,10 +371,10 @@ export const FutureLetters: React.FC = () => {
       >
         {openedLetter ? (
           <div className="space-y-5">
-            <p className="text-[12px] font-black uppercase tracking-widest text-gray-nav/60">
+            <p className="dashboard-caption opacity-70">
               Opened {openedLetter.openedAt ? formatDate(openedLetter.openedAt) : 'today'}
             </p>
-            <div className="surface-inline-panel whitespace-pre-wrap rounded-[22px] p-5 font-serif text-[19px] leading-8 text-gray-text">
+            <div className="surface-inline-panel dashboard-letter-text whitespace-pre-wrap rounded-[22px] p-5">
               {openedLetter.content}
             </div>
           </div>

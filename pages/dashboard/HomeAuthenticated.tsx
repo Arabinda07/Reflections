@@ -546,11 +546,11 @@ export const HomeAuthenticated: React.FC = () => {
           <div className="grid gap-6">
             <motion.div
               variants={bentoItemVariants}
-              className="group relative surface-flat overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(14,165,233,0.05)] hover:border-sky/10"
+              className="group relative surface-flat surface-tone-sky overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(14,165,233,0.05)]"
             >
               <div className="relative z-10">
               <div className="mb-6 flex items-center gap-2 text-gray-nav">
-                <FolderOpen size={18} weight="duotone" className="text-gray-nav/70" />
+                <FolderOpen size={18} weight="duotone" className="text-sky" />
                 <p className="label-caps opacity-60">
                   Your Rhythm
                 </p>
@@ -566,14 +566,14 @@ export const HomeAuthenticated: React.FC = () => {
               <div className="space-y-3">
                 <button
                   onClick={() => navigate(RoutePath.NOTES)}
-                  className="surface-inline-panel group flex w-full items-center justify-between p-4 text-left transition-colors hover:border-green/20"
+                  className="surface-inline-panel surface-tone-sage dashboard-tone-card group flex w-full items-center justify-between p-4 text-left transition-colors"
                   aria-label="View all reflections"
                 >
                   <div className="flex items-center gap-3">
                     <FolderOpen size={18} weight="duotone" className="text-gray-nav group-hover:text-green transition-colors" />
                     <div>
-                      <p className="text-base font-bold text-gray-text">View archive</p>
-                      <p className="text-xs font-medium text-gray-nav">Read saved reflections</p>
+                      <p className="dashboard-action-title dashboard-hover-title">View archive</p>
+                      <p className="dashboard-action-description">Read saved reflections</p>
                     </div>
                   </div>
                   <CaretRight size={16} weight="regular" className="text-gray-nav/40 group-hover:text-green transition-colors" />
@@ -581,14 +581,14 @@ export const HomeAuthenticated: React.FC = () => {
 
                 <button
                   onClick={() => navigate(RoutePath.INSIGHTS)}
-                  className="surface-inline-panel group flex w-full items-center justify-between p-4 text-left transition-colors hover:border-sky/20"
+                  className="surface-inline-panel surface-tone-sky dashboard-tone-card group flex w-full items-center justify-between p-4 text-left transition-colors"
                   aria-label="View writing patterns"
                 >
                   <div className="flex items-center gap-3">
                     <Brain size={18} weight="duotone" className="text-sky group-hover:text-sky transition-colors" />
                     <div>
-                      <p className="text-base font-bold text-gray-text">Writing patterns</p>
-                      <p className="text-xs font-serif italic text-gray-nav">Mood, rhythm, and recurring themes</p>
+                      <p className="dashboard-action-title dashboard-hover-title">Writing patterns</p>
+                      <p className="dashboard-action-description">Mood, rhythm, and recurring themes</p>
                     </div>
                   </div>
                   <CaretRight size={16} weight="regular" className="text-gray-nav/40 group-hover:text-sky transition-colors" />
@@ -596,7 +596,7 @@ export const HomeAuthenticated: React.FC = () => {
               </div>
             </div>
             {/* Subtle background glow effect on hover */}
-            <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-sky-500/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+            <div className="dashboard-accent-glow pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
           </motion.div>
 
             <motion.div

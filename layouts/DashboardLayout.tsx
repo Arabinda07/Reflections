@@ -13,7 +13,15 @@ import {
   Bug,
   Leaf,
   PaperPlaneTilt,
-  CheckCircle
+  CheckCircle,
+  House,
+  Question,
+  SignIn,
+  UserPlus,
+  Notebook,
+  PencilSimpleLine,
+  UserCircle,
+  SignOut
 } from '@phosphor-icons/react';
 import { RoutePath } from '../types';
 import { useAuth } from '../context/AuthContext';
@@ -206,18 +214,24 @@ export const DashboardLayout: React.FC = () => {
   };
 
   const guestNavItems = [
-    { label: 'Homepage', path: RoutePath.HOME },
-    { label: 'FAQ', path: RoutePath.FAQ },
+    { label: 'Homepage', path: RoutePath.HOME, icon: House, description: 'Start from the quiet opening page.' },
+    { label: 'FAQ', path: RoutePath.FAQ, icon: Question, description: 'Answers about privacy, writing, and care.' },
   ];
 
   const authNavItems = [
-    { label: 'My notes', path: RoutePath.NOTES },
-    { label: 'Create note', path: RoutePath.CREATE_NOTE },
-    { label: 'Account', path: RoutePath.ACCOUNT },
-    { label: 'FAQ', path: RoutePath.FAQ },
+    { label: 'My notes', path: RoutePath.NOTES, icon: Notebook, description: 'Return to your saved reflections.' },
+    { label: 'Create note', path: RoutePath.CREATE_NOTE, icon: PencilSimpleLine, description: 'Open a fresh writing surface.' },
+    { label: 'Account', path: RoutePath.ACCOUNT, icon: UserCircle, description: 'Manage your profile and plan.' },
+    { label: 'FAQ', path: RoutePath.FAQ, icon: Question, description: 'Read how Reflections works.' },
   ];
 
   const navItems = isAuthenticated ? authNavItems : guestNavItems;
+  const guestSidebarNavItems = [
+    ...guestNavItems,
+    { label: 'Sign In', path: RoutePath.LOGIN, icon: SignIn, description: 'Enter your private journal.' },
+    { label: 'Sign Up', path: RoutePath.SIGNUP, icon: UserPlus, description: 'Create a writing space.' },
+  ];
+  const sidebarNavItems = isAuthenticated ? authNavItems : guestSidebarNavItems;
   const isWritingRoute =
     location.pathname === RoutePath.RELEASE ||
     location.pathname.includes('/new') ||
@@ -370,13 +384,17 @@ export const DashboardLayout: React.FC = () => {
       </nav>
       )}
 
-      {/* Mobile Menu Overlay - Moved OUTSIDE of nav to avoid overflow:hidden from liquid-glass */}
+      {/* Mobile sidebar portal - outside nav to avoid header clipping */}
       {typeof document !== 'undefined' && isMobileMenuOpen
         ? createPortal(
-            <div className="fixed inset-x-0 top-0 bottom-0 z-[105] h-[100dvh] overflow-hidden md:hidden animate-in fade-in duration-500">
-              <div
-                className="fixed inset-x-0 top-0 bottom-0 h-[100dvh] screen-scrim screen-scrim--strong"
+            <div className="fixed inset-x-0 top-0 bottom-0 z-[105] h-[100dvh] overflow-hidden md:hidden">
+              <motion.div
+                className="mobile-sidebar-scrim fixed inset-x-0 top-0 bottom-0 h-[100dvh]"
                 onClick={() => setIsMobileMenuOpen(false)}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
               />
 
               <motion.div
@@ -386,126 +404,145 @@ export const DashboardLayout: React.FC = () => {
                 aria-modal="true"
                 aria-labelledby={mobileMenuTitleId}
                 aria-describedby={mobileMenuDescriptionId}
-                initial={{ x: '100%' }}
-                animate={{ x: 0 }}
-                exit={{ x: '100%' }}
-                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className="fixed right-0 top-0 bottom-0 z-[110] h-[100dvh] w-[min(100vw,360px)] border-l border-border/70 bg-body shadow-[-18px_0_48px_-32px_rgba(0,0,0,0.35)]"
+                initial={{ x: 36, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: 36, opacity: 0 }}
+                transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+                className="mobile-sidebar-shell fixed right-0 top-0 bottom-0 z-[110] h-[100dvh]"
+                style={{
+                  paddingTop: NATIVE_PAGE_TOP_PADDING,
+                  paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom))',
+                  width: 'min(92vw, 390px)',
+                }}
               >
-                <div 
-                  className="flex h-full flex-col gap-6 overflow-y-auto p-8"
-                  style={{ paddingTop: NATIVE_PAGE_TOP_PADDING }}
-                >
+                <div className="flex h-full min-h-0 flex-col">
                   <h2 id={mobileMenuTitleId} className="sr-only">
                     Navigation menu
                   </h2>
                   <p id={mobileMenuDescriptionId} className="sr-only">
                     Use this menu to move around Reflections and close it when you are ready to return to the page.
                   </p>
-  
-                  {/* Close Button */}
-                  <button
-                    ref={mobileMenuCloseRef}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="surface-floating surface-floating--strong absolute right-4 z-[120] rounded-2xl p-3 text-gray-nav transition-colors duration-300 ease-out-expo hover:text-green active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
-                    style={{ top: NATIVE_TOP_CONTROL_OFFSET }}
-                    aria-label="Close menu"
-                  >
-                    <X size={24} />
-                  </button>
-  
-                  <div className="flex items-center gap-3 mb-8">
-                    <div className="h-12 w-12 rounded-2xl bg-green flex items-center justify-center text-white shadow-sm">
-                      <Leaf size={28} weight="fill" />
+
+                  <div className="flex shrink-0 items-start justify-between gap-4 px-5 pb-5 sm:px-6">
+                    <div className="flex min-w-0 items-center gap-3 pt-1">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-chip)] bg-green text-[rgb(var(--panel-bg-rgb))] shadow-sm shadow-green/10">
+                        <Leaf size={20} weight="fill" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-black uppercase tracking-[0.22em] text-gray-nav">Menu</p>
+                        <p className="font-serif text-[22px] italic leading-tight text-green">Reflections</p>
+                      </div>
                     </div>
-                    <span className="font-serif italic text-[28px] text-green">Reflections</span>
+
+                    <button
+                      ref={mobileMenuCloseRef}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="mobile-sidebar-close"
+                      style={{ marginTop: `calc(${NATIVE_TOP_CONTROL_OFFSET} - ${NATIVE_PAGE_TOP_PADDING})` }}
+                      aria-label="Close menu"
+                    >
+                      <X size={20} />
+                    </button>
                   </div>
 
-                {isAuthenticated ? (
-                  <>
-                    <div className="flex flex-col gap-2">
-                      {navItems.map((item) => {
+                  <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-5 sm:px-5">
+                    <nav aria-label="Mobile navigation" className="flex flex-col gap-2">
+                      {sidebarNavItems.map((item) => {
                         const isActive = location.pathname === item.path;
+                        const Icon = item.icon;
+
                         return (
                           <button
                             key={item.label}
                             onClick={() => handleNavigation(item.path)}
                             aria-current={isActive ? 'page' : undefined}
-                            className={`flex w-full items-center justify-between rounded-2xl border-l-2 p-6 text-left text-[24px] font-black transition-all duration-300 active:bg-green/5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset ${
-                              isActive ? 'border-green bg-green/5 text-green' : 'border-transparent text-gray-text hover:text-green'
-                            }`}
+                            className="mobile-sidebar-link group"
+                            data-active={isActive ? 'true' : 'false'}
                           >
-                            <span>{item.label}</span>
-                            <CaretRight weight="regular" className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <span className="mobile-sidebar-link-icon">
+                              <Icon size={20} weight={isActive ? 'fill' : 'regular'} />
+                            </span>
+                            <span className="min-w-0 flex-1">
+                              <span className="block truncate text-[15px] font-extrabold leading-tight">
+                                {item.label}
+                              </span>
+                              <span className="mt-1 block text-[12px] font-semibold leading-snug text-gray-nav">
+                                {item.description}
+                              </span>
+                            </span>
+                            <CaretRight
+                              size={16}
+                              weight="regular"
+                              className="mobile-sidebar-link-caret"
+                              aria-hidden="true"
+                            />
                           </button>
                         );
                       })}
-                    </div>
-                    <div className="mt-8 flex flex-col gap-4" style={{ paddingBottom: 'calc(2.5rem + env(safe-area-inset-bottom))' }}>
-                      {/* PWA Install Button — only visible when browser supports it */}
+                    </nav>
+
+                    <div className="mt-6 flex flex-col gap-3 border-t border-border/70 pt-5">
                       {canInstall && !isInstalled && (
                         <button
                           onClick={async () => {
                             await triggerInstall();
                             setIsMobileMenuOpen(false);
                           }}
-                          className="w-full flex items-center justify-center gap-3 p-5 rounded-2xl border-2 border-green/30 bg-green/5 text-green font-black text-[14px] transition-colors duration-300 hover:bg-green/10 active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+                          className="mobile-sidebar-link mobile-sidebar-link--action"
                           aria-label="Add Reflections to your home screen"
                         >
-                          <DownloadSimple size={20} weight="regular" />
-                          Add to home screen
+                          <span className="mobile-sidebar-link-icon">
+                            <DownloadSimple size={20} weight="regular" />
+                          </span>
+                          <span className="min-w-0 flex-1 text-left">
+                            <span className="block text-[15px] font-extrabold leading-tight">Add to home screen</span>
+                            <span className="mt-1 block text-[12px] font-semibold leading-snug text-gray-nav">
+                              Keep Reflections close by.
+                            </span>
+                          </span>
                         </button>
                       )}
-                      <Button
-                        variant="secondary"
-                        size="lg"
-                        onClick={() => {
-                          setIsInviteModalOpen(true);
-                          setIsMobileMenuOpen(false);
-                        }}
-                        className="w-full h-16 font-black rounded-2xl"
-                      >
-                        Invite
-                        <PaperPlaneTilt size={18} weight="regular" className="ml-2" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="lg"
-                        onClick={() => {
-                          logout();
-                          setIsMobileMenuOpen(false);
-                        }}
-                        className="w-full text-clay hover:bg-clay/5 h-16 font-black border-2 border-clay/10 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-1"
-                      >
-                        Logout
-                      </Button>
+
+                      {isAuthenticated && (
+                        <>
+                          <button
+                            onClick={() => {
+                              setIsInviteModalOpen(true);
+                              setIsMobileMenuOpen(false);
+                            }}
+                            className="mobile-sidebar-link mobile-sidebar-link--action"
+                          >
+                            <span className="mobile-sidebar-link-icon">
+                              <PaperPlaneTilt size={20} weight="regular" />
+                            </span>
+                            <span className="min-w-0 flex-1 text-left">
+                              <span className="block text-[15px] font-extrabold leading-tight">Invite</span>
+                              <span className="mt-1 block text-[12px] font-semibold leading-snug text-gray-nav">
+                                Share a quiet writing space.
+                              </span>
+                            </span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              logout();
+                              setIsMobileMenuOpen(false);
+                            }}
+                            className="mobile-sidebar-link mobile-sidebar-link--danger"
+                          >
+                            <span className="mobile-sidebar-link-icon">
+                              <SignOut size={20} weight="regular" />
+                            </span>
+                            <span className="min-w-0 flex-1 text-left">
+                              <span className="block text-[15px] font-extrabold leading-tight">Logout</span>
+                              <span className="mt-1 block text-[12px] font-semibold leading-snug text-gray-nav">
+                                Leave this session.
+                              </span>
+                            </span>
+                          </button>
+                        </>
+                      )}
                     </div>
-                  </>
-                ) : (
-                  <div className="flex flex-col gap-2" style={{ paddingBottom: 'calc(2.5rem + env(safe-area-inset-bottom))' }}>
-                    {[
-                      { label: 'Homepage', path: RoutePath.HOME },
-                      { label: 'FAQ', path: RoutePath.FAQ },
-                      { label: 'Sign In', path: RoutePath.LOGIN },
-                      { label: 'Sign Up', path: RoutePath.SIGNUP },
-                    ].map((item) => {
-                      const isActive = location.pathname === item.path;
-                      return (
-                        <button
-                          key={item.label}
-                          onClick={() => handleNavigation(item.path)}
-                          aria-current={isActive ? 'page' : undefined}
-                          className={`flex w-full items-center justify-between rounded-2xl border-l-2 p-6 text-left text-[24px] font-black transition-all duration-300 ease-out-expo active:bg-green/5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset ${
-                            isActive ? 'border-green bg-green/5 text-green' : 'border-transparent text-gray-text hover:text-green'
-                          }`}
-                        >
-                          <span>{item.label}</span>
-                          <CaretRight weight="regular" className="opacity-0 group-hover:opacity-100 transition-opacity" />
-                        </button>
-                      );
-                    })}
                   </div>
-                )}
                 </div>
               </motion.div>
             </div>,
