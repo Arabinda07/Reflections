@@ -27,6 +27,21 @@ begin
   end if;
 end $$;
 
+-- 2b. Preserve signup newsletter opt-ins on the profile row created by auth.
+create or replace function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.profiles (id, full_name, avatar_url, newsletter_opt_in)
+  values (
+    new.id,
+    new.raw_user_meta_data->>'full_name',
+    new.raw_user_meta_data->>'avatar_url',
+    coalesce((new.raw_user_meta_data->>'newsletter_opt_in')::boolean, false)
+  );
+  return new;
+end;
+$$ language plpgsql security definer;
+
 -- 3. Add the Smart Mode absorb log used to skip unchanged notes
 create table if not exists wiki_absorb_log (
   id uuid default gen_random_uuid() primary key,

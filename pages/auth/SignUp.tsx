@@ -22,6 +22,7 @@ import {
   isVerifiedEmailAvailable,
   requestVerifiedEmail,
 } from '@/src/auth/credentialManager';
+import { NEWSLETTER_SIGNUP_LABEL, buildNewsletterOptInMetadata } from '@/src/newsletter';
 import { CheckCircle } from '@phosphor-icons/react';
 import { referralService } from '@/services/engagementServices';
 
@@ -82,7 +83,7 @@ export const SignUp: React.FC = () => {
         options: {
           data: {
             full_name: name,
-            newsletter_opt_in: newsletterOptIn,
+            ...buildNewsletterOptInMetadata(newsletterOptIn),
           },
         },
       });
@@ -211,7 +212,7 @@ export const SignUp: React.FC = () => {
                   className="h-5 w-5 rounded border-border text-brand-accent focus:ring-brand-accent cursor-pointer"
                 />
                 <label htmlFor="newsletter" className="text-[14px] font-medium text-gray-text select-none cursor-pointer">
-                  Subscribe to our weekly note
+                  {NEWSLETTER_SIGNUP_LABEL}
                 </label>
               </div>
 

@@ -412,7 +412,7 @@ export const DashboardLayout: React.FC = () => {
                 style={{
                   paddingTop: NATIVE_PAGE_TOP_PADDING,
                   paddingBottom: 'calc(1.25rem + env(safe-area-inset-bottom))',
-                  width: 'min(92vw, 390px)',
+                  width: 'min(86vw, 352px)',
                 }}
               >
                 <div className="flex h-full min-h-0 flex-col">

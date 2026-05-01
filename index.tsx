@@ -19,7 +19,49 @@ const root = createRoot(rootElement, {
   onRecoverableError: handleReactRootError,
 });
 
-const renderBootstrapState = (title: string, body: string, detail?: string) => {
+const STALE_APP_SHELL_RECOVERY_KEY = 'app_recovered_from_import_error';
+const LEGACY_IMPORT_ERROR_RELOAD_KEY = 'app_reloaded_from_import_error';
+
+const isDynamicImportFailure = (detail: string) =>
+  detail.includes("Failed to fetch dynamically imported module");
+
+const reloadWithCacheBust = () => {
+  const currentUrl = new URL(window.location.href);
+  currentUrl.searchParams.set('t', Date.now().toString());
+  window.location.replace(currentUrl.toString());
+};
+
+const clearBrowserManagedAppCaches = async () => {
+  if ('serviceWorker' in navigator) {
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(registrations.map((registration) => registration.unregister()));
+  }
+
+  if (typeof caches !== 'undefined') {
+    const cacheNames = await caches.keys();
+    await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)));
+  }
+};
+
+const recoverFromStaleAppShell = async (detail: string) => {
+  console.warn("Detected stale app shell. Clearing browser-managed app caches before reloading.", detail);
+  sessionStorage.setItem(STALE_APP_SHELL_RECOVERY_KEY, 'true');
+
+  try {
+    await clearBrowserManagedAppCaches();
+  } catch (recoveryError) {
+    console.warn("Could not clear all browser-managed app caches before reloading.", recoveryError);
+  } finally {
+    reloadWithCacheBust();
+  }
+};
+
+const renderBootstrapState = (
+  title: string,
+  body: string,
+  detail?: string,
+  action?: { label: string; onClick: () => void },
+) => {
   root.render(
     <StrictMode>
       <div className="flex min-h-[100dvh] items-center justify-center bg-body px-6 py-12 text-gray-text">
@@ -35,6 +77,15 @@ const renderBootstrapState = (title: string, body: string, detail?: string) => {
             <p className="mt-4 text-[0.8rem] font-semibold uppercase tracking-[0.16em] text-gray-nav/75">
               {detail}
             </p>
+          ) : null}
+          {action ? (
+            <button
+              type="button"
+              onClick={action.onClick}
+              className="mt-6 inline-flex min-h-11 items-center justify-center rounded-[var(--radius-control)] bg-green px-5 text-sm font-bold text-white transition-transform duration-200 ease-out-expo active:translate-y-px"
+            >
+              {action.label}
+            </button>
           ) : null}
         </div>
       </div>
@@ -55,7 +106,8 @@ const bootstrapApp = async () => {
 
   try {
     const { default: App } = await import('./App');
-    sessionStorage.removeItem('app_reloaded_from_import_error');
+    sessionStorage.removeItem(STALE_APP_SHELL_RECOVERY_KEY);
+    sessionStorage.removeItem(LEGACY_IMPORT_ERROR_RELOAD_KEY);
 
     root.render(
       <StrictMode>
@@ -68,28 +120,28 @@ const bootstrapApp = async () => {
 
     // Detect dynamic import failures which usually indicate a version mismatch 
     // due to service worker caching or rapid redeployments.
-    if (detail.includes("Failed to fetch dynamically imported module")) {
-      const isReloaded = sessionStorage.getItem('app_reloaded_from_import_error');
-      
-      if (!isReloaded) {
-        console.warn("Detected dynamic import failure. Force-reloading the app to fetch the latest bundle.");
-        sessionStorage.setItem('app_reloaded_from_import_error', 'true');
-        
-        // Cache bust the URL to force the browser to fetch the new index.html
-        const currentUrl = new URL(window.location.href);
-        currentUrl.searchParams.set('t', Date.now().toString());
-        window.location.href = currentUrl.toString();
-        return;
-      } else {
-        sessionStorage.removeItem('app_reloaded_from_import_error');
-        console.error("Dynamic import failed even after cache-busted reload. Manual cache clear required.");
+    if (isDynamicImportFailure(detail)) {
+      const hasRecovered = sessionStorage.getItem(STALE_APP_SHELL_RECOVERY_KEY);
+
+      if (!hasRecovered) {
         renderBootstrapState(
-          "Update available.",
-          "We've updated Reflections. Please clear your browser cache or try opening the app in an incognito window to load the latest version.",
+          "Updating Reflections.",
+          "A newer version is available. Reflections is refreshing its local app shell so the latest files can load.",
           detail,
         );
+        await recoverFromStaleAppShell(detail);
         return;
       }
+
+      sessionStorage.removeItem(STALE_APP_SHELL_RECOVERY_KEY);
+      console.error("Dynamic import failed after stale app-shell recovery.", error);
+      renderBootstrapState(
+        "Refresh needed.",
+        "Reflections updated while this tab had an older app shell. Tap reload to fetch the newest files.",
+        detail,
+        { label: "Reload Reflections", onClick: reloadWithCacheBust },
+      );
+      return;
     }
 
     console.error("App bootstrap failed.", error);

@@ -87,6 +87,7 @@ export default defineConfig(({ mode }) => {
             ]
           },
           workbox: {
+            cleanupOutdatedCaches: true,
             maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
             globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
             globIgnores: [
@@ -95,17 +96,6 @@ export default defineConfig(({ mode }) => {
               '**/vendor-sentry-*.js',
             ],
             runtimeCaching: [
-              {
-                urlPattern: ({ event }) => event.request.mode === 'navigate',
-                handler: 'NetworkFirst',
-                options: {
-                  cacheName: 'app-navigation',
-                  networkTimeoutSeconds: 3,
-                  cacheableResponse: {
-                    statuses: [0, 200],
-                  },
-                },
-              },
               {
                 urlPattern: /^https:\/\/.*\.supabase\.co\/auth\/.*/i,
                 handler: 'NetworkOnly',

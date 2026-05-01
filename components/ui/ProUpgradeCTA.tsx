@@ -4,6 +4,7 @@ import { Button } from './Button';
 import { ModalSheet } from './ModalSheet';
 import { supabase } from '../../src/supabaseClient';
 import { useAuth } from '../../context/AuthContext';
+import { NEWSLETTER_SIGNUP_LABEL } from '../../src/newsletter';
 
 interface ProUpgradeCTAProps {
   onSuccess?: () => void;
@@ -226,7 +227,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
                   </div>
                 </div>
                 <span className="text-sm font-medium leading-relaxed text-gray-light">
-                  Send me occasional journaling ideas and product updates.
+                  {NEWSLETTER_SIGNUP_LABEL}
                 </span>
               </label>
             </div>

@@ -13,7 +13,7 @@ describe('Mobile sidebar navigation contract', () => {
     expect(layout).toContain('mobile-sidebar-scrim');
     expect(layout).toContain('mobile-sidebar-link');
     expect(layout).toContain('aria-label="Close menu"');
-    expect(layout).toContain("width: 'min(92vw, 390px)'");
+    expect(layout).toContain("width: 'min(86vw, 352px)'");
     expect(layout).not.toContain('border-l-2');
 
     expect(css).toContain('.mobile-sidebar-shell');
