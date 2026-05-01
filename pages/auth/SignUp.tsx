@@ -38,6 +38,7 @@ export const SignUp: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [newsletterOptIn, setNewsletterOptIn] = useState(true);
   const postLoginPath = resolvePostAuthRedirectPath(location.state?.from);
   const referralRecordedRef = useRef(false);
 
@@ -85,6 +86,7 @@ export const SignUp: React.FC = () => {
         options: {
           data: {
             full_name: name,
+            newsletter_opt_in: newsletterOptIn,
           },
         },
       });
@@ -214,7 +216,20 @@ export const SignUp: React.FC = () => {
                 icon={Lock}
               />
 
-              <Button type="submit" variant="primary" className="w-full h-[52px] text-[15px] font-bold mt-4" isLoading={loading}>
+              <div className="flex items-center gap-3 mt-4">
+                <input
+                  type="checkbox"
+                  id="newsletter"
+                  checked={newsletterOptIn}
+                  onChange={(e) => setNewsletterOptIn(e.target.checked)}
+                  className="h-5 w-5 rounded border-border text-brand-accent focus:ring-brand-accent cursor-pointer"
+                />
+                <label htmlFor="newsletter" className="text-[14px] font-medium text-gray-text select-none cursor-pointer">
+                  Subscribe to our weekly note
+                </label>
+              </div>
+
+              <Button type="submit" variant="primary" className="w-full h-[52px] text-[15px] font-bold mt-6" isLoading={loading}>
                 Create account
               </Button>
 
