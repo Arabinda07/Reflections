@@ -423,7 +423,7 @@ export const DashboardLayout: React.FC = () => {
                             key={item.label}
                             onClick={() => handleNavigation(item.path)}
                             aria-current={isActive ? 'page' : undefined}
-                            className={`flex w-full items-center justify-between rounded-2xl border-l-2 p-6 text-left text-[24px] font-black transition-colors duration-300 active:bg-green/5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset ${
+                            className={`flex w-full items-center justify-between rounded-2xl border-l-2 p-6 text-left text-[24px] font-black transition-all duration-300 active:bg-green/5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset ${
                               isActive ? 'border-green bg-green/5 text-green' : 'border-transparent text-gray-text hover:text-green'
                             }`}
                           >
@@ -487,7 +487,7 @@ export const DashboardLayout: React.FC = () => {
                           key={item.label}
                           onClick={() => handleNavigation(item.path)}
                           aria-current={isActive ? 'page' : undefined}
-                          className={`flex w-full items-center justify-between rounded-2xl border-l-2 p-6 text-left text-[24px] font-black transition-colors duration-300 ease-out-expo active:bg-green/5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset ${
+                          className={`flex w-full items-center justify-between rounded-2xl border-l-2 p-6 text-left text-[24px] font-black transition-all duration-300 ease-out-expo active:bg-green/5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset ${
                             isActive ? 'border-green bg-green/5 text-green' : 'border-transparent text-gray-text hover:text-green'
                           }`}
                         >
