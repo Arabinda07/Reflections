@@ -498,7 +498,8 @@ export const DashboardLayout: React.FC = () => {
                     })}
                   </div>
                 )}
-              </div>
+                </div>
+              </motion.div>
             </div>,
             document.body,
           )
