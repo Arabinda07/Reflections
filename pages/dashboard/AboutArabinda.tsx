@@ -56,7 +56,7 @@ export const AboutArabinda: React.FC = () => {
           </div>
           <div className="md:col-span-7 space-y-8">
             <h1 className="text-mk-display font-display font-extrabold leading-[0.95] tracking-normal text-gray-text text-balance">
-              A note from <br className="hidden md:block" />
+              A note from <br />
               <span className="font-serif italic font-normal text-green">Arabinda</span>
             </h1>
             <div className="space-y-6">

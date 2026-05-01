@@ -646,7 +646,7 @@ export const Account: React.FC = () => {
                 </Surface>
               </div>
 
-              <div className="p-6 lg:p-8 pt-0 lg:pt-0">
+              <div className="p-6 lg:p-8">
                 <Surface variant="bezel" tone="clay">
                   <details className="group marker:content-['']">
                     <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors hover:bg-black/5 focus-visible:bg-black/5">
