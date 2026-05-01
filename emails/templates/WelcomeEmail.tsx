@@ -1,8 +1,8 @@
 import { Text, Button, Section } from '@react-email/components';
 import React from 'react';
-import { BaseEmailLayout } from '../components/BaseEmailLayout';
-import { EmailHeader } from '../components/EmailHeader';
-import { UnsubscribeFooter } from '../components/UnsubscribeFooter';
+import { BaseEmailLayout } from '../components/BaseEmailLayout.tsx';
+import { EmailHeader } from '../components/EmailHeader.tsx';
+import { UnsubscribeFooter } from '../components/UnsubscribeFooter.tsx';
 
 interface WelcomeEmailProps {
   userName?: string;
