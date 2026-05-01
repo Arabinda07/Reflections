@@ -382,7 +382,7 @@ export const DashboardLayout: React.FC = () => {
                 animate={{ x: 0 }}
                 exit={{ x: '100%' }}
                 transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute right-0 top-0 bottom-0 h-full w-[min(calc(100vw-32px),360px)] z-[110] bg-body shadow-2xl"
+                className="absolute right-0 top-0 bottom-0 z-[110] h-full w-[min(100vw,360px)] border-l border-border/70 bg-body shadow-[-18px_0_48px_-32px_rgba(0,0,0,0.35)]"
               >
                 <div 
                   className="flex h-full flex-col gap-6 overflow-y-auto p-8"
