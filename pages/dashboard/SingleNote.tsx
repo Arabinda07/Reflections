@@ -5,7 +5,6 @@ import {
   Trash,
   ArrowLeft,
   Calendar,
-  Clock,
   WarningCircle,
   Paperclip,
   FileText,

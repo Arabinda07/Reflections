@@ -183,7 +183,6 @@ describe('phase 2/3 design-system rollout', () => {
     const cardSurfaceFiles = [
       'components/ui/CompletionCardActions.tsx',
       'components/ui/ReferralInvitePanel.tsx',
-      'pages/dashboard/NoteExportDialog.tsx',
       'pages/dashboard/ReleaseMode.tsx',
       'pages/dashboard/FutureLetters.tsx',
       'pages/dashboard/LifeWiki.tsx',

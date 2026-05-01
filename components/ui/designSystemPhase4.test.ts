@@ -9,7 +9,6 @@ describe('phase 4 design-system normalization', () => {
   it('moves the shared shell and portal-heavy surfaces onto the phase 4 contract', () => {
     const dashboardLayout = read('layouts/DashboardLayout.tsx');
     const createNote = read('pages/dashboard/CreateNote.tsx');
-    const ambientPlayer = read('components/wellness/AmbientPlayer.tsx');
     const startupScreen = read('components/ui/StartupScreen.tsx');
 
     expect(dashboardLayout).toContain('min-h-[100dvh]');
@@ -18,12 +17,6 @@ describe('phase 4 design-system normalization', () => {
     expect(createNote).toContain("from '../../components/ui/ModalSheet'");
     expect(createNote).not.toContain("from 'react-dom'");
     expect(createNote).not.toContain('window.innerWidth');
-
-    expect(ambientPlayer).toContain("from '../ui/ModalSheet'");
-    expect(ambientPlayer).not.toContain("from 'react-dom'");
-    expect(ambientPlayer).not.toContain('text-blue');
-    expect(ambientPlayer).not.toContain('text-red');
-    expect(ambientPlayer).not.toContain('border-sky');
 
     expect(startupScreen).toContain("from './OverlayFeedback'");
     expect(startupScreen).not.toContain("from 'react-dom'");

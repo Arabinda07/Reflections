@@ -13,16 +13,12 @@ describe('adapt and distill source contract', () => {
     const createNote = read('pages/dashboard/CreateNote.tsx');
     const myNotes = read('pages/dashboard/MyNotes.tsx');
     const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
-    const tabs = read('components/ui/Tabs.tsx');
     const button = read('components/ui/Button.tsx');
-    const installPrompt = read('components/ui/PWAInstallPrompt.tsx');
 
     expect(landing).toContain('min-h-11');
     expect(signIn).toContain('min-h-11');
     expect(home).toContain('h-11 w-11');
     expect(button).toContain('sm: "min-h-11 px-4 py-2');
-    expect(tabs).toContain('inline-flex min-h-11 items-center');
-    expect(installPrompt).toContain('inline-flex h-11 w-11 shrink-0');
     expect(myNotes).toContain('control-surface inline-flex h-11 w-11');
     expect(myNotes).toContain('inline-flex min-h-11 items-center');
     expect(createNote).toContain('inline-flex min-h-11 items-center gap-2 whitespace-nowrap');

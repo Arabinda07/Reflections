@@ -1,5 +1,4 @@
 import { Section, Text, Link } from '@react-email/components';
-import React from 'react';
 
 interface UnsubscribeFooterProps {
   unsubscribeUrl: string;

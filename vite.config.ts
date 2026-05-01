@@ -30,8 +30,9 @@ const vendorChunk = (id: string) => {
   return 'vendor-react';
 };
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(() => {
     const hasSentryAuthToken = Boolean(process.env.SENTRY_AUTH_TOKEN);
+    const sentrySourcemap: false | 'hidden' = hasSentryAuthToken ? 'hidden' : false;
 
     return {
       root: __dirname,
@@ -160,7 +161,7 @@ export default defineConfig(({ mode }) => {
         }),
       ],
       build: {
-        sourcemap: hasSentryAuthToken ? 'hidden' : false,
+        sourcemap: sentrySourcemap,
         rollupOptions: {
           output: {
             manualChunks: vendorChunk,

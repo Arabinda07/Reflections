@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
 import {
@@ -212,7 +212,6 @@ const getPageMap = (pages: LifeTheme[]) =>
 
 export const LifeWiki: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const { pageType } = useParams();
   const [notes, setNotes] = useState<Note[]>([]);
   const [themes, setThemes] = useState<LifeTheme[]>([]);

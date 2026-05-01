@@ -39,7 +39,6 @@ import { useAndroidBackHandler } from '../src/native/useAndroidBackHandler';
 import { useHaptics } from '../hooks/useHaptics';
 import { useSound } from '../hooks/useSound';
 
-const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
 const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY; 
@@ -162,11 +161,6 @@ export const DashboardLayout: React.FC = () => {
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };
-
-  const handleCloseBugModal = React.useCallback(() => {
-    setIsBugModalOpen(false);
-    setSubmitError(null);
-  }, []);
 
   const handleNavigation = (path: string) => {
     navigate(path);

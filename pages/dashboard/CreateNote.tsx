@@ -53,7 +53,6 @@ import { NATIVE_PAGE_TOP_PADDING, NATIVE_TOP_CONTROL_OFFSET } from '../../src/na
 import { profileService } from '../../services/profileService';
 import { getMonthlyNoteUsage } from '../../services/wellnessPolicy';
 import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
-import { useKeyboardShortcut } from '../../src/hooks/useKeyboardShortcut';
 import {
   buildCreateNoteDraftSnapshot,
   CREATE_NOTE_SAVE_VISUAL_FLOOR_MS,

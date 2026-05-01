@@ -1,12 +1,8 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
-  ArrowRight,
   BookOpen,
   Brain,
-  Checks,
   Compass,
-  EnvelopeSimple,
   Heart,
   PenNib,
   ShieldCheck,
@@ -16,11 +12,6 @@ import {
   Image as ImageIcon,
   ListChecks,
 } from '@phosphor-icons/react';
-
-import { Button } from '../../components/ui/Button';
-import { RoutePath } from '../../types';
-
-const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
 
 const guideSections = [
   {
@@ -105,9 +96,9 @@ const featureGrid = [
   { title: 'Life Wiki', body: 'A high-level summary of your world, updated only when you choose.', icon: Brain },
 ];
 
-export const FAQ: React.FC = () => {
-  const navigate = useNavigate();
+const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
 
+export const FAQ: React.FC = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -238,6 +229,17 @@ export const FAQ: React.FC = () => {
               );
             })}
           </div>
+        </section>
+
+        <section className="mb-28 border-t border-border pt-10">
+          <p className="label-caps text-green">Contact</p>
+          <p className="mt-3 max-w-[42rem] font-sans text-[16px] leading-relaxed text-gray-light">
+            Questions about Reflections can go to{' '}
+            <a className="font-bold text-green hover:opacity-70" href={`mailto:${SUPPORT_EMAIL}`}>
+              {SUPPORT_EMAIL}
+            </a>
+            .
+          </p>
         </section>
 
       </main>

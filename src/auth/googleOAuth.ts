@@ -213,7 +213,7 @@ export const redirectToAppRoute = (path: string) => {
   window.location.replace(`${window.location.origin}${targetPath}`);
 };
 
-const launchGoogleOAuth = async (sourcePath: GoogleAuthSourcePath) => {
+const launchGoogleOAuth = async () => {
   const isNative = hasWindow() && Capacitor.isNativePlatform();
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
@@ -257,7 +257,7 @@ export const startGoogleOAuthFlow = async ({
   rememberPendingGoogleAuth({ sourcePath, redirectPath });
 
   try {
-    const launchResult = await launchGoogleOAuth(sourcePath);
+    const launchResult = await launchGoogleOAuth();
 
     if (!launchResult.ok) {
       clearPendingGoogleAuth();

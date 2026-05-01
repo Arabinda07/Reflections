@@ -32,7 +32,8 @@ describe('optimize audit contract', () => {
     expect(vite).toContain("return 'vendor-lottie'");
     expect(vite).toContain("return 'vendor-state'");
     expect(vite).toContain('const hasSentryAuthToken = Boolean(process.env.SENTRY_AUTH_TOKEN);');
-    expect(vite).toContain("sourcemap: hasSentryAuthToken ? 'hidden' : false");
+    expect(vite).toContain("const sentrySourcemap: false | 'hidden' = hasSentryAuthToken ? 'hidden' : false;");
+    expect(vite).toContain('sourcemap: sentrySourcemap');
   });
 
   it('removes perception-slow waits from the authenticated home prompt refresh', () => {

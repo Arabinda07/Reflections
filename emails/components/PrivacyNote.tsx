@@ -1,5 +1,4 @@
 import { Section, Text } from '@react-email/components';
-import React from 'react';
 
 export const PrivacyNote = () => (
   <Section className="my-6">

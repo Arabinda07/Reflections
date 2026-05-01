@@ -1,5 +1,4 @@
 import { Text } from '@react-email/components';
-import React from 'react';
 import { BaseEmailLayout } from '../components/BaseEmailLayout';
 import { EmailHeader } from '../components/EmailHeader';
 import { FounderNoteBlock } from '../components/FounderNoteBlock';

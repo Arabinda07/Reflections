@@ -1,5 +1,4 @@
 import { Section, Row, Column, Text } from '@react-email/components';
-import React from 'react';
 
 export const EmailHeader = () => (
   <Section className="mb-8">

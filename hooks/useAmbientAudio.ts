@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { audioEngine } from '../services/audioEngine';
 
 export interface AmbientTrack {

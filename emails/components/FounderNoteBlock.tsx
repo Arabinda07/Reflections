@@ -1,5 +1,4 @@
 import { Section, Text, Img, Row, Column } from '@react-email/components';
-import React from 'react';
 
 interface FounderNoteBlockProps {
   content: string;

@@ -1,7 +1,6 @@
 import { supabase } from '../src/supabaseClient';
 import type { LifeTheme, ThemeCitation, Note } from '../types';
 import { WikiPageType, STRUCTURED_WIKI_PAGES } from './wikiTypes';
-import { getAuthenticatedUser } from './authUtils';
 import { mapToNote, type SupabaseNoteRow } from './noteService';
 
 const VALID_THEME_STATES = new Set<LifeTheme['state']>(['active', 'archived', 'resolved']);
