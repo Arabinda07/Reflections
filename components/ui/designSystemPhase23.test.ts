@@ -30,12 +30,20 @@ describe('phase 2/3 design-system rollout', () => {
     const paperPlaneToast = read('components/ui/PaperPlaneToast.tsx');
     const companionObservation = read('components/ui/CompanionObservation.tsx');
     const ambientMusicButton = read('components/ui/AmbientMusicButton.tsx');
+    const homeAuthenticated = read('pages/dashboard/HomeAuthenticated.tsx');
+    const css = read('index.css');
 
     expect(confirmationDialog).toContain("from './ModalSheet'");
     expect(loadingState).toContain("from './OverlayFeedback'");
     expect(paperPlaneToast).toContain("from './OverlayFeedback'");
     expect(companionObservation).toContain("from './OverlayFeedback'");
     expect(ambientMusicButton).toContain("from './ModalSheet'");
+    expect(homeAuthenticated).toContain('tone="sage"');
+    expect(css).toContain('--modal-sheet-backdrop-bg: rgba(var(--panel-bg-rgb), 0.88);');
+    expect(css).toContain('--modal-sheet-opaque-bg');
+    expect(css).toMatch(/\.modal-sheet-backdrop\s*{[^}]*background: var\(--modal-sheet-backdrop-bg\);/s);
+    expect(css).toMatch(/\.modal-sheet-panel\s*{[^}]*backdrop-filter: none;/s);
+    expect(css).not.toMatch(/\.modal-sheet-backdrop\s*{[^}]*background:\s*rgba\(var\(--panel-bg-rgb\), 0\.72\);/s);
 
     expect(loadingState).not.toContain('Schibsted Grotesk');
     expect(paperPlaneToast).not.toContain('Schibsted Grotesk');
@@ -160,7 +168,7 @@ describe('phase 2/3 design-system rollout', () => {
     expect(createNote).toContain('title="AI reflection"');
     expect(createNote).toContain('tone="sage"');
 
-    expect(moodConfig).toContain('bg-green/10 border-green/20 text-green');
+    expect(moodConfig).toContain('bg-mood-calm/10 border-mood-calm/20 text-mood-calm');
     expect(moodConfig).not.toContain('bg-blue/10');
     expect(moodConfig).not.toContain('text-red');
     expect(moodConfig).not.toContain('bg-golden/10');

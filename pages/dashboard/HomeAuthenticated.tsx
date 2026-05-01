@@ -733,6 +733,7 @@ export const HomeAuthenticated: React.FC = () => {
         title="Quick check-in"
         icon={<Heart size={20} weight="duotone" />}
         size="sm"
+        tone="sage"
         bodyClassName="pt-2"
       >
         <div className="space-y-5">
