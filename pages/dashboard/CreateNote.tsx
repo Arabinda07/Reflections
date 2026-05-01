@@ -28,6 +28,8 @@ import {
 } from '@phosphor-icons/react';
 import { Magnetic } from '../../components/ui/Magnetic';
 import { useAmbientAudio, AMBIENT_TRACKS } from '../../hooks/useAmbientAudio';
+import { useHaptics } from '../../hooks/useHaptics';
+import { useSound } from '../../hooks/useSound';
 import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
 import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
@@ -246,6 +248,8 @@ export const CreateNote: React.FC = () => {
   );
 
   const { isPlaying: musicPlaying, activeTrack: activeMusicTrack, playTrack: playMusicTrack, stopAll: stopMusic } = useAmbientAudio();
+  const haptics = useHaptics();
+  const { playSaveChime } = useSound();
   const ActiveMoodIcon = getMoodConfig(mood)?.icon || Smiley;
   const recognitionRef = useRef<any>(null);
   const isWhisperingRef = useRef(false);
@@ -518,6 +522,9 @@ export const CreateNote: React.FC = () => {
         tagCount: tags.length,
         taskCount: tasks.length,
       });
+
+      haptics.confirming();
+      playSaveChime();
 
       if (smartModeEnabled) {
         void noteService.getAll()

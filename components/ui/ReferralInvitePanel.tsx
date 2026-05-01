@@ -4,6 +4,8 @@ import { Button } from './Button';
 import { MetadataPill } from './MetadataPill';
 import { buildReferralLink, referralService } from '../../services/engagementServices';
 import type { ReferralInvite } from '../../types';
+import { useHaptics } from '../../hooks/useHaptics';
+import { useSound } from '../../hooks/useSound';
 
 interface ReferralInvitePanelProps {
   compact?: boolean;
@@ -12,6 +14,8 @@ interface ReferralInvitePanelProps {
 export const ReferralInvitePanel: React.FC<ReferralInvitePanelProps> = ({ compact = false }) => {
   const [invite, setInvite] = useState<ReferralInvite | null>(null);
   const [acceptedCount, setAcceptedCount] = useState(0);
+  const haptics = useHaptics();
+  const { playSaveChime } = useSound();
   const [isLoading, setIsLoading] = useState(true);
   const [status, setStatus] = useState<string | null>(null);
   const isErrorStatus = status ? status.startsWith('I could not') || status.startsWith('Copy did not') : false;
@@ -70,6 +74,8 @@ export const ReferralInvitePanel: React.FC<ReferralInvitePanelProps> = ({ compac
       await navigator.clipboard.writeText(inviteLink);
       await markShared();
       setStatus('Invite link copied.');
+      haptics.confirming();
+      playSaveChime();
     } catch (error) {
       console.error('Could not copy invite link:', error);
       setStatus('Copy did not work. You can select the link instead.');
@@ -88,6 +94,8 @@ export const ReferralInvitePanel: React.FC<ReferralInvitePanelProps> = ({ compac
         });
         await markShared();
         setStatus('Invite shared.');
+        haptics.confirming();
+        playSaveChime();
         return;
       }
 

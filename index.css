@@ -199,8 +199,8 @@
   --hero-scrim: linear-gradient(180deg,
       oklch(0.28 0.02 135 / 0.12),
       oklch(0.24 0.02 135 / 0.28));
-  --screen-scrim-soft: rgba(var(--panel-bg-rgb), 0.72);
-  --screen-scrim-strong: rgba(var(--panel-bg-rgb), 0.84);
+  --screen-scrim-soft: rgba(var(--panel-bg-rgb), 0.85);
+  --screen-scrim-strong: rgba(var(--panel-bg-rgb), 0.95);
   --floating-panel-bg: rgba(var(--panel-bg-rgb), 0.82);
   --floating-panel-bg-strong: rgba(var(--panel-bg-rgb), 0.92);
   --floating-panel-border: oklch(from var(--border-color) l c h / 0.82);
@@ -389,8 +389,8 @@
   --hero-scrim: linear-gradient(180deg,
       oklch(0.13 0.02 135 / 0.22),
       oklch(0.1 0.02 135 / 0.48));
-  --screen-scrim-soft: rgba(var(--panel-bg-rgb), 0.72);
-  --screen-scrim-strong: rgba(var(--panel-bg-rgb), 0.86);
+  --screen-scrim-soft: rgba(var(--panel-bg-rgb), 0.85);
+  --screen-scrim-strong: rgba(var(--panel-bg-rgb), 0.95);
   --floating-panel-media-border: rgba(255, 255, 255, 0.12);
   --ambient-hint-shadow: 0 18px 24px -18px rgba(0, 0, 0, 0.42);
 
@@ -615,8 +615,8 @@ select:focus-visible,
     background: var(--surface-current-bg);
     border-radius: calc(var(--radius-shell) - 1px);
     border: 1.5px solid var(--surface-current-border);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     height: 100%;
     width: 100%;
   }
@@ -786,14 +786,14 @@ select:focus-visible,
         rgba(var(--panel-bg-rgb), 0.94) 0%,
         rgba(var(--panel-bg-rgb), 0.72) 56%,
         rgba(var(--panel-bg-rgb), 0) 100%);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
   }
 
   .screen-scrim {
     background: var(--screen-scrim-soft);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
   }
 
   .screen-scrim--strong {
@@ -805,8 +805,8 @@ select:focus-visible,
     background: var(--surface-current-bg);
     color: var(--gray-text);
     box-shadow: var(--surface-tinted-shadow);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     transition:
       background-color 220ms ease,
       border-color 220ms ease,

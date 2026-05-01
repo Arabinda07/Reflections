@@ -28,6 +28,8 @@ import { referralService } from '../services/engagementServices';
 import { registerAndroidBackAction } from '../src/native/androidBack';
 import { NATIVE_PAGE_TOP_PADDING, NATIVE_TOP_CONTROL_OFFSET } from '../src/native/safeArea';
 import { useAndroidBackHandler } from '../src/native/useAndroidBackHandler';
+import { useHaptics } from '../hooks/useHaptics';
+import { useSound } from '../hooks/useSound';
 
 const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
@@ -49,6 +51,9 @@ export const DashboardLayout: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return document.documentElement.classList.contains('dark');
   });
+
+  const haptics = useHaptics();
+  const { playSaveChime } = useSound();
 
   useKeyboardShortcut(
     { key: 'n', ctrlOrCmd: true },
@@ -177,6 +182,9 @@ export const DashboardLayout: React.FC = () => {
       setIsSubmitting(false);
       setIsSubmitted(true);
       setBugMessage('');
+      
+      haptics.confirming();
+      playSaveChime();
       
       setTimeout(() => {
         setIsBugModalOpen(false);
