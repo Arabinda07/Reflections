@@ -382,10 +382,10 @@ export const DashboardLayout: React.FC = () => {
                 animate={{ x: 0 }}
                 exit={{ x: '100%' }}
                 transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute right-4 top-4 bottom-4 w-[min(calc(100vw-32px),360px)] z-[110] surface-bezel surface-tone-sage"
+                className="absolute right-0 top-0 bottom-0 h-full w-[min(calc(100vw-32px),360px)] z-[110] bg-body shadow-2xl"
               >
                 <div 
-                  className="surface-bezel-inner flex flex-col gap-6 overflow-y-auto p-8"
+                  className="flex h-full flex-col gap-6 overflow-y-auto p-8"
                   style={{ paddingTop: NATIVE_PAGE_TOP_PADDING }}
                 >
                   <h2 id={mobileMenuTitleId} className="sr-only">
@@ -423,8 +423,8 @@ export const DashboardLayout: React.FC = () => {
                             key={item.label}
                             onClick={() => handleNavigation(item.path)}
                             aria-current={isActive ? 'page' : undefined}
-                            className={`flex w-full items-center justify-between rounded-2xl p-6 text-left text-[24px] font-black transition-colors duration-300 active:bg-green/5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset ${
-                              isActive ? 'bg-green/10 text-green' : 'text-gray-text hover:text-green'
+                            className={`flex w-full items-center justify-between rounded-2xl border-l-2 p-6 text-left text-[24px] font-black transition-colors duration-300 active:bg-green/5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset ${
+                              isActive ? 'border-green bg-green/5 text-green' : 'border-transparent text-gray-text hover:text-green'
                             }`}
                           >
                             <span>{item.label}</span>
@@ -487,8 +487,8 @@ export const DashboardLayout: React.FC = () => {
                           key={item.label}
                           onClick={() => handleNavigation(item.path)}
                           aria-current={isActive ? 'page' : undefined}
-                          className={`flex w-full items-center justify-between rounded-2xl p-6 text-left text-[24px] font-black transition-colors duration-300 ease-out-expo active:bg-green/5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset ${
-                            isActive ? 'bg-green/10 text-green' : 'text-gray-text hover:text-green'
+                          className={`flex w-full items-center justify-between rounded-2xl border-l-2 p-6 text-left text-[24px] font-black transition-colors duration-300 ease-out-expo active:bg-green/5 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-inset ${
+                            isActive ? 'border-green bg-green/5 text-green' : 'border-transparent text-gray-text hover:text-green'
                           }`}
                         >
                           <span>{item.label}</span>
