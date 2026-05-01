@@ -55,6 +55,7 @@ const bootstrapApp = async () => {
 
   try {
     const { default: App } = await import('./App');
+    sessionStorage.removeItem('app_reloaded_from_import_error');
 
     root.render(
       <StrictMode>
@@ -68,9 +69,27 @@ const bootstrapApp = async () => {
     // Detect dynamic import failures which usually indicate a version mismatch 
     // due to service worker caching or rapid redeployments.
     if (detail.includes("Failed to fetch dynamically imported module")) {
-      console.warn("Detected dynamic import failure. Force-reloading the app to fetch the latest bundle.");
-      window.location.reload();
-      return;
+      const isReloaded = sessionStorage.getItem('app_reloaded_from_import_error');
+      
+      if (!isReloaded) {
+        console.warn("Detected dynamic import failure. Force-reloading the app to fetch the latest bundle.");
+        sessionStorage.setItem('app_reloaded_from_import_error', 'true');
+        
+        // Cache bust the URL to force the browser to fetch the new index.html
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set('t', Date.now().toString());
+        window.location.href = currentUrl.toString();
+        return;
+      } else {
+        sessionStorage.removeItem('app_reloaded_from_import_error');
+        console.error("Dynamic import failed even after cache-busted reload. Manual cache clear required.");
+        renderBootstrapState(
+          "Update available.",
+          "We've updated Reflections. Please clear your browser cache or try opening the app in an incognito window to load the latest version.",
+          detail,
+        );
+        return;
+      }
     }
 
     console.error("App bootstrap failed.", error);
