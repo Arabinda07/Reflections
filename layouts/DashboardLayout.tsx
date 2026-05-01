@@ -371,40 +371,47 @@ export const DashboardLayout: React.FC = () => {
                 onClick={() => setIsMobileMenuOpen(false)}
               />
 
-              <div
+              <motion.div
                 ref={mobileMenuPanelRef}
                 id={mobileMenuId}
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby={mobileMenuTitleId}
                 aria-describedby={mobileMenuDescriptionId}
-                className="relative flex h-full flex-col gap-6 overflow-y-auto p-8"
-                style={{ paddingTop: NATIVE_PAGE_TOP_PADDING }}
+                initial={{ x: '100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '100%' }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute right-4 top-4 bottom-4 w-[min(calc(100vw-32px),360px)] z-[110] surface-bezel surface-tone-sage"
               >
-                <h2 id={mobileMenuTitleId} className="sr-only">
-                  Navigation menu
-                </h2>
-                <p id={mobileMenuDescriptionId} className="sr-only">
-                  Use this menu to move around Reflections and close it when you are ready to return to the page.
-                </p>
-
-                {/* Close Button */}
-                <button
-                  ref={mobileMenuCloseRef}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="surface-floating surface-floating--strong absolute right-4 z-[110] rounded-2xl p-3 text-gray-nav transition-colors duration-300 ease-out-expo hover:text-green active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
-                  style={{ top: NATIVE_TOP_CONTROL_OFFSET }}
-                  aria-label="Close menu"
+                <div 
+                  className="surface-bezel-inner flex flex-col gap-6 overflow-y-auto p-8"
+                  style={{ paddingTop: NATIVE_PAGE_TOP_PADDING }}
                 >
-                  <X size={24} />
-                </button>
-
-                <div className="flex items-center gap-3 mb-8">
-                  <div className="h-12 w-12 rounded-2xl bg-green flex items-center justify-center text-white shadow-sm">
-                    <Leaf size={28} weight="fill" />
+                  <h2 id={mobileMenuTitleId} className="sr-only">
+                    Navigation menu
+                  </h2>
+                  <p id={mobileMenuDescriptionId} className="sr-only">
+                    Use this menu to move around Reflections and close it when you are ready to return to the page.
+                  </p>
+  
+                  {/* Close Button */}
+                  <button
+                    ref={mobileMenuCloseRef}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="surface-floating surface-floating--strong absolute right-4 z-[120] rounded-2xl p-3 text-gray-nav transition-colors duration-300 ease-out-expo hover:text-green active:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
+                    style={{ top: NATIVE_TOP_CONTROL_OFFSET }}
+                    aria-label="Close menu"
+                  >
+                    <X size={24} />
+                  </button>
+  
+                  <div className="flex items-center gap-3 mb-8">
+                    <div className="h-12 w-12 rounded-2xl bg-green flex items-center justify-center text-white shadow-sm">
+                      <Leaf size={28} weight="fill" />
+                    </div>
+                    <span className="font-serif italic text-[28px] text-green">Reflections</span>
                   </div>
-                  <span className="font-serif italic text-[28px] text-green">Reflections</span>
-                </div>
 
                 {isAuthenticated ? (
                   <>

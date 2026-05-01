@@ -8,6 +8,8 @@ const GOOGLE_AUTH_ERROR_KEY = 'reflections.google-auth-error';
 // Native apps should return through an app link, not back into the public web origin.
 const NATIVE_GOOGLE_AUTH_REDIRECT_URL = 'com.arabinda.reflections://auth/callback';
 
+let isLaunchingOAuth = false;
+
 type GoogleAuthSourcePath = RoutePath.LOGIN | RoutePath.SIGNUP;
 
 type NativeGoogleOAuthResult =
@@ -246,6 +248,8 @@ export const startGoogleOAuthFlow = async ({
   sourcePath: GoogleAuthSourcePath;
   redirectPath?: string;
 }) => {
+  if (isLaunchingOAuth) return null;
+  isLaunchingOAuth = true;
   rememberPendingGoogleAuth({ sourcePath, redirectPath });
 
   try {
@@ -260,6 +264,8 @@ export const startGoogleOAuthFlow = async ({
     return error instanceof Error
       ? error.message
       : 'An unexpected error occurred during Google login.';
+  } finally {
+    isLaunchingOAuth = false;
   }
 
   return null;

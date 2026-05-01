@@ -2,6 +2,7 @@ import { useEffect, useCallback, useRef } from 'react';
 import { offlineStorage } from '../services/offlineStorage';
 import { supabase } from '../src/supabaseClient';
 import { useNetworkState } from './useNetworkState';
+import { useAuth } from '../context/AuthContext';
 
 /**
  * useSync hook
@@ -10,6 +11,7 @@ import { useNetworkState } from './useNetworkState';
  * Automatically synchronizes pending notes when connectivity is restored.
  */
 export const useSync = () => {
+  const { isAuthenticated } = useAuth();
   const isOnline = useNetworkState();
   const isSyncing = useRef(false);
 
@@ -17,7 +19,8 @@ export const useSync = () => {
     // 1. Guards
     if (!isOnline || isSyncing.current) return;
 
-    // 2. Auth Check
+    // 2. Auth Check - Rely on context state to avoid racing with code exchange
+    if (!isAuthenticated) return;
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
 
@@ -81,7 +84,7 @@ export const useSync = () => {
 
     isSyncing.current = false;
     console.debug('[SyncEngine] Sync cycle complete.');
-  }, [isOnline]);
+  }, [isOnline, isAuthenticated]);
 
   useEffect(() => {
     if (isOnline) {
