@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { render } from "https://esm.sh/@react-email/render@0.0.10"
-import React from "https://esm.sh/react@18.2.0"
+import { render } from "@react-email/render"
+import React from "react"
 import { WelcomeEmail } from "../../../emails/templates/WelcomeEmail.tsx"
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
