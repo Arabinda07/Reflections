@@ -9,8 +9,6 @@ interface BaseEmailLayoutProps {
 export const BaseEmailLayout = ({ children, previewText }: BaseEmailLayoutProps) => {
   return (
     <Html>
-      <Head />
-      {previewText && <Preview>{previewText}</Preview>}
       <Tailwind
         config={{
           theme: {
@@ -27,6 +25,8 @@ export const BaseEmailLayout = ({ children, previewText }: BaseEmailLayoutProps)
           },
         }}
       >
+        <Head />
+        {previewText && <Preview>{previewText}</Preview>}
         <Body className="bg-brand-bg text-brand-text font-sans py-10 antialiased">
           <Container className="mx-auto max-w-[600px] bg-white rounded-[2rem] p-8 sm:p-12 shadow-sm border border-black/5">
             {children}
