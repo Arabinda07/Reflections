@@ -95,7 +95,7 @@ describe('Sanctuary Life Wiki contract', () => {
     expect(insights).toContain('dotLottieRefCallback={bindSanctuaryEntrancePlayer}');
     expect(insights).toContain("addEventListener('complete'");
     expect(insights).toContain('window.setTimeout(completeOpenSanctuary, SANCTUARY_ENTRANCE_FALLBACK_MS)');
-    expect(insights).toContain('/assets/lottie/Level Up Animation.json');
+    expect(insights).toContain('/assets/lottie/Level%20Up%20Animation.json');
     expect(lifeWiki).not.toContain('refreshModeLabel');
     expect(lifeWiki).not.toContain('On demand. Use Refresh with AI when you want the library rebuilt.');
   });

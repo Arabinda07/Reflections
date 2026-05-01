@@ -147,7 +147,7 @@ const ROOM_TONE_CLASSES: Record<PageMeta['tone'], {
 
 const SOURCE_LINK_PREFIX = 'source-note:';
 const SOURCE_MARKER_PATTERN = /\[source:([^\]]+)\]/gi;
-const SANCTUARY_ENTRANCE_LOTTIE = '/assets/lottie/Level Up Animation.json';
+const SANCTUARY_ENTRANCE_LOTTIE = '/assets/lottie/Level%20Up%20Animation.json';
 
 const articlePath = (pageType: WikiPageType) =>
   RoutePath.SANCTUARY_ARTICLE.replace(':pageType', pageType);
@@ -219,9 +219,6 @@ export const LifeWiki: React.FC = () => {
   const [isRefreshingWiki, setIsRefreshingWiki] = useState(false);
   const [hasLoadedLibrary, setHasLoadedLibrary] = useState(false);
   const [refreshFeedback, setRefreshFeedback] = useState<RefreshFeedback | null>(null);
-  const [showInsightsEntrance, setShowInsightsEntrance] = useState(
-    () => Boolean((location.state as { fromInsights?: boolean } | null)?.fromInsights),
-  );
   const shouldReduceMotion = useReducedMotion();
 
   const loadData = async () => {
@@ -247,10 +244,8 @@ export const LifeWiki: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!showInsightsEntrance) return;
-    const timer = window.setTimeout(() => setShowInsightsEntrance(false), 1100);
-    return () => window.clearTimeout(timer);
-  }, [showInsightsEntrance]);
+    // Entrance threshold handled by Insights or on-demand refresh
+  }, []);
 
   const gate = useMemo(() => {
     if (!access) return null;
@@ -427,7 +422,7 @@ export const LifeWiki: React.FC = () => {
 
   const renderEntrance = () => (
     <AnimatePresence>
-      {(isRefreshingWiki || showInsightsEntrance) && (
+      {isRefreshingWiki && (
         <motion.div
           initial={shouldReduceMotion ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
