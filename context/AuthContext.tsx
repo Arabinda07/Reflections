@@ -61,8 +61,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (session) {
             setUser(mapSessionToUser(session));
           } else if (error) {
-            console.warn('Supabase session check failed (likely offline). Using local persisted session.');
-            // Session remains as it was in the persisted Zustand store
+            console.warn('Supabase session check failed:', error);
+            if (error.status && error.status >= 400 && error.status < 500) {
+              // 4xx errors mean the session is invalid or expired
+              setUser(null);
+            } else {
+              console.warn('Likely offline. Using local persisted session.');
+              // Session remains as it was in the persisted Zustand store
+            }
           } else {
             setUser(null);
           }
