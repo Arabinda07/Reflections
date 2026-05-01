@@ -5,6 +5,7 @@ import { supabase } from '../supabaseClient';
 const PENDING_GOOGLE_AUTH_PATH_KEY = 'reflections.pending-google-auth-path';
 const PENDING_GOOGLE_AUTH_REDIRECT_PATH_KEY = 'reflections.pending-google-auth-redirect-path';
 const GOOGLE_AUTH_ERROR_KEY = 'reflections.google-auth-error';
+export const LAST_HANDLED_NATIVE_URL_KEY = 'reflections.last-handled-native-url';
 // Native apps should return through an app link, not back into the public web origin.
 const NATIVE_GOOGLE_AUTH_REDIRECT_URL = 'com.arabinda.reflections://auth/callback';
 

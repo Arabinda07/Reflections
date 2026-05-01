@@ -187,7 +187,6 @@ export const FutureLetters: React.FC = () => {
           </button>
 
           <SectionHeader
-            eyebrow="Future letter"
             title="Write a letter to yourself"
             icon={
               <div className="icon-block icon-block-lg">
@@ -275,8 +274,7 @@ export const FutureLetters: React.FC = () => {
               <div className="space-y-5 p-6 sm:p-8">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="label-caps text-honey">Letters</p>
-                    <h2 className="mt-1 text-[26px] font-display font-bold text-gray-text">
+                    <h2 className="text-[26px] font-display font-bold text-gray-text">
                       Waiting to open
                     </h2>
                   </div>

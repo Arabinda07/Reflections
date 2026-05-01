@@ -11,7 +11,6 @@ export function useNativeOAuthListener() {
   useEffect(() => {
     let isActive = true;
     let removeNativeUrlListener: (() => Promise<void>) | null = null;
-    let lastHandledNativeUrl: string | null = null;
     
     const setupNativeOAuth = async () => {
       const { Capacitor } = await import('@capacitor/core');
@@ -29,11 +28,12 @@ export function useNativeOAuthListener() {
       }
 
       const handleNativeOAuthUrl = async (url: string) => {
-        if (!url || url === lastHandledNativeUrl) {
+        const lastHandled = sessionStorage.getItem(googleOAuth.LAST_HANDLED_NATIVE_URL_KEY);
+        if (!url || url === lastHandled) {
           return;
         }
 
-        lastHandledNativeUrl = url;
+        sessionStorage.setItem(googleOAuth.LAST_HANDLED_NATIVE_URL_KEY, url);
         const pendingSourcePath = googleOAuth.getPendingGoogleAuthPath() || RoutePath.LOGIN;
         const result = await googleOAuth.consumeNativeGoogleOAuthCallback(url);
 
