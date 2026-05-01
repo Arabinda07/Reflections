@@ -52,13 +52,25 @@ export const AboutArabinda: React.FC = () => {
         <SectionHeader title={<>A note from <span className="text-emphasis">Arabinda</span></>} />
 
         <Surface variant="bezel" tone="sage">
-          <div className="space-y-5 p-6 sm:p-10">
-            <p className="max-w-[65ch] font-serif text-2xl italic leading-relaxed text-gray-text sm:text-4xl">
-              Reflections began as a reminder to take a few quiet minutes before the day ends.
-            </p>
-            <p className="max-w-[65ch] text-base font-medium leading-relaxed text-gray-light">
-              I am <span className="text-emphasis">Arabinda</span>. I made this app because we are all part of a mass movement that often prefers fitting in. I wanted a quieter counterweight: a place to check in with your emotions, write something down, and leave without being pushed to perform. Thank you for trusting me with a few minutes of your day.
-            </p>
+          <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start p-6 sm:p-10">
+            <div className="flex-shrink-0">
+              <div className="h-28 w-28 sm:h-32 sm:w-32 md:h-40 md:w-40 overflow-hidden rounded-[2rem] shadow-sm ring-1 ring-black/5 transition-shadow duration-500 hover:shadow-md">
+                <img
+                  src="/assets/images/founder.png"
+                  alt="Arabinda, creator of Reflections"
+                  className="h-full w-full object-cover grayscale-[0.3] transition-all duration-700 hover:scale-105 hover:grayscale-0"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+            <div className="flex-1 space-y-5 md:pt-2">
+              <p className="max-w-[65ch] font-serif text-2xl italic leading-relaxed text-gray-text sm:text-3xl md:text-4xl">
+                Reflections began as a reminder to take a few quiet minutes before the day ends.
+              </p>
+              <p className="max-w-[65ch] text-base font-medium leading-relaxed text-gray-light">
+                I am <span className="text-emphasis">Arabinda</span>. I made this app because we are all part of a mass movement that often prefers fitting in. I wanted a quieter counterweight: a place to check in with your emotions, write something down, and leave without being pushed to perform. Thank you for trusting me with a few minutes of your day.
+              </p>
+            </div>
           </div>
         </Surface>
 
