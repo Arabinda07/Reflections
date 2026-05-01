@@ -55,12 +55,18 @@ export const AboutArabinda: React.FC = () => {
             </div>
           </div>
           <div className="md:col-span-7 space-y-8">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif italic text-gray-text leading-tight">
-              Reflections began as a reminder to take a few quiet minutes before the day ends.
+            <h1 className="text-mk-display font-display font-extrabold leading-[0.95] tracking-normal text-gray-text text-balance">
+              A note from <br className="hidden md:block" />
+              <span className="font-serif italic font-normal text-green">Arabinda</span>
             </h1>
-            <p className="max-w-[55ch] text-lg font-medium leading-relaxed text-gray-light">
-              I am <span className="text-emphasis">Arabinda</span>. I made this app because we are all part of a mass movement that often prefers fitting in. I wanted a quieter counterweight: a place to check in with your emotions, write something down, and leave without being pushed to perform. Thank you for trusting me with a few minutes of your day.
-            </p>
+            <div className="space-y-6">
+              <p className="max-w-[55ch] text-xl font-serif italic leading-relaxed text-gray-text">
+                Reflections began as a reminder to take a few quiet minutes before the day ends.
+              </p>
+              <p className="max-w-[55ch] font-sans text-[16px] leading-relaxed text-gray-light">
+                I made this app because we are all part of a mass movement that often prefers fitting in. I wanted a quieter counterweight: a place to check in with your emotions, write something down, and leave without being pushed to perform. Thank you for trusting me with a few minutes of your day.
+              </p>
+            </div>
           </div>
         </section>
 
@@ -72,15 +78,15 @@ export const AboutArabinda: React.FC = () => {
               className="group border-t border-black/5 py-12 md:py-16 grid gap-6 md:grid-cols-12 md:gap-12 transition-colors duration-500 hover:bg-black/[0.02] -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-3xl"
             >
               <div className="md:col-span-4 flex flex-col items-start gap-4">
-                <div className="h-12 w-12 flex items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-black/5 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
+                <div className="h-12 w-12 flex items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-black/5 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
                   {section.icon}
                 </div>
-                <h2 className="text-2xl font-serif italic text-gray-text">
+                <h2 className="text-[22px] font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green">
                   {section.title}
                 </h2>
               </div>
               <div className="md:col-span-8 flex items-center">
-                <p className="max-w-[65ch] text-lg font-medium leading-relaxed text-gray-light">
+                <p className="font-sans text-[16px] leading-relaxed text-gray-light max-w-[65ch]">
                   {section.body}
                 </p>
               </div>
