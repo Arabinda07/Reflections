@@ -208,7 +208,7 @@ export const DashboardLayout: React.FC = () => {
   };
 
   const guestNavItems = [
-    { label: 'Homepage', path: RoutePath.HOME, icon: House, description: 'Start from the quiet opening page.' },
+    { label: 'Homepage', path: RoutePath.HOME, icon: House, description: 'Start from the opening page.' },
     { label: 'FAQ', path: RoutePath.FAQ, icon: Question, description: 'Answers about privacy, writing, and care.' },
   ];
 
@@ -236,7 +236,7 @@ export const DashboardLayout: React.FC = () => {
     location.pathname.startsWith(RoutePath.SANCTUARY);
   const isLandingRoute = location.pathname === RoutePath.HOME && !isAuthenticated;
   const landingControlClass = isLandingRoute
-    ? 'text-hero-ink hover:text-green hover:bg-white/10'
+    ? 'hero-ink hover:text-green hover:bg-white/10'
     : 'text-gray-nav hover:text-green hover:bg-green/5';
 
   return (
@@ -371,7 +371,17 @@ export const DashboardLayout: React.FC = () => {
               aria-expanded={isMobileMenuOpen}
               aria-controls={mobileMenuId}
             >
-              {isMobileMenuOpen ? <X size={24} weight="regular" /> : <List size={24} weight="regular" />}
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={isMobileMenuOpen ? 'close' : 'open'}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  {isMobileMenuOpen ? <X size={24} weight="regular" /> : <List size={24} weight="regular" />}
+                </motion.div>
+              </AnimatePresence>
             </button>
           </div>
         </div>
@@ -512,7 +522,7 @@ export const DashboardLayout: React.FC = () => {
                             <span className="min-w-0 flex-1 text-left">
                               <span className="block text-[15px] font-extrabold leading-tight">Invite</span>
                               <span className="mt-1 block text-[12px] font-semibold leading-snug text-gray-nav">
-                                Share a quiet writing space.
+                                Share a writing space.
                               </span>
                             </span>
                           </button>
@@ -693,7 +703,7 @@ export const DashboardLayout: React.FC = () => {
         isOpen={isInviteModalOpen}
         onClose={() => setIsInviteModalOpen(false)}
         title="Invite someone"
-        description="Share Reflections with someone who might want a quiet space to write."
+        description="Share Reflections with someone who might want a space to write."
         icon={<PaperPlaneTilt size={20} weight="duotone" />}
         tone="honey"
         size="md"

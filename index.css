@@ -905,8 +905,11 @@ select:focus-visible,
         rgba(var(--panel-bg-rgb), 0.94) 0%,
         rgba(var(--panel-bg-rgb), 0.72) 56%,
         rgba(var(--panel-bg-rgb), 0) 100%);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: 
+      background 0.5s var(--ease-out-expo),
+      backdrop-filter 0.5s var(--ease-out-expo);
   }
 
   .screen-scrim {
@@ -934,18 +937,18 @@ select:focus-visible,
     border-radius: var(--radius-shell) 0 0 var(--radius-shell);
     border: 1px solid oklch(from var(--border-color) l c h / 0.78);
     border-right: 0;
-    background-color: rgb(var(--panel-bg-rgb) / 0.94);
     background:
       linear-gradient(160deg,
-        rgb(var(--panel-bg-rgb) / 0.9) 0%,
-        rgb(var(--panel-bg-rgb) / 0.96) 48%,
-        rgb(var(--panel-bg-rgb) / 0.9) 100%);
+        rgb(var(--panel-bg-rgb) / 0.88) 0%,
+        rgb(var(--panel-bg-rgb) / 0.94) 48%,
+        rgb(var(--panel-bg-rgb) / 0.88) 100%);
     color: var(--gray-text);
     box-shadow:
       -24px 0 58px -42px oklch(from var(--green-shadow) l c h / 0.5),
-      inset 1px 0 0 rgba(var(--panel-bg-rgb), 0.68);
-    backdrop-filter: blur(18px) saturate(1.02);
-    -webkit-backdrop-filter: blur(18px) saturate(1.02);
+      inset 1px 0 0 oklch(from var(--border-color) l c h / 0.1),
+      inset 0 1px 0 oklch(from var(--border-color) l c h / 0.05);
+    backdrop-filter: blur(24px) saturate(1.2);
+    -webkit-backdrop-filter: blur(24px) saturate(1.2);
     overflow: hidden;
     transform: translateZ(0);
   }
