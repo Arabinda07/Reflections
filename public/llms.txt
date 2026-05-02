@@ -18,7 +18,7 @@ People who want a calm place to think in writing — without gamification, publi
 
 ## Pricing
 - Free: 30 notes/month, all AI features included
-- Pro: unlimited notes (pricing TBD)
+- Pro: unlimited notes (pricing Rs 99/- per month)
 
 ## Links
 - Homepage: https://reflections-ebon.vercel.app/

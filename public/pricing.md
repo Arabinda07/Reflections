@@ -1,11 +1,14 @@
 # Pricing — Reflections
 
 ## Free
-- Price: ₹0/month
-- Limits: 30 notes per calendar month
-- Features: Full AI reflections, Life Wiki, mood tracking, tags, ambient sound, whisper mode, focus mode
+
+* Price: ₹0/month
+* Limits: 30 notes per calendar month
+* Features: Full AI reflections, Life Wiki, mood tracking, tags, ambient sound, whisper mode, focus mode
 
 ## Pro
-- Price: TBD
-- Limits: Unlimited notes
-- Features: Everything in Free, plus unlimited monthly notes
+
+* Price: Rs. 99 per month. Rs 999/- yearly at 15% off.
+* Limits: Unlimited notes
+* Features: Everything in Free, plus unlimited monthly notes
+
