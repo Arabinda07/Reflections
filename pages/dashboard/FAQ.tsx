@@ -249,6 +249,5 @@ export const FAQ: React.FC = () => {
 
       </main>
     </div>
-    </div>
   );
 };
