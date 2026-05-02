@@ -1,4 +1,5 @@
 {
+  "cleanUrls": true,
   "headers": [
     {
       "source": "/sw.js",
@@ -44,13 +45,17 @@
         {
           "key": "Referrer-Policy",
           "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
         }
       ]
     }
   ],
   "rewrites": [
     {
-      "source": "/((?!assets/).*)",
+      "source": "/((?!assets/|icons/|sitemap\\.xml|sitemap\\.xsl|robots\\.txt|llms\\.txt|pricing\\.md|manifest\\.webmanifest|manifest\\.json|sw\\.js|workbox-.*\\.js|registerSW\\.js|faq$|privacy$|about$).*)",
       "destination": "/index.html"
     }
   ]

@@ -141,7 +141,7 @@ export const MyNotes: React.FC = () => {
       <Surface
         key={note.id}
         variant="flat"
-        className="group relative overflow-hidden rounded-[2.5rem] border border-border/40 transition-all duration-500 hover:-translate-y-1 hover:border-green/20 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)]"
+        className="group relative overflow-hidden rounded-[2.5rem] border border-border/40 transition-[transform,border-color,box-shadow] duration-500 hover:-translate-y-1 hover:border-green/20 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)]"
       >
         <article
           className="flex h-full flex-col"
@@ -172,7 +172,7 @@ export const MyNotes: React.FC = () => {
             <button
               onClick={(event) => initiateDelete(event, note.id)}
               disabled={isDeleting && noteIdToDelete === note.id}
-              className="control-surface absolute left-4 top-4 z-20 inline-flex h-11 w-11 items-center justify-center rounded-2xl text-gray-text shadow-sm backdrop-blur-xl transition-all duration-500 hover:scale-110 hover:border-clay/30 hover:text-clay"
+              className="control-surface absolute left-4 top-4 z-20 inline-flex h-11 w-11 items-center justify-center rounded-2xl text-gray-text shadow-sm backdrop-blur-xl transition-[transform,border-color,color] duration-500 hover:scale-110 hover:border-clay/30 hover:text-clay"
               aria-label={`Delete ${note.title}`}
             >
               {isDeleting && noteIdToDelete === note.id ? (
@@ -234,7 +234,7 @@ export const MyNotes: React.FC = () => {
                     event.stopPropagation();
                     downloadNoteExport(note, 'md');
                   }}
-                  className="control-surface inline-flex h-11 w-11 items-center justify-center rounded-2xl text-gray-nav transition-all duration-500 hover:scale-110 hover:border-green/25 hover:bg-green/5 hover:text-green"
+                  className="control-surface inline-flex h-11 w-11 items-center justify-center rounded-2xl text-gray-nav transition-[transform,border-color,background-color,color] duration-500 hover:scale-110 hover:border-green/25 hover:bg-green/5 hover:text-green"
                   title={`Export ${note.title}`}
                   aria-label={`Export ${note.title}`}
                 >
@@ -243,7 +243,7 @@ export const MyNotes: React.FC = () => {
 
                 <Link
                   to={noteDetailPath}
-                  className="inline-flex min-h-11 items-center rounded-2xl bg-green px-4 text-xs font-black uppercase tracking-widest text-white shadow-lg shadow-green/10 transition-all duration-300 hover:bg-green/90 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
+                  className="inline-flex min-h-11 items-center rounded-2xl bg-green px-4 text-xs font-black uppercase tracking-widest text-white shadow-lg shadow-green/10 transition-[background-color,transform] duration-300 hover:bg-green/90 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
                   aria-label={`Open ${note.title}`}
                 >
                   <span>Open</span>
@@ -269,7 +269,7 @@ export const MyNotes: React.FC = () => {
       />
 
       {!loading ? (
-        <PageContainer className="surface-scope-sage pb-14 pt-4 md:pt-8">
+        <PageContainer className="surface-scope-sage page-wash pb-14 pt-4 md:pt-8">
           <div className="space-y-10 animate-in fade-in duration-500">
             <SectionHeader
               title="Saved reflections"

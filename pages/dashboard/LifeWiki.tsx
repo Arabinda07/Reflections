@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
 import {
@@ -28,6 +28,7 @@ import {
   type WikiPageType,
 } from '../../services/wikiTypes';
 import { trackLifeWikiRefreshedDeferred } from '../../src/analytics/deferredEvents';
+import { SANCTUARY_LEVEL_UP_ANIMATION_SRC } from '../../src/lottie/sanctuaryAnimation';
 
 type RefreshFeedback = {
   variant: 'warning' | 'error';
@@ -148,7 +149,6 @@ const ROOM_TONE_CLASSES: Record<PageMeta['tone'], {
 
 const SOURCE_LINK_PREFIX = 'source-note:';
 const SOURCE_MARKER_PATTERN = /\[source:([^\]]+)\]/gi;
-const SANCTUARY_ENTRANCE_LOTTIE = '/assets/lottie/Level%20Up%20Animation.json';
 
 const articlePath = (pageType: WikiPageType) =>
   RoutePath.SANCTUARY_ARTICLE.replace(':pageType', pageType);
@@ -212,14 +212,19 @@ const getPageMap = (pages: LifeTheme[]) =>
 
 export const LifeWiki: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { pageType } = useParams();
+  const shouldReduceMotion = useReducedMotion();
+  const cameFromInsights = Boolean(location.state?.fromInsights);
+  const shouldPlayEntryAnimation =
+    !shouldReduceMotion && (location.pathname === RoutePath.WIKI || location.pathname === RoutePath.SANCTUARY);
   const [notes, setNotes] = useState<Note[]>([]);
   const [themes, setThemes] = useState<LifeTheme[]>([]);
   const [access, setAccess] = useState<WellnessAccess | null>(null);
   const [isRefreshingWiki, setIsRefreshingWiki] = useState(false);
+  const [isEnteringWiki, setIsEnteringWiki] = useState(shouldPlayEntryAnimation && !cameFromInsights);
   const [hasLoadedLibrary, setHasLoadedLibrary] = useState(false);
   const [refreshFeedback, setRefreshFeedback] = useState<RefreshFeedback | null>(null);
-  const shouldReduceMotion = useReducedMotion();
 
   const loadData = async () => {
     try {
@@ -244,8 +249,18 @@ export const LifeWiki: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // Entrance threshold handled by Insights or on-demand refresh
-  }, []);
+    // If we came from Insights, the transition animation already played there.
+    // Skip the local entrance animation to prevent redundancy.
+    if (!shouldPlayEntryAnimation || cameFromInsights) {
+      setIsEnteringWiki(false);
+      return;
+    }
+
+    setIsEnteringWiki(true);
+    const timeoutId = window.setTimeout(() => setIsEnteringWiki(false), 2400);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [cameFromInsights, location.key, shouldPlayEntryAnimation]);
 
   const gate = useMemo(() => {
     if (!access) return null;
@@ -379,7 +394,7 @@ export const LifeWiki: React.FC = () => {
     return (
       <div
         key={meta.pageType}
-        className={`group relative h-full overflow-hidden rounded-[2.5rem] surface-flat ${tone.surface} dashboard-tone-card transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)]`}
+        className={`group relative h-full overflow-hidden rounded-[2.5rem] surface-flat ${tone.surface} dashboard-tone-card transition-[box-shadow,transform] duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)]`}
       >
         <Link
           to={articlePath(meta.pageType)}
@@ -391,7 +406,7 @@ export const LifeWiki: React.FC = () => {
               <span className={`dashboard-caption ${tone.accent}`}>
                 {isSupporting ? 'Supporting page' : isEmptyRoom ? 'Room awaiting signal' : 'Generated page'}
               </span>
-              <CaretRight size={18} weight="bold" className={`${tone.text} transition-all duration-500 ease-out-expo group-hover:translate-x-1`} />
+              <CaretRight size={18} weight="bold" className={`${tone.text} transition-transform duration-500 ease-out-expo group-hover:translate-x-1`} />
             </div>
             <div className="space-y-4">
               <h2 className="dashboard-card-title-lg dashboard-hover-title">{meta.label}</h2>
@@ -423,7 +438,7 @@ export const LifeWiki: React.FC = () => {
 
   const renderEntrance = () => (
     <AnimatePresence>
-      {isRefreshingWiki && (
+      {(isRefreshingWiki || isEnteringWiki) && (
         <motion.div
           initial={shouldReduceMotion ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -431,17 +446,17 @@ export const LifeWiki: React.FC = () => {
           transition={{ duration: shouldReduceMotion ? 0 : 0.35, ease: [0.16, 1, 0.3, 1] }}
           className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-body px-6"
         >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,oklch(from_var(--color-accent)_l_c_h_/_0.18),transparent_54%)]" />
-          <div className="absolute inset-0 bg-gradient-to-b from-green/10 via-body/95 to-body" />
+          <div className="sanctuary-entrance-glow absolute inset-0" />
+          <div className="sanctuary-entrance-scrim absolute inset-0" />
           <motion.div
             aria-hidden="true"
             initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.96 }}
-            animate={{ opacity: shouldReduceMotion ? 0.14 : 0.2, scale: 1 }}
+            animate={{ opacity: shouldReduceMotion ? 0.14 : 0.8, scale: 1 }}
             transition={{ delay: shouldReduceMotion ? 0 : 0.08, duration: shouldReduceMotion ? 0 : 0.55, ease: [0.16, 1, 0.3, 1] }}
-            className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center mix-blend-luminosity"
+            className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
           >
             <div className="h-[min(66vmin,34rem)] w-[min(66vmin,34rem)]">
-              <DotLottieReact src={SANCTUARY_ENTRANCE_LOTTIE} autoplay loop={isRefreshingWiki} />
+              <DotLottieReact src={SANCTUARY_LEVEL_UP_ANIMATION_SRC} autoplay loop={isRefreshingWiki || isEnteringWiki} />
             </div>
           </motion.div>
           <motion.div
@@ -474,13 +489,13 @@ export const LifeWiki: React.FC = () => {
       <>
         {renderEntrance()}
         <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden bg-body">
-          <div className="absolute inset-0 bg-gradient-to-b from-green/5 via-body to-body opacity-50" />
+          <div className="sanctuary-page-fade absolute inset-0 opacity-50" />
         </div>
-        <PageContainer size="narrow" className="surface-scope-sage pb-24 pt-6 md:pt-10 relative z-10">
+        <PageContainer size="narrow" className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10 relative z-10">
           <div className="space-y-8">
             <button
               onClick={() => navigate(RoutePath.SANCTUARY)}
-              className="group flex items-center gap-2 text-sm font-bold text-gray-nav hover:text-green transition-all duration-300 w-fit hover:-translate-x-1"
+              className="group flex items-center gap-2 text-sm font-bold text-gray-nav hover:text-green transition-[color,transform] duration-300 w-fit hover:-translate-x-1"
               aria-label="Back to Sanctuary"
             >
               <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
@@ -669,10 +684,10 @@ export const LifeWiki: React.FC = () => {
     <>
       {renderEntrance()}
       <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden bg-body">
-        <div className="absolute inset-0 bg-gradient-to-b from-green/5 via-body to-body opacity-50" />
+        <div className="sanctuary-page-fade absolute inset-0 opacity-50" />
       </div>
 
-      <PageContainer className="surface-scope-sage pb-24 pt-6 md:pt-10 relative z-10">
+      <PageContainer className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10 relative z-10">
         <div className="space-y-10">
           <div className="flex items-center justify-between gap-4">
             <button 

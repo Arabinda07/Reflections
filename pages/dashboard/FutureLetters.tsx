@@ -175,7 +175,7 @@ export const FutureLetters: React.FC = () => {
 
   return (
     <>
-      <PageContainer size="wide" className="surface-scope-honey pb-24 pt-6 md:pt-10">
+      <PageContainer size="wide" className="surface-scope-honey page-wash pb-24 pt-6 md:pt-10">
         <div className="space-y-8">
           <button
             onClick={() => navigate(RoutePath.HOME)}

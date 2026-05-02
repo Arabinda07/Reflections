@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, HTMLMotionProps } from 'motion/react';
+import { motion, HTMLMotionProps, useReducedMotion } from 'motion/react';
 
 interface ButtonProps extends Omit<HTMLMotionProps<"button">, 'ref'> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'bezel';
@@ -18,7 +18,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   whileTap,
   ...props
 }, ref) => {
-  const baseStyles = "inline-flex items-center justify-center font-bold transition-all focus:outline-none disabled:opacity-50 disabled:pointer-events-none select-none relative";
+  const prefersReducedMotion = useReducedMotion();
+  const baseStyles = "relative inline-flex min-w-0 items-center justify-center whitespace-nowrap font-bold select-none transition-[background-color,border-color,color,box-shadow,transform,filter] duration-300 ease-out-expo motion-reduce:transition-none focus:outline-none disabled:pointer-events-none disabled:opacity-50";
 
   const variants = {
     primary: "border border-transparent bg-green text-white shadow-lg shadow-green/20 hover:bg-green-hover hover:shadow-xl hover:shadow-green/30",
@@ -30,22 +31,24 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   };
 
   const sizes = {
-    sm: "min-h-11 px-4 py-2 text-[13px] rounded-[var(--radius-control)]",
-    md: "h-12 px-6 text-[15px] rounded-[var(--radius-control)]",
-    lg: "h-14 px-8 text-[16px] rounded-[var(--radius-control)]",
+    sm: "min-h-11 px-3 py-2 text-[13px] rounded-[var(--radius-control)] sm:px-4",
+    md: "min-h-12 px-4 py-3 text-[15px] rounded-[var(--radius-control)] sm:px-6",
+    lg: "min-h-14 px-5 py-4 text-[16px] rounded-[var(--radius-control)] sm:px-8",
   };
 
-  const expoTransition: any = {
+  const expoTransition = {
     duration: 0.25,
     ease: [0.16, 1, 0.3, 1]
-  };
+  } as const;
+  const hoverMotion = prefersReducedMotion ? undefined : whileHover || { y: -1 };
+  const tapMotion = prefersReducedMotion ? undefined : whileTap || { scale: 0.98, y: 0 };
 
   if (variant === 'bezel') {
     return (
       <motion.button
         ref={ref}
-        whileHover={whileHover || { scale: 1.02 }}
-        whileTap={whileTap || { scale: 0.98 }}
+        whileHover={hoverMotion}
+        whileTap={tapMotion}
         transition={expoTransition}
         className={`${baseStyles} ${variants.bezel} ${className}`}
         disabled={isLoading || disabled}
@@ -62,8 +65,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   return (
     <motion.button
       ref={ref}
-      whileHover={whileHover || { scale: 1.02 }}
-      whileTap={whileTap || { scale: 0.98 }}
+      whileHover={hoverMotion}
+      whileTap={tapMotion}
       transition={expoTransition}
       className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
       disabled={isLoading || disabled}

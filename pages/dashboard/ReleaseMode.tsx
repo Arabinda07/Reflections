@@ -42,7 +42,7 @@ export const ReleaseMode: React.FC = () => {
   };
 
   return (
-    <div className="surface-scope-clay flex min-h-[100dvh] flex-1 flex-col bg-body">
+    <div className="surface-scope-clay page-wash flex min-h-[100dvh] flex-1 flex-col bg-body">
       <div className="mx-auto flex min-h-[100dvh] w-full max-w-4xl flex-col px-5 py-5 sm:px-8 sm:py-8">
         <div className="mb-5 flex items-center justify-between">
           <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.HOME)} className="-ml-2 min-h-11">

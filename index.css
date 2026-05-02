@@ -15,34 +15,26 @@
 }
 
 @font-face {
-  font-family: 'Newsreader';
-  src: url('/assets/fonts/Newsreader16pt-Regular.woff2') format('woff2');
+  font-family: 'Spectral';
+  src: url('/assets/fonts/Spectral-Regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Newsreader';
-  src: url('/assets/fonts/Newsreader16pt-Italic.woff2') format('woff2');
+  font-family: 'Spectral';
+  src: url('/assets/fonts/Spectral-Italic.woff2') format('woff2');
   font-weight: 400;
   font-style: italic;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Newsreader';
-  src: url('/assets/fonts/Newsreader16pt-Bold.woff2') format('woff2');
+  font-family: 'Spectral';
+  src: url('/assets/fonts/Spectral-Bold.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Newsreader';
-  src: url('/assets/fonts/Newsreader16pt-BoldItalic.woff2') format('woff2');
-  font-weight: 700;
-  font-style: italic;
   font-display: swap;
 }
 
@@ -53,7 +45,7 @@
 @layer base {
   :root {
     --font-sans: 'Manrope', sans-serif;
-    --font-serif: 'Newsreader', serif;
+    --font-serif: 'Spectral', serif;
     --font-display: 'Manrope', sans-serif;
     --font-mono: 'Geist Mono', monospace;
     --font-editor: var(--font-serif);
@@ -107,6 +99,22 @@
       oklch(from var(--green) 0.97 0.018 h / 0.78) 0%,
       var(--bg-color) 42%,
       oklch(from var(--blue) 0.97 0.018 h / 0.58) 100%);
+  --page-wash-paper:
+    radial-gradient(circle at 14% 8%, oklch(from var(--green) 0.97 0.014 h / 0.46), transparent 34%),
+    linear-gradient(145deg, oklch(0.99 0.01 135), var(--bg-color) 46%, oklch(0.985 0.012 135));
+  --page-wash-sage:
+    radial-gradient(circle at 12% 10%, oklch(from var(--green) 0.955 0.028 h / 0.6), transparent 36%),
+    linear-gradient(145deg, oklch(from var(--green) 0.982 0.014 h), var(--bg-color) 46%, oklch(from var(--blue) 0.978 0.012 h / 0.62));
+  --page-wash-sky:
+    radial-gradient(circle at 12% 10%, oklch(from var(--blue) 0.96 0.026 h / 0.54), transparent 36%),
+    linear-gradient(145deg, oklch(from var(--blue) 0.982 0.014 h), var(--bg-color) 48%, oklch(from var(--green) 0.982 0.01 h / 0.58));
+  --page-wash-honey:
+    radial-gradient(circle at 14% 9%, oklch(from var(--honey) 0.958 0.028 h / 0.56), transparent 36%),
+    linear-gradient(145deg, oklch(from var(--honey) 0.982 0.016 h), var(--bg-color) 48%, oklch(from var(--green) 0.982 0.01 h / 0.58));
+  --page-wash-clay:
+    radial-gradient(circle at 14% 9%, oklch(from var(--clay) 0.955 0.024 h / 0.5), transparent 35%),
+    linear-gradient(145deg, oklch(from var(--clay) 0.982 0.012 h), var(--bg-color) 48%, oklch(from var(--honey) 0.984 0.01 h / 0.42));
+  --page-wash: var(--page-wash-sage);
   --surface-paper-bg:
     linear-gradient(145deg,
       oklch(0.985 0.012 135 / 0.96),
@@ -175,6 +183,16 @@
   --hero-scrim: linear-gradient(180deg,
       oklch(0.28 0.02 135 / 0.12),
       oklch(0.24 0.02 135 / 0.28));
+  --startup-ambient-wash:
+    radial-gradient(circle at center, oklch(from var(--green) 0.26 0.04 h / 0.32), var(--bg-color) 58%);
+  --startup-video-scrim:
+    linear-gradient(180deg, rgb(var(--black-rgb) / 0.18), transparent 36%, rgb(var(--black-rgb) / 0.2));
+  --sanctuary-entrance-glow:
+    radial-gradient(circle at center, oklch(from var(--color-accent) l c h / 0.17), transparent 54%);
+  --sanctuary-entrance-scrim:
+    linear-gradient(to bottom, oklch(from var(--green) l c h / 0.1), oklch(from var(--bg-color) l c h / 0.95), var(--bg-color));
+  --sanctuary-page-fade:
+    linear-gradient(to bottom, oklch(from var(--green) l c h / 0.05), var(--bg-color), var(--bg-color));
   --screen-scrim-soft: rgba(var(--panel-bg-rgb), 0.85);
   --screen-scrim-strong: rgba(var(--panel-bg-rgb), 0.95);
   --floating-panel-bg: rgba(var(--panel-bg-rgb), 0.82);
@@ -280,7 +298,8 @@
   /* System Hardening Tokens */
   --scrollbar-thumb: rgba(148, 163, 184, 0.4);
   --scrollbar-thumb-hover: rgba(148, 163, 184, 0.55);
-  --chip-shadow: #E5E5E5;
+  --chip-shadow: oklch(from var(--border-color) l c h);
+  --popover-bg: var(--panel-bg);
 }
 
 .dark {
@@ -317,6 +336,21 @@
       oklch(from var(--green) 0.19 0.03 h / 0.64) 0%,
       var(--bg-color) 46%,
       oklch(from var(--blue) 0.19 0.032 h / 0.5) 100%);
+  --page-wash-paper:
+    radial-gradient(circle at 14% 8%, oklch(from var(--green) 0.25 0.026 h / 0.32), transparent 36%),
+    linear-gradient(145deg, oklch(0.19 0.014 135), var(--bg-color) 48%, oklch(0.17 0.014 135));
+  --page-wash-sage:
+    radial-gradient(circle at 12% 10%, oklch(from var(--green) 0.25 0.04 h / 0.44), transparent 38%),
+    linear-gradient(145deg, oklch(from var(--green) 0.19 0.02 h / 0.92), var(--bg-color) 50%, oklch(from var(--blue) 0.18 0.018 h / 0.64));
+  --page-wash-sky:
+    radial-gradient(circle at 12% 10%, oklch(from var(--blue) 0.25 0.04 h / 0.38), transparent 38%),
+    linear-gradient(145deg, oklch(from var(--blue) 0.19 0.02 h / 0.88), var(--bg-color) 50%, oklch(from var(--green) 0.18 0.016 h / 0.56));
+  --page-wash-honey:
+    radial-gradient(circle at 14% 9%, oklch(from var(--honey) 0.25 0.038 h / 0.34), transparent 38%),
+    linear-gradient(145deg, oklch(from var(--honey) 0.19 0.02 h / 0.84), var(--bg-color) 50%, oklch(from var(--green) 0.18 0.016 h / 0.54));
+  --page-wash-clay:
+    radial-gradient(circle at 14% 9%, oklch(from var(--clay) 0.25 0.036 h / 0.34), transparent 38%),
+    linear-gradient(145deg, oklch(from var(--clay) 0.19 0.02 h / 0.84), var(--bg-color) 50%, oklch(from var(--honey) 0.18 0.014 h / 0.48));
   --surface-paper-bg:
     linear-gradient(145deg,
       oklch(0.225 0.014 135 / 0.96),
@@ -372,6 +406,16 @@
   --hero-scrim: linear-gradient(180deg,
       oklch(0.13 0.02 135 / 0.22),
       oklch(0.1 0.02 135 / 0.48));
+  --startup-ambient-wash:
+    radial-gradient(circle at center, oklch(from var(--green) 0.26 0.04 h / 0.28), var(--bg-color) 58%);
+  --startup-video-scrim:
+    linear-gradient(180deg, rgb(var(--black-rgb) / 0.28), transparent 36%, rgb(var(--black-rgb) / 0.34));
+  --sanctuary-entrance-glow:
+    radial-gradient(circle at center, oklch(from var(--color-accent) l c h / 0.2), transparent 54%);
+  --sanctuary-entrance-scrim:
+    linear-gradient(to bottom, oklch(from var(--green) l c h / 0.14), oklch(from var(--bg-color) l c h / 0.95), var(--bg-color));
+  --sanctuary-page-fade:
+    linear-gradient(to bottom, oklch(from var(--green) l c h / 0.08), var(--bg-color), var(--bg-color));
   --screen-scrim-soft: rgba(var(--panel-bg-rgb), 0.85);
   --screen-scrim-strong: rgba(var(--panel-bg-rgb), 0.95);
   --floating-panel-media-border: rgba(255, 255, 255, 0.12);
@@ -386,7 +430,7 @@
 
   /* System Hardening Tokens - Dark Mode */
   --chip-shadow: rgba(0, 0, 0, 0.3);
-  --popover-bg: #1E1E1E;
+  --popover-bg: var(--panel-bg);
 
   /* ── Semantic Overrides ── */
   --color-surface-muted: oklch(0.24 0.012 135);
@@ -404,9 +448,6 @@ body {
   font-family: var(--font-sans);
   color: var(--gray-text);
   background-color: var(--bg-color);
-  background-image: var(--app-background-wash);
-  background-attachment: fixed;
-  background-size: cover;
   font-weight: 400;
   transition: background-color 0.35s var(--ease-out-expo), color 0.35s var(--ease-out-expo);
   overscroll-behavior-y: none;
@@ -415,14 +456,36 @@ body {
 
 .bg-body {
   background-color: var(--bg-color);
-  background-image: var(--app-background-wash);
+}
+
+.page-wash {
+  background: var(--page-wash);
   background-attachment: fixed;
   background-size: cover;
 }
 
+.startup-ambient-wash {
+  background: var(--startup-ambient-wash);
+}
+
+.startup-video-scrim {
+  background: var(--startup-video-scrim);
+}
+
+.sanctuary-entrance-glow {
+  background: var(--sanctuary-entrance-glow);
+}
+
+.sanctuary-entrance-scrim {
+  background: var(--sanctuary-entrance-scrim);
+}
+
+.sanctuary-page-fade {
+  background: var(--sanctuary-page-fade);
+}
+
 @media (max-width: 768px) {
-  body,
-  .bg-body {
+  .page-wash {
     background-attachment: scroll;
   }
 }
@@ -638,6 +701,27 @@ select:focus-visible,
   }
 
   /* Sanctioned Surface Families */
+  .surface-scope-paper,
+  .surface-scope-neutral {
+    --page-wash: var(--page-wash-paper);
+  }
+
+  .surface-scope-sage {
+    --page-wash: var(--page-wash-sage);
+  }
+
+  .surface-scope-sky {
+    --page-wash: var(--page-wash-sky);
+  }
+
+  .surface-scope-honey {
+    --page-wash: var(--page-wash-honey);
+  }
+
+  .surface-scope-clay {
+    --page-wash: var(--page-wash-clay);
+  }
+
   .surface-scope-paper,
   .surface-scope-neutral,
   .surface-tone-paper,
@@ -905,6 +989,7 @@ select:focus-visible,
         rgba(var(--panel-bg-rgb), 0.68) 100%);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
+    will-change: backdrop-filter;
   }
 
   .mobile-sidebar-shell {
@@ -1225,7 +1310,42 @@ select:focus-visible,
   .section-header-actions {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 0.75rem;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .section-header-actions > * {
+    min-width: 0;
+  }
+
+  @media (max-width: 639px) {
+    .section-header-actions {
+      align-items: stretch;
+    }
+
+    .section-header-actions :where(button, a) {
+      min-width: 0;
+    }
+
+    .section-header-actions > :where(button, a) {
+      width: 100%;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .section-header-row {
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+
+    .section-header-actions {
+      justify-content: flex-end;
+      width: auto;
+      flex-shrink: 0;
+    }
   }
 
   .section-header-eyebrow {
@@ -1681,6 +1801,7 @@ select:focus-visible,
     background: var(--modal-sheet-backdrop-bg);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
+    will-change: backdrop-filter;
   }
 
   .modal-sheet-shell {
@@ -2201,7 +2322,7 @@ select:focus-visible,
     outline: none !important;
   }
 
-  /* The snow theme renders a 1px solid #ccc border on this element by default.
+  /* The snow theme renders a default gray border on this element.
      Remove every expression of it so the editor merges invisibly into its parent. */
   .ql-container.ql-snow {
     border: none !important;
@@ -2286,7 +2407,10 @@ select:focus-visible,
   }
 
   .chooser-chip {
-    @apply flex flex-row items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 bg-white border-border text-gray-nav transition-all duration-300 dark:bg-white/5 dark:border-white/10 dark:text-slate-300;
+    @apply flex flex-row items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-[background-color,border-color,color,box-shadow] duration-300;
+    background-color: var(--surface-current-control-bg);
+    border-color: var(--border-color);
+    color: var(--nav-text);
     font-weight: 900;
     white-space: nowrap;
     flex-shrink: 0;
@@ -2299,20 +2423,22 @@ select:focus-visible,
   }
 
   .dark .chooser-chip:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
+    background-color: oklch(from var(--green) l c h / 0.12);
+    border-color: oklch(from var(--green) l c h / 0.24);
   }
 
   .chooser-chip.active {
-    @apply text-green dark:bg-white/10 dark:border-white/20 dark:text-white;
+    @apply text-green;
     background-color: oklch(from var(--green) l c h / 0.05);
     border-color: oklch(from var(--green) l c h / 0.3);
     box-shadow: 0 2px 0 0 var(--chip-shadow);
   }
 
   .chooser-popover {
-    @apply p-5 rounded-3xl z-[100] border border-white/40 shadow-xl bg-white dark:shadow-xl dark:shadow-black/50 dark:border-white/10;
-    background-color: var(--popover-bg, #ffffff);
+    @apply p-5 rounded-3xl z-[100] border shadow-xl;
+    background-color: var(--popover-bg);
+    border-color: var(--floating-panel-border);
+    box-shadow: var(--floating-panel-shadow-strong);
   }
 }
 

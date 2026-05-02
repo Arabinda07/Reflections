@@ -25,19 +25,19 @@ describe('Typography and motion contract', () => {
     const completionCardService = read('services/completionCardService.ts');
 
     expect(indexCss).toContain("--font-sans: 'Manrope'");
-    expect(indexCss).toContain("--font-serif: 'Newsreader'");
+    expect(indexCss).toContain("--font-serif: 'Spectral'");
     expect(indexCss).toContain("--font-display: 'Manrope'");
     expect(indexCss).toContain('font-family: var(--font-sans)');
     expect(indexCss).toContain("url('/assets/fonts/Manrope-Variable.woff2')");
-    expect(indexCss).toContain("url('/assets/fonts/Newsreader16pt-Regular.woff2')");
-    expect(indexCss).toContain("url('/assets/fonts/Newsreader16pt-Italic.woff2')");
+    expect(indexCss).toContain("url('/assets/fonts/Spectral-Regular.woff2')");
+    expect(indexCss).toContain("url('/assets/fonts/Spectral-Italic.woff2')");
     expect(indexHtml).toContain('/assets/fonts/Manrope-Variable.woff2');
-    expect(indexHtml).toContain('/assets/fonts/Newsreader16pt-Regular.woff2');
-    expect(indexHtml).toContain('/assets/fonts/Newsreader16pt-Italic.woff2');
-    expect(tailwindConfig).toContain('serif: [\'"Newsreader"\', \'serif\']');
+    expect(indexHtml).toContain('/assets/fonts/Spectral-Regular.woff2');
+    expect(indexHtml).toContain('/assets/fonts/Spectral-Italic.woff2');
+    expect(tailwindConfig).toContain('serif: [\'"Spectral"\', \'serif\']');
     expect(tailwindConfig).toContain('display: [\'"Manrope"\', \'sans-serif\']');
     expect([indexCss, indexHtml, tailwindConfig, completionCardService].join('\n')).not.toMatch(
-      /Spectral|Nunito|Manrope\[wght\]/,
+      /Newsreader|Nunito|Manrope\[wght\]/,
     );
     expect(indexCss).not.toContain("font-family: 'Geist', sans-serif");
     expect(indexCss).not.toContain("font-family: 'Feather Bold'");
@@ -73,11 +73,35 @@ describe('Typography and motion contract', () => {
     expect(home).toContain('if (shouldReduceMotion)');
   });
 
+  it('keeps dashboard motion off broad and layout-property animations', () => {
+    const auditedMotionFiles = [
+      'pages/dashboard/HomeAuthenticated.tsx',
+      'pages/dashboard/Insights.tsx',
+      'pages/dashboard/LifeWiki.tsx',
+      'components/ui/AmbientMusicButton.tsx',
+    ];
+
+    auditedMotionFiles.forEach((file) => {
+      const source = read(file);
+
+      expect(source, file).not.toContain('transition-all');
+      expect(source, file).not.toMatch(/(?:initial|animate|exit)=\{\{\s*height:/);
+      expect(source, file).not.toMatch(/(?:initial|animate|exit)=\{\{\s*width:/);
+    });
+
+    const insights = read('pages/dashboard/Insights.tsx');
+    const ambientButton = read('components/ui/AmbientMusicButton.tsx');
+
+    expect(insights).toContain("gridTemplateRows: '1fr'");
+    expect(insights).toContain('scaleX: percent / 100');
+    expect(ambientButton).toContain('scaleY: bar.h.map');
+  });
+
   it('keeps the Sanctuary entry animation unframed and full-screen', () => {
     const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
 
-    expect(lifeWiki).toContain('pointer-events-none absolute inset-0 z-0');
-    expect(lifeWiki).toContain('mix-blend-luminosity');
+    expect(lifeWiki).toContain('pointer-events-none absolute inset-0 z-0 flex items-center justify-center');
+    expect(lifeWiki).toContain('SANCTUARY_LEVEL_UP_ANIMATION_SRC');
     expect(lifeWiki).not.toContain('h-32 w-32 overflow-hidden rounded-[var(--radius-panel)] bg-green/5');
   });
 });

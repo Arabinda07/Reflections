@@ -2,9 +2,15 @@ import { ArrowRight, SpeakerHigh, SpeakerSlash } from '@phosphor-icons/react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
+import { useDocumentMeta } from '../../hooks/useDocumentMeta';
 import { RoutePath } from '../../types';
 
 export const Landing: React.FC = () => {
+  useDocumentMeta({
+    title: 'Reflections – Private Journal for Notes, Mood & Reflection',
+    description: 'A private journal for writing notes, naming moods, and noticing patterns. AI runs only when you ask. No streaks, no pressure.',
+    path: '/',
+  });
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isMuted, setIsMuted] = useState(true);
@@ -56,7 +62,7 @@ export const Landing: React.FC = () => {
   };
 
   return (
-    <div role="region" aria-label="Welcome" className="relative min-h-[100dvh] overflow-x-hidden surface-scope-sage selection:bg-green/20 selection:text-green bg-body text-gray-text">
+    <div role="region" aria-label="Welcome" className="surface-scope-sage page-wash relative min-h-[100dvh] overflow-x-hidden selection:bg-green/20 selection:text-green bg-body text-gray-text">
       {/* Full-bleed layered container */}
       <div className="relative isolate min-h-[100dvh] w-full overflow-hidden bg-body">
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
@@ -90,7 +96,6 @@ export const Landing: React.FC = () => {
             >
               <source src="/assets/videos/landing_video.webm" type="video/webm" />
               <source src="/assets/videos/landing_video.mp4" type="video/mp4" />
-              <track kind="captions" default />
             </video>
           ) : null}
         </div>
@@ -150,16 +155,12 @@ export const Landing: React.FC = () => {
                   Sign in
                 </Button>
 
-                <Button
-                  variant="ghost"
-                  onClick={() => navigate(RoutePath.FAQ)}
-                  whileHover={{ y: -1 }}
-                  whileTap={{ scale: 0.97 }}
-                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                  className="h-11 px-0 text-[15px] font-medium text-gray-text hover:text-green transition-colors"
+                <a
+                  href={RoutePath.FAQ}
+                  className="inline-flex h-11 min-w-0 items-center justify-center whitespace-nowrap px-0 text-[15px] font-medium text-gray-text transition-colors duration-300 ease-out-expo hover:text-green focus:outline-none"
                 >
                   How it works
-                </Button>
+                </a>
               </div>
 
               <Button
@@ -168,7 +169,7 @@ export const Landing: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.9, rotate: -8 }}
                 transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                className="surface-floating surface-floating--media h-11 min-h-11 w-11 min-w-11 !px-0 rounded-2xl !text-gray-nav hover:!text-green hover:border-green/40 transition-all duration-300 group"
+                className="surface-floating surface-floating--media h-11 min-h-11 w-11 min-w-11 !px-0 rounded-2xl !text-gray-nav hover:!text-green hover:border-green/40 transition-[color,border-color] duration-300 group"
                 aria-label={isMuted ? 'Unmute video' : 'Mute video'}
               >
                 {isMuted ? <SpeakerSlash size={20} weight="regular" /> : <SpeakerHigh size={20} weight="regular" />}

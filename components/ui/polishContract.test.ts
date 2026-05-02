@@ -33,7 +33,7 @@ describe('polish contract', () => {
     expect(startupScreen).not.toContain('setIsPosterReady');
     expect(startupScreen).not.toContain("isPosterReady && !isVideoReady ? 'opacity-85' : 'opacity-0'");
     expect(startupScreen).toContain('opacity-0');
-    expect(startupScreen).toContain('bg-[radial-gradient');
+    expect(startupScreen).toContain('startup-ambient-wash');
     expect(startupScreen).not.toContain('animate-pulse');
     expect(appLaunch).toContain('NATIVE_STARTUP_MIN_MS = 650');
   });

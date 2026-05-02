@@ -357,7 +357,7 @@ export const Account: React.FC = () => {
 
   return (
     <>
-      <PageContainer className="surface-scope-paper pb-24 pt-6 md:pt-10">
+      <PageContainer className="surface-scope-paper page-wash pb-24 pt-6 md:pt-10">
         <div className="space-y-8">
           <SectionHeader
             eyebrow="Account"

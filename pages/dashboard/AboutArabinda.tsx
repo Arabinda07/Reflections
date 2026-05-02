@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowLeft, Feather, LockKey, Sparkle } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
 import { PageContainer } from '../../components/ui/PageContainer';
+import { useDocumentMeta } from '../../hooks/useDocumentMeta';
 import { RoutePath } from '../../types';
 
 const sections = [
@@ -21,13 +22,18 @@ const sections = [
     body: 'I built Reflections to help writing stay private and ordinary. Your notes are yours. You can export them when you want. You can write for 2 minutes before bed, add music if it helps, keep a small rhythm if you like, or restart whenever life gets crowded again.',
   },
   {
-    title: 'Optional AI',
+    title: 'AI that waits',
     icon: <Sparkle size={24} weight="duotone" className="text-emerald-600" />,
     body: 'AI should wait until you invite it. When it does appear, the job is simple: read carefully, reflect gently, and never act like it knows your life better than you do.',
   },
 ];
 
 export const AboutArabinda: React.FC = () => {
+  useDocumentMeta({
+    title: 'About Reflections & Arabinda – A Private Journal App',
+    description: 'A note from Arabinda about why Reflections is a personal writing app with mood notes, Life Wiki, and AI that stays out of the way.',
+    path: '/about',
+  });
   const navigate = useNavigate();
 
   return (
@@ -61,11 +67,12 @@ export const AboutArabinda: React.FC = () => {
             </h1>
             <div className="space-y-6">
               <p className="max-w-[55ch] text-xl font-serif italic leading-relaxed text-gray-text">
-                Reflections began as a reminder to take a few quiet minutes before the day ends.
+                Reflections began as a reminder to slow down before the day ends.
               </p>
               <p className="max-w-[55ch] font-sans text-[16px] leading-relaxed text-gray-light">
-                I made this app because we are all part of a mass movement that often prefers fitting in. I wanted a quieter counterweight: a place to check in with your emotions, write something down, and leave without being pushed to perform. Thank you for trusting me with a few minutes of your day.
+                I made this app because we are all part of a mass movement that often prefers fitting in. I wanted a slower counterweight: a place to check in with your emotions, write something down, and leave without being pushed to perform. Thank you for trusting me with a few minutes of your day.
               </p>
+              <p className="text-[12px] font-bold uppercase tracking-widest text-gray-nav">Last updated · May 2026</p>
             </div>
           </div>
         </section>

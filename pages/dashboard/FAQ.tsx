@@ -12,32 +12,33 @@ import {
   Image as ImageIcon,
   ListChecks,
 } from '@phosphor-icons/react';
+import { useDocumentMeta } from '../../hooks/useDocumentMeta';
 
 const guideSections = [
   {
     icon: BookOpen,
     title: 'What is Reflections?',
     body:
-      'Reflections is a private writing-first wellness journal for saving notes, naming moods, and returning to patterns when you are ready.',
+      'A journal where writing comes first. You save notes, name moods, tag patterns, and come back to them whenever you want.',
   },
   {
     icon: Heart,
     title: 'Who is Reflections for?',
     body:
-      'It is for people who want a calm place to think in writing without streaks, public sharing, pressure loops, or automatic AI interruptions.',
+      'It is for people who want a calm place to think in writing. You set the pace, keep your notes to yourself, and choose when to involve AI.',
   },
   {
     icon: PenNib,
     title: 'Why writing first?',
     body:
-      'Writing is the main practice. Optional AI support and Life Wiki refreshes stay out of the way until you ask for them.',
+      'Writing is the main practice. AI and Life Wiki refreshes stay in the background until you invite them.',
   },
 ];
 
 const practiceItems = [
   {
     title: 'The practice',
-    body: 'A quiet space to write, one reflection at a time.',
+    body: 'A place to write, one reflection at a time.',
     icon: BookOpen,
   },
   {
@@ -80,8 +81,8 @@ const detailItems = [
     icon: Tag,
   },
   {
-    title: 'Optional AI support',
-    body: "Reflections can help notice patterns or refresh your Life Wiki, but only when you ask. It never runs in the background, and we don't use your notes to train AI models.",
+    title: 'AI on your terms',
+    body: 'Reflections can spot patterns or refresh your Life Wiki, but only when you choose. It never fires in the background. See our Privacy page for how your notes are protected.',
     label: 'On demand only • Private by design',
     icon: Brain,
   },
@@ -99,12 +100,18 @@ const featureGrid = [
 const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
 
 export const FAQ: React.FC = () => {
+  useDocumentMeta({
+    title: 'FAQ – How Reflections Works | Private Journaling App',
+    description: 'How Reflections works: the writing practice, mood check-ins, AI that waits for you, Life Wiki, and the design choices behind each feature.',
+    path: '/faq',
+  });
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   return (
-    <div className="surface-scope-sky relative min-h-full bg-body pb-28 text-gray-text transition-colors duration-300">
+    <div className="surface-scope-sky page-wash relative min-h-full bg-body pb-28 text-gray-text transition-colors duration-300">
       <section className="mx-auto grid w-full max-w-[1440px] gap-12 px-6 py-20 sm:px-10 lg:grid-cols-12 lg:items-end lg:px-16 lg:py-28">
         <div className="lg:col-span-8">
           <h1 className="text-mk-display font-display font-extrabold leading-[0.95] tracking-normal text-gray-text text-balance">
@@ -117,8 +124,9 @@ export const FAQ: React.FC = () => {
 
           <p className="max-w-[36rem] font-serif text-[18px] leading-relaxed text-gray-light">
             Reflections is a calm, private writing space. This guide explains what the product does,
-            what it avoids, and how optional AI fits around the writing
+            how AI fits around the writing, and the choices behind the design
           </p>
+          <p className="text-[12px] font-bold uppercase tracking-widest text-gray-nav">Last updated · May 2026</p>
         </div>
       </section>
 
@@ -129,7 +137,7 @@ export const FAQ: React.FC = () => {
             const Icon = section.icon;
 
             return (
-              <article key={section.title} className="group relative flex flex-col justify-between overflow-hidden rounded-[2rem] bg-body-surface border border-border/40 p-8 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-green/20 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+              <article key={section.title} className="surface-flat surface-tone-sage group relative flex flex-col justify-between overflow-hidden rounded-[2rem] p-8 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-green/20">
                 <div className="relative z-10">
                   <div className="tone-icon tone-icon-sage mb-8 h-12 w-12 rounded-2xl transition-transform duration-500 ease-out group-hover:scale-110 group-hover:-rotate-6">
                     <Icon size={24} weight="duotone" />
@@ -143,8 +151,6 @@ export const FAQ: React.FC = () => {
                     </p>
                   </div>
                 </div>
-                {/* Subtle background glow effect on hover */}
-                <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-green/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
               </article>
             );
           })}
@@ -161,7 +167,7 @@ export const FAQ: React.FC = () => {
             {practiceItems.map((item) => {
               const Icon = item.icon;
               return (
-                <div key={item.title} className="group relative flex flex-col justify-between overflow-hidden rounded-[2rem] bg-body-surface border border-border/40 p-8 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-green/20 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                <div key={item.title} className="surface-flat surface-tone-sky group relative flex flex-col justify-between overflow-hidden rounded-[2rem] p-8 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-green/20">
                   <div className="relative z-10">
                     <div className="tone-icon tone-icon-sky mb-6 h-12 w-12 rounded-2xl transition-transform duration-500 ease-out group-hover:scale-110 group-hover:rotate-6">
                       <Icon size={24} weight="duotone" />
@@ -169,7 +175,6 @@ export const FAQ: React.FC = () => {
                     <h3 className="mb-3 text-[20px] font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">{item.title}</h3>
                     <p className="font-sans text-[16px] leading-relaxed text-gray-light">{item.body}</p>
                   </div>
-                  <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-sky-500/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                 </div>
               );
             })}
@@ -214,7 +219,7 @@ export const FAQ: React.FC = () => {
             {featureGrid.map((feature) => {
               const Icon = feature.icon;
               return (
-                <div key={feature.title} className="group relative rounded-[2rem] bg-body-surface border border-border/40 p-8 transition-all duration-500 hover:border-green/20 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1">
+                <div key={feature.title} className="surface-flat surface-tone-honey group relative rounded-[2rem] p-8 transition-all duration-500 hover:border-green/20 hover:-translate-y-1">
                   <div className="space-y-6">
                     <div className="tone-icon tone-icon-honey h-12 w-12 rounded-2xl transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
                       <Icon size={24} weight="duotone" />
@@ -224,12 +229,12 @@ export const FAQ: React.FC = () => {
                       <p className="font-sans text-[16px] leading-relaxed text-gray-light">{feature.body}</p>
                     </div>
                   </div>
-                  <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-tr from-amber-500/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                 </div>
               );
             })}
           </div>
         </section>
+
 
         <section className="mb-28 border-t border-border pt-10">
           <p className="label-caps text-green">Contact</p>

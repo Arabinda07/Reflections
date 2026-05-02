@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const read = (path: string) => readFileSync(join(process.cwd(), path), 'utf8');
@@ -36,7 +36,7 @@ describe('Sanctuary Life Wiki contract', () => {
   it('renders a library-first Sanctuary surface with five primary cards and a supporting shelf', () => {
     const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
 
-    expect(lifeWiki).toContain('SANCTUARY_WIKI_PAGES');
+    expect(lifeWiki).toContain('SANCTUARY_LEVEL_UP_ANIMATION_SRC');
     expect(lifeWiki).toContain('SUPPORTING_WIKI_PAGES');
     expect(lifeWiki).toContain('Sanctuary pages');
     expect(lifeWiki).toContain('Supporting shelf');
@@ -86,6 +86,10 @@ describe('Sanctuary Life Wiki contract', () => {
   it('preserves the opening animation as a threshold from Insights', () => {
     const insights = read('pages/dashboard/Insights.tsx');
     const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
+    const sanctuaryAnimationPath = join(process.cwd(), 'src/lottie/sanctuaryAnimation.ts');
+
+    expect(existsSync(sanctuaryAnimationPath)).toBe(true);
+    const sanctuaryAnimation = read('src/lottie/sanctuaryAnimation.ts');
 
     expect(insights).toContain("state={{ fromInsights: true }}");
     expect(insights).toContain('isOpeningSanctuary');
@@ -95,8 +99,43 @@ describe('Sanctuary Life Wiki contract', () => {
     expect(insights).toContain('dotLottieRefCallback={bindSanctuaryEntrancePlayer}');
     expect(insights).toContain("addEventListener('complete'");
     expect(insights).toContain('window.setTimeout(completeOpenSanctuary, SANCTUARY_ENTRANCE_FALLBACK_MS)');
-    expect(insights).toContain('/assets/lottie/Level%20Up%20Animation.json');
+    expect(insights).not.toContain("from '@/src/lottie/level-up-animation.json'");
+    expect(lifeWiki).not.toContain("from '@/src/lottie/level-up-animation.json'");
+    expect(insights).toContain('src={SANCTUARY_LEVEL_UP_ANIMATION_SRC}');
+    expect(lifeWiki).toContain('src={SANCTUARY_LEVEL_UP_ANIMATION_SRC}');
+    expect(sanctuaryAnimation).toContain("new URL('./level-up-animation.json', import.meta.url).href");
+    expect(lifeWiki).toContain('const cameFromInsights = Boolean(location.state?.fromInsights);');
+    expect(lifeWiki).toContain('const [isEnteringWiki, setIsEnteringWiki] = useState(shouldPlayEntryAnimation && !cameFromInsights);');
     expect(lifeWiki).not.toContain('refreshModeLabel');
     expect(lifeWiki).not.toContain('On demand. Use Refresh with AI when you want the library rebuilt.');
+  });
+
+  it('keeps startup and Sanctuary overlay gradients behind named design tokens', () => {
+    const startupScreen = read('components/ui/StartupScreen.tsx');
+    const insights = read('pages/dashboard/Insights.tsx');
+    const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
+    const css = read('index.css');
+
+    expect(startupScreen).toContain('startup-ambient-wash');
+    expect(startupScreen).toContain('startup-video-scrim');
+    expect(startupScreen).not.toContain('bg-[radial-gradient');
+    expect(startupScreen).not.toContain('bg-[linear-gradient');
+
+    expect(insights).toContain('sanctuary-entrance-glow');
+    expect(insights).toContain('sanctuary-entrance-scrim');
+    expect(insights).not.toContain('bg-[radial-gradient');
+    expect(insights).not.toContain('bg-gradient-to-b');
+
+    expect(lifeWiki).toContain('sanctuary-entrance-glow');
+    expect(lifeWiki).toContain('sanctuary-entrance-scrim');
+    expect(lifeWiki).toContain('sanctuary-page-fade');
+    expect(lifeWiki).not.toContain('bg-[radial-gradient');
+    expect(lifeWiki).not.toContain('bg-gradient-to-b');
+
+    expect(css).toContain('--startup-ambient-wash:');
+    expect(css).toContain('--startup-video-scrim:');
+    expect(css).toContain('--sanctuary-entrance-glow:');
+    expect(css).toContain('--sanctuary-entrance-scrim:');
+    expect(css).toContain('--sanctuary-page-fade:');
   });
 });

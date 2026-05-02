@@ -22,8 +22,8 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
         className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-body"
         style={{ touchAction: 'none' }}
       >
-        <div className="absolute inset-0 flex items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_center,oklch(from_var(--green)_0.26_0.04_h_/_0.32),var(--bg-color)_58%)]">
-          <div className="absolute inset-0 z-10 bg-[linear-gradient(180deg,rgba(0,0,0,0.18),transparent_36%,rgba(0,0,0,0.2))]" />
+        <div className="startup-ambient-wash absolute inset-0 flex items-center justify-center overflow-hidden">
+          <div className="startup-video-scrim absolute inset-0 z-10" />
 
           {/* Static poster — renders instantly, zero autoplay dependency */}
           <img
@@ -68,4 +68,3 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
     </OverlayFeedback>
   );
 };
-

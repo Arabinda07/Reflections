@@ -15,6 +15,7 @@ import {
 } from '@phosphor-icons/react';
 
 import { Button } from '../../components/ui/Button';
+import { useDocumentMeta } from '../../hooks/useDocumentMeta';
 import { RoutePath } from '../../types';
 
 const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
@@ -107,6 +108,11 @@ const policySections = [
 ];
 
 export const PrivacyPolicy: React.FC = () => {
+  useDocumentMeta({
+    title: 'Privacy – How Reflections Handles Your Data',
+    description: 'What Reflections stores, when AI runs, how payments and analytics work, and how to export or delete your writing.',
+    path: '/privacy',
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -114,7 +120,7 @@ export const PrivacyPolicy: React.FC = () => {
   }, []);
 
   return (
-    <div className="surface-scope-paper relative min-h-full bg-body pb-28 text-gray-text transition-colors duration-300">
+    <div className="surface-scope-paper page-wash relative min-h-full bg-body pb-28 text-gray-text transition-colors duration-300">
       <section className="mx-auto grid w-full max-w-[1440px] gap-12 px-6 py-20 sm:px-10 lg:grid-cols-12 lg:items-end lg:px-16 lg:py-28">
         <div className="lg:col-span-8">
           <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.HOME)} className="-ml-2 mb-8">
@@ -130,6 +136,7 @@ export const PrivacyPolicy: React.FC = () => {
           <p className="max-w-[36rem] font-serif text-[18px] leading-relaxed text-gray-light">
             This page explains what Reflections stores, when AI is used, how payments and analytics work, and how you can remove your writing.
           </p>
+          <p className="text-[12px] font-bold uppercase tracking-widest text-gray-nav">Last updated · May 2026</p>
         </div>
       </section>
 
@@ -138,7 +145,7 @@ export const PrivacyPolicy: React.FC = () => {
           {policySections.map((section) => {
             const Icon = section.icon;
             return (
-              <article key={section.title} className="group relative flex flex-col justify-between overflow-hidden rounded-[2rem] bg-body-surface border border-border/40 p-8 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-green/20 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+              <article key={section.title} className="surface-flat surface-tone-paper group relative flex flex-col justify-between overflow-hidden rounded-[2rem] p-8 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-green/20">
                 <div className="relative z-10">
                   <div className={`tone-icon ${section.color} mb-8 h-12 w-12 rounded-2xl transition-transform duration-500 ease-out group-hover:scale-110 group-hover:-rotate-6`}>
                     <Icon size={24} weight="duotone" />
@@ -154,14 +161,12 @@ export const PrivacyPolicy: React.FC = () => {
                     ))}
                   </div>
                 </div>
-                {/* Subtle background glow effect on hover */}
-                <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-green/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
               </article>
             );
           })}
 
           {/* Questions & Contact Card */}
-          <article className="group relative flex flex-col justify-between overflow-hidden rounded-[2rem] bg-body-surface border border-border/40 p-8 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-green/20 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] md:col-span-2 xl:col-span-3">
+          <article className="surface-flat surface-tone-sage group relative flex flex-col justify-between overflow-hidden rounded-[2rem] p-8 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-green/20 md:col-span-2 xl:col-span-3">
             <div className="relative z-10 flex flex-col gap-6 md:flex-row md:items-center md:gap-12">
               <div className="tone-icon tone-icon-sage h-14 w-14 flex-none rounded-2xl transition-transform duration-500 ease-out group-hover:scale-110 group-hover:rotate-6">
                 <Envelope size={26} weight="duotone" />
@@ -182,7 +187,6 @@ export const PrivacyPolicy: React.FC = () => {
                 </a>
               </div>
             </div>
-            <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-green/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
           </article>
         </section>
       </main>

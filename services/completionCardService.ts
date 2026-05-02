@@ -7,7 +7,7 @@ export type CompletionCardShareResult = 'shared' | 'unsupported';
 
 const CARD_WIDTH = 1200;
 const CARD_HEIGHT = 630;
-const CARD_FONT_SERIF = 'Newsreader, serif';
+const CARD_FONT_SERIF = 'Spectral, serif';
 const CARD_FONT_SANS = 'Manrope, sans-serif';
 
 const roundRect = (

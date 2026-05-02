@@ -158,7 +158,7 @@ export const SignUp: React.FC = () => {
   };
 
   return (
-    <div className="surface-scope-paper flex min-h-[100dvh] items-center justify-center bg-body p-6 transition-colors duration-300">
+    <div className="surface-scope-paper page-wash flex min-h-[100dvh] items-center justify-center bg-body p-6 transition-colors duration-300">
       <div className="w-full max-w-[460px]">
         <Surface variant="bezel">
           <div className="p-8 sm:p-10 space-y-6">
@@ -283,6 +283,7 @@ export const SignUp: React.FC = () => {
                 src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
                 className="h-5 w-5"
                 alt="Google"
+                loading="lazy"
               />
               <span className="font-bold text-gray-text">Continue with Google</span>
             </Button>
@@ -290,7 +291,10 @@ export const SignUp: React.FC = () => {
 
             <p className="text-[15px] font-bold text-gray-light text-center">
               Already have an account?{' '}
-              <Link to={RoutePath.LOGIN} className="text-green hover:opacity-70">
+              <Link
+                to={RoutePath.LOGIN}
+                className="inline-flex min-h-11 items-center rounded-xl px-2 text-green transition-colors hover:text-green/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
+              >
                 Sign in
               </Link>
             </p>
