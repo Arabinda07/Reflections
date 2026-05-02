@@ -12,6 +12,7 @@ import {
   Image as ImageIcon,
   ListChecks,
 } from '@phosphor-icons/react';
+import { useDocumentMeta } from '../../hooks/useDocumentMeta';
 
 const guideSections = [
   {
@@ -99,6 +100,12 @@ const featureGrid = [
 const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
 
 export const FAQ: React.FC = () => {
+  useDocumentMeta({
+    title: 'FAQ – How Reflections Works | Private Journaling App',
+    description: 'Answers about Reflections: private notes, mood check-ins, optional AI support, Life Wiki, and writing without streaks or scores.',
+    path: '/faq',
+  });
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -119,6 +126,7 @@ export const FAQ: React.FC = () => {
             Reflections is a calm, private writing space. This guide explains what the product does,
             what it avoids, and how optional AI fits around the writing
           </p>
+          <p className="text-[12px] font-bold uppercase tracking-widest text-gray-nav">Last updated · May 2026</p>
         </div>
       </section>
 

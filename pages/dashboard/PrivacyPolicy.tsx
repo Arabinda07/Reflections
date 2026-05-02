@@ -15,6 +15,7 @@ import {
 } from '@phosphor-icons/react';
 
 import { Button } from '../../components/ui/Button';
+import { useDocumentMeta } from '../../hooks/useDocumentMeta';
 import { RoutePath } from '../../types';
 
 const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
@@ -107,6 +108,11 @@ const policySections = [
 ];
 
 export const PrivacyPolicy: React.FC = () => {
+  useDocumentMeta({
+    title: 'Privacy – How Reflections Handles Your Data',
+    description: 'How Reflections handles private notes, moods, tags, attachments, optional AI actions, analytics, payments, exports, and deletion.',
+    path: '/privacy',
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -130,6 +136,7 @@ export const PrivacyPolicy: React.FC = () => {
           <p className="max-w-[36rem] font-serif text-[18px] leading-relaxed text-gray-light">
             This page explains what Reflections stores, when AI is used, how payments and analytics work, and how you can remove your writing.
           </p>
+          <p className="text-[12px] font-bold uppercase tracking-widest text-gray-nav">Last updated · May 2026</p>
         </div>
       </section>
 

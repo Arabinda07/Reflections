@@ -2,9 +2,15 @@ import { ArrowRight, SpeakerHigh, SpeakerSlash } from '@phosphor-icons/react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
+import { useDocumentMeta } from '../../hooks/useDocumentMeta';
 import { RoutePath } from '../../types';
 
 export const Landing: React.FC = () => {
+  useDocumentMeta({
+    title: 'Reflections – Private Journal for Notes, Mood & Reflection',
+    description: 'A private journal app for writing notes, naming moods, tagging patterns, and using optional AI support only when you ask. No streaks, no pressure.',
+    path: '/',
+  });
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isMuted, setIsMuted] = useState(true);

@@ -105,4 +105,84 @@ describe('SEO crawlability contract', () => {
     expect(landing).toContain('href={RoutePath.FAQ}');
     expect(landing).not.toContain('navigate(RoutePath.FAQ)');
   });
+
+  it('explicitly allows AI search crawlers in robots.txt', () => {
+    const robots = read('public/robots.txt');
+
+    for (const bot of ['GPTBot', 'ChatGPT-User', 'PerplexityBot', 'ClaudeBot', 'anthropic-ai', 'Google-Extended']) {
+      expect(robots).toContain(`User-agent: ${bot}`);
+    }
+  });
+
+  it('provides an llms.txt context file for AI systems', () => {
+    const llms = read('public/llms.txt');
+
+    expect(llms).toContain('Reflections');
+    expect(llms).toContain('journal');
+    expect(llms).toContain('https://reflections-ebon.vercel.app/');
+    expect(llms).toContain('Pricing');
+  });
+
+  it('provides a machine-readable pricing file', () => {
+    const pricing = read('public/pricing.md');
+
+    expect(pricing).toContain('Free');
+    expect(pricing).toContain('Pro');
+    expect(pricing).toContain('30 notes');
+  });
+
+  it('excludes llms.txt and pricing.md from the SPA rewrite', () => {
+    const vercel = JSON.parse(read('vercel.json')) as {
+      rewrites: Array<{ source: string; destination: string }>;
+    };
+    const rewriteSource = vercel.rewrites.map((rewrite) => rewrite.source).join('\n');
+
+    expect(rewriteSource).toContain('llms\\.txt');
+    expect(rewriteSource).toContain('pricing\\.md');
+  });
+
+  it('uses a 1200×630 OG social card image, not the app icon', () => {
+    const html = read('index.html');
+
+    expect(html).toContain('og:image:width" content="1200"');
+    expect(html).toContain('og:image:height" content="630"');
+    expect(html).toContain('og-social.png');
+    expect(html).not.toMatch(/og:image:width" content="512"/);
+  });
+
+  it('includes dateModified in structured data schemas', () => {
+    const html = read('index.html');
+
+    expect(html).toContain('"dateModified"');
+  });
+
+  it('does not expose a SearchAction pointing to a private route', () => {
+    const html = read('index.html');
+
+    expect(html).not.toContain('"SearchAction"');
+  });
+
+  it('sets per-page document meta via useDocumentMeta on every public page', () => {
+    for (const [file, path] of [
+      ['pages/dashboard/Landing.tsx', '/'],
+      ['pages/dashboard/FAQ.tsx', '/faq'],
+      ['pages/dashboard/PrivacyPolicy.tsx', '/privacy'],
+      ['pages/dashboard/AboutArabinda.tsx', '/about'],
+    ] as const) {
+      const source = read(file);
+      expect(source).toContain('useDocumentMeta');
+      expect(source).toContain(`path: '${path}'`);
+    }
+  });
+
+  it('shows a visible last-updated date on FAQ, Privacy, and About pages', () => {
+    for (const file of [
+      'pages/dashboard/FAQ.tsx',
+      'pages/dashboard/PrivacyPolicy.tsx',
+      'pages/dashboard/AboutArabinda.tsx',
+    ]) {
+      const source = read(file);
+      expect(source).toMatch(/Last updated/i);
+    }
+  });
 });

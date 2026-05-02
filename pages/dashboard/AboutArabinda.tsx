@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowLeft, Feather, LockKey, Sparkle } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
 import { PageContainer } from '../../components/ui/PageContainer';
+import { useDocumentMeta } from '../../hooks/useDocumentMeta';
 import { RoutePath } from '../../types';
 
 const sections = [
@@ -28,6 +29,11 @@ const sections = [
 ];
 
 export const AboutArabinda: React.FC = () => {
+  useDocumentMeta({
+    title: 'About Reflections & Arabinda – A Private Journal App',
+    description: 'A note from Arabinda about why Reflections is a private writing app with mood notes, Life Wiki, and optional AI support.',
+    path: '/about',
+  });
   const navigate = useNavigate();
 
   return (
@@ -66,6 +72,7 @@ export const AboutArabinda: React.FC = () => {
               <p className="max-w-[55ch] font-sans text-[16px] leading-relaxed text-gray-light">
                 I made this app because we are all part of a mass movement that often prefers fitting in. I wanted a quieter counterweight: a place to check in with your emotions, write something down, and leave without being pushed to perform. Thank you for trusting me with a few minutes of your day.
               </p>
+              <p className="text-[12px] font-bold uppercase tracking-widest text-gray-nav">Last updated · May 2026</p>
             </div>
           </div>
         </section>

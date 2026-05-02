@@ -51,7 +51,7 @@
   ],
   "rewrites": [
     {
-      "source": "/((?!assets/|icons/|sitemap\\.xml|sitemap\\.xsl|robots\\.txt|manifest\\.webmanifest|manifest\\.json|sw\\.js|workbox-.*\\.js|registerSW\\.js|faq$|privacy$|about$).*)",
+      "source": "/((?!assets/|icons/|sitemap\\.xml|sitemap\\.xsl|robots\\.txt|llms\\.txt|pricing\\.md|manifest\\.webmanifest|manifest\\.json|sw\\.js|workbox-.*\\.js|registerSW\\.js|faq$|privacy$|about$).*)",
       "destination": "/index.html"
     }
   ]

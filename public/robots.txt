@@ -1,3 +1,35 @@
+# ── AI Search Crawlers ────────────────────────────────────────
+User-agent: GPTBot
+Allow: /
+Disallow: /login
+Disallow: /signup
+Disallow: /home
+Disallow: /notes
+Disallow: /notes/
+Disallow: /account
+Disallow: /insights
+Disallow: /release
+Disallow: /letters
+Disallow: /wiki
+Disallow: /sanctuary
+Disallow: /auth/
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# ── General Crawlers ─────────────────────────────────────────
 User-agent: *
 Allow: /
 Allow: /manifest.json
