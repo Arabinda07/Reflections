@@ -249,10 +249,10 @@ export const Insights: React.FC = () => {
       </AnimatePresence>
 
       <PageContainer className="surface-scope-sky page-wash pb-24 pt-6 md:pt-10">
-        <div className="space-y-10">
+        <div className="core-page-stack">
           <button 
             onClick={() => navigate(RoutePath.HOME)}
-            className="group flex items-center gap-2 text-sm font-bold text-gray-nav hover:text-green transition-[color,transform] duration-300 w-fit hover:-translate-x-1"
+            className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-green/5 hover:text-green"
             aria-label="Back to home"
           >
             <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
@@ -293,8 +293,8 @@ export const Insights: React.FC = () => {
                   ['Active days', weeklyRecap.activityDays.length],
                 ].map(([label, value]) => (
                   <div key={label} className="tone-chip tone-chip-sky flex-col items-start p-4">
-                    <p className="text-2xl font-display font-bold text-gray-text">{value}</p>
-                    <p className="mt-1 text-xs font-black uppercase tracking-widest text-gray-nav">{label}</p>
+                    <p className="dashboard-stat-value">{value}</p>
+                    <p className="dashboard-caption mt-1 text-gray-nav">{label}</p>
                   </div>
                 ))}
               </div>

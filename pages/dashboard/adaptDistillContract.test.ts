@@ -37,7 +37,7 @@ describe('adapt and distill source contract', () => {
     expect(landing).not.toContain('grain-overlay');
     expect(layout).not.toContain('grain-overlay');
     expect(createNote).not.toContain('grain-overlay');
-    expect(createNote).toContain('text-[36px] sm:text-[42px] md:text-[56px]');
+    expect(createNote).toContain('editor-title-input');
     expect(home).toContain('h-[56dvh] min-h-[360px]');
     expect(faq).toContain('flex flex-col gap-4 sm:flex-row sm:gap-6');
     expect(css).toContain('@media (max-width: 768px)');

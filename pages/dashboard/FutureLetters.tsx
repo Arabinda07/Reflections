@@ -176,10 +176,10 @@ export const FutureLetters: React.FC = () => {
   return (
     <>
       <PageContainer size="wide" className="surface-scope-honey page-wash pb-24 pt-6 md:pt-10">
-        <div className="space-y-8">
+        <div className="core-page-stack">
           <button
             onClick={() => navigate(RoutePath.HOME)}
-            className="group flex items-center gap-2 text-sm font-bold text-gray-nav hover:text-green transition-all duration-300 w-fit hover:-translate-x-1"
+            className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-green/5 hover:text-green"
             aria-label="Back to home"
           >
             <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
@@ -306,7 +306,7 @@ export const FutureLetters: React.FC = () => {
                         return (
                           <div
                             key={letter.id}
-                            className="group relative surface-inline-panel dashboard-tone-card overflow-hidden rounded-3xl p-5 transition-all duration-300 hover:shadow-lg"
+                            className="group relative surface-inline-panel dashboard-tone-card overflow-hidden rounded-3xl p-5 transition-[border-color,box-shadow] duration-300 hover:shadow-lg"
                           >
                             <div className="relative z-10">
                               <div className="mb-4 flex items-start justify-between gap-3">
@@ -338,7 +338,7 @@ export const FutureLetters: React.FC = () => {
                                 disabled={Boolean(openingLetterId)}
                                 isLoading={isOpening}
                                 onClick={() => handleOpenLetter(letter)}
-                                className={`min-h-11 w-full rounded-2xl font-bold transition-all ${isLocked ? 'opacity-60' : 'group-hover:bg-green group-hover:text-white group-hover:border-transparent'}`}
+                                className={`min-h-11 w-full rounded-2xl font-bold transition-[background-color,border-color,color,opacity] ${isLocked ? 'opacity-60' : 'group-hover:bg-green group-hover:text-white group-hover:border-transparent'}`}
                                 aria-label={
                                   isOpening
                                     ? `Opening ${letter.title}`

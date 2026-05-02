@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -61,5 +61,16 @@ describe('optimize audit contract', () => {
     expect(existsSync(path.resolve(process.cwd(), 'public/assets/videos/twist.mp4'))).toBe(false);
     expect(existsSync(path.resolve(process.cwd(), 'public/assets/videos/user_hero.mp4'))).toBe(false);
     expect(existsSync(path.resolve(process.cwd(), 'public/assets/videos/robot_meeting.mp4'))).toBe(false);
+  });
+
+  it('ships optimized landing media for mobile first paint', () => {
+    const landingPoster = path.resolve(process.cwd(), 'public/assets/videos/landing_video.webp');
+    const mobileLandingPoster = path.resolve(process.cwd(), 'public/assets/videos/landing_video_mobile.webp');
+
+    expect(existsSync(landingPoster)).toBe(true);
+    expect(existsSync(mobileLandingPoster)).toBe(true);
+    expect(existsSync(path.resolve(process.cwd(), 'public/assets/videos/landing_video.png'))).toBe(false);
+    expect(statSync(landingPoster).size).toBeLessThan(240 * 1024);
+    expect(statSync(mobileLandingPoster).size).toBeLessThan(120 * 1024);
   });
 });

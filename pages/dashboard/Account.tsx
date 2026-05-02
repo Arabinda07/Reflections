@@ -358,7 +358,7 @@ export const Account: React.FC = () => {
   return (
     <>
       <PageContainer className="surface-scope-paper page-wash pb-24 pt-6 md:pt-10">
-        <div className="space-y-8">
+        <div className="core-page-stack">
           <SectionHeader
             eyebrow="Account"
             title="Your account settings"
@@ -398,7 +398,7 @@ export const Account: React.FC = () => {
                     onClick={() => avatarInputRef.current?.click()}
                     aria-label="Upload a new profile photo"
                   >
-                    <div className="surface-inline-panel h-32 w-32 overflow-hidden rounded-full border-4 border-white/50 shadow-xl shadow-gray-text/10 transition-all duration-500 group-hover:border-green/50 group-hover:shadow-green/10">
+                    <div className="surface-inline-panel h-32 w-32 overflow-hidden rounded-full border-4 border-white/50 shadow-xl shadow-gray-text/10 transition-[border-color,box-shadow,transform] duration-500 group-hover:border-green/50 group-hover:shadow-green/10">
                       {avatarPath ? (
                         <StorageImage path={avatarPath} alt="Profile" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
                       ) : (
@@ -407,7 +407,7 @@ export const Account: React.FC = () => {
                         </div>
                       )}
                     </div>
-                    <div className="absolute bottom-1 right-1 flex h-11 w-11 items-center justify-center rounded-full border-4 border-white bg-gray-text text-white shadow-xl shadow-gray-text/15 transition-all duration-500 group-hover:bg-green group-hover:scale-110">
+                    <div className="absolute bottom-1 right-1 flex h-11 w-11 items-center justify-center rounded-full border-4 border-white bg-gray-text text-white shadow-xl shadow-gray-text/15 transition-[background-color,box-shadow,transform] duration-500 group-hover:bg-green group-hover:scale-110">
                       <Camera size={18} weight="bold" className="transition-transform group-hover:rotate-12" />
                     </div>
                   </button>
@@ -468,19 +468,19 @@ export const Account: React.FC = () => {
               <div className="grid gap-4 p-6 md:grid-cols-2 lg:p-8">
                 <Surface variant="bezel" tone="paper">
                   <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-all duration-300 hover:bg-gray-text/[0.03] focus-visible:bg-gray-text/[0.06]">
+                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors duration-300 hover:bg-gray-text/[0.03] focus-visible:bg-gray-text/[0.06]">
                       <div className="flex items-center gap-3">
                         <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
                           <Sparkle size={24} weight="duotone" className="text-green" />
                         </div>
                         <div>
-                          <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">Membership</p>
+                          <p className="dashboard-caption text-gray-nav/60">Membership</p>
                           <h3 className="text-[20px] font-display font-bold text-gray-text capitalize group-hover:text-green transition-colors">
                             {access?.planTier || 'Free'} plan
                           </h3>
                         </div>
                       </div>
-                      <div className="text-gray-nav/40 transition-all duration-500 group-open:rotate-180 group-hover:text-green">
+                      <div className="text-gray-nav/40 transition-[color,transform] duration-500 group-open:rotate-180 group-hover:text-green">
                         <CaretDown size={20} weight="bold" />
                       </div>
                     </summary>
@@ -502,17 +502,17 @@ export const Account: React.FC = () => {
 
                 <Surface variant="bezel" tone="paper">
                   <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-all duration-300 hover:bg-gray-text/[0.03] focus-visible:bg-gray-text/[0.06]">
+                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors duration-300 hover:bg-gray-text/[0.03] focus-visible:bg-gray-text/[0.06]">
                       <div className="flex items-center gap-3">
                         <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
                           <ShieldCheck size={24} weight="duotone" className="text-sky" />
                         </div>
                         <div>
-                          <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">Security</p>
+                          <p className="dashboard-caption text-gray-nav/60">Security</p>
                           <h3 className="text-[20px] font-display font-bold text-gray-text group-hover:text-sky transition-colors">Keep this private</h3>
                         </div>
                       </div>
-                      <div className="text-gray-nav/40 transition-all duration-500 group-open:rotate-180 group-hover:text-sky">
+                      <div className="text-gray-nav/40 transition-[color,transform] duration-500 group-open:rotate-180 group-hover:text-sky">
                         <CaretDown size={20} weight="bold" />
                       </div>
                     </summary>
@@ -546,17 +546,17 @@ export const Account: React.FC = () => {
 
                 <Surface variant="bezel" tone="paper">
                   <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-all duration-300 hover:bg-gray-text/[0.03] focus-visible:bg-gray-text/[0.06]">
+                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors duration-300 hover:bg-gray-text/[0.03] focus-visible:bg-gray-text/[0.06]">
                       <div className="flex items-center gap-3">
                         <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12">
                           <EnvelopeSimple size={24} weight="duotone" className="text-honey" />
                         </div>
                         <div>
-                          <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">Invites</p>
+                          <p className="dashboard-caption text-gray-nav/60">Invites</p>
                           <h3 className="text-[20px] font-display font-bold text-gray-text group-hover:text-honey transition-colors">Share Reflections</h3>
                         </div>
                       </div>
-                      <div className="text-gray-nav/40 transition-all duration-500 group-open:rotate-180 group-hover:text-honey">
+                      <div className="text-gray-nav/40 transition-[color,transform] duration-500 group-open:rotate-180 group-hover:text-honey">
                         <CaretDown size={20} weight="bold" />
                       </div>
                     </summary>
@@ -571,17 +571,17 @@ export const Account: React.FC = () => {
 
                 <Surface variant="bezel" tone="paper">
                   <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-all duration-300 hover:bg-gray-text/[0.03] focus-visible:bg-gray-text/[0.06]">
+                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors duration-300 hover:bg-gray-text/[0.03] focus-visible:bg-gray-text/[0.06]">
                       <div className="flex items-center gap-3">
                         <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-12">
                           <Sparkle size={24} weight="duotone" className="text-green" />
                         </div>
                         <div>
-                          <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">Sanctuary</p>
+                          <p className="dashboard-caption text-gray-nav/60">Sanctuary</p>
                           <h3 className="text-[20px] font-display font-bold text-gray-text group-hover:text-green transition-colors">Smart Mode</h3>
                         </div>
                       </div>
-                      <div className="text-gray-nav/40 transition-all duration-500 group-open:rotate-180 group-hover:text-green">
+                      <div className="text-gray-nav/40 transition-[color,transform] duration-500 group-open:rotate-180 group-hover:text-green">
                         <CaretDown size={20} weight="bold" />
                       </div>
                     </summary>
@@ -592,7 +592,7 @@ export const Account: React.FC = () => {
 
                       {greatIngestProgress ? (
                         <div className="surface-inline-panel p-4">
-                          <p className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">
+                          <p className="dashboard-caption text-gray-nav/60">
                             Preparing Sanctuary
                           </p>
                           <p className="mt-2 text-[14px] font-bold text-gray-text">
@@ -633,7 +633,7 @@ export const Account: React.FC = () => {
                               access?.smartModeEnabled ? 'translate-x-[110px]' : 'translate-x-0'
                             }`}
                           />
-                          <span className="relative z-10 flex w-full items-center justify-between px-2 text-[11px] font-black uppercase tracking-widest">
+                          <span className="relative z-10 flex w-full items-center justify-between px-2 label-caps">
                             <span>{access?.smartModeEnabled ? 'On' : 'Off'}</span>
                             <span className="text-gray-text">
                               {isSmartModeChanging ? 'Saving' : 'Smart Mode'}
@@ -655,7 +655,7 @@ export const Account: React.FC = () => {
                           <Warning size={24} weight="duotone" className="text-clay" />
                         </div>
                         <div>
-                          <p className="text-[11px] font-black uppercase tracking-widest text-clay/60">Danger zone</p>
+                          <p className="dashboard-caption text-clay/60">Danger zone</p>
                           <h3 className="text-[20px] font-display font-bold text-clay">Delete account</h3>
                         </div>
                       </div>
@@ -680,7 +680,7 @@ export const Account: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleSignOut}
-                    className="flex items-center gap-2 text-[13px] font-bold uppercase tracking-widest text-gray-nav transition-colors hover:text-clay"
+                    className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-[var(--radius-control)] px-2 label-caps text-gray-nav transition-[background-color,color] hover:bg-clay/5 hover:text-clay sm:min-w-0"
                     aria-label="Sign out of your account"
                   >
                     <SignOut size={20} weight="regular" />

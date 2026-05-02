@@ -24,6 +24,8 @@ describe('landing first-paint contract', () => {
     expect(protectedRoute).not.toContain('StartupScreen is covering this visually');
 
     expect(home).toContain("import { RouteLoadingFrame } from '../../components/ui/RouteLoadingFrame';");
+    expect(home).toContain("const Landing = React.lazy(() => import('./Landing').then((module) => ({ default: module.Landing })));");
+    expect(home).not.toContain("import { Landing } from './Landing';");
     expect(home).toContain('return <RouteLoadingFrame />;');
     expect(home).not.toContain('CircleNotch');
   });
@@ -36,7 +38,7 @@ describe('landing first-paint contract', () => {
     expect(authContext).toContain('isAuthStoreHydrated: isHydrated');
     expect(home).toContain('isAuthStoreHydrated');
     expect(home).toContain('if (!isInitialCheckDone && isAuthStoreHydrated && !isAuthenticated)');
-    expect(home).toContain('return <Landing />;');
+    expect(home).toContain('return renderLanding();');
   });
 
   it('lets the startup overlay fade over already-rendered app content', () => {
@@ -67,10 +69,15 @@ describe('landing first-paint contract', () => {
     const landing = read('pages/dashboard/Landing.tsx');
     const indexHtml = read('index.html');
 
-    expect(indexHtml).toContain('rel="preload" href="/assets/videos/landing_video.png" as="image" fetchpriority="high"');
+    expect(indexHtml).toContain('rel="preload" href="/assets/videos/landing_video_mobile.webp" as="image" type="image/webp" fetchpriority="high" media="(max-width: 1023px)"');
+    expect(indexHtml).toContain('rel="preload" href="/assets/videos/landing_video.webp" as="image" type="image/webp" fetchpriority="high" media="(min-width: 1024px)"');
     expect(landing).toContain('const [shouldLoadHeroVideo, setShouldLoadHeroVideo] = useState(false);');
     expect(landing).toContain('const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);');
+    expect(landing).toContain("const desktopHeroVideoQuery = window.matchMedia('(min-width: 1024px)');");
     expect(landing).toContain('fetchPriority="high"');
+    expect(landing).toContain('<source srcSet="/assets/videos/landing_video.webp" type="image/webp" media="(min-width: 1024px)" />');
+    expect(landing).toContain('<source srcSet="/assets/videos/landing_video_mobile.webp" type="image/webp" media="(max-width: 1023px)" />');
+    expect(landing).toContain('src="/assets/videos/landing_video_mobile.webp"');
     expect(landing).not.toContain('isHeroPosterReady');
     expect(landing).not.toContain('setIsHeroPosterReady');
     expect(landing).not.toContain('onLoad={() => setIsHeroPosterReady(true)}');
@@ -85,6 +92,7 @@ describe('landing first-paint contract', () => {
     expect(landing).toContain('onCanPlay={() => setIsHeroVideoReady(true)}');
     expect(landing).toContain('onPlaying={() => setIsHeroVideoReady(true)}');
     expect(landing).toContain("isHeroVideoReady ? 'opacity-90' : 'opacity-0'");
+    expect(landing).not.toContain('poster="/assets/videos/landing_video.png"');
   });
 
   it('renders landing hero copy and calls to action on the first paint', () => {

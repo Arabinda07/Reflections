@@ -74,7 +74,7 @@ export const ReleaseMode: React.FC = () => {
                 key="release-writing"
                 exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -18, filter: 'blur(10px)' }}
                 transition={{ duration: shouldReduceMotion ? 0 : 0.52, ease: [0.16, 1, 0.3, 1] }}
-                className="space-y-7"
+                className="release-writing-measure w-full space-y-7"
               >
                 <div className="surface-flat p-4 sm:p-6">
                   <label htmlFor="release-writing" className="sr-only">

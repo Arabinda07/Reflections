@@ -492,7 +492,7 @@ export const LifeWiki: React.FC = () => {
           <div className="sanctuary-page-fade absolute inset-0 opacity-50" />
         </div>
         <PageContainer size="narrow" className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10 relative z-10">
-          <div className="space-y-8">
+          <div className="core-page-stack">
             <button
               onClick={() => navigate(RoutePath.SANCTUARY)}
               className="group flex items-center gap-2 text-sm font-bold text-gray-nav hover:text-green transition-[color,transform] duration-300 w-fit hover:-translate-x-1"
@@ -600,7 +600,7 @@ export const LifeWiki: React.FC = () => {
                 </header>
 
                 <Surface variant="flat" tone="sage" className="p-6 md:p-10">
-                  <div className="mx-auto max-w-[68ch] space-y-5 font-serif text-lg leading-loose text-gray-text">
+                  <div className="dashboard-prose dashboard-prose-wide mx-auto space-y-5">
                     <ReactMarkdown
                       skipHtml
                       components={{
@@ -688,7 +688,7 @@ export const LifeWiki: React.FC = () => {
       </div>
 
       <PageContainer className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10 relative z-10">
-        <div className="space-y-10">
+        <div className="core-page-stack">
           <div className="flex items-center justify-between gap-4">
             <button 
               onClick={() => navigate(RoutePath.INSIGHTS)}
@@ -728,7 +728,7 @@ export const LifeWiki: React.FC = () => {
               title="You have used your free Life Wiki refresh."
               description="You can still read what is already here. Upgrade when you want to keep refreshing it with AI."
               actions={
-                <Button size="sm" variant="primary" className="font-black" onClick={() => navigate(RoutePath.ACCOUNT)}>
+                <Button size="sm" variant="primary" className="font-bold" onClick={() => navigate(RoutePath.ACCOUNT)}>
                   See Pro options
                 </Button>
               }
@@ -754,7 +754,7 @@ export const LifeWiki: React.FC = () => {
               ].map(([label, value]) => (
                 <div key={label} className="px-0 py-4 first:pt-0 last:pb-0 md:px-5 md:py-0 md:first:pl-0 md:last:pr-0">
                   <p className="label-caps text-gray-nav">{label}</p>
-                  <p className="mt-2 text-base font-bold tabular-nums leading-relaxed text-gray-text">{value}</p>
+                  <p className="dashboard-stat-value mt-2 !text-base">{value}</p>
                 </div>
               ))}
             </div>

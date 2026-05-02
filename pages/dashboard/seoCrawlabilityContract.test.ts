@@ -77,7 +77,7 @@ describe('SEO crawlability contract', () => {
     expect(generator).toContain("path: '/privacy'");
     expect(generator).toContain("path: '/about'");
     expect(generator).toContain('<meta name="robots" content="index, follow" />');
-    expect(generator).toContain('<main id="public-seo-content"');
+    expect(generator).toContain('<main id="public-seo-content" data-seo-snapshot="true" class="sr-only"');
     expect(generator).toContain('Private journal for notes, mood, and reflection');
     expect(generator).toContain('FAQ about private journaling');
     expect(generator).toContain('Privacy for your private journal');
@@ -146,7 +146,7 @@ describe('SEO crawlability contract', () => {
 
     expect(html).toContain('og:image:width" content="1200"');
     expect(html).toContain('og:image:height" content="630"');
-    expect(html).toContain('og-social.png');
+    expect(html).toContain('og-social.webp');
     expect(html).not.toMatch(/og:image:width" content="512"/);
   });
 

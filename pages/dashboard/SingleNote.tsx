@@ -273,7 +273,7 @@ export const SingleNote: React.FC = () => {
   return (
     <>
       <PageContainer className="surface-scope-paper page-wash pb-20 pt-4 md:pt-8">
-        <div className="space-y-8 selection:bg-green/10">
+        <div className="core-page-stack selection:bg-green/10">
           <div className="sticky-bar !px-2 sm:!px-4">
             <Button
               variant="ghost"
@@ -335,7 +335,7 @@ export const SingleNote: React.FC = () => {
             ) : null}
           </div>
 
-          <div className="mx-auto max-w-3xl">
+          <div className="mx-auto typographic-measure-wide">
 
 
             <Surface variant="bezel" tone="paper">
@@ -417,7 +417,7 @@ export const SingleNote: React.FC = () => {
                   </div>
 
                   <div
-                    className="prose prose-zinc prose-lg max-w-prose mx-auto text-gray-text leading-loose font-serif italic"
+                    className="dashboard-prose mx-auto prose prose-zinc prose-lg"
                     dangerouslySetInnerHTML={{ __html: sanitizedContent }}
                   />
 

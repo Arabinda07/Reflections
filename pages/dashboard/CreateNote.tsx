@@ -771,7 +771,7 @@ export const CreateNote: React.FC = () => {
             setIsFlowing(false);
             setIsFocusModeEnabled(false);
           }}
-          className="surface-floating fixed right-4 z-[85] inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 text-[11px] font-black uppercase tracking-[0.18em] text-green hover:text-green"
+          className="surface-floating fixed right-4 z-[85] inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 label-caps text-green hover:text-green"
           style={{ top: NATIVE_TOP_CONTROL_OFFSET }}
         >
           <X size={12} weight="regular" />
@@ -795,7 +795,7 @@ export const CreateNote: React.FC = () => {
               Back to Notes
             </button>
 
-            <span className="text-[10px] font-black text-gray-nav tracking-widest uppercase opacity-40 ml-2">Personalize</span>
+            <span className="label-caps ml-2 text-gray-nav opacity-50">Personalize</span>
             
             {/* Options */}
             <button onClick={() => setIsMoodOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-[52px] rounded-[20px] transition-colors border border-border/40 ${mood ? getMoodConfig(mood)?.nav || 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>
@@ -847,7 +847,7 @@ export const CreateNote: React.FC = () => {
         className="relative flex-1 w-full pb-40 px-6 sm:px-12 md:px-16 lg:px-24 transition-[padding] duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]"
         style={{ paddingTop: NATIVE_PAGE_TOP_PADDING }}
       >
-        <div className={`max-w-[800px] transition-[margin,width] duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isFocusModeActive ? 'mx-auto' : 'mr-auto lg:ml-12 xl:ml-24'}`}>
+        <div className={`editor-writing-measure transition-[margin,width] duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isFocusModeActive ? 'mx-auto' : 'mr-auto lg:ml-12 xl:ml-24'}`}>
           
           {/* Cover Image */}
           {imagePreview && (
@@ -865,7 +865,7 @@ export const CreateNote: React.FC = () => {
 
           {/* Eyebrow Date */}
           <div className="mb-6 flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-green/10 text-green px-3 py-1 text-[10px] uppercase tracking-[0.2em] font-bold flex items-center gap-2">
+            <span className="label-caps flex items-center gap-2 rounded-full bg-green/10 px-3 py-1 text-green">
               <CalendarBlank size={12} weight="regular" />
               {new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'long', day: 'numeric' })}
             </span>
@@ -884,7 +884,7 @@ export const CreateNote: React.FC = () => {
                   return next;
                 });
               }}
-              className={`inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] transition-colors sm:min-h-0 sm:px-3 sm:py-1 sm:text-[10px] ${
+              className={`inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 label-caps transition-colors sm:min-h-0 sm:px-3 sm:py-1 ${
                 isFocusModeEnabled
                   ? 'bg-green text-white'
                   : 'control-surface text-gray-text hover:bg-green/10 hover:text-green'
@@ -894,7 +894,7 @@ export const CreateNote: React.FC = () => {
               Focus mode
             </button>
             {canReflect && (
-              <button onClick={handleAiReflect} disabled={isReflecting} className="inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-[var(--radius-control)] bg-green px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-white transition-colors hover:bg-green-hover disabled:opacity-60 sm:min-h-0 sm:px-3 sm:py-1 sm:text-[10px]">
+              <button onClick={handleAiReflect} disabled={isReflecting} className="inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-[var(--radius-control)] bg-green px-4 py-2 label-caps text-white transition-colors hover:bg-green-hover disabled:opacity-60 sm:min-h-0 sm:px-3 sm:py-1">
                 <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center sm:h-3 sm:w-3">
                   {isReflecting ? <CircleNotch size={14} className="animate-spin" /> : <Brain size={14} weight="regular" />}
                 </span>
@@ -923,7 +923,7 @@ export const CreateNote: React.FC = () => {
             onChange={e => setTitle(e.target.value)}
             onFocus={() => { setIsFocused(true); setIsTitleFocused(true); setIsFlowing(false); }}
             onBlur={() => { setIsFocused(false); setIsTitleFocused(false); }}
-            className="w-full bg-transparent border-none outline-none font-serif text-[36px] sm:text-[42px] md:text-[56px] leading-tight text-gray-text placeholder:text-border/40 mb-8 p-0"
+            className="editor-title-input"
           />
 
           <AnimatePresence>

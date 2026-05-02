@@ -20,24 +20,46 @@ export const Landing: React.FC = () => {
   useEffect(() => {
     if (shouldLoadHeroVideo) return;
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const desktopHeroVideoQuery = window.matchMedia('(min-width: 1024px)');
+    const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     const saveData = Boolean(
       (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData,
     );
 
-    if (prefersReducedMotion || saveData) return;
+    if (saveData) return;
 
-    const loadVideo = () => setShouldLoadHeroVideo(true);
     let idleId: number | undefined;
     let timerId: number | undefined;
+    let isLoadScheduled = false;
 
-    if (window.requestIdleCallback) {
-      idleId = window.requestIdleCallback(loadVideo, { timeout: 1600 });
-    } else {
-      timerId = window.setTimeout(loadVideo, 1200);
-    }
+    const loadVideo = () => {
+      isLoadScheduled = false;
+
+      if (desktopHeroVideoQuery.matches && !reducedMotionQuery.matches) {
+        setShouldLoadHeroVideo(true);
+      }
+    };
+
+    const scheduleLoadVideo = () => {
+      if (isLoadScheduled || !desktopHeroVideoQuery.matches || reducedMotionQuery.matches) return;
+
+      isLoadScheduled = true;
+
+      if (window.requestIdleCallback) {
+        idleId = window.requestIdleCallback(loadVideo, { timeout: 2400 });
+      } else {
+        timerId = window.setTimeout(loadVideo, 1800);
+      }
+    };
+
+    scheduleLoadVideo();
+    desktopHeroVideoQuery.addEventListener('change', scheduleLoadVideo);
+    reducedMotionQuery.addEventListener('change', scheduleLoadVideo);
 
     return () => {
+      desktopHeroVideoQuery.removeEventListener('change', scheduleLoadVideo);
+      reducedMotionQuery.removeEventListener('change', scheduleLoadVideo);
+
       if (idleId !== undefined) {
         window.cancelIdleCallback(idleId);
       }
@@ -49,6 +71,8 @@ export const Landing: React.FC = () => {
   }, [shouldLoadHeroVideo]);
 
   const toggleMute = () => {
+    if (!window.matchMedia('(min-width: 1024px)').matches) return;
+
     if (!videoRef.current) {
       setShouldLoadHeroVideo(true);
       setIsMuted(false);
@@ -68,21 +92,25 @@ export const Landing: React.FC = () => {
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <div className="video-mask video-mask--mobile lg:hidden" />
           <div className="video-mask video-mask--desktop hidden lg:block" />
-          <img
-            src="/assets/videos/landing_video.png"
-            alt=""
-            aria-hidden="true"
-            fetchPriority="high"
-            loading="eager"
-            decoding="async"
-            className={`absolute inset-0 h-full min-h-full w-full min-w-full transform-gpu object-cover object-[48%_center] sm:object-[64%_center] lg:object-center transition-opacity duration-700 ease-out-expo ${isHeroVideoReady ? 'opacity-0' : 'opacity-100'}`}
-            style={{ willChange: 'opacity' }}
-          />
+          <picture>
+            <source srcSet="/assets/videos/landing_video.webp" type="image/webp" media="(min-width: 1024px)" />
+            <source srcSet="/assets/videos/landing_video_mobile.webp" type="image/webp" media="(max-width: 1023px)" />
+            <img
+              src="/assets/videos/landing_video_mobile.webp"
+              alt=""
+              aria-hidden="true"
+              fetchPriority="high"
+              loading="eager"
+              decoding="async"
+              className={`absolute inset-0 h-full min-h-full w-full min-w-full transform-gpu object-cover object-[48%_center] sm:object-[64%_center] lg:object-center transition-opacity duration-700 ease-out-expo ${isHeroVideoReady ? 'opacity-0' : 'opacity-100'}`}
+              style={{ willChange: 'opacity' }}
+            />
+          </picture>
 
           {shouldLoadHeroVideo ? (
             <video
               ref={videoRef}
-              poster="/assets/videos/landing_video.png"
+              poster="/assets/videos/landing_video.webp"
               aria-hidden="true"
               className={`absolute inset-0 h-full min-h-full w-full min-w-full transform-gpu object-cover object-[48%_center] bg-transparent transition-opacity duration-700 ease-out-expo motion-reduce:transition-none sm:object-[64%_center] lg:object-center ${isHeroVideoReady ? 'opacity-90' : 'opacity-0'}`}
               style={{ willChange: 'opacity' }}
@@ -169,7 +197,7 @@ export const Landing: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.9, rotate: -8 }}
                 transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                className="surface-floating surface-floating--media h-11 min-h-11 w-11 min-w-11 !px-0 rounded-2xl !text-gray-nav hover:!text-green hover:border-green/40 transition-[color,border-color] duration-300 group"
+                className="surface-floating surface-floating--media h-11 min-h-11 w-11 min-w-11 !px-0 rounded-2xl !text-gray-nav hover:!text-green hover:border-green/40 transition-[color,border-color] duration-300 group max-lg:hidden"
                 aria-label={isMuted ? 'Unmute video' : 'Mute video'}
               >
                 {isMuted ? <SpeakerSlash size={20} weight="regular" /> : <SpeakerHigh size={20} weight="regular" />}
