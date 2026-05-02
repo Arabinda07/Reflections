@@ -150,16 +150,12 @@ export const Landing: React.FC = () => {
                   Sign in
                 </Button>
 
-                <Button
-                  variant="ghost"
-                  onClick={() => navigate(RoutePath.FAQ)}
-                  whileHover={{ y: -1 }}
-                  whileTap={{ scale: 0.97 }}
-                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                  className="h-11 px-0 text-[15px] font-medium text-gray-text hover:text-green transition-colors"
+                <a
+                  href={RoutePath.FAQ}
+                  className="inline-flex h-11 min-w-0 items-center justify-center whitespace-nowrap px-0 text-[15px] font-medium text-gray-text transition-colors duration-300 ease-out-expo hover:text-green focus:outline-none"
                 >
                   How it works
-                </Button>
+                </a>
               </div>
 
               <Button

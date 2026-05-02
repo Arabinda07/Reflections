@@ -1,0 +1,108 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { describe, expect, it } from 'vitest';
+
+const SITE_ORIGIN = 'https://reflections-ebon.vercel.app';
+
+const read = (filePath: string) =>
+  readFileSync(path.resolve(process.cwd(), filePath), 'utf8');
+
+const sitemapLocations = () => {
+  const sitemap = read('public/sitemap.xml');
+  return Array.from(sitemap.matchAll(/<loc>(.*?)<\/loc>/g), ([, loc]) => loc);
+};
+
+describe('SEO crawlability contract', () => {
+  it('publishes only public canonical routes in the static sitemap', () => {
+    const sitemap = read('public/sitemap.xml');
+    const locations = sitemapLocations();
+
+    expect(sitemap).toMatch(/^<\?xml version="1\.0" encoding="UTF-8"\?>/);
+    expect(sitemap).toContain('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">');
+    expect(locations).toEqual([
+      `${SITE_ORIGIN}/`,
+      `${SITE_ORIGIN}/faq`,
+      `${SITE_ORIGIN}/privacy`,
+      `${SITE_ORIGIN}/about`,
+    ]);
+    expect(sitemap).not.toContain('localhost');
+
+    for (const privateRoute of [
+      '/home',
+      '/notes',
+      '/notes/new',
+      '/account',
+      '/insights',
+      '/release',
+      '/letters',
+      '/wiki',
+      '/sanctuary',
+      '/login',
+      '/signup',
+    ]) {
+      expect(locations).not.toContain(`${SITE_ORIGIN}${privateRoute}`);
+    }
+  });
+
+  it('keeps robots.txt open for public pages and pointed at the static sitemap', () => {
+    const robots = read('public/robots.txt');
+
+    expect(robots).toContain('User-agent: *');
+    expect(robots).toContain('Allow: /');
+    expect(robots).toContain(`Sitemap: ${SITE_ORIGIN}/sitemap.xml`);
+    expect(robots).toContain('Disallow: /home');
+    expect(robots).toContain('Disallow: /notes');
+    expect(robots).toContain('Disallow: /wiki');
+    expect(robots).toContain('Disallow: /sanctuary');
+    expect(robots).not.toMatch(/Disallow:\s*\/faq\b/);
+    expect(robots).not.toMatch(/Disallow:\s*\/privacy\b/);
+    expect(robots).not.toMatch(/Disallow:\s*\/about\b/);
+  });
+
+  it('exposes a focused SEO audit script for crawl-file regressions', () => {
+    const pkg = JSON.parse(read('package.json')) as { scripts: Record<string, string> };
+
+    expect(pkg.scripts['seo:audit']).toBe(
+      'vitest run pages/dashboard/seoCrawlabilityContract.test.ts',
+    );
+  });
+
+  it('generates static HTML snapshots for public pages after build', () => {
+    const pkg = JSON.parse(read('package.json')) as { scripts: Record<string, string> };
+    const generator = read('scripts/generate-public-seo-pages.mjs');
+
+    expect(pkg.scripts.postbuild).toBe('node scripts/generate-public-seo-pages.mjs');
+    expect(generator).toContain("path: '/'");
+    expect(generator).toContain("path: '/faq'");
+    expect(generator).toContain("path: '/privacy'");
+    expect(generator).toContain("path: '/about'");
+    expect(generator).toContain('<meta name="robots" content="index, follow" />');
+    expect(generator).toContain('<main id="public-seo-content"');
+    expect(generator).toContain('Private journal app for notes, mood, and reflection');
+    expect(generator).toContain('FAQ about private journaling');
+    expect(generator).toContain('Privacy for your private journal');
+    expect(generator).toContain('About Reflections and Arabinda');
+  });
+
+  it('lets Vercel serve public SEO snapshots instead of rewriting them to the SPA shell', () => {
+    const vercel = JSON.parse(read('vercel.json')) as {
+      cleanUrls?: boolean;
+      rewrites: Array<{ source: string; destination: string }>;
+    };
+    const rewriteSource = vercel.rewrites.map((rewrite) => rewrite.source).join('\n');
+
+    expect(vercel.cleanUrls).toBe(true);
+    expect(rewriteSource).toContain('sitemap\\.xml');
+    expect(rewriteSource).toContain('robots\\.txt');
+    expect(rewriteSource).toContain('faq$');
+    expect(rewriteSource).toContain('privacy$');
+    expect(rewriteSource).toContain('about$');
+  });
+
+  it('uses real public anchors from the landing page to crawlable public routes', () => {
+    const landing = read('pages/dashboard/Landing.tsx');
+
+    expect(landing).toContain('href={RoutePath.FAQ}');
+    expect(landing).not.toContain('navigate(RoutePath.FAQ)');
+  });
+});

@@ -191,6 +191,16 @@
   --hero-scrim: linear-gradient(180deg,
       oklch(0.28 0.02 135 / 0.12),
       oklch(0.24 0.02 135 / 0.28));
+  --startup-ambient-wash:
+    radial-gradient(circle at center, oklch(from var(--green) 0.26 0.04 h / 0.32), var(--bg-color) 58%);
+  --startup-video-scrim:
+    linear-gradient(180deg, rgb(var(--black-rgb) / 0.18), transparent 36%, rgb(var(--black-rgb) / 0.2));
+  --sanctuary-entrance-glow:
+    radial-gradient(circle at center, oklch(from var(--color-accent) l c h / 0.17), transparent 54%);
+  --sanctuary-entrance-scrim:
+    linear-gradient(to bottom, oklch(from var(--green) l c h / 0.1), oklch(from var(--bg-color) l c h / 0.95), var(--bg-color));
+  --sanctuary-page-fade:
+    linear-gradient(to bottom, oklch(from var(--green) l c h / 0.05), var(--bg-color), var(--bg-color));
   --screen-scrim-soft: rgba(var(--panel-bg-rgb), 0.85);
   --screen-scrim-strong: rgba(var(--panel-bg-rgb), 0.95);
   --floating-panel-bg: rgba(var(--panel-bg-rgb), 0.82);
@@ -404,6 +414,16 @@
   --hero-scrim: linear-gradient(180deg,
       oklch(0.13 0.02 135 / 0.22),
       oklch(0.1 0.02 135 / 0.48));
+  --startup-ambient-wash:
+    radial-gradient(circle at center, oklch(from var(--green) 0.26 0.04 h / 0.28), var(--bg-color) 58%);
+  --startup-video-scrim:
+    linear-gradient(180deg, rgb(var(--black-rgb) / 0.28), transparent 36%, rgb(var(--black-rgb) / 0.34));
+  --sanctuary-entrance-glow:
+    radial-gradient(circle at center, oklch(from var(--color-accent) l c h / 0.2), transparent 54%);
+  --sanctuary-entrance-scrim:
+    linear-gradient(to bottom, oklch(from var(--green) l c h / 0.14), oklch(from var(--bg-color) l c h / 0.95), var(--bg-color));
+  --sanctuary-page-fade:
+    linear-gradient(to bottom, oklch(from var(--green) l c h / 0.08), var(--bg-color), var(--bg-color));
   --screen-scrim-soft: rgba(var(--panel-bg-rgb), 0.85);
   --screen-scrim-strong: rgba(var(--panel-bg-rgb), 0.95);
   --floating-panel-media-border: rgba(255, 255, 255, 0.12);
@@ -450,6 +470,26 @@ body {
   background: var(--page-wash);
   background-attachment: fixed;
   background-size: cover;
+}
+
+.startup-ambient-wash {
+  background: var(--startup-ambient-wash);
+}
+
+.startup-video-scrim {
+  background: var(--startup-video-scrim);
+}
+
+.sanctuary-entrance-glow {
+  background: var(--sanctuary-entrance-glow);
+}
+
+.sanctuary-entrance-scrim {
+  background: var(--sanctuary-entrance-scrim);
+}
+
+.sanctuary-page-fade {
+  background: var(--sanctuary-page-fade);
 }
 
 @media (max-width: 768px) {

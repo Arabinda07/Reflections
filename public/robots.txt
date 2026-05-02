@@ -7,16 +7,20 @@ Allow: /icons/
 # Public Pages
 Allow: /privacy
 Allow: /faq
+Allow: /about
 
 # Private/Protected Routes - Do not index
 Disallow: /login
 Disallow: /signup
+Disallow: /home
 Disallow: /notes
 Disallow: /notes/
 Disallow: /account
 Disallow: /insights
-Disallow: /create-note
-Disallow: /edit-note
-Disallow: /note/
+Disallow: /release
+Disallow: /letters
+Disallow: /wiki
+Disallow: /sanctuary
+Disallow: /auth/
 
 Sitemap: https://reflections-ebon.vercel.app/sitemap.xml

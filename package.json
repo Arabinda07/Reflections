@@ -6,8 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "postbuild": "node scripts/generate-public-seo-pages.mjs",
     "preview": "vite preview",
     "lint": "tsc --noEmit",
+    "seo:audit": "vitest run pages/dashboard/seoCrawlabilityContract.test.ts",
     "cap": "cap",
     "cap:sync": "cap sync",
     "cap:open:android": "cap open android",

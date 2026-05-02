@@ -11,7 +11,6 @@ import {
   Leaf,
 } from '@phosphor-icons/react';
 import { DotLottieReact, type DotLottie } from '@lottiefiles/dotlottie-react';
-import levelUpAnimation from '@/src/lottie/level-up-animation.json';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { CompletionCardActions } from '../../components/ui/CompletionCardActions';
 import { MetadataPill } from '../../components/ui/MetadataPill';
@@ -27,6 +26,7 @@ import { FREE_WIKI_MINIMUM_ENTRIES, getWikiInsightsGate } from '../../services/w
 import { buildWeeklyRecap } from '../../services/weeklyRecapService';
 import { moodCheckinService, ritualEventService } from '../../services/engagementServices';
 import { buildCompletionCardPayload } from '../../services/completionCardPayload';
+import { SANCTUARY_LEVEL_UP_ANIMATION_SRC } from '../../src/lottie/sanctuaryAnimation';
 import { DEFAULT_MOOD_TONE, getMoodConfig } from './moodConfig';
 
 const TAG_TONE_CLASSES = ['text-green', 'text-green/80', 'text-green/70', 'text-green/60'];
@@ -210,8 +210,8 @@ export const Insights: React.FC = () => {
             aria-live="polite"
             aria-label="Opening Sanctuary"
           >
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,oklch(from_var(--color-accent)_l_c_h_/_0.16),transparent_54%)]" />
-            <div className="absolute inset-0 bg-gradient-to-b from-green/10 via-body/95 to-body" />
+            <div className="sanctuary-entrance-glow absolute inset-0" />
+            <div className="sanctuary-entrance-scrim absolute inset-0" />
             <motion.div
               aria-hidden="true"
               initial={{ opacity: 0, scale: 0.96 }}
@@ -221,7 +221,7 @@ export const Insights: React.FC = () => {
             >
               <div className="h-[min(66vmin,34rem)] w-[min(66vmin,34rem)]">
                 <DotLottieReact
-                  data={levelUpAnimation}
+                  src={SANCTUARY_LEVEL_UP_ANIMATION_SRC}
                   autoplay
                   loop={false}
                   dotLottieRefCallback={bindSanctuaryEntrancePlayer}
@@ -577,7 +577,7 @@ export const Insights: React.FC = () => {
               <div className="space-y-5">
                 {isWikiReadyToBuild ? (
                   <div className="h-28 w-28 overflow-hidden rounded-[2rem] bg-[oklch(from_var(--color-accent)_l_c_h_/_0.16)] transition-transform duration-500 group-hover:scale-105 group-hover:rotate-3">
-                    <DotLottieReact data={levelUpAnimation} autoplay loop />
+                    <DotLottieReact src={SANCTUARY_LEVEL_UP_ANIMATION_SRC} autoplay loop />
                   </div>
                 ) : (
                   <div className="tone-icon tone-icon-sage h-14 w-14 rounded-2xl transition-transform duration-500 ease-out-expo group-hover:scale-110 group-hover:rotate-6">

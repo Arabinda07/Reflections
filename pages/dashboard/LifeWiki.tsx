@@ -10,7 +10,6 @@ import {
   Warning,
 } from '@phosphor-icons/react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
-import levelUpAnimation from '@/src/lottie/level-up-animation.json';
 import { Button } from '../../components/ui/Button';
 import { Alert } from '../../components/ui/Alert';
 import { MetadataPill } from '../../components/ui/MetadataPill';
@@ -29,6 +28,7 @@ import {
   type WikiPageType,
 } from '../../services/wikiTypes';
 import { trackLifeWikiRefreshedDeferred } from '../../src/analytics/deferredEvents';
+import { SANCTUARY_LEVEL_UP_ANIMATION_SRC } from '../../src/lottie/sanctuaryAnimation';
 
 type RefreshFeedback = {
   variant: 'warning' | 'error';
@@ -215,13 +215,14 @@ export const LifeWiki: React.FC = () => {
   const location = useLocation();
   const { pageType } = useParams();
   const shouldReduceMotion = useReducedMotion();
+  const cameFromInsights = Boolean(location.state?.fromInsights);
   const shouldPlayEntryAnimation =
     !shouldReduceMotion && (location.pathname === RoutePath.WIKI || location.pathname === RoutePath.SANCTUARY);
   const [notes, setNotes] = useState<Note[]>([]);
   const [themes, setThemes] = useState<LifeTheme[]>([]);
   const [access, setAccess] = useState<WellnessAccess | null>(null);
   const [isRefreshingWiki, setIsRefreshingWiki] = useState(false);
-  const [isEnteringWiki, setIsEnteringWiki] = useState(shouldPlayEntryAnimation);
+  const [isEnteringWiki, setIsEnteringWiki] = useState(shouldPlayEntryAnimation && !cameFromInsights);
   const [hasLoadedLibrary, setHasLoadedLibrary] = useState(false);
   const [refreshFeedback, setRefreshFeedback] = useState<RefreshFeedback | null>(null);
 
@@ -250,7 +251,7 @@ export const LifeWiki: React.FC = () => {
   useEffect(() => {
     // If we came from Insights, the transition animation already played there.
     // Skip the local entrance animation to prevent redundancy.
-    if (!shouldPlayEntryAnimation || location.state?.fromInsights) {
+    if (!shouldPlayEntryAnimation || cameFromInsights) {
       setIsEnteringWiki(false);
       return;
     }
@@ -259,7 +260,7 @@ export const LifeWiki: React.FC = () => {
     const timeoutId = window.setTimeout(() => setIsEnteringWiki(false), 2400);
 
     return () => window.clearTimeout(timeoutId);
-  }, [location.key, location.state?.fromInsights, shouldPlayEntryAnimation]);
+  }, [cameFromInsights, location.key, shouldPlayEntryAnimation]);
 
   const gate = useMemo(() => {
     if (!access) return null;
@@ -445,8 +446,8 @@ export const LifeWiki: React.FC = () => {
           transition={{ duration: shouldReduceMotion ? 0 : 0.35, ease: [0.16, 1, 0.3, 1] }}
           className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-body px-6"
         >
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,oklch(from_var(--color-accent)_l_c_h_/_0.18),transparent_54%)]" />
-          <div className="absolute inset-0 bg-gradient-to-b from-green/10 via-body/95 to-body" />
+          <div className="sanctuary-entrance-glow absolute inset-0" />
+          <div className="sanctuary-entrance-scrim absolute inset-0" />
           <motion.div
             aria-hidden="true"
             initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.96 }}
@@ -455,7 +456,7 @@ export const LifeWiki: React.FC = () => {
             className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
           >
             <div className="h-[min(66vmin,34rem)] w-[min(66vmin,34rem)]">
-              <DotLottieReact data={levelUpAnimation} autoplay loop={isRefreshingWiki || isEnteringWiki} />
+              <DotLottieReact src={SANCTUARY_LEVEL_UP_ANIMATION_SRC} autoplay loop={isRefreshingWiki || isEnteringWiki} />
             </div>
           </motion.div>
           <motion.div
@@ -488,7 +489,7 @@ export const LifeWiki: React.FC = () => {
       <>
         {renderEntrance()}
         <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden bg-body">
-          <div className="absolute inset-0 bg-gradient-to-b from-green/5 via-body to-body opacity-50" />
+          <div className="sanctuary-page-fade absolute inset-0 opacity-50" />
         </div>
         <PageContainer size="narrow" className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10 relative z-10">
           <div className="space-y-8">
@@ -683,7 +684,7 @@ export const LifeWiki: React.FC = () => {
     <>
       {renderEntrance()}
       <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden bg-body">
-        <div className="absolute inset-0 bg-gradient-to-b from-green/5 via-body to-body opacity-50" />
+        <div className="sanctuary-page-fade absolute inset-0 opacity-50" />
       </div>
 
       <PageContainer className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10 relative z-10">
