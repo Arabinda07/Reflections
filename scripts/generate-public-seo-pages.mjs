@@ -142,7 +142,7 @@ const setRobotsMeta = (html) =>
 const renderSeoContent = (page) => {
   const navLinks = publicPages
     .map((item) => `<a href="${item.path}">${item.path === '/' ? 'Home' : escapeHtml(item.h1)}</a>`)
-    .join('');
+    .join(' ');
   const sections = page.sections
     .map(
       ([title, body]) => `
@@ -154,7 +154,7 @@ const renderSeoContent = (page) => {
     .join('');
 
   return `
-    <main id="public-seo-content" data-seo-snapshot="true">
+    <main id="public-seo-content" data-seo-snapshot="true" class="sr-only">
       <nav aria-label="Public pages">${navLinks}</nav>
       <h1>${escapeHtml(page.h1)}</h1>
       <p>${escapeHtml(page.intro)}</p>
