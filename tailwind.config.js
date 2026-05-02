@@ -15,7 +15,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['"Manrope"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        serif: ['"Newsreader"', 'serif'],
+        serif: ['"Spectral"', 'serif'],
         display: ['"Manrope"', 'sans-serif'],
         editor: ['var(--font-editor)'],
         mono: ['"Geist Mono"', 'monospace'],

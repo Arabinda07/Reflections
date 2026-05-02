@@ -15,34 +15,26 @@
 }
 
 @font-face {
-  font-family: 'Newsreader';
-  src: url('/assets/fonts/Newsreader16pt-Regular.woff2') format('woff2');
+  font-family: 'Spectral';
+  src: url('/assets/fonts/Spectral-Regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Newsreader';
-  src: url('/assets/fonts/Newsreader16pt-Italic.woff2') format('woff2');
+  font-family: 'Spectral';
+  src: url('/assets/fonts/Spectral-Italic.woff2') format('woff2');
   font-weight: 400;
   font-style: italic;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Newsreader';
-  src: url('/assets/fonts/Newsreader16pt-Bold.woff2') format('woff2');
+  font-family: 'Spectral';
+  src: url('/assets/fonts/Spectral-Bold.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Newsreader';
-  src: url('/assets/fonts/Newsreader16pt-BoldItalic.woff2') format('woff2');
-  font-weight: 700;
-  font-style: italic;
   font-display: swap;
 }
 
@@ -53,7 +45,7 @@
 @layer base {
   :root {
     --font-sans: 'Manrope', sans-serif;
-    --font-serif: 'Newsreader', serif;
+    --font-serif: 'Spectral', serif;
     --font-display: 'Manrope', sans-serif;
     --font-mono: 'Geist Mono', monospace;
     --font-editor: var(--font-serif);
