@@ -146,7 +146,7 @@ describe('SEO crawlability contract', () => {
 
     expect(html).toContain('og:image:width" content="1200"');
     expect(html).toContain('og:image:height" content="630"');
-    expect(html).toContain('og-social.png');
+    expect(html).toContain('og-social.webp');
     expect(html).not.toMatch(/og:image:width" content="512"/);
   });
 

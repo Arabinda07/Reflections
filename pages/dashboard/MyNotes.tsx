@@ -243,7 +243,7 @@ export const MyNotes: React.FC = () => {
 
                 <Link
                   to={noteDetailPath}
-                  className="inline-flex min-h-11 items-center rounded-2xl bg-green px-4 text-xs font-black uppercase tracking-widest text-white shadow-lg shadow-green/10 transition-[background-color,transform] duration-300 hover:bg-green/90 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
+                  className="inline-flex min-h-11 items-center rounded-2xl bg-green px-4 label-caps text-white shadow-lg shadow-green/10 transition-[background-color,transform] duration-300 hover:bg-green/90 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
                   aria-label={`Open ${note.title}`}
                 >
                   <span>Open</span>
@@ -270,7 +270,7 @@ export const MyNotes: React.FC = () => {
 
       {!loading ? (
         <PageContainer className="surface-scope-sage page-wash pb-14 pt-4 md:pt-8">
-          <div className="space-y-10 animate-in fade-in duration-500">
+          <div className="core-page-stack animate-in fade-in duration-500">
             <SectionHeader
               title="Saved reflections"
               description={
@@ -279,7 +279,7 @@ export const MyNotes: React.FC = () => {
                   : 'Cards or calendar — pick how you want to look through them.'
               }
               actions={
-                <div className="flex flex-wrap items-center gap-3">
+                <div className="core-control-cluster">
                   <div className="flex items-center gap-2">
                     <Chip
                       active={viewMode === 'grid'}
@@ -353,7 +353,7 @@ export const MyNotes: React.FC = () => {
 
                 <div className="space-y-5 lg:col-span-5 xl:col-span-4">
                   <div className="flex items-center justify-between gap-3">
-                    <h3 className="text-sm font-black text-gray-text flex items-center gap-2">
+                    <h3 className="flex items-center gap-2 text-sm font-bold text-gray-text">
                       <CalendarIcon size={18} weight="regular" className="text-green" />
                       {format(selectedDate, 'MMMM do, yyyy')}
                     </h3>

@@ -1,21 +1,21 @@
 import { describe, expect, it } from 'vitest';
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 const read = (path: string) => readFileSync(join(process.cwd(), path), 'utf8');
 
-const collectSourceFiles = (directory: string): string[] =>
+const collectFiles = (directory: string, pattern: RegExp): string[] =>
   readdirSync(join(process.cwd(), directory), { withFileTypes: true }).flatMap((entry) => {
     const path = `${directory}/${entry.name}`;
 
     if (entry.isDirectory()) {
-      return collectSourceFiles(path);
+      return collectFiles(path, pattern);
     }
 
-    return /\.(tsx|ts|css)$/.test(entry.name) && !entry.name.includes('.test.')
-      ? [path]
-      : [];
+    return pattern.test(entry.name) && !entry.name.includes('.test.') ? [path] : [];
   });
+
+const collectSourceFiles = (directory: string): string[] => collectFiles(directory, /\.(tsx|ts|css)$/);
 
 describe('Typography and motion contract', () => {
   it('keeps the app font system explicit and shared across surfaces', () => {
@@ -41,6 +41,34 @@ describe('Typography and motion contract', () => {
     );
     expect(indexCss).not.toContain("font-family: 'Geist', sans-serif");
     expect(indexCss).not.toContain("font-family: 'Feather Bold'");
+  });
+
+  it('ships only the font files used by the current app typography system', () => {
+    const fontFiles = readdirSync(join(process.cwd(), 'public/assets/fonts')).sort();
+
+    expect(fontFiles).toEqual([
+      'GeistMono[wght].woff2',
+      'Manrope-Variable.woff2',
+      'Spectral-Bold.woff2',
+      'Spectral-Italic.woff2',
+      'Spectral-Regular.woff2',
+    ]);
+  });
+
+  it('keeps the Android bundle synced to the web font system', () => {
+    const androidPublicBundle = 'android/app/src/main/assets/public';
+
+    if (!existsSync(join(process.cwd(), androidPublicBundle))) {
+      return;
+    }
+
+    const androidFiles = collectFiles(androidPublicBundle, /\.(css|html|js)$/);
+    const androidBundle = androidFiles.map(read).join('\n');
+
+    expect(androidBundle).toContain('Spectral');
+    expect(androidBundle).toContain('Manrope');
+    expect(androidBundle).toContain('Geist Mono');
+    expect(androidBundle).not.toMatch(/Newsreader|Nunito|Sora|sora|Geist\[wght\]/);
   });
 
   it('does not use negative tracking for page or component typography', () => {

@@ -90,7 +90,10 @@ export default defineConfig(() => {
           workbox: {
             cleanupOutdatedCaches: true,
             maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
-            globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+            globPatterns: [
+              '**/*.{js,css,html,ico,svg,webp,woff2}',
+              'icons/*.png',
+            ],
             globIgnores: [
               '**/vendor-lottie-*.js',
               '**/vendor-analytics-*.js',

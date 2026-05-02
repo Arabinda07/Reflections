@@ -400,7 +400,7 @@ export const HomeAuthenticated: React.FC = () => {
           initial="hidden"
           whileInView="show"
           viewport={BENTO_VIEWPORT_CONFIG}
-          className="grid grid-cols-1 gap-6 p-6 md:p-10 lg:grid-cols-[minmax(0,2fr)_minmax(20rem,0.95fr)] max-w-[1440px] mx-auto min-h-[500px]"
+          className="core-bento-grid"
         >
           <motion.div
             variants={bentoItemVariants}
@@ -427,7 +427,7 @@ export const HomeAuthenticated: React.FC = () => {
 
               <div className="mb-12 space-y-8">
                 <p
-                  className="text-2xl md:text-3xl text-gray-text font-serif italic leading-relaxed"
+                  className="dashboard-prompt-text typographic-measure"
                   style={{ opacity: isRefreshing ? 0 : 1, transition: 'opacity 0.4s ease' }}
                 >
                   {dailyPrompt}
@@ -558,7 +558,7 @@ export const HomeAuthenticated: React.FC = () => {
               </div>
 
               <div className="mb-6">
-                <p className="text-3xl font-display font-extrabold text-gray-text tabular-nums">
+                <p className="dashboard-stat-value">
                   {isCountLoading ? '...' : displayCount}
                 </p>
                 <p className="mt-1 text-sm font-semibold text-gray-nav">reflections saved</p>
@@ -616,7 +616,7 @@ export const HomeAuthenticated: React.FC = () => {
                 {isFromSave ? (
                   <p className="text-sm font-bold text-green">Reflection saved.</p>
                 ) : null}
-                <p className="relative font-serif text-xl italic leading-relaxed text-gray-text">
+                <p className="dashboard-prose typographic-measure-compact relative italic">
                   <span className="absolute -left-4 -top-5 font-serif text-5xl text-honey/10 pointer-events-none">
                     "
                   </span>
@@ -624,7 +624,7 @@ export const HomeAuthenticated: React.FC = () => {
                 </p>
                 <div className="flex items-center gap-4">
                   <div className="h-px w-8 bg-honey/20" />
-                  <p className="text-xs font-bold text-gray-nav uppercase tracking-widest">
+                  <p className="dashboard-caption text-gray-nav">
                     {quote.author}
                   </p>
                 </div>

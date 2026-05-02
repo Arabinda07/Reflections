@@ -4,7 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import { RouteLoadingFrame } from '../../components/ui/RouteLoadingFrame';
 import { useAuth } from '../../context/AuthContext';
 import { RoutePath } from '../../types';
-import { Landing } from './Landing';
+
+const Landing = React.lazy(() => import('./Landing').then((module) => ({ default: module.Landing })));
+
+const renderLanding = () => (
+  <React.Suspense fallback={<RouteLoadingFrame />}>
+    <Landing />
+  </React.Suspense>
+);
 
 /**
  * Switcher for the root '/' route.
@@ -21,7 +28,7 @@ export const Home: React.FC = () => {
   }, [isAuthenticated, isInitialCheckDone, navigate]);
 
   if (!isInitialCheckDone && isAuthStoreHydrated && !isAuthenticated) {
-    return <Landing />;
+    return renderLanding();
   }
 
   if (!isInitialCheckDone) {
@@ -29,7 +36,7 @@ export const Home: React.FC = () => {
   }
 
   if (!isAuthenticated) {
-    return <Landing />;
+    return renderLanding();
   }
 
   return <RouteLoadingFrame />;
