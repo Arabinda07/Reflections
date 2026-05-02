@@ -1,3 +1,5 @@
+import DOMPurify, { type Config } from 'dompurify';
+
 const NOTE_EMPTY_PREVIEW = 'No content available';
 
 const COMMON_HTML_ENTITIES: Record<string, string> = {
@@ -12,26 +14,49 @@ const COMMON_HTML_ENTITIES: Record<string, string> = {
 const decodeEntities = (value: string) =>
   value.replace(/&(nbsp|amp|lt|gt|quot|#39);/g, (entity) => COMMON_HTML_ENTITIES[entity] || entity);
 
+const DOMPURIFY_CONFIG: Config = {
+  ALLOWED_ATTR: ['href', 'rel', 'target'],
+  ALLOWED_TAGS: [
+    'a',
+    'blockquote',
+    'br',
+    'div',
+    'em',
+    'h1',
+    'h2',
+    'h3',
+    'li',
+    'ol',
+    'p',
+    'pre',
+    's',
+    'strong',
+    'u',
+    'ul',
+  ],
+  ALLOW_DATA_ATTR: false,
+  ALLOW_UNKNOWN_PROTOCOLS: false,
+  FORBID_ATTR: ['style'],
+  FORBID_TAGS: ['form', 'iframe', 'img', 'input', 'math', 'object', 'script', 'style', 'svg'],
+};
+
+const stripAllTagsForNonBrowserRuntime = (html: string) =>
+  decodeEntities(html)
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<\/(p|div|li|blockquote|h1|h2|h3|h4|h5|h6|pre|ul|ol)>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
 export const sanitizeNoteHtml = (html: string) => {
   if (!html) return '';
 
-  let sanitized = html;
+  if (typeof window === 'undefined' || !window.document) {
+    return stripAllTagsForNonBrowserRuntime(html);
+  }
 
-  sanitized = sanitized.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
-  sanitized = sanitized.replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, '');
-  sanitized = sanitized.replace(/<img\b[^>]*\/?>/gi, '');
-  sanitized = sanitized.replace(
-    /<(iframe|object|embed|form|input|button|textarea|select|meta|link)\b[^>]*>([\s\S]*?)<\/\1>/gi,
-    '',
-  );
-  sanitized = sanitized.replace(
-    /<(iframe|object|embed|form|input|button|textarea|select|meta|link)\b[^>]*\/?>/gi,
-    '',
-  );
-  sanitized = sanitized.replace(/\son[a-z]+\s*=\s*(".*?"|'.*?'|[^\s>]+)/gi, '');
-  sanitized = sanitized.replace(/\s(href|src)\s*=\s*(['"])\s*javascript:[\s\S]*?\2/gi, '');
-
-  return sanitized.trim();
+  return DOMPurify.sanitize(html, DOMPURIFY_CONFIG).trim();
 };
 
 export const extractNotePlainText = (html: string) => {

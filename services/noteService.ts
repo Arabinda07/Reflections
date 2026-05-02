@@ -65,7 +65,7 @@ export const noteService = {
       // 2. Sync fetch results to local storage (Dexie)
       // Only overwrite if local is NOT pending an update/delete
       for (const note of notes) {
-        const local = await offlineStorage.getNoteById(note.id);
+        const local = await offlineStorage.getNoteById(note.id, user.id);
         if (!local || local.syncStatus === 'synced') {
            await offlineStorage.saveNote({ ...note, userId: user.id, syncStatus: 'synced' });
         }
@@ -82,8 +82,11 @@ export const noteService = {
 
   // Get a single note by ID
   getById: async (id: string): Promise<Note | undefined> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
     // 1. Try local first for instant response
-    const localNote = await offlineStorage.getNoteById(id);
+    const localNote = await offlineStorage.getNoteById(id, user.id);
     if (localNote) return localNote;
 
     // 2. Fallback to Supabase
@@ -92,16 +95,14 @@ export const noteService = {
         .from('notes')
         .select('*')
         .eq('id', id)
+        .eq('user_id', user.id)
         .single();
       
       if (error || !data) return undefined;
       const note = mapToNote(data);
       
       // 3. Cache locally
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        await offlineStorage.saveNote({ ...note, userId: user.id, syncStatus: 'synced' });
-      }
+      await offlineStorage.saveNote({ ...note, userId: user.id, syncStatus: 'synced' });
       return note;
     } catch (err) {
       return undefined;
@@ -151,7 +152,7 @@ export const noteService = {
     if (!user) throw new Error('User not authenticated');
 
     // 1. Get current and merge
-    const current = await offlineStorage.getNoteById(id);
+    const current = await offlineStorage.getNoteById(id, user.id);
     if (!current) throw new Error('Note not found locally');
     
     const now = new Date().toISOString();
@@ -206,7 +207,7 @@ export const noteService = {
     if (!user) throw new Error('User not authenticated');
 
     // 1. Mark as pending delete in Dexie
-    await offlineStorage.deleteNote(id);
+    await offlineStorage.deleteNote(id, user.id);
 
     // 2. Attempt Supabase Background Sync
     supabase.from('notes')

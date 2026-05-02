@@ -4,7 +4,24 @@ import React from "react"
 import { WelcomeEmail } from "../../../emails/templates/WelcomeEmail.tsx"
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
-const FUNCTION_SECRET = Deno.env.get('FUNCTION_SECRET') // Optional: A custom secret to verify the webhook origin
+const FUNCTION_SECRET = Deno.env.get('FUNCTION_SECRET')
+const encoder = new TextEncoder()
+
+const timingSafeEqual = (left: string, right: string) => {
+  const leftBytes = encoder.encode(left)
+  const rightBytes = encoder.encode(right)
+  const length = Math.max(leftBytes.length, rightBytes.length)
+  let diff = leftBytes.length ^ rightBytes.length
+
+  for (let index = 0; index < length; index += 1) {
+    diff |= (leftBytes[index] ?? 0) ^ (rightBytes[index] ?? 0)
+  }
+
+  return diff === 0
+}
+
+const isAuthorized = (req: Request) =>
+  Boolean(FUNCTION_SECRET && timingSafeEqual(req.headers.get('x-function-secret') || '', FUNCTION_SECRET))
 
 serve(async (req) => {
   // Only allow POST requests
@@ -12,8 +29,26 @@ serve(async (req) => {
     return new Response('Method Not Allowed', { status: 405 })
   }
 
-  // NOTE: If you use the Supabase Dashboard Webhooks UI, it handles 
-  // authentication for you. You don't need to pass the Service Role Key.
+  if (!FUNCTION_SECRET) {
+    return new Response(JSON.stringify({ error: 'Function secret is not configured' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
+  if (!isAuthorized(req)) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
+  if (!RESEND_API_KEY) {
+    return new Response(JSON.stringify({ error: 'Email provider is not configured' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
 
   try {
     const payload = await req.json()
@@ -22,7 +57,6 @@ serve(async (req) => {
     const { record } = payload
     
     if (!record || !record.email) {
-      console.error('No email found in record:', record)
       return new Response(JSON.stringify({ error: 'No email found' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
@@ -71,8 +105,9 @@ serve(async (req) => {
     })
 
   } catch (error) {
-    console.error('Error in send-welcome-email function:', error.message)
-    return new Response(JSON.stringify({ error: error.message }), {
+    const message = error instanceof Error ? error.message : 'Email request failed'
+    console.error('Error in send-welcome-email function:', message)
+    return new Response(JSON.stringify({ error: message }), {
       headers: { 'Content-Type': 'application/json' },
       status: 500,
     })

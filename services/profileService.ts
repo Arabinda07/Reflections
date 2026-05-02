@@ -3,47 +3,99 @@ import { PlanTier, WellnessAccess } from '../types';
 import { getAuthenticatedUser } from './authUtils';
 
 export interface SupabaseProfileRow {
-  plan: string | null;
-  free_ai_reflections_used: number | null;
-  free_wiki_insights_used: number | null;
   smart_mode_enabled: boolean | null;
+}
+
+interface SupabaseEntitlementRow {
+  plan: string | null;
+}
+
+interface SupabaseAiUsageRow {
+  action: string;
+  used: number | null;
 }
 
 const VALID_PLAN_TIERS = new Set<PlanTier>(['free', 'pro']);
 const parsePlanTier = (raw?: string | null): PlanTier =>
   raw && VALID_PLAN_TIERS.has(raw as PlanTier) ? (raw as PlanTier) : 'free';
 
-const mapWellnessAccess = (userId: string, data: SupabaseProfileRow | null): WellnessAccess => ({
+const currentPeriodStart = () => {
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1))
+    .toISOString()
+    .slice(0, 10);
+};
+
+const getUsedCount = (rows: SupabaseAiUsageRow[] | null, action: string) =>
+  rows?.find((row) => row.action === action)?.used || 0;
+
+const mapWellnessAccess = (
+  userId: string,
+  profile: SupabaseProfileRow | null,
+  entitlement: SupabaseEntitlementRow | null,
+  usage: SupabaseAiUsageRow[] | null,
+): WellnessAccess => ({
   userId,
-  planTier: parsePlanTier(data?.plan),
-  freeAiReflectionsUsed: data?.free_ai_reflections_used || 0,
-  freeWikiInsightsUsed: data?.free_wiki_insights_used || 0,
-  smartModeEnabled: Boolean(data?.smart_mode_enabled),
+  planTier: parsePlanTier(entitlement?.plan),
+  freeAiReflectionsUsed: getUsedCount(usage, 'reflection'),
+  freeWikiInsightsUsed: getUsedCount(usage, 'wikiPage'),
+  smartModeEnabled: Boolean(profile?.smart_mode_enabled),
 });
+
+const getWellnessAccessForUser = async (
+  userId: string,
+  profileOverride?: SupabaseProfileRow | null,
+): Promise<WellnessAccess> => {
+  const periodStart = currentPeriodStart();
+
+  const profilePromise = profileOverride !== undefined
+    ? Promise.resolve({ data: profileOverride, error: null })
+    : supabase
+        .from('profiles')
+        .select('smart_mode_enabled')
+        .eq('id', userId)
+        .single();
+
+  const [profileResult, entitlementResult, usageResult] = await Promise.all([
+    profilePromise,
+    supabase
+      .from('account_entitlements')
+      .select('plan')
+      .eq('user_id', userId)
+      .maybeSingle(),
+    supabase
+      .from('ai_usage_counters')
+      .select('action, used')
+      .eq('user_id', userId)
+      .eq('period_start', periodStart)
+      .in('action', ['reflection', 'wikiPage']),
+  ]);
+
+  if (profileResult.error) {
+    console.error('[profileService] Error fetching profile:', profileResult.error);
+  }
+
+  if (entitlementResult.error) {
+    console.error('[profileService] Error fetching entitlement:', entitlementResult.error);
+  }
+
+  if (usageResult.error) {
+    console.error('[profileService] Error fetching AI usage:', usageResult.error);
+  }
+
+  return mapWellnessAccess(
+    userId,
+    profileResult.data || null,
+    entitlementResult.data || null,
+    usageResult.data || [],
+  );
+};
 
 export const profileService = {
   getWellnessAccess: async (): Promise<WellnessAccess> => {
     const user = await getAuthenticatedUser();
 
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('plan, free_ai_reflections_used, free_wiki_insights_used, smart_mode_enabled')
-      .eq('id', user.id)
-      .single();
-
-    if (error) {
-      console.error('[profileService] Error fetching profile:', error);
-      // Fallback for new users or missing profiles
-      return {
-        userId: user.id,
-        planTier: 'free',
-        freeAiReflectionsUsed: 0,
-        freeWikiInsightsUsed: 0,
-        smartModeEnabled: false,
-      };
-    }
-
-    return mapWellnessAccess(user.id, data);
+    return getWellnessAccessForUser(user.id);
   },
 
   setSmartModeEnabled: async (enabled: boolean): Promise<WellnessAccess> => {
@@ -55,57 +107,23 @@ export const profileService = {
         { id: user.id, smart_mode_enabled: enabled },
         { onConflict: 'id' },
       )
-      .select('plan, free_ai_reflections_used, free_wiki_insights_used, smart_mode_enabled')
+      .select('smart_mode_enabled')
       .single();
 
     if (error) throw error;
-    return mapWellnessAccess(user.id, data);
+    return getWellnessAccessForUser(user.id, data);
   },
 
   incrementFreeAiReflections: async (): Promise<void> => {
-    const user = await getAuthenticatedUser();
-
-    // Fetch current count first
-    const { data } = await supabase
-      .from('profiles')
-      .select('free_ai_reflections_used')
-      .eq('id', user.id)
-      .single();
-
-    const currentCount = data?.free_ai_reflections_used || 0;
-
-    const { error } = await supabase
-      .from('profiles')
-      .update({ free_ai_reflections_used: currentCount + 1 })
-      .eq('id', user.id);
-
-    if (error) throw error;
+    await getAuthenticatedUser();
   },
 
   incrementFreeWikiInsights: async (): Promise<boolean> => {
-    const user = await getAuthenticatedUser();
-
-    const { data, error } = await supabase
-      .from('profiles')
-      .update({ free_wiki_insights_used: 1 })
-      .eq('id', user.id)
-      .eq('free_wiki_insights_used', 0)
-      .select('id')
-      .limit(1);
-
-    if (error) throw error;
-    return (data?.length ?? 0) === 1;
+    await getAuthenticatedUser();
+    return true;
   },
 
   releaseClaimedFreeWikiInsight: async (): Promise<void> => {
-    const user = await getAuthenticatedUser();
-
-    const { error } = await supabase
-      .from('profiles')
-      .update({ free_wiki_insights_used: 0 })
-      .eq('id', user.id)
-      .eq('free_wiki_insights_used', 1);
-
-    if (error) throw error;
+    await getAuthenticatedUser();
   }
 };

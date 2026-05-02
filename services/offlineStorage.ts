@@ -17,12 +17,15 @@ export const offlineStorage = {
       .sortBy('updatedAt');
   },
 
-  async getNoteById(id: string): Promise<LocalNote | undefined> {
-    return await db.notes.get(id);
+  async getNoteById(id: string, userId: string): Promise<LocalNote | undefined> {
+    const note = await db.notes.get(id);
+    return note?.userId === userId ? note : undefined;
   },
 
-  async deleteNote(id: string): Promise<void> {
+  async deleteNote(id: string, userId: string): Promise<void> {
     const note = await db.notes.get(id);
+    if (note?.userId !== userId) return;
+
     if (note) {
       // If it was already pending insert (never went to server), just delete it
       if (note.syncStatus === 'pending_insert') {
@@ -36,10 +39,14 @@ export const offlineStorage = {
 
   // --- Sync Engine Queries ---
 
-  async getPendingOperations(): Promise<LocalNote[]> {
+  async getPendingOperations(userId: string): Promise<LocalNote[]> {
     return await db.notes
-      .where('syncStatus')
-      .anyOf(['pending_insert', 'pending_update', 'pending_delete'])
+      .where('[userId+syncStatus]')
+      .anyOf([
+        [userId, 'pending_insert'],
+        [userId, 'pending_update'],
+        [userId, 'pending_delete'],
+      ])
       .toArray();
   },
 
@@ -58,4 +65,3 @@ export const offlineStorage = {
     await db.notes.where('userId').equals(userId).delete();
   },
 };
-

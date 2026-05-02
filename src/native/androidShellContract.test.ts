@@ -9,11 +9,13 @@ describe('Android shell contract', () => {
   it('drops the placeholder native splash and keeps launch polish in the in-app startup screen', () => {
     const capacitorConfig = read('capacitor.config.ts');
     const app = read('App.tsx');
+    const authenticatedShell = read('layouts/AuthenticatedAppShell.tsx');
     const statusBarHook = read('hooks/useNativeStatusBar.ts');
     const styles = read('android/app/src/main/res/values/styles.xml');
     const authContext = read('context/AuthContext.tsx');
 
-    expect(app).toContain('useNativeStatusBar');
+    expect(app).not.toContain("import { useNativeStatusBar }");
+    expect(authenticatedShell).toContain('useNativeStatusBar');
     expect(statusBarHook).toContain('StatusBar.setOverlaysWebView');
     expect(capacitorConfig).not.toContain('SplashScreen: {');
     expect(app).not.toContain('@capacitor/splash-screen');
@@ -42,13 +44,15 @@ describe('Android shell contract', () => {
 
   it('returns successful native Google auth to home and keeps floating mobile chrome below the status bar', () => {
     const app = read('App.tsx');
+    const authenticatedShell = read('layouts/AuthenticatedAppShell.tsx');
     const oauthHook = read('hooks/useNativeOAuthListener.ts');
     const googleOAuth = read('src/auth/googleOAuth.ts');
     const dashboardLayout = read('layouts/DashboardLayout.tsx');
     const createNote = read('pages/dashboard/CreateNote.tsx');
     const safeArea = read('src/native/safeArea.ts');
 
-    expect(app).toContain('useNativeOAuthListener');
+    expect(app).not.toContain("import { useNativeOAuthListener }");
+    expect(authenticatedShell).toContain('useNativeOAuthListener');
     expect(oauthHook).toContain('consumeNativeGoogleAuthSuccessRedirectPath');
     expect(oauthHook).toContain("import('@capacitor/browser')");
     expect(googleOAuth).toContain('skipBrowserRedirect: true');

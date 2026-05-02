@@ -25,7 +25,7 @@ export const useSync = () => {
     if (!session) return;
 
     // 3. Get all pending operations from Dexie
-    const pending = await offlineStorage.getPendingOperations();
+    const pending = await offlineStorage.getPendingOperations(session.user.id);
     if (pending.length === 0) return;
 
     isSyncing.current = true;

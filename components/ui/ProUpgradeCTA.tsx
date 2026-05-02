@@ -12,9 +12,6 @@ interface ProUpgradeCTAProps {
   variant?: 'card' | 'fullscreen';
 }
 
-const RAZORPAY_MONTHLY_PLAN_ID = import.meta.env.VITE_RAZORPAY_MONTHLY_PLAN_ID;
-const RAZORPAY_YEARLY_PLAN_ID = import.meta.env.VITE_RAZORPAY_YEARLY_PLAN_ID;
-
 export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, className = '', variant = 'card' }) => {
   useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -61,12 +58,6 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
     setError(null);
 
     try {
-      const planId = selectedPlan === 'monthly' ? RAZORPAY_MONTHLY_PLAN_ID : RAZORPAY_YEARLY_PLAN_ID;
-
-      if (!planId) {
-        throw new Error('Subscription plans are not fully configured yet.');
-      }
-
       const { data: { session } } = await supabase.auth.getSession();
       
       // 1. Create Subscription
@@ -76,7 +67,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session?.access_token}`
         },
-        body: JSON.stringify({ planId })
+        body: JSON.stringify({ billingPeriod: selectedPlan })
       });
 
       const data = await res.json();
@@ -111,7 +102,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
             const verifyData = await verifyRes.json();
             if (!verifyRes.ok) throw new Error(verifyData.error || 'Verification failed');
 
-            // 4. Show Unlock Sequence
+            // 4. Show confirmation while the webhook applies the entitlement.
             setIsUnlocked(true);
             
             // Reload user profile data to reflect Pro status
@@ -250,7 +241,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
             </div>
             <h3 className="text-3xl font-display font-extrabold text-gray-text mb-3">Welcome to Pro</h3>
             <p className="text-base font-medium text-gray-light leading-relaxed max-w-[280px]">
-              Writing stays unlimited. You can refresh your Life Wiki whenever you ask.
+              Payment is verified. Pro access activates as soon as Razorpay confirms the subscription.
             </p>
           </div>
         )}

@@ -32,6 +32,35 @@ beforeEach(() => {
   mockAuth.mockResolvedValue({ data: { user: { id: 'uid-1' } } } as any);
 });
 
+describe('noteService.getById', () => {
+  it('does not return a cached Dexie note owned by another signed-in user', async () => {
+    const otherUsersNote = {
+      id: 'note-1',
+      userId: 'uid-2',
+      syncStatus: 'synced',
+      title: 'Someone else',
+      content: 'Private',
+      createdAt: '2026-04-20T00:00:00.000Z',
+      updatedAt: '2026-04-20T00:00:00.000Z',
+    } as any;
+    mockGetNoteById.mockImplementation(async (_id, userId) =>
+      userId === 'uid-2' ? otherUsersNote : undefined,
+    );
+
+    const chain = {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockResolvedValue({ data: null, error: { code: 'PGRST116' } }),
+    };
+    mockFrom.mockReturnValue(chain as any);
+
+    const note = await noteService.getById('note-1');
+
+    expect(mockGetNoteById).toHaveBeenCalledWith('note-1', 'uid-1');
+    expect(note).toBeUndefined();
+  });
+});
+
 describe('noteService.getCount', () => {
   it('queries Supabase with count:exact and returns the integer', async () => {
     const chain = {

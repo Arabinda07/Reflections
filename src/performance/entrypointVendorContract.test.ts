@@ -9,6 +9,7 @@ describe('entrypoint vendor loading contract', () => {
   it('keeps heavy observability vendors out of the root entrypoint', () => {
     const index = read('index.tsx');
     const app = read('App.tsx');
+    const authenticatedShell = read('layouts/AuthenticatedAppShell.tsx');
 
     expect(index).not.toContain('PostHogProvider');
     expect(index).not.toContain('@posthog/react');
@@ -19,11 +20,16 @@ describe('entrypoint vendor loading contract', () => {
     expect(index).toContain('scheduleSentryInitialization');
     expect(index).toContain('captureReactRootError');
 
+    const instrument = read('src/instrument.ts');
+    expect(instrument).toContain('const SENTRY_IDLE_DELAY_MS = 12_000;');
+    expect(instrument).toContain('window.setTimeout(() => {');
+    expect(instrument).toContain('SENTRY_IDLE_DELAY_MS');
+
     expect(app).not.toContain("from '@vercel/analytics/react'");
     expect(app).not.toContain("from '@vercel/speed-insights/react'");
-    expect(app).toContain('DeferredVercelVitals');
-    expect(app).toContain("import('@vercel/analytics/react')");
-    expect(app).toContain("import('@vercel/speed-insights/react')");
+    expect(authenticatedShell).toContain('DeferredVercelVitals');
+    expect(authenticatedShell).toContain("import('@vercel/analytics/react')");
+    expect(authenticatedShell).toContain("import('@vercel/speed-insights/react')");
   });
 
   it('loads PostHog only from async event-time helpers', () => {
@@ -62,6 +68,14 @@ describe('entrypoint vendor loading contract', () => {
     expect(viteConfig).toContain('**/vendor-lottie-*.js');
     expect(viteConfig).toContain('**/vendor-analytics-*.js');
     expect(viteConfig).toContain('**/vendor-sentry-*.js');
+  });
+
+  it('keeps the Vite preload helper out of the native vendor chunk', () => {
+    const viteConfig = read('vite.config.ts');
+
+    expect(viteConfig).toContain("id.includes('vite/preload-helper')");
+    expect(viteConfig).toContain("return 'vendor-core'");
+    expect(viteConfig).toContain("if (id.includes('@capacitor')) return 'vendor-native';");
   });
 
   it('pins the Vite dev server root to this repo', () => {

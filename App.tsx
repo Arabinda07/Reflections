@@ -1,232 +1,76 @@
-import React, { Suspense, lazy, useState, useEffect } from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Navigate, Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import { PWAInstallProvider } from './context/PWAInstallContext';
-import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { RouteLoadingFrame } from './components/ui/RouteLoadingFrame';
-import { ToastProvider } from './components/ui/Toast';
-import { DashboardLayout } from './layouts/DashboardLayout';
-import { Home } from './pages/dashboard/Home';
 import { RouteErrorBoundary } from './pages/RouteErrorBoundary';
+import { Landing } from './pages/dashboard/Landing';
 import { RoutePath } from './types';
-import { useSync } from './hooks/useSync';
-import { MotionConfig } from 'motion/react';
-import { useNativeStatusBar } from './hooks/useNativeStatusBar';
-import { useNativeOAuthListener } from './hooks/useNativeOAuthListener';
 
-// Lazy load non-critical routes to reduce initial bundle size
-const SignIn = lazy(() => import('@/pages/auth/SignIn.tsx').then(m => ({ default: m.SignIn })));
-const SignUp = lazy(() => import('@/pages/auth/SignUp.tsx').then(m => ({ default: m.SignUp })));
-const ResetPassword = lazy(() => import('@/pages/auth/ResetPassword.tsx').then(m => ({ default: m.ResetPassword })));
-const MyNotes = lazy(() => import('@/pages/dashboard/MyNotes.tsx').then(m => ({ default: m.MyNotes })));
-const CreateNote = lazy(() => import('@/pages/dashboard/CreateNote.tsx').then(m => ({ default: m.CreateNote })));
-const SingleNote = lazy(() => import('@/pages/dashboard/SingleNote.tsx').then(m => ({ default: m.SingleNote })));
-const ReleaseMode = lazy(() => import('@/pages/dashboard/ReleaseMode.tsx').then(m => ({ default: m.ReleaseMode })));
-const FutureLetters = lazy(() => import('@/pages/dashboard/FutureLetters.tsx').then(m => ({ default: m.FutureLetters })));
-const Account = lazy(() => import('@/pages/dashboard/Account.tsx').then(m => ({ default: m.Account })));
-const Insights = lazy(() => import('@/pages/dashboard/Insights.tsx').then(m => ({ default: m.Insights })));
-const LifeWiki = lazy(() => import('@/pages/dashboard/LifeWiki.tsx').then(m => ({ default: m.LifeWiki })));
-const FAQ = lazy(() => import('@/pages/dashboard/FAQ.tsx').then(m => ({ default: m.FAQ })));
-const AboutArabinda = lazy(() => import('@/pages/dashboard/AboutArabinda.tsx').then(m => ({ default: m.AboutArabinda })));
-const PrivacyPolicy = lazy(() => import('@/pages/dashboard/PrivacyPolicy.tsx').then(m => ({ default: m.PrivacyPolicy })));
-const AuthCallback = lazy(() => import('@/pages/auth/AuthCallback.tsx').then(m => ({ default: m.AuthCallback })));
-const HomeAuthenticated = lazy(() => import('@/pages/dashboard/HomeAuthenticated.tsx').then(m => ({ default: m.HomeAuthenticated })));
-const NotFound = lazy(() => import('@/pages/NotFound.tsx').then(m => ({ default: m.NotFound })));
-const LazyVercelVitals = lazy(async () => {
-  const [{ Analytics }, { SpeedInsights }] = await Promise.all([
-    import('@vercel/analytics/react'),
-    import('@vercel/speed-insights/react'),
-  ]);
+const AuthenticatedAppShell = lazy(() => import('./layouts/AuthenticatedAppShell').then((m) => ({ default: m.AuthenticatedAppShell })));
+const ProtectedRoute = lazy(() => import('./components/auth/ProtectedRoute').then((m) => ({ default: m.ProtectedRoute })));
 
-  return {
-    default: () => (
-      <>
-        <Analytics />
-        <SpeedInsights />
-      </>
-    ),
-  };
-});
+const SignIn = lazy(() => import('@/pages/auth/SignIn.tsx').then((m) => ({ default: m.SignIn })));
+const SignUp = lazy(() => import('@/pages/auth/SignUp.tsx').then((m) => ({ default: m.SignUp })));
+const ResetPassword = lazy(() => import('@/pages/auth/ResetPassword.tsx').then((m) => ({ default: m.ResetPassword })));
+const MyNotes = lazy(() => import('@/pages/dashboard/MyNotes.tsx').then((m) => ({ default: m.MyNotes })));
+const CreateNote = lazy(() => import('@/pages/dashboard/CreateNote.tsx').then((m) => ({ default: m.CreateNote })));
+const SingleNote = lazy(() => import('@/pages/dashboard/SingleNote.tsx').then((m) => ({ default: m.SingleNote })));
+const ReleaseMode = lazy(() => import('@/pages/dashboard/ReleaseMode.tsx').then((m) => ({ default: m.ReleaseMode })));
+const FutureLetters = lazy(() => import('@/pages/dashboard/FutureLetters.tsx').then((m) => ({ default: m.FutureLetters })));
+const Account = lazy(() => import('@/pages/dashboard/Account.tsx').then((m) => ({ default: m.Account })));
+const Insights = lazy(() => import('@/pages/dashboard/Insights.tsx').then((m) => ({ default: m.Insights })));
+const LifeWiki = lazy(() => import('@/pages/dashboard/LifeWiki.tsx').then((m) => ({ default: m.LifeWiki })));
+const FAQ = lazy(() => import('@/pages/dashboard/FAQ.tsx').then((m) => ({ default: m.FAQ })));
+const AboutArabinda = lazy(() => import('@/pages/dashboard/AboutArabinda.tsx').then((m) => ({ default: m.AboutArabinda })));
+const PrivacyPolicy = lazy(() => import('@/pages/dashboard/PrivacyPolicy.tsx').then((m) => ({ default: m.PrivacyPolicy })));
+const AuthCallback = lazy(() => import('@/pages/auth/AuthCallback.tsx').then((m) => ({ default: m.AuthCallback })));
+const HomeAuthenticated = lazy(() => import('@/pages/dashboard/HomeAuthenticated.tsx').then((m) => ({ default: m.HomeAuthenticated })));
+const NotFound = lazy(() => import('@/pages/NotFound.tsx').then((m) => ({ default: m.NotFound })));
 
 const withRouteFallback = (element: React.ReactNode) => (
   <Suspense fallback={<RouteLoadingFrame />}>{element}</Suspense>
 );
 
+const withProtectedRoute = (element: React.ReactNode) =>
+  withRouteFallback(<ProtectedRoute>{element}</ProtectedRoute>);
+
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route element={<DashboardLayout />} errorElement={<RouteErrorBoundary />}>
-      <Route path={RoutePath.HOME} element={<Home />} />
-      <Route path={RoutePath.FAQ} element={withRouteFallback(<FAQ />)} />
-      <Route path={RoutePath.ABOUT} element={withRouteFallback(<AboutArabinda />)} />
-      <Route path={RoutePath.PRIVACY} element={withRouteFallback(<PrivacyPolicy />)} />
-      <Route path={RoutePath.TERMS} element={<Navigate to={RoutePath.PRIVACY} replace />} />
+    <>
+      <Route errorElement={<RouteErrorBoundary />}>
+        <Route path={RoutePath.HOME} element={<Landing />} />
+        <Route path={RoutePath.FAQ} element={withRouteFallback(<FAQ />)} />
+        <Route path={RoutePath.ABOUT} element={withRouteFallback(<AboutArabinda />)} />
+        <Route path={RoutePath.PRIVACY} element={withRouteFallback(<PrivacyPolicy />)} />
+        <Route path={RoutePath.TERMS} element={<Navigate to={RoutePath.PRIVACY} replace />} />
+      </Route>
 
-      <Route path={RoutePath.LOGIN} element={withRouteFallback(<SignIn />)} />
-      <Route path={RoutePath.SIGNUP} element={withRouteFallback(<SignUp />)} />
-      <Route path={RoutePath.RESET_PASSWORD} element={withRouteFallback(<ResetPassword />)} />
-      <Route path={RoutePath.AUTH_CALLBACK} element={withRouteFallback(<AuthCallback />)} />
+      <Route element={withRouteFallback(<AuthenticatedAppShell />)} errorElement={<RouteErrorBoundary />}>
+        <Route path={RoutePath.LOGIN} element={withRouteFallback(<SignIn />)} />
+        <Route path={RoutePath.SIGNUP} element={withRouteFallback(<SignUp />)} />
+        <Route path={RoutePath.RESET_PASSWORD} element={withRouteFallback(<ResetPassword />)} />
+        <Route path={RoutePath.AUTH_CALLBACK} element={withRouteFallback(<AuthCallback />)} />
 
-      <Route
-        path={RoutePath.DASHBOARD}
-        element={
-          <ProtectedRoute>
-            {withRouteFallback(<HomeAuthenticated />)}
-          </ProtectedRoute>
-        }
-      />
+        <Route path={RoutePath.DASHBOARD} element={withProtectedRoute(withRouteFallback(<HomeAuthenticated />))} />
+        <Route path={RoutePath.NOTES} element={withProtectedRoute(withRouteFallback(<MyNotes />))} />
+        <Route path={RoutePath.CREATE_NOTE} element={withProtectedRoute(withRouteFallback(<CreateNote />))} />
+        <Route path={RoutePath.EDIT_NOTE} element={withProtectedRoute(withRouteFallback(<CreateNote />))} />
+        <Route path={RoutePath.NOTE_DETAIL} element={withProtectedRoute(withRouteFallback(<SingleNote />))} />
+        <Route path={RoutePath.RELEASE} element={withProtectedRoute(withRouteFallback(<ReleaseMode />))} />
+        <Route path={RoutePath.FUTURE_LETTERS} element={withProtectedRoute(withRouteFallback(<FutureLetters />))} />
+        <Route path={RoutePath.ACCOUNT} element={withProtectedRoute(withRouteFallback(<Account />))} />
+        <Route path={RoutePath.INSIGHTS} element={withProtectedRoute(withRouteFallback(<Insights />))} />
+        <Route path={RoutePath.WIKI} element={withProtectedRoute(withRouteFallback(<LifeWiki />))} />
+        <Route path={RoutePath.SANCTUARY} element={withProtectedRoute(withRouteFallback(<LifeWiki />))} />
+        <Route path={RoutePath.SANCTUARY_ARTICLE} element={withProtectedRoute(withRouteFallback(<LifeWiki />))} />
 
-      <Route
-        path={RoutePath.NOTES}
-        element={
-          <ProtectedRoute>
-            {withRouteFallback(<MyNotes />)}
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path={RoutePath.CREATE_NOTE}
-        element={
-          <ProtectedRoute>
-            {withRouteFallback(<CreateNote />)}
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path={RoutePath.EDIT_NOTE}
-        element={
-          <ProtectedRoute>
-            {withRouteFallback(<CreateNote />)}
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path={RoutePath.NOTE_DETAIL}
-        element={
-          <ProtectedRoute>
-            {withRouteFallback(<SingleNote />)}
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path={RoutePath.RELEASE}
-        element={
-          <ProtectedRoute>
-            {withRouteFallback(<ReleaseMode />)}
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path={RoutePath.FUTURE_LETTERS}
-        element={
-          <ProtectedRoute>
-            {withRouteFallback(<FutureLetters />)}
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path={RoutePath.ACCOUNT}
-        element={
-          <ProtectedRoute>
-            {withRouteFallback(<Account />)}
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path={RoutePath.INSIGHTS}
-        element={
-          <ProtectedRoute>
-            {withRouteFallback(<Insights />)}
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path={RoutePath.WIKI}
-        element={
-          <ProtectedRoute>
-            {withRouteFallback(<LifeWiki />)}
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path={RoutePath.SANCTUARY}
-        element={
-          <ProtectedRoute>
-            {withRouteFallback(<LifeWiki />)}
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path={RoutePath.SANCTUARY_ARTICLE}
-        element={
-          <ProtectedRoute>
-            {withRouteFallback(<LifeWiki />)}
-          </ProtectedRoute>
-        }
-      />
-
-      <Route path="*" element={withRouteFallback(<NotFound />)} />
-    </Route>,
+        <Route path="*" element={withRouteFallback(<NotFound />)} />
+      </Route>
+    </>,
   ),
 );
 
-// Wrapper to initialize hooks inside Context
-const SyncWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  useSync();
-
-  return <>{children}</>;
-};
-
-const scheduleIdleMount = (callback: () => void) => {
-  const idleWindow = window as Window & {
-    requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
-    cancelIdleCallback?: (handle: number) => void;
-  };
-
-  if (idleWindow.requestIdleCallback) {
-    const handle = idleWindow.requestIdleCallback(callback, { timeout: 3000 });
-    return () => idleWindow.cancelIdleCallback?.(handle);
-  }
-
-  const handle = window.setTimeout(callback, 1200);
-  return () => window.clearTimeout(handle);
-};
-
-const DeferredVercelVitals: React.FC = () => {
-  const [shouldMount, setShouldMount] = useState(false);
-
-  useEffect(() => {
-    return scheduleIdleMount(() => setShouldMount(true));
-  }, []);
-
-  if (!shouldMount) {
-    return null;
-  }
-
-  return (
-    <Suspense fallback={null}>
-      <LazyVercelVitals />
-    </Suspense>
-  );
-};
-
 function App() {
-  useNativeStatusBar();
-  useNativeOAuthListener();
-
-  return (
-    <PWAInstallProvider>
-      <AuthProvider>
-        <ToastProvider>
-          <DeferredVercelVitals />
-          <SyncWrapper>
-            <MotionConfig reducedMotion="user">
-              <RouterProvider router={router} />
-            </MotionConfig>
-          </SyncWrapper>
-        </ToastProvider>
-      </AuthProvider>
-    </PWAInstallProvider>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;

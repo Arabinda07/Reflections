@@ -7,6 +7,8 @@ let sentryModulePromise: Promise<SentryModule> | null = null;
 let initPromise: Promise<boolean> | null = null;
 let hasInitialized = false;
 
+const SENTRY_IDLE_DELAY_MS = 12_000;
+
 const getSentryDsn = (env: BrowserEnv = import.meta.env) => env.VITE_SENTRY_DSN?.trim() || '';
 
 const loadSentry = () => {
@@ -65,13 +67,24 @@ export const scheduleSentryInitialization = (env: BrowserEnv = import.meta.env) 
     cancelIdleCallback?: (handle: number) => void;
   };
 
-  if (idleWindow.requestIdleCallback) {
-    const handle = idleWindow.requestIdleCallback(start, { timeout: 3000 });
-    return () => idleWindow.cancelIdleCallback?.(handle);
-  }
+  let idleHandle: number | undefined;
 
-  const handle = window.setTimeout(start, 1200);
-  return () => window.clearTimeout(handle);
+  const delayHandle = window.setTimeout(() => {
+    if (idleWindow.requestIdleCallback) {
+      idleHandle = idleWindow.requestIdleCallback(start, { timeout: 3000 });
+      return;
+    }
+
+    start();
+  }, SENTRY_IDLE_DELAY_MS);
+
+  return () => {
+    window.clearTimeout(delayHandle);
+
+    if (idleHandle !== undefined) {
+      idleWindow.cancelIdleCallback?.(idleHandle);
+    }
+  };
 };
 
 export const captureReactRootError = (error: unknown, errorInfo?: ErrorInfo) => {

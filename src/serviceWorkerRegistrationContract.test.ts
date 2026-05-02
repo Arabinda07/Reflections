@@ -9,6 +9,10 @@ describe('service worker registration contract', () => {
     expect(htmlSource).not.toContain("navigator.serviceWorker.register('/sw.js'");
   });
 
+  it('defers the generated registration script so it does not block first paint', () => {
+    expect(viteConfigSource).toContain("injectRegister: 'script-defer'");
+  });
+
   it('does not race mobile navigations back to stale cached HTML during deploys', () => {
     expect(viteConfigSource).toContain('cleanupOutdatedCaches: true');
     expect(viteConfigSource).not.toContain("cacheName: 'app-navigation'");

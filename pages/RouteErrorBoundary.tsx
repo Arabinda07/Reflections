@@ -1,6 +1,5 @@
 import React, { Suspense, lazy } from 'react';
 import { isRouteErrorResponse, useNavigate, useRouteError } from 'react-router-dom';
-import { Button } from '../components/ui/Button';
 import { RoutePath } from '../types';
 
 const error404Animation = '/assets/lottie/Error%20404.json';
@@ -67,22 +66,20 @@ export const RouteErrorBoundary: React.FC = () => {
         </p>
 
         <div className="mt-8 flex w-full max-w-md flex-col gap-3 sm:flex-row sm:justify-center">
-          <Button
-            variant="primary"
-            size="lg"
+          <button
+            type="button"
             onClick={() => window.location.reload()}
-            className="w-full sm:w-auto"
+            className="inline-flex min-h-14 w-full items-center justify-center rounded-[var(--radius-control)] border border-transparent bg-green px-5 py-4 text-[16px] font-bold text-white shadow-lg shadow-green/20 transition-[background-color,box-shadow,transform] duration-300 ease-out-expo hover:-translate-y-0.5 hover:bg-green-hover hover:shadow-xl hover:shadow-green/30 active:translate-y-0 sm:w-auto sm:px-8"
           >
             Try again
-          </Button>
-          <Button
-            variant="secondary"
-            size="lg"
+          </button>
+          <button
+            type="button"
             onClick={() => navigate(RoutePath.HOME)}
-            className="w-full sm:w-auto"
+            className="control-surface inline-flex min-h-14 w-full items-center justify-center rounded-[var(--radius-control)] px-5 py-4 text-[16px] font-bold text-gray-text transition-[background-color,border-color,color,transform] duration-300 ease-out-expo hover:-translate-y-0.5 hover:border-green/20 hover:bg-green/5 active:translate-y-0 sm:w-auto sm:px-8"
           >
             Return home
-          </Button>
+          </button>
         </div>
       </div>
     </div>

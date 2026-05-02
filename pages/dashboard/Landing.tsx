@@ -1,13 +1,94 @@
-import { ArrowRight, SpeakerHigh, SpeakerSlash } from '@phosphor-icons/react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '../../components/ui/Button';
 import { useDocumentMeta } from '../../hooks/useDocumentMeta';
 import { RoutePath } from '../../types';
 
+type TinyIconProps = {
+  className?: string;
+};
+
+const ArrowRightIcon: React.FC<TinyIconProps> = ({ className = '' }) => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" className={className} fill="none">
+    <path
+      d="M5 12h13m-5-5 5 5-5 5"
+      stroke="currentColor"
+      strokeWidth="2.3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+const SpeakerHighIcon: React.FC<TinyIconProps> = ({ className = '' }) => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" className={className} fill="none">
+    <path
+      d="M4 10v4h4l5 4V6L8 10H4Z"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M16.5 8.5a5 5 0 0 1 0 7M18.8 6.2a8.2 8.2 0 0 1 0 11.6"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+    />
+  </svg>
+);
+
+const SpeakerMutedIcon: React.FC<TinyIconProps> = ({ className = '' }) => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" className={className} fill="none">
+    <path
+      d="M4 10v4h4l5 4V6L8 10H4Z"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="m17 10 4 4m0-4-4 4"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+    />
+  </svg>
+);
+
+const scheduleIdleTask = (callback: () => void, timeout = 2400) => {
+  const idleWindow = window as Window & {
+    requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
+    cancelIdleCallback?: (handle: number) => void;
+  };
+
+  if (idleWindow.requestIdleCallback) {
+    const handle = idleWindow.requestIdleCallback(callback, { timeout });
+    return () => idleWindow.cancelIdleCallback?.(handle);
+  }
+
+  const handle = window.setTimeout(callback, Math.min(timeout, 1200));
+  return () => window.clearTimeout(handle);
+};
+
+const hasStoredAuthSessionHint = () => {
+  try {
+    for (let index = 0; index < window.localStorage.length; index += 1) {
+      const key = window.localStorage.key(index);
+
+      if (key?.startsWith('sb-') && key.endsWith('-auth-token')) {
+        return true;
+      }
+    }
+  } catch (error) {
+    console.warn('Could not inspect local auth storage from landing.', error);
+  }
+
+  return false;
+};
+
 export const Landing: React.FC = () => {
   useDocumentMeta({
-    title: 'Reflections – Private Journal for Notes, Mood & Reflection',
+    title: 'Reflections - Private Journal for Notes, Mood & Reflection',
     description: 'A private journal for writing notes, naming moods, and noticing patterns. AI runs only when you ask. No streaks, no pressure.',
     path: '/',
   });
@@ -27,45 +108,42 @@ export const Landing: React.FC = () => {
 
     if (saveData || reducedMotionQuery.matches) return;
 
-    let idleId: number | undefined;
-    let timerId: number | undefined;
-    let isLoadScheduled = false;
+    const frameId = window.requestAnimationFrame(() => {
+      setShouldLoadHeroVideo(true);
+    });
 
-    const loadVideo = () => {
-      isLoadScheduled = false;
+    return () => window.cancelAnimationFrame(frameId);
+  }, [shouldLoadHeroVideo]);
 
-      if (!reducedMotionQuery.matches) {
-        setShouldLoadHeroVideo(true);
+  useEffect(() => {
+    if (!hasStoredAuthSessionHint()) {
+      return;
+    }
+
+    let isActive = true;
+
+    const redirectAuthenticatedUser = async () => {
+      try {
+        const { supabase } = await import('../../src/supabaseClient');
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (isActive && session) {
+          navigate(RoutePath.DASHBOARD, { replace: true });
+        }
+      } catch (error) {
+        console.warn('Could not check the existing auth session from landing.', error);
       }
     };
 
-    const scheduleLoadVideo = () => {
-      if (isLoadScheduled || reducedMotionQuery.matches) return;
-
-      isLoadScheduled = true;
-
-      if (window.requestIdleCallback) {
-        idleId = window.requestIdleCallback(loadVideo, { timeout: 1600 });
-      } else {
-        timerId = window.setTimeout(loadVideo, 900);
-      }
-    };
-
-    scheduleLoadVideo();
-    reducedMotionQuery.addEventListener('change', scheduleLoadVideo);
+    const cancelIdleCheck = scheduleIdleTask(redirectAuthenticatedUser, 5200);
 
     return () => {
-      reducedMotionQuery.removeEventListener('change', scheduleLoadVideo);
-
-      if (idleId !== undefined) {
-        window.cancelIdleCallback(idleId);
-      }
-
-      if (timerId !== undefined) {
-        window.clearTimeout(timerId);
-      }
+      isActive = false;
+      cancelIdleCheck();
     };
-  }, [shouldLoadHeroVideo]);
+  }, [navigate]);
 
   const toggleMute = () => {
     const nextMuted = !isMuted;
@@ -90,7 +168,6 @@ export const Landing: React.FC = () => {
 
   return (
     <div role="region" aria-label="Welcome" className="surface-scope-sage page-wash relative min-h-[100dvh] overflow-x-hidden selection:bg-green/20 selection:text-green bg-body text-gray-text">
-      {/* Full-bleed layered container */}
       <div className="relative isolate min-h-[100dvh] w-full overflow-hidden bg-body">
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <div className="video-mask video-mask--mobile lg:hidden" />
@@ -113,7 +190,6 @@ export const Landing: React.FC = () => {
           {shouldLoadHeroVideo ? (
             <video
               ref={videoRef}
-              poster="/assets/videos/landing_video.webp"
               aria-hidden="true"
               className={`absolute inset-0 h-full min-h-full w-full min-w-full transform-gpu object-cover object-[48%_center] bg-transparent transition-opacity duration-700 ease-out-expo motion-reduce:transition-none sm:object-[64%_center] lg:object-center ${isHeroVideoReady ? 'opacity-90' : 'opacity-0'}`}
               style={{ willChange: 'opacity' }}
@@ -122,69 +198,63 @@ export const Landing: React.FC = () => {
               muted={isMuted}
               playsInline
               preload="metadata"
-              onCanPlay={() => setIsHeroVideoReady(true)}
+              onCanPlay={(event) => {
+                setIsHeroVideoReady(true);
+                if (!isMuted) {
+                  void event.currentTarget.play().catch(() => {
+                    event.currentTarget.muted = true;
+                    setIsMuted(true);
+                  });
+                }
+              }}
               onPlaying={() => setIsHeroVideoReady(true)}
             >
-              <source src="/assets/videos/landing_video.webm" type="video/webm" />
-              <source src="/assets/videos/landing_video.mp4" type="video/mp4" />
+              <source src="/assets/videos/landing_video_mobile.webm" type="video/webm" media="(max-width: 1023px)" />
+              <source src="/assets/videos/landing_video_mobile.mp4" type="video/mp4" media="(max-width: 1023px)" />
+              <source src="/assets/videos/landing_video.webm" type="video/webm" media="(min-width: 1024px)" />
+              <source src="/assets/videos/landing_video.mp4" type="video/mp4" media="(min-width: 1024px)" />
             </video>
           ) : null}
         </div>
 
-        {/* ── Left panel: content ── */}
         <div className="relative z-20 flex min-h-[100dvh] flex-col px-6 pb-[calc(env(safe-area-inset-bottom)+1.75rem)] pt-[calc(env(safe-area-inset-top)+var(--header-height)+1.5rem)] sm:px-12 sm:pt-[calc(env(safe-area-inset-top)+var(--header-height)+2rem)] lg:justify-between lg:pt-[28vh] lg:pb-12 lg:px-16 xl:px-24 pointer-events-none">
-
           <div className="flex flex-col gap-6 lg:w-[60%] lg:gap-8 xl:w-[55%]">
             <h1
               aria-label="Your mind beautifully organized"
               className="pointer-events-auto flex max-w-[11ch] flex-col text-mk-display font-display font-extrabold tracking-normal text-gray-text leading-[0.92] sm:max-w-[12ch] sm:leading-[0.94] lg:max-w-5xl lg:leading-[0.96]"
             >
-              <span>
-                Your mind
-              </span>
+              <span>Your mind</span>
               <span className="font-serif italic font-normal text-green" style={{ lineHeight: 1.1 }}>
                 beautifully
               </span>
-              <span>
-                organized
-              </span>
+              <span>organized</span>
             </h1>
 
-            <p
-              className="pointer-events-auto max-w-[26ch] sm:max-w-[32ch] lg:max-w-[40ch] font-sans text-base font-medium leading-relaxed text-gray-text sm:text-lg tracking-normal"
-            >
+            <p className="pointer-events-auto max-w-[26ch] sm:max-w-[32ch] lg:max-w-[40ch] font-sans text-base font-medium leading-relaxed text-gray-text sm:text-lg tracking-normal">
               A private journal. Write what's on your mind, notice the patterns, and keep it to yourself
             </p>
           </div>
 
-          <div
-            className="pointer-events-auto mt-auto flex w-full flex-col items-start gap-8 sm:max-w-none sm:flex-row sm:items-center sm:justify-between lg:mt-0"
-          >
-            <Button
-              variant="primary"
+          <div className="pointer-events-auto mt-auto flex w-full flex-col items-start gap-8 sm:max-w-none sm:flex-row sm:items-center sm:justify-between lg:mt-0">
+            <button
+              type="button"
               onClick={() => navigate(RoutePath.SIGNUP)}
-              whileHover={{ y: -3, scale: 1.02 }}
-              whileTap={{ scale: 0.98, y: 0 }}
-              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="group h-16 w-auto px-10 font-sans text-[19px] font-bold tracking-normal"
+              className="group relative inline-flex h-16 min-w-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-control)] border border-transparent bg-green px-10 font-sans text-[19px] font-bold tracking-normal text-white shadow-lg shadow-green/20 transition-[background-color,box-shadow,transform] duration-300 ease-out-expo hover:-translate-y-0.5 hover:bg-green-hover hover:shadow-xl hover:shadow-green/30 active:translate-y-0 motion-reduce:transition-none"
               aria-label="Begin writing"
             >
               Begin writing
-              <ArrowRight size={22} className="ml-3 group-hover:translate-x-1.5 transition-transform duration-500 ease-out-expo" />
-            </Button>
+              <ArrowRightIcon className="ml-3 h-5 w-5 transition-transform duration-500 ease-out-expo group-hover:translate-x-1.5" />
+            </button>
 
-            <div className="flex w-full items-center justify-between sm:w-auto sm:gap-x-10 lg:gap-x-12 mt-4 sm:mt-0">
-              <div className="flex items-center gap-x-8 sm:gap-x-10">
-                <Button
-                  variant="ghost"
+            <div className="mt-4 flex w-full items-center justify-between gap-5 sm:mt-0 sm:w-auto sm:gap-x-10 lg:gap-x-12">
+              <div className="flex min-w-0 items-center gap-x-8 sm:gap-x-10">
+                <button
+                  type="button"
                   onClick={() => navigate(RoutePath.LOGIN)}
-                  whileHover={{ y: -1 }}
-                  whileTap={{ scale: 0.97 }}
-                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                  className="h-11 px-0 text-[15px] font-medium text-gray-text hover:text-green transition-colors"
+                  className="inline-flex h-11 min-w-0 items-center justify-center whitespace-nowrap px-0 text-[15px] font-medium text-gray-text transition-colors duration-300 ease-out-expo hover:text-green focus:outline-none"
                 >
                   Sign in
-                </Button>
+                </button>
 
                 <a
                   href={RoutePath.FAQ}
@@ -194,17 +264,18 @@ export const Landing: React.FC = () => {
                 </a>
               </div>
 
-              <Button
-                variant="outline"
+              <button
+                type="button"
                 onClick={toggleMute}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.9, rotate: -8 }}
-                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                className="surface-floating surface-floating--media h-11 min-h-11 w-11 min-w-11 !px-0 rounded-2xl !text-gray-nav hover:!text-green hover:border-green/40 transition-[color,border-color] duration-300 group"
+                className="surface-floating surface-floating--media flex h-12 min-h-12 w-12 min-w-12 shrink-0 items-center justify-center rounded-2xl text-gray-nav transition-[color,border-color,transform] duration-300 ease-out-expo hover:scale-[1.03] hover:border-green/40 hover:text-green active:scale-95 motion-reduce:transition-none"
                 aria-label={isMuted ? 'Unmute video' : 'Mute video'}
               >
-                {isMuted ? <SpeakerSlash size={20} weight="regular" /> : <SpeakerHigh size={20} weight="regular" />}
-              </Button>
+                {isMuted ? (
+                  <SpeakerMutedIcon className="h-5 w-5" />
+                ) : (
+                  <SpeakerHighIcon className="h-5 w-5" />
+                )}
+              </button>
             </div>
           </div>
         </div>

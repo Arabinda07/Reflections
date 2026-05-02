@@ -6,15 +6,16 @@ const read = (filePath: string) =>
   readFileSync(path.resolve(process.cwd(), filePath), 'utf8');
 
 describe('landing first-paint contract', () => {
-  it('keeps lazy route waits inside the app shell instead of replacing the router', () => {
+  it('keeps lazy route waits inside async routes instead of replacing the router', () => {
     const app = read('App.tsx');
     const protectedRoute = read('components/auth/ProtectedRoute.tsx');
-    const home = read('pages/dashboard/Home.tsx');
 
     expect(existsSync(path.resolve(process.cwd(), 'components/ui/RouteLoadingFrame.tsx'))).toBe(true);
     expect(app).toContain("import { RouteLoadingFrame } from './components/ui/RouteLoadingFrame';");
+    expect(app).toContain("import { Landing } from './pages/dashboard/Landing';");
     expect(app).toContain('const withRouteFallback = (element: React.ReactNode) => (');
     expect(app).toContain('fallback={<RouteLoadingFrame />}');
+    expect(app).toContain('path={RoutePath.HOME} element={<Landing />}');
     expect(app).not.toContain('const PageLoader');
     expect(app).not.toContain('<Suspense fallback={<PageLoader />}>');
 
@@ -22,23 +23,16 @@ describe('landing first-paint contract', () => {
     expect(protectedRoute).toContain('return <RouteLoadingFrame />;');
     expect(protectedRoute).not.toContain('return null;');
     expect(protectedRoute).not.toContain('StartupScreen is covering this visually');
-
-    expect(home).toContain("import { RouteLoadingFrame } from '../../components/ui/RouteLoadingFrame';");
-    expect(home).toContain("const Landing = React.lazy(() => import('./Landing').then((module) => ({ default: module.Landing })));");
-    expect(home).not.toContain("import { Landing } from './Landing';");
-    expect(home).toContain('return <RouteLoadingFrame />;');
-    expect(home).not.toContain('CircleNotch');
   });
 
-  it('keeps guests on a stable landing frame after local auth hydration', () => {
-    const authContext = read('context/AuthContext.tsx');
-    const home = read('pages/dashboard/Home.tsx');
+  it('keeps guests on the landing frame without waiting for auth hydration', () => {
+    const app = read('App.tsx');
+    const landing = read('pages/dashboard/Landing.tsx');
 
-    expect(authContext).toContain('isAuthStoreHydrated: boolean');
-    expect(authContext).toContain('isAuthStoreHydrated: isHydrated');
-    expect(home).toContain('isAuthStoreHydrated');
-    expect(home).toContain('if (!isInitialCheckDone && isAuthStoreHydrated && !isAuthenticated)');
-    expect(home).toContain('return renderLanding();');
+    expect(app).not.toContain('<AuthProvider>');
+    expect(app).not.toContain('<Home />');
+    expect(landing).toContain("import('../../src/supabaseClient')");
+    expect(landing).toContain('navigate(RoutePath.DASHBOARD, { replace: true })');
   });
 
   it('lets the startup overlay fade over already-rendered app content', () => {
@@ -56,8 +50,10 @@ describe('landing first-paint contract', () => {
   it('keeps the startup poster visible while video fades above it', () => {
     const startup = read('components/ui/StartupScreen.tsx');
 
-    expect(startup).toContain('src="/assets/videos/sanctuary.png"');
-    expect(startup).toContain('poster="/assets/videos/sanctuary.png"');
+    expect(existsSync(path.resolve(process.cwd(), 'public/assets/videos/sanctuary.webp'))).toBe(true);
+    expect(startup).toContain('src="/assets/videos/sanctuary.webp"');
+    expect(startup).toContain('poster="/assets/videos/sanctuary.webp"');
+    expect(startup).not.toContain('/assets/videos/sanctuary.png');
     expect(startup).toContain('className="absolute inset-0 z-0 h-full w-full object-cover opacity-85"');
     expect(startup).toContain("isVideoReady ? 'opacity-85' : 'opacity-0'");
     expect(startup).not.toContain('isPosterReady');
@@ -78,20 +74,23 @@ describe('landing first-paint contract', () => {
     expect(landing).toContain('<source srcSet="/assets/videos/landing_video.webp" type="image/webp" media="(min-width: 1024px)" />');
     expect(landing).toContain('<source srcSet="/assets/videos/landing_video_mobile.webp" type="image/webp" media="(max-width: 1023px)" />');
     expect(landing).toContain('src="/assets/videos/landing_video_mobile.webp"');
+    expect(landing).not.toContain('poster="/assets/videos/landing_video.webp"');
+    expect(landing).toContain('src="/assets/videos/landing_video_mobile.webm" type="video/webm" media="(max-width: 1023px)"');
+    expect(landing).toContain('src="/assets/videos/landing_video_mobile.mp4" type="video/mp4" media="(max-width: 1023px)"');
     expect(landing).not.toContain('isHeroPosterReady');
     expect(landing).not.toContain('setIsHeroPosterReady');
     expect(landing).not.toContain('onLoad={() => setIsHeroPosterReady(true)}');
     expect(landing).toContain("navigator as Navigator & { connection?: { saveData?: boolean } }");
     expect(landing).toContain("const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');");
     expect(landing).toContain('if (saveData || reducedMotionQuery.matches) return;');
-    expect(landing).toContain('window.requestIdleCallback');
-    expect(landing).toContain('window.cancelIdleCallback');
+    expect(landing).toContain('requestIdleCallback');
+    expect(landing).toContain('cancelIdleCallback');
     expect(landing).toContain('preload="metadata"');
     expect(landing).not.toContain('preload="auto"');
     expect(landing).toContain("isHeroVideoReady ? 'opacity-0' : 'opacity-100'");
     expect(landing).toContain('sm:object-[64%_center]');
     expect(landing).not.toContain("isHeroPosterReady && !isHeroVideoReady ? 'opacity-90' : 'opacity-0'");
-    expect(landing).toContain('onCanPlay={() => setIsHeroVideoReady(true)}');
+    expect(landing).toContain('onCanPlay={(event) => {');
     expect(landing).toContain('onPlaying={() => setIsHeroVideoReady(true)}');
     expect(landing).toContain("isHeroVideoReady ? 'opacity-90' : 'opacity-0'");
     expect(landing).not.toContain('poster="/assets/videos/landing_video.png"');

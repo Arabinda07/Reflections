@@ -27,7 +27,7 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
 
           {/* Static poster — renders instantly, zero autoplay dependency */}
           <img
-            src="/assets/videos/sanctuary.png"
+            src="/assets/videos/sanctuary.webp"
             alt=""
             aria-hidden="true"
             loading="eager"
@@ -38,7 +38,7 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
           {/* Crossfade with the poster so startup never stacks two bright media layers. */}
           <video
             src="/assets/videos/sanctuary.mp4"
-            poster="/assets/videos/sanctuary.png"
+            poster="/assets/videos/sanctuary.webp"
             autoPlay
             loop
             muted

@@ -16,6 +16,9 @@ export class AppDatabase extends Dexie {
       // We index syncStatus for the sync engine to find pending changes
       notes: 'id, userId, syncStatus, updatedAt'
     });
+    this.version(2).stores({
+      notes: 'id, userId, syncStatus, [userId+syncStatus], updatedAt'
+    });
   }
 }
 

@@ -5,6 +5,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 import { sentryVitePlugin } from '@sentry/vite-plugin';
 
 const vendorChunk = (id: string) => {
+  if (id.includes('vite/preload-helper')) return 'vendor-core';
   if (!id.includes('node_modules')) return undefined;
 
   if (/[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/.test(id)) return 'vendor-core';
@@ -44,6 +45,7 @@ export default defineConfig(() => {
         react(),
         VitePWA({
           registerType: 'autoUpdate',
+          injectRegister: 'script-defer',
           includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
           manifest: {
             name: 'Reflections',

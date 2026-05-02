@@ -537,14 +537,17 @@ Create a `.env.local` file at the project root. This file must never be committe
 # Supabase — get these from your Supabase project Settings → API
 VITE_SUPABASE_URL=https://your-project-ref.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key-here
+SUPABASE_URL=https://your-project-ref.supabase.co
+SUPABASE_ANON_KEY=your-anon-key-here
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
 
-# Google Gemini — get this from https://aistudio.google.com/app/apikey
-VITE_GEMINI_API_KEY=your-gemini-api-key-here
+# Google Gemini — server-side only; never prefix with VITE_
+GEMINI_API_KEY=your-gemini-api-key-here
 ```
 
-**Why `VITE_` prefix?** Vite only exposes environment variables prefixed with `VITE_` to the browser bundle. Variables without this prefix remain server-side only. Since this app has no server, all variables must be prefixed.
+**Why only some `VITE_` prefixes?** Vite exposes variables prefixed with `VITE_` to the browser bundle. Keep secrets such as `GEMINI_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `RAZORPAY_KEY_SECRET`, and webhook secrets server-side only.
 
-**Security note:** The Supabase anon key is safe to expose in the browser — it is a public key designed for client-side use. Row Level Security enforces data isolation. The Gemini API key is also used client-side. For production deployments with real billing, consider proxying Gemini calls through a Supabase Edge Function to keep the key server-side.
+**Security note:** The Supabase anon key is safe to expose in the browser because Row Level Security enforces data isolation. AI provider keys and service-role keys are not public and must only be used by `/api` routes or Supabase Edge Functions.
 
 ---
 
@@ -586,14 +589,14 @@ In the project root, create a new file called `.env.local`. Do not name it `.env
 touch .env.local
 ```
 
-Open it in your editor and add the three variables from Section 11. You will fill in the values in the next steps.
+Open it in your editor and add the variables from Section 11. You will fill in the values in the next steps.
 
 ### Step 5: Get your Gemini API key
 
 1. Go to https://aistudio.google.com/app/apikey
 2. Sign in with a Google account
 3. Click **Create API key**
-4. Copy the key and paste it as the value of `VITE_GEMINI_API_KEY` in `.env.local`
+4. Copy the key and paste it as the value of `GEMINI_API_KEY` in `.env.local`
 
 The free tier of Gemini API is generous — you do not need billing enabled for development.
 
@@ -608,7 +611,10 @@ At this point your file should look like this (with real values):
 ```env
 VITE_SUPABASE_URL=https://abcdefghij.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-VITE_GEMINI_API_KEY=AIzaSy...
+SUPABASE_URL=https://abcdefghij.supabase.co
+SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+GEMINI_API_KEY=AIzaSy...
 ```
 
 ### Step 8: Run the development server

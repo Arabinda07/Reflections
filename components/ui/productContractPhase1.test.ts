@@ -51,7 +51,7 @@ describe('phase 1 product contract and clarity', () => {
     expect(account).not.toContain('Delete your notes, moods, tags, tasks, and saved profile details here.');
 
     expect(proUpgrade).toContain('Join Pro');
-    expect(proUpgrade).toContain('VITE_RAZORPAY_MONTHLY_PLAN_ID');
+    expect(proUpgrade).toContain('billingPeriod: selectedPlan');
     expect(proUpgrade).toContain('verify-razorpay-payment');
     expect(proUpgrade).not.toContain("plan: 'pro'");
 

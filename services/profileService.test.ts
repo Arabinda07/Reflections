@@ -19,31 +19,47 @@ describe('profileService.setSmartModeEnabled', () => {
   });
 
   it('upserts Smart Mode so older accounts without profile rows can enable it', async () => {
-    const chain = {
+    const profileChain = {
       upsert: vi.fn().mockReturnThis(),
       select: vi.fn().mockReturnThis(),
       single: vi.fn().mockResolvedValue({
         data: {
-          plan: 'free',
-          free_ai_reflections_used: 0,
-          free_wiki_insights_used: 0,
           smart_mode_enabled: true,
         },
         error: null,
       }),
     };
-    mockFrom.mockReturnValue(chain as any);
+    const entitlementChain = {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({
+        data: { plan: 'free' },
+        error: null,
+      }),
+    };
+    const usageChain = {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      in: vi.fn().mockResolvedValue({
+        data: [],
+        error: null,
+      }),
+    };
+    mockFrom
+      .mockReturnValueOnce(profileChain as any)
+      .mockReturnValueOnce(entitlementChain as any)
+      .mockReturnValueOnce(usageChain as any);
 
     const access = await profileService.setSmartModeEnabled(true);
 
     expect(mockFrom).toHaveBeenCalledWith('profiles');
-    expect(chain.upsert).toHaveBeenCalledWith(
+    expect(profileChain.upsert).toHaveBeenCalledWith(
       { id: 'user-1', smart_mode_enabled: true },
       { onConflict: 'id' },
     );
-    expect(chain.select).toHaveBeenCalledWith(
-      'plan, free_ai_reflections_used, free_wiki_insights_used, smart_mode_enabled',
-    );
+    expect(profileChain.select).toHaveBeenCalledWith('smart_mode_enabled');
+    expect(mockFrom).toHaveBeenCalledWith('account_entitlements');
+    expect(mockFrom).toHaveBeenCalledWith('ai_usage_counters');
     expect(access.smartModeEnabled).toBe(true);
   });
 });

@@ -1,5 +1,16 @@
 import { GoogleGenAI, Type } from '@google/genai';
-import { createClient } from '@supabase/supabase-js';
+import {
+  HttpError,
+  createSupabaseAdminClient,
+  createSupabaseAuthClient,
+  getClientIp,
+  getErrorMessage,
+  getErrorStatusCode,
+  hashForLogs,
+  parseJsonBody,
+  requireUser,
+  sendJson,
+} from '../server/apiUtils';
 
 type AiAction =
   | 'prompts'
@@ -19,27 +30,36 @@ type AiRequest = {
 const GEMINI_MODEL = 'gemini-3-flash-preview';
 const INGEST_MODEL = 'gemini-2.5-flash';
 const MAX_BODY_BYTES = 250_000;
-const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '';
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
+const NOTE_OWNERSHIP_ACTIONS = new Set<AiAction>([
+  'reflection',
+  'ingestDecision',
+  'ingestSynthesis',
+]);
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const LOCAL_RATE_WINDOW_MS = 60 * 60 * 1000;
+const LOCAL_RATE_LIMITS: Record<AiAction, { user: number; ip: number }> = {
+  prompts: { user: 20, ip: 80 },
+  reflection: { user: 10, ip: 40 },
+  tags: { user: 30, ip: 100 },
+  ingestDecision: { user: 20, ip: 60 },
+  ingestSynthesis: { user: 20, ip: 60 },
+  wikiPage: { user: 20, ip: 60 },
+  index: { user: 20, ip: 60 },
+  writingNotes: { user: 20, ip: 80 },
+};
+const localRateBuckets = new Map<string, number[]>();
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseAuth = createSupabaseAuthClient();
 
 const getGemini = () => {
   const apiKey =
     process.env.GEMINI_API_KEY ||
-    process.env.GOOGLE_GEMINI_API_KEY ||
-    process.env.VITE_GEMINI_API_KEY;
+    process.env.GOOGLE_GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error('GEMINI_API_KEY is not configured');
   }
 
   return new GoogleGenAI({ apiKey });
-};
-
-const sendJson = (res: any, statusCode: number, body: unknown) => {
-  res.statusCode = statusCode;
-  res.setHeader('Content-Type', 'application/json; charset=utf-8');
-  res.end(JSON.stringify(body));
 };
 
 const cleanJson = (text: string) =>
@@ -53,46 +73,6 @@ const normalizeList = (value: unknown): string[] => {
     .map((item) => String(item).trim())
     .filter(Boolean)
     .slice(0, 6);
-};
-
-const parseBody = async (req: any): Promise<AiRequest> => {
-  if (req.body) {
-    return typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-  }
-
-  const chunks: Buffer[] = [];
-  let size = 0;
-
-  for await (const chunk of req) {
-    const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
-    size += buffer.length;
-    if (size > MAX_BODY_BYTES) {
-      throw new Error('Request body too large');
-    }
-    chunks.push(buffer);
-  }
-
-  const raw = Buffer.concat(chunks).toString('utf8').trim();
-  if (!raw) return {};
-
-  return JSON.parse(raw);
-};
-
-const requireUser = async (authorization?: string) => {
-  const token = authorization?.startsWith('Bearer ')
-    ? authorization.slice('Bearer '.length)
-    : '';
-
-  if (!token) {
-    throw new Error('Unauthorized');
-  }
-
-  const { data, error } = await supabase.auth.getUser(token);
-  if (error || !data.user) {
-    throw new Error('Unauthorized');
-  }
-
-  return data.user;
 };
 
 const generateJson = async <T>(
@@ -123,6 +103,75 @@ const generateText = async (prompt: string, model = GEMINI_MODEL): Promise<strin
 };
 
 const buildPrompt = (parts: string[]) => parts.filter(Boolean).join('\n\n');
+
+const pruneRateBucket = (key: string, now: number) => {
+  const cutoff = now - LOCAL_RATE_WINDOW_MS;
+  const entries = (localRateBuckets.get(key) || []).filter((time) => time > cutoff);
+  localRateBuckets.set(key, entries);
+  return entries;
+};
+
+const assertLocalRateLimit = (action: AiAction, userId: string, ipHash: string) => {
+  const now = Date.now();
+  const limits = LOCAL_RATE_LIMITS[action];
+  const keys = [
+    { key: `user:${userId}:${action}`, limit: limits.user },
+    { key: `ip:${ipHash}:${action}`, limit: limits.ip },
+  ];
+
+  for (const { key, limit } of keys) {
+    const entries = pruneRateBucket(key, now);
+    if (entries.length >= limit) {
+      throw new HttpError(429, 'rate_limit_exceeded');
+    }
+    entries.push(now);
+    localRateBuckets.set(key, entries);
+  }
+};
+
+const assertNoteOwnership = async (userId: string, action: AiAction, payload: any) => {
+  const noteId = String(payload?.note?.id || '');
+  if (!NOTE_OWNERSHIP_ACTIONS.has(action) || !noteId || !UUID_PATTERN.test(noteId)) {
+    return;
+  }
+
+  const supabaseAdmin = createSupabaseAdminClient();
+  const { data, error } = await supabaseAdmin
+    .from('notes')
+    .select('id')
+    .eq('id', noteId)
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (error || !data) {
+    throw new HttpError(403, 'Note does not belong to the authenticated user');
+  }
+};
+
+const claimAiUsage = async (userId: string, action: AiAction, req: any) => {
+  const ipHash = hashForLogs(getClientIp(req));
+  assertLocalRateLimit(action, userId, ipHash);
+
+  const supabaseAdmin = createSupabaseAdminClient();
+  const { data, error } = await supabaseAdmin.rpc('claim_ai_usage', {
+    p_action: action,
+    p_ip_hash: ipHash,
+    p_user_id: userId,
+  });
+
+  if (error) {
+    throw new HttpError(500, 'AI quota check failed');
+  }
+
+  const allowed = typeof data === 'object' && data !== null && (data as any).allowed === true;
+  if (!allowed) {
+    const reason =
+      typeof data === 'object' && data !== null && typeof (data as any).reason === 'string'
+        ? (data as any).reason
+        : 'AI quota exhausted';
+    throw new HttpError(429, reason);
+  }
+};
 
 const handlePrompts = async (payload: any) => {
   const recentNotes = Array.isArray(payload?.recentNotes) ? payload.recentNotes : [];
@@ -325,18 +374,21 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    await requireUser(req.headers?.authorization);
-    const body = await parseBody(req);
+    const user = await requireUser(supabaseAuth, req.headers?.authorization);
+    const body = await parseJsonBody<AiRequest>(req, MAX_BODY_BYTES);
 
     if (!body.action || !(body.action in handlers)) {
       return sendJson(res, 400, { error: 'Invalid AI action' });
     }
 
+    await assertNoteOwnership(user.id, body.action, body.payload);
+    await claimAiUsage(user.id, body.action, req);
+
     const data = await handlers[body.action](body.payload);
     return sendJson(res, 200, { ok: true, data });
-  } catch (error: any) {
-    const message = error?.message || 'AI request failed';
-    const statusCode = message === 'Unauthorized' ? 401 : message === 'Method not allowed' ? 405 : 500;
-    return sendJson(res, statusCode, { error: message });
+  } catch (error: unknown) {
+    return sendJson(res, getErrorStatusCode(error), {
+      error: getErrorMessage(error, 'AI request failed'),
+    });
   }
 }
