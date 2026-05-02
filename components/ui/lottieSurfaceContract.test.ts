@@ -27,5 +27,8 @@ describe('lottie surface mapping contract', () => {
     expect(notFound).toContain('/assets/lottie/Error 404.json');
     expect(myNotes).toContain('/assets/lottie/empty%20notes.json');
     expect(lifeWiki).toContain('/assets/lottie/Level%20Up%20Animation.json');
+    expect(lifeWiki).toContain('const [isEnteringWiki, setIsEnteringWiki]');
+    expect(lifeWiki).toContain('location.pathname === RoutePath.WIKI');
+    expect(lifeWiki).toContain('isRefreshingWiki || isEnteringWiki');
   });
 });

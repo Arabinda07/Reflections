@@ -405,7 +405,7 @@ export const HomeAuthenticated: React.FC = () => {
         >
           <motion.div
             variants={bentoItemVariants}
-            className="group relative surface-flat overflow-hidden rounded-[2.5rem] p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full transition-all duration-500 hover:shadow-[0_20px_50px_rgba(34,197,94,0.05)] hover:border-green/10"
+            className="group relative surface-flat overflow-hidden rounded-[2.5rem] p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full transition-[border-color,box-shadow] duration-500 ease-out-expo hover:shadow-[0_20px_50px_rgba(34,197,94,0.05)] hover:border-green/10"
           >
             <div className="relative z-10">
               <div className="flex items-center justify-between mb-8">
@@ -548,7 +548,7 @@ export const HomeAuthenticated: React.FC = () => {
           <div className="grid gap-6">
             <motion.div
               variants={bentoItemVariants}
-              className="group relative surface-flat surface-tone-sky overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(14,165,233,0.05)]"
+              className="group relative surface-flat surface-tone-sky overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_rgba(14,165,233,0.05)]"
             >
               <div className="relative z-10">
               <div className="mb-6 flex items-center gap-2 text-gray-nav">
@@ -603,7 +603,7 @@ export const HomeAuthenticated: React.FC = () => {
 
             <motion.div
               variants={bentoItemVariants}
-              className="group relative surface-flat surface-tone-honey overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(245,158,11,0.05)]"
+              className="group relative surface-flat surface-tone-honey overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_rgba(245,158,11,0.05)]"
             >
               <div className="relative z-10">
               <div className="mb-8 flex items-center gap-2 text-gray-nav">
@@ -753,7 +753,7 @@ export const HomeAuthenticated: React.FC = () => {
                   type="button"
                   onClick={() => handleMoodCheckIn(moodOption)}
                   disabled={isSavingCheckIn}
-                  className={`group rounded-[1.5rem] border p-5 text-left transition-all duration-300 disabled:opacity-60 hover:scale-[1.02] hover:shadow-lg ${moodConfig.option}`}
+                  className={`group rounded-[1.5rem] border p-5 text-left transition-[border-color,background-color,box-shadow,transform,opacity] duration-300 ease-out-expo disabled:opacity-60 hover:scale-[1.02] hover:shadow-lg ${moodConfig.option}`}
                 >
                   <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-body/50 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-12">
                     <Icon size={24} weight="duotone" className={moodConfig.labelClass} />

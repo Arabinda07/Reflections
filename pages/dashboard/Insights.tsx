@@ -251,7 +251,7 @@ export const Insights: React.FC = () => {
         <div className="space-y-10">
           <button 
             onClick={() => navigate(RoutePath.HOME)}
-            className="group flex items-center gap-2 text-sm font-bold text-gray-nav hover:text-green transition-all duration-300 w-fit hover:-translate-x-1"
+            className="group flex items-center gap-2 text-sm font-bold text-gray-nav hover:text-green transition-[color,transform] duration-300 w-fit hover:-translate-x-1"
             aria-label="Back to home"
           >
             <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
@@ -269,7 +269,7 @@ export const Insights: React.FC = () => {
               <WeeklyRecapLoadingSkeleton />
             </Surface>
           ) : (<>
-          <Surface variant="flat" tone="sky" className="group relative overflow-hidden rounded-[2.5rem] p-8 md:p-10 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(14,165,233,0.05)]">
+          <Surface variant="flat" tone="sky" className="group relative overflow-hidden rounded-[2.5rem] p-8 md:p-10 transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_rgba(14,165,233,0.05)]">
             <div className="relative z-10">
             <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
               <div className="space-y-5">
@@ -317,7 +317,7 @@ export const Insights: React.FC = () => {
                   <CaretRight
                     size={18}
                     weight="bold"
-                    className={`shrink-0 text-gray-nav/40 transition-all duration-500 ease-out-expo ${isMoodOpen ? 'rotate-90 text-sky' : 'group-hover/acc:translate-x-1'}`}
+                    className={`shrink-0 text-gray-nav/40 transition-[color,transform] duration-500 ease-out-expo ${isMoodOpen ? 'rotate-90 text-sky' : 'group-hover/acc:translate-x-1'}`}
                   />
                 </button>
 
@@ -325,13 +325,13 @@ export const Insights: React.FC = () => {
                   {isMoodOpen ? (
                     <motion.div
                       id="insights-mood-panel"
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
+                      initial={{ gridTemplateRows: '0fr', opacity: 0 }}
+                      animate={{ gridTemplateRows: '1fr', opacity: 1 }}
+                      exit={{ gridTemplateRows: '0fr', opacity: 0 }}
                       transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                      className="overflow-hidden"
+                      className="grid overflow-hidden"
                     >
-                      <div className="pb-8">
+                      <div className="min-h-0 pb-8">
                         {weeklyRecap.moodData.length === 0 ? (
                           <EmptyState
                             surface="none"
@@ -354,10 +354,10 @@ export const Insights: React.FC = () => {
                                   </span>
                                   <div className={`relative h-10 flex-1 overflow-hidden rounded-2xl ${tone.trackClass}`}>
                                     <motion.div
-                                      initial={{ width: 0 }}
-                                      animate={{ width: `${percent}%` }}
+                                      initial={{ scaleX: 0 }}
+                                      animate={{ scaleX: percent / 100 }}
                                       transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-                                      className={`absolute inset-y-0 left-0 rounded-2xl ${tone.fillClass}`}
+                                      className={`absolute inset-y-0 left-0 w-full origin-left rounded-2xl ${tone.fillClass}`}
                                     />
                                     <div className="absolute inset-0 bg-white/5 opacity-0 transition-opacity group-hover/bar:opacity-100" />
                                   </div>
@@ -393,7 +393,7 @@ export const Insights: React.FC = () => {
                   <CaretRight
                     size={18}
                     weight="bold"
-                    className={`shrink-0 text-gray-nav/40 transition-all duration-500 ease-out-expo ${isTagsOpen ? 'rotate-90 text-honey' : 'group-hover/acc:translate-x-1'}`}
+                    className={`shrink-0 text-gray-nav/40 transition-[color,transform] duration-500 ease-out-expo ${isTagsOpen ? 'rotate-90 text-honey' : 'group-hover/acc:translate-x-1'}`}
                   />
                 </button>
 
@@ -401,13 +401,13 @@ export const Insights: React.FC = () => {
                   {isTagsOpen ? (
                     <motion.div
                       id="insights-tags-panel"
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
+                      initial={{ gridTemplateRows: '0fr', opacity: 0 }}
+                      animate={{ gridTemplateRows: '1fr', opacity: 1 }}
+                      exit={{ gridTemplateRows: '0fr', opacity: 0 }}
                       transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                      className="overflow-hidden"
+                      className="grid overflow-hidden"
                     >
-                      <div className="pb-8">
+                      <div className="min-h-0 pb-8">
                         {weeklyRecap.recurringTags.length === 0 ? (
                           <EmptyState
                             surface="none"
@@ -425,7 +425,7 @@ export const Insights: React.FC = () => {
                                   initial={{ opacity: 0, scale: 0.9 }}
                                   animate={{ opacity: 1, scale: 1 }}
                                   transition={{ delay: index * 0.05 }}
-                                  className={`font-display font-bold lowercase transition-all hover:scale-110 cursor-default ${TAG_TONE_CLASSES[index % TAG_TONE_CLASSES.length]}`}
+                                  className={`font-display font-bold lowercase transition-transform hover:scale-110 cursor-default ${TAG_TONE_CLASSES[index % TAG_TONE_CLASSES.length]}`}
                                   style={{
                                     fontSize: `${scale}rem`,
                                     lineHeight: '1',
@@ -447,7 +447,7 @@ export const Insights: React.FC = () => {
             <div className="dashboard-accent-glow pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
           </Surface>
 
-          <Surface variant="bezel" tone="sage" className="group relative overflow-hidden rounded-[2.5rem] transition-all duration-500 hover:shadow-[0_20px_50px_rgba(34,197,94,0.05)]">
+          <Surface variant="bezel" tone="sage" className="group relative overflow-hidden rounded-[2.5rem] transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_rgba(34,197,94,0.05)]">
             <button
               type="button"
               onClick={() => setIsOverviewOpen((current) => !current)}
@@ -469,7 +469,7 @@ export const Insights: React.FC = () => {
               <CaretRight
                 size={18}
                 weight="bold"
-                className={`shrink-0 text-gray-nav/40 transition-all duration-500 ease-out-expo ${isOverviewOpen ? 'rotate-90 text-green' : 'group-hover:translate-x-1'}`}
+                className={`shrink-0 text-gray-nav/40 transition-[color,transform] duration-500 ease-out-expo ${isOverviewOpen ? 'rotate-90 text-green' : 'group-hover:translate-x-1'}`}
               />
             </button>
 
@@ -477,13 +477,13 @@ export const Insights: React.FC = () => {
               {isOverviewOpen ? (
                 <motion.div
                   id="insights-overview-panel"
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
+                  initial={{ gridTemplateRows: '0fr', opacity: 0 }}
+                  animate={{ gridTemplateRows: '1fr', opacity: 1 }}
+                  exit={{ gridTemplateRows: '0fr', opacity: 0 }}
                   transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                  className="overflow-hidden"
+                  className="grid overflow-hidden"
                 >
-                  <div className="space-y-5 border-t border-border/60 p-6 md:p-8">
+                  <div className="min-h-0 space-y-5 border-t border-border/60 p-6 md:p-8">
                     <div className="flex flex-wrap items-center gap-2">
                       <MetadataPill tone="sage" icon={<Book size={13} weight="regular" />}>
                         {stats.wordsWritten.toLocaleString()} words written
@@ -502,7 +502,7 @@ export const Insights: React.FC = () => {
             </AnimatePresence>
           </Surface>
 
-          <Surface variant="flat" tone="honey" className="group relative overflow-hidden rounded-[2.5rem] transition-all duration-500 hover:shadow-[0_20px_50px_rgba(245,158,11,0.05)]">
+          <Surface variant="flat" tone="honey" className="group relative overflow-hidden rounded-[2.5rem] transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_rgba(245,158,11,0.05)]">
             <button
               type="button"
               onClick={() => setIsCompletionOpen((prev) => !prev)}
@@ -522,7 +522,7 @@ export const Insights: React.FC = () => {
               <CaretRight
                 size={18}
                 weight="bold"
-                className={`shrink-0 text-gray-nav/40 transition-all duration-500 ease-out-expo ${isCompletionOpen ? 'rotate-90 text-honey' : 'group-hover:translate-x-1'}`}
+                className={`shrink-0 text-gray-nav/40 transition-[color,transform] duration-500 ease-out-expo ${isCompletionOpen ? 'rotate-90 text-honey' : 'group-hover:translate-x-1'}`}
               />
             </button>
 
@@ -530,13 +530,13 @@ export const Insights: React.FC = () => {
               {isCompletionOpen ? (
                 <motion.div
                   id="insights-completion-panel"
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
+                  initial={{ gridTemplateRows: '0fr', opacity: 0 }}
+                  animate={{ gridTemplateRows: '1fr', opacity: 1 }}
+                  exit={{ gridTemplateRows: '0fr', opacity: 0 }}
                   transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                  className="overflow-hidden"
+                  className="grid overflow-hidden"
                 >
-                  <div className="space-y-5 border-t border-border/60 p-6 md:p-8">
+                  <div className="min-h-0 space-y-5 border-t border-border/60 p-6 md:p-8">
                     <div className="space-y-2">
                       <label htmlFor="completion-card-title" className="label-caps text-gray-nav">
                         Card message
@@ -564,7 +564,7 @@ export const Insights: React.FC = () => {
           <Surface
             variant="flat"
             tone="sage"
-            className="group relative overflow-hidden rounded-[2.5rem] border border-transparent transition-all duration-500 hover:border-green/20 hover:shadow-[0_20px_50px_rgba(34,197,94,0.05)]"
+            className="group relative overflow-hidden rounded-[2.5rem] border border-transparent transition-[border-color,box-shadow] duration-500 ease-out-expo hover:border-green/20 hover:shadow-[0_20px_50px_rgba(34,197,94,0.05)]"
           >
             <Link
               to={RoutePath.SANCTUARY}

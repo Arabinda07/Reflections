@@ -17,9 +17,9 @@ const WaveformBars: React.FC<{ color: string }> = ({ color }) => {
       {bars.map((bar, index) => (
         <motion.div
           key={index}
-          className="w-[3px] rounded-full"
+          className="h-[18px] w-[3px] origin-center rounded-full"
           style={{ backgroundColor: color }}
-          animate={{ height: bar.h.map((value) => `${value}px`) }}
+          animate={{ scaleY: bar.h.map((value) => value / 18) }}
           transition={{
             duration: bar.dur,
             repeat: Infinity,

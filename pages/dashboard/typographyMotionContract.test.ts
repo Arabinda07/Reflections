@@ -73,6 +73,30 @@ describe('Typography and motion contract', () => {
     expect(home).toContain('if (shouldReduceMotion)');
   });
 
+  it('keeps dashboard motion off broad and layout-property animations', () => {
+    const auditedMotionFiles = [
+      'pages/dashboard/HomeAuthenticated.tsx',
+      'pages/dashboard/Insights.tsx',
+      'pages/dashboard/LifeWiki.tsx',
+      'components/ui/AmbientMusicButton.tsx',
+    ];
+
+    auditedMotionFiles.forEach((file) => {
+      const source = read(file);
+
+      expect(source, file).not.toContain('transition-all');
+      expect(source, file).not.toMatch(/(?:initial|animate|exit)=\{\{\s*height:/);
+      expect(source, file).not.toMatch(/(?:initial|animate|exit)=\{\{\s*width:/);
+    });
+
+    const insights = read('pages/dashboard/Insights.tsx');
+    const ambientButton = read('components/ui/AmbientMusicButton.tsx');
+
+    expect(insights).toContain("gridTemplateRows: '1fr'");
+    expect(insights).toContain('scaleX: percent / 100');
+    expect(ambientButton).toContain('scaleY: bar.h.map');
+  });
+
   it('keeps the Sanctuary entry animation unframed and full-screen', () => {
     const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
 
