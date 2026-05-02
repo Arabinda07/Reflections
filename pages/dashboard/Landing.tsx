@@ -56,7 +56,7 @@ export const Landing: React.FC = () => {
   };
 
   return (
-    <div role="region" aria-label="Welcome" className="relative min-h-[100dvh] overflow-x-hidden surface-scope-sage selection:bg-green/20 selection:text-green bg-body text-gray-text">
+    <div role="region" aria-label="Welcome" className="surface-scope-sage page-wash relative min-h-[100dvh] overflow-x-hidden selection:bg-green/20 selection:text-green bg-body text-gray-text">
       {/* Full-bleed layered container */}
       <div className="relative isolate min-h-[100dvh] w-full overflow-hidden bg-body">
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">

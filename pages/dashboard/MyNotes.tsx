@@ -269,7 +269,7 @@ export const MyNotes: React.FC = () => {
       />
 
       {!loading ? (
-        <PageContainer className="surface-scope-sage pb-14 pt-4 md:pt-8">
+        <PageContainer className="surface-scope-sage page-wash pb-14 pt-4 md:pt-8">
           <div className="space-y-10 animate-in fade-in duration-500">
             <SectionHeader
               title="Saved reflections"

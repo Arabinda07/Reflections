@@ -272,7 +272,7 @@ export const SingleNote: React.FC = () => {
 
   return (
     <>
-      <PageContainer className="surface-scope-paper pb-20 pt-4 md:pt-8">
+      <PageContainer className="surface-scope-paper page-wash pb-20 pt-4 md:pt-8">
         <div className="space-y-8 selection:bg-green/10">
           <div className="sticky-bar !px-2 sm:!px-4">
             <Button

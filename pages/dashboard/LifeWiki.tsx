@@ -476,7 +476,7 @@ export const LifeWiki: React.FC = () => {
         <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden bg-body">
           <div className="absolute inset-0 bg-gradient-to-b from-green/5 via-body to-body opacity-50" />
         </div>
-        <PageContainer size="narrow" className="surface-scope-sage pb-24 pt-6 md:pt-10 relative z-10">
+        <PageContainer size="narrow" className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10 relative z-10">
           <div className="space-y-8">
             <button
               onClick={() => navigate(RoutePath.SANCTUARY)}
@@ -672,7 +672,7 @@ export const LifeWiki: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-green/5 via-body to-body opacity-50" />
       </div>
 
-      <PageContainer className="surface-scope-sage pb-24 pt-6 md:pt-10 relative z-10">
+      <PageContainer className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10 relative z-10">
         <div className="space-y-10">
           <div className="flex items-center justify-between gap-4">
             <button 

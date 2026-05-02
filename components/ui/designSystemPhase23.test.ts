@@ -130,6 +130,62 @@ describe('phase 2/3 design-system rollout', () => {
     expect(insights).toContain('tone="honey"');
   });
 
+  it('applies subtle pastel page washes without raw body-surface escape hatches', () => {
+    const css = read('index.css');
+    const dashboardLayout = read('layouts/DashboardLayout.tsx');
+    const landing = read('pages/dashboard/Landing.tsx');
+    const homeAuthenticated = read('pages/dashboard/HomeAuthenticated.tsx');
+    const myNotes = read('pages/dashboard/MyNotes.tsx');
+    const createNote = read('pages/dashboard/CreateNote.tsx');
+    const singleNote = read('pages/dashboard/SingleNote.tsx');
+    const releaseMode = read('pages/dashboard/ReleaseMode.tsx');
+    const futureLetters = read('pages/dashboard/FutureLetters.tsx');
+    const insights = read('pages/dashboard/Insights.tsx');
+    const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
+    const account = read('pages/dashboard/Account.tsx');
+    const faq = read('pages/dashboard/FAQ.tsx');
+    const privacyPolicy = read('pages/dashboard/PrivacyPolicy.tsx');
+    const signIn = read('pages/auth/SignIn.tsx');
+    const signUp = read('pages/auth/SignUp.tsx');
+    const resetPassword = read('pages/auth/ResetPassword.tsx');
+
+    expect(css).toContain('--page-wash:');
+    expect(css).toMatch(/\.surface-scope-paper[\s\S]*--page-wash: var\(--page-wash-paper\);/);
+    expect(css).toMatch(/\.surface-scope-sage[\s\S]*--page-wash: var\(--page-wash-sage\);/);
+    expect(css).toMatch(/\.surface-scope-sky[\s\S]*--page-wash: var\(--page-wash-sky\);/);
+    expect(css).toMatch(/\.surface-scope-honey[\s\S]*--page-wash: var\(--page-wash-honey\);/);
+    expect(css).toMatch(/\.surface-scope-clay[\s\S]*--page-wash: var\(--page-wash-clay\);/);
+    expect(css).toMatch(/\.page-wash\s*{[^}]*background: var\(--page-wash\);/s);
+    expect(css).not.toContain('.bg-body-surface');
+
+    expect(dashboardLayout).toContain('const ROUTE_SURFACE_SCOPE_CLASS');
+    expect(dashboardLayout).toContain('const routeSurfaceScopeClass = getRouteSurfaceScopeClass(location.pathname);');
+    expect(dashboardLayout).toContain('`${routeSurfaceScopeClass} page-wash');
+    expect(dashboardLayout).toContain("[RoutePath.FAQ]: 'surface-scope-sky'");
+    expect(dashboardLayout).toContain("[RoutePath.INSIGHTS]: 'surface-scope-sky'");
+    expect(dashboardLayout).toContain("[RoutePath.FUTURE_LETTERS]: 'surface-scope-honey'");
+    expect(dashboardLayout).toContain("[RoutePath.RELEASE]: 'surface-scope-clay'");
+    expect(dashboardLayout).toContain("[RoutePath.ACCOUNT]: 'surface-scope-paper'");
+    expect(landing).toContain('surface-scope-sage page-wash');
+    expect(homeAuthenticated).toContain('surface-scope-sage page-wash');
+    expect(myNotes).toContain('surface-scope-sage page-wash');
+    expect(createNote).toContain('page-wash');
+    expect(singleNote).toContain('surface-scope-paper page-wash');
+    expect(releaseMode).toContain('surface-scope-clay page-wash');
+    expect(futureLetters).toContain('surface-scope-honey page-wash');
+    expect(insights).toContain('surface-scope-sky page-wash');
+    expect(lifeWiki).toContain('surface-scope-sage page-wash');
+    expect(account).toContain('surface-scope-paper page-wash');
+    expect(faq).toContain('surface-scope-sky page-wash');
+    expect(privacyPolicy).toContain('surface-scope-paper page-wash');
+    expect(signIn).toContain('surface-scope-paper page-wash');
+    expect(signUp).toContain('surface-scope-paper page-wash');
+    expect(resetPassword).toContain('surface-scope-paper page-wash');
+
+    expect(faq).not.toContain('bg-body-surface');
+    expect(privacyPolicy).not.toContain('bg-body-surface');
+  });
+
   it('applies the Reflections semantic color roles to primitives and route surfaces', () => {
     const button = read('components/ui/Button.tsx');
     const input = read('components/ui/Input.tsx');
@@ -177,6 +233,28 @@ describe('phase 2/3 design-system rollout', () => {
     expect(insights).toContain('surface-scope-sky');
     expect(insights).toContain('tone="sky"');
     expect(insights).toContain("const TAG_TONE_CLASSES = ['text-green', 'text-green/80', 'text-green/70', 'text-green/60'];");
+  });
+
+  it('keeps header buttons responsive without changing the calm brand treatment', () => {
+    const button = read('components/ui/Button.tsx');
+    const sectionHeader = read('components/ui/SectionHeader.tsx');
+    const dashboardLayout = read('layouts/DashboardLayout.tsx');
+    const css = read('index.css');
+
+    expect(sectionHeader).toContain('section-header-actions');
+    expect(css).toMatch(/\.section-header-actions\s*{[^}]*flex-wrap: wrap;/s);
+    expect(css).toMatch(/\.section-header-actions\s*{[^}]*width: 100%;/s);
+    expect(css).toMatch(/@media \(max-width: 639px\)[\s\S]*\.section-header-actions :where\(button, a\)/);
+
+    expect(button).toContain('useReducedMotion');
+    expect(button).toContain('transition-[background-color,border-color,color,box-shadow,transform,filter]');
+    expect(button).toContain('motion-reduce:transition-none');
+    expect(button).not.toContain('transition-all');
+
+    expect(dashboardLayout).toContain("isMobileNavSuppressedRoute ? 'hidden lg:flex' : 'flex'");
+    expect(dashboardLayout).toContain('hidden lg:flex items-center gap-1.5 xl:gap-2');
+    expect(dashboardLayout).toContain('lg:hidden items-center gap-2');
+    expect(dashboardLayout).toContain('px-3 xl:px-4');
   });
 
   it('keeps card-like surfaces off raw white and panel background escape hatches', () => {

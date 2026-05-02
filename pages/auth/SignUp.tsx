@@ -158,7 +158,7 @@ export const SignUp: React.FC = () => {
   };
 
   return (
-    <div className="surface-scope-paper flex min-h-[100dvh] items-center justify-center bg-body p-6 transition-colors duration-300">
+    <div className="surface-scope-paper page-wash flex min-h-[100dvh] items-center justify-center bg-body p-6 transition-colors duration-300">
       <div className="w-full max-w-[460px]">
         <Surface variant="bezel">
           <div className="p-8 sm:p-10 space-y-6">

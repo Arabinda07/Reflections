@@ -107,6 +107,22 @@
       oklch(from var(--green) 0.97 0.018 h / 0.78) 0%,
       var(--bg-color) 42%,
       oklch(from var(--blue) 0.97 0.018 h / 0.58) 100%);
+  --page-wash-paper:
+    radial-gradient(circle at 14% 8%, oklch(from var(--green) 0.97 0.014 h / 0.46), transparent 34%),
+    linear-gradient(145deg, oklch(0.99 0.01 135), var(--bg-color) 46%, oklch(0.985 0.012 135));
+  --page-wash-sage:
+    radial-gradient(circle at 12% 10%, oklch(from var(--green) 0.955 0.028 h / 0.6), transparent 36%),
+    linear-gradient(145deg, oklch(from var(--green) 0.982 0.014 h), var(--bg-color) 46%, oklch(from var(--blue) 0.978 0.012 h / 0.62));
+  --page-wash-sky:
+    radial-gradient(circle at 12% 10%, oklch(from var(--blue) 0.96 0.026 h / 0.54), transparent 36%),
+    linear-gradient(145deg, oklch(from var(--blue) 0.982 0.014 h), var(--bg-color) 48%, oklch(from var(--green) 0.982 0.01 h / 0.58));
+  --page-wash-honey:
+    radial-gradient(circle at 14% 9%, oklch(from var(--honey) 0.958 0.028 h / 0.56), transparent 36%),
+    linear-gradient(145deg, oklch(from var(--honey) 0.982 0.016 h), var(--bg-color) 48%, oklch(from var(--green) 0.982 0.01 h / 0.58));
+  --page-wash-clay:
+    radial-gradient(circle at 14% 9%, oklch(from var(--clay) 0.955 0.024 h / 0.5), transparent 35%),
+    linear-gradient(145deg, oklch(from var(--clay) 0.982 0.012 h), var(--bg-color) 48%, oklch(from var(--honey) 0.984 0.01 h / 0.42));
+  --page-wash: var(--page-wash-sage);
   --surface-paper-bg:
     linear-gradient(145deg,
       oklch(0.985 0.012 135 / 0.96),
@@ -317,6 +333,21 @@
       oklch(from var(--green) 0.19 0.03 h / 0.64) 0%,
       var(--bg-color) 46%,
       oklch(from var(--blue) 0.19 0.032 h / 0.5) 100%);
+  --page-wash-paper:
+    radial-gradient(circle at 14% 8%, oklch(from var(--green) 0.25 0.026 h / 0.32), transparent 36%),
+    linear-gradient(145deg, oklch(0.19 0.014 135), var(--bg-color) 48%, oklch(0.17 0.014 135));
+  --page-wash-sage:
+    radial-gradient(circle at 12% 10%, oklch(from var(--green) 0.25 0.04 h / 0.44), transparent 38%),
+    linear-gradient(145deg, oklch(from var(--green) 0.19 0.02 h / 0.92), var(--bg-color) 50%, oklch(from var(--blue) 0.18 0.018 h / 0.64));
+  --page-wash-sky:
+    radial-gradient(circle at 12% 10%, oklch(from var(--blue) 0.25 0.04 h / 0.38), transparent 38%),
+    linear-gradient(145deg, oklch(from var(--blue) 0.19 0.02 h / 0.88), var(--bg-color) 50%, oklch(from var(--green) 0.18 0.016 h / 0.56));
+  --page-wash-honey:
+    radial-gradient(circle at 14% 9%, oklch(from var(--honey) 0.25 0.038 h / 0.34), transparent 38%),
+    linear-gradient(145deg, oklch(from var(--honey) 0.19 0.02 h / 0.84), var(--bg-color) 50%, oklch(from var(--green) 0.18 0.016 h / 0.54));
+  --page-wash-clay:
+    radial-gradient(circle at 14% 9%, oklch(from var(--clay) 0.25 0.036 h / 0.34), transparent 38%),
+    linear-gradient(145deg, oklch(from var(--clay) 0.19 0.02 h / 0.84), var(--bg-color) 50%, oklch(from var(--honey) 0.18 0.014 h / 0.48));
   --surface-paper-bg:
     linear-gradient(145deg,
       oklch(0.225 0.014 135 / 0.96),
@@ -404,9 +435,6 @@ body {
   font-family: var(--font-sans);
   color: var(--gray-text);
   background-color: var(--bg-color);
-  background-image: var(--app-background-wash);
-  background-attachment: fixed;
-  background-size: cover;
   font-weight: 400;
   transition: background-color 0.35s var(--ease-out-expo), color 0.35s var(--ease-out-expo);
   overscroll-behavior-y: none;
@@ -415,14 +443,16 @@ body {
 
 .bg-body {
   background-color: var(--bg-color);
-  background-image: var(--app-background-wash);
+}
+
+.page-wash {
+  background: var(--page-wash);
   background-attachment: fixed;
   background-size: cover;
 }
 
 @media (max-width: 768px) {
-  body,
-  .bg-body {
+  .page-wash {
     background-attachment: scroll;
   }
 }
@@ -638,6 +668,27 @@ select:focus-visible,
   }
 
   /* Sanctioned Surface Families */
+  .surface-scope-paper,
+  .surface-scope-neutral {
+    --page-wash: var(--page-wash-paper);
+  }
+
+  .surface-scope-sage {
+    --page-wash: var(--page-wash-sage);
+  }
+
+  .surface-scope-sky {
+    --page-wash: var(--page-wash-sky);
+  }
+
+  .surface-scope-honey {
+    --page-wash: var(--page-wash-honey);
+  }
+
+  .surface-scope-clay {
+    --page-wash: var(--page-wash-clay);
+  }
+
   .surface-scope-paper,
   .surface-scope-neutral,
   .surface-tone-paper,
@@ -1225,7 +1276,42 @@ select:focus-visible,
   .section-header-actions {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 0.75rem;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .section-header-actions > * {
+    min-width: 0;
+  }
+
+  @media (max-width: 639px) {
+    .section-header-actions {
+      align-items: stretch;
+    }
+
+    .section-header-actions :where(button, a) {
+      min-width: 0;
+    }
+
+    .section-header-actions > :where(button, a) {
+      width: 100%;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .section-header-row {
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+
+    .section-header-actions {
+      justify-content: flex-end;
+      width: auto;
+      flex-shrink: 0;
+    }
   }
 
   .section-header-eyebrow {

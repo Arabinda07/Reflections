@@ -744,14 +744,14 @@ export const CreateNote: React.FC = () => {
 
   if (!id && !canCreateNote) {
     return (
-      <div className="surface-scope-paper relative flex flex-1 min-h-[100dvh] bg-body">
+      <div className="surface-scope-paper page-wash relative flex flex-1 min-h-[100dvh] bg-body">
         <ProUpgradeCTA variant="fullscreen" onSuccess={() => setCanCreateNote(true)} />
       </div>
     );
   }
 
   return (
-    <div className={`${getSurfaceScopeForMood(mood)} relative flex-1 flex min-h-0 bg-body overflow-hidden`}>
+    <div className={`${getSurfaceScopeForMood(mood)} page-wash relative flex-1 flex min-h-0 bg-body overflow-hidden`}>
       {/* â”€â”€ Mobile Back Button â”€â”€ */}
       {isMobile && (
         <button 

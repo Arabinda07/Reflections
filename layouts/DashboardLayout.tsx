@@ -44,6 +44,38 @@ const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
 const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY; 
 
+const ROUTE_SURFACE_SCOPE_CLASS: Partial<Record<RoutePath, string>> = {
+  [RoutePath.HOME]: 'surface-scope-sage',
+  [RoutePath.DASHBOARD]: 'surface-scope-sage',
+  [RoutePath.NOTES]: 'surface-scope-sage',
+  [RoutePath.CREATE_NOTE]: 'surface-scope-paper',
+  [RoutePath.RELEASE]: 'surface-scope-clay',
+  [RoutePath.FUTURE_LETTERS]: 'surface-scope-honey',
+  [RoutePath.ACCOUNT]: 'surface-scope-paper',
+  [RoutePath.INSIGHTS]: 'surface-scope-sky',
+  [RoutePath.FAQ]: 'surface-scope-sky',
+  [RoutePath.ABOUT]: 'surface-scope-paper',
+  [RoutePath.PRIVACY]: 'surface-scope-paper',
+  [RoutePath.LOGIN]: 'surface-scope-paper',
+  [RoutePath.SIGNUP]: 'surface-scope-paper',
+  [RoutePath.RESET_PASSWORD]: 'surface-scope-paper',
+  [RoutePath.AUTH_CALLBACK]: 'surface-scope-paper',
+  [RoutePath.WIKI]: 'surface-scope-sage',
+  [RoutePath.SANCTUARY]: 'surface-scope-sage',
+};
+
+const getRouteSurfaceScopeClass = (pathname: string) => {
+  if (pathname.startsWith('/notes/') && pathname !== RoutePath.CREATE_NOTE) {
+    return 'surface-scope-paper';
+  }
+
+  if (pathname.startsWith(RoutePath.SANCTUARY)) {
+    return 'surface-scope-sage';
+  }
+
+  return ROUTE_SURFACE_SCOPE_CLASS[pathname as RoutePath] ?? 'surface-scope-sage';
+};
+
 export const DashboardLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -252,9 +284,10 @@ export const DashboardLayout: React.FC = () => {
     : 'text-gray-nav hover:text-green hover:bg-green/5';
   const footerLinkClass =
     'inline-flex min-h-11 items-center text-[11px] font-black uppercase tracking-widest text-gray-nav transition-colors hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
+  const routeSurfaceScopeClass = getRouteSurfaceScopeClass(location.pathname);
 
   return (
-    <div className="surface-scope-sage relative flex h-[100dvh] min-h-[100dvh] flex-col overflow-hidden bg-body font-sans selection:bg-green/30 selection:text-green">
+    <div className={`${routeSurfaceScopeClass} page-wash relative flex h-[100dvh] min-h-[100dvh] flex-col overflow-hidden bg-body font-sans selection:bg-green/30 selection:text-green`}>
       <AnalyticsRouteTracker />
       <a href="#main-content" className="skip-link">
         Skip to content
@@ -263,7 +296,7 @@ export const DashboardLayout: React.FC = () => {
       {/* Navbar — flex-none keeps it outside the scroll container, no sticky needed */}
       {!isWritingRoute && (
         <nav className={`z-[100] flex-none flex justify-center transition-colors duration-500 ${isLandingRoute ? 'landing-nav-scrim fixed left-0 right-0 top-0 pt-[env(safe-area-inset-top)]' : 'bg-body/95 pt-[env(safe-area-inset-top)]'}`}>
-          <div className="w-full max-w-[1440px] px-4 md:px-10 h-14 flex items-center justify-between">
+          <div className="flex h-14 w-full max-w-[1440px] min-w-0 items-center justify-between gap-3 px-4 md:px-8 xl:px-10">
           {/* Left Side */}
           <div className="flex items-center gap-4">
             <Link 
@@ -281,7 +314,7 @@ export const DashboardLayout: React.FC = () => {
           </div>
 
           {/* Right Side - Desktop Nav */}
-          <div className={`${isMobileNavSuppressedRoute ? 'hidden md:flex' : 'flex'} hidden md:flex items-center gap-2`}>
+          <div className={`${isMobileNavSuppressedRoute ? 'hidden lg:flex' : 'flex'} hidden lg:flex items-center gap-1.5 xl:gap-2`}>
             <button 
               onClick={toggleDarkMode}
               className={`relative flex h-11 w-11 items-center justify-center rounded-xl transition-colors ${landingControlClass}`}
@@ -307,7 +340,7 @@ export const DashboardLayout: React.FC = () => {
                   key={item.label}
                   to={item.path}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`inline-flex min-h-11 items-center rounded-xl border px-4 py-2 text-[13px] font-extrabold transition-colors duration-200 hover:border-green/20 hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-1 ${
+                  className={`inline-flex min-h-11 items-center rounded-xl border px-3 py-2 text-[12px] font-extrabold transition-colors duration-200 hover:border-green/20 hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-1 xl:px-4 xl:text-[13px] ${
                     isActive ? 'border-green bg-green/5 text-green shadow-sm shadow-green/5' : 'border-transparent text-gray-nav'
                   }`}
                 >
@@ -322,7 +355,7 @@ export const DashboardLayout: React.FC = () => {
                   variant="secondary"
                   size="sm"
                   onClick={() => setIsInviteModalOpen(true)}
-                  className="gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+                  className="gap-2 px-3 xl:px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
                 >
                   Invite
                   <PaperPlaneTilt size={16} weight="regular" />
@@ -331,7 +364,7 @@ export const DashboardLayout: React.FC = () => {
                   variant="ghost"
                   size="sm"
                   onClick={() => logout()}
-                  className="text-clay hover:bg-clay/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+                  className="px-3 text-clay hover:bg-clay/5 xl:px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
                 >
                   Logout
                 </Button>
@@ -342,7 +375,7 @@ export const DashboardLayout: React.FC = () => {
                   variant="ghost" 
                   size="sm" 
                   onClick={() => navigate(RoutePath.LOGIN)}
-                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+                  className="px-3 xl:px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
                 >
                   Sign in
                 </Button>
@@ -350,7 +383,7 @@ export const DashboardLayout: React.FC = () => {
                   variant="primary" 
                   size="sm" 
                   onClick={() => navigate(RoutePath.SIGNUP)}
-                  className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green"
+                  className="px-3 xl:px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green"
                 >
                   Sign up
                 </Button>
@@ -359,7 +392,7 @@ export const DashboardLayout: React.FC = () => {
           </div>
 
           {/* Mobile Menu Icon */}
-          <div className={`${isMobileNavSuppressedRoute ? 'hidden' : 'flex'} md:hidden items-center gap-2`}>
+          <div className={`${isMobileNavSuppressedRoute ? 'hidden' : 'flex'} lg:hidden items-center gap-2`}>
             <button 
               onClick={toggleDarkMode}
               className={`relative flex h-11 w-11 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green ${landingControlClass}`}

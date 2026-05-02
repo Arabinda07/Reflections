@@ -102,8 +102,8 @@ describe('landing first-paint contract', () => {
   it('allows the landing content to grow vertically while clipping horizontal bleed', () => {
     const landing = read('pages/dashboard/Landing.tsx');
 
-    expect(landing).toContain('<div role="region" aria-label="Welcome" className="relative min-h-[100dvh] overflow-x-hidden');
-    expect(landing).not.toContain('<div role="region" aria-label="Welcome" className="relative min-h-[100dvh] overflow-hidden');
+    expect(landing).toMatch(/<div role="region" aria-label="Welcome" className="[^"]*min-h-\[100dvh\][^"]*overflow-x-hidden/);
+    expect(landing).not.toMatch(/<div role="region" aria-label="Welcome" className="[^"]*min-h-\[100dvh\][^"]*overflow-hidden/);
   });
 
   it('clips hero media to the page frame instead of letting it bleed into the shell', () => {

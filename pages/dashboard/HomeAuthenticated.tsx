@@ -345,7 +345,7 @@ export const HomeAuthenticated: React.FC = () => {
   return (
     <>
       <div
-        className="surface-scope-sage relative min-h-full flex flex-col flex-1 bg-body selection:bg-green/10"
+        className="surface-scope-sage page-wash relative min-h-full flex flex-col flex-1 bg-body selection:bg-green/10"
         {...((showOnboarding ? { 'aria-hidden': 'true' } : {}) as any)}
       >
         <section className="relative isolate h-[56dvh] min-h-[360px] w-full overflow-hidden bg-body sm:h-[60dvh] sm:min-h-[450px]">
