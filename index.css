@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'Manrope';
-  src: url('/assets/fonts/Manrope[wght].woff2') format('woff2');
+  src: url('/assets/fonts/Manrope-Variable.woff2') format('woff2');
   font-weight: 200 800;
   font-style: normal;
   font-display: swap;
@@ -15,57 +15,33 @@
 }
 
 @font-face {
-  font-family: 'Spectral';
-  src: url('/assets/fonts/Spectral-Regular.woff2') format('woff2');
+  font-family: 'Newsreader';
+  src: url('/assets/fonts/Newsreader16pt-Regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Spectral';
-  src: url('/assets/fonts/Spectral-Italic.woff2') format('woff2');
+  font-family: 'Newsreader';
+  src: url('/assets/fonts/Newsreader16pt-Italic.woff2') format('woff2');
   font-weight: 400;
   font-style: italic;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Spectral';
-  src: url('/assets/fonts/Spectral-Bold.woff2') format('woff2');
+  font-family: 'Newsreader';
+  src: url('/assets/fonts/Newsreader16pt-Bold.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Nunito';
-  src: url('/assets/fonts/Nunito-Bold.woff2') format('woff2');
+  font-family: 'Newsreader';
+  src: url('/assets/fonts/Newsreader16pt-BoldItalic.woff2') format('woff2');
   font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Nunito';
-  src: url('/assets/fonts/Nunito-ExtraBold.woff2') format('woff2');
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Nunito';
-  src: url('/assets/fonts/Nunito-Black.woff2') format('woff2');
-  font-weight: 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Nunito';
-  src: url('/assets/fonts/Nunito-BlackItalic.woff2') format('woff2');
-  font-weight: 800 900;
   font-style: italic;
   font-display: swap;
 }
@@ -77,8 +53,8 @@
 @layer base {
   :root {
     --font-sans: 'Manrope', sans-serif;
-    --font-serif: 'Spectral', serif;
-    --font-display: 'Nunito', sans-serif;
+    --font-serif: 'Newsreader', serif;
+    --font-display: 'Manrope', sans-serif;
     --font-mono: 'Geist Mono', monospace;
     --font-editor: var(--font-serif);
   }
@@ -1647,7 +1623,7 @@ select:focus-visible,
   }
 
   .empty-state-title {
-    font-family: 'Spectral', serif;
+    font-family: var(--font-serif);
     font-size: 1.6rem;
     line-height: 1.3;
     color: oklch(from var(--green) l c h / 0.64);
@@ -2283,7 +2259,7 @@ select:focus-visible,
     font-family: var(--font-sans) !important;
   }
 
-  /* Editor body wrapper — sets DM Sans for the writing surface only */
+  /* Editor body wrapper — keeps the writing surface on the editorial serif token. */
   .editor-body {
     font-family: var(--font-editor);
   }

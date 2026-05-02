@@ -26,12 +26,17 @@ describe('Android shell contract', () => {
   it('routes Android back presses through the shared registry and native toast bridge', () => {
     const modalSheet = read('components/ui/ModalSheet.tsx');
     const backHook = read('src/native/useAndroidBackHandler.ts');
+    const dashboardLayout = read('layouts/DashboardLayout.tsx');
     const mainActivity = read('android/app/src/main/java/com/arabinda/reflections/MainActivity.java');
 
     expect(modalSheet).toContain('registerAndroidBackAction');
     expect(backHook).toContain('Press back again to exit');
     expect(backHook).toContain('App.exitApp');
     expect(backHook).toContain('nativeToast.show');
+    expect(backHook).toContain("navigate(fallbackOutcome.path)");
+    expect(backHook).toContain('isListenerActive');
+    expect(backHook).toContain('lastExitPromptAtRef.current = null');
+    expect(dashboardLayout).toContain('setIsBugModalOpen(false)');
     expect(mainActivity).toContain('registerPlugin(NativeToastPlugin.class);');
   });
 

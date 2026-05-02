@@ -152,6 +152,15 @@ export const DashboardLayout: React.FC = () => {
   }, [isMobileMenuOpen]);
 
   useEffect(() => {
+    if (!isBugModalOpen) return;
+
+    return registerAndroidBackAction(() => {
+      setIsBugModalOpen(false);
+      return true;
+    });
+  }, [isBugModalOpen]);
+
+  useEffect(() => {
     document.documentElement.classList.toggle('no-scroll', isMobileMenuOpen);
 
     return () => {
@@ -534,6 +543,7 @@ export const DashboardLayout: React.FC = () => {
                           await triggerInstall();
                           setIsMobileMenuOpen(false);
                         }}
+                        aria-label="Add Reflections to your home screen"
                         className="mobile-sidebar-link mobile-sidebar-link--action"
                       >
                         <span className="mobile-sidebar-link-icon">

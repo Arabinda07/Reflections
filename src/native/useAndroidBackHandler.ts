@@ -5,7 +5,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import {
   androidBackActionRegistry,
   canNavigateBackInApp,
-  isTopLevelAndroidRoute,
   resolveAndroidBackOutcome,
 } from './androidBack';
 import { nativeToast } from './nativeToast';
@@ -18,6 +17,11 @@ export const useAndroidBackHandler = () => {
   const lastExitPromptAtRef = useRef<number | null>(null);
 
   useEffect(() => {
+    lastExitPromptAtRef.current = null;
+  }, [location.pathname]);
+
+  useEffect(() => {
+    let isListenerActive = true;
     let removeListener: (() => Promise<void>) | null = null;
 
     const setupBackHandler = async () => {
@@ -31,11 +35,10 @@ export const useAndroidBackHandler = () => {
           typeof window !== 'undefined'
             ? canNavigateBackInApp(
                 window.history.state as { idx?: unknown } | null,
-                window.history.length,
               )
             : false;
         const baseInput = {
-          isTopLevelRoute: isTopLevelAndroidRoute(location.pathname),
+          pathname: location.pathname,
           canNavigateBack,
           now,
           lastExitPromptAt: lastExitPromptAtRef.current,
@@ -63,6 +66,11 @@ export const useAndroidBackHandler = () => {
           return;
         }
 
+        if (fallbackOutcome.type === 'navigate-to-fallback') {
+          navigate(fallbackOutcome.path);
+          return;
+        }
+
         if (fallbackOutcome.type === 'prompt-exit') {
           lastExitPromptAtRef.current = fallbackOutcome.nextExitPromptAt;
           await nativeToast.show({
@@ -74,12 +82,18 @@ export const useAndroidBackHandler = () => {
         await App.exitApp();
       });
 
+      if (!isListenerActive) {
+        await listener.remove();
+        return;
+      }
+
       removeListener = () => listener.remove();
     };
 
     void setupBackHandler();
 
     return () => {
+      isListenerActive = false;
       void removeListener?.();
     };
   }, [location.pathname, navigate]);

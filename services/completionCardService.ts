@@ -7,6 +7,8 @@ export type CompletionCardShareResult = 'shared' | 'unsupported';
 
 const CARD_WIDTH = 1200;
 const CARD_HEIGHT = 630;
+const CARD_FONT_SERIF = 'Newsreader, serif';
+const CARD_FONT_SANS = 'Manrope, sans-serif';
 
 const roundRect = (
   context: CanvasRenderingContext2D,
@@ -133,7 +135,7 @@ const drawCardLogo = (ctx: CanvasRenderingContext2D) => {
   ctx.stroke();
 
   ctx.fillStyle = '#4f6f46';
-  ctx.font = 'italic 700 26px Spectral, serif';
+  ctx.font = `italic 700 26px ${CARD_FONT_SERIF}`;
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
   ctx.fillText('Reflections', CARD_LAYOUT.wordmarkX, CARD_LAYOUT.wordmarkY);
@@ -141,7 +143,7 @@ const drawCardLogo = (ctx: CanvasRenderingContext2D) => {
 
 const drawCardTitle = (ctx: CanvasRenderingContext2D, payload: CompletionCardPayload): number => {
   ctx.fillStyle = '#293127';
-  ctx.font = '800 64px Nunito, sans-serif';
+  ctx.font = `800 64px ${CARD_FONT_SANS}`;
   const titleLines = wrapText(ctx, payload.title, CARD_LAYOUT.titleMaxWidth);
   titleLines.forEach((line, index) => {
     ctx.fillText(line, CARD_LAYOUT.contentLeft, CARD_LAYOUT.titleY + index * CARD_LAYOUT.titleLineHeight);
@@ -149,7 +151,7 @@ const drawCardTitle = (ctx: CanvasRenderingContext2D, payload: CompletionCardPay
 
   const subtitleY = CARD_LAYOUT.titleY + titleLines.length * CARD_LAYOUT.titleLineHeight + CARD_LAYOUT.subtitleOffsetY;
   ctx.fillStyle = '#65705e';
-  ctx.font = '500 26px Manrope, sans-serif';
+  ctx.font = `500 26px ${CARD_FONT_SANS}`;
   ctx.fillText(payload.subtitle, CARD_LAYOUT.contentLeft, subtitleY);
 
   return subtitleY;
@@ -159,7 +161,7 @@ const drawCardBadge = (ctx: CanvasRenderingContext2D, payload: CompletionCardPay
   const { height } = ctx.canvas;
   const colors = BADGE_COLORS[payload.kind] || BADGE_COLORS.weekly_recap;
 
-  ctx.font = '800 16px Nunito, sans-serif';
+  ctx.font = `800 16px ${CARD_FONT_SANS}`;
   const badgeText = payload.badge.toUpperCase();
   const badgeWidth = ctx.measureText(badgeText).width + CARD_LAYOUT.badgePaddingX * 2;
   const badgeX = CARD_LAYOUT.contentLeft;
@@ -183,7 +185,7 @@ const drawCardFooter = (ctx: CanvasRenderingContext2D, payload: CompletionCardPa
   const { width } = ctx.canvas;
 
   ctx.fillStyle = '#819076';
-  ctx.font = '700 20px Nunito, sans-serif';
+  ctx.font = `700 20px ${CARD_FONT_SANS}`;
   ctx.textAlign = 'right';
   ctx.fillText(payload.dateLabel, width - CARD_LAYOUT.contentLeft, badgeY + 25);
 };
