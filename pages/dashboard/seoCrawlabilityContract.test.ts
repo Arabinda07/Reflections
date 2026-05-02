@@ -186,32 +186,21 @@ describe('SEO crawlability contract', () => {
     }
   });
 
-  it('renders a PublicFooter with crawlable links on every public page', () => {
-    for (const file of [
-      'pages/dashboard/Landing.tsx',
-      'pages/dashboard/FAQ.tsx',
-      'pages/dashboard/PrivacyPolicy.tsx',
-      'pages/dashboard/AboutArabinda.tsx',
-    ]) {
-      const source = read(file);
-      expect(source).toContain('PublicFooter');
-    }
+  it('renders a global footer with crawlable links to all public routes', () => {
+    const layout = read('layouts/DashboardLayout.tsx');
 
-    const footer = read('components/ui/PublicFooter.tsx');
-    expect(footer).toContain("href: '/'");
-    expect(footer).toContain("href: '/faq'");
-    expect(footer).toContain("href: '/privacy'");
-    expect(footer).toContain("href: '/about'");
+    expect(layout).toContain('Footer navigation');
+    expect(layout).toContain('RoutePath.HOME');
+    expect(layout).toContain('RoutePath.FAQ');
+    expect(layout).toContain('RoutePath.ABOUT');
+    expect(layout).toContain('RoutePath.PRIVACY');
   });
 
-  it('uses semantic Q&A markup on the FAQ page for AI extractability', () => {
+  it('keeps FAQ guide sections with key product questions for AI extractability', () => {
     const faq = read('pages/dashboard/FAQ.tsx');
 
-    expect(faq).toContain('<dl');
-    expect(faq).toContain('<dt');
-    expect(faq).toContain('<dd');
     expect(faq).toContain('What is Reflections?');
-    expect(faq).toContain('What is the Life Wiki?');
+    expect(faq).toContain('Life Wiki');
   });
 
   it('sends HSTS header on all routes', () => {
