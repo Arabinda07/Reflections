@@ -10,9 +10,9 @@ describe('landing semantic contract', () => {
     const landing = read('pages/dashboard/Landing.tsx');
 
     expect(landing).toContain('<h1');
-    expect(landing).toContain('aria-label="Your mind, beautifully organized"');
+    expect(landing).toContain('aria-label="Your mind beautifully organized"');
     expect(landing).toContain('</h1>');
-    expect(landing).toContain('Your mind,');
+    expect(landing).toContain('Your mind');
     expect(landing).toContain('beautifully');
     expect(landing).toContain('organized');
   });

@@ -136,11 +136,11 @@ export const Landing: React.FC = () => {
 
           <div className="flex flex-col gap-6 lg:w-[60%] lg:gap-8 xl:w-[55%]">
             <h1
-              aria-label="Your mind, beautifully organized"
+              aria-label="Your mind beautifully organized"
               className="pointer-events-auto flex max-w-[11ch] flex-col text-mk-display font-display font-extrabold tracking-normal text-gray-text leading-[0.92] sm:max-w-[12ch] sm:leading-[0.94] lg:max-w-5xl lg:leading-[0.96]"
             >
               <span>
-                Your mind,
+                Your mind
               </span>
               <span className="font-serif italic font-normal text-green" style={{ lineHeight: 1.1 }}>
                 beautifully

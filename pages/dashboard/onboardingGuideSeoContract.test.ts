@@ -81,7 +81,7 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
 
     expect(landing).not.toContain('usePWAInstall');
     expect(landing).not.toContain('Install app');
-    expect(landing).toContain('Your mind,');
+    expect(landing).toContain('Your mind');
     expect(landing).toContain('beautifully');
     expect(landing).toContain('organized');
     expect(landing).not.toContain('organized.');
