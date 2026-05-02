@@ -411,7 +411,7 @@ export const HomeAuthenticated: React.FC = () => {
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-2 text-gray-nav">
                   <Target size={18} weight="duotone" className="text-green" />
-                  <span className="label-caps opacity-60">
+                  <span className="label-caps">
                     Today's Reflection
                   </span>
                 </div>
@@ -477,7 +477,7 @@ export const HomeAuthenticated: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-gray-nav">
                   <ListChecks size={16} weight="duotone" className="text-honey" />
-                  <span className="label-caps opacity-60">
+                  <span className="label-caps">
                     Your Intentions
                   </span>
                 </div>
@@ -553,7 +553,7 @@ export const HomeAuthenticated: React.FC = () => {
               <div className="relative z-10">
               <div className="mb-6 flex items-center gap-2 text-gray-nav">
                 <FolderOpen size={18} weight="duotone" className="text-sky" />
-                <p className="label-caps opacity-60">
+                <p className="label-caps">
                   Your Rhythm
                 </p>
               </div>
@@ -608,7 +608,7 @@ export const HomeAuthenticated: React.FC = () => {
               <div className="relative z-10">
               <div className="mb-8 flex items-center gap-2 text-gray-nav">
                 <Sparkle size={18} weight="duotone" className="text-honey" />
-                <span className="label-caps opacity-60">
+                <span className="label-caps">
                   Before you write
                 </span>
               </div>

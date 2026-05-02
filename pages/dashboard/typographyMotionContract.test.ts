@@ -25,19 +25,19 @@ describe('Typography and motion contract', () => {
     const completionCardService = read('services/completionCardService.ts');
 
     expect(indexCss).toContain("--font-sans: 'Manrope'");
-    expect(indexCss).toContain("--font-serif: 'Newsreader'");
+    expect(indexCss).toContain("--font-serif: 'Spectral'");
     expect(indexCss).toContain("--font-display: 'Manrope'");
     expect(indexCss).toContain('font-family: var(--font-sans)');
     expect(indexCss).toContain("url('/assets/fonts/Manrope-Variable.woff2')");
-    expect(indexCss).toContain("url('/assets/fonts/Newsreader16pt-Regular.woff2')");
-    expect(indexCss).toContain("url('/assets/fonts/Newsreader16pt-Italic.woff2')");
+    expect(indexCss).toContain("url('/assets/fonts/Spectral-Regular.woff2')");
+    expect(indexCss).toContain("url('/assets/fonts/Spectral-Italic.woff2')");
     expect(indexHtml).toContain('/assets/fonts/Manrope-Variable.woff2');
-    expect(indexHtml).toContain('/assets/fonts/Newsreader16pt-Regular.woff2');
-    expect(indexHtml).toContain('/assets/fonts/Newsreader16pt-Italic.woff2');
-    expect(tailwindConfig).toContain('serif: [\'"Newsreader"\', \'serif\']');
+    expect(indexHtml).toContain('/assets/fonts/Spectral-Regular.woff2');
+    expect(indexHtml).toContain('/assets/fonts/Spectral-Italic.woff2');
+    expect(tailwindConfig).toContain('serif: [\'"Spectral"\', \'serif\']');
     expect(tailwindConfig).toContain('display: [\'"Manrope"\', \'sans-serif\']');
     expect([indexCss, indexHtml, tailwindConfig, completionCardService].join('\n')).not.toMatch(
-      /Spectral|Nunito|Manrope\[wght\]/,
+      /Newsreader|Nunito|Manrope\[wght\]/,
     );
     expect(indexCss).not.toContain("font-family: 'Geist', sans-serif");
     expect(indexCss).not.toContain("font-family: 'Feather Bold'");
