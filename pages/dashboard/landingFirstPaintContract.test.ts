@@ -73,7 +73,7 @@ describe('landing first-paint contract', () => {
     expect(indexHtml).toContain('rel="preload" href="/assets/videos/landing_video.webp" as="image" type="image/webp" fetchpriority="high" media="(min-width: 1024px)"');
     expect(landing).toContain('const [shouldLoadHeroVideo, setShouldLoadHeroVideo] = useState(false);');
     expect(landing).toContain('const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);');
-    expect(landing).toContain("const desktopHeroVideoQuery = window.matchMedia('(min-width: 1024px)');");
+    expect(landing).not.toContain("const desktopHeroVideoQuery = window.matchMedia('(min-width: 1024px)');");
     expect(landing).toContain('fetchPriority="high"');
     expect(landing).toContain('<source srcSet="/assets/videos/landing_video.webp" type="image/webp" media="(min-width: 1024px)" />');
     expect(landing).toContain('<source srcSet="/assets/videos/landing_video_mobile.webp" type="image/webp" media="(max-width: 1023px)" />');
@@ -82,6 +82,8 @@ describe('landing first-paint contract', () => {
     expect(landing).not.toContain('setIsHeroPosterReady');
     expect(landing).not.toContain('onLoad={() => setIsHeroPosterReady(true)}');
     expect(landing).toContain("navigator as Navigator & { connection?: { saveData?: boolean } }");
+    expect(landing).toContain("const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');");
+    expect(landing).toContain('if (saveData || reducedMotionQuery.matches) return;');
     expect(landing).toContain('window.requestIdleCallback');
     expect(landing).toContain('window.cancelIdleCallback');
     expect(landing).toContain('preload="metadata"');

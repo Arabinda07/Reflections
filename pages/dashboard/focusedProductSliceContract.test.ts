@@ -33,6 +33,8 @@ describe('focused product slice source contract', () => {
     expect(landing).toContain('pb-[calc(env(safe-area-inset-bottom)+1.75rem)]');
     expect(landing).toContain('surface-floating--media');
     expect(landing).toContain('min-h-11');
+    expect(landing).not.toContain('max-lg:hidden');
+    expect(landing).not.toContain("if (!window.matchMedia('(min-width: 1024px)').matches) return;");
   });
 
   it('keeps note cards semantic and directly export-capable without nested card clicks', () => {

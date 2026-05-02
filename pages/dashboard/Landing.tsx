@@ -20,13 +20,12 @@ export const Landing: React.FC = () => {
   useEffect(() => {
     if (shouldLoadHeroVideo) return;
 
-    const desktopHeroVideoQuery = window.matchMedia('(min-width: 1024px)');
     const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     const saveData = Boolean(
       (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData,
     );
 
-    if (saveData) return;
+    if (saveData || reducedMotionQuery.matches) return;
 
     let idleId: number | undefined;
     let timerId: number | undefined;
@@ -35,29 +34,27 @@ export const Landing: React.FC = () => {
     const loadVideo = () => {
       isLoadScheduled = false;
 
-      if (desktopHeroVideoQuery.matches && !reducedMotionQuery.matches) {
+      if (!reducedMotionQuery.matches) {
         setShouldLoadHeroVideo(true);
       }
     };
 
     const scheduleLoadVideo = () => {
-      if (isLoadScheduled || !desktopHeroVideoQuery.matches || reducedMotionQuery.matches) return;
+      if (isLoadScheduled || reducedMotionQuery.matches) return;
 
       isLoadScheduled = true;
 
       if (window.requestIdleCallback) {
-        idleId = window.requestIdleCallback(loadVideo, { timeout: 2400 });
+        idleId = window.requestIdleCallback(loadVideo, { timeout: 1600 });
       } else {
-        timerId = window.setTimeout(loadVideo, 1800);
+        timerId = window.setTimeout(loadVideo, 900);
       }
     };
 
     scheduleLoadVideo();
-    desktopHeroVideoQuery.addEventListener('change', scheduleLoadVideo);
     reducedMotionQuery.addEventListener('change', scheduleLoadVideo);
 
     return () => {
-      desktopHeroVideoQuery.removeEventListener('change', scheduleLoadVideo);
       reducedMotionQuery.removeEventListener('change', scheduleLoadVideo);
 
       if (idleId !== undefined) {
@@ -71,17 +68,23 @@ export const Landing: React.FC = () => {
   }, [shouldLoadHeroVideo]);
 
   const toggleMute = () => {
-    if (!window.matchMedia('(min-width: 1024px)').matches) return;
+    const nextMuted = !isMuted;
 
-    if (!videoRef.current) {
-      setShouldLoadHeroVideo(true);
-      setIsMuted(false);
+    setShouldLoadHeroVideo(true);
+    setIsMuted(nextMuted);
+
+    const video = videoRef.current;
+    if (!video) {
       return;
     }
 
-    if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
+    video.muted = nextMuted;
+
+    if (!nextMuted && video.paused) {
+      void video.play().catch(() => {
+        video.muted = true;
+        setIsMuted(true);
+      });
     }
   };
 
@@ -197,7 +200,7 @@ export const Landing: React.FC = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.9, rotate: -8 }}
                 transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                className="surface-floating surface-floating--media h-11 min-h-11 w-11 min-w-11 !px-0 rounded-2xl !text-gray-nav hover:!text-green hover:border-green/40 transition-[color,border-color] duration-300 group max-lg:hidden"
+                className="surface-floating surface-floating--media h-11 min-h-11 w-11 min-w-11 !px-0 rounded-2xl !text-gray-nav hover:!text-green hover:border-green/40 transition-[color,border-color] duration-300 group"
                 aria-label={isMuted ? 'Unmute video' : 'Mute video'}
               >
                 {isMuted ? <SpeakerSlash size={20} weight="regular" /> : <SpeakerHigh size={20} weight="regular" />}
