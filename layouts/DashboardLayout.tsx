@@ -438,7 +438,7 @@ export const DashboardLayout: React.FC = () => {
       {/* Mobile sidebar portal - outside nav to avoid header clipping */}
       {typeof document !== 'undefined' && isMobileMenuOpen
         ? createPortal(
-            <div className="fixed inset-x-0 top-0 bottom-0 z-[105] h-[100dvh] overflow-hidden md:hidden">
+            <div className="fixed inset-x-0 top-0 bottom-0 z-[105] h-[100dvh] overflow-hidden lg:hidden">
               <motion.div
                 className="mobile-sidebar-scrim fixed inset-x-0 top-0 bottom-0 h-[100dvh]"
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -677,7 +677,7 @@ export const DashboardLayout: React.FC = () => {
                 </Link>
               </nav>
 
-              <div className="text-[11px] font-black uppercase tracking-widest text-gray-nav/40">
+              <div className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">
                 © 2026 <a 
                   href="https://arabinda07.github.io/" 
                   target="_blank" 

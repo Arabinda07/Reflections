@@ -100,8 +100,8 @@ describe('Typography and motion contract', () => {
   it('keeps the Sanctuary entry animation unframed and full-screen', () => {
     const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
 
-    expect(lifeWiki).toContain('pointer-events-none absolute inset-0 z-0');
-    expect(lifeWiki).toContain('mix-blend-luminosity');
+    expect(lifeWiki).toContain('pointer-events-none absolute inset-0 z-0 flex items-center justify-center');
+    expect(lifeWiki).toContain('SANCTUARY_LEVEL_UP_ANIMATION_SRC');
     expect(lifeWiki).not.toContain('h-32 w-32 overflow-hidden rounded-[var(--radius-panel)] bg-green/5');
   });
 });

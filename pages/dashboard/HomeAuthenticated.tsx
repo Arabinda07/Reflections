@@ -370,7 +370,6 @@ export const HomeAuthenticated: React.FC = () => {
               isHeroVideoReady ? 'opacity-95' : 'opacity-0'
             }`}
           >
-            <track kind="captions" default />
           </video>
           <div className="absolute inset-0 z-10 hero-scrim" />
           <div className="absolute inset-0 z-10 screen-scrim opacity-20" />

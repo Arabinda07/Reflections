@@ -989,6 +989,7 @@ select:focus-visible,
         rgba(var(--panel-bg-rgb), 0.68) 100%);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
+    will-change: backdrop-filter;
   }
 
   .mobile-sidebar-shell {
@@ -1800,6 +1801,7 @@ select:focus-visible,
     background: var(--modal-sheet-backdrop-bg);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
+    will-change: backdrop-filter;
   }
 
   .modal-sheet-shell {

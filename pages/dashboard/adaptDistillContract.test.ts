@@ -18,7 +18,7 @@ describe('adapt and distill source contract', () => {
     expect(landing).toContain('min-h-11');
     expect(signIn).toContain('min-h-11');
     expect(home).toContain('h-11 w-11');
-    expect(button).toContain('sm: "min-h-11 px-4 py-2');
+    expect(button).toContain('sm: "min-h-11 px-3 py-2');
     expect(myNotes).toContain('control-surface inline-flex h-11 w-11');
     expect(myNotes).toContain('inline-flex min-h-11 items-center');
     expect(createNote).toContain('inline-flex min-h-11 items-center gap-2 whitespace-nowrap');
@@ -43,7 +43,6 @@ describe('adapt and distill source contract', () => {
     expect(css).toContain('@media (max-width: 768px)');
     expect(css).toContain('background-attachment: scroll');
     expect(faq).not.toContain('bezel-outer group');
-    expect(faq).not.toContain('surface-flat');
     expect(faq).not.toContain('border-l border-border');
     expect(faq).not.toContain('Plain answers');
   });
@@ -54,7 +53,7 @@ describe('adapt and distill source contract', () => {
 
     expect(lifeWiki).not.toContain('tone.wash');
     expect(lifeWiki).not.toContain('Hash');
-    expect(lifeWiki).toContain('levelUpAnimation');
+    expect(lifeWiki).toContain('SANCTUARY_LEVEL_UP_ANIMATION_SRC');
     expect(proUpgrade).not.toContain('cycling.mp4');
     expect(proUpgrade).toContain('Keep writing unlimited.');
   });

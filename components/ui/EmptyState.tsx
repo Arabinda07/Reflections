@@ -31,7 +31,7 @@ const EmptyStateBody: React.FC<Omit<EmptyStateProps, 'surface'>> = ({
       </div>
     ) : illustrationSrc ? (
       <div className="mb-4 h-48 w-48 max-w-full" aria-hidden="true">
-        <img src={illustrationSrc} alt="" loading="lazy" className="h-full w-full object-contain" />
+        <img src={illustrationSrc} alt="" aria-hidden="true" loading="lazy" className="h-full w-full object-contain" />
       </div>
     ) : icon ? (
       <div className="empty-state-icon">{icon}</div>
