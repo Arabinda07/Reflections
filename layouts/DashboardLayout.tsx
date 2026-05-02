@@ -283,7 +283,7 @@ export const DashboardLayout: React.FC = () => {
     ? 'hero-ink hover:text-green hover:bg-white/10'
     : 'text-gray-nav hover:text-green hover:bg-green/5';
   const footerLinkClass =
-    'inline-flex min-h-11 items-center text-[11px] font-black uppercase tracking-widest text-gray-nav transition-colors hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
+    'inline-flex min-h-11 min-w-11 items-center justify-center text-[11px] font-black uppercase tracking-widest text-gray-nav transition-colors hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
   const routeSurfaceScopeClass = getRouteSurfaceScopeClass(location.pathname);
 
   return (

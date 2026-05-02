@@ -290,7 +290,10 @@ export const SignUp: React.FC = () => {
 
             <p className="text-[15px] font-bold text-gray-light text-center">
               Already have an account?{' '}
-              <Link to={RoutePath.LOGIN} className="text-green hover:opacity-70">
+              <Link
+                to={RoutePath.LOGIN}
+                className="inline-flex min-h-11 items-center rounded-xl px-2 text-green transition-colors hover:text-green/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
+              >
                 Sign in
               </Link>
             </p>

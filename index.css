@@ -296,7 +296,8 @@
   /* System Hardening Tokens */
   --scrollbar-thumb: rgba(148, 163, 184, 0.4);
   --scrollbar-thumb-hover: rgba(148, 163, 184, 0.55);
-  --chip-shadow: #E5E5E5;
+  --chip-shadow: oklch(from var(--border-color) l c h);
+  --popover-bg: var(--panel-bg);
 }
 
 .dark {
@@ -417,7 +418,7 @@
 
   /* System Hardening Tokens - Dark Mode */
   --chip-shadow: rgba(0, 0, 0, 0.3);
-  --popover-bg: #1E1E1E;
+  --popover-bg: var(--panel-bg);
 
   /* ── Semantic Overrides ── */
   --color-surface-muted: oklch(0.24 0.012 135);
@@ -2287,7 +2288,7 @@ select:focus-visible,
     outline: none !important;
   }
 
-  /* The snow theme renders a 1px solid #ccc border on this element by default.
+  /* The snow theme renders a default gray border on this element.
      Remove every expression of it so the editor merges invisibly into its parent. */
   .ql-container.ql-snow {
     border: none !important;
@@ -2372,7 +2373,10 @@ select:focus-visible,
   }
 
   .chooser-chip {
-    @apply flex flex-row items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 bg-white border-border text-gray-nav transition-all duration-300 dark:bg-white/5 dark:border-white/10 dark:text-slate-300;
+    @apply flex flex-row items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-xl border-2 transition-[background-color,border-color,color,box-shadow] duration-300;
+    background-color: var(--surface-current-control-bg);
+    border-color: var(--border-color);
+    color: var(--nav-text);
     font-weight: 900;
     white-space: nowrap;
     flex-shrink: 0;
@@ -2385,20 +2389,22 @@ select:focus-visible,
   }
 
   .dark .chooser-chip:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
+    background-color: oklch(from var(--green) l c h / 0.12);
+    border-color: oklch(from var(--green) l c h / 0.24);
   }
 
   .chooser-chip.active {
-    @apply text-green dark:bg-white/10 dark:border-white/20 dark:text-white;
+    @apply text-green;
     background-color: oklch(from var(--green) l c h / 0.05);
     border-color: oklch(from var(--green) l c h / 0.3);
     box-shadow: 0 2px 0 0 var(--chip-shadow);
   }
 
   .chooser-popover {
-    @apply p-5 rounded-3xl z-[100] border border-white/40 shadow-xl bg-white dark:shadow-xl dark:shadow-black/50 dark:border-white/10;
-    background-color: var(--popover-bg, #ffffff);
+    @apply p-5 rounded-3xl z-[100] border shadow-xl;
+    background-color: var(--popover-bg);
+    border-color: var(--floating-panel-border);
+    box-shadow: var(--floating-panel-shadow-strong);
   }
 }
 
