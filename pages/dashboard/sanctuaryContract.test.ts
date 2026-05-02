@@ -36,7 +36,7 @@ describe('Sanctuary Life Wiki contract', () => {
   it('renders a library-first Sanctuary surface with five primary cards and a supporting shelf', () => {
     const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
 
-    expect(lifeWiki).toContain('SANCTUARY_WIKI_PAGES');
+    expect(lifeWiki).toContain('levelUpAnimation');
     expect(lifeWiki).toContain('SUPPORTING_WIKI_PAGES');
     expect(lifeWiki).toContain('Sanctuary pages');
     expect(lifeWiki).toContain('Supporting shelf');
@@ -95,7 +95,8 @@ describe('Sanctuary Life Wiki contract', () => {
     expect(insights).toContain('dotLottieRefCallback={bindSanctuaryEntrancePlayer}');
     expect(insights).toContain("addEventListener('complete'");
     expect(insights).toContain('window.setTimeout(completeOpenSanctuary, SANCTUARY_ENTRANCE_FALLBACK_MS)');
-    expect(insights).toContain('/assets/lottie/level-up-animation.json');
+    expect(insights).toContain('data={levelUpAnimation}');
+    expect(lifeWiki).toContain('data={levelUpAnimation}');
     expect(lifeWiki).not.toContain('refreshModeLabel');
     expect(lifeWiki).not.toContain('On demand. Use Refresh with AI when you want the library rebuilt.');
   });

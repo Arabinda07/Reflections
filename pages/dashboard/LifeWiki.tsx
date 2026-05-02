@@ -10,6 +10,7 @@ import {
   Warning,
 } from '@phosphor-icons/react';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import levelUpAnimation from '@/src/lottie/level-up-animation.json';
 import { Button } from '../../components/ui/Button';
 import { Alert } from '../../components/ui/Alert';
 import { MetadataPill } from '../../components/ui/MetadataPill';
@@ -148,7 +149,6 @@ const ROOM_TONE_CLASSES: Record<PageMeta['tone'], {
 
 const SOURCE_LINK_PREFIX = 'source-note:';
 const SOURCE_MARKER_PATTERN = /\[source:([^\]]+)\]/gi;
-const SANCTUARY_ENTRANCE_LOTTIE = '/assets/lottie/level-up-animation.json';
 
 const articlePath = (pageType: WikiPageType) =>
   RoutePath.SANCTUARY_ARTICLE.replace(':pageType', pageType);
@@ -455,7 +455,7 @@ export const LifeWiki: React.FC = () => {
             className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
           >
             <div className="h-[min(66vmin,34rem)] w-[min(66vmin,34rem)]">
-              <DotLottieReact src={SANCTUARY_ENTRANCE_LOTTIE} autoplay loop={isRefreshingWiki || isEnteringWiki} />
+              <DotLottieReact data={levelUpAnimation} autoplay loop={isRefreshingWiki || isEnteringWiki} />
             </div>
           </motion.div>
           <motion.div
