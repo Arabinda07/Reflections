@@ -29,7 +29,8 @@ import { buildCompletionCardPayload } from '../../services/completionCardPayload
 import { DEFAULT_MOOD_TONE, getMoodConfig } from './moodConfig';
 
 const TAG_TONE_CLASSES = ['text-green', 'text-green/80', 'text-green/70', 'text-green/60'];
-const SANCTUARY_ENTRANCE_LOTTIE = '/assets/lottie/Level%20Up%20Animation.json';
+const SANCTUARY_ENTRANCE_LOTTIE = '/assets/lottie/level-up-animation.json';
+
 const SANCTUARY_ENTRANCE_FALLBACK_MS = 2200;
 
 const getWeekSignalSince = () => {
@@ -51,8 +52,8 @@ export const Insights: React.FC = () => {
   const [isMoodOpen, setIsMoodOpen] = useState(false);
   const [isTagsOpen, setIsTagsOpen] = useState(false);
   const [isCompletionOpen, setIsCompletionOpen] = useState(false);
-  const [cardTitle, setCardTitle] = useState('');
   const [isOpeningSanctuary, setIsOpeningSanctuary] = useState(false);
+  const [cardTitle, setCardTitle] = useState('');
   const [loading, setLoading] = useState(true);
   const isOpeningSanctuaryRef = useRef(false);
   const openingTimerRef = useRef<number | null>(null);
@@ -174,7 +175,7 @@ export const Insights: React.FC = () => {
     if (isOpeningSanctuaryRef.current) return;
 
     if (shouldReduceMotion) {
-      navigate(RoutePath.SANCTUARY);
+      navigate(RoutePath.SANCTUARY, { state: { fromInsights: true } });
       return;
     }
 
@@ -214,9 +215,9 @@ export const Insights: React.FC = () => {
             <motion.div
               aria-hidden="true"
               initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 0.2, scale: 1 }}
+              animate={{ opacity: 0.8, scale: 1 }}
               transition={{ delay: 0.08, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-              className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center mix-blend-luminosity"
+              className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
             >
               <div className="h-[min(66vmin,34rem)] w-[min(66vmin,34rem)]">
                 <DotLottieReact
@@ -572,7 +573,6 @@ export const Insights: React.FC = () => {
               onClick={handleOpenSanctuary}
               className="relative z-10 flex w-full flex-col items-center justify-between gap-8 p-8 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 md:flex-row md:p-12"
               aria-label="Open your Life Wiki"
-              aria-busy={isOpeningSanctuary}
             >
               <div className="space-y-5">
                 {isWikiReadyToBuild ? (

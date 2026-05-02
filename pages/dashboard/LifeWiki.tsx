@@ -148,7 +148,7 @@ const ROOM_TONE_CLASSES: Record<PageMeta['tone'], {
 
 const SOURCE_LINK_PREFIX = 'source-note:';
 const SOURCE_MARKER_PATTERN = /\[source:([^\]]+)\]/gi;
-const SANCTUARY_ENTRANCE_LOTTIE = '/assets/lottie/Level%20Up%20Animation.json';
+const SANCTUARY_ENTRANCE_LOTTIE = '/assets/lottie/level-up-animation.json';
 
 const articlePath = (pageType: WikiPageType) =>
   RoutePath.SANCTUARY_ARTICLE.replace(':pageType', pageType);
@@ -248,7 +248,9 @@ export const LifeWiki: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!shouldPlayEntryAnimation) {
+    // If we came from Insights, the transition animation already played there.
+    // Skip the local entrance animation to prevent redundancy.
+    if (!shouldPlayEntryAnimation || location.state?.fromInsights) {
       setIsEnteringWiki(false);
       return;
     }
@@ -257,7 +259,7 @@ export const LifeWiki: React.FC = () => {
     const timeoutId = window.setTimeout(() => setIsEnteringWiki(false), 2400);
 
     return () => window.clearTimeout(timeoutId);
-  }, [location.key, shouldPlayEntryAnimation]);
+  }, [location.key, location.state?.fromInsights, shouldPlayEntryAnimation]);
 
   const gate = useMemo(() => {
     if (!access) return null;
@@ -448,9 +450,9 @@ export const LifeWiki: React.FC = () => {
           <motion.div
             aria-hidden="true"
             initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.96 }}
-            animate={{ opacity: shouldReduceMotion ? 0.14 : 0.2, scale: 1 }}
+            animate={{ opacity: shouldReduceMotion ? 0.14 : 0.8, scale: 1 }}
             transition={{ delay: shouldReduceMotion ? 0 : 0.08, duration: shouldReduceMotion ? 0 : 0.55, ease: [0.16, 1, 0.3, 1] }}
-            className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center mix-blend-luminosity"
+            className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
           >
             <div className="h-[min(66vmin,34rem)] w-[min(66vmin,34rem)]">
               <DotLottieReact src={SANCTUARY_ENTRANCE_LOTTIE} autoplay loop={isRefreshingWiki || isEnteringWiki} />
