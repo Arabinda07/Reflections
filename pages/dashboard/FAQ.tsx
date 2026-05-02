@@ -13,6 +13,7 @@ import {
   ListChecks,
 } from '@phosphor-icons/react';
 import { useDocumentMeta } from '../../hooks/useDocumentMeta';
+import { PublicFooter } from '../../components/ui/PublicFooter';
 
 const guideSections = [
   {
@@ -235,6 +236,52 @@ export const FAQ: React.FC = () => {
           </div>
         </section>
 
+        <section className="mb-20 border-t border-border pt-16">
+          <div className="mb-10 space-y-4">
+            <p className="label-caps text-green">Common questions</p>
+            <h2 className="text-mk-h2 font-display font-bold text-gray-text">Answers for new visitors</h2>
+          </div>
+
+          <dl className="grid gap-8 md:grid-cols-2">
+            <div>
+              <dt className="mb-2 text-[18px] font-display font-bold text-gray-text">What is Reflections?</dt>
+              <dd className="font-sans text-[16px] leading-relaxed text-gray-light">
+                Reflections is a private, writing-first wellness journal. You save notes, name your mood, tag patterns, and optionally ask AI for a personalised reflection that draws on everything you have written before — not just one entry.
+              </dd>
+            </div>
+            <div>
+              <dt className="mb-2 text-[18px] font-display font-bold text-gray-text">Does AI run automatically?</dt>
+              <dd className="font-sans text-[16px] leading-relaxed text-gray-light">
+                No. AI support only runs when you explicitly press Reflect with AI or Refresh Insights. The Life Wiki updates when you save a note, but AI never fires in the background without your action.
+              </dd>
+            </div>
+            <div>
+              <dt className="mb-2 text-[18px] font-display font-bold text-gray-text">Is Reflections free?</dt>
+              <dd className="font-sans text-[16px] leading-relaxed text-gray-light">
+                Yes. The free tier includes 30 notes per month with full AI features — reflections, Life Wiki, mood tracking, ambient sound, and whisper mode. A Pro tier with unlimited notes is planned.
+              </dd>
+            </div>
+            <div>
+              <dt className="mb-2 text-[18px] font-display font-bold text-gray-text">Is Reflections therapy?</dt>
+              <dd className="font-sans text-[16px] leading-relaxed text-gray-light">
+                No. Reflections is a personal writing tool for noticing thoughts more clearly. It is not professional mental health care and is not a substitute for trained support.
+              </dd>
+            </div>
+            <div>
+              <dt className="mb-2 text-[18px] font-display font-bold text-gray-text">What is the Life Wiki?</dt>
+              <dd className="font-sans text-[16px] leading-relaxed text-gray-light">
+                The Life Wiki is an AI-maintained personal knowledge base that grows from your writing. It tracks mood patterns, recurring themes, a self-model, and a timeline — compiled context that makes every AI reflection deeply personal.
+              </dd>
+            </div>
+            <div>
+              <dt className="mb-2 text-[18px] font-display font-bold text-gray-text">How is my data protected?</dt>
+              <dd className="font-sans text-[16px] leading-relaxed text-gray-light">
+                All data is stored in Supabase with Row Level Security. Every query is scoped to your account. Files use time-limited signed URLs. Your notes are never used to train AI models.
+              </dd>
+            </div>
+          </dl>
+        </section>
+
         <section className="mb-28 border-t border-border pt-10">
           <p className="label-caps text-green">Contact</p>
           <p className="mt-3 max-w-[42rem] font-sans text-[16px] leading-relaxed text-gray-light">
@@ -247,6 +294,7 @@ export const FAQ: React.FC = () => {
         </section>
 
       </main>
+      <PublicFooter />
     </div>
   );
 };

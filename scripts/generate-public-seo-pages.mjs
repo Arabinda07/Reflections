@@ -34,6 +34,42 @@ const publicPages = [
       ['Does AI run automatically?', 'No. AI support runs only when you ask for a reflection or a Life Wiki refresh.'],
       ['Is Reflections therapy?', 'No. Reflections is a personal writing tool, not professional mental health care.'],
     ],
+    extraSchema: JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is Reflections?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Reflections is a private, writing-first wellness journal. You save notes, name your mood, tag patterns, and optionally ask AI for a personalised reflection that draws on everything you have written before." }
+        },
+        {
+          "@type": "Question",
+          "name": "Does AI run automatically?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. AI support only runs when you explicitly press Reflect with AI or Refresh Insights." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Reflections free?",
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. The free tier includes 30 notes per month with full AI features. A Pro tier with unlimited notes is planned." }
+        },
+        {
+          "@type": "Question",
+          "name": "Is Reflections therapy?",
+          "acceptedAnswer": { "@type": "Answer", "text": "No. Reflections is a personal writing tool for noticing thoughts more clearly. It is not professional mental health care." }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the Life Wiki?",
+          "acceptedAnswer": { "@type": "Answer", "text": "The Life Wiki is an AI-maintained personal knowledge base that grows from your writing, tracking mood patterns, recurring themes, and a timeline." }
+        },
+        {
+          "@type": "Question",
+          "name": "How is my data protected?",
+          "acceptedAnswer": { "@type": "Answer", "text": "All data is stored in Supabase with Row Level Security. Every query is scoped to your account. Your notes are never used to train AI models." }
+        }
+      ]
+    }),
   },
   {
     path: '/privacy',
@@ -62,6 +98,16 @@ const publicPages = [
       ['No pressure loops', 'Reflections avoids streaks, scores, public feeds, and productivity rankings.'],
       ['AI should wait', 'Optional AI support appears only when invited and should never act like it knows you better than you do.'],
     ],
+    extraSchema: JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "About Reflections and Arabinda",
+      "author": { "@type": "Person", "name": "Arabinda" },
+      "datePublished": "2025-01-01",
+      "dateModified": "2026-05-02",
+      "publisher": { "@type": "Organization", "name": "Reflections", "url": "https://reflections-ebon.vercel.app/" },
+      "description": "A note from Arabinda about why Reflections is a private writing app with mood notes, Life Wiki, and optional AI support."
+    }),
   },
 ];
 
@@ -131,7 +177,13 @@ const applyPageSeo = (template, page) => {
   html = setMetaName(html, 'twitter:title', page.title);
   html = setMetaName(html, 'twitter:description', page.description);
 
-  return html.replace('<div id="root"></div>', `<div id="root">${renderSeoContent(page)}</div>`);
+  html = html.replace('<div id="root"></div>', `<div id="root">${renderSeoContent(page)}</div>`);
+
+  if (page.extraSchema) {
+    html = html.replace('</head>', `<script type="application/ld+json">${page.extraSchema}</script>\n  </head>`);
+  }
+
+  return html;
 };
 
 const outputFilesFor = (page) => {

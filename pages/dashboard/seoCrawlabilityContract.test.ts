@@ -185,4 +185,60 @@ describe('SEO crawlability contract', () => {
       expect(source).toMatch(/Last updated/i);
     }
   });
+
+  it('renders a PublicFooter with crawlable links on every public page', () => {
+    for (const file of [
+      'pages/dashboard/Landing.tsx',
+      'pages/dashboard/FAQ.tsx',
+      'pages/dashboard/PrivacyPolicy.tsx',
+      'pages/dashboard/AboutArabinda.tsx',
+    ]) {
+      const source = read(file);
+      expect(source).toContain('PublicFooter');
+    }
+
+    const footer = read('components/ui/PublicFooter.tsx');
+    expect(footer).toContain("href: '/'");
+    expect(footer).toContain("href: '/faq'");
+    expect(footer).toContain("href: '/privacy'");
+    expect(footer).toContain("href: '/about'");
+  });
+
+  it('uses semantic Q&A markup on the FAQ page for AI extractability', () => {
+    const faq = read('pages/dashboard/FAQ.tsx');
+
+    expect(faq).toContain('<dl');
+    expect(faq).toContain('<dt');
+    expect(faq).toContain('<dd');
+    expect(faq).toContain('What is Reflections?');
+    expect(faq).toContain('What is the Life Wiki?');
+  });
+
+  it('sends HSTS header on all routes', () => {
+    const vercel = JSON.parse(read('vercel.json')) as {
+      headers: Array<{ source: string; headers: Array<{ key: string; value: string }> }>;
+    };
+    const globalHeaders = vercel.headers.find((h) => h.source === '/(.*)')?.headers ?? [];
+    const hsts = globalHeaders.find((h) => h.key === 'Strict-Transport-Security');
+
+    expect(hsts).toBeDefined();
+    expect(hsts?.value).toContain('max-age=');
+  });
+
+  it('places FAQPage schema on /faq snapshot only, not in the global shell', () => {
+    const html = read('index.html');
+    const generator = read('scripts/generate-public-seo-pages.mjs');
+
+    expect(html).not.toContain('"FAQPage"');
+    expect(generator).toContain('"FAQPage"');
+    expect(generator).toContain('extraSchema');
+  });
+
+  it('places Article schema on /about snapshot only', () => {
+    const generator = read('scripts/generate-public-seo-pages.mjs');
+
+    expect(generator).toContain('"Article"');
+    expect(generator).toContain('"Arabinda"');
+    expect(generator).toContain('"datePublished"');
+  });
 });

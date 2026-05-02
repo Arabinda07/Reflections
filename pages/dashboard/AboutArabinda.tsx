@@ -3,6 +3,7 @@ import { ArrowLeft, Feather, LockKey, Sparkle } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { useDocumentMeta } from '../../hooks/useDocumentMeta';
+import { PublicFooter } from '../../components/ui/PublicFooter';
 import { RoutePath } from '../../types';
 
 const sections = [
@@ -101,6 +102,7 @@ export const AboutArabinda: React.FC = () => {
           ))}
         </div>
       </div>
+      <PublicFooter />
     </PageContainer>
   );
 };

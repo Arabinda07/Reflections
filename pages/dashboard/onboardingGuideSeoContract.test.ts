@@ -123,16 +123,18 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
     expect(faq).not.toContain('No. Reflections is not therapy');
   });
 
-  it('publishes structured data for app, service, guide answers, and install help', () => {
+  it('publishes structured data for app, service, and install help in the global shell', () => {
     const indexHtml = read('index.html');
     const types = structuredDataTypes();
 
     expect(types).toContain('SoftwareApplication');
     expect(types).toContain('Service');
-    expect(types).toContain('FAQPage');
     expect(types).toContain('HowTo');
-    expect(indexHtml).toContain('Optional AI support only runs when the user asks for it.');
     expect(indexHtml).not.toContain('AI-powered');
     expect(indexHtml).not.toContain('therapy replacement');
+
+    // FAQPage schema now lives in the /faq postbuild snapshot, not the global shell
+    const generator = read('scripts/generate-public-seo-pages.mjs');
+    expect(generator).toContain('"FAQPage"');
   });
 });

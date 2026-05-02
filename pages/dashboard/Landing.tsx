@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { useDocumentMeta } from '../../hooks/useDocumentMeta';
+import { PublicFooter } from '../../components/ui/PublicFooter';
 import { RoutePath } from '../../types';
 
 export const Landing: React.FC = () => {
@@ -178,6 +179,7 @@ export const Landing: React.FC = () => {
           </div>
         </div>
       </div>
+      <PublicFooter />
     </div>
   );
 };

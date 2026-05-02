@@ -16,6 +16,7 @@ import {
 
 import { Button } from '../../components/ui/Button';
 import { useDocumentMeta } from '../../hooks/useDocumentMeta';
+import { PublicFooter } from '../../components/ui/PublicFooter';
 import { RoutePath } from '../../types';
 
 const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
@@ -190,6 +191,7 @@ export const PrivacyPolicy: React.FC = () => {
           </article>
         </section>
       </main>
+      <PublicFooter />
     </div>
   );
 };
