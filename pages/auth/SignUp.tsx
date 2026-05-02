@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Envelope, Lock, User, UserPlus } from '@phosphor-icons/react';
+import { Check, Envelope, Lock, User, UserPlus } from '@phosphor-icons/react';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { SectionHeader } from '@/components/ui/SectionHeader';
@@ -209,18 +209,28 @@ export const SignUp: React.FC = () => {
                 icon={Lock}
               />
 
-              <div className="flex items-center gap-3 mt-4">
-                <input
-                  type="checkbox"
-                  id="newsletter"
-                  checked={newsletterOptIn}
-                  onChange={(e) => setNewsletterOptIn(e.target.checked)}
-                  className="h-5 w-5 rounded border-border text-brand-accent focus:ring-brand-accent cursor-pointer"
-                />
-                <label htmlFor="newsletter" className="text-[14px] font-medium text-gray-text select-none cursor-pointer">
+              <label htmlFor="newsletter" className="mt-4 flex min-h-11 cursor-pointer select-none items-center gap-3 rounded-[var(--radius-control)] pr-2 text-[14px] font-medium text-gray-text">
+                <span className="relative flex h-11 w-11 shrink-0 items-center justify-center">
+                  <input
+                    type="checkbox"
+                    id="newsletter"
+                    checked={newsletterOptIn}
+                    onChange={(e) => setNewsletterOptIn(e.target.checked)}
+                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                  />
+                  <span
+                    aria-hidden="true"
+                    className={`flex h-6 w-6 items-center justify-center rounded-md border transition-colors ${
+                      newsletterOptIn ? 'border-green bg-green text-white' : 'border-border bg-body text-transparent'
+                    }`}
+                  >
+                    <Check size={16} weight="bold" />
+                  </span>
+                </span>
+                <span>
                   {NEWSLETTER_SIGNUP_LABEL}
-                </label>
-              </div>
+                </span>
+              </label>
 
               <Button type="submit" variant="primary" className="w-full h-[52px] text-[15px] font-bold mt-6" isLoading={loading}>
                 Create account

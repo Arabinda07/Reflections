@@ -75,7 +75,7 @@ export const AboutArabinda: React.FC = () => {
           {sections.map((section) => (
             <section
               key={section.title}
-              className="group border-t border-black/5 py-12 md:py-16 grid gap-6 md:grid-cols-12 md:gap-12 transition-colors duration-500 hover:bg-black/[0.02] -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-3xl"
+              className="group grid gap-6 rounded-3xl border-t border-gray-text/5 px-4 py-12 transition-colors duration-500 -mx-4 hover:bg-gray-text/[0.03] sm:-mx-6 sm:px-6 md:grid-cols-12 md:gap-12 md:py-16"
             >
               <div className="md:col-span-4 flex flex-col items-start gap-4">
                 <div className="h-12 w-12 flex items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-black/5 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">

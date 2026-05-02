@@ -398,7 +398,7 @@ export const Account: React.FC = () => {
                     onClick={() => avatarInputRef.current?.click()}
                     aria-label="Upload a new profile photo"
                   >
-                    <div className="surface-inline-panel h-32 w-32 overflow-hidden rounded-full border-4 border-white/50 shadow-xl shadow-black/10 transition-all duration-500 group-hover:border-green/50 group-hover:shadow-green/10">
+                    <div className="surface-inline-panel h-32 w-32 overflow-hidden rounded-full border-4 border-white/50 shadow-xl shadow-gray-text/10 transition-all duration-500 group-hover:border-green/50 group-hover:shadow-green/10">
                       {avatarPath ? (
                         <StorageImage path={avatarPath} alt="Profile" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
                       ) : (
@@ -407,7 +407,7 @@ export const Account: React.FC = () => {
                         </div>
                       )}
                     </div>
-                    <div className="absolute bottom-1 right-1 flex h-11 w-11 items-center justify-center rounded-full border-4 border-white bg-gray-text text-white shadow-xl shadow-black/15 transition-all duration-500 group-hover:bg-green group-hover:scale-110">
+                    <div className="absolute bottom-1 right-1 flex h-11 w-11 items-center justify-center rounded-full border-4 border-white bg-gray-text text-white shadow-xl shadow-gray-text/15 transition-all duration-500 group-hover:bg-green group-hover:scale-110">
                       <Camera size={18} weight="bold" className="transition-transform group-hover:rotate-12" />
                     </div>
                   </button>
@@ -468,7 +468,7 @@ export const Account: React.FC = () => {
               <div className="grid gap-4 p-6 md:grid-cols-2 lg:p-8">
                 <Surface variant="bezel" tone="paper">
                   <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-all duration-300 hover:bg-black/[0.02] focus-visible:bg-black/5">
+                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-all duration-300 hover:bg-gray-text/[0.03] focus-visible:bg-gray-text/[0.06]">
                       <div className="flex items-center gap-3">
                         <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
                           <Sparkle size={24} weight="duotone" className="text-green" />
@@ -502,7 +502,7 @@ export const Account: React.FC = () => {
 
                 <Surface variant="bezel" tone="paper">
                   <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-all duration-300 hover:bg-black/[0.02] focus-visible:bg-black/5">
+                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-all duration-300 hover:bg-gray-text/[0.03] focus-visible:bg-gray-text/[0.06]">
                       <div className="flex items-center gap-3">
                         <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
                           <ShieldCheck size={24} weight="duotone" className="text-sky" />
@@ -546,7 +546,7 @@ export const Account: React.FC = () => {
 
                 <Surface variant="bezel" tone="paper">
                   <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-all duration-300 hover:bg-black/[0.02] focus-visible:bg-black/5">
+                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-all duration-300 hover:bg-gray-text/[0.03] focus-visible:bg-gray-text/[0.06]">
                       <div className="flex items-center gap-3">
                         <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12">
                           <EnvelopeSimple size={24} weight="duotone" className="text-honey" />
@@ -571,7 +571,7 @@ export const Account: React.FC = () => {
 
                 <Surface variant="bezel" tone="paper">
                   <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-all duration-300 hover:bg-black/[0.02] focus-visible:bg-black/5">
+                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-all duration-300 hover:bg-gray-text/[0.03] focus-visible:bg-gray-text/[0.06]">
                       <div className="flex items-center gap-3">
                         <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-12">
                           <Sparkle size={24} weight="duotone" className="text-green" />
@@ -629,7 +629,7 @@ export const Account: React.FC = () => {
                           }`}
                         >
                           <span
-                            className={`absolute h-8 w-8 rounded-[var(--radius-chip)] bg-white shadow-sm shadow-black/10 transition-transform duration-500 ease-out-expo ${
+                            className={`absolute h-8 w-8 rounded-[var(--radius-chip)] bg-white shadow-sm shadow-gray-text/10 transition-transform duration-500 ease-out-expo ${
                               access?.smartModeEnabled ? 'translate-x-[110px]' : 'translate-x-0'
                             }`}
                           />
@@ -649,7 +649,7 @@ export const Account: React.FC = () => {
               <div className="p-6 lg:p-8">
                 <Surface variant="bezel" tone="clay">
                   <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors hover:bg-black/5 focus-visible:bg-black/5">
+                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors hover:bg-clay/5 focus-visible:bg-clay/10">
                       <div className="flex items-center gap-3">
                         <div className="icon-block icon-block-sm">
                           <Warning size={24} weight="duotone" className="text-clay" />

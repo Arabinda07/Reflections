@@ -104,8 +104,17 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
     };
 
     const focusTimer = window.setTimeout(() => {
+      const preferredAutoFocus = panelRef.current?.querySelector<HTMLElement>(
+        '[autofocus], [data-autofocus="true"]',
+      );
+
+      if (preferredAutoFocus) {
+        preferredAutoFocus.focus();
+        return;
+      }
+
       // Only focus the close button if no other element inside the modal is focused yet.
-      // This prevents stealing focus from autoFocus elements like textareas.
+      // This prevents stealing focus from fields that focus themselves during mount.
       if (!panelRef.current?.contains(document.activeElement)) {
         closeButtonRef.current?.focus();
       }

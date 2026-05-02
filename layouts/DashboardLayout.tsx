@@ -250,6 +250,8 @@ export const DashboardLayout: React.FC = () => {
   const landingControlClass = isLandingRoute
     ? 'hero-ink hover:text-green hover:bg-white/10'
     : 'text-gray-nav hover:text-green hover:bg-green/5';
+  const footerLinkClass =
+    'inline-flex min-h-11 items-center text-[11px] font-black uppercase tracking-widest text-gray-nav transition-colors hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
 
   return (
     <div className="surface-scope-sage relative flex h-[100dvh] min-h-[100dvh] flex-col overflow-hidden bg-body font-sans selection:bg-green/30 selection:text-green">
@@ -266,7 +268,7 @@ export const DashboardLayout: React.FC = () => {
           <div className="flex items-center gap-4">
             <Link 
               to={RoutePath.HOME}
-              className="flex items-center gap-2 group"
+              className="group flex min-h-11 items-center gap-2"
               aria-label="Reflections — go to home"
             >
               <div className="h-10 w-10 rounded-xl bg-green flex items-center justify-center text-white shadow-sm transition-transform duration-300 group-hover:scale-105 group-hover:-rotate-12">
@@ -282,7 +284,7 @@ export const DashboardLayout: React.FC = () => {
           <div className={`${isMobileNavSuppressedRoute ? 'hidden md:flex' : 'flex'} hidden md:flex items-center gap-2`}>
             <button 
               onClick={toggleDarkMode}
-              className={`relative flex items-center justify-center w-9 h-9 rounded-xl transition-colors ${landingControlClass}`}
+              className={`relative flex h-11 w-11 items-center justify-center rounded-xl transition-colors ${landingControlClass}`}
               title="Toggle Dark Mode"
               aria-label={isDarkMode ? 'Use light mode' : 'Use dark mode'}
             >
@@ -305,8 +307,8 @@ export const DashboardLayout: React.FC = () => {
                   key={item.label}
                   to={item.path}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`rounded-xl border-b-2 px-4 py-2 text-[13px] font-extrabold transition-colors duration-200 hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-1 ${
-                    isActive ? 'border-green bg-green/5 text-green' : 'border-transparent text-gray-nav'
+                  className={`inline-flex min-h-11 items-center rounded-xl border px-4 py-2 text-[13px] font-extrabold transition-colors duration-200 hover:border-green/20 hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-1 ${
+                    isActive ? 'border-green bg-green/5 text-green shadow-sm shadow-green/5' : 'border-transparent text-gray-nav'
                   }`}
                 >
                   {item.label}
@@ -360,7 +362,7 @@ export const DashboardLayout: React.FC = () => {
           <div className={`${isMobileNavSuppressedRoute ? 'hidden' : 'flex'} md:hidden items-center gap-2`}>
             <button 
               onClick={toggleDarkMode}
-              className={`relative flex items-center justify-center w-9 h-9 rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green ${landingControlClass}`}
+              className={`relative flex h-11 w-11 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green ${landingControlClass}`}
               title="Toggle Dark Mode"
               aria-label={isDarkMode ? 'Use light mode' : 'Use dark mode'}
             >
@@ -378,7 +380,7 @@ export const DashboardLayout: React.FC = () => {
             </button>
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className={`p-2 rounded-xl transition-colors z-[110] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green ${landingControlClass}`}
+              className={`z-[110] flex h-11 w-11 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green ${landingControlClass}`}
               aria-label="Toggle menu"
               aria-expanded={isMobileMenuOpen}
               aria-controls={mobileMenuId}
@@ -555,6 +557,23 @@ export const DashboardLayout: React.FC = () => {
                       </button>
                     )}
 
+                    <button
+                      onClick={() => {
+                        setIsBugModalOpen(true);
+                        setIsMobileMenuOpen(false);
+                      }}
+                      aria-label="Report a bug"
+                      className="mobile-sidebar-link mobile-sidebar-link--action"
+                    >
+                      <span className="mobile-sidebar-link-icon">
+                        <Bug size={20} weight="regular" />
+                      </span>
+                      <span className="min-w-0 flex-1 text-left">
+                        <span className="block text-[15px] font-extrabold leading-tight">Report a bug</span>
+                        <span className="mt-0.5 block text-[11px] font-semibold leading-snug text-gray-nav">Tell us what felt off.</span>
+                      </span>
+                    </button>
+
                     {isAuthenticated && (
                       <div className="flex gap-2 mt-1">
                         <button
@@ -601,25 +620,25 @@ export const DashboardLayout: React.FC = () => {
               <nav aria-label="Footer navigation" className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 sm:gap-10">
                 <Link 
                   to={RoutePath.HOME}
-                  className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-colors"
+                  className={footerLinkClass}
                 >
                   Home
                 </Link>
                 <Link 
                   to={RoutePath.FAQ}
-                  className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-colors"
+                  className={footerLinkClass}
                 >
                   FAQ
                 </Link>
                 <Link
                   to={RoutePath.ABOUT}
-                  className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-colors"
+                  className={footerLinkClass}
                 >
                   About
                 </Link>
                 <Link 
                   to={RoutePath.PRIVACY}
-                  className="text-[11px] font-black uppercase tracking-widest text-gray-nav hover:text-green transition-colors"
+                  className={footerLinkClass}
                 >
                   Privacy
                 </Link>
@@ -630,7 +649,7 @@ export const DashboardLayout: React.FC = () => {
                   href="https://arabinda07.github.io/" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="hover:text-green transition-colors duration-300"
+                  className="inline-flex min-h-11 items-center transition-colors duration-300 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
                   aria-label="Arabinda's portfolio (opens in new tab)"
                 >
                   Arabinda
@@ -646,7 +665,7 @@ export const DashboardLayout: React.FC = () => {
           {/* Floating Bug Report Button */}
           <button
             onClick={() => setIsBugModalOpen(!isBugModalOpen)}
-            className={`fixed bottom-3 left-6 z-[110] flex h-11 w-11 items-center justify-center rounded-2xl transition duration-300 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/20 group shadow-sm ${
+            className={`fixed bottom-4 left-6 z-[110] hidden h-11 w-11 items-center justify-center rounded-2xl transition duration-300 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/20 group shadow-sm md:flex ${
               isBugModalOpen
                 ? 'bg-green text-white border-[1.5px] border-green'
                 : 'surface-floating hover:text-green'
@@ -660,75 +679,62 @@ export const DashboardLayout: React.FC = () => {
             )}
           </button>
 
-          {/* Floating Bug Report Toast */}
-          {typeof document !== 'undefined' && createPortal(
-            <AnimatePresence>
-              {isBugModalOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 20, scale: 0.95 }}
-                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                  className="fixed bottom-[68px] left-6 z-[105] w-[calc(100vw-48px)] sm:w-[380px] surface-floating surface-floating--strong !rounded-[24px] overflow-hidden"
+          <ModalSheet
+            isOpen={isBugModalOpen}
+            onClose={() => setIsBugModalOpen(false)}
+            title="Report a bug"
+            description="Tell us what broke or felt off. Add the page or step if you can."
+            icon={<Bug size={20} weight="duotone" />}
+            tone="sage"
+            size="md"
+          >
+            {!isSubmitted ? (
+              <form onSubmit={handleBugSubmit} className="space-y-5">
+                <div className="space-y-2">
+                  <label htmlFor="bug-message" className="sr-only">
+                    Describe the bug
+                  </label>
+                  <textarea
+                    id="bug-message"
+                    autoFocus
+                    data-autofocus="true"
+                    required
+                    placeholder="Describe what happened..."
+                    value={bugMessage}
+                    onChange={(e) => setBugMessage(e.target.value)}
+                    className="w-full min-h-[160px] resize-none rounded-[20px] border border-border/40 bg-body/50 p-5 font-serif text-[17px] leading-relaxed text-gray-text transition-colors placeholder:text-gray-nav/50 focus:border-green/30 focus:outline-none focus:ring-2 focus:ring-green/10"
+                  />
+                  {submitError && (
+                    <p className="text-[12px] font-bold text-clay animate-in fade-in slide-in-from-top-1">
+                      {submitError}
+                    </p>
+                  )}
+                </div>
+
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="sm"
+                  isLoading={isSubmitting}
+                  disabled={!bugMessage.trim()}
+                  className="h-11 w-full rounded-xl"
                 >
-                  <div className="p-6">
-                    {!isSubmitted ? (
-                      <form onSubmit={handleBugSubmit} className="space-y-5">
-                        <div className="flex items-center gap-2.5 mb-2">
-                          <div className="h-8 w-8 rounded-lg bg-green/10 text-green flex items-center justify-center">
-                            <Bug size={18} weight="regular" />
-                          </div>
-                          <h3 className="label-caps !text-gray-text">Report a bug</h3>
-                        </div>
-
-                        <div className="space-y-2">
-                          <textarea
-                            id="bug-message"
-                            autoFocus
-                            required
-                            placeholder="Describe what happened..."
-                            value={bugMessage}
-                            onChange={(e) => setBugMessage(e.target.value)}
-                            className="w-full min-h-[160px] p-5 rounded-[20px] border border-border/40 bg-body/50 text-gray-text font-serif text-[17px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-green/10 focus:border-green/30 transition-colors resize-none placeholder:text-gray-nav/30"
-                          />
-                          {submitError && (
-                            <p className="text-[12px] font-bold text-clay animate-in fade-in slide-in-from-top-1">
-                              {submitError}
-                            </p>
-                          )}
-                        </div>
-
-                        <div className="flex justify-end gap-2 pt-1">
-                          <Button
-                            type="submit"
-                            variant="primary"
-                            size="sm"
-                            isLoading={isSubmitting}
-                            disabled={!bugMessage.trim()}
-                            className="w-full h-11 rounded-xl"
-                          >
-                            Send report
-                            <PaperPlaneTilt size={16} weight="regular" className="ml-2" />
-                          </Button>
-                        </div>
-                      </form>
-                    ) : (
-                      <div className="flex flex-col items-center justify-center py-6 text-center animate-in fade-in zoom-in duration-500">
-                        <div className="h-16 w-16 rounded-full bg-green/10 text-green flex items-center justify-center mb-5">
-                          <CheckCircle size={36} weight="fill" />
-                        </div>
-                        <h3 className="label-caps mb-2">Thank you</h3>
-                        <p className="font-serif italic text-[16px] text-gray-light leading-relaxed">
-                          We've received your report. <br /> Your feedback helps a lot.
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>,
-            document.body
-          )}
+                  Send report
+                  <PaperPlaneTilt size={16} weight="regular" className="ml-2" />
+                </Button>
+              </form>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-6 text-center animate-in fade-in zoom-in duration-500">
+                <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-green/10 text-green">
+                  <CheckCircle size={36} weight="fill" />
+                </div>
+                <h3 className="label-caps mb-2">Thank you</h3>
+                <p className="font-serif text-[16px] italic leading-relaxed text-gray-light">
+                  We've received your report. <br /> Your feedback helps a lot.
+                </p>
+              </div>
+            )}
+          </ModalSheet>
         </>
       )}
 
