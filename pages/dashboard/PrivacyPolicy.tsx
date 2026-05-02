@@ -16,7 +16,6 @@ import {
 
 import { Button } from '../../components/ui/Button';
 import { useDocumentMeta } from '../../hooks/useDocumentMeta';
-import { PublicFooter } from '../../components/ui/PublicFooter';
 import { RoutePath } from '../../types';
 
 const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
@@ -111,7 +110,7 @@ const policySections = [
 export const PrivacyPolicy: React.FC = () => {
   useDocumentMeta({
     title: 'Privacy – How Reflections Handles Your Data',
-    description: 'How Reflections handles private notes, moods, tags, attachments, optional AI actions, analytics, payments, exports, and deletion.',
+    description: 'What Reflections stores, when AI runs, how payments and analytics work, and how to export or delete your writing.',
     path: '/privacy',
   });
   const navigate = useNavigate();
@@ -191,7 +190,7 @@ export const PrivacyPolicy: React.FC = () => {
           </article>
         </section>
       </main>
-      <PublicFooter />
+    </div>
     </div>
   );
 };

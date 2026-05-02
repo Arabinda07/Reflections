@@ -13,33 +13,32 @@ import {
   ListChecks,
 } from '@phosphor-icons/react';
 import { useDocumentMeta } from '../../hooks/useDocumentMeta';
-import { PublicFooter } from '../../components/ui/PublicFooter';
 
 const guideSections = [
   {
     icon: BookOpen,
     title: 'What is Reflections?',
     body:
-      'Reflections is a private writing-first wellness journal for saving notes, naming moods, and returning to patterns when you are ready.',
+      'A journal where writing comes first. You save notes, name moods, tag patterns, and come back to them whenever you want.',
   },
   {
     icon: Heart,
     title: 'Who is Reflections for?',
     body:
-      'It is for people who want a calm place to think in writing without streaks, public sharing, pressure loops, or automatic AI interruptions.',
+      'It is for people who want a calm place to think in writing. You set the pace, keep your notes to yourself, and choose when to involve AI.',
   },
   {
     icon: PenNib,
     title: 'Why writing first?',
     body:
-      'Writing is the main practice. Optional AI support and Life Wiki refreshes stay out of the way until you ask for them.',
+      'Writing is the main practice. AI and Life Wiki refreshes stay in the background until you invite them.',
   },
 ];
 
 const practiceItems = [
   {
     title: 'The practice',
-    body: 'A quiet space to write, one reflection at a time.',
+    body: 'A place to write, one reflection at a time.',
     icon: BookOpen,
   },
   {
@@ -82,8 +81,8 @@ const detailItems = [
     icon: Tag,
   },
   {
-    title: 'Optional AI support',
-    body: "Reflections can help notice patterns or refresh your Life Wiki, but only when you ask. It never runs in the background, and we don't use your notes to train AI models.",
+    title: 'AI on your terms',
+    body: 'Reflections can spot patterns or refresh your Life Wiki, but only when you choose. It never fires in the background. See our Privacy page for how your notes are protected.',
     label: 'On demand only • Private by design',
     icon: Brain,
   },
@@ -103,7 +102,7 @@ const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
 export const FAQ: React.FC = () => {
   useDocumentMeta({
     title: 'FAQ – How Reflections Works | Private Journaling App',
-    description: 'Answers about Reflections: private notes, mood check-ins, optional AI support, Life Wiki, and writing without streaks or scores.',
+    description: 'How Reflections works: the writing practice, mood check-ins, AI that waits for you, Life Wiki, and the design choices behind each feature.',
     path: '/faq',
   });
 
@@ -125,7 +124,7 @@ export const FAQ: React.FC = () => {
 
           <p className="max-w-[36rem] font-serif text-[18px] leading-relaxed text-gray-light">
             Reflections is a calm, private writing space. This guide explains what the product does,
-            what it avoids, and how optional AI fits around the writing
+            how AI fits around the writing, and the choices behind the design
           </p>
           <p className="text-[12px] font-bold uppercase tracking-widest text-gray-nav">Last updated · May 2026</p>
         </div>
@@ -236,51 +235,6 @@ export const FAQ: React.FC = () => {
           </div>
         </section>
 
-        <section className="mb-20 border-t border-border pt-16">
-          <div className="mb-10 space-y-4">
-            <p className="label-caps text-green">Common questions</p>
-            <h2 className="text-mk-h2 font-display font-bold text-gray-text">Answers for new visitors</h2>
-          </div>
-
-          <dl className="grid gap-8 md:grid-cols-2">
-            <div>
-              <dt className="mb-2 text-[18px] font-display font-bold text-gray-text">What is Reflections?</dt>
-              <dd className="font-sans text-[16px] leading-relaxed text-gray-light">
-                Reflections is a private, writing-first wellness journal. You save notes, name your mood, tag patterns, and optionally ask AI for a personalised reflection that draws on everything you have written before — not just one entry.
-              </dd>
-            </div>
-            <div>
-              <dt className="mb-2 text-[18px] font-display font-bold text-gray-text">Does AI run automatically?</dt>
-              <dd className="font-sans text-[16px] leading-relaxed text-gray-light">
-                No. AI support only runs when you explicitly press Reflect with AI or Refresh Insights. The Life Wiki updates when you save a note, but AI never fires in the background without your action.
-              </dd>
-            </div>
-            <div>
-              <dt className="mb-2 text-[18px] font-display font-bold text-gray-text">Is Reflections free?</dt>
-              <dd className="font-sans text-[16px] leading-relaxed text-gray-light">
-                Yes. The free tier includes 30 notes per month with full AI features — reflections, Life Wiki, mood tracking, ambient sound, and whisper mode. A Pro tier with unlimited notes is planned.
-              </dd>
-            </div>
-            <div>
-              <dt className="mb-2 text-[18px] font-display font-bold text-gray-text">Is Reflections therapy?</dt>
-              <dd className="font-sans text-[16px] leading-relaxed text-gray-light">
-                No. Reflections is a personal writing tool for noticing thoughts more clearly. It is not professional mental health care and is not a substitute for trained support.
-              </dd>
-            </div>
-            <div>
-              <dt className="mb-2 text-[18px] font-display font-bold text-gray-text">What is the Life Wiki?</dt>
-              <dd className="font-sans text-[16px] leading-relaxed text-gray-light">
-                The Life Wiki is an AI-maintained personal knowledge base that grows from your writing. It tracks mood patterns, recurring themes, a self-model, and a timeline — compiled context that makes every AI reflection deeply personal.
-              </dd>
-            </div>
-            <div>
-              <dt className="mb-2 text-[18px] font-display font-bold text-gray-text">How is my data protected?</dt>
-              <dd className="font-sans text-[16px] leading-relaxed text-gray-light">
-                All data is stored in Supabase with Row Level Security. Every query is scoped to your account. Files use time-limited signed URLs. Your notes are never used to train AI models.
-              </dd>
-            </div>
-          </dl>
-        </section>
 
         <section className="mb-28 border-t border-border pt-10">
           <p className="label-caps text-green">Contact</p>
@@ -294,7 +248,7 @@ export const FAQ: React.FC = () => {
         </section>
 
       </main>
-      <PublicFooter />
+    </div>
     </div>
   );
 };

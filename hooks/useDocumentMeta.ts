@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 
 const SITE_ORIGIN = 'https://reflections-ebon.vercel.app';
-const DEFAULT_TITLE = 'Reflections – Achieve Mental Clarity through Minimalist Journaling';
+const DEFAULT_TITLE = 'Reflections – A Calm Space to Write and Reflect';
 const DEFAULT_DESCRIPTION =
-  'Discover your private writing sanctuary for mental clarity. Reflections is a minimalist journal designed for calm reflection, secure note-taking, and personal growth.';
+  'A private journal for writing notes, naming moods, and noticing patterns. Reflections stays out of the way until you need it.';
 
 interface DocumentMeta {
   title: string;

@@ -3,13 +3,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { useDocumentMeta } from '../../hooks/useDocumentMeta';
-import { PublicFooter } from '../../components/ui/PublicFooter';
 import { RoutePath } from '../../types';
 
 export const Landing: React.FC = () => {
   useDocumentMeta({
     title: 'Reflections – Private Journal for Notes, Mood & Reflection',
-    description: 'A private journal app for writing notes, naming moods, tagging patterns, and using optional AI support only when you ask. No streaks, no pressure.',
+    description: 'A private journal for writing notes, naming moods, and noticing patterns. AI runs only when you ask. No streaks, no pressure.',
     path: '/',
   });
   const navigate = useNavigate();
@@ -179,7 +178,6 @@ export const Landing: React.FC = () => {
           </div>
         </div>
       </div>
-      <PublicFooter />
     </div>
   );
 };

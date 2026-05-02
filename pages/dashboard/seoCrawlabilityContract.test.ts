@@ -78,7 +78,7 @@ describe('SEO crawlability contract', () => {
     expect(generator).toContain("path: '/about'");
     expect(generator).toContain('<meta name="robots" content="index, follow" />');
     expect(generator).toContain('<main id="public-seo-content"');
-    expect(generator).toContain('Private journal app for notes, mood, and reflection');
+    expect(generator).toContain('Private journal for notes, mood, and reflection');
     expect(generator).toContain('FAQ about private journaling');
     expect(generator).toContain('Privacy for your private journal');
     expect(generator).toContain('About Reflections and Arabinda');

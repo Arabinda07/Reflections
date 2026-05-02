@@ -48,7 +48,7 @@ export default defineConfig(() => {
           manifest: {
             name: 'Reflections',
             short_name: 'Reflections',
-            description: 'A private writing-first journal with optional AI support when you ask for it.',
+            description: 'A journal for writing, mood tracking, and reflection. AI runs only when you ask.',
             theme_color: '#f7f8f6',
             background_color: '#f7f8f6',
             display: 'standalone',

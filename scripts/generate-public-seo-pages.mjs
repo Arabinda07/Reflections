@@ -9,28 +9,28 @@ const distDir = new URL('../dist/', import.meta.url);
 const publicPages = [
   {
     path: '/',
-    title: 'Private journal app for notes, mood, and reflection',
+    title: 'Private journal for notes, mood, and reflection',
     description:
-      'Reflections is a private journal app for writing notes, naming moods, tagging patterns, and using optional AI support only when you ask.',
-    h1: 'Private journal app for notes, mood, and reflection',
+      'A private journal for writing notes, naming moods, and noticing patterns. AI runs only when you ask. No streaks, no pressure.',
+    h1: 'Private journal for notes, mood, and reflection',
     intro:
-      'Write a few lines, name the mood if it helps, and return to patterns without streaks, scores, or pressure.',
+      'Write a few lines, name the mood if it helps, and return to patterns at your own pace.',
     sections: [
       ['Private writing', 'Your notes belong to your account and stay centered on your own words.'],
       ['Mood and tags', 'Use moods and tags to notice patterns in ordinary language.'],
-      ['Optional AI support', 'Reflect with AI and Refresh with AI stay on demand, not automatic.'],
+      ['Optional AI support', 'Reflect with AI and Refresh with AI run on demand, not in the background.'],
     ],
   },
   {
     path: '/faq',
     title: 'FAQ about private journaling | Reflections',
     description:
-      'Answers about Reflections, private notes, mood check-ins, optional AI support, Life Wiki, and writing without streaks or scores.',
+      'How Reflections works: the writing practice, mood check-ins, AI that waits for you, Life Wiki, and the design choices behind each feature.',
     h1: 'FAQ about private journaling',
     intro:
-      'Plain answers about how Reflections works, what it stores, and how optional AI fits around private writing.',
+      'How Reflections works, what it stores, and how AI fits around private writing.',
     sections: [
-      ['What is Reflections?', 'Reflections is a private writing-first journal for notes, moods, tags, and personal patterns.'],
+      ['What is Reflections?', 'A journal built around writing for notes, moods, tags, and personal patterns.'],
       ['Does AI run automatically?', 'No. AI support runs only when you ask for a reflection or a Life Wiki refresh.'],
       ['Is Reflections therapy?', 'No. Reflections is a personal writing tool, not professional mental health care.'],
     ],
@@ -41,7 +41,7 @@ const publicPages = [
         {
           "@type": "Question",
           "name": "What is Reflections?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Reflections is a private, writing-first wellness journal. You save notes, name your mood, tag patterns, and optionally ask AI for a personalised reflection that draws on everything you have written before." }
+          "acceptedAnswer": { "@type": "Answer", "text": "Reflections is a journal built around writing. You save notes, name your mood, tag patterns, and can ask AI for a personalised reflection that draws on everything you have written before." }
         },
         {
           "@type": "Question",
@@ -66,7 +66,7 @@ const publicPages = [
         {
           "@type": "Question",
           "name": "How is my data protected?",
-          "acceptedAnswer": { "@type": "Answer", "text": "All data is stored in Supabase with Row Level Security. Every query is scoped to your account. Your notes are never used to train AI models." }
+          "acceptedAnswer": { "@type": "Answer", "text": "All data is stored in Supabase with Row Level Security. Every query is scoped to your account. Read our Privacy page for the full picture." }
         }
       ]
     }),
@@ -75,7 +75,7 @@ const publicPages = [
     path: '/privacy',
     title: 'Privacy for your private journal | Reflections',
     description:
-      'How Reflections handles private notes, moods, tags, attachments, optional AI actions, analytics, payments, exports, and deletion.',
+      'What Reflections stores, when AI runs, how payments and analytics work, and how to export or delete your writing.',
     h1: 'Privacy for your private journal',
     intro:
       'This page explains what Reflections stores, when AI is used, and how you can export or delete your writing.',
@@ -89,14 +89,14 @@ const publicPages = [
     path: '/about',
     title: 'About Reflections and Arabinda | Private journal app',
     description:
-      'A note from Arabinda about why Reflections is a private writing app with mood notes, Life Wiki, and optional AI support.',
+      'A note from Arabinda about why Reflections is a personal writing app with mood notes, Life Wiki, and AI that stays out of the way.',
     h1: 'About Reflections and Arabinda',
     intro:
-      'Reflections began as a quieter place to write, notice feelings, and leave without being pushed to perform.',
+      'Reflections began as a slower place to write, notice feelings, and leave without being pushed to perform.',
     sections: [
       ['Private writing', 'The product is built around writing that stays private and ordinary.'],
-      ['No pressure loops', 'Reflections avoids streaks, scores, public feeds, and productivity rankings.'],
-      ['AI should wait', 'Optional AI support appears only when invited and should never act like it knows you better than you do.'],
+      ['No pressure loops', 'Write at your own pace without streaks, scores, or public feeds.'],
+      ['AI should wait', 'AI support appears only when invited and never acts like it knows you better than you do.'],
     ],
     extraSchema: JSON.stringify({
       "@context": "https://schema.org",
@@ -106,7 +106,7 @@ const publicPages = [
       "datePublished": "2025-01-01",
       "dateModified": "2026-05-02",
       "publisher": { "@type": "Organization", "name": "Reflections", "url": "https://reflections-ebon.vercel.app/" },
-      "description": "A note from Arabinda about why Reflections is a private writing app with mood notes, Life Wiki, and optional AI support."
+      "description": "A note from Arabinda about why Reflections is a personal writing app with mood notes, Life Wiki, and AI that stays out of the way."
     }),
   },
 ];

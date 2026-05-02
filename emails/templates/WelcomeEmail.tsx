@@ -17,7 +17,7 @@ export const WelcomeEmail = ({
   preferencesUrl = 'https://reflections.app/account'
 }: WelcomeEmailProps) => {
   return (
-    <BaseEmailLayout previewText="Welcome to Reflections. A quiet place for your thoughts.">
+    <BaseEmailLayout previewText="Welcome to Reflections. A place for your thoughts.">
       <EmailHeader />
       
       <Text className="text-2xl font-serif text-brand-text mb-6">
@@ -25,9 +25,8 @@ export const WelcomeEmail = ({
       </Text>
       
       <Text className="text-base text-brand-light leading-relaxed mb-6">
-        Reflections is a private writing space designed to stay quiet until you need it. 
-        There are no social feeds, no streaks, and no pressure to perform. 
-        Just a blank page and optional AI support when you ask for it.
+        Reflections is a private writing space designed to stay out of the way until you need it. 
+        Write at your own pace, keep your notes to yourself, and ask for AI support whenever it feels right.
       </Text>
 
       <Section className="my-8 text-center">
@@ -40,7 +39,7 @@ export const WelcomeEmail = ({
       </Section>
       
       <Text className="text-base text-brand-light leading-relaxed mb-6">
-        We're glad you're here. Take a few quiet minutes before the day ends.
+        We're glad you're here. Take a few minutes before the day ends.
       </Text>
 
       <UnsubscribeFooter unsubscribeUrl={unsubscribeUrl} preferencesUrl={preferencesUrl} />
