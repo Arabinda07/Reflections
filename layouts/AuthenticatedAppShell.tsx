@@ -3,8 +3,6 @@ import { MotionConfig } from 'motion/react';
 import { AuthProvider } from '../context/AuthContext';
 import { PWAInstallProvider } from '../context/PWAInstallContext';
 import { ToastProvider } from '../components/ui/Toast';
-import { useNativeOAuthListener } from '../hooks/useNativeOAuthListener';
-import { useNativeStatusBar } from '../hooks/useNativeStatusBar';
 import { useSync } from '../hooks/useSync';
 import { DashboardLayout } from './DashboardLayout';
 
@@ -62,9 +60,6 @@ const SyncBoundary: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 };
 
 export const AuthenticatedAppShell: React.FC = () => {
-  useNativeStatusBar();
-  useNativeOAuthListener();
-
   return (
     <PWAInstallProvider>
       <AuthProvider>

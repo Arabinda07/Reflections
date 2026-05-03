@@ -17,7 +17,8 @@
 @rem
 
 @if "%DEBUG%"=="" @echo off
-set JAVA_HOME=C:\PROGRA~1\Java\jdk-21
+set "JAVA_HOME=C:\Program Files\Java\jdk-21"
+set "JAVA_EXE=%JAVA_HOME%\bin\java.exe"
 @rem ##########################################################################
 @rem
 @rem  Gradle startup script for Windows

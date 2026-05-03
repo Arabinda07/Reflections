@@ -4,6 +4,8 @@ import { RouteLoadingFrame } from './components/ui/RouteLoadingFrame';
 import { RouteErrorBoundary } from './pages/RouteErrorBoundary';
 import { Landing } from './pages/dashboard/Landing';
 import { RoutePath } from './types';
+import { useNativeOAuthListener } from './hooks/useNativeOAuthListener';
+import { useNativeStatusBar } from './hooks/useNativeStatusBar';
 
 const AuthenticatedAppShell = lazy(() => import('./layouts/AuthenticatedAppShell').then((m) => ({ default: m.AuthenticatedAppShell })));
 const AuthAppShell = lazy(() => import('./layouts/AuthAppShell').then((m) => ({ default: m.AuthAppShell })));
@@ -74,6 +76,8 @@ const router = createBrowserRouter(
 );
 
 function App() {
+  useNativeOAuthListener();
+  useNativeStatusBar();
   return <RouterProvider router={router} />;
 }
 

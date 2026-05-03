@@ -10,7 +10,7 @@ export const AuthAppShell: React.FC = () => (
         <a href="#main-content" className="skip-link">
           Skip to content
         </a>
-        <main id="main-content" className="min-h-[100dvh]">
+        <main id="main-content" className="flex min-h-[100dvh] flex-col pt-[env(safe-area-inset-top)]">
           <Outlet />
         </main>
       </div>
