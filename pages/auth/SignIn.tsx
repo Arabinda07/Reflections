@@ -10,6 +10,7 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 import { Surface } from '@/components/ui/Surface';
 import { RoutePath } from '@/types';
 import { useAuth } from '@/context/AuthContext';
+import { useDocumentMeta } from '@/hooks/useDocumentMeta';
 import { supabase } from '@/src/supabaseClient';
 import {
   consumeGoogleAuthError,
@@ -26,6 +27,11 @@ import {
 import { trackGoogleAuthStartedDeferred } from '@/src/analytics/deferredEvents';
 
 export const SignIn: React.FC = () => {
+  useDocumentMeta({
+    title: 'Reflections – A Calm Space to Write and Reflect',
+    description: 'Sign in to your private journal to continue writing and reflecting.',
+    path: RoutePath.LOGIN,
+  });
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, isInitialCheckDone } = useAuth();

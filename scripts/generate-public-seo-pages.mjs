@@ -9,7 +9,7 @@ const distDir = new URL('../dist/', import.meta.url);
 const publicPages = [
   {
     path: '/',
-    title: 'Private journal for notes, mood, and reflection',
+    title: 'Reflections - Private Journal for Notes, Mood & Reflection',
     description:
       'A private journal for writing notes, naming moods, and noticing patterns. AI runs only when you ask. No streaks, no pressure.',
     h1: 'Private journal for notes, mood, and reflection',

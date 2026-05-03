@@ -9,6 +9,7 @@ import { SectionHeader } from '@/components/ui/SectionHeader';
 import { Surface } from '@/components/ui/Surface';
 import { RoutePath } from '@/types';
 import { useAuth } from '@/context/AuthContext';
+import { useDocumentMeta } from '@/hooks/useDocumentMeta';
 import { supabase } from '@/src/supabaseClient';
 import {
   consumeGoogleAuthError,
@@ -27,6 +28,11 @@ import { referralService } from '@/services/engagementServices';
 import { trackGoogleAuthStartedDeferred } from '@/src/analytics/deferredEvents';
 
 export const SignUp: React.FC = () => {
+  useDocumentMeta({
+    title: 'Reflections – A Calm Space to Write and Reflect',
+    description: 'Create an account to start your private journal and reflection practice.',
+    path: RoutePath.SIGNUP,
+  });
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, isInitialCheckDone } = useAuth();
