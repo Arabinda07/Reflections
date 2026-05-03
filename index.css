@@ -1287,6 +1287,14 @@ select:focus-visible,
     font-size: 1.125rem;
     font-weight: 800;
     box-shadow: 0 4px 12px oklch(from var(--green-shadow) l c h / 0.2);
+    overflow: hidden;
+  }
+
+  .mobile-sidebar-user-avatar img {
+    display: block;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
   }
 
   .mobile-sidebar-footer {
@@ -1507,6 +1515,77 @@ select:focus-visible,
     background: var(--floating-panel-media-bg-hover);
     border-color: var(--floating-panel-media-border);
     color: var(--floating-panel-media-text);
+  }
+
+  .public-contact-link {
+    display: inline-flex;
+    min-height: 44px;
+    min-width: 44px;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-control);
+    padding-inline: 0.25rem;
+    color: var(--green);
+    font-weight: 800;
+    text-underline-offset: 0.22em;
+    transition:
+      color 220ms var(--ease-out-expo),
+      background-color 220ms var(--ease-out-expo);
+  }
+
+  .public-contact-link:hover {
+    background: oklch(from var(--green) l c h / 0.07);
+    color: var(--gray-text);
+  }
+
+  .faq-detail-ledger > article:first-child {
+    border-bottom: 1px solid oklch(from var(--border-color) l c h / 0.68);
+    padding-bottom: 1.75rem;
+  }
+
+  .privacy-principle-strip > article {
+    align-items: flex-start;
+  }
+
+  .privacy-policy-ledger article {
+    position: relative;
+  }
+
+  .privacy-policy-ledger article::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 1.75rem;
+    bottom: 1.75rem;
+    width: 1px;
+    background: oklch(from var(--surface-current-accent) l c h / 0.18);
+  }
+
+  @media (min-width: 768px) {
+    .faq-detail-ledger > article:first-child {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 3.5rem minmax(0, 1fr);
+      max-width: 56rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .public-contact-link {
+      margin-top: 0.35rem;
+      width: 100%;
+      justify-content: flex-start;
+      overflow-wrap: anywhere;
+    }
+
+    .faq-detail-ledger,
+    .privacy-principle-strip {
+      gap: 1.5rem;
+    }
+
+    .privacy-policy-ledger article::before {
+      display: none;
+    }
   }
 
   .video-mask {

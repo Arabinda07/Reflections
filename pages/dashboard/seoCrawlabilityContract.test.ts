@@ -118,7 +118,6 @@ describe('SEO crawlability contract', () => {
       '/wiki/:path*',
       '/sanctuary',
       '/sanctuary/:path*',
-      '/terms',
     ]));
     expect(rewriteSources).not.toContain('/faq');
     expect(rewriteSources).not.toContain('/privacy');
@@ -225,7 +224,7 @@ describe('SEO crawlability contract', () => {
     expect(footer).toContain("href: RoutePath.PRIVACY");
     expect(header).toContain('Public navigation');
     expect(header).toContain('Mobile public navigation');
-    expect(header).toContain('href={item.href}');
+    expect(header).toContain('to={item.href}');
   });
 
   it('keeps FAQ guide sections with key product questions for AI extractability', () => {

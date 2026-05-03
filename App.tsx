@@ -43,7 +43,6 @@ const router = createBrowserRouter(
         <Route path={RoutePath.FAQ} element={withRouteFallback(<FAQ />)} />
         <Route path={RoutePath.ABOUT} element={withRouteFallback(<AboutArabinda />)} />
         <Route path={RoutePath.PRIVACY} element={withRouteFallback(<PrivacyPolicy />)} />
-        <Route path={RoutePath.TERMS} element={<Navigate to={RoutePath.PRIVACY} replace />} />
       </Route>
 
       <Route element={withRouteFallback(<AuthAppShell />)} errorElement={<RouteErrorBoundary />}>

@@ -29,7 +29,7 @@ export const getScreenGroup = (pathname: string): ScreenGroup => {
   if (pathname === '/account') return 'account';
   if (pathname === '/insights') return 'insights';
   if (pathname === '/faq') return 'support';
-  if (pathname === '/privacy' || pathname === '/terms') return 'legal';
+  if (pathname === '/privacy') return 'legal';
   return 'other';
 };
 

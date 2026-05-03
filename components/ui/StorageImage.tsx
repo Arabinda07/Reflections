@@ -68,5 +68,14 @@ export const StorageImage: React.FC<StorageImageProps> = ({
      );
   }
 
-  return <img src={src} alt={alt} className={className} referrerPolicy="no-referrer" {...props} />;
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className={className}
+      referrerPolicy="no-referrer"
+      onError={() => setSrc(fallbackSrc || null)}
+      {...props}
+    />
+  );
 };

@@ -191,7 +191,6 @@ export enum RoutePath {
   FAQ = '/faq',
   ABOUT = '/about',
   PRIVACY = '/privacy',
-  TERMS = '/terms',
   WIKI = '/wiki',
   SANCTUARY = '/sanctuary',
   SANCTUARY_ARTICLE = '/sanctuary/:pageType',

@@ -239,6 +239,11 @@ export const HomeAuthenticated: React.FC = () => {
     navigate(RoutePath.CREATE_NOTE, { state: { initialPrompt: "What's on your mind?" } });
   }, [handleCloseOnboarding, navigate]);
 
+  const handleSkipOnboarding = useCallback(() => {
+    handleCloseOnboarding();
+    navigate(RoutePath.DASHBOARD, { replace: true });
+  }, [handleCloseOnboarding, navigate]);
+
   const updateIntentionSummary = useCallback((notes: Note[]) => {
     setTaskNotes(notes);
     setIntentionSummary(buildHomeIntentionSummary(notes));
@@ -655,7 +660,7 @@ export const HomeAuthenticated: React.FC = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={handleFinishOnboarding}
+              onClick={handleSkipOnboarding}
               aria-label="Skip onboarding"
               className="self-center px-3 text-gray-nav/75 hover:text-green"
             >

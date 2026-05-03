@@ -124,7 +124,6 @@ describe('isTopLevelAndroidRoute', () => {
     expect(isTopLevelAndroidRoute('/faq')).toBe(true);
     expect(isTopLevelAndroidRoute('/about')).toBe(true);
     expect(isTopLevelAndroidRoute('/privacy')).toBe(true);
-    expect(isTopLevelAndroidRoute('/terms')).toBe(true);
     expect(isTopLevelAndroidRoute('/wiki')).toBe(true);
     expect(isTopLevelAndroidRoute('/sanctuary')).toBe(true);
     expect(isTopLevelAndroidRoute('/notes/new')).toBe(false);

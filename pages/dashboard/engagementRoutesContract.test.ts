@@ -41,14 +41,9 @@ describe('engagement routes source contract', () => {
     expect(homeAuthenticated.toLowerCase()).not.toMatch(/\b(streak|xp|leaderboard|lost|failed)\b/);
   });
 
-  it('folds Terms into the canonical Privacy page', () => {
-    const app = read('App.tsx');
-    const layout = read('layouts/DashboardLayout.tsx');
+  it('keeps usage and account policies on the Privacy page', () => {
     const privacy = read('pages/dashboard/PrivacyPolicy.tsx');
 
-    expect(app).toContain('to={RoutePath.PRIVACY} replace');
-    expect(app).not.toContain('TermsOfService');
-    expect(layout).not.toContain('to={RoutePath.TERMS}');
     expect(privacy).toContain('What Reflections keeps');
     expect(privacy).toContain('Using Reflections');
     expect(privacy).toContain('Export, deletion, and account closure');

@@ -23,11 +23,17 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const getSessionAvatarUrl = (session: Session) =>
+  session.user.user_metadata?.avatar_url ||
+  session.user.user_metadata?.picture ||
+  session.user.user_metadata?.avatar ||
+  null;
+
 const mapSessionToUser = (session: Session): User => ({
   id: session.user.id,
   email: session.user.email || '',
   name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
-  avatarUrl: session.user.user_metadata?.avatar_url,
+  avatarUrl: getSessionAvatarUrl(session) || undefined,
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

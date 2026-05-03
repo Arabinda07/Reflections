@@ -192,7 +192,7 @@ export const FAQ: React.FC = () => {
             <h2 className="text-mk-h2 font-display font-bold text-gray-text">Tools built to support you without getting in the way</h2>
           </div>
 
-          <div className="grid gap-x-10 gap-y-8 md:grid-cols-2">
+          <div className="faq-detail-ledger grid gap-x-10 gap-y-8 md:grid-cols-2">
             {detailItems.map((item) => (
               <article key={item.title} className="group flex flex-col gap-4 sm:flex-row sm:gap-6">
                 <div className="tone-icon tone-icon-sky flex h-14 w-14 flex-none rounded-2xl transition-transform duration-500 ease-out-expo group-hover:-rotate-3">
@@ -234,7 +234,10 @@ export const FAQ: React.FC = () => {
           <p className="label-caps text-green">Contact</p>
           <p className="mt-3 max-w-[42rem] font-sans text-[16px] leading-relaxed text-gray-light">
             Questions about Reflections can go to{' '}
-            <a className="font-bold text-green hover:opacity-70" href={`mailto:${SUPPORT_EMAIL}`}>
+            <a
+              className="public-contact-link"
+              href={`mailto:${SUPPORT_EMAIL}`}
+            >
               {SUPPORT_EMAIL}
             </a>
             .

@@ -1,6 +1,6 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { RoutePath } from '../../types';
 
 type IconProps = {
@@ -39,8 +39,13 @@ const publicActionItems = [
   { label: 'Sign up', href: RoutePath.SIGNUP, description: 'Start writing', icon: 'signUp' },
 ] satisfies PublicMenuItem[];
 
+const PUBLIC_THEME_STORAGE_KEY = 'reflections.public-theme';
+
 const getInitialDarkMode = () =>
-  typeof document !== 'undefined' ? document.documentElement.classList.contains('dark') : false;
+  typeof document !== 'undefined'
+    ? localStorage.getItem(PUBLIC_THEME_STORAGE_KEY) === 'dark' ||
+      document.documentElement.classList.contains('dark')
+    : false;
 
 const AppLeafIcon: React.FC<IconProps> = ({ className = '' }) => (
   <svg viewBox="0 0 256 256" aria-hidden="true" className={className} fill="currentColor">
@@ -217,6 +222,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDarkMode);
+    localStorage.setItem(PUBLIC_THEME_STORAGE_KEY, isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
 
   useEffect(() => {
@@ -333,9 +339,10 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
                 const isActive = location.pathname === item.href;
 
                 return (
-                  <a
+                  <Link
                     key={item.href}
-                    href={item.href}
+                    to={item.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
                     className="mobile-sidebar-link group"
                     data-active={isActive ? 'true' : undefined}
                     aria-current={isActive ? 'page' : undefined}
@@ -350,7 +357,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
                       </span>
                     </span>
                     <CaretIcon className="mobile-sidebar-link-caret h-4 w-4" />
-                  </a>
+                  </Link>
                 );
               })}
             </nav>
@@ -363,7 +370,12 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
                 className="public-theme-toggle public-theme-toggle--mobile-menu mobile-sidebar-link mobile-sidebar-link--action group"
               />
               {publicActionItems.map((item) => (
-                <a key={item.href} href={item.href} className="mobile-sidebar-link mobile-sidebar-link--action group">
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="mobile-sidebar-link mobile-sidebar-link--action group"
+                >
                   <span className="mobile-sidebar-link-icon">
                     <PublicMenuIcon name={item.icon} className="h-5 w-5" />
                   </span>
@@ -373,7 +385,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
                       {item.description}
                     </span>
                   </span>
-                </a>
+                </Link>
               ))}
             </div>
           </aside>
@@ -386,8 +398,8 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
     <>
       <header className={`public-header ${isLandingRoute ? 'public-header--landing landing-nav-scrim' : 'public-header--standard'}`}>
         <div className="mx-auto flex h-14 w-full max-w-[1440px] items-center justify-between gap-3 px-4 md:px-8 xl:px-10">
-          <a
-            href={RoutePath.HOME}
+          <Link
+            to={RoutePath.HOME}
             className="group flex min-h-11 min-w-0 items-center gap-2"
             aria-label="Reflections - go to home"
           >
@@ -397,7 +409,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
             <span className="max-w-[150px] truncate font-serif text-[22px] italic tracking-normal text-green sm:max-w-none sm:text-[26px]">
               Reflections
             </span>
-          </a>
+          </Link>
 
           <nav aria-label="Public navigation" className="hidden items-center gap-1.5 lg:flex xl:gap-2">
             <ThemeModeButton
@@ -409,31 +421,31 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
               const isActive = location.pathname === item.href;
 
               return (
-                <a
+                <Link
                   key={item.href}
-                  href={item.href}
+                  to={item.href}
                   aria-current={isActive ? 'page' : undefined}
                   className={`inline-flex min-h-11 items-center rounded-xl border px-3 py-2 text-[12px] font-extrabold transition-colors duration-200 hover:border-green/20 hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-1 xl:px-4 xl:text-[13px] ${
                     isActive ? 'border-green bg-green/5 text-green shadow-sm shadow-green/5' : 'border-transparent text-gray-nav'
                   }`}
                 >
                   {item.label}
-                </a>
+                </Link>
               );
             })}
             <span className="mx-2 h-6 w-px bg-border" aria-hidden="true" />
-            <a
-              href={RoutePath.LOGIN}
+            <Link
+              to={RoutePath.LOGIN}
               className="inline-flex min-h-11 items-center rounded-xl px-3 py-2 text-[13px] font-extrabold text-gray-nav transition-colors hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
             >
               Sign in
-            </a>
-            <a
-              href={RoutePath.SIGNUP}
+            </Link>
+            <Link
+              to={RoutePath.SIGNUP}
               className="inline-flex min-h-11 items-center rounded-xl bg-green px-4 py-2 text-[13px] font-extrabold text-white shadow-sm shadow-green/10 transition-colors hover:bg-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
             >
               Sign up
-            </a>
+            </Link>
           </nav>
 
           <div className="flex items-center gap-2 lg:hidden">

@@ -31,7 +31,6 @@ const ANDROID_TOP_LEVEL_ROUTES = new Set<string>([
   RoutePath.FAQ,
   RoutePath.ABOUT,
   RoutePath.PRIVACY,
-  RoutePath.TERMS,
   RoutePath.WIKI,
   RoutePath.SANCTUARY,
 ]);

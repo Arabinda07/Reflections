@@ -175,7 +175,7 @@ export const PrivacyPolicy: React.FC = () => {
         </section>
 
         <section className="privacy-comparison-band mb-20 surface-flat surface-tone-sage rounded-[2rem] p-7 md:p-10">
-          <div className="grid gap-8 lg:grid-cols-3">
+          <div className="privacy-principle-strip grid gap-8 lg:grid-cols-3">
             {[
               {
                 title: 'Stays private',
@@ -206,7 +206,7 @@ export const PrivacyPolicy: React.FC = () => {
           </div>
         </section>
 
-        <section className="privacy-compact-list mb-20 border-y border-border py-10">
+        <section className="privacy-compact-list privacy-policy-ledger mb-20 border-y border-border py-10">
           <div className="grid gap-x-12 lg:grid-cols-2">
             {policySections.map((section) => (
               <article key={section.title} className="group border-b border-border/60 py-7 lg:odd:pr-4 lg:even:pl-4">

@@ -39,6 +39,11 @@ import { aiService, type GreatIngestProgress } from '../../services/aiService';
 
 const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
 
+const getAuthAvatarPath = (metadata: Record<string, unknown> | undefined) => {
+  const avatar = metadata?.avatar_url || metadata?.picture || metadata?.avatar;
+  return typeof avatar === 'string' ? avatar : null;
+};
+
 type FeedbackState =
   | {
       variant: 'info' | 'success' | 'warning' | 'error';
@@ -91,7 +96,7 @@ export const Account: React.FC = () => {
 
         setUserId(fullUser.id);
         setEmail(fullUser.email || '');
-        setAvatarPath(fullUser.user_metadata?.avatar_url || null);
+        setAvatarPath(getAuthAvatarPath(fullUser.user_metadata));
         setLastSignIn(fullUser.last_sign_in_at || null);
         setFormData({
           fullName: fullUser.user_metadata?.full_name || '',
