@@ -68,6 +68,16 @@ describe('public landing performance contract', () => {
     expect(landing).toContain("import('../../src/supabaseClient')");
   });
 
+  it('keeps decorative video out of the initial landing network burst', () => {
+    const landing = read('pages/dashboard/Landing.tsx');
+
+    expect(landing).not.toContain('window.requestAnimationFrame(() => {\n      setShouldLoadHeroVideo(true);');
+    expect(landing).toContain('const videoDelay = window.setTimeout(() => {');
+    expect(landing).toContain('cancelVideoLoad = scheduleIdleTask(() => setShouldLoadHeroVideo(true), 1800);');
+    expect(landing).toContain('}, 3200);');
+    expect(landing).toContain('cancelVideoLoad?.();');
+  });
+
   it('keeps first-paint media and font hints mobile friendly', () => {
     const indexHtml = read('index.html');
 

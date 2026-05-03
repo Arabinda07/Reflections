@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Check, Envelope, Lock, User, UserPlus } from '@phosphor-icons/react';
+import { ArrowLeft, Check, CheckCircle, Envelope, GoogleLogo, Lock, User, UserPlus } from '@phosphor-icons/react';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { SectionHeader } from '@/components/ui/SectionHeader';
@@ -23,7 +23,6 @@ import {
   requestVerifiedEmail,
 } from '@/src/auth/credentialManager';
 import { NEWSLETTER_SIGNUP_LABEL, buildNewsletterOptInMetadata } from '@/src/newsletter';
-import { CheckCircle } from '@phosphor-icons/react';
 import { referralService } from '@/services/engagementServices';
 import { trackGoogleAuthStartedDeferred } from '@/src/analytics/deferredEvents';
 
@@ -162,6 +161,15 @@ export const SignUp: React.FC = () => {
       <div className="w-full max-w-[460px]">
         <Surface variant="bezel">
           <div className="p-8 sm:p-10 space-y-6">
+            <Link
+              to={RoutePath.HOME}
+              className="-ml-3 inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] px-3 text-[13px] font-bold text-gray-nav transition-colors hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
+              aria-label="Back to home"
+            >
+              <ArrowLeft size={16} weight="bold" />
+              Back
+            </Link>
+
             <SectionHeader
               eyebrow="Join Reflections"
               title="Create account"
@@ -279,12 +287,7 @@ export const SignUp: React.FC = () => {
                 disabled={loading}
                 className="w-full h-[52px] gap-3"
               >
-              <img
-                src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                className="h-5 w-5"
-                alt="Google"
-                loading="lazy"
-              />
+              <GoogleLogo size={20} weight="bold" aria-hidden="true" className="text-gray-text" />
               <span className="font-bold text-gray-text">Continue with Google</span>
             </Button>
           </div>

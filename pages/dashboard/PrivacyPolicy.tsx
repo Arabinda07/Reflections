@@ -206,26 +206,37 @@ export const PrivacyPolicy: React.FC = () => {
           </div>
         </section>
 
-        <section className="privacy-compact-list privacy-policy-ledger mb-20 border-y border-border py-10">
-          <div className="grid gap-x-12 lg:grid-cols-2">
+        <section className="privacy-policy-ledger mb-20">
+          <div className="mb-8 flex flex-col gap-3 border-t border-border pt-10 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="label-caps text-green">Full policy</p>
+              <h2 className="mt-3 text-[32px] font-display font-bold leading-tight text-gray-text md:text-[40px]">
+                The full data picture.
+              </h2>
+            </div>
+            <p className="max-w-[34rem] font-sans text-[15px] leading-relaxed text-gray-light">
+              Read what Reflections stores, what can leave your device, and what you can remove.
+            </p>
+          </div>
+
+          <div className="space-y-5">
             {policySections.map((section) => (
-              <article key={section.title} className="group border-b border-border/60 py-7 lg:odd:pr-4 lg:even:pl-4">
-                <div className="flex gap-5">
+              <article key={section.title} className="privacy-policy-row group grid gap-5 border-b border-border/60 py-8 transition-colors duration-300 md:grid-cols-[minmax(13rem,0.34fr)_minmax(0,1fr)] md:px-4">
+                <div className="flex gap-4 md:block">
                   <div className={`tone-icon ${section.color} mt-1 h-11 w-11 flex-none rounded-2xl transition-transform duration-500 ease-out-expo group-hover:scale-105`}>
                     <PublicPageIcon name={section.icon} size={22} />
                   </div>
-                  <div>
-                    <h2 className="text-[22px] font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green">
-                      {section.title}
-                    </h2>
-                    <div className="mt-4 space-y-3">
-                      {section.body.map((paragraph) => (
-                        <p key={paragraph} className="font-sans text-[15px] leading-relaxed text-gray-light">
-                          {paragraph}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
+                  <h3 className="mt-0 text-[21px] font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green md:mt-5">
+                    {section.title}
+                  </h3>
+                </div>
+
+                <div className="space-y-3 md:pt-1">
+                  {section.body.map((paragraph) => (
+                    <p key={paragraph} className="max-w-[72ch] font-sans text-[15px] leading-relaxed text-gray-light">
+                      {paragraph}
+                    </p>
+                  ))}
                 </div>
               </article>
             ))}

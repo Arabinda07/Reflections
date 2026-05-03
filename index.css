@@ -1547,18 +1547,12 @@ select:focus-visible,
     align-items: flex-start;
   }
 
-  .privacy-policy-ledger article {
-    position: relative;
+  .privacy-policy-row {
+    align-items: flex-start;
   }
 
-  .privacy-policy-ledger article::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 1.75rem;
-    bottom: 1.75rem;
-    width: 1px;
-    background: oklch(from var(--surface-current-accent) l c h / 0.18);
+  .privacy-policy-row:hover {
+    background: oklch(from var(--surface-current-bg) l c h / 0.36);
   }
 
   @media (min-width: 768px) {
@@ -1583,8 +1577,8 @@ select:focus-visible,
       gap: 1.5rem;
     }
 
-    .privacy-policy-ledger article::before {
-      display: none;
+    .privacy-policy-row {
+      padding-inline: 0;
     }
   }
 

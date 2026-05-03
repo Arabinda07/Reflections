@@ -66,7 +66,7 @@ const scheduleIdleTask = (callback: () => void, timeout = 2400) => {
     return () => idleWindow.cancelIdleCallback?.(handle);
   }
 
-  const handle = window.setTimeout(callback, Math.min(timeout, 1200));
+  const handle = window.setTimeout(callback, timeout);
   return () => window.clearTimeout(handle);
 };
 
@@ -108,11 +108,15 @@ export const Landing: React.FC = () => {
 
     if (saveData || reducedMotionQuery.matches) return;
 
-    const frameId = window.requestAnimationFrame(() => {
-      setShouldLoadHeroVideo(true);
-    });
+    let cancelVideoLoad: (() => void) | undefined;
+    const videoDelay = window.setTimeout(() => {
+      cancelVideoLoad = scheduleIdleTask(() => setShouldLoadHeroVideo(true), 1800);
+    }, 3200);
 
-    return () => window.cancelAnimationFrame(frameId);
+    return () => {
+      window.clearTimeout(videoDelay);
+      cancelVideoLoad?.();
+    };
   }, [shouldLoadHeroVideo]);
 
   useEffect(() => {
