@@ -1,0 +1,91 @@
+.overlay-feedback {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+.overlay-feedback--screen {
+    background: var(--bg-color);
+    padding: 0;
+}
+
+.overlay-feedback--soft {
+    background: rgba(var(--panel-bg-rgb), 0.52);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .overlay-feedback--veil {
+    background: rgba(var(--panel-bg-rgb), 0.84);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .overlay-feedback-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.85rem;
+    min-width: min(100%, 17rem);
+    max-width: 32rem;
+    padding: 1.25rem 1.5rem;
+    border-radius: var(--radius-panel);
+    border: 1.5px solid var(--border-color);
+    background: rgba(var(--panel-bg-rgb), 0.94);
+    box-shadow:
+      0 28px 52px -28px rgba(0, 0, 0, 0.3),
+      0 12px 28px -22px rgba(0, 0, 0, 0.18);
+  }
+
+  .overlay-feedback-card--row {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 0.85rem;
+    min-width: min(100%, 20rem);
+  }
+
+  .overlay-feedback-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  .overlay-feedback-title {
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--nav-text);
+  }
+
+  .overlay-feedback-message {
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: var(--gray-light);
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .overlay-feedback-wordmark {
+    font-family: var(--font-sans);
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: 0;
+    text-transform: lowercase;
+    color: var(--gray-text);
+  }
+
+  .overlay-feedback-divider {
+    width: 2rem;
+    height: 2px;
+    border-radius: 999px;
+    background: oklch(from var(--green) l c h / 0.45);
+  }

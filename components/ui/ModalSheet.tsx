@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { X } from '@phosphor-icons/react';
 import { registerAndroidBackAction } from '../../src/native/androidBack';
 import { SURFACE_TONE_CLASS, type SurfaceTone } from './surfaceTone';
+import './modal-sheet.css';
 
 interface ModalSheetProps {
   isOpen: boolean;

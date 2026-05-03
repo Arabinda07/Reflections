@@ -8,6 +8,13 @@
   line-height: 1.125em;
 }
 
+.react-calendar,
+.react-calendar *,
+.react-calendar button,
+.react-calendar input {
+  font-family: var(--font-sans) !important;
+}
+
 .react-calendar--doubleView {
   width: 700px;
 }

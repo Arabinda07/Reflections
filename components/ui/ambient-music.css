@@ -1,0 +1,159 @@
+.floating-audio-container {
+    position: fixed;
+    right: 20px;
+    bottom: calc(24px + env(safe-area-inset-bottom));
+    z-index: 8000;
+    transition:
+      bottom 0.4s var(--ease-out-expo),
+      top 0.4s var(--ease-out-expo);
+}
+
+html.no-scroll .floating-audio-container {
+    bottom: calc(160px + env(safe-area-inset-bottom));
+}
+
+@media (max-width: 640px) {
+    .floating-audio-container {
+      position: absolute;
+      top: auto;
+      right: clamp(1rem, 5vw, 1.5rem);
+      bottom: clamp(1rem, 4dvh, 2rem);
+      z-index: 30;
+    }
+
+    .floating-audio-container .audio-hint {
+      display: none;
+    }
+
+    html.no-scroll .floating-audio-container {
+      top: auto;
+      bottom: clamp(1rem, 4dvh, 2rem);
+    }
+  }
+
+  .audio-popup {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: var(--radius-panel);
+    border: 1.5px solid var(--audio-picker-border, var(--border-color));
+    background: var(--audio-picker-bg, rgba(var(--panel-bg-rgb), 0.96));
+    box-shadow: var(--audio-picker-shadow, 0 18px 32px -20px rgba(0, 0, 0, 0.18));
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .audio-popup-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .audio-popup-label {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--nav-text);
+  }
+
+  .audio-track-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .audio-track-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: var(--radius-panel);
+    border: 1.5px solid var(--audio-track-border, var(--border-color));
+    background: var(--audio-track-bg, rgba(var(--panel-bg-rgb), 0.92));
+    transition:
+      background-color 180ms ease,
+      border-color 180ms ease,
+      color 180ms ease;
+  }
+
+  .audio-track-row:hover {
+    background: var(--audio-track-hover, rgba(var(--panel-bg-rgb), 1));
+  }
+
+  .audio-track-row--active {
+    border-color: var(--audio-track-active-border, oklch(from var(--green) l c h / 0.35));
+    background: var(--audio-track-active-bg, oklch(from var(--green) l c h / 0.08));
+  }
+
+  .audio-track-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    flex-shrink: 0;
+    border-radius: 1rem;
+    border: 1.5px solid var(--audio-badge-border, oklch(from var(--green) l c h / 0.24));
+    background: var(--audio-badge-bg, oklch(from var(--green) l c h / 0.1));
+  }
+
+  .audio-track-copy {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+  }
+
+  .audio-track-title {
+    font-family: var(--font-sans);
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: var(--gray-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .audio-hint {
+    position: absolute;
+    right: 3.75rem;
+    bottom: 0;
+    padding: 0.45rem 0.75rem;
+    border-radius: 0.85rem;
+    border: 1px solid var(--floating-panel-border);
+    background: var(--ambient-hint-bg);
+    color: var(--gray-text);
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0;
+    white-space: nowrap;
+    box-shadow: var(--ambient-hint-shadow);
+  }
+
+  .audio-floating-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 999px;
+    border: 1.5px solid var(--audio-button-border, var(--floating-panel-border));
+    background: var(--audio-button-bg, var(--floating-panel-bg));
+    color: var(--audio-icon-stroke, var(--gray-text));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: var(--audio-button-shadow, var(--floating-panel-shadow));
+    transition:
+      background-color 220ms ease,
+      border-color 220ms ease,
+      box-shadow 220ms ease,
+      color 220ms ease;
+  }

@@ -49,15 +49,15 @@ describe('core app typography and layout contract', () => {
   });
 
   it('keeps the home audio control away from the mobile primary CTA path', () => {
-    const css = read('index.css');
+    const audioCss = read('components/ui/ambient-music.css');
     const home = read('pages/dashboard/HomeAuthenticated.tsx');
 
-    expect(css).toContain('@media (max-width: 640px)');
-    expect(css).toContain('position: absolute;');
-    expect(css).toContain('bottom: clamp(1rem, 4dvh, 2rem);');
-    expect(css).toContain('z-index: 30;');
-    expect(css).toContain('.floating-audio-container .audio-hint');
-    expect(css).toContain('display: none;');
+    expect(audioCss).toContain('@media (max-width: 640px)');
+    expect(audioCss).toContain('position: absolute;');
+    expect(audioCss).toContain('bottom: clamp(1rem, 4dvh, 2rem);');
+    expect(audioCss).toContain('z-index: 30;');
+    expect(audioCss).toContain('.floating-audio-container .audio-hint');
+    expect(audioCss).toContain('display: none;');
     const audioPosition = home.indexOf('<div className="floating-audio-container">');
     const cardsPosition = home.indexOf('className="core-bento-grid"');
 

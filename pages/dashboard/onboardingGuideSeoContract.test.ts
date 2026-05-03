@@ -38,7 +38,7 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
   it('keeps onboarding centered and non-repetitive on mobile', () => {
     const home = read('pages/dashboard/HomeAuthenticated.tsx');
     const modalSheet = read('components/ui/ModalSheet.tsx');
-    const css = read('index.css');
+    const modalCss = read('components/ui/modal-sheet.css');
 
     expect(home).toContain('mobilePlacement="center"');
     expect(home).toContain('title={currentOnboardingStep.title}');
@@ -51,12 +51,12 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
 
     expect(modalSheet).toContain("mobilePlacement?: 'bottom' | 'center'");
     expect(modalSheet).toContain('modal-sheet-root--center');
-    expect(css).toContain('.modal-sheet-root--center');
+    expect(modalCss).toContain('.modal-sheet-root--center');
   });
 
   it('gives onboarding modal a distinctive editorial treatment', () => {
     const home = read('pages/dashboard/HomeAuthenticated.tsx');
-    const css = read('index.css');
+    const modalCss = read('components/ui/modal-sheet.css');
 
     expect(home).toContain('panelClassName="onboarding-modal-panel"');
     expect(home).toContain('CurrentOnboardingIcon');
@@ -67,12 +67,12 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
     expect(home).not.toContain('onboarding-step-index');
     expect(home).not.toContain('onboarding-step-folio');
 
-    expect(css).toContain('.onboarding-modal-panel .modal-sheet-title');
-    expect(css).toContain('font-family: var(--font-serif)');
-    expect(css).toContain('max-width: none');
-    expect(css).not.toContain('.onboarding-step-index');
-    expect(css).not.toContain('.onboarding-step-signal');
-    expect(css).not.toContain('.onboarding-step-folio');
+    expect(modalCss).toContain('.onboarding-modal-panel .modal-sheet-title');
+    expect(modalCss).toContain('font-family: var(--font-serif)');
+    expect(modalCss).toContain('max-width: none');
+    expect(modalCss).not.toContain('.onboarding-step-index');
+    expect(modalCss).not.toContain('.onboarding-step-signal');
+    expect(modalCss).not.toContain('.onboarding-step-folio');
   });
 
   it('keeps the landing page in its full-bleed hero form', () => {

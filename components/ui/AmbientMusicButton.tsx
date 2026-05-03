@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { ModalSheet } from './ModalSheet';
 import { useAmbientAudio, AMBIENT_TRACKS } from '../../hooks/useAmbientAudio';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
+import './ambient-music.css';
 
 const WaveformBars: React.FC<{ color: string }> = ({ color }) => {
   const bars = [

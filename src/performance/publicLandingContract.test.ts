@@ -88,6 +88,56 @@ describe('public landing performance contract', () => {
     expect(indexHtml).not.toContain('rel="preload" href="/assets/fonts/Spectral-Regular.woff2"');
   });
 
+  it('keeps component-only chrome out of the public landing stylesheet', () => {
+    const scopedCssFiles = [
+      'components/ui/modal-sheet.css',
+      'components/ui/overlay-feedback.css',
+      'components/ui/ambient-music.css',
+      'components/ui/quill-snow.css',
+    ];
+
+    for (const filePath of scopedCssFiles) {
+      expect(existsSync(path.resolve(process.cwd(), filePath)), `${filePath} should exist`).toBe(true);
+    }
+
+    const indexCss = read('index.css');
+    const modalCss = read('components/ui/modal-sheet.css');
+    const overlayCss = read('components/ui/overlay-feedback.css');
+    const audioCss = read('components/ui/ambient-music.css');
+    const quillCss = read('components/ui/quill-snow.css');
+    const modalSheet = read('components/ui/ModalSheet.tsx');
+    const overlayFeedback = read('components/ui/OverlayFeedback.tsx');
+    const ambientMusicButton = read('components/ui/AmbientMusicButton.tsx');
+    const editor = read('components/ui/Editor.tsx');
+
+    expect(indexCss).not.toContain('.modal-sheet-root');
+    expect(indexCss).not.toContain('.overlay-feedback');
+    expect(indexCss).not.toContain('.audio-popup');
+    expect(indexCss).not.toContain('.ql-toolbar.ql-snow');
+    expect(indexCss).toMatch(/(^|\n)\s*\.no-scroll\s*{/);
+    expect(indexCss).toMatch(/(^|\n)\s*\.no-scroll\s+#main-content\s*{/);
+
+    expect(modalCss).not.toContain('.no-scroll');
+    expect(modalCss).toContain('.modal-sheet-root');
+    expect(overlayCss).toContain('.overlay-feedback');
+    expect(audioCss).toContain('.audio-popup');
+    expect(quillCss).toContain('.ql-toolbar.ql-snow');
+
+    expect(modalSheet).toContain("import './modal-sheet.css';");
+    expect(overlayFeedback).toContain("import './overlay-feedback.css';");
+    expect(ambientMusicButton).toContain("import './ambient-music.css';");
+    expect(editor).toContain("import './quill-snow.css';");
+  });
+
+  it('keeps editor-only critical styles out of the public document head', () => {
+    const indexHtml = read('index.html');
+    const editor = read('components/ui/Editor.tsx');
+
+    expect(indexHtml).not.toContain('.ql-container.ql-snow');
+    expect(indexHtml).not.toContain('.ql-editor {');
+    expect(editor).toContain("import './quill-snow.css';");
+  });
+
   it('keeps generated mobile video assets inside the mobile payload budget', () => {
     const mobileWebm = 'public/assets/videos/landing_video_mobile.webm';
     const mobileMp4 = 'public/assets/videos/landing_video_mobile.mp4';

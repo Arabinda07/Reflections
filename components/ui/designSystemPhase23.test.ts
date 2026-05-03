@@ -31,7 +31,8 @@ describe('phase 2/3 design-system rollout', () => {
     const companionObservation = read('components/ui/CompanionObservation.tsx');
     const ambientMusicButton = read('components/ui/AmbientMusicButton.tsx');
     const homeAuthenticated = read('pages/dashboard/HomeAuthenticated.tsx');
-    const css = read('index.css');
+    const indexCss = read('index.css');
+    const modalCss = read('components/ui/modal-sheet.css');
 
     expect(confirmationDialog).toContain("from './ModalSheet'");
     expect(loadingState).toContain("from './OverlayFeedback'");
@@ -39,11 +40,11 @@ describe('phase 2/3 design-system rollout', () => {
     expect(companionObservation).toContain("from './OverlayFeedback'");
     expect(ambientMusicButton).toContain("from './ModalSheet'");
     expect(homeAuthenticated).toContain('tone="sage"');
-    expect(css).toContain('--modal-sheet-backdrop-bg: rgba(var(--panel-bg-rgb), 0.88);');
-    expect(css).toContain('--modal-sheet-opaque-bg');
-    expect(css).toMatch(/\.modal-sheet-backdrop\s*{[^}]*background: var\(--modal-sheet-backdrop-bg\);/s);
-    expect(css).toMatch(/\.modal-sheet-panel\s*{[^}]*backdrop-filter: none;/s);
-    expect(css).not.toMatch(/\.modal-sheet-backdrop\s*{[^}]*background:\s*rgba\(var\(--panel-bg-rgb\), 0\.72\);/s);
+    expect(indexCss).toContain('--modal-sheet-backdrop-bg: rgba(var(--panel-bg-rgb), 0.88);');
+    expect(indexCss).toContain('--modal-sheet-opaque-bg');
+    expect(modalCss).toMatch(/\.modal-sheet-backdrop\s*{[^}]*background: var\(--modal-sheet-backdrop-bg\);/s);
+    expect(modalCss).toMatch(/\.modal-sheet-panel\s*{[^}]*backdrop-filter: none;/s);
+    expect(modalCss).not.toMatch(/\.modal-sheet-backdrop\s*{[^}]*background:\s*rgba\(var\(--panel-bg-rgb\), 0\.72\);/s);
 
     expect(loadingState).not.toContain('Schibsted Grotesk');
     expect(paperPlaneToast).not.toContain('Schibsted Grotesk');
