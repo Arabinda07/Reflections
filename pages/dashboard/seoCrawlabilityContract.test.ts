@@ -93,19 +93,37 @@ describe('SEO crawlability contract', () => {
     expect(generator).toContain('landing_video\\.webp');
   });
 
-  it('lets Vercel serve public SEO snapshots instead of rewriting them to the SPA shell', () => {
+  it('lets Vercel serve public SEO snapshots while explicitly rewriting app routes', () => {
     const vercel = JSON.parse(read('vercel.json')) as {
       cleanUrls?: boolean;
       rewrites: Array<{ source: string; destination: string }>;
     };
-    const rewriteSource = vercel.rewrites.map((rewrite) => rewrite.source).join('\n');
+    const rewriteSources = vercel.rewrites.map((rewrite) => rewrite.source);
 
     expect(vercel.cleanUrls).toBe(true);
-    expect(rewriteSource).toContain('sitemap\\.xml');
-    expect(rewriteSource).toContain('robots\\.txt');
-    expect(rewriteSource).toContain('faq$');
-    expect(rewriteSource).toContain('privacy$');
-    expect(rewriteSource).toContain('about$');
+    expect(vercel.rewrites.every((rewrite) => rewrite.destination === '/index.html')).toBe(true);
+    expect(rewriteSources).toEqual(expect.arrayContaining([
+      '/login',
+      '/signup',
+      '/reset-password',
+      '/auth/:path*',
+      '/home',
+      '/notes',
+      '/notes/:path*',
+      '/account',
+      '/insights',
+      '/release',
+      '/letters',
+      '/wiki',
+      '/wiki/:path*',
+      '/sanctuary',
+      '/sanctuary/:path*',
+      '/terms',
+    ]));
+    expect(rewriteSources).not.toContain('/faq');
+    expect(rewriteSources).not.toContain('/privacy');
+    expect(rewriteSources).not.toContain('/about');
+    expect(rewriteSources).not.toContain('/(.*)');
   });
 
   it('uses real public anchors from the landing page to crawlable public routes', () => {
@@ -144,10 +162,11 @@ describe('SEO crawlability contract', () => {
     const vercel = JSON.parse(read('vercel.json')) as {
       rewrites: Array<{ source: string; destination: string }>;
     };
-    const rewriteSource = vercel.rewrites.map((rewrite) => rewrite.source).join('\n');
+    const rewriteSources = vercel.rewrites.map((rewrite) => rewrite.source);
 
-    expect(rewriteSource).toContain('llms\\.txt');
-    expect(rewriteSource).toContain('pricing\\.md');
+    expect(rewriteSources).not.toContain('/llms.txt');
+    expect(rewriteSources).not.toContain('/pricing.md');
+    expect(rewriteSources.some((source) => source.includes('(.*)'))).toBe(false);
   });
 
   it('uses a 1200×630 OG social card image, not the app icon', () => {

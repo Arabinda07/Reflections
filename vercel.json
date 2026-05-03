@@ -59,7 +59,67 @@
   ],
   "rewrites": [
     {
-      "source": "/((?!assets/|icons/|sitemap\\.xml|sitemap\\.xsl|robots\\.txt|llms\\.txt|pricing\\.md|manifest\\.webmanifest|manifest\\.json|sw\\.js|workbox-.*\\.js|registerSW\\.js|faq$|privacy$|about$).*)",
+      "source": "/login",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/signup",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/reset-password",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/auth/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/home",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/notes",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/notes/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/account",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/insights",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/release",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/letters",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/wiki",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/wiki/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/sanctuary",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/sanctuary/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/terms",
       "destination": "/index.html"
     }
   ]

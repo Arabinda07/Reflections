@@ -393,6 +393,10 @@ export const HomeAuthenticated: React.FC = () => {
               </h1>
             </motion.div>
           </div>
+
+          <div className="floating-audio-container">
+            <AmbientMusicButton />
+          </div>
         </section>
 
         <motion.section
@@ -769,10 +773,6 @@ export const HomeAuthenticated: React.FC = () => {
           ) : null}
         </div>
       </ModalSheet>
-
-      <div className="floating-audio-container">
-        <AmbientMusicButton />
-      </div>
     </>
   );
 };

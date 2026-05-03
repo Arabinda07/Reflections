@@ -1332,9 +1332,11 @@ select:focus-visible,
 
   @media (max-width: 640px) {
     .floating-audio-container {
-      top: calc(72px + env(safe-area-inset-top));
-      right: 16px;
-      bottom: auto;
+      position: absolute;
+      top: auto;
+      right: clamp(1rem, 5vw, 1.5rem);
+      bottom: clamp(1rem, 4dvh, 2rem);
+      z-index: 30;
     }
 
     .floating-audio-container .audio-hint {
@@ -1343,7 +1345,7 @@ select:focus-visible,
 
     html.no-scroll .floating-audio-container {
       top: auto;
-      bottom: calc(160px + env(safe-area-inset-bottom));
+      bottom: clamp(1rem, 4dvh, 2rem);
     }
   }
 
