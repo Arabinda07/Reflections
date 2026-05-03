@@ -1,29 +1,40 @@
 import React from 'react';
-import { ArrowLeft, Feather, LockKey, Sparkle } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
 import { PageContainer } from '../../components/ui/PageContainer';
+import { PublicPageIcon, type PublicPageIconName } from '../../components/ui/PublicPageIcon';
 import { useDocumentMeta } from '../../hooks/useDocumentMeta';
 import { RoutePath } from '../../types';
 
-const sections = [
+type AboutSection = {
+  title: string;
+  icon: PublicPageIconName;
+  iconClassName: string;
+  body: string;
+};
+
+const sections: AboutSection[] = [
   {
     title: 'The pace around us',
-    icon: <Feather size={24} weight="duotone" className="text-sky-600" />,
+    icon: 'feather',
+    iconClassName: 'text-sky-600',
     body: 'I have always been fascinated by how consumed we are by work and by the pace of ordinary life now. Even rest has started to move quickly. Reels, episodes, feeds, messages, everything asks us to keep up. We hardly sit down to read, write, draw, or listen to the music we like when it does not match the mainstream choice.',
   },
   {
     title: 'Why writing helps',
-    icon: <Feather size={24} weight="duotone" className="text-sky-600" />,
+    icon: 'feather',
+    iconClassName: 'text-sky-600',
     body: 'Therapy can help, and for many people it is the right support. It is also too expensive for a lot of us. Reflections is not a replacement for trained professionals. It is a smaller thing: a place to write feelings down, recognise what might be there, and take a little time out for yourself.',
   },
   {
     title: 'Private writing',
-    icon: <LockKey size={24} weight="duotone" className="text-honey-600" />,
+    icon: 'lock',
+    iconClassName: 'text-honey-600',
     body: 'I built Reflections to help writing stay private and ordinary. Your notes are yours. You can export them when you want. You can write for 2 minutes before bed, add music if it helps, keep a small rhythm if you like, or restart whenever life gets crowded again.',
   },
   {
     title: 'AI that waits',
-    icon: <Sparkle size={24} weight="duotone" className="text-emerald-600" />,
+    icon: 'sparkle',
+    iconClassName: 'text-emerald-600',
     body: 'AI should wait until you invite it. When it does appear, the job is simple: read carefully, reflect gently, and never act like it knows your life better than you do.',
   },
 ];
@@ -44,7 +55,7 @@ export const AboutArabinda: React.FC = () => {
           className="group -ml-2 mb-12 flex min-h-11 w-fit items-center gap-2 px-2 text-sm font-bold text-gray-nav transition-all duration-300 hover:-translate-x-1 hover:text-green"
           aria-label="Back to home"
         >
-          <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
+          <PublicPageIcon name="arrowLeft" size={16} className="transition-transform group-hover:scale-110" />
           <span>Back</span>
         </button>
 
@@ -86,7 +97,7 @@ export const AboutArabinda: React.FC = () => {
             >
               <div className="md:col-span-4 flex flex-col items-start gap-4">
                 <div className="h-12 w-12 flex items-center justify-center rounded-2xl bg-white shadow-sm ring-1 ring-black/5 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
-                  {section.icon}
+                  <PublicPageIcon name={section.icon} size={24} className={section.iconClassName} />
                 </div>
                 <h2 className="text-[22px] font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green">
                   {section.title}

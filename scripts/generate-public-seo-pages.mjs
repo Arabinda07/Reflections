@@ -139,6 +139,11 @@ const setCanonical = (html, href) =>
 const setRobotsMeta = (html) =>
   html.replace(/<meta name="robots" content="[^"]*"\s*\/?>/, INDEX_FOLLOW_ROBOTS_META);
 
+const stripLandingHeroPreloads = (html) =>
+  html
+    .replace(/\n\s*<link rel="preload" href="\/assets\/videos\/landing_video_mobile\.webp"[^>]*\/>/, '')
+    .replace(/\n\s*<link rel="preload" href="\/assets\/videos\/landing_video\.webp"[^>]*\/>/, '');
+
 const renderSeoContent = (page) => {
   const navLinks = publicPages
     .map((item) => `<a href="${item.path}">${item.path === '/' ? 'Home' : escapeHtml(item.h1)}</a>`)
@@ -166,6 +171,8 @@ const renderSeoContent = (page) => {
 const applyPageSeo = (template, page) => {
   const url = `${SITE_ORIGIN}${page.path === '/' ? '/' : page.path}`;
   let html = template;
+
+  html = page.path === '/' ? html : stripLandingHeroPreloads(html);
 
   html = html.replace(/<title>[\s\S]*?<\/title>/, `<title>${escapeHtml(page.title)}</title>`);
   html = setMetaName(html, 'description', page.description);

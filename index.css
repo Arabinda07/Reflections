@@ -1176,6 +1176,48 @@ select:focus-visible,
       backdrop-filter 0.5s var(--ease-out-expo);
   }
 
+  .public-header {
+    position: fixed;
+    inset-inline: 0;
+    top: 0;
+    z-index: 100;
+    padding-top: env(safe-area-inset-top);
+    transition:
+      background-color 260ms var(--ease-out-expo),
+      box-shadow 260ms var(--ease-out-expo);
+  }
+
+  .public-header--standard {
+    background: rgba(var(--panel-bg-rgb), 0.95);
+    border-bottom: 1px solid oklch(from var(--border-color) l c h / 0.62);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .public-header--landing {
+    border-bottom: 0;
+  }
+
+  .public-mobile-menu-scrim {
+    background:
+      linear-gradient(to left,
+        rgba(var(--panel-bg-rgb), 0.34) 0%,
+        rgba(var(--panel-bg-rgb), 0.68) 100%);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .public-mobile-menu.mobile-sidebar-shell {
+    background:
+      linear-gradient(160deg,
+        rgb(var(--panel-bg-rgb) / 0.97) 0%,
+        rgb(var(--panel-bg-rgb) / 0.985) 48%,
+        rgb(var(--panel-bg-rgb) / 0.96) 100%);
+    backdrop-filter: blur(18px) saturate(1.08);
+    -webkit-backdrop-filter: blur(18px) saturate(1.08);
+    color: var(--gray-text);
+  }
+
   .screen-scrim {
     background: var(--screen-scrim-soft);
     backdrop-filter: blur(6px);

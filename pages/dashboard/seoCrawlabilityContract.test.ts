@@ -84,6 +84,15 @@ describe('SEO crawlability contract', () => {
     expect(generator).toContain('About Reflections and Arabinda');
   });
 
+  it('keeps landing-only hero preloads out of non-home SEO snapshots', () => {
+    const generator = read('scripts/generate-public-seo-pages.mjs');
+
+    expect(generator).toContain('const stripLandingHeroPreloads = (html) =>');
+    expect(generator).toContain("page.path === '/' ? html : stripLandingHeroPreloads(html)");
+    expect(generator).toContain('landing_video_mobile\\.webp');
+    expect(generator).toContain('landing_video\\.webp');
+  });
+
   it('lets Vercel serve public SEO snapshots instead of rewriting them to the SPA shell', () => {
     const vercel = JSON.parse(read('vercel.json')) as {
       cleanUrls?: boolean;
@@ -187,13 +196,17 @@ describe('SEO crawlability contract', () => {
   });
 
   it('renders a global footer with crawlable links to all public routes', () => {
-    const layout = read('layouts/DashboardLayout.tsx');
+    const footer = read('components/ui/PublicFooter.tsx');
+    const header = read('components/ui/PublicHeader.tsx');
 
-    expect(layout).toContain('Footer navigation');
-    expect(layout).toContain('RoutePath.HOME');
-    expect(layout).toContain('RoutePath.FAQ');
-    expect(layout).toContain('RoutePath.ABOUT');
-    expect(layout).toContain('RoutePath.PRIVACY');
+    expect(footer).toContain('Public pages');
+    expect(footer).toContain("href: RoutePath.HOME");
+    expect(footer).toContain("href: RoutePath.FAQ");
+    expect(footer).toContain("href: RoutePath.ABOUT");
+    expect(footer).toContain("href: RoutePath.PRIVACY");
+    expect(header).toContain('Public navigation');
+    expect(header).toContain('Mobile public navigation');
+    expect(header).toContain('href={item.href}');
   });
 
   it('keeps FAQ guide sections with key product questions for AI extractability', () => {

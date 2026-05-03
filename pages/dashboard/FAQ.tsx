@@ -1,100 +1,95 @@
 import React, { useEffect } from 'react';
-import {
-  BookOpen,
-  Brain,
-  Compass,
-  Heart,
-  PenNib,
-  ShieldCheck,
-  Tag,
-  Headphones,
-  Microphone,
-  Image as ImageIcon,
-  ListChecks,
-} from '@phosphor-icons/react';
+import { PublicPageIcon, type PublicPageIconName } from '../../components/ui/PublicPageIcon';
 import { useDocumentMeta } from '../../hooks/useDocumentMeta';
 
-const guideSections = [
+type PublicIconCard = {
+  icon: PublicPageIconName;
+  title: string;
+  body: string;
+  label?: string;
+};
+
+const guideSections: PublicIconCard[] = [
   {
-    icon: BookOpen,
+    icon: 'book',
     title: 'What is Reflections?',
     body:
       'A journal where writing comes first. You save notes, name moods, tag patterns, and come back to them whenever you want.',
   },
   {
-    icon: Heart,
+    icon: 'heart',
     title: 'Who is Reflections for?',
     body:
       'It is for people who want a calm place to think in writing. You set the pace, keep your notes to yourself, and choose when to involve AI.',
   },
   {
-    icon: PenNib,
+    icon: 'pen',
     title: 'Why writing first?',
     body:
       'Writing is the main practice. AI and Life Wiki refreshes stay in the background until you invite them.',
   },
 ];
 
-const practiceItems = [
+const practiceItems: PublicIconCard[] = [
   {
     title: 'The practice',
     body: 'A place to write, one reflection at a time.',
-    icon: BookOpen,
+    icon: 'book',
   },
   {
     title: 'Morning or night',
     body: 'Set an intention for the day or clear your head before sleep. Write whenever you find your rhythm.',
-    icon: Compass,
+    icon: 'compass',
   },
   {
     title: 'The daily spark',
     body: "If you're staring at a blank page, tap the spark. It's a gentle nudge to help you get started.",
-    icon: Tag,
+    icon: 'tag',
   },
   {
     title: 'Just you and the page',
     body: 'Focus Mode lets the interface fade away. No distractions, just you and your words.',
-    icon: ShieldCheck,
+    icon: 'shield',
   },
   {
     title: 'Naming the feeling',
     body: "Check in with your mood. It's how you start noticing the patterns in your emotional life.",
-    icon: Heart,
+    icon: 'heart',
   },
 ];
 
-const detailItems = [
+const detailItems: PublicIconCard[] = [
   {
     title: 'Private to your account',
     body: 'Your notes are tied to your login and protected by account-level security. You own your writing, period.',
     label: 'Account protected',
-    icon: ShieldCheck,
+    icon: 'shield',
   },
   {
     title: 'Notice the rhythm',
     body: 'See how your feelings shift over time with simple mood mapping.',
-    icon: Brain,
+    icon: 'brain',
   },
   {
     title: 'Keep what matters',
     body: 'Attach images, tasks, and notes as you need them.',
-    icon: Tag,
+    icon: 'tag',
   },
   {
     title: 'AI on your terms',
     body: 'Reflections can spot patterns or refresh your Life Wiki, but only when you choose. It never fires in the background. See our Privacy page for how your notes are protected.',
     label: 'On demand only • Private by design',
-    icon: Brain,
+    icon: 'brain',
   },
 ];
 
-const featureGrid = [
-  { title: 'Ambient sound', body: 'Soundscapes to help you focus. Quiet the room as you write.', icon: Headphones },
-  { title: 'Whisper mode', body: 'Speak your thoughts. Fast, private transcription for when you need it.', icon: Microphone },
-  { title: 'Writing sparks', body: 'Gentle prompts for those days when you aren\'t sure where to start.', icon: Tag },
-  { title: 'Visual covers', body: 'Add atmospheric imagery to set the mood for your entries.', icon: ImageIcon },
-  { title: 'Embedded tasks', body: 'Keep track of follow-ups and intentions right inside your prose.', icon: ListChecks },
-  { title: 'Life Wiki', body: 'A high-level summary of your world, updated only when you choose.', icon: Brain },
+const featureGrid: PublicIconCard[] = [
+  { title: 'Ambient sound', body: 'Soundscapes to help you focus. Quiet the room as you write.', icon: 'headphones' },
+  { title: 'Whisper mode', body: 'Speak your thoughts. Fast, private transcription for when you need it.', icon: 'microphone' },
+  { title: 'Writing sparks', body: 'Gentle prompts for those days when you aren\'t sure where to start.', icon: 'tag' },
+  { title: 'Visual covers', body: 'Add atmospheric imagery to set the mood for your entries.', icon: 'image' },
+  { title: 'Embedded tasks', body: 'Keep track of follow-ups and intentions right inside your prose.', icon: 'checklist' },
+  { title: 'Life Wiki', body: 'A high-level summary of your world, updated only when you choose.', icon: 'brain' },
 ];
 
 const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
@@ -134,13 +129,11 @@ export const FAQ: React.FC = () => {
         {/* Core Guide Sections */}
         <section className="mb-20 grid gap-6 md:grid-cols-3">
           {guideSections.map((section) => {
-            const Icon = section.icon;
-
             return (
               <article key={section.title} className="surface-flat surface-tone-sage group relative flex flex-col justify-between overflow-hidden rounded-[2rem] p-8 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-green/20">
                 <div className="relative z-10">
                   <div className="tone-icon tone-icon-sage mb-8 h-12 w-12 rounded-2xl transition-transform duration-500 ease-out group-hover:scale-110 group-hover:-rotate-6">
-                    <Icon size={24} weight="duotone" />
+                    <PublicPageIcon name={section.icon} size={24} />
                   </div>
                   <div className="space-y-4">
                     <h2 className="text-[22px] font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green">
@@ -165,12 +158,11 @@ export const FAQ: React.FC = () => {
           
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {practiceItems.map((item) => {
-              const Icon = item.icon;
               return (
                 <div key={item.title} className="surface-flat surface-tone-sky group relative flex flex-col justify-between overflow-hidden rounded-[2rem] p-8 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-green/20">
                   <div className="relative z-10">
                     <div className="tone-icon tone-icon-sky mb-6 h-12 w-12 rounded-2xl transition-transform duration-500 ease-out group-hover:scale-110 group-hover:rotate-6">
-                      <Icon size={24} weight="duotone" />
+                      <PublicPageIcon name={item.icon} size={24} />
                     </div>
                     <h3 className="mb-3 text-[20px] font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">{item.title}</h3>
                     <p className="font-sans text-[16px] leading-relaxed text-gray-light">{item.body}</p>
@@ -190,12 +182,11 @@ export const FAQ: React.FC = () => {
 
           <div className="grid gap-6 md:grid-cols-2">
             {detailItems.map((item) => {
-              const Icon = item.icon;
               return (
                 <div key={item.title} className="tone-panel tone-panel-sky group relative overflow-hidden rounded-[2rem] p-8 transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_8px_40px_rgba(14,165,233,0.08)]">
                   <div className="relative z-10 flex flex-col gap-4 sm:flex-row sm:gap-6">
                     <div className="tone-icon tone-icon-sky flex h-14 w-14 flex-none rounded-2xl transition-transform duration-500 ease-out group-hover:scale-110 group-hover:-rotate-12">
-                      <Icon size={28} weight="duotone" />
+                      <PublicPageIcon name={item.icon} size={28} />
                     </div>
                     <div className="space-y-4">
                       <div className="space-y-1">
@@ -217,12 +208,11 @@ export const FAQ: React.FC = () => {
         <section className="mb-28">
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {featureGrid.map((feature) => {
-              const Icon = feature.icon;
               return (
                 <div key={feature.title} className="surface-flat surface-tone-honey group relative rounded-[2rem] p-8 transition-all duration-500 hover:border-green/20 hover:-translate-y-1">
                   <div className="space-y-6">
                     <div className="tone-icon tone-icon-honey h-12 w-12 rounded-2xl transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
-                      <Icon size={24} weight="duotone" />
+                      <PublicPageIcon name={feature.icon} size={24} />
                     </div>
                     <div className="space-y-3">
                       <h4 className="text-[14px] font-black uppercase tracking-widest text-gray-text group-hover:text-green transition-colors duration-300">{feature.title}</h4>

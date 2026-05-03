@@ -1,29 +1,23 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, 
-  Envelope, 
-  Database, 
-  DeviceMobile, 
-  Image as ImageIcon, 
-  Robot, 
-  ChartBar, 
-  CreditCard, 
-  Trash, 
-  User, 
-  ShieldCheck 
-} from '@phosphor-icons/react';
 
-import { Button } from '../../components/ui/Button';
+import { PublicPageIcon, type PublicPageIconName } from '../../components/ui/PublicPageIcon';
 import { useDocumentMeta } from '../../hooks/useDocumentMeta';
 import { RoutePath } from '../../types';
 
 const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
 
-const policySections = [
+type PolicySection = {
+  title: string;
+  icon: PublicPageIconName;
+  color: string;
+  body: string[];
+};
+
+const policySections: PolicySection[] = [
   {
     title: 'What Reflections keeps',
-    icon: Database,
+    icon: 'database',
     color: 'tone-icon-sky',
     body: [
       'Reflections stores the account information needed to sign you in, including your email address and profile details you choose to save, such as your name, display name, timezone, and avatar.',
@@ -32,7 +26,7 @@ const policySections = [
   },
   {
     title: 'Local and offline copies',
-    icon: DeviceMobile,
+    icon: 'device',
     color: 'tone-icon-sage',
     body: [
       'Reflections keeps a local copy of your notes in the browser or app database so writing can feel quick and can keep working through short connection drops.',
@@ -41,7 +35,7 @@ const policySections = [
   },
   {
     title: 'Attachments and files',
-    icon: ImageIcon,
+    icon: 'image',
     color: 'tone-icon-honey',
     body: [
       'Images, avatars, and note attachments are stored in a private Supabase Storage bucket. The app creates short-lived signed links when it needs to show those files back to you.',
@@ -50,7 +44,7 @@ const policySections = [
   },
   {
     title: 'AI and Smart Mode',
-    icon: Robot,
+    icon: 'robot',
     color: 'tone-icon-sky',
     body: [
       'Most AI work runs when you choose an AI action, or when you explicitly turn on Smart Mode. If you use Reflect with AI, Refresh with AI, or Smart Mode, the relevant writing is sent to the AI service so it can return that result.',
@@ -61,7 +55,7 @@ const policySections = [
   },
   {
     title: 'Analytics',
-    icon: ChartBar,
+    icon: 'chart',
     color: 'tone-icon-clay',
     body: [
       'If analytics are configured, Reflections may record basic product events such as sign-in status, note saves, route groups, plan tier, counts of tags or attachments, and whether an AI refresh was used.',
@@ -70,7 +64,7 @@ const policySections = [
   },
   {
     title: 'Payments and referrals',
-    icon: CreditCard,
+    icon: 'creditCard',
     color: 'tone-icon-honey',
     body: [
       'Payments are handled through Razorpay. Reflections stores enough payment and plan information to know whether your account has Pro access, but card and bank details are handled by Razorpay.',
@@ -79,7 +73,7 @@ const policySections = [
   },
   {
     title: 'Export, deletion, and account closure',
-    icon: Trash,
+    icon: 'trash',
     color: 'tone-icon-sage',
     body: [
       'Your notes belong to you. You can export saved notes from note pages in the formats currently available in the app.',
@@ -89,7 +83,7 @@ const policySections = [
   },
   {
     title: 'Using Reflections',
-    icon: User,
+    icon: 'user',
     color: 'tone-icon-sky',
     body: [
       'Use Reflections as a personal writing tool. Do not use it for anything illegal or harmful, and do not try to access another person\'s account or files.',
@@ -98,7 +92,7 @@ const policySections = [
   },
   {
     title: 'Security and service limits',
-    icon: ShieldCheck,
+    icon: 'shield',
     color: 'tone-icon-honey',
     body: [
       'Reflections uses Supabase account security, private storage, Row Level Security, and encrypted connections to protect saved writing. No online service can promise perfect security.',
@@ -123,10 +117,14 @@ export const PrivacyPolicy: React.FC = () => {
     <div className="surface-scope-paper page-wash relative min-h-full bg-body pb-28 text-gray-text transition-colors duration-300">
       <section className="mx-auto grid w-full max-w-[1440px] gap-12 px-6 py-20 sm:px-10 lg:grid-cols-12 lg:items-end lg:px-16 lg:py-28">
         <div className="lg:col-span-8">
-          <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.HOME)} className="-ml-2 mb-8">
-            <ArrowLeft size={16} weight="bold" className="mr-2" />
+          <button
+            type="button"
+            onClick={() => navigate(RoutePath.HOME)}
+            className="-ml-2 mb-8 inline-flex min-h-11 items-center rounded-[var(--radius-control)] px-3 text-[13px] font-bold text-gray-nav transition-colors hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+          >
+            <PublicPageIcon name="arrowLeft" size={16} className="mr-2" />
             Back
-          </Button>
+          </button>
           <h1 className="text-mk-display font-display font-extrabold leading-[0.95] tracking-normal text-gray-text text-balance">
             Privacy
           </h1>
@@ -143,12 +141,11 @@ export const PrivacyPolicy: React.FC = () => {
       <main className="mx-auto w-full max-w-[1440px] px-6 sm:px-10 lg:px-16">
         <section className="mb-20 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {policySections.map((section) => {
-            const Icon = section.icon;
             return (
               <article key={section.title} className="surface-flat surface-tone-paper group relative flex flex-col justify-between overflow-hidden rounded-[2rem] p-8 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-green/20">
                 <div className="relative z-10">
                   <div className={`tone-icon ${section.color} mb-8 h-12 w-12 rounded-2xl transition-transform duration-500 ease-out group-hover:scale-110 group-hover:-rotate-6`}>
-                    <Icon size={24} weight="duotone" />
+                    <PublicPageIcon name={section.icon} size={24} />
                   </div>
                   <h2 className="mb-4 text-[22px] font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green">
                     {section.title}
@@ -169,7 +166,7 @@ export const PrivacyPolicy: React.FC = () => {
           <article className="surface-flat surface-tone-sage group relative flex flex-col justify-between overflow-hidden rounded-[2rem] p-8 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-green/20 md:col-span-2 xl:col-span-3">
             <div className="relative z-10 flex flex-col gap-6 md:flex-row md:items-center md:gap-12">
               <div className="tone-icon tone-icon-sage h-14 w-14 flex-none rounded-2xl transition-transform duration-500 ease-out group-hover:scale-110 group-hover:rotate-6">
-                <Envelope size={26} weight="duotone" />
+                <PublicPageIcon name="envelope" size={26} />
               </div>
               <div className="space-y-4">
                 <h2 className="text-[24px] font-display font-bold text-gray-text group-hover:text-green transition-colors duration-300">
@@ -182,7 +179,7 @@ export const PrivacyPolicy: React.FC = () => {
                   href={`mailto:${SUPPORT_EMAIL}`}
                   className="inline-flex items-center gap-2 text-[15px] font-black uppercase tracking-widest text-green transition-colors hover:text-gray-text"
                 >
-                  <Envelope size={16} weight="bold" />
+                  <PublicPageIcon name="envelope" size={16} />
                   {SUPPORT_EMAIL}
                 </a>
               </div>

@@ -6,6 +6,7 @@ import { Landing } from './pages/dashboard/Landing';
 import { RoutePath } from './types';
 
 const AuthenticatedAppShell = lazy(() => import('./layouts/AuthenticatedAppShell').then((m) => ({ default: m.AuthenticatedAppShell })));
+const PublicAppShell = lazy(() => import('./layouts/PublicAppShell').then((m) => ({ default: m.PublicAppShell })));
 const ProtectedRoute = lazy(() => import('./components/auth/ProtectedRoute').then((m) => ({ default: m.ProtectedRoute })));
 
 const SignIn = lazy(() => import('@/pages/auth/SignIn.tsx').then((m) => ({ default: m.SignIn })));
@@ -36,7 +37,7 @@ const withProtectedRoute = (element: React.ReactNode) =>
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
-      <Route errorElement={<RouteErrorBoundary />}>
+      <Route element={withRouteFallback(<PublicAppShell />)} errorElement={<RouteErrorBoundary />}>
         <Route path={RoutePath.HOME} element={<Landing />} />
         <Route path={RoutePath.FAQ} element={withRouteFallback(<FAQ />)} />
         <Route path={RoutePath.ABOUT} element={withRouteFallback(<AboutArabinda />)} />
