@@ -138,7 +138,7 @@ export const PrivacyPolicy: React.FC = () => {
         </div>
       </section>
 
-      <main className="mx-auto w-full max-w-[1440px] px-6 sm:px-10 lg:px-16">
+      <div className="mx-auto w-full max-w-[1440px] px-6 sm:px-10 lg:px-16">
         <section className="privacy-editorial-lead mb-20 grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
           <article className="surface-flat surface-tone-paper rounded-[2rem] p-8 md:p-12">
             <p className="label-caps text-green">Short version</p>
@@ -254,7 +254,7 @@ export const PrivacyPolicy: React.FC = () => {
             </div>
           </div>
         </section>
-      </main>
+      </div>
     </div>
   );
 };

@@ -125,7 +125,7 @@ export const FAQ: React.FC = () => {
         </div>
       </section>
 
-      <main className="mx-auto w-full max-w-[1440px] px-6 sm:px-10 lg:px-16">
+      <div className="mx-auto w-full max-w-[1440px] px-6 sm:px-10 lg:px-16">
         <section className="faq-editorial-lead mb-20 grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-stretch">
           <article className="surface-flat surface-tone-sage rounded-[2rem] p-8 md:p-12">
             <p className="label-caps text-green">Quick guide</p>
@@ -241,7 +241,7 @@ export const FAQ: React.FC = () => {
           </p>
         </section>
 
-      </main>
+      </div>
     </div>
   );
 };

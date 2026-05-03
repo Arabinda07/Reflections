@@ -9,17 +9,32 @@ const links = [
 ];
 
 export const PublicFooter: React.FC = () => (
-  <footer className="mx-auto w-full max-w-[1440px] border-t border-border px-6 py-10 sm:px-10 lg:px-16">
-    <nav aria-label="Public pages" className="flex flex-wrap items-center gap-x-8 gap-y-3">
-      {links.map((link) => (
+  <footer className="screen-scrim screen-scrim--strong mt-auto w-full border-t border-border py-12 transition-colors duration-300">
+    <div className="mx-auto flex w-full max-w-[1440px] flex-col items-center justify-between gap-8 px-6 sm:flex-row md:px-16">
+      <nav aria-label="Public pages" className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 sm:gap-10">
+        {links.map((link) => (
+          <a
+            key={link.href}
+            href={link.href}
+            className="inline-flex min-h-11 min-w-11 items-center justify-center text-[11px] font-black uppercase tracking-widest text-gray-nav transition-colors hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
+          >
+            {link.label}
+          </a>
+        ))}
+      </nav>
+
+      <div className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">
+        © 2026{' '}
         <a
-          key={link.href}
-          href={link.href}
-          className="inline-flex min-h-11 items-center text-[13px] font-bold uppercase tracking-widest text-gray-nav transition-colors duration-300 hover:text-green"
+          href="https://arabinda07.github.io/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex min-h-11 items-center transition-colors duration-300 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
+          aria-label="Arabinda's portfolio (opens in new tab)"
         >
-          {link.label}
+          Arabinda
         </a>
-      ))}
-    </nav>
+      </div>
+    </div>
   </footer>
 );

@@ -16,7 +16,18 @@ describe('public review fixes contract', () => {
     expect(shell).toContain('{!isLandingRoute && <PublicFooter />}');
     expect(shell).not.toContain('sr-only');
     expect(footer).toContain('min-h-11');
+    expect(footer).toContain('min-w-11');
     expect(footer).toContain('inline-flex');
+    expect(footer).toContain('justify-center');
+    expect(footer).toContain('© 2026');
+  });
+
+  it('keeps public pages from nesting main landmarks inside the public shell', () => {
+    const faq = read('pages/dashboard/FAQ.tsx');
+    const privacy = read('pages/dashboard/PrivacyPolicy.tsx');
+
+    expect(faq).not.toContain('<main className=');
+    expect(privacy).not.toContain('<main className=');
   });
 
   it('redirects guessed dashboard URLs to the canonical authenticated home route', () => {
@@ -52,10 +63,12 @@ describe('public review fixes contract', () => {
 
   it('caps backdrop blur and avoids long-lived backdrop-filter layers', () => {
     const css = read('index.css');
+    const landing = read('pages/dashboard/Landing.tsx');
     const maxBlur = Math.max(...backdropBlurValues(css));
 
     expect(maxBlur).toBeLessThanOrEqual(16);
     expect(css).not.toContain('will-change: backdrop-filter');
+    expect(landing).not.toContain("willChange: 'opacity'");
   });
 
   it('keeps heavyweight public media out of the default shipped asset budget', () => {

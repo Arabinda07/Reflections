@@ -183,7 +183,6 @@ export const Landing: React.FC = () => {
               loading="eager"
               decoding="async"
               className={`absolute inset-0 h-full min-h-full w-full min-w-full transform-gpu object-cover object-[48%_center] sm:object-[64%_center] lg:object-center transition-opacity duration-700 ease-out-expo ${isHeroVideoReady ? 'opacity-0' : 'opacity-100'}`}
-              style={{ willChange: 'opacity' }}
             />
           </picture>
 
@@ -192,7 +191,6 @@ export const Landing: React.FC = () => {
               ref={videoRef}
               aria-hidden="true"
               className={`absolute inset-0 h-full min-h-full w-full min-w-full transform-gpu object-cover object-[48%_center] bg-transparent transition-opacity duration-700 ease-out-expo motion-reduce:transition-none sm:object-[64%_center] lg:object-center ${isHeroVideoReady ? 'opacity-90' : 'opacity-0'}`}
-              style={{ willChange: 'opacity' }}
               autoPlay
               loop
               muted={isMuted}

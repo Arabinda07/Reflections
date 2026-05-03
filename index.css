@@ -1201,21 +1201,28 @@ select:focus-visible,
   .public-mobile-menu-scrim {
     background:
       linear-gradient(to left,
-        rgba(var(--panel-bg-rgb), 0.34) 0%,
-        rgba(var(--panel-bg-rgb), 0.68) 100%);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+        rgba(var(--panel-bg-rgb), 0.18) 0%,
+        rgba(var(--panel-bg-rgb), 0.52) 100%);
   }
 
-  .public-mobile-menu.mobile-sidebar-shell {
+  .public-mobile-menu {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius-shell) 0 0 var(--radius-shell);
+    border: 1px solid oklch(from var(--border-color) l c h / 0.78);
+    border-right: 0;
     background:
       linear-gradient(160deg,
-        rgb(var(--panel-bg-rgb) / 0.97) 0%,
-        rgb(var(--panel-bg-rgb) / 0.985) 48%,
-        rgb(var(--panel-bg-rgb) / 0.96) 100%);
-    backdrop-filter: blur(14px) saturate(1.04);
-    -webkit-backdrop-filter: blur(14px) saturate(1.04);
+        rgb(var(--panel-bg-rgb) / 0.99) 0%,
+        rgb(var(--panel-bg-rgb) / 1) 48%,
+        rgb(var(--panel-bg-rgb) / 0.98) 100%);
     color: var(--gray-text);
+    box-shadow:
+      -24px 0 58px -42px oklch(from var(--green-shadow) l c h / 0.5),
+      inset 1px 0 0 oklch(from var(--border-color) l c h / 0.1),
+      inset 0 1px 0 oklch(from var(--border-color) l c h / 0.05);
+    overflow: hidden;
+    transform: translateZ(0);
   }
 
   .screen-scrim {

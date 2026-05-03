@@ -6,6 +6,7 @@ import { Landing } from './pages/dashboard/Landing';
 import { RoutePath } from './types';
 
 const AuthenticatedAppShell = lazy(() => import('./layouts/AuthenticatedAppShell').then((m) => ({ default: m.AuthenticatedAppShell })));
+const AuthAppShell = lazy(() => import('./layouts/AuthAppShell').then((m) => ({ default: m.AuthAppShell })));
 const PublicAppShell = lazy(() => import('./layouts/PublicAppShell').then((m) => ({ default: m.PublicAppShell })));
 const ProtectedRoute = lazy(() => import('./components/auth/ProtectedRoute').then((m) => ({ default: m.ProtectedRoute })));
 
@@ -45,13 +46,15 @@ const router = createBrowserRouter(
         <Route path={RoutePath.TERMS} element={<Navigate to={RoutePath.PRIVACY} replace />} />
       </Route>
 
-      <Route element={withRouteFallback(<AuthenticatedAppShell />)} errorElement={<RouteErrorBoundary />}>
-        <Route path={RoutePath.DASHBOARD_ALIAS} element={<Navigate to={RoutePath.DASHBOARD} replace />} />
+      <Route element={withRouteFallback(<AuthAppShell />)} errorElement={<RouteErrorBoundary />}>
         <Route path={RoutePath.LOGIN} element={withRouteFallback(<SignIn />)} />
         <Route path={RoutePath.SIGNUP} element={withRouteFallback(<SignUp />)} />
         <Route path={RoutePath.RESET_PASSWORD} element={withRouteFallback(<ResetPassword />)} />
         <Route path={RoutePath.AUTH_CALLBACK} element={withRouteFallback(<AuthCallback />)} />
+      </Route>
 
+      <Route element={withRouteFallback(<AuthenticatedAppShell />)} errorElement={<RouteErrorBoundary />}>
+        <Route path={RoutePath.DASHBOARD_ALIAS} element={<Navigate to={RoutePath.DASHBOARD} replace />} />
         <Route path={RoutePath.DASHBOARD} element={withProtectedRoute(withRouteFallback(<HomeAuthenticated />))} />
         <Route path={RoutePath.NOTES} element={withProtectedRoute(withRouteFallback(<MyNotes />))} />
         <Route path={RoutePath.CREATE_NOTE} element={withProtectedRoute(withRouteFallback(<CreateNote />))} />

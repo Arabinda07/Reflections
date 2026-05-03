@@ -44,7 +44,8 @@ describe('public navigation shell contract', () => {
     expect(header).toContain('href={RoutePath.SIGNUP}');
     expect(header).toContain('const MenuIcon');
     expect(header).toContain('const CloseIcon');
-    expect(header).toContain('const LeafIcon');
+    expect(header).toContain('const AppLeafIcon');
+    expect(header).toContain("import { createPortal } from 'react-dom';");
     expect(header).toContain('const PublicMenuIcon');
     expect(header).toContain("description: 'Quick answers'");
     expect(header).toContain("description: 'Start writing'");
