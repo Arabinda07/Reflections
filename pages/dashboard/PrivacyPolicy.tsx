@@ -139,52 +139,120 @@ export const PrivacyPolicy: React.FC = () => {
       </section>
 
       <main className="mx-auto w-full max-w-[1440px] px-6 sm:px-10 lg:px-16">
-        <section className="mb-20 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {policySections.map((section) => {
-            return (
-              <article key={section.title} className="surface-flat surface-tone-paper group relative flex flex-col justify-between overflow-hidden rounded-[2rem] p-8 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-green/20">
-                <div className="relative z-10">
-                  <div className={`tone-icon ${section.color} mb-8 h-12 w-12 rounded-2xl transition-transform duration-500 ease-out group-hover:scale-110 group-hover:-rotate-6`}>
-                    <PublicPageIcon name={section.icon} size={24} />
-                  </div>
-                  <h2 className="mb-4 text-[22px] font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green">
+        <section className="privacy-editorial-lead mb-20 grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+          <article className="surface-flat surface-tone-paper rounded-[2rem] p-8 md:p-12">
+            <p className="label-caps text-green">Short version</p>
+            <h2 className="mt-5 max-w-[14ch] text-mk-h2 font-display font-bold leading-tight text-gray-text">
+              Your writing is yours.
+            </h2>
+            <div className="mt-7 max-w-[62ch] space-y-4 font-sans text-[17px] leading-relaxed text-gray-light">
+              <p>
+                Reflections stores the account and writing data needed to make the journal work. AI runs only for the actions you choose, or for Smart Mode if you turn it on.
+              </p>
+              <p>
+                You can export notes, delete individual notes, and request account closure when you want the sign-in account removed too.
+              </p>
+            </div>
+          </article>
+
+          <aside className="privacy-compact-list rounded-[2rem] border border-border/70 bg-[rgb(var(--panel-bg-rgb)/0.54)]">
+            {policySections.slice(0, 3).map((section) => (
+              <article key={section.title} className="group flex gap-5 border-b border-border/60 p-6 last:border-b-0 md:p-8">
+                <div className={`tone-icon ${section.color} mt-1 h-12 w-12 flex-none rounded-2xl transition-transform duration-500 ease-out-expo group-hover:scale-105`}>
+                  <PublicPageIcon name={section.icon} size={24} />
+                </div>
+                <div>
+                  <h2 className="text-[21px] font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green">
                     {section.title}
                   </h2>
-                  <div className="space-y-3">
-                    {section.body.map((paragraph) => (
-                      <p key={paragraph} className="font-sans text-[15px] leading-relaxed text-gray-light">
-                        {paragraph}
-                      </p>
-                    ))}
+                  <p className="mt-3 font-sans text-[15px] leading-relaxed text-gray-light">
+                    {section.body[0]}
+                  </p>
+                </div>
+              </article>
+            ))}
+          </aside>
+        </section>
+
+        <section className="privacy-comparison-band mb-20 surface-flat surface-tone-sage rounded-[2rem] p-7 md:p-10">
+          <div className="grid gap-8 lg:grid-cols-3">
+            {[
+              {
+                title: 'Stays private',
+                body: 'Notes, moods, tags, tasks, letters, and Life Wiki pages are scoped to your account.',
+                icon: 'shield' as const,
+              },
+              {
+                title: 'Leaves only by action',
+                body: 'AI receives relevant writing only when you choose an AI action, or when Smart Mode is enabled.',
+                icon: 'robot' as const,
+              },
+              {
+                title: 'Can be removed',
+                body: 'You can delete notes and app data, then email support if you want the sign-in account closed.',
+                icon: 'trash' as const,
+              },
+            ].map((item) => (
+              <article key={item.title} className="group flex gap-5">
+                <div className="tone-icon tone-icon-sage mt-1 h-12 w-12 flex-none rounded-2xl transition-transform duration-500 ease-out-expo group-hover:-rotate-3">
+                  <PublicPageIcon name={item.icon} size={24} />
+                </div>
+                <div>
+                  <h2 className="text-[22px] font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">{item.title}</h2>
+                  <p className="mt-3 font-sans text-[16px] leading-relaxed text-gray-light">{item.body}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="privacy-compact-list mb-20 border-y border-border py-10">
+          <div className="grid gap-x-12 lg:grid-cols-2">
+            {policySections.map((section) => (
+              <article key={section.title} className="group border-b border-border/60 py-7 lg:odd:pr-4 lg:even:pl-4">
+                <div className="flex gap-5">
+                  <div className={`tone-icon ${section.color} mt-1 h-11 w-11 flex-none rounded-2xl transition-transform duration-500 ease-out-expo group-hover:scale-105`}>
+                    <PublicPageIcon name={section.icon} size={22} />
+                  </div>
+                  <div>
+                    <h2 className="text-[22px] font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green">
+                      {section.title}
+                    </h2>
+                    <div className="mt-4 space-y-3">
+                      {section.body.map((paragraph) => (
+                        <p key={paragraph} className="font-sans text-[15px] leading-relaxed text-gray-light">
+                          {paragraph}
+                        </p>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </article>
-            );
-          })}
+            ))}
+          </div>
+        </section>
 
-          {/* Questions & Contact Card */}
-          <article className="surface-flat surface-tone-sage group relative flex flex-col justify-between overflow-hidden rounded-[2rem] p-8 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-green/20 md:col-span-2 xl:col-span-3">
-            <div className="relative z-10 flex flex-col gap-6 md:flex-row md:items-center md:gap-12">
-              <div className="tone-icon tone-icon-sage h-14 w-14 flex-none rounded-2xl transition-transform duration-500 ease-out group-hover:scale-110 group-hover:rotate-6">
-                <PublicPageIcon name="envelope" size={26} />
-              </div>
-              <div className="space-y-4">
-                <h2 className="text-[24px] font-display font-bold text-gray-text group-hover:text-green transition-colors duration-300">
-                  Questions or account deletion
-                </h2>
-                <p className="max-w-2xl font-sans text-[16px] leading-relaxed text-gray-light">
-                  If you have questions, want everything deleted, or need the sign-in account closed, email us directly.
-                </p>
-                <a
-                  href={`mailto:${SUPPORT_EMAIL}`}
-                  className="inline-flex items-center gap-2 text-[15px] font-black uppercase tracking-widest text-green transition-colors hover:text-gray-text"
-                >
-                  <PublicPageIcon name="envelope" size={16} />
-                  {SUPPORT_EMAIL}
-                </a>
-              </div>
+        <section className="mb-28 surface-flat surface-tone-paper rounded-[2rem] p-8 md:p-10">
+          <div className="flex flex-col gap-6 md:flex-row md:items-center md:gap-12">
+            <div className="tone-icon tone-icon-sage h-14 w-14 flex-none rounded-2xl">
+              <PublicPageIcon name="envelope" size={26} />
             </div>
-          </article>
+            <div className="space-y-4">
+              <h2 className="text-[24px] font-display font-bold text-gray-text">
+                Questions or account deletion
+              </h2>
+              <p className="max-w-2xl font-sans text-[16px] leading-relaxed text-gray-light">
+                If you have questions, want everything deleted, or need the sign-in account closed, email us directly.
+              </p>
+              <a
+                href={`mailto:${SUPPORT_EMAIL}`}
+                className="inline-flex min-h-11 items-center gap-2 text-[15px] font-black uppercase tracking-widest text-green transition-colors duration-300 hover:text-gray-text"
+              >
+                <PublicPageIcon name="envelope" size={16} />
+                {SUPPORT_EMAIL}
+              </a>
+            </div>
+          </div>
         </section>
       </main>
     </div>

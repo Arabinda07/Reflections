@@ -103,7 +103,8 @@ describe('Sanctuary Life Wiki contract', () => {
     expect(lifeWiki).not.toContain("from '@/src/lottie/level-up-animation.json'");
     expect(insights).toContain('src={SANCTUARY_LEVEL_UP_ANIMATION_SRC}');
     expect(lifeWiki).toContain('src={SANCTUARY_LEVEL_UP_ANIMATION_SRC}');
-    expect(sanctuaryAnimation).toContain("new URL('./level-up-animation.json', import.meta.url).href");
+    expect(sanctuaryAnimation).toContain('/assets/lottie/level-up-animation.lottie');
+    expect(sanctuaryAnimation).not.toContain('level-up-animation.json');
     expect(lifeWiki).toContain('const cameFromInsights = Boolean(location.state?.fromInsights);');
     expect(lifeWiki).toContain('const [isEnteringWiki, setIsEnteringWiki] = useState(shouldPlayEntryAnimation && !cameFromInsights);');
     expect(lifeWiki).not.toContain('refreshModeLabel');

@@ -212,7 +212,6 @@ export const Landing: React.FC = () => {
               <source src="/assets/videos/landing_video_mobile.webm" type="video/webm" media="(max-width: 1023px)" />
               <source src="/assets/videos/landing_video_mobile.mp4" type="video/mp4" media="(max-width: 1023px)" />
               <source src="/assets/videos/landing_video.webm" type="video/webm" media="(min-width: 1024px)" />
-              <source src="/assets/videos/landing_video.mp4" type="video/mp4" media="(min-width: 1024px)" />
             </video>
           ) : null}
         </div>
@@ -251,14 +250,14 @@ export const Landing: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => navigate(RoutePath.LOGIN)}
-                  className="inline-flex h-11 min-w-0 items-center justify-center whitespace-nowrap px-0 text-[15px] font-medium text-gray-text transition-colors duration-300 ease-out-expo hover:text-green focus:outline-none"
+                  className="inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap px-0 text-[15px] font-medium text-gray-text transition-colors duration-300 ease-out-expo hover:text-green focus:outline-none"
                 >
                   Sign in
                 </button>
 
                 <a
                   href={RoutePath.FAQ}
-                  className="inline-flex h-11 min-w-0 items-center justify-center whitespace-nowrap px-0 text-[15px] font-medium text-gray-text transition-colors duration-300 ease-out-expo hover:text-green focus:outline-none"
+                  className="inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap px-0 text-[15px] font-medium text-gray-text transition-colors duration-300 ease-out-expo hover:text-green focus:outline-none"
                 >
                   How it works
                 </a>

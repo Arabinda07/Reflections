@@ -46,6 +46,7 @@ const router = createBrowserRouter(
       </Route>
 
       <Route element={withRouteFallback(<AuthenticatedAppShell />)} errorElement={<RouteErrorBoundary />}>
+        <Route path={RoutePath.DASHBOARD_ALIAS} element={<Navigate to={RoutePath.DASHBOARD} replace />} />
         <Route path={RoutePath.LOGIN} element={withRouteFallback(<SignIn />)} />
         <Route path={RoutePath.SIGNUP} element={withRouteFallback(<SignUp />)} />
         <Route path={RoutePath.RESET_PASSWORD} element={withRouteFallback(<ResetPassword />)} />

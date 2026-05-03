@@ -53,7 +53,7 @@ describe('public landing performance contract', () => {
     expect(landing).toContain('src="/assets/videos/landing_video_mobile.webm" type="video/webm" media="(max-width: 1023px)"');
     expect(landing).toContain('src="/assets/videos/landing_video_mobile.mp4" type="video/mp4" media="(max-width: 1023px)"');
     expect(landing).toContain('src="/assets/videos/landing_video.webm" type="video/webm" media="(min-width: 1024px)"');
-    expect(landing).toContain('src="/assets/videos/landing_video.mp4" type="video/mp4" media="(min-width: 1024px)"');
+    expect(landing).not.toContain('landing_video.mp4');
     expect(landing).not.toContain('poster="/assets/videos/landing_video.webp"');
     expect(landing).not.toContain('src="/assets/videos/landing_video.webm" type="video/webm" />');
     expect(landing).not.toContain('src="/assets/videos/landing_video.mp4" type="video/mp4" />');

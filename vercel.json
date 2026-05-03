@@ -79,6 +79,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/dashboard",
+      "destination": "/index.html"
+    },
+    {
       "source": "/notes",
       "destination": "/index.html"
     },

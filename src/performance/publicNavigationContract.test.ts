@@ -73,7 +73,8 @@ describe('public navigation shell contract', () => {
 
     expect(shell).toContain('const isLandingRoute = location.pathname === RoutePath.HOME;');
     expect(shell).toContain("isLandingRoute ? 'public-shell public-shell--landing'");
-    expect(shell).toContain('<PublicFooter className={isLandingRoute ? \'sr-only\' : undefined} />');
+    expect(shell).toContain('{!isLandingRoute && <PublicFooter />}');
+    expect(shell).not.toContain('sr-only');
     expect(landing).toContain('var(--header-height)');
     expect(landing).toContain('aria-label={isMuted ? \'Unmute video\' : \'Mute video\'}');
     expect(css).toContain('.public-header');

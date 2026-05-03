@@ -1213,8 +1213,8 @@ select:focus-visible,
         rgb(var(--panel-bg-rgb) / 0.97) 0%,
         rgb(var(--panel-bg-rgb) / 0.985) 48%,
         rgb(var(--panel-bg-rgb) / 0.96) 100%);
-    backdrop-filter: blur(18px) saturate(1.08);
-    -webkit-backdrop-filter: blur(18px) saturate(1.08);
+    backdrop-filter: blur(14px) saturate(1.04);
+    -webkit-backdrop-filter: blur(14px) saturate(1.04);
     color: var(--gray-text);
   }
 
@@ -1235,7 +1235,6 @@ select:focus-visible,
         rgba(var(--panel-bg-rgb), 0.68) 100%);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    will-change: backdrop-filter;
   }
 
   .mobile-sidebar-shell {
@@ -1254,8 +1253,8 @@ select:focus-visible,
       -24px 0 58px -42px oklch(from var(--green-shadow) l c h / 0.5),
       inset 1px 0 0 oklch(from var(--border-color) l c h / 0.1),
       inset 0 1px 0 oklch(from var(--border-color) l c h / 0.05);
-    backdrop-filter: blur(24px) saturate(1.2);
-    -webkit-backdrop-filter: blur(24px) saturate(1.2);
+    backdrop-filter: blur(16px) saturate(1.08);
+    -webkit-backdrop-filter: blur(16px) saturate(1.08);
     overflow: hidden;
     transform: translateZ(0);
   }
@@ -1742,8 +1741,8 @@ select:focus-visible,
     border: 1.5px solid var(--border-color);
     border-radius: var(--radius-shell);
     background-color: rgba(var(--panel-bg-rgb), 0.88);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     box-shadow:
       0 20px 36px -26px rgba(0, 0, 0, 0.18),
       0 6px 16px -12px rgba(0, 0, 0, 0.08);
@@ -2069,7 +2068,6 @@ select:focus-visible,
     background: var(--modal-sheet-backdrop-bg);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    will-change: backdrop-filter;
   }
 
   .modal-sheet-shell {
@@ -2317,8 +2315,8 @@ select:focus-visible,
 
   .overlay-feedback--veil {
     background: rgba(var(--panel-bg-rgb), 0.84);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
   }
 
   .overlay-feedback-card {
@@ -2395,8 +2393,8 @@ select:focus-visible,
     border: 1.5px solid var(--audio-picker-border, var(--border-color));
     background: var(--audio-picker-bg, rgba(var(--panel-bg-rgb), 0.96));
     box-shadow: var(--audio-picker-shadow, 0 18px 32px -20px rgba(0, 0, 0, 0.18));
-    backdrop-filter: blur(26px);
-    -webkit-backdrop-filter: blur(26px);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
   }
 
   .audio-popup-header {
@@ -2503,8 +2501,8 @@ select:focus-visible,
     border: 1.5px solid var(--audio-button-border, var(--floating-panel-border));
     background: var(--audio-button-bg, var(--floating-panel-bg));
     color: var(--audio-icon-stroke, var(--gray-text));
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     box-shadow: var(--audio-button-shadow, var(--floating-panel-shadow));
     transition:
       background-color 220ms ease,

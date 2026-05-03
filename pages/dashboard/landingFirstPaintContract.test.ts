@@ -77,6 +77,8 @@ describe('landing first-paint contract', () => {
     expect(landing).not.toContain('poster="/assets/videos/landing_video.webp"');
     expect(landing).toContain('src="/assets/videos/landing_video_mobile.webm" type="video/webm" media="(max-width: 1023px)"');
     expect(landing).toContain('src="/assets/videos/landing_video_mobile.mp4" type="video/mp4" media="(max-width: 1023px)"');
+    expect(landing).toContain('src="/assets/videos/landing_video.webm" type="video/webm" media="(min-width: 1024px)"');
+    expect(landing).not.toContain('landing_video.mp4');
     expect(landing).not.toContain('isHeroPosterReady');
     expect(landing).not.toContain('setIsHeroPosterReady');
     expect(landing).not.toContain('onLoad={() => setIsHeroPosterReady(true)}');

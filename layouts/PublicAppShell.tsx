@@ -17,7 +17,7 @@ export const PublicAppShell: React.FC = () => {
       <main id="main-content" className={isLandingRoute ? 'min-h-[100dvh]' : 'min-h-[calc(100dvh-var(--header-height))] pt-[calc(env(safe-area-inset-top)+var(--header-height))]'}>
         <Outlet />
       </main>
-      <PublicFooter className={isLandingRoute ? 'sr-only' : undefined} />
+      {!isLandingRoute && <PublicFooter />}
     </div>
   );
 };

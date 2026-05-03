@@ -126,102 +126,106 @@ export const FAQ: React.FC = () => {
       </section>
 
       <main className="mx-auto w-full max-w-[1440px] px-6 sm:px-10 lg:px-16">
-        {/* Core Guide Sections */}
-        <section className="mb-20 grid gap-6 md:grid-cols-3">
-          {guideSections.map((section) => {
-            return (
-              <article key={section.title} className="surface-flat surface-tone-sage group relative flex flex-col justify-between overflow-hidden rounded-[2rem] p-8 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-green/20">
-                <div className="relative z-10">
-                  <div className="tone-icon tone-icon-sage mb-8 h-12 w-12 rounded-2xl transition-transform duration-500 ease-out group-hover:scale-110 group-hover:-rotate-6">
-                    <PublicPageIcon name={section.icon} size={24} />
-                  </div>
-                  <div className="space-y-4">
-                    <h2 className="text-[22px] font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green">
-                      {section.title}
-                    </h2>
-                    <p className="font-sans text-[16px] leading-relaxed text-gray-light">
-                      {section.body}
-                    </p>
-                  </div>
+        <section className="faq-editorial-lead mb-20 grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-stretch">
+          <article className="surface-flat surface-tone-sage rounded-[2rem] p-8 md:p-12">
+            <p className="label-caps text-green">Quick guide</p>
+            <h2 className="mt-5 max-w-[12ch] text-mk-h2 font-display font-bold leading-tight text-gray-text">
+              Writing stays at the center.
+            </h2>
+            <p className="mt-6 max-w-[52ch] font-serif text-[20px] italic leading-relaxed text-gray-text/75">
+              Reflections is not a feed, a coach, or a scorecard. It is a private place for notes, mood labels, and patterns you choose to inspect.
+            </p>
+          </article>
+
+          <div className="faq-compact-list rounded-[2rem] border border-border/70 bg-[rgb(var(--panel-bg-rgb)/0.54)]">
+            {guideSections.map((section, index) => (
+              <article
+                key={section.title}
+                className="group grid gap-5 border-b border-border/60 p-6 last:border-b-0 sm:grid-cols-[3.25rem_minmax(0,1fr)] md:p-8"
+              >
+                <div className="tone-icon tone-icon-sage flex h-12 w-12 rounded-2xl transition-transform duration-500 ease-out-expo group-hover:scale-105">
+                  <PublicPageIcon name={section.icon} size={24} />
+                </div>
+                <div>
+                  <p className="label-caps text-green/70">0{index + 1}</p>
+                  <h2 className="mt-2 text-[22px] font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green">
+                    {section.title}
+                  </h2>
+                  <p className="mt-3 font-sans text-[16px] leading-relaxed text-gray-light">
+                    {section.body}
+                  </p>
                 </div>
               </article>
-            );
-          })}
+            ))}
+          </div>
         </section>
 
-        {/* The Practice Section */}
-        <section className="mb-20">
-          <div className="mb-10 space-y-4">
+        <section className="mb-20 grid gap-10 border-y border-border py-16 lg:grid-cols-[0.72fr_1.28fr] lg:py-20">
+          <div className="space-y-4">
             <p className="label-caps text-green">The practice</p>
             <h2 className="text-mk-h2 font-display font-bold text-gray-text">A space to write, one reflection at a time</h2>
+            <p className="max-w-[38rem] font-sans text-[16px] leading-relaxed text-gray-light">
+              The interface is deliberately quiet. The useful pieces stay close to the page, not above it.
+            </p>
           </div>
-          
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {practiceItems.map((item) => {
-              return (
-                <div key={item.title} className="surface-flat surface-tone-sky group relative flex flex-col justify-between overflow-hidden rounded-[2rem] p-8 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-green/20">
-                  <div className="relative z-10">
-                    <div className="tone-icon tone-icon-sky mb-6 h-12 w-12 rounded-2xl transition-transform duration-500 ease-out group-hover:scale-110 group-hover:rotate-6">
-                      <PublicPageIcon name={item.icon} size={24} />
-                    </div>
-                    <h3 className="mb-3 text-[20px] font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">{item.title}</h3>
-                    <p className="font-sans text-[16px] leading-relaxed text-gray-light">{item.body}</p>
-                  </div>
+
+          <div className="faq-compact-list divide-y divide-border/60">
+            {practiceItems.map((item) => (
+              <article key={item.title} className="group flex gap-5 py-6 first:pt-0 last:pb-0">
+                <div className="tone-icon tone-icon-sky mt-1 h-11 w-11 flex-none rounded-2xl transition-transform duration-500 ease-out-expo group-hover:rotate-3">
+                  <PublicPageIcon name={item.icon} size={22} />
                 </div>
-              );
-            })}
+                <div>
+                  <h3 className="text-[20px] font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 font-sans text-[16px] leading-relaxed text-gray-light">{item.body}</p>
+                </div>
+              </article>
+            ))}
           </div>
         </section>
 
-        {/* The Details Section */}
-        <section className="mb-20 border-y border-border py-20">
-          <div className="mb-12 space-y-4">
+        <section className="faq-comparison-band mb-20 surface-flat surface-tone-sky rounded-[2rem] p-7 md:p-10">
+          <div className="mb-10 max-w-3xl space-y-4">
             <p className="label-caps text-green">The details</p>
             <h2 className="text-mk-h2 font-display font-bold text-gray-text">Tools built to support you without getting in the way</h2>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            {detailItems.map((item) => {
-              return (
-                <div key={item.title} className="tone-panel tone-panel-sky group relative overflow-hidden rounded-[2rem] p-8 transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_8px_40px_rgba(14,165,233,0.08)]">
-                  <div className="relative z-10 flex flex-col gap-4 sm:flex-row sm:gap-6">
-                    <div className="tone-icon tone-icon-sky flex h-14 w-14 flex-none rounded-2xl transition-transform duration-500 ease-out group-hover:scale-110 group-hover:-rotate-12">
-                      <PublicPageIcon name={item.icon} size={28} />
-                    </div>
-                    <div className="space-y-4">
-                      <div className="space-y-1">
-                        <h3 className="text-[24px] font-display font-bold text-gray-text group-hover:text-green transition-colors duration-300">{item.title}</h3>
-                        {item.label && <p className="text-[11px] font-black uppercase tracking-widest text-green/60">{item.label}</p>}
-                      </div>
-                      <p className="font-sans text-[17px] leading-relaxed text-gray-light">{item.body}</p>
-                    </div>
-                  </div>
-                  {/* Subtle sweep effect on hover */}
-                  <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-sky-400/0 via-sky-400/5 to-sky-400/0 translate-x-[-100%] transition-transform duration-1000 group-hover:translate-x-[100%]" />
+          <div className="grid gap-x-10 gap-y-8 md:grid-cols-2">
+            {detailItems.map((item) => (
+              <article key={item.title} className="group flex flex-col gap-4 sm:flex-row sm:gap-6">
+                <div className="tone-icon tone-icon-sky flex h-14 w-14 flex-none rounded-2xl transition-transform duration-500 ease-out-expo group-hover:-rotate-3">
+                  <PublicPageIcon name={item.icon} size={28} />
                 </div>
-              );
-            })}
+                <div>
+                  {item.label && <p className="mb-2 text-[11px] font-black uppercase tracking-widest text-green/60">{item.label}</p>}
+                  <h3 className="text-[24px] font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">{item.title}</h3>
+                  <p className="mt-3 font-sans text-[17px] leading-relaxed text-gray-light">{item.body}</p>
+                </div>
+              </article>
+            ))}
           </div>
         </section>
 
-        {/* Feature Grid */}
-        <section className="mb-28">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {featureGrid.map((feature) => {
-              return (
-                <div key={feature.title} className="surface-flat surface-tone-honey group relative rounded-[2rem] p-8 transition-all duration-500 hover:border-green/20 hover:-translate-y-1">
-                  <div className="space-y-6">
-                    <div className="tone-icon tone-icon-honey h-12 w-12 rounded-2xl transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
-                      <PublicPageIcon name={feature.icon} size={24} />
-                    </div>
-                    <div className="space-y-3">
-                      <h4 className="text-[14px] font-black uppercase tracking-widest text-gray-text group-hover:text-green transition-colors duration-300">{feature.title}</h4>
-                      <p className="font-sans text-[16px] leading-relaxed text-gray-light">{feature.body}</p>
-                    </div>
-                  </div>
+        <section className="mb-28 grid gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+          <div className="space-y-4">
+            <p className="label-caps text-green">Feature shelf</p>
+            <h2 className="text-mk-h2 font-display font-bold text-gray-text">Small tools, close to the page</h2>
+          </div>
+
+          <div className="faq-compact-list grid gap-x-8 gap-y-0 sm:grid-cols-2">
+            {featureGrid.map((feature) => (
+              <article key={feature.title} className="group flex gap-4 border-t border-border/60 py-5">
+                <div className="tone-icon tone-icon-honey mt-1 h-10 w-10 flex-none rounded-2xl transition-transform duration-500 ease-out-expo group-hover:scale-105">
+                  <PublicPageIcon name={feature.icon} size={21} />
                 </div>
-              );
-            })}
+                <div>
+                  <h3 className="text-[13px] font-black uppercase tracking-widest text-gray-text transition-colors duration-300 group-hover:text-green">{feature.title}</h3>
+                  <p className="mt-2 font-sans text-[15px] leading-relaxed text-gray-light">{feature.body}</p>
+                </div>
+              </article>
+            ))}
           </div>
         </section>
 
