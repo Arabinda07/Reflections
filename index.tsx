@@ -31,6 +31,11 @@ const reloadWithCacheBust = () => {
   window.location.replace(currentUrl.toString());
 };
 
+window.addEventListener('vite:preloadError', () => {
+  console.warn("Vite preload error detected. Silently reloading to fetch new chunks...");
+  reloadWithCacheBust();
+});
+
 const clearBrowserManagedAppCaches = async () => {
   if ('serviceWorker' in navigator) {
     const registrations = await navigator.serviceWorker.getRegistrations();

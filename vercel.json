@@ -59,11 +59,7 @@
   ],
   "rewrites": [
     {
-      "source": "/assets/(.*)",
-      "destination": "/assets/$1"
-    },
-    {
-      "source": "/(.*)",
+      "source": "/(login|signup|reset-password|auth/.*|home|dashboard|notes(/.*)?|account|insights|release|letters|wiki(/.*)?|sanctuary(/.*)?|faq|about|privacy|signin|sign-in)",
       "destination": "/index.html"
     }
   ]
