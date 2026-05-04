@@ -19,7 +19,8 @@ const vendorChunk = (id: string) => {
     id.includes('get-user-locale')
   ) return 'vendor-calendar';
   if (id.includes('quill')) return 'vendor-editor';
-  if (id.includes('@supabase') || id.includes('dexie') || id.includes('idb-keyval')) return 'vendor-data';
+  if (id.includes('@supabase') || id.includes('idb-keyval')) return 'vendor-supabase';
+  if (id.includes('dexie')) return 'vendor-dexie';
   if (id.includes('@lottiefiles')) return 'vendor-lottie';
   if (id.includes('motion')) return 'vendor-motion';
   if (id.includes('@phosphor-icons')) return 'vendor-icons';
@@ -167,6 +168,11 @@ export default defineConfig(() => {
       ],
       build: {
         sourcemap: sentrySourcemap,
+        modulePreload: {
+          resolveDependencies: (_filename, deps) => {
+            return deps.filter(dep => !dep.includes('vendor-analytics'));
+          }
+        },
         rollupOptions: {
           output: {
             manualChunks: vendorChunk,

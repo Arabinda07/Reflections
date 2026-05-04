@@ -6,6 +6,12 @@
     align-items: center;
     justify-content: center;
     padding: 1.5rem;
+    opacity: 0;
+    transition: opacity 350ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.overlay-feedback.is-visible {
+    opacity: 1;
 }
 
 .overlay-feedback--screen {
