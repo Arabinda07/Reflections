@@ -4,9 +4,17 @@ import { RoutePath } from '../types';
 
 const error404Animation = '/assets/lottie/Error%20404.json';
 
-const LottieAnimation = lazy(() => import('../components/ui/LottieAnimation').then((module) => ({
-  default: module.LottieAnimation,
-})));
+const LottieAnimation = lazy(() => import('../components/ui/LottieAnimation')
+  .then((module) => ({
+    default: module.LottieAnimation,
+  }))
+  .catch((err) => {
+    console.warn('Failed to load Lottie fallback chunk', err);
+    return { 
+      default: () => <div className="h-full w-full rounded-[var(--radius-panel)] bg-green/5 border border-border flex items-center justify-center" />
+    };
+  })
+);
 
 const getRouteErrorCopy = (error: unknown) => {
   if (isRouteErrorResponse(error)) {
