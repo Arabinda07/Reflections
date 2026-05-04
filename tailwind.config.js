@@ -102,6 +102,13 @@ export default {
       transitionTimingFunction: {
         'out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',
       },
+      zIndex: {
+        'under': '-1',
+        'deep': '-2',
+        'floating': '80',
+        'sticky-nav': '85',
+        'overlay': '100',
+      },
     },
   },
   plugins: [

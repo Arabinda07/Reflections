@@ -567,7 +567,7 @@ export const HomeAuthenticated: React.FC = () => {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         whileTap={{ scale: 0.98 }}
-                        className="w-full flex items-center gap-4 p-4 rounded-2xl border border-honey/15 bg-honey/5 hover:border-honey/30 transition-colors text-left shadow-none group/btn"
+                        className="w-full flex items-center gap-4 p-4 rounded-2xl border border-honey/15 bg-honey/5 hover:border-honey/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-honey/40 transition-colors text-left shadow-none group/btn"
                         onClick={() => handleToggleIntention(intention.noteId, intention.id)}
                         aria-label={`Mark "${intention.text}" from ${intention.noteTitle} as complete`}
                       >

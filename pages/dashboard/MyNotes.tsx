@@ -289,6 +289,7 @@ export const MyNotes: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <Chip
                       active={viewMode === 'grid'}
+                      aria-pressed={viewMode === 'grid'}
                       icon={<SquaresFour size={16} weight="regular" />}
                       onClick={() => setViewMode('grid')}
                       title="Grid view"
@@ -297,6 +298,7 @@ export const MyNotes: React.FC = () => {
                     </Chip>
                     <Chip
                       active={viewMode === 'calendar'}
+                      aria-pressed={viewMode === 'calendar'}
                       icon={<CalendarIcon size={16} weight="regular" />}
                       onClick={() => setViewMode('calendar')}
                       title="Calendar view"

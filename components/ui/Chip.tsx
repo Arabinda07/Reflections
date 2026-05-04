@@ -9,6 +9,7 @@ interface ChipProps {
   className?: string;
   title?: string;
   'aria-label'?: string;
+  'aria-pressed'?: boolean;
 }
 
 export const Chip: React.FC<ChipProps> = ({
@@ -20,6 +21,7 @@ export const Chip: React.FC<ChipProps> = ({
   className = '',
   title,
   'aria-label': ariaLabel,
+  'aria-pressed': ariaPressed,
 }) => {
   const classes = ['chip-filter', active ? 'chip-filter--active' : '', className]
     .filter(Boolean)
@@ -41,7 +43,7 @@ export const Chip: React.FC<ChipProps> = ({
   }
 
   return (
-    <button type="button" onClick={onClick} className={classes} title={title} aria-label={ariaLabel}>
+    <button type="button" onClick={onClick} className={classes} title={title} aria-label={ariaLabel} aria-pressed={ariaPressed}>
       {content}
     </button>
   );

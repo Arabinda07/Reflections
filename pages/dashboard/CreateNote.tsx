@@ -100,11 +100,23 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
   }, [task.completed]);
 
   return (
-    <motion.div
-      layout="position"
-      className={`group relative flex items-center gap-3 rounded-2xl p-3 transition-colors duration-300 hover:bg-green/5 dark:hover:bg-white/5 ${task.completed ? 'opacity-60' : ''}`}
-    >
-      <AnimatePresence>
+    <div className="relative overflow-hidden rounded-2xl mb-1 group/row">
+      <div className="absolute inset-0 flex items-center justify-end bg-clay/10 px-5 rounded-2xl">
+        <Trash size={18} weight="fill" className="text-clay transition-transform group-hover/row:scale-110" />
+      </div>
+      <motion.div
+        drag="x"
+        dragConstraints={{ left: -80, right: 0 }}
+        dragElastic={0.2}
+        onDragEnd={(e, { offset, velocity }) => {
+          if (offset.x < -50 || velocity.x < -500) {
+            removeTask(task.id);
+          }
+        }}
+        layout="position"
+        className={`group relative z-10 flex items-center gap-3 rounded-2xl p-3 bg-surface transition-colors duration-300 hover:bg-green/5 dark:hover:bg-white/5 ${task.completed ? 'opacity-60' : ''}`}
+      >
+        <AnimatePresence>
         {rippleKey > 0 && task.completed && (
           <motion.span
             key={rippleKey}
@@ -148,11 +160,12 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
         type="button"
         onClick={() => removeTask(task.id)}
         aria-label={`Remove task: ${taskLabel}`}
-        className="opacity-0 group-hover:opacity-100 flex min-h-[44px] min-w-[44px] items-center justify-center text-gray-nav hover:text-clay transition-opacity"
+        className="opacity-0 lg:group-hover:opacity-100 flex min-h-[44px] min-w-[44px] items-center justify-center text-gray-nav hover:text-clay transition-opacity"
       >
         <Trash size={16} />
       </button>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 };
 
@@ -345,7 +358,9 @@ export const CreateNote: React.FC = () => {
 
   // â”€â”€ Derived values â”€â”€
   const hasContent = Boolean(draft.currentSnapshot.content);
-  const wordCount = draft.currentSnapshot.content.replace(/<[^>]*>/g, '').trim().split(/\s+/).filter(Boolean).length;
+  const wordCount = React.useMemo(() => {
+    return draft.currentSnapshot.content.replace(/<[^>]*>/g, '').trim().split(/\s+/).filter(Boolean).length;
+  }, [draft.currentSnapshot.content]);
   const canReflect = wordCount >= 100;
   const isFocusModeActive = focusMode.isActive;
   const isFocusModeEnabled = focusMode.isEnabled;
@@ -406,7 +421,7 @@ export const CreateNote: React.FC = () => {
       {isMobile && (
         <button 
           onClick={handleMobileBack}
-          className={`surface-floating fixed left-4 z-[80] flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] transition hover:text-green ${isFocusModeActive ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
+          className={`surface-floating fixed left-4 z-floating flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] transition hover:text-green ${isFocusModeActive ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
           style={{ top: NATIVE_TOP_CONTROL_OFFSET }}
           aria-label="Back to notes"
         >
@@ -420,7 +435,7 @@ export const CreateNote: React.FC = () => {
           onClick={() => {
             focusMode.disable();
           }}
-          className="surface-floating fixed right-4 z-[85] inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 label-caps text-green hover:text-green"
+          className="surface-floating fixed right-4 z-sticky-nav inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 label-caps text-green hover:text-green"
           style={{ top: NATIVE_TOP_CONTROL_OFFSET }}
         >
           <X size={12} weight="regular" />
@@ -520,6 +535,7 @@ export const CreateNote: React.FC = () => {
             </span>
             <button
               type="button"
+              aria-pressed={isFocusModeEnabled}
               onClick={() => {
                 focusMode.toggle();
               }}

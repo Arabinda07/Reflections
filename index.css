@@ -233,12 +233,12 @@
   --color-accent-soft: oklch(from var(--green) 0.965 0.022 h);
 
   /* Mood Tokens */
-  --color-mood-happy: var(--sky);
+  --color-mood-happy: var(--golden);
   --color-mood-calm: var(--green);
-  --color-mood-anxious: var(--nav-text);
-  --color-mood-sad: var(--dark-blue);
-  --color-mood-angry: oklch(0.40 0.04 260);
-  --color-mood-tired: var(--gray-light);
+  --color-mood-anxious: var(--orange);
+  --color-mood-sad: var(--blue);
+  --color-mood-angry: var(--red);
+  --color-mood-tired: oklch(0.60 0.05 260);
 
   /* Status Tokens */
   --color-success-soft: oklch(from var(--green) 0.955 0.03 h);
@@ -446,7 +446,7 @@
 
   /* ── Semantic Overrides ── */
   --color-surface-muted: oklch(0.24 0.012 135);
-  --color-mood-angry: oklch(0.70 0.04 260);
+  --color-mood-angry: var(--red);
   --color-success-soft: oklch(from var(--green) 0.24 0.04 h);
   --color-warning-soft: oklch(from var(--honey) 0.24 0.04 h);
   --color-danger-soft: oklch(from var(--clay) 0.24 0.04 h);

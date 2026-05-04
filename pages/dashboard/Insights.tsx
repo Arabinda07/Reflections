@@ -206,7 +206,7 @@ export const Insights: React.FC = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-body px-6"
+            className="fixed inset-0 z-overlay flex items-center justify-center overflow-hidden bg-body px-6"
             aria-live="polite"
             aria-label="Opening Sanctuary"
           >
@@ -269,6 +269,18 @@ export const Insights: React.FC = () => {
             <Surface variant="flat" tone="sky" className="p-8 md:p-10">
               <WeeklyRecapLoadingSkeleton />
             </Surface>
+          ) : notes.length === 0 && weeklyRecap.writingDays === 0 ? (
+            <EmptyState
+              surface="bezel"
+              illustration={<DotLottieReact src="/assets/lottie/empty%20notes.json" autoplay loop />}
+              title="Your story is being written."
+              description="Patterns and insights will gather here as you continue to write and check in."
+              action={
+                <Button onClick={() => navigate(RoutePath.CREATE_NOTE)} variant="primary">
+                  Start reflecting
+                </Button>
+              }
+            />
           ) : (<>
           <Surface variant="flat" tone="sky" className="group relative overflow-hidden rounded-[2.5rem] p-8 md:p-10 transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_rgba(14,165,233,0.05)]">
             <div className="relative z-10">

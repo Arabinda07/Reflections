@@ -444,7 +444,7 @@ export const LifeWiki: React.FC = () => {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: shouldReduceMotion ? 0 : 0.35, ease: [0.16, 1, 0.3, 1] }}
-          className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-body px-6"
+          className="fixed inset-0 z-overlay flex items-center justify-center overflow-hidden bg-body px-6"
         >
           <div className="sanctuary-entrance-glow absolute inset-0" />
           <div className="sanctuary-entrance-scrim absolute inset-0" />
@@ -488,7 +488,7 @@ export const LifeWiki: React.FC = () => {
     return (
       <>
         {renderEntrance()}
-        <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden bg-body">
+        <div className="fixed inset-0 pointer-events-none z-deep overflow-hidden bg-body">
           <div className="sanctuary-page-fade absolute inset-0 opacity-50" />
         </div>
         <PageContainer size="narrow" className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10 relative z-10">
@@ -589,9 +589,9 @@ export const LifeWiki: React.FC = () => {
               <article className="space-y-8">
                 <header className="space-y-4 pb-2">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className={`metadata-pill ${articleTone.surface}`}>
+                    <MetadataPill tone={articleMeta?.tone === 'green' ? 'green' : 'blue'}>
                       {articleMeta?.label || articlePage.title}
-                    </span>
+                    </MetadataPill>
                     <MetadataPill tone="green">Updated {new Date(articlePage.updatedAt).toLocaleDateString()}</MetadataPill>
                     <MetadataPill tone="green">{sourceIds.length} source{sourceIds.length === 1 ? '' : 's'}</MetadataPill>
                   </div>
