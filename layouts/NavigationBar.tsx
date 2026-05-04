@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { AnimatePresence, motion } from 'motion/react';
 import {
   Moon,
   Sun,
@@ -68,17 +67,14 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
       title="Toggle Dark Mode"
       aria-label={isDarkMode ? 'Use light mode' : 'Use dark mode'}
     >
-      <AnimatePresence mode="popLayout" initial={false}>
-        <motion.div
-          key={isDarkMode ? 'dark' : 'light'}
-          initial={{ rotate: -90, opacity: 0, scale: 0.5 }}
-          animate={{ rotate: 0, opacity: 1, scale: 1 }}
-          exit={{ rotate: 90, opacity: 0, scale: 0.5 }}
-          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-        >
-          {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-        </motion.div>
-      </AnimatePresence>
+      <div className="relative h-5 w-5">
+        <div className={`absolute inset-0 transition-all duration-300 ease-out-expo ${isDarkMode ? 'rotate-0 opacity-100 scale-100' : 'rotate-90 opacity-0 scale-50'}`}>
+          <Sun size={20} />
+        </div>
+        <div className={`absolute inset-0 transition-all duration-300 ease-out-expo ${!isDarkMode ? 'rotate-0 opacity-100 scale-100' : '-rotate-90 opacity-0 scale-50'}`}>
+          <Moon size={20} />
+        </div>
+      </div>
     </button>
   );
 
@@ -187,21 +183,14 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
             aria-label="Toggle menu"
             aria-expanded={isMobileMenuOpen}
           >
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={isMobileMenuOpen ? 'close' : 'open'}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              >
-                {isMobileMenuOpen ? (
-                  <X size={24} weight="regular" />
-                ) : (
-                  <List size={24} weight="regular" />
-                )}
-              </motion.div>
-            </AnimatePresence>
+            <div className="relative h-6 w-6">
+              <div className={`absolute inset-0 transition-all duration-200 ease-out-expo ${isMobileMenuOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
+                <X size={24} weight="regular" />
+              </div>
+              <div className={`absolute inset-0 transition-all duration-200 ease-out-expo ${!isMobileMenuOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
+                <List size={24} weight="regular" />
+              </div>
+            </div>
           </button>
         </div>
       </div>

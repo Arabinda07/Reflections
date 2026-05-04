@@ -28,7 +28,9 @@ const isDynamicImportFailure = (detail: string) =>
 const reloadWithCacheBust = () => {
   const currentUrl = new URL(window.location.href);
   currentUrl.searchParams.set('t', Date.now().toString());
-  window.location.replace(currentUrl.toString());
+  // Use href assignment instead of replace to force a proper navigation event,
+  // bypassing SPA routers that might intercept replace()
+  window.location.href = currentUrl.toString();
 };
 
 window.addEventListener('vite:preloadError', () => {
@@ -39,12 +41,16 @@ window.addEventListener('vite:preloadError', () => {
 const clearBrowserManagedAppCaches = async () => {
   if ('serviceWorker' in navigator) {
     const registrations = await navigator.serviceWorker.getRegistrations();
-    await Promise.all(registrations.map((registration) => registration.unregister()));
+    for (const registration of registrations) {
+      await registration.unregister();
+    }
   }
 
   if (typeof caches !== 'undefined') {
     const cacheNames = await caches.keys();
-    await Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)));
+    for (const cacheName of cacheNames) {
+      await caches.delete(cacheName);
+    }
   }
 };
 
@@ -54,6 +60,8 @@ const recoverFromStaleAppShell = async (detail: string) => {
 
   try {
     await clearBrowserManagedAppCaches();
+    // Give the browser a tiny window to flush cache API before navigating
+    await new Promise(resolve => setTimeout(resolve, 100));
   } catch (recoveryError) {
     console.warn("Could not clear all browser-managed app caches before reloading.", recoveryError);
   } finally {

@@ -254,7 +254,7 @@ export const Landing: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate(RoutePath.SIGNUP)}
-              className="group relative inline-flex h-16 min-w-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-control)] bg-green px-10 font-sans text-btn-lg font-bold text-white shadow-[0_12px_28px_-10px_var(--green-shadow)] transition-[transform,box-shadow,background-color] duration-300 ease-out-expo hover:scale-[1.03] hover:bg-green-hover hover:shadow-[0_16px_36px_-10px_var(--green-shadow)] active:scale-[0.97] motion-reduce:transition-none"
+              className="group relative inline-flex h-16 min-w-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-control)] bg-green px-10 font-sans text-btn-lg font-bold text-white transition-[transform,background-color] duration-300 ease-out-expo hover:scale-[1.03] hover:bg-green-hover active:scale-[0.97] motion-reduce:transition-none"
               aria-label="Begin writing"
             >
               Begin writing
@@ -266,14 +266,14 @@ export const Landing: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => navigate(RoutePath.LOGIN)}
-                  className="inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap px-1 text-btn-sm font-bold text-gray-nav transition-colors duration-300 ease-out-expo hover:text-green"
+                  className="inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap px-1 text-btn-sm font-extrabold text-gray-text transition-colors duration-300 ease-out-expo hover:text-green"
                 >
                   Sign in
                 </button>
 
                 <a
                   href={RoutePath.FAQ}
-                  className="inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap px-1 text-btn-sm font-bold text-gray-nav transition-colors duration-300 ease-out-expo hover:text-green"
+                  className="inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap px-1 text-btn-sm font-extrabold text-gray-text transition-colors duration-300 ease-out-expo hover:text-green"
                 >
                   How it works
                 </a>
@@ -282,13 +282,13 @@ export const Landing: React.FC = () => {
               <button
                 type="button"
                 onClick={toggleMute}
-                className="surface-floating surface-floating--media flex h-12 min-h-12 w-12 min-w-12 shrink-0 items-center justify-center rounded-2xl text-gray-nav transition-[color,border-color,transform] duration-300 ease-out-expo hover:scale-[1.03] hover:border-green/40 hover:text-green active:scale-95 motion-reduce:transition-none"
+                className="flex h-[3.25rem] min-h-[3.25rem] w-[3.25rem] min-w-[3.25rem] shrink-0 items-center justify-center rounded-2xl text-gray-text transition-[color,transform] duration-300 ease-out-expo hover:scale-[1.05] hover:text-green active:scale-95 motion-reduce:transition-none"
                 aria-label={isMuted ? 'Unmute video' : 'Mute video'}
               >
                 {isMuted ? (
-                  <SpeakerMutedIcon className="h-5 w-5" />
+                  <SpeakerMutedIcon className="h-6 w-6" />
                 ) : (
-                  <SpeakerHighIcon className="h-5 w-5" />
+                  <SpeakerHighIcon className="h-6 w-6" />
                 )}
               </button>
             </div>
