@@ -48,7 +48,7 @@ export const AboutArabinda: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <PageContainer size="app" className="py-12 sm:py-16">
+    <PageContainer as="main" size="app" className="py-12 sm:py-16">
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
         <button
           onClick={() => navigate(RoutePath.HOME)}

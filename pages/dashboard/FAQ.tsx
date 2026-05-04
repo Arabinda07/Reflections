@@ -106,7 +106,7 @@ export const FAQ: React.FC = () => {
   }, []);
 
   return (
-    <div className="surface-scope-sky page-wash relative min-h-full bg-body pb-28 text-gray-text transition-colors duration-300">
+    <main className="surface-scope-sky page-wash relative min-h-full bg-body pb-28 text-gray-text transition-colors duration-300">
       <section className="mx-auto grid w-full max-w-[1440px] gap-12 px-6 py-20 sm:px-10 lg:grid-cols-12 lg:items-end lg:px-16 lg:py-28">
         <div className="lg:col-span-8">
           <h1 className="text-mk-display font-display font-extrabold leading-[0.95] tracking-normal text-gray-text text-balance">
@@ -245,6 +245,6 @@ export const FAQ: React.FC = () => {
         </section>
 
       </div>
-    </div>
+    </main>
   );
 };

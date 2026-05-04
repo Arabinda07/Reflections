@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { Navigate, Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from 'react-router-dom';
+import { Navigate, Route, RouterProvider, createBrowserRouter, createRoutesFromElements, ScrollRestoration, Outlet } from 'react-router-dom';
 import { RouteLoadingFrame } from './components/ui/RouteLoadingFrame';
 import { RouteErrorBoundary } from './pages/RouteErrorBoundary';
 import { Landing } from './pages/dashboard/Landing';
@@ -43,9 +43,16 @@ const withRouteFallback = (element: React.ReactNode) => (
 const withProtectedRoute = (element: React.ReactNode) =>
   withRouteFallback(<ProtectedRoute>{element}</ProtectedRoute>);
 
+const RootLayout = () => (
+  <>
+    <ScrollRestoration />
+    <Outlet />
+  </>
+);
+
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <>
+    <Route element={<RootLayout />}>
       <Route element={withRouteFallback(<PublicAppShell />)} errorElement={<RouteErrorBoundary />}>
         <Route path={RoutePath.HOME} element={<Landing />} />
         <Route path={RoutePath.FAQ} element={withRouteFallback(<FAQ />)} />
@@ -79,7 +86,7 @@ const router = createBrowserRouter(
 
         <Route path="*" element={withRouteFallback(<NotFound />)} />
       </Route>
-    </>,
+    </Route>,
   ),
 );
 

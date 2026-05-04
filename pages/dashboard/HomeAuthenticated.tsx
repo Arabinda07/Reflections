@@ -135,6 +135,7 @@ export const HomeAuthenticated: React.FC = () => {
   );
   const [newTaskText, setNewTaskText] = useState('');
   const [isCreatingTask, setIsCreatingTask] = useState(false);
+  const [isIntentionModalOpen, setIsIntentionModalOpen] = useState(false);
   const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);
   const shouldReduceMotion = useReducedMotion();
   const { showToast } = useToast();
@@ -355,25 +356,34 @@ export const HomeAuthenticated: React.FC = () => {
     if (!newTaskText.trim() || isCreatingTask) return;
     setIsCreatingTask(true);
     try {
-      const today = new Date();
-      const todaysNotes = taskNotes.filter(n => isSameDay(new Date(n.updatedAt), today) || isSameDay(new Date(n.createdAt), today));
-      todaysNotes.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      let targetNote = taskNotes[0];
       
-      let targetNote = todaysNotes[0];
+      const newTask = {
+        id: crypto.randomUUID(),
+        text: newTaskText.trim(),
+        completed: false,
+      };
+
       const taskHtml = `<ul data-type="taskList"><li data-type="taskItem" data-checked="false"><p>${newTaskText}</p></li></ul>`;
       
       if (!targetNote) {
         targetNote = await noteService.create({
-          title: 'Daily Intentions',
+          title: 'My Intentions',
           content: taskHtml,
+          tasks: [newTask]
         });
         updateIntentionSummary([...taskNotes, targetNote]);
       } else {
         const updatedContent = targetNote.content + taskHtml;
-        const updatedNote = await noteService.update(targetNote.id, { content: updatedContent });
+        const updatedTasks = [...(targetNote.tasks || []), newTask];
+        const updatedNote = await noteService.update(targetNote.id, { 
+          content: updatedContent,
+          tasks: updatedTasks
+        });
         updateIntentionSummary(taskNotes.map(n => n.id === targetNote.id ? updatedNote : n));
       }
       setNewTaskText('');
+      setIsIntentionModalOpen(false);
       showToast('Intention added');
     } catch (err) {
       console.error('Failed to create intention', err);
@@ -584,23 +594,16 @@ export const HomeAuthenticated: React.FC = () => {
                   </button>
                 )}
 
-                <form onSubmit={handleCreateIntention} className="mt-4 flex gap-2">
-                  <input
-                    type="text"
-                    value={newTaskText}
-                    onChange={(e) => setNewTaskText(e.target.value)}
-                    placeholder="Add a new intention..."
-                    disabled={isCreatingTask}
-                    className="flex-1 rounded-xl border border-honey/15 bg-honey/5 px-4 py-2.5 text-sm text-gray-text placeholder:text-gray-nav/50 focus:border-honey/40 focus:outline-none focus:ring-1 focus:ring-honey/40 transition-colors"
-                  />
-                  <button
-                    type="submit"
-                    disabled={!newTaskText.trim() || isCreatingTask}
-                    className="flex shrink-0 items-center justify-center rounded-xl bg-honey/10 px-4 text-sm font-bold text-honey transition-colors hover:bg-honey/20 disabled:opacity-50"
+                <div className="mt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsIntentionModalOpen(true)}
+                    className="w-full justify-center border-dashed border-honey/25 text-honey hover:bg-honey/5 hover:border-honey/40 h-11"
                   >
-                    <Plus size={16} weight="bold" />
-                  </button>
-                </form>
+                    <Plus size={16} weight="bold" className="mr-2" />
+                    Add intention
+                  </Button>
+                </div>
               </div>
             </div>
             {/* Subtle background glow effect on hover */}
@@ -831,6 +834,51 @@ export const HomeAuthenticated: React.FC = () => {
             </p>
           ) : null}
         </div>
+      </ModalSheet>
+      <ModalSheet
+        isOpen={isIntentionModalOpen}
+        onClose={() => {
+          setIsIntentionModalOpen(false);
+          setNewTaskText('');
+        }}
+        title="Add intention"
+        icon={<Target size={20} weight="duotone" />}
+        size="sm"
+        tone="sage"
+        bodyClassName="pt-2"
+      >
+        <form onSubmit={handleCreateIntention} className="space-y-5">
+          <p className="text-base font-medium leading-relaxed text-gray-light">
+            Set a clear intention to guide your focus.
+          </p>
+          <input
+            type="text"
+            autoFocus
+            value={newTaskText}
+            onChange={(e) => setNewTaskText(e.target.value)}
+            placeholder="What needs to be done?"
+            disabled={isCreatingTask}
+            className="w-full rounded-[1.5rem] border border-border bg-body/50 p-5 text-base font-bold text-gray-text placeholder:text-gray-nav/40 focus:border-green/40 focus:outline-none focus:ring-2 focus:ring-green/10 transition-colors"
+          />
+          <div className="flex gap-3 justify-end pt-2">
+             <Button
+               type="button"
+               variant="ghost"
+               onClick={() => setIsIntentionModalOpen(false)}
+               disabled={isCreatingTask}
+             >
+               Cancel
+             </Button>
+             <Button
+               type="submit"
+               variant="primary"
+               disabled={!newTaskText.trim() || isCreatingTask}
+               className="min-w-[8rem]"
+             >
+               {isCreatingTask ? 'Saving...' : 'Save intention'}
+             </Button>
+          </div>
+        </form>
       </ModalSheet>
     </>
   );
