@@ -34,6 +34,7 @@ import { Note, RoutePath } from '../../types';
 import {
   buildHomeIntentionSummary,
   getHomeIntentionToggleUpdate,
+  MAX_ACTIVE_INTENTIONS,
   type HomeIntentionSummary,
 } from './homeIntentions';
 import { MOOD_CONFIG, MOOD_OPTIONS } from './moodConfig';
@@ -354,6 +355,12 @@ export const HomeAuthenticated: React.FC = () => {
   const handleCreateIntention = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTaskText.trim() || isCreatingTask) return;
+
+    if (intentionSummary.openCount >= MAX_ACTIVE_INTENTIONS) {
+      showToast('Cross off an existing intention first to keep your focus.');
+      return;
+    }
+
     setIsCreatingTask(true);
     try {
       let targetNote = taskNotes[0];
@@ -542,7 +549,7 @@ export const HomeAuthenticated: React.FC = () => {
                 )}
               </div>
 
-              <div className="space-y-3 mt-2">
+              <div className="space-y-3 mt-4">
                 <AnimatePresence mode="popLayout">
                   {intentionSummary.items.length > 0 ? (
                     intentionSummary.items.slice(0, 3).map((intention) => (
@@ -553,38 +560,57 @@ export const HomeAuthenticated: React.FC = () => {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         whileTap={{ scale: 0.98 }}
-                        className="w-full flex items-start gap-4 p-4 rounded-2xl border border-honey/15 bg-honey/5 hover:border-honey/30 transition-colors text-left shadow-none group/btn"
+                        className="w-full flex items-center gap-4 p-4 rounded-2xl border border-honey/15 bg-honey/5 hover:border-honey/30 transition-colors text-left shadow-none group/btn"
                         onClick={() => handleToggleIntention(intention.noteId, intention.id)}
                         aria-label={`Mark "${intention.text}" from ${intention.noteTitle} as complete`}
                       >
-                        <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 border-border group-hover/btn:border-honey transition-colors">
+                        <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 border-border group-hover/btn:border-honey transition-colors">
                            <div className="h-2 w-2 rounded-full bg-honey opacity-0 group-hover/btn:opacity-100 transition-opacity" />
                         </div>
-                        <span className="min-w-0">
-                            <span className="block font-serif italic text-base text-gray-text group-hover/btn:text-honey transition-colors line-clamp-2 leading-snug">
+                        <span className="min-w-0 flex-1">
+                          <span className="block font-serif italic text-base text-gray-text group-hover/btn:text-honey transition-colors line-clamp-2 leading-snug">
                             {intention.text}
                           </span>
                         </span>
                       </motion.button>
                     ))
-                  ) : (
-                    <motion.div 
+                  ) : null}
+
+                  {/* Completed intentions — crossed-off state */}
+                  {intentionSummary.completedItems.map((intention) => (
+                    <motion.div
+                      key={`done-${intention.id}`}
+                      layout
                       initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="py-5"
+                      animate={{ opacity: 0.5 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      className="flex items-center gap-4 p-4 rounded-2xl text-left"
                     >
-                      <div className="mb-3 flex">
-                        <div className="h-8 w-8 rounded-full border border-border flex items-center justify-center text-gray-nav/20">
-                          <CheckCircleIcon size={18} weight="duotone" />
-                        </div>
+                      <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 border-green bg-green text-white">
+                        <CheckCircleIcon size={12} weight="bold" />
                       </div>
-                      <p className="text-base font-semibold text-gray-nav/70">
-                        No intentions yet
-                      </p>
+                      <span className="min-w-0 flex-1">
+                        <span className="block font-serif italic text-base text-gray-nav line-through decoration-green decoration-2 leading-snug">
+                          {intention.text}
+                        </span>
+                      </span>
                     </motion.div>
-                  )}
+                  ))}
                 </AnimatePresence>
-                
+
+                {/* Empty state — horizontal layout so icon doesn't push text down */}
+                {intentionSummary.items.length === 0 && intentionSummary.completedItems.length === 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setIsIntentionModalOpen(true)}
+                    className="w-full flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-honey/25 p-8 text-honey hover:border-honey/40 hover:bg-honey/5 transition-colors"
+                  >
+                    <Plus size={24} weight="bold" />
+                    <span className="text-base font-bold">Set your first intention</span>
+                    <span className="text-sm font-medium text-gray-nav/60">What matters most today?</span>
+                  </button>
+                )}
+
                 {(intentionSummary.hiddenCount > 0 || intentionSummary.items.length > 3) && (
                   <button 
                     onClick={() => navigate(RoutePath.NOTES)}
@@ -594,16 +620,19 @@ export const HomeAuthenticated: React.FC = () => {
                   </button>
                 )}
 
-                <div className="mt-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsIntentionModalOpen(true)}
-                    className="w-full justify-center border-dashed border-honey/25 text-honey hover:bg-honey/5 hover:border-honey/40 h-11"
-                  >
-                    <Plus size={16} weight="bold" className="mr-2" />
-                    Add intention
-                  </Button>
-                </div>
+                {/* Secondary add button — only when tasks already exist */}
+                {(intentionSummary.items.length > 0 || intentionSummary.completedItems.length > 0) && intentionSummary.openCount < MAX_ACTIVE_INTENTIONS && (
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsIntentionModalOpen(true)}
+                      className="w-full flex items-center justify-center gap-2 rounded-xl py-2 text-sm font-bold text-honey/60 hover:text-honey transition-colors"
+                    >
+                      <Plus size={14} weight="bold" />
+                      Add intention
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
             {/* Subtle background glow effect on hover */}
@@ -841,44 +870,64 @@ export const HomeAuthenticated: React.FC = () => {
           setIsIntentionModalOpen(false);
           setNewTaskText('');
         }}
-        title="Add intention"
-        icon={<Target size={20} weight="duotone" />}
-        size="sm"
-        tone="sage"
-        bodyClassName="pt-2"
+        title="Intentions"
+        icon={<ListChecks size={24} weight="bold" className="text-green" />}
+        size="md"
+        bodyClassName="max-h-[72vh] pt-2"
       >
-        <form onSubmit={handleCreateIntention} className="space-y-5">
-          <p className="text-base font-medium leading-relaxed text-gray-light">
-            Set a clear intention to guide your focus.
-          </p>
-          <input
-            type="text"
-            autoFocus
-            value={newTaskText}
-            onChange={(e) => setNewTaskText(e.target.value)}
-            placeholder="What needs to be done?"
-            disabled={isCreatingTask}
-            className="w-full rounded-[1.5rem] border border-border bg-body/50 p-5 text-base font-bold text-gray-text placeholder:text-gray-nav/40 focus:border-green/40 focus:outline-none focus:ring-2 focus:ring-green/10 transition-colors"
-          />
-          <div className="flex gap-3 justify-end pt-2">
-             <Button
-               type="button"
-               variant="ghost"
-               onClick={() => setIsIntentionModalOpen(false)}
-               disabled={isCreatingTask}
-             >
-               Cancel
-             </Button>
-             <Button
-               type="submit"
-               variant="primary"
-               disabled={!newTaskText.trim() || isCreatingTask}
-               className="min-w-[8rem]"
-             >
-               {isCreatingTask ? 'Saving...' : 'Save intention'}
-             </Button>
-          </div>
-        </form>
+        <div className="flex flex-col gap-6">
+          {/* Existing open intentions */}
+          {intentionSummary.items.length > 0 && (
+            <div className="space-y-2">
+              {intentionSummary.items.map((intention) => (
+                <button
+                  key={intention.id}
+                  type="button"
+                  onClick={() => handleToggleIntention(intention.noteId, intention.id)}
+                  className="group relative flex w-full items-center gap-3 rounded-2xl p-3 text-left transition-colors hover:bg-green/5"
+                >
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border-2 border-border text-transparent transition-colors group-hover:border-green/50">
+                    <span />
+                  </div>
+                  <span className="flex-1 text-[14px] font-bold text-gray-text line-clamp-2">{intention.text}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Add new intention form */}
+          {intentionSummary.openCount < MAX_ACTIVE_INTENTIONS ? (
+            <form onSubmit={handleCreateIntention} className="flex items-center gap-3">
+              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border-2 border-dashed border-border">
+                <Plus size={12} weight="bold" className="text-gray-nav/40" />
+              </div>
+              <input
+                type="text"
+                autoFocus
+                value={newTaskText}
+                onChange={(e) => setNewTaskText(e.target.value)}
+                placeholder="What needs to be done?"
+                disabled={isCreatingTask}
+                className="flex-1 bg-transparent border-none outline-none font-bold text-[14px] text-gray-text placeholder:text-gray-nav/40"
+              />
+              {newTaskText.trim() && (
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="sm"
+                  disabled={isCreatingTask}
+                  className="shrink-0"
+                >
+                  {isCreatingTask ? 'Saving...' : 'Add'}
+                </Button>
+              )}
+            </form>
+          ) : (
+            <p className="text-sm font-medium text-gray-nav/60 text-center py-2">
+              Cross off an existing intention to add a new one.
+            </p>
+          )}
+        </div>
       </ModalSheet>
     </>
   );

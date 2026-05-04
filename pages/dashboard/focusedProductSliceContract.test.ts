@@ -19,7 +19,7 @@ describe('focused product slice source contract', () => {
     const homeAuthenticated = read('pages/dashboard/HomeAuthenticated.tsx');
 
     expect(homeAuthenticated).toContain('Your Intentions');
-    expect(homeAuthenticated).toContain('No intentions yet');
+    expect(homeAuthenticated).toContain('Set your first intention');
     expect(homeAuthenticated).not.toContain('Task summary');
     expect(homeAuthenticated).not.toContain('All settled');
     expect(homeAuthenticated).toContain('{intentionSummary.openCount}');

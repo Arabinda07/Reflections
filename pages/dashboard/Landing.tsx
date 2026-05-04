@@ -254,7 +254,7 @@ export const Landing: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate(RoutePath.SIGNUP)}
-              className="group relative inline-flex h-16 min-w-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-control)] border border-transparent bg-green px-10 font-sans text-[19px] font-bold tracking-normal text-white shadow-lg shadow-green/20 transition-[background-color,box-shadow,transform] duration-300 ease-out-expo hover:-translate-y-0.5 hover:bg-green-hover hover:shadow-xl hover:shadow-green/30 active:translate-y-0 motion-reduce:transition-none"
+              className="surface-floating group relative inline-flex h-16 min-w-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-control)] px-10 font-sans text-[19px] font-bold tracking-normal text-green shadow-sm transition-[transform,box-shadow,background-color,color] duration-300 ease-out-expo hover:scale-[1.03] hover:shadow-md active:scale-95 motion-reduce:transition-none"
               aria-label="Begin writing"
             >
               Begin writing

@@ -12,6 +12,7 @@ export interface HomeIntention {
 
 export interface HomeIntentionSummary {
   items: HomeIntention[];
+  completedItems: HomeIntention[];
   openCount: number;
   completedCount: number;
   hiddenCount: number;
@@ -25,6 +26,8 @@ const getNoteTimestamp = (note: Note) => {
 
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+export const MAX_ACTIVE_INTENTIONS = 3;
+
 export function buildHomeIntentionSummary(
   notes: Note[],
   visibleLimit = HOME_INTENTION_VISIBLE_LIMIT,
@@ -33,8 +36,8 @@ export function buildHomeIntentionSummary(
     .map((note, index) => ({ note, index }))
     .sort((a, b) => getNoteTimestamp(b.note) - getNoteTimestamp(a.note) || a.index - b.index);
 
-  let completedCount = 0;
   const openIntentions: HomeIntention[] = [];
+  const completedIntentions: HomeIntention[] = [];
 
   for (const { note } of orderedNotes) {
     const noteTitle = note.title.trim() || 'Untitled reflection';
@@ -43,27 +46,29 @@ export function buildHomeIntentionSummary(
       const text = task.text.trim();
       if (!text) continue;
 
-      if (task.completed) {
-        completedCount += 1;
-        continue;
-      }
-
-      openIntentions.push({
+      const intention: HomeIntention = {
         id: task.id,
         text,
         noteId: note.id,
         noteTitle,
         completed: task.completed,
-      });
+      };
+
+      if (task.completed) {
+        completedIntentions.push(intention);
+      } else {
+        openIntentions.push(intention);
+      }
     }
   }
 
   return {
     items: openIntentions.slice(0, visibleLimit),
+    completedItems: completedIntentions.slice(0, 3),
     openCount: openIntentions.length,
-    completedCount,
+    completedCount: completedIntentions.length,
     hiddenCount: Math.max(0, openIntentions.length - visibleLimit),
-    hasAnyTasks: openIntentions.length + completedCount > 0,
+    hasAnyTasks: openIntentions.length + completedIntentions.length > 0,
   };
 }
 
