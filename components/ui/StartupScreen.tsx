@@ -15,6 +15,15 @@ interface StartupScreenProps {
  */
 export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
   const [isVideoReady, setIsVideoReady] = useState(false);
+  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
+
+  React.useEffect(() => {
+    if (isVisible) {
+      // Defer video loading so the main thread and LCP are not blocked
+      const timer = setTimeout(() => setShouldLoadVideo(true), 250);
+      return () => clearTimeout(timer);
+    }
+  }, [isVisible]);
 
   return (
     <OverlayFeedback isVisible={isVisible} overlayClassName="overlay-feedback--screen">
@@ -36,20 +45,22 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
           />
 
           {/* Crossfade with the poster so startup never stacks two bright media layers. */}
-          <video
-            src="/assets/videos/sanctuary.mp4"
-            poster="/assets/videos/sanctuary.webp"
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="metadata"
-            aria-hidden="true"
-            onLoadedData={() => setIsVideoReady(true)}
-            className={`absolute inset-0 z-[1] h-full w-full object-cover transition-opacity duration-700 ease-out ${
-              isVideoReady ? 'opacity-85' : 'opacity-0'
-            }`}
-          />
+          {shouldLoadVideo && (
+            <video
+              src="/assets/videos/sanctuary.mp4"
+              poster="/assets/videos/sanctuary.webp"
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="metadata"
+              aria-hidden="true"
+              onLoadedData={() => setIsVideoReady(true)}
+              className={`absolute inset-0 z-[1] h-full w-full object-cover transition-opacity duration-700 ease-out ${
+                isVideoReady ? 'opacity-85' : 'opacity-0'
+              }`}
+            />
+          )}
         </div>
 
         <div className="absolute bottom-14 z-20 flex flex-col items-center gap-2">

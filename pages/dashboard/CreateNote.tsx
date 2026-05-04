@@ -114,7 +114,7 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
 
   return (
     <motion.div
-      layout
+      layout="position"
       className={`group relative flex items-center gap-3 rounded-2xl p-3 transition-colors duration-300 hover:bg-green/5 dark:hover:bg-white/5 ${task.completed ? 'opacity-60' : ''}`}
     >
       <AnimatePresence>

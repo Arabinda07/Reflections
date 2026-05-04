@@ -18,6 +18,7 @@ import {
 import { animate, motion, useReducedMotion, AnimatePresence, Variants } from 'motion/react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { isSameDay } from 'date-fns';
 
 import { AmbientMusicButton } from '../../components/ui/AmbientMusicButton';
 import { Button } from '../../components/ui/Button';
@@ -132,6 +133,8 @@ export const HomeAuthenticated: React.FC = () => {
   const [intentionSummary, setIntentionSummary] = useState<HomeIntentionSummary>(() =>
     buildHomeIntentionSummary([]),
   );
+  const [newTaskText, setNewTaskText] = useState('');
+  const [isCreatingTask, setIsCreatingTask] = useState(false);
   const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);
   const shouldReduceMotion = useReducedMotion();
   const { showToast } = useToast();
@@ -347,6 +350,39 @@ export const HomeAuthenticated: React.FC = () => {
     }
   };
 
+  const handleCreateIntention = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTaskText.trim() || isCreatingTask) return;
+    setIsCreatingTask(true);
+    try {
+      const today = new Date();
+      const todaysNotes = taskNotes.filter(n => isSameDay(new Date(n.updatedAt), today) || isSameDay(new Date(n.createdAt), today));
+      todaysNotes.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      
+      let targetNote = todaysNotes[0];
+      const taskHtml = `<ul data-type="taskList"><li data-type="taskItem" data-checked="false"><p>${newTaskText}</p></li></ul>`;
+      
+      if (!targetNote) {
+        targetNote = await noteService.create({
+          title: 'Daily Intentions',
+          content: taskHtml,
+        });
+        updateIntentionSummary([...taskNotes, targetNote]);
+      } else {
+        const updatedContent = targetNote.content + taskHtml;
+        const updatedNote = await noteService.update(targetNote.id, { content: updatedContent });
+        updateIntentionSummary(taskNotes.map(n => n.id === targetNote.id ? updatedNote : n));
+      }
+      setNewTaskText('');
+      showToast('Intention added');
+    } catch (err) {
+      console.error('Failed to create intention', err);
+      showToast('Could not save intention');
+    } finally {
+      setIsCreatingTask(false);
+    }
+  };
+
   return (
     <>
       <div
@@ -547,6 +583,24 @@ export const HomeAuthenticated: React.FC = () => {
                     + {intentionSummary.hiddenCount + Math.max(0, intentionSummary.items.length - 3)} more
                   </button>
                 )}
+
+                <form onSubmit={handleCreateIntention} className="mt-4 flex gap-2">
+                  <input
+                    type="text"
+                    value={newTaskText}
+                    onChange={(e) => setNewTaskText(e.target.value)}
+                    placeholder="Add a new intention..."
+                    disabled={isCreatingTask}
+                    className="flex-1 rounded-xl border border-honey/15 bg-honey/5 px-4 py-2.5 text-sm text-gray-text placeholder:text-gray-nav/50 focus:border-honey/40 focus:outline-none focus:ring-1 focus:ring-honey/40 transition-colors"
+                  />
+                  <button
+                    type="submit"
+                    disabled={!newTaskText.trim() || isCreatingTask}
+                    className="flex shrink-0 items-center justify-center rounded-xl bg-honey/10 px-4 text-sm font-bold text-honey transition-colors hover:bg-honey/20 disabled:opacity-50"
+                  >
+                    <Plus size={16} weight="bold" />
+                  </button>
+                </form>
               </div>
             </div>
             {/* Subtle background glow effect on hover */}

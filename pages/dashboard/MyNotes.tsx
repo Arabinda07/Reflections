@@ -1,5 +1,6 @@
 import React, { Suspense, lazy, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { motion } from 'motion/react';
 import {
   Plus,
   FileText,
@@ -141,7 +142,7 @@ export const MyNotes: React.FC = () => {
       <Surface
         key={note.id}
         variant="flat"
-        className="group relative overflow-hidden rounded-[2.5rem] border border-border/40 transition-[transform,border-color,box-shadow] duration-500 hover:-translate-y-1 hover:border-green/20 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)]"
+        className="group relative overflow-hidden rounded-[2.5rem] border border-border/40 transition-[transform,border-color,box-shadow] duration-500 hover:-translate-y-1 hover:border-green/20 hover:shadow-xl"
       >
         <article
           className="flex h-full flex-col"
@@ -270,7 +271,12 @@ export const MyNotes: React.FC = () => {
 
       {!loading ? (
         <PageContainer className="surface-scope-sage page-wash pb-14 pt-4 md:pt-8">
-          <div className="core-page-stack animate-in fade-in duration-500">
+          <motion.div 
+            className="core-page-stack"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          >
             <SectionHeader
               title="Saved reflections"
               description={
@@ -408,7 +414,7 @@ export const MyNotes: React.FC = () => {
                 }
               />
             )}
-          </div>
+          </motion.div>
         </PageContainer>
       ) : null}
 

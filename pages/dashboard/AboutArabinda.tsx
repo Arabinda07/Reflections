@@ -89,13 +89,13 @@ export const AboutArabinda: React.FC = () => {
         </section>
 
         {/* Philosophy Chapters */}
-        <div className="space-y-0">
+        <div className="space-y-4 border-t border-gray-text/5 pt-8">
           {sections.map((section) => (
             <section
               key={section.title}
-              className="group grid gap-6 rounded-3xl border-t border-gray-text/5 px-4 py-12 transition-colors duration-500 -mx-4 hover:bg-gray-text/[0.03] sm:-mx-6 sm:px-6 md:grid-cols-12 md:gap-12 md:py-16"
+              className="group flex flex-col md:flex-row gap-6 md:gap-12 rounded-[2rem] p-6 md:p-10 transition-colors duration-500 hover:bg-gray-text/[0.03]"
             >
-              <div className="md:col-span-4 flex flex-col items-start gap-4">
+              <div className="md:w-1/3 shrink-0 flex flex-col items-start gap-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[rgb(var(--panel-bg-rgb))] shadow-sm ring-1 ring-border/70 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
                   <PublicPageIcon name={section.icon} size={24} className={section.iconClassName} />
                 </div>
@@ -103,7 +103,7 @@ export const AboutArabinda: React.FC = () => {
                   {section.title}
                 </h2>
               </div>
-              <div className="md:col-span-8 flex items-center">
+              <div className="md:w-2/3 flex items-center">
                 <p className="font-sans text-[16px] leading-relaxed text-gray-light max-w-[65ch]">
                   {section.body}
                 </p>

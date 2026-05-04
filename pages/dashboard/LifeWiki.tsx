@@ -492,7 +492,12 @@ export const LifeWiki: React.FC = () => {
           <div className="sanctuary-page-fade absolute inset-0 opacity-50" />
         </div>
         <PageContainer size="narrow" className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10 relative z-10">
-          <div className="core-page-stack">
+          <motion.div 
+            className="core-page-stack"
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 15 }}
+            animate={{ opacity: isEnteringWiki ? 0 : 1, y: isEnteringWiki ? 15 : 0 }}
+            transition={{ duration: shouldReduceMotion ? 0 : 0.6, ease: [0.16, 1, 0.3, 1] }}
+          >
             <button
               onClick={() => navigate(RoutePath.SANCTUARY)}
               className="group flex items-center gap-2 text-sm font-bold text-gray-nav hover:text-green transition-[color,transform] duration-300 w-fit hover:-translate-x-1"
@@ -549,31 +554,30 @@ export const LifeWiki: React.FC = () => {
                     </p>
                   </header>
 
-                  <Surface variant="flat" tone="sky" className="p-6 md:p-9">
-                    <div className="flex flex-col gap-7 md:flex-row md:items-end md:justify-between">
-                      <div className="max-w-2xl space-y-3">
-                        <p className="label-caps text-gray-nav">
-                          Not written yet
-                        </p>
-                        <h2 className="text-3xl font-display font-bold text-gray-text">
-                          This Sanctuary room is ready, but it has not been written yet.
-                        </h2>
-                        <p className="text-base font-medium leading-relaxed text-gray-light">
-                          Refresh with AI from the library when you want this room drafted from your saved reflections.
-                        </p>
+                  <Surface variant="flat" tone="sky" className="p-8 md:p-12 text-center">
+                    <div className="flex flex-col items-center max-w-lg mx-auto">
+                      <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green/10 text-green">
+                        <Sparkle size={32} weight="duotone" />
                       </div>
+                      <h2 className="text-2xl font-display font-bold text-gray-text">
+                        Awaiting your signal
+                      </h2>
+                      <p className="mt-4 mb-8 text-base font-medium leading-relaxed text-gray-light">
+                        This Sanctuary room is ready to be drafted. The AI will read through your saved reflections and organize the patterns it finds here.
+                      </p>
                       {!gate?.requiresUpgrade ? (
                         <Button
                           variant="primary"
                           onClick={handleRefreshWiki}
                           isLoading={isRefreshingWiki}
                           disabled={isRefreshingWiki || !gate?.canGenerate}
+                          className="px-8"
                         >
                           <Sparkle size={16} weight="fill" className="mr-2" />
-                          Refresh with AI
+                          Draft this room
                         </Button>
                       ) : (
-                        <Button variant="primary" onClick={() => navigate(RoutePath.ACCOUNT)}>
+                        <Button variant="primary" className="px-8" onClick={() => navigate(RoutePath.ACCOUNT)}>
                           See Pro options
                         </Button>
                       )}
@@ -674,7 +678,7 @@ export const LifeWiki: React.FC = () => {
                 </Surface>
               </article>
             )}
-          </div>
+            </motion.div>
         </PageContainer>
       </>
     );
@@ -688,7 +692,12 @@ export const LifeWiki: React.FC = () => {
       </div>
 
       <PageContainer className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10 relative z-10">
-        <div className="core-page-stack">
+        <motion.div 
+          className="core-page-stack"
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 15 }}
+          animate={{ opacity: isEnteringWiki ? 0 : 1, y: isEnteringWiki ? 15 : 0 }}
+          transition={{ duration: shouldReduceMotion ? 0 : 0.6, ease: [0.16, 1, 0.3, 1] }}
+        >
           <div className="flex items-center justify-between gap-4">
             <button 
               onClick={() => navigate(RoutePath.INSIGHTS)}
@@ -867,7 +876,7 @@ export const LifeWiki: React.FC = () => {
               </div>
             </section>
           ) : null}
-        </div>
+        </motion.div>
       </PageContainer>
     </>
   );
