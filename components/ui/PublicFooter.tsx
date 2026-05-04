@@ -4,7 +4,7 @@ import { RoutePath } from '../../types';
 
 const links = [
   { href: RoutePath.HOME, label: 'Home' },
-  { href: RoutePath.FAQ, label: 'How it works' },
+  { href: RoutePath.FAQ, label: 'FAQ' },
   { href: RoutePath.PRIVACY, label: 'Privacy' },
   { href: RoutePath.ABOUT, label: 'About' },
 ];

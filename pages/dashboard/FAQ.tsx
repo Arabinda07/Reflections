@@ -125,8 +125,8 @@ export const FAQ: React.FC = () => {
         </div>
       </section>
 
-      <div className="mx-auto w-full max-w-[1440px] px-6 sm:px-10 lg:px-16">
-        <section className="faq-editorial-lead mb-20 grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-stretch">
+      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-20 px-6 sm:px-10 lg:gap-28 lg:px-16">
+        <section className="faq-editorial-lead grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-stretch">
           <article className="surface-flat surface-tone-sage rounded-[2rem] p-8 md:p-12">
             <p className="label-caps text-green">Quick guide</p>
             <h2 className="mt-5 max-w-[12ch] text-mk-h2 font-display font-bold leading-tight text-gray-text">
@@ -160,7 +160,7 @@ export const FAQ: React.FC = () => {
           </div>
         </section>
 
-        <section className="mb-20 grid gap-10 border-y border-border py-16 lg:grid-cols-[0.72fr_1.28fr] lg:py-20">
+        <section className="grid gap-10 border-y border-border py-16 lg:grid-cols-[0.72fr_1.28fr] lg:py-20">
           <div className="space-y-4">
             <p className="label-caps text-green">The practice</p>
             <h2 className="text-mk-h2 font-display font-bold text-gray-text">A space to write, one reflection at a time</h2>
@@ -186,7 +186,7 @@ export const FAQ: React.FC = () => {
           </div>
         </section>
 
-        <section className="faq-comparison-band mb-20 surface-flat surface-tone-sky rounded-[2rem] p-7 md:p-10">
+        <section className="faq-comparison-band surface-flat surface-tone-sky rounded-[2rem] p-7 md:p-10">
           <div className="mb-10 max-w-3xl space-y-4">
             <p className="label-caps text-green">The details</p>
             <h2 className="text-mk-h2 font-display font-bold text-gray-text">Tools built to support you without getting in the way</h2>
@@ -208,7 +208,7 @@ export const FAQ: React.FC = () => {
           </div>
         </section>
 
-        <section className="mb-28 grid gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+        <section className="grid gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
           <div className="space-y-4">
             <p className="label-caps text-green">Feature shelf</p>
             <h2 className="text-mk-h2 font-display font-bold text-gray-text">Small tools, close to the page</h2>
@@ -230,7 +230,7 @@ export const FAQ: React.FC = () => {
         </section>
 
 
-        <section className="mb-28 border-t border-border pt-10">
+        <section className="border-t border-border pt-10">
           <p className="label-caps text-green">Contact</p>
           <p className="mt-3 max-w-[42rem] font-sans text-[16px] leading-relaxed text-gray-light">
             Questions about Reflections can go to{' '}

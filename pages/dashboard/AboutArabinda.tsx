@@ -66,7 +66,7 @@ export const AboutArabinda: React.FC = () => {
               <img
                 src="/assets/images/founder.webp"
                 alt="Arabinda, creator of Reflections"
-                className="h-full w-full object-cover transition-transform duration-700 hover:scale-105 grayscale-[0.1]"
+                className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
                 loading="lazy"
               />
             </div>

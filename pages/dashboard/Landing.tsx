@@ -99,6 +99,20 @@ export const Landing: React.FC = () => {
   const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);
 
   useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const handleMotionChange = (e: MediaQueryListEvent) => {
+      if (e.matches && videoRef.current) {
+        videoRef.current.pause();
+      } else if (!e.matches && videoRef.current && isHeroVideoReady) {
+        videoRef.current.play().catch(() => {});
+      }
+    };
+    
+    mediaQuery.addEventListener('change', handleMotionChange);
+    return () => mediaQuery.removeEventListener('change', handleMotionChange);
+  }, [isHeroVideoReady]);
+
+  useEffect(() => {
     if (shouldLoadHeroVideo) return;
 
     const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -252,14 +266,14 @@ export const Landing: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => navigate(RoutePath.LOGIN)}
-                  className="inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap px-0 text-[15px] font-medium text-gray-text transition-colors duration-300 ease-out-expo hover:text-green focus:outline-none"
+                  className="surface-floating inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap rounded-xl px-4 text-[14px] font-bold text-gray-text shadow-sm transition-[transform,box-shadow,background-color,color] duration-300 ease-out-expo hover:scale-[1.03] hover:text-green active:scale-95 focus:outline-none"
                 >
                   Sign in
                 </button>
 
                 <a
                   href={RoutePath.FAQ}
-                  className="inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap px-0 text-[15px] font-medium text-gray-text transition-colors duration-300 ease-out-expo hover:text-green focus:outline-none"
+                  className="surface-floating inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap rounded-xl px-4 text-[14px] font-bold text-gray-text shadow-sm transition-[transform,box-shadow,background-color,color] duration-300 ease-out-expo hover:scale-[1.03] hover:text-green active:scale-95 focus:outline-none"
                 >
                   How it works
                 </a>

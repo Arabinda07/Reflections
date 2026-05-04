@@ -40,6 +40,12 @@ const getRouteErrorCopy = (error: unknown) => {
   };
 };
 
+const reloadWithCacheBust = () => {
+  const currentUrl = new URL(window.location.href);
+  currentUrl.searchParams.set('t', Date.now().toString());
+  window.location.replace(currentUrl.toString());
+};
+
 export const RouteErrorBoundary: React.FC = () => {
   const error = useRouteError();
   const navigate = useNavigate();
@@ -68,7 +74,7 @@ export const RouteErrorBoundary: React.FC = () => {
         <div className="mt-8 flex w-full max-w-md flex-col gap-3 sm:flex-row sm:justify-center">
           <button
             type="button"
-            onClick={() => window.location.reload()}
+            onClick={reloadWithCacheBust}
             className="inline-flex min-h-14 w-full items-center justify-center rounded-[var(--radius-control)] border border-transparent bg-green px-5 py-4 text-[16px] font-bold text-white shadow-lg shadow-green/20 transition-[background-color,box-shadow,transform] duration-300 ease-out-expo hover:-translate-y-0.5 hover:bg-green-hover hover:shadow-xl hover:shadow-green/30 active:translate-y-0 sm:w-auto sm:px-8"
           >
             Try again
