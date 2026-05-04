@@ -236,16 +236,16 @@ export const Landing: React.FC = () => {
           <div className="flex flex-col gap-6 lg:w-[60%] lg:gap-8 xl:w-[55%]">
             <h1
               aria-label="Your mind beautifully organized"
-              className="pointer-events-auto flex max-w-[11ch] flex-col text-mk-display font-display font-extrabold tracking-normal text-gray-text leading-[0.92] sm:max-w-[12ch] sm:leading-[0.94] lg:max-w-5xl lg:leading-[0.96]"
+              className="pointer-events-auto flex max-w-[11ch] flex-col text-mk-display font-display font-extrabold tracking-normal text-gray-text leading-[1.05] sm:leading-[1.0] lg:max-w-5xl lg:leading-[0.96]"
             >
               <span>Your mind</span>
-              <span className="font-serif italic font-normal text-green" style={{ lineHeight: 1.1 }}>
+              <span className="font-serif italic font-normal text-green" style={{ lineHeight: 1.15 }}>
                 beautifully
               </span>
               <span>organized</span>
             </h1>
 
-            <p className="pointer-events-auto max-w-[26ch] sm:max-w-[32ch] lg:max-w-[40ch] font-sans text-base font-medium leading-relaxed text-gray-text sm:text-lg tracking-normal">
+            <p className="pointer-events-auto max-w-[26ch] sm:max-w-[32ch] lg:max-w-[40ch] font-sans text-base font-normal leading-relaxed text-gray-text/85 sm:text-lg tracking-[-0.01em]">
               A private journal. Write what's on your mind, notice the patterns, and keep it to yourself
             </p>
           </div>
@@ -254,11 +254,11 @@ export const Landing: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate(RoutePath.SIGNUP)}
-              className="surface-floating group relative inline-flex h-16 min-w-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-control)] px-10 font-sans text-[19px] font-bold tracking-normal text-green shadow-sm transition-[transform,box-shadow,background-color,color] duration-300 ease-out-expo hover:scale-[1.03] hover:shadow-md active:scale-95 motion-reduce:transition-none"
+              className="group relative inline-flex h-16 min-w-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-control)] bg-green px-10 font-sans text-btn-lg font-bold text-white shadow-[0_12px_28px_-10px_var(--green-shadow)] transition-[transform,box-shadow,background-color] duration-300 ease-out-expo hover:scale-[1.03] hover:bg-green-hover hover:shadow-[0_16px_36px_-10px_var(--green-shadow)] active:scale-[0.97] motion-reduce:transition-none"
               aria-label="Begin writing"
             >
               Begin writing
-              <ArrowRightIcon className="ml-3 h-5 w-5 transition-transform duration-500 ease-out-expo group-hover:translate-x-1.5" />
+              <ArrowRightIcon className="ml-3 h-5 w-5 text-white/80 transition-transform duration-500 ease-out-expo group-hover:translate-x-1.5" />
             </button>
 
             <div className="mt-4 flex w-full items-center justify-between gap-5 sm:mt-0 sm:w-auto sm:gap-x-10 lg:gap-x-12">
@@ -266,14 +266,14 @@ export const Landing: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => navigate(RoutePath.LOGIN)}
-                  className="surface-floating inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap rounded-xl px-4 text-[14px] font-bold text-gray-text shadow-sm transition-[transform,box-shadow,background-color,color] duration-300 ease-out-expo hover:scale-[1.03] hover:text-green active:scale-95 focus:outline-none"
+                  className="inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap px-1 text-btn-sm font-bold text-gray-nav transition-colors duration-300 ease-out-expo hover:text-green"
                 >
                   Sign in
                 </button>
 
                 <a
                   href={RoutePath.FAQ}
-                  className="surface-floating inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap rounded-xl px-4 text-[14px] font-bold text-gray-text shadow-sm transition-[transform,box-shadow,background-color,color] duration-300 ease-out-expo hover:scale-[1.03] hover:text-green active:scale-95 focus:outline-none"
+                  className="inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap px-1 text-btn-sm font-bold text-gray-nav transition-colors duration-300 ease-out-expo hover:text-green"
                 >
                   How it works
                 </a>

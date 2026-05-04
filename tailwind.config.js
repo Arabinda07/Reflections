@@ -27,6 +27,9 @@ export default {
         'ui-base': ['1rem', { lineHeight: '1.5' }],     /* 16px */
         'ui-lg': ['1.25rem', { lineHeight: '1.3' }],    /* 20px */
         'ui-xl': ['1.563rem', { lineHeight: '1.2' }],   /* 25px */
+        /* Button Text Scale */
+        'btn-lg': ['1.25rem', { lineHeight: '1.2', letterSpacing: '0' }],   /* 20px — primary CTAs */
+        'btn-sm': ['0.8125rem', { lineHeight: '1.2', letterSpacing: '0.01em' }], /* 13px — secondary actions */
         /* Marketing Fluid Scale */
         'mk-display': ['clamp(2.5rem, 5vw + 1rem, 4.5rem)', { lineHeight: '1.2', letterSpacing: '0' }],
         'mk-h1': ['clamp(2rem, 4vw + 1rem, 3.5rem)', { lineHeight: '1.2', letterSpacing: '0' }],
