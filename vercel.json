@@ -58,9 +58,10 @@
     }
   ],
   "rewrites": [
-    {
-      "source": "/(login|signup|reset-password|auth/.*|home|dashboard|notes(/.*)?|account|insights|release|letters|wiki(/.*)?|sanctuary(/.*)?|faq|about|privacy|signin|sign-in)",
-      "destination": "/index.html"
-    }
+    { "source": "/(login|signup|reset-password|home|dashboard|account|insights|release|letters|faq|about|privacy|signin|sign-in)", "destination": "/index.html" },
+    { "source": "/auth/:path*", "destination": "/index.html" },
+    { "source": "/notes/:path*", "destination": "/index.html" },
+    { "source": "/wiki/:path*", "destination": "/index.html" },
+    { "source": "/sanctuary/:path*", "destination": "/index.html" }
   ]
 }
