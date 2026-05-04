@@ -196,6 +196,8 @@ export const CreateNote: React.FC = () => {
   const [isTasksOpen, setIsTasksOpen] = useState(false);
   const [isSaveChoiceOpen, setIsSaveChoiceOpen] = useState(false);
   const [releaseError, setReleaseError] = useState<string | null>(null);
+  const [releaseSuccess, setReleaseSuccess] = useState<string | null>(null);
+  const [newTaskText, setNewTaskText] = useState('');
   const [pendingTrackId, setPendingTrackId] = useState<string | null>(null);
   const [showObservation, setShowObservation] = useState(false);
   const [observationText, setObservationText] = useState<string | null>(null);
@@ -277,8 +279,12 @@ export const CreateNote: React.FC = () => {
     if (error) {
       setReleaseError(error);
     } else {
-      setIsSaveChoiceOpen(false);
-      navigateWithBypass(RoutePath.HOME, { state: { fromSave: true } });
+      setReleaseSuccess('saved. new task added');
+      setTimeout(() => {
+        setIsSaveChoiceOpen(false);
+        setReleaseSuccess(null);
+        navigateWithBypass(RoutePath.HOME, { state: { fromSave: true } });
+      }, 1500);
     }
   };
 
@@ -728,6 +734,12 @@ export const CreateNote: React.FC = () => {
               {releaseError}
             </p>
           ) : null}
+
+          {releaseSuccess ? (
+            <p className="text-sm font-bold text-green mt-2 text-center" aria-live="polite">
+              {releaseSuccess}
+            </p>
+          ) : null}
         </div>
       </ModalSheet>
 
@@ -752,9 +764,32 @@ export const CreateNote: React.FC = () => {
             ))}
           </div>
 
-          <Button onClick={() => setTasks([...tasks, { id: Math.random().toString(36).substr(2, 9), text: '', completed: false }])} className="h-14 w-full rounded-2xl bg-green text-white font-bold">
-            <Plus size={20} weight="regular" className="mr-2" /> Add Task
-          </Button>
+          <form 
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (newTaskText.trim()) {
+                setTasks([...tasks, { id: Math.random().toString(36).substr(2, 9), text: newTaskText.trim(), completed: false }]);
+                setNewTaskText('');
+              }
+            }} 
+            className="flex items-center gap-3 mt-4"
+          >
+            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border-2 border-dashed border-border">
+              <Plus size={12} weight="bold" className="text-gray-nav/40" />
+            </div>
+            <input
+              type="text"
+              value={newTaskText}
+              onChange={(e) => setNewTaskText(e.target.value)}
+              placeholder="What needs to be done?"
+              className="flex-1 bg-transparent border-none outline-none font-bold text-[14px] text-gray-text placeholder:text-gray-nav/40"
+            />
+            {newTaskText.trim() && (
+              <Button type="submit" variant="primary" size="sm" className="shrink-0">
+                Add
+              </Button>
+            )}
+          </form>
         </div>
       </ModalSheet>
 

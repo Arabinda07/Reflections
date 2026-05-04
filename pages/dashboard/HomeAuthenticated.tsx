@@ -129,6 +129,7 @@ export const HomeAuthenticated: React.FC = () => {
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
   const [isSavingCheckIn, setIsSavingCheckIn] = useState(false);
   const [checkInFeedback, setCheckInFeedback] = useState<string | null>(null);
+  const [intentionFeedback, setIntentionFeedback] = useState<string | null>(null);
   const [quote, setQuote] = useState({ text: '', author: '' });
   const [taskNotes, setTaskNotes] = useState<Note[]>([]);
   const [intentionSummary, setIntentionSummary] = useState<HomeIntentionSummary>(() =>
@@ -324,8 +325,11 @@ export const HomeAuthenticated: React.FC = () => {
         mood,
         source: 'home',
       });
-      setIsCheckInOpen(false);
-      showToast('Saved. This moment counts.');
+      setCheckInFeedback('saved. new task added');
+      setTimeout(() => {
+        setIsCheckInOpen(false);
+        setCheckInFeedback(null);
+      }, 1500);
     } catch (error) {
       console.error('Could not save mood check-in:', error);
       setCheckInFeedback('Could not save that just now.');
@@ -390,8 +394,11 @@ export const HomeAuthenticated: React.FC = () => {
         updateIntentionSummary(taskNotes.map(n => n.id === targetNote.id ? updatedNote : n));
       }
       setNewTaskText('');
-      setIsIntentionModalOpen(false);
-      showToast('Intention added');
+      setIntentionFeedback('saved. new task added');
+      setTimeout(() => {
+        setIsIntentionModalOpen(false);
+        setIntentionFeedback(null);
+      }, 1500);
     } catch (err) {
       console.error('Could not create intention', err);
       showToast('Could not save intention');
@@ -869,6 +876,7 @@ export const HomeAuthenticated: React.FC = () => {
         onClose={() => {
           setIsIntentionModalOpen(false);
           setNewTaskText('');
+          setIntentionFeedback(null);
         }}
         title="Intentions"
         icon={<ListChecks size={24} weight="bold" className="text-green" />}
@@ -927,6 +935,12 @@ export const HomeAuthenticated: React.FC = () => {
               Cross off an existing intention to add a new one.
             </p>
           )}
+
+          {intentionFeedback ? (
+            <p className="text-sm font-bold text-green mt-2" aria-live="polite">
+              {intentionFeedback}
+            </p>
+          ) : null}
         </div>
       </ModalSheet>
     </>
