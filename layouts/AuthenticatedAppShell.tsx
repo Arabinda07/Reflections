@@ -59,7 +59,13 @@ const SyncBoundary: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   return <>{children}</>;
 };
 
+import { useNativeStatusBar } from '../hooks/useNativeStatusBar';
+import { useNativeOAuthListener } from '../hooks/useNativeOAuthListener';
+
 export const AuthenticatedAppShell: React.FC = () => {
+  useNativeStatusBar();
+  useNativeOAuthListener();
+
   return (
     <PWAInstallProvider>
 

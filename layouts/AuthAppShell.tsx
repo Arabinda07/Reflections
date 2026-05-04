@@ -3,8 +3,14 @@ import { MotionConfig } from 'motion/react';
 import { Outlet } from 'react-router-dom';
 
 
-export const AuthAppShell: React.FC = () => (
+import { useNativeStatusBar } from '../hooks/useNativeStatusBar';
+import { useNativeOAuthListener } from '../hooks/useNativeOAuthListener';
 
+export const AuthAppShell: React.FC = () => {
+  useNativeStatusBar();
+  useNativeOAuthListener();
+
+  return (
     <MotionConfig reducedMotion="user">
       <div className="surface-scope-paper page-wash min-h-[100dvh] bg-body text-gray-text">
         <a href="#main-content" className="skip-link">
@@ -14,6 +20,5 @@ export const AuthAppShell: React.FC = () => (
           <Outlet />
         </main>
       </div>
-    </MotionConfig>
-
-);
+    </MotionConfig>  );
+};
