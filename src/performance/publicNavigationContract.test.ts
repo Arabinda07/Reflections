@@ -39,9 +39,9 @@ describe('public navigation shell contract', () => {
     expect(header).toContain('aria-expanded={isMobileMenuOpen}');
     expect(header).toContain('aria-label="Close menu"');
     expect(header).toContain('aria-current={isActive ? \'page\' : undefined}');
-    expect(header).toContain('to={item.href}');
-    expect(header).toContain('to={RoutePath.LOGIN}');
-    expect(header).toContain('to={RoutePath.SIGNUP}');
+    expect(header).toContain('href={item.href}');
+    expect(header).toContain('href={RoutePath.LOGIN}');
+    expect(header).toContain('href={RoutePath.SIGNUP}');
     expect(header).toContain('const MenuIcon');
     expect(header).toContain('const CloseIcon');
     expect(header).toContain('const AppLeafIcon');

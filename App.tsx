@@ -4,12 +4,20 @@ import { RouteLoadingFrame } from './components/ui/RouteLoadingFrame';
 import { RouteErrorBoundary } from './pages/RouteErrorBoundary';
 import { Landing } from './pages/dashboard/Landing';
 import { RoutePath } from './types';
+import { useNativeOAuthListener } from './hooks/useNativeOAuthListener';
+import { useNativeStatusBar } from './hooks/useNativeStatusBar';
 import { AppBootstrapper } from './components/ui/AppBootstrapper';
 
 const AuthenticatedAppShell = lazy(() => import('./layouts/AuthenticatedAppShell').then((m) => ({ default: m.AuthenticatedAppShell })));
 const AuthAppShell = lazy(() => import('./layouts/AuthAppShell').then((m) => ({ default: m.AuthAppShell })));
 const PublicAppShell = lazy(() => import('./layouts/PublicAppShell').then((m) => ({ default: m.PublicAppShell })));
 const ProtectedRoute = lazy(() => import('./components/auth/ProtectedRoute').then((m) => ({ default: m.ProtectedRoute })));
+
+const NativeBridge: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  useNativeOAuthListener();
+  useNativeStatusBar();
+  return <>{children}</>;
+};
 
 const SignIn = lazy(() => import('@/pages/auth/SignIn.tsx').then((m) => ({ default: m.SignIn })));
 const SignUp = lazy(() => import('@/pages/auth/SignUp.tsx').then((m) => ({ default: m.SignUp })));
@@ -53,7 +61,7 @@ const router = createBrowserRouter(
         <Route path={RoutePath.PRIVACY} element={withRouteFallback(<PrivacyPolicy />)} />
       </Route>
 
-      <Route element={withRouteFallback(<AuthAppShell />)} errorElement={<RouteErrorBoundary />}>
+      <Route element={<NativeBridge>{withRouteFallback(<AuthAppShell />)}</NativeBridge>} errorElement={<RouteErrorBoundary />}>
         <Route path="/signin" element={<Navigate to={RoutePath.LOGIN} replace />} />
         <Route path="/sign-in" element={<Navigate to={RoutePath.LOGIN} replace />} />
         <Route path={RoutePath.LOGIN} element={withRouteFallback(<SignIn />)} />
@@ -62,7 +70,7 @@ const router = createBrowserRouter(
         <Route path={RoutePath.AUTH_CALLBACK} element={withRouteFallback(<AuthCallback />)} />
       </Route>
 
-      <Route element={withRouteFallback(<AuthenticatedAppShell />)} errorElement={<RouteErrorBoundary />}>
+      <Route element={<NativeBridge>{withRouteFallback(<AuthenticatedAppShell />)}</NativeBridge>} errorElement={<RouteErrorBoundary />}>
         <Route path={RoutePath.DASHBOARD_ALIAS} element={<Navigate to={RoutePath.DASHBOARD} replace />} />
         <Route path={RoutePath.DASHBOARD} element={withProtectedRoute(withRouteFallback(<HomeAuthenticated />))} />
         <Route path={RoutePath.NOTES} element={withProtectedRoute(withRouteFallback(<MyNotes />))} />

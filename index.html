@@ -49,31 +49,21 @@
     <!-- ── Resource Hints ──────────────────────────────────────────── -->
     <link rel="preload" href="/assets/fonts/Manrope-Variable.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/assets/fonts/Spectral-Italic.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/assets/videos/landing_video_mobile.webp" as="image" type="image/webp" fetchpriority="high" media="(max-width: 1023px)" />
-    <link rel="preload" href="/assets/videos/landing_video.webp" as="image" type="image/webp" fetchpriority="high" media="(min-width: 1024px)" />
     <link rel="preload" href="/assets/videos/sanctuary.webp" as="image" type="image/webp" fetchpriority="high" />
     <link rel="dns-prefetch" href="https://supabase.co" />
 
     <!-- ── Stylesheets ─────────────────────────────────────────────── -->
-    <link rel="stylesheet" href="/index.css" media="print" onload="this.media='all'" />
-    <noscript><link rel="stylesheet" href="/index.css" /></noscript>
+    <link rel="stylesheet" href="/index.css" />
     <!-- Quill is now loaded via npm dependency in Editor.tsx -->
 
     <!-- ── Inline critical styles ──────────────────────────────────── -->
     <style>
       body {
         font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Noto Sans Devanagari', 'Noto Sans Bengali', sans-serif;
-        background-color: var(--bg-color, #f7f8f6);
+        background-color: var(--bg-color);
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
-        color: var(--gray-text, #282a27);
-        margin: 0;
-      }
-      @media (prefers-color-scheme: dark) {
-        body {
-          background-color: var(--bg-color, #282a27);
-          color: var(--gray-text, #f7f8f6);
-        }
+        color: var(--gray-text);
       }
       /* Hide SEO content from users but keep for crawlers (sr-only pattern) */
       #public-seo-content {

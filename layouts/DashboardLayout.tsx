@@ -113,19 +113,17 @@ export const DashboardLayout: React.FC = () => {
       )}
 
       {/* Mobile Sidebar */}
-      {(!isLandingRoute || isMobileMenuOpen) && (
-        <React.Suspense fallback={null}>
-          <MobileSidebar
-            isOpen={isMobileMenuOpen}
-            onClose={() => setIsMobileMenuOpen(false)}
-            navItems={sidebarNavItems}
-            onBugReport={() => {
-              /* BugReportFlow manages its own state */
-            }}
-            onInvite={() => setIsInviteModalOpen(true)}
-          />
-        </React.Suspense>
-      )}
+      <React.Suspense fallback={null}>
+        <MobileSidebar
+          isOpen={isMobileMenuOpen}
+          onClose={() => setIsMobileMenuOpen(false)}
+          navItems={sidebarNavItems}
+          onBugReport={() => {
+            /* BugReportFlow manages its own state */
+          }}
+          onInvite={() => setIsInviteModalOpen(true)}
+        />
+      </React.Suspense>
 
       {/* Main Content — sole scroll container in the shell */}
       <main
@@ -133,11 +131,9 @@ export const DashboardLayout: React.FC = () => {
         tabIndex={-1}
         className="relative flex min-h-0 w-full flex-1 flex-col overflow-y-auto custom-scrollbar"
       >
-        {isAuthenticated && (
-          <React.Suspense fallback={null}>
-            <SyncBanner />
-          </React.Suspense>
-        )}
+        <React.Suspense fallback={null}>
+          <SyncBanner />
+        </React.Suspense>
         <div className="w-full flex-1 flex flex-col">
           <Outlet />
         </div>
@@ -182,28 +178,26 @@ export const DashboardLayout: React.FC = () => {
       </main>
 
       {/* Bug Report Flow — self-contained with floating trigger + modal */}
-      {!isWritingRoute && isAuthenticated && (
+      {!isWritingRoute && (
         <React.Suspense fallback={null}>
           <BugReportFlow />
         </React.Suspense>
       )}
 
       {/* Invite Modal */}
-      {(isInviteModalOpen || !isLandingRoute) && (
-        <React.Suspense fallback={null}>
-          <ModalSheet
-            isOpen={isInviteModalOpen}
-            onClose={() => setIsInviteModalOpen(false)}
-            title="Invite someone"
-            description="Share Reflections with someone who might want a space to write."
-            icon={<PaperPlaneTilt size={20} weight="duotone" />}
-            tone="honey"
-            size="md"
-          >
-            <ReferralInvitePanel compact />
-          </ModalSheet>
-        </React.Suspense>
-      )}
+      <React.Suspense fallback={null}>
+        <ModalSheet
+          isOpen={isInviteModalOpen}
+          onClose={() => setIsInviteModalOpen(false)}
+          title="Invite someone"
+          description="Share Reflections with someone who might want a space to write."
+          icon={<PaperPlaneTilt size={20} weight="duotone" />}
+          tone="honey"
+          size="md"
+        >
+          <ReferralInvitePanel compact />
+        </ModalSheet>
+      </React.Suspense>
     </div>
   );
 };

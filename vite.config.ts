@@ -170,7 +170,7 @@ export default defineConfig(() => {
         sourcemap: sentrySourcemap,
         modulePreload: {
           resolveDependencies: (_filename, deps) => {
-            return deps.filter(dep => !dep.includes('vendor-analytics') && !dep.includes('vendor-motion'));
+            return deps.filter(dep => !dep.includes('vendor-analytics'));
           }
         },
         rollupOptions: {

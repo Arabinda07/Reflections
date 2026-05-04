@@ -1,6 +1,6 @@
 import React, { Suspense, lazy, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-
+import { motion } from 'motion/react';
 import {
   Plus,
   FileText,
@@ -128,7 +128,7 @@ export const MyNotes: React.FC = () => {
               )}
             </div>
           ))}
-          {dayNotes.length > 3 ? <div className="h-1.5 w-1.5 rounded-full bg-border ml-1" /> : null}
+          {dayNotes.length > 3 ? <div className="h-1.5 w-1.5 rounded-full bg-gray-300 ml-1" /> : null}
         </div>
       </div>
     );
@@ -173,7 +173,7 @@ export const MyNotes: React.FC = () => {
             <button
               onClick={(event) => initiateDelete(event, note.id)}
               disabled={isDeleting && noteIdToDelete === note.id}
-              className="control-surface absolute left-4 top-4 z-20 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/90 dark:bg-surface-muted text-gray-text shadow-sm transition-[transform,border-color,color] duration-500 hover:scale-110 hover:border-clay/30 hover:text-clay"
+              className="control-surface absolute left-4 top-4 z-20 inline-flex h-11 w-11 items-center justify-center rounded-2xl text-gray-text shadow-sm backdrop-blur-xl transition-[transform,border-color,color] duration-500 hover:scale-110 hover:border-clay/30 hover:text-clay"
               aria-label={`Delete ${note.title}`}
             >
               {isDeleting && noteIdToDelete === note.id ? (
@@ -271,7 +271,12 @@ export const MyNotes: React.FC = () => {
 
       {!loading ? (
         <PageContainer className="surface-scope-sage page-wash pb-14 pt-4 md:pt-8">
-          <div className="core-page-stack animate-mount">
+          <motion.div 
+            className="core-page-stack"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          >
             <SectionHeader
               title="Saved reflections"
               description={
@@ -411,7 +416,7 @@ export const MyNotes: React.FC = () => {
                 }
               />
             )}
-          </div>
+          </motion.div>
         </PageContainer>
       ) : null}
 
