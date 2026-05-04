@@ -1,5 +1,4 @@
 import React, { Suspense, lazy, useEffect, useState } from 'react';
-import { MotionConfig } from 'motion/react';
 
 import { PWAInstallProvider } from '../context/PWAInstallContext';
 import { ToastProvider } from '../components/ui/Toast';
@@ -66,9 +65,7 @@ export const AuthenticatedAppShell: React.FC = () => {
         <ToastProvider>
           <DeferredVercelVitals />
           <SyncBoundary>
-            <MotionConfig reducedMotion="user">
-              <DashboardLayout />
-            </MotionConfig>
+            <DashboardLayout />
           </SyncBoundary>
         </ToastProvider>
 

@@ -15,16 +15,18 @@ import { RoutePath } from '../types';
 import { useAuthStore } from '../hooks/useAuthStore';
 import { useKeyboardShortcut } from '../src/hooks/useKeyboardShortcut';
 import { AnalyticsRouteTracker } from '../src/analytics/AnalyticsRouteTracker';
-import { ModalSheet } from '../components/ui/ModalSheet';
-import { ReferralInvitePanel } from '../components/ui/ReferralInvitePanel';
-import { SyncBanner } from '../components/ui/SyncBanner';
 import { referralService } from '../services/engagementServices';
 import { useAndroidBackHandler } from '../src/native/useAndroidBackHandler';
 
 import { useSurfaceScope } from './SurfaceScope';
 import { NavigationBar } from './NavigationBar';
-import { MobileSidebar, type SidebarNavItem } from './MobileSidebar';
-import { BugReportFlow } from './BugReportFlow';
+import type { SidebarNavItem } from './MobileSidebar';
+
+const ModalSheet = React.lazy(() => import('../components/ui/ModalSheet').then(m => ({ default: m.ModalSheet })));
+const ReferralInvitePanel = React.lazy(() => import('../components/ui/ReferralInvitePanel').then(m => ({ default: m.ReferralInvitePanel })));
+const SyncBanner = React.lazy(() => import('../components/ui/SyncBanner').then(m => ({ default: m.SyncBanner })));
+const MobileSidebar = React.lazy(() => import('./MobileSidebar').then(m => ({ default: m.MobileSidebar })));
+const BugReportFlow = React.lazy(() => import('./BugReportFlow').then(m => ({ default: m.BugReportFlow })));
 
 const GUEST_NAV_ITEMS: SidebarNavItem[] = [
   { label: 'Homepage', path: RoutePath.HOME, icon: House, description: 'Start from the opening page.' },
@@ -111,15 +113,17 @@ export const DashboardLayout: React.FC = () => {
       )}
 
       {/* Mobile Sidebar */}
-      <MobileSidebar
-        isOpen={isMobileMenuOpen}
-        onClose={() => setIsMobileMenuOpen(false)}
-        navItems={sidebarNavItems}
-        onBugReport={() => {
-          /* BugReportFlow manages its own state */
-        }}
-        onInvite={() => setIsInviteModalOpen(true)}
-      />
+      <React.Suspense fallback={null}>
+        <MobileSidebar
+          isOpen={isMobileMenuOpen}
+          onClose={() => setIsMobileMenuOpen(false)}
+          navItems={sidebarNavItems}
+          onBugReport={() => {
+            /* BugReportFlow manages its own state */
+          }}
+          onInvite={() => setIsInviteModalOpen(true)}
+        />
+      </React.Suspense>
 
       {/* Main Content — sole scroll container in the shell */}
       <main
@@ -127,7 +131,9 @@ export const DashboardLayout: React.FC = () => {
         tabIndex={-1}
         className="relative flex min-h-0 w-full flex-1 flex-col overflow-y-auto custom-scrollbar"
       >
-        <SyncBanner />
+        <React.Suspense fallback={null}>
+          <SyncBanner />
+        </React.Suspense>
         <div className="w-full flex-1 flex flex-col">
           <Outlet />
         </div>
@@ -172,20 +178,26 @@ export const DashboardLayout: React.FC = () => {
       </main>
 
       {/* Bug Report Flow — self-contained with floating trigger + modal */}
-      {!isWritingRoute && <BugReportFlow />}
+      {!isWritingRoute && (
+        <React.Suspense fallback={null}>
+          <BugReportFlow />
+        </React.Suspense>
+      )}
 
       {/* Invite Modal */}
-      <ModalSheet
-        isOpen={isInviteModalOpen}
-        onClose={() => setIsInviteModalOpen(false)}
-        title="Invite someone"
-        description="Share Reflections with someone who might want a space to write."
-        icon={<PaperPlaneTilt size={20} weight="duotone" />}
-        tone="honey"
-        size="md"
-      >
-        <ReferralInvitePanel compact />
-      </ModalSheet>
+      <React.Suspense fallback={null}>
+        <ModalSheet
+          isOpen={isInviteModalOpen}
+          onClose={() => setIsInviteModalOpen(false)}
+          title="Invite someone"
+          description="Share Reflections with someone who might want a space to write."
+          icon={<PaperPlaneTilt size={20} weight="duotone" />}
+          tone="honey"
+          size="md"
+        >
+          <ReferralInvitePanel compact />
+        </ModalSheet>
+      </React.Suspense>
     </div>
   );
 };
