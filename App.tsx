@@ -6,6 +6,7 @@ import { Landing } from './pages/dashboard/Landing';
 import { RoutePath } from './types';
 import { useNativeOAuthListener } from './hooks/useNativeOAuthListener';
 import { useNativeStatusBar } from './hooks/useNativeStatusBar';
+import { AppBootstrapper } from './components/ui/AppBootstrapper';
 
 const AuthenticatedAppShell = lazy(() => import('./layouts/AuthenticatedAppShell').then((m) => ({ default: m.AuthenticatedAppShell })));
 const AuthAppShell = lazy(() => import('./layouts/AuthAppShell').then((m) => ({ default: m.AuthAppShell })));
@@ -91,7 +92,11 @@ const router = createBrowserRouter(
 );
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <AppBootstrapper>
+      <RouterProvider router={router} />
+    </AppBootstrapper>
+  );
 }
 
 export default App;

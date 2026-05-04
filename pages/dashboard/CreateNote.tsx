@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { useBlocker } from 'react-router';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -34,35 +33,23 @@ import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
 import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
 import { Editor, EditorRef } from '../../components/ui/Editor';
-import { noteService } from '../../services/noteService';
-import { ritualEventService } from '../../services/engagementServices';
-import { storageService } from '../../services/storageService';
-import { RoutePath, NoteAttachment, Task } from '../../types';
-import { supabase } from '../../src/supabaseClient';
+import { RoutePath, Task } from '../../types';
 import { CompanionObservation } from '../../components/ui/CompanionObservation';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { PaperPlaneToast } from '../../components/ui/PaperPlaneToast';
 import { InlineLoadingBadge } from '../../components/ui/InlineLoadingBadge';
-import { observationService } from '../../services/observationService';
 import { DEFAULT_WELLNESS_PROMPTS, getCurrentWellnessPrompt, getNextWellnessPromptState } from '../../services/wellnessPrompts';
 import { aiService } from '../../services/aiService';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { useNoteDraft } from '../../hooks/useNoteDraft';
+import { useFocusMode } from '../../hooks/useFocusMode';
+import { useWhisperInput } from '../../hooks/useWhisperInput';
 import { getOrderedTasks, getTaskDrawerTriggerLabel } from './createNoteTasks';
 import { canNavigateBackInApp } from '../../src/native/androidBack';
 import { NATIVE_PAGE_TOP_PADDING, NATIVE_TOP_CONTROL_OFFSET } from '../../src/native/safeArea';
-import { profileService } from '../../services/profileService';
-import { getMonthlyNoteUsage } from '../../services/wellnessPolicy';
 import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
-import {
-  buildCreateNoteDraftSnapshot,
-  CREATE_NOTE_SAVE_VISUAL_FLOOR_MS,
-  CREATE_NOTE_UNSUPPORTED_WHISPER_MESSAGE,
-  hasUnsavedCreateNoteChanges,
-} from './createNoteDraftState';
-import { extractTasksFromContent, mergeTasks } from '../../src/utils/taskParser';
 import trailLoadingAnimation from '@/src/lottie/trail-loading.json';
 import { MOOD_CONFIG, MOOD_OPTIONS, getMoodConfig } from './moodConfig';
-import { trackNoteSavedDeferred } from '../../src/analytics/deferredEvents';
 
 const getSurfaceScopeForMood = (mood?: string) => {
   switch (mood) {
@@ -134,13 +121,15 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
         type="button"
         onClick={() => toggleTask(task.id)}
         aria-label={task.completed ? `Mark "${taskLabel}" as open` : `Mark "${taskLabel}" as complete`}
-        className={`relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border-2 transition-colors duration-300 ${
-          task.completed ? 'border-green bg-green text-white' : 'border-border text-transparent hover:border-green/50'
-        }`}
+        className="relative z-10 flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center group/checkbox"
       >
-        <motion.span animate={{ scale: task.completed ? 1 : 0 }}>
-          <Check size={14} weight="bold" />
-        </motion.span>
+        <div className={`flex h-6 w-6 items-center justify-center rounded-lg border-2 transition-colors duration-300 ${
+          task.completed ? 'border-green bg-green text-white' : 'border-border text-transparent group-hover/checkbox:border-green/50'
+        }`}>
+          <motion.span animate={{ scale: task.completed ? 1 : 0 }}>
+            <Check size={14} weight="bold" />
+          </motion.span>
+        </div>
       </button>
 
       <input
@@ -159,7 +148,7 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
         type="button"
         onClick={() => removeTask(task.id)}
         aria-label={`Remove task: ${taskLabel}`}
-        className="opacity-0 group-hover:opacity-100 p-2 text-gray-nav hover:text-clay transition-opacity"
+        className="opacity-0 group-hover:opacity-100 flex min-h-[44px] min-w-[44px] items-center justify-center text-gray-nav hover:text-clay transition-opacity"
       >
         <Trash size={16} />
       </button>
@@ -169,30 +158,67 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
 
 export const CreateNote: React.FC = () => {
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>(); 
   const location = useLocation();
   const initialPrompt = location.state?.initialPrompt;
-  
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [mood, setMood] = useState<string | undefined>(undefined);
-  const [tags, setTags] = useState<string[]>([]);
+
+  // â”€â”€ Core draft lifecycle (state, save, release, navigation blocking) â”€â”€
+  const draft = useNoteDraft();
+
+  // â”€â”€ Focus/flow mode â”€â”€
+  const [isFocused, setIsFocused] = useState(false);
+  const [isTitleFocused, setIsTitleFocused] = useState(false);
+  const focusMode = useFocusMode({ isEditorFocused: isFocused, isTitleFocused });
+
+  // â”€â”€ Whisper (speech-to-text) â”€â”€
+  const whisper = useWhisperInput(
+    useCallback((text: string) => {
+      draft.setContent((prev: string) => {
+        const clean = prev === '<p><br></p>' ? '' : prev;
+        if (!clean) return `<p>${text}</p>`;
+        return clean.endsWith('</p>') ? clean.slice(0, -4) + ' ' + text + '</p>' : clean + ' ' + text;
+      });
+    }, [draft.setContent]),
+  );
+
+  // â”€â”€ UI-local state (modals, editor chrome) â”€â”€
+  const isMobile = useMediaQuery('(max-width: 1023px)');
   const [tagInput, setTagInput] = useState('');
-  const [saving, setSaving] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [activePlaceholder, setActivePlaceholder] = useState<string | null>(
     initialPrompt || getCurrentWellnessPrompt(0, DEFAULT_WELLNESS_PROMPTS),
   );
+  const [promptIndex, setPromptIndex] = useState(0);
   const [isReflecting, setIsReflecting] = useState(false);
   const [aiReflection, setAiReflection] = useState<string | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [newAttachments, setNewAttachments] = useState<File[]>([]);
-  const [existingAttachments, setExistingAttachments] = useState<NoteAttachment[]>([]);
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [canCreateNote, setCanCreateNote] = useState<boolean>(true);
-  
-  // UI States
-  const isMobile = useMediaQuery('(max-width: 1023px)');
+  const [isMobileOptionsOpen, setIsMobileOptionsOpen] = useState(false);
+  const [isMoodOpen, setIsMoodOpen] = useState(false);
+  const [isTagsOpen, setIsTagsOpen] = useState(false);
+  const [isMusicOpen, setIsMusicOpen] = useState(false);
+  const [isTasksOpen, setIsTasksOpen] = useState(false);
+  const [isSaveChoiceOpen, setIsSaveChoiceOpen] = useState(false);
+  const [releaseError, setReleaseError] = useState<string | null>(null);
+  const [pendingTrackId, setPendingTrackId] = useState<string | null>(null);
+  const [showObservation, setShowObservation] = useState(false);
+  const [observationText, setObservationText] = useState<string | null>(null);
+  const [showPlane, setShowPlane] = useState(false);
+  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
+
+  const { isPlaying: musicPlaying, activeTrack: activeMusicTrack, playTrack: playMusicTrack, stopAll: stopMusic } = useAmbientAudio();
+  const haptics = useHaptics();
+  const { playSaveChime } = useSound();
+  const ActiveMoodIcon = getMoodConfig(draft.mood)?.icon || Smiley;
+  const editorInstanceRef = useRef<EditorRef>(null);
+  const isUnmounted = useRef(false);
+
+  useEffect(() => {
+    isUnmounted.current = false;
+    return () => { isUnmounted.current = true; };
+  }, []);
+
+  // Aliases from draft hook for template readability
+  const { title, setTitle, content, setContent, mood, setMood, tags, setTags, tasks, setTasks } = draft;
+  const { imagePreview, setImagePreview, loading, saving, releasing: isReleasing, canCreateNote, setCanCreateNote, hasUnsavedChanges } = draft;
+  const { blocker, navigateWithBypass } = draft;
+  const id = undefined as string | undefined; // id is read internally by useNoteDraft via useParams
 
   const handleMobileBack = useCallback(() => {
     if (
@@ -205,403 +231,54 @@ export const CreateNote: React.FC = () => {
       navigate(-1);
       return;
     }
-
     navigate(RoutePath.NOTES);
   }, [navigate]);
-  const [isFocused, setIsFocused] = useState(false);
-  const [isTitleFocused, setIsTitleFocused] = useState(false);
-  const [isFocusModeEnabled, setIsFocusModeEnabled] = useState(false);
-  const [isFlowing, setIsFlowing] = useState(false);
-  const [isMobileOptionsOpen, setIsMobileOptionsOpen] = useState(false);
 
-  // Sub-modal states
-  const [isMoodOpen, setIsMoodOpen] = useState(false);
-  const [isTagsOpen, setIsTagsOpen] = useState(false);
-  const [isMusicOpen, setIsMusicOpen] = useState(false);
-  const [isTasksOpen, setIsTasksOpen] = useState(false);
-  const [isSaveChoiceOpen, setIsSaveChoiceOpen] = useState(false);
-  const [isReleasing, setIsReleasing] = useState(false);
-  const [releaseError, setReleaseError] = useState<string | null>(null);
-  
-  const [isWhispering, setIsWhispering] = useState(false);
-  const [interimTranscript, setInterimTranscript] = useState('');
-  const [whisperFeedback, setWhisperFeedback] = useState<string | null>(null);
-  const [pendingTrackId, setPendingTrackId] = useState<string | null>(null);
-  const [showObservation, setShowObservation] = useState(false);
-  const [observationText, setObservationText] = useState<string | null>(null);
-  const [showPlane, setShowPlane] = useState(false);
-  const [showLeaveDialog, setShowLeaveDialog] = useState(false);
-  const [promptIndex, setPromptIndex] = useState(0);
-  const [smartModeEnabled, setSmartModeEnabled] = useState(false);
-  const [baselineDraftSnapshot, setBaselineDraftSnapshot] = useState(() =>
-    buildCreateNoteDraftSnapshot({
-      title: '',
-      content: '',
-      mood: undefined,
-      tags: [],
-      tasks: [],
-      imagePreview: null,
-      existingAttachments: [],
-      newAttachments: [],
-    }),
-  );
-
-  const { isPlaying: musicPlaying, activeTrack: activeMusicTrack, playTrack: playMusicTrack, stopAll: stopMusic } = useAmbientAudio();
-  const haptics = useHaptics();
-  const { playSaveChime } = useSound();
-  const ActiveMoodIcon = getMoodConfig(mood)?.icon || Smiley;
-  const recognitionRef = useRef<any>(null);
-  const isWhisperingRef = useRef(false);
-  const editorInstanceRef = useRef<EditorRef>(null);
-  const flowTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const isUnmounted = useRef(false);
-  const lastFocusToggleRef = useRef<number>(0);
-
-  const allowNavigationRef = useRef(false);
-  const currentDraftSnapshot = buildCreateNoteDraftSnapshot({
-    title,
-    content,
-    mood,
-    tags,
-    tasks,
-    imagePreview,
-    existingAttachments,
-    newAttachments,
-  });
-  const hasUnsavedChanges = !loading && hasUnsavedCreateNoteChanges(currentDraftSnapshot, baselineDraftSnapshot);
-  const blocker = useBlocker(() => hasUnsavedChanges && !saving && !isReleasing && !allowNavigationRef.current);
-  const navigateWithBypass = useCallback(
-    (to: string, options?: { replace?: boolean; state?: unknown }) => {
-      allowNavigationRef.current = true;
-      navigate(to, options);
-      window.setTimeout(() => {
-        allowNavigationRef.current = false;
-      }, 0);
-    },
-    [navigate],
-  );
-
-  useEffect(() => {
-    isUnmounted.current = false;
-    return () => { 
-      isUnmounted.current = true; 
-    };
-  }, []);
-
-  useEffect(() => {
-    if (isFocusModeEnabled) return;
-    if (flowTimeoutRef.current) clearTimeout(flowTimeoutRef.current);
-    if (isFlowing) setIsFlowing(false);
-  }, [isFlowing, isFocusModeEnabled]);
-
-  // Flow Logic (Zen Mode)
-  useEffect(() => {
-    const handleWake = () => {
-      // Grace period of 1s after toggling Focus Mode to prevent immediate wake from the click movement
-      if (Date.now() - lastFocusToggleRef.current < 1000) return;
-      
-      if (flowTimeoutRef.current) clearTimeout(flowTimeoutRef.current);
-      if (isFlowing) setIsFlowing(false);
-    };
-    const handleKeydown = (e: KeyboardEvent) => {
-      if (!isFocusModeEnabled) return;
-      if (!isFocused && !isTitleFocused) return;
-      if (e.key === 'Escape') return handleWake();
-      if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Enter') {
-        if (isTitleFocused) return; // Don't flow while typing title
-        setIsFlowing(true);
-        if (flowTimeoutRef.current) clearTimeout(flowTimeoutRef.current);
-        if (!isMobile) {
-          flowTimeoutRef.current = setTimeout(() => {
-            if (!isUnmounted.current) setIsFlowing(false);
-          }, 5000);
-        }
-      }
-    };
-    if (!isFocusModeEnabled) return;
-    window.addEventListener('keydown', handleKeydown);
-    window.addEventListener('mousemove', handleWake);
-    window.addEventListener('touchstart', handleWake, { passive: true });
-    return () => {
-      window.removeEventListener('keydown', handleKeydown);
-      window.removeEventListener('mousemove', handleWake);
-      window.removeEventListener('touchstart', handleWake);
-    };
-  }, [isFocusModeEnabled, isFocused, isTitleFocused, isFlowing, isMobile]);
-
-  useEffect(() => {
-    const fetchNote = async () => {
-      try {
-        const access = await profileService.getWellnessAccess();
-        if (!isUnmounted.current) {
-          setSmartModeEnabled(access.smartModeEnabled);
-        }
-
-        if (!id) {
-          setBaselineDraftSnapshot(
-            buildCreateNoteDraftSnapshot({
-              title: '',
-              content: '',
-              mood: undefined,
-              tags: [],
-              tasks: [],
-              imagePreview: null,
-              existingAttachments: [],
-              newAttachments: [],
-            }),
-          );
-          setTimeout(() => {
-            if (!isUnmounted.current) setLoading(false);
-          }, 1200);
-          
-          // Check note limit for new notes
-          const allNotes = await noteService.getAll();
-          const usage = getMonthlyNoteUsage(allNotes, access);
-          if (!isUnmounted.current) {
-            setCanCreateNote(usage.canCreateNote);
-          }
-          return;
-        }
-        const note = await noteService.getById(id);
-        if (note && !isUnmounted.current) {
-          const initialDraftSnapshot = buildCreateNoteDraftSnapshot({
-            title: note.title,
-            content: note.content,
-            mood: note.mood,
-            tags: note.tags || [],
-            tasks: note.tasks || [],
-            imagePreview: note.thumbnailUrl || null,
-            existingAttachments: note.attachments || [],
-            newAttachments: [],
-          });
-          setTitle(note.title);
-          setContent(note.content);
-          setMood(note.mood);
-          setTags(note.tags || []);
-          setTasks(note.tasks || []);
-          setImagePreview(note.thumbnailUrl || null);
-          setExistingAttachments(note.attachments || []);
-          setBaselineDraftSnapshot(initialDraftSnapshot);
-          setTimeout(() => {
-            if (!isUnmounted.current) setLoading(false);
-          }, 1200);
-        } else {
-          navigate(RoutePath.HOME);
-        }
-      } catch (err) {
-        setLoading(false);
-      }
-    };
-    fetchNote();
-  }, [id, navigate]);
-
+  // Blocker â†’ leave dialog sync
   useEffect(() => {
     if (blocker.state === 'blocked') {
       setShowLeaveDialog(true);
       return;
     }
-
     if (blocker.state === 'unblocked') {
       setShowLeaveDialog(false);
     }
   }, [blocker.state]);
 
-  useEffect(() => {
-    if (!whisperFeedback) return;
-
-    const timer = window.setTimeout(() => {
-      setWhisperFeedback(null);
-    }, 5000);
-
-    return () => window.clearTimeout(timer);
-  }, [whisperFeedback]);
-
-  useEffect(() => {
-    if (!hasUnsavedChanges || saving || isReleasing) return;
-
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (allowNavigationRef.current) return;
-      event.preventDefault();
-      event.returnValue = '';
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [hasUnsavedChanges, isReleasing, saving]);
-
-  // --- NUCLEAR SAVE LOGIC ---
+  // â”€â”€ Save handler (delegates to draft.save, adds UI feedback) â”€â”€
   const handleSave = async () => {
-    if (!currentDraftSnapshot.title && !currentDraftSnapshot.content) return;
+    if (!draft.currentSnapshot.title && !draft.currentSnapshot.content) return;
 
     setIsSaveChoiceOpen(false);
-    setSaving(true);
     setShowPlane(true);
-    setWhisperFeedback(null);
 
-    const nuclearTimer = window.setTimeout(() => {
-      if (!isUnmounted.current) {
-        setSaving(false);
-        setShowPlane(false);
-        navigateWithBypass(RoutePath.HOME);
-      }
-    }, 5000);
+    const result = await draft.save();
 
-    const visualFloor =
-      CREATE_NOTE_SAVE_VISUAL_FLOOR_MS > 0
-        ? new Promise<void>((resolve) =>
-            window.setTimeout(resolve, CREATE_NOTE_SAVE_VISUAL_FLOOR_MS),
-          )
-        : Promise.resolve();
+    if (isUnmounted.current) return;
+    setShowPlane(false);
 
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Unauthenticated");
+    haptics.confirming();
+    playSaveChime();
 
-      let noteId = id;
-      
-      // Auto-extract tasks from content
-      const extractedTasks = extractTasksFromContent(content);
-      const syncedTasks = mergeTasks(tasks, extractedTasks);
-      setTasks(syncedTasks); // Sync local state for UI consistency
-
-      const saveMode = noteId ? 'edit' : 'new';
-
-      if (!noteId) {
-        const newNote = await noteService.create({ title, content, tags, mood, tasks: syncedTasks });
-        noteId = newNote.id;
-      }
-
-      const uploadedAttachments = await Promise.all(
-        newAttachments.map(async (file) => ({
-          id: crypto.randomUUID(),
-          name: file.name,
-          path: await storageService.uploadFile(file, user.id, 'notes', noteId),
-          size: file.size,
-          type: file.type,
-        })),
-      );
-      const mergedAttachments = [...existingAttachments, ...uploadedAttachments];
-
-      let finalThumbnailUrl = imagePreview;
-      if (imagePreview?.startsWith('blob:')) {
-        const response = await fetch(imagePreview);
-        const blob = await response.blob();
-        const file = new File([blob], "cover.jpg", { type: blob.type });
-        finalThumbnailUrl = await storageService.uploadFile(file, user.id, 'notes', noteId);
-      }
-
-      const savedNote = await noteService.update(noteId, {
-        title, content, mood, tags, tasks: syncedTasks,
-        thumbnailUrl: finalThumbnailUrl || undefined,
-        attachments: mergedAttachments
-      });
-      trackNoteSavedDeferred({
-        mode: saveMode,
-        attachmentCount: mergedAttachments.length,
-        tagCount: tags.length,
-        taskCount: syncedTasks.length,
-      });
-
-      const savedDraftSnapshot = buildCreateNoteDraftSnapshot({
-        title,
-        content,
-        mood,
-        tags,
-        tasks,
-        imagePreview: finalThumbnailUrl || null,
-        existingAttachments: mergedAttachments,
-        newAttachments: [],
-      });
-      
-      await visualFloor;
-      clearTimeout(nuclearTimer);
-      if (isUnmounted.current) return;
-
-      setExistingAttachments(mergedAttachments);
-      setNewAttachments([]);
-      setImagePreview(finalThumbnailUrl || null);
-      setBaselineDraftSnapshot(savedDraftSnapshot);
-      setSaving(false);
-      setShowPlane(false);
-
-      haptics.confirming();
-      playSaveChime();
-
-      if (smartModeEnabled) {
-        void noteService.getAll()
-          .then((allNotes) => aiService.autoIngestSavedNote(savedNote, allNotes))
-          .catch((error) => {
-            console.error('[CreateNote] Smart Mode auto-ingest failed:', error);
-          });
-      }
-
-      const [totalCount, recentNotes] = await Promise.all([
-        noteService.getCount(),
-        noteService.getRecent(10)
-      ]).catch(() => [0, []]);
-
-      const observation = observationService.checkMilestones(
-        { title, content, createdAt: new Date().toISOString() } as any,
-        totalCount as number,
-        recentNotes as any[]
-      );
-
-      if (observation && !isUnmounted.current) {
-        setObservationText(observation.text);
-        setShowObservation(true);
-        observationService.markObservationShown();
-      } else {
-        navigateWithBypass(RoutePath.HOME, { state: { fromSave: true } });
-      }
-
-    } catch (err) {
-      clearTimeout(nuclearTimer);
-      if (!isUnmounted.current) {
-        setSaving(false);
-        setShowPlane(false);
-      }
+    if (result.observation) {
+      setObservationText(result.observation.text);
+      setShowObservation(true);
+    } else {
+      navigateWithBypass(RoutePath.HOME, { state: { fromSave: true } });
     }
   };
 
+  // â”€â”€ Release handler â”€â”€
   const handleReleaseDraft = async () => {
-    if (!currentDraftSnapshot.title && !currentDraftSnapshot.content) return;
-
-    setIsReleasing(true);
+    if (!draft.currentSnapshot.title && !draft.currentSnapshot.content) return;
     setReleaseError(null);
 
-    try {
-      await ritualEventService.recordReleaseCompleted();
-
-      const emptyDraftSnapshot = buildCreateNoteDraftSnapshot({
-        title: '',
-        content: '',
-        mood: undefined,
-        tags: [],
-        tasks: [],
-        imagePreview: null,
-        existingAttachments: [],
-        newAttachments: [],
-      });
-
-      setTitle('');
-      setContent('');
-      setMood(undefined);
-      setTags([]);
-      setTagInput('');
-      setTasks([]);
-      setImagePreview(null);
-      setExistingAttachments([]);
-      setNewAttachments([]);
-      setBaselineDraftSnapshot(emptyDraftSnapshot);
+    const error = await draft.release();
+    if (error) {
+      setReleaseError(error);
+    } else {
       setIsSaveChoiceOpen(false);
       navigateWithBypass(RoutePath.HOME, { state: { fromSave: true } });
-    } catch (error) {
-      console.error('[CreateNote] Could not release draft:', error);
-      setReleaseError('Release could not finish just now. Your words are still only here on this screen.');
-    } finally {
-      if (!isUnmounted.current) {
-        setIsReleasing(false);
-      }
     }
   };
 
@@ -619,12 +296,10 @@ export const CreateNote: React.FC = () => {
   const handleTrackSelect = useCallback(
     async (track: (typeof AMBIENT_TRACKS)[number]) => {
       if (pendingTrackId) return;
-
       if (activeMusicTrack?.id === track.id) {
         handleStopMusic();
         return;
       }
-
       setPendingTrackId(track.id);
       try {
         await playMusicTrack(track);
@@ -637,48 +312,6 @@ export const CreateNote: React.FC = () => {
     [activeMusicTrack?.id, handleStopMusic, pendingTrackId, playMusicTrack],
   );
 
-  const toggleWhisper = () => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      setWhisperFeedback(CREATE_NOTE_UNSUPPORTED_WHISPER_MESSAGE);
-      return;
-    }
-
-    setWhisperFeedback(null);
-
-    if (isWhispering) {
-      setIsWhispering(false);
-      isWhisperingRef.current = false;
-      recognitionRef.current?.stop();
-      setInterimTranscript('');
-    } else {
-      setIsWhispering(true);
-      isWhisperingRef.current = true;
-      if (!recognitionRef.current) {
-        recognitionRef.current = new SpeechRecognition();
-        recognitionRef.current.continuous = true;
-        recognitionRef.current.interimResults = true;
-        recognitionRef.current.onresult = (event: any) => {
-          let final = '';
-          let currentInterim = '';
-          for (let i = event.resultIndex; i < event.results.length; ++i) {
-            if (event.results[i].isFinal) final += event.results[i][0].transcript;
-            else currentInterim += event.results[i][0].transcript;
-          }
-          if (final) {
-            setContent(prev => {
-              const clean = prev === '<p><br></p>' ? '' : prev;
-              if (!clean) return `<p>${final}</p>`;
-              return clean.endsWith('</p>') ? clean.slice(0, -4) + ' ' + final + '</p>' : clean + ' ' + final;
-            });
-          }
-          setInterimTranscript(currentInterim);
-        };
-      }
-      recognitionRef.current.start();
-    }
-  };
-
   const handleAiReflect = async () => {
     if (!content || content === '<p><br></p>') return;
     setIsReflecting(true);
@@ -686,7 +319,7 @@ export const CreateNote: React.FC = () => {
     try {
       const now = new Date().toISOString();
       const reflection = await aiService.generateReflection({
-        id: id || 'draft-reflection-preview',
+        id: 'draft-reflection-preview',
         title,
         content,
         mood,
@@ -704,23 +337,34 @@ export const CreateNote: React.FC = () => {
     }
   };
 
-  const hasContent = Boolean(currentDraftSnapshot.content);
-  const wordCount = currentDraftSnapshot.content.replace(/<[^>]*>/g, '').trim().split(/\s+/).filter(Boolean).length;
+  // â”€â”€ Derived values â”€â”€
+  const hasContent = Boolean(draft.currentSnapshot.content);
+  const wordCount = draft.currentSnapshot.content.replace(/<[^>]*>/g, '').trim().split(/\s+/).filter(Boolean).length;
   const canReflect = wordCount >= 100;
-  const isFocusModeActive = isFocusModeEnabled && isFlowing && !isTitleFocused;
+  const isFocusModeActive = focusMode.isActive;
+  const isFocusModeEnabled = focusMode.isEnabled;
+  const isWhispering = whisper.isWhispering;
+  const interimTranscript = whisper.interimTranscript;
+  const whisperFeedback = whisper.feedback;
+  const toggleWhisper = whisper.toggle;
   const showEntryExperience = loading;
+
   const handleStayOnDraft = () => {
     setShowLeaveDialog(false);
     if (blocker.state === 'blocked') {
       blocker.reset();
     }
-  };
+   };
   const handleLeaveDraft = () => {
     setShowLeaveDialog(false);
     if (blocker.state === 'blocked') {
       blocker.proceed();
     }
   };
+
+
+
+
 
   if (showEntryExperience) {
     return (
@@ -752,7 +396,7 @@ export const CreateNote: React.FC = () => {
 
   return (
     <div className={`${getSurfaceScopeForMood(mood)} page-wash relative flex-1 flex min-h-0 bg-body overflow-hidden`}>
-      {/* â”€â”€ Mobile Back Button â”€â”€ */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Mobile Back Button Ã¢â€â‚¬Ã¢â€â‚¬ */}
       {isMobile && (
         <button 
           onClick={handleMobileBack}
@@ -768,8 +412,7 @@ export const CreateNote: React.FC = () => {
         <button
           type="button"
           onClick={() => {
-            setIsFlowing(false);
-            setIsFocusModeEnabled(false);
+            focusMode.disable();
           }}
           className="surface-floating fixed right-4 z-[85] inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 label-caps text-green hover:text-green"
           style={{ top: NATIVE_TOP_CONTROL_OFFSET }}
@@ -779,7 +422,7 @@ export const CreateNote: React.FC = () => {
         </button>
       ) : null}
 
-      {/* ── Desktop Sidebar ── */}
+      {/* â”€â”€ Desktop Sidebar â”€â”€ */}
       {!isMobile && (
         <aside className={`${getSurfacePanelForMood(mood)} flex flex-col min-h-0 z-40 transition-[width,opacity,transform,border] duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] border-r border-green/15 ${isFocusModeActive ? 'w-0 opacity-0 -translate-x-full overflow-hidden border-r-0' : 'w-[240px] opacity-100 translate-x-0'}`}>
           <div className="pt-8 px-6 pb-6 flex-1 overflow-y-auto custom-scrollbar space-y-4">
@@ -787,7 +430,7 @@ export const CreateNote: React.FC = () => {
             {/* Desktop Back Button */}
             <button 
               onClick={() => navigate(RoutePath.NOTES)}
-              className="flex items-center gap-2 text-gray-nav hover:text-gray-text text-[13px] font-bold mb-8 group transition-colors"
+              className="flex min-h-11 items-center gap-2 text-gray-nav hover:text-gray-text text-[13px] font-bold mb-8 group transition-colors"
             >
               <div className="control-surface flex h-8 w-8 items-center justify-center transition-colors group-hover:border-green/20 group-hover:bg-green/5">
                 <ArrowLeft size={14} weight="regular" />
@@ -827,7 +470,7 @@ export const CreateNote: React.FC = () => {
                 <Paperclip size={20} className="mb-2" /><span className="text-[10px] font-bold uppercase">Files</span>
                 <input type="file" multiple className="hidden" onChange={(e) => {
                   if (e.target.files) {
-                    setNewAttachments((current) => [...current, ...Array.from(e.target.files || [])]);
+                draft.addFiles(Array.from(e.target.files || []));
                   }
                 }} />
               </label>
@@ -842,7 +485,7 @@ export const CreateNote: React.FC = () => {
         </aside>
       )}
 
-      {/* â”€â”€ Main Canvas â”€â”€ */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Main Canvas Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <main
         className="relative flex-1 w-full pb-40 px-6 sm:px-12 md:px-16 lg:px-24 transition-[padding] duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]"
         style={{ paddingTop: NATIVE_PAGE_TOP_PADDING }}
@@ -872,17 +515,7 @@ export const CreateNote: React.FC = () => {
             <button
               type="button"
               onClick={() => {
-                setIsFocusModeEnabled((current) => {
-                  const next = !current;
-                  if (!next) {
-                    setIsFlowing(false);
-                  } else {
-                    // Activate immediately when enabling
-                    setIsFlowing(true);
-                    lastFocusToggleRef.current = Date.now();
-                  }
-                  return next;
-                });
+                focusMode.toggle();
               }}
               className={`inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 label-caps transition-colors sm:min-h-0 sm:px-3 sm:py-1 ${
                 isFocusModeEnabled
@@ -921,7 +554,7 @@ export const CreateNote: React.FC = () => {
             placeholder="Untitled Reflection"
             value={title}
             onChange={e => setTitle(e.target.value)}
-            onFocus={() => { setIsFocused(true); setIsTitleFocused(true); setIsFlowing(false); }}
+            onFocus={() => { setIsFocused(true); setIsTitleFocused(true); }}
             onBlur={() => { setIsFocused(false); setIsTitleFocused(false); }}
             className="editor-title-input"
           />
@@ -940,9 +573,6 @@ export const CreateNote: React.FC = () => {
             onChange={setContent} 
             onFocusChange={(nextIsFocused) => {
               setIsFocused(nextIsFocused);
-              if (!nextIsFocused) {
-                setIsFlowing(false);
-              }
             }}
             placeholder={activePlaceholder || "What's on your mind?"} 
             ariaLabel="Reflection body"
@@ -950,7 +580,7 @@ export const CreateNote: React.FC = () => {
             className="text-[20px] md:text-[22px] font-serif leading-[1.8] text-gray-text/90" 
           />
 
-          {/* Word count â€” shown only after 50+ words */}
+          {/* Word count Ã¢â‚¬â€ shown only after 50+ words */}
           {wordCount >= 50 && (
             <p className="mt-2 text-right text-[12px] font-medium text-gray-nav/40 select-none" aria-label={`${wordCount} words`}>
               {wordCount} words
@@ -959,7 +589,7 @@ export const CreateNote: React.FC = () => {
         </div>
       </main>
 
-      {/* â”€â”€ Floating Actions â”€â”€ */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Floating Actions Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <div 
         className={`fixed z-50 flex gap-4 transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isFocusModeActive ? 'opacity-0 translate-y-8' : 'opacity-100 translate-y-0'} ${isMobile ? 'left-6 right-6 justify-between' : 'flex-col'}`}
         style={{ bottom: isMobile ? 'calc(2rem + env(safe-area-inset-bottom))' : '2.5rem', right: isMobile ? undefined : '2.5rem' }}
@@ -1020,7 +650,7 @@ export const CreateNote: React.FC = () => {
         </AnimatePresence>
       </div>
 
-      {/* â”€â”€ Shared Sheets â”€â”€ */}
+      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Shared Sheets Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <ModalSheet
         isOpen={isMobile && isMobileOptionsOpen}
         onClose={() => setIsMobileOptionsOpen(false)}
@@ -1039,7 +669,7 @@ export const CreateNote: React.FC = () => {
             <Paperclip size={24} weight="regular" /><span className="text-[14px] font-bold">Files</span>
             <input type="file" multiple className="hidden" onChange={(e) => {
               if (e.target.files) {
-                setNewAttachments((current) => [...current, ...Array.from(e.target.files || [])]);
+                draft.addFiles(Array.from(e.target.files || []));
               }
               setIsMobileOptionsOpen(false);
             }} />

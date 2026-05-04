@@ -23,8 +23,8 @@ describe('polish contract', () => {
     const startupScreen = read('components/ui/StartupScreen.tsx');
     const appLaunch = read('src/native/appLaunch.ts');
 
-    expect(startupScreen).toContain('src="/assets/videos/sanctuary.png"');
-    expect(startupScreen).toContain('poster="/assets/videos/sanctuary.png"');
+    expect(startupScreen).toContain('src="/assets/videos/sanctuary.webp"');
+    expect(startupScreen).toContain('poster="/assets/videos/sanctuary.webp"');
     expect(startupScreen).toContain('className="absolute inset-0 z-0 h-full w-full object-cover opacity-85"');
     expect(startupScreen).toContain('isVideoReady');
     expect(startupScreen).toContain('onLoadedData={() => setIsVideoReady(true)}');

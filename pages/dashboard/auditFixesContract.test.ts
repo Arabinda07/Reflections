@@ -8,10 +8,11 @@ const read = (filePath: string) =>
 describe('audit fix source contract', () => {
   it('keeps CreateNote on the custom draft guard path instead of browser alerts', () => {
     const createNote = read('pages/dashboard/CreateNote.tsx');
+    const noteDraft = read('hooks/useNoteDraft.ts');
 
-    expect(createNote).toContain("from 'react-router'");
+    expect(noteDraft).toContain("from 'react-router'");
     expect(createNote).toContain("from '../../components/ui/ConfirmationDialog'");
-    expect(createNote).toContain('beforeunload');
+    expect(noteDraft).toContain('beforeunload');
     expect(createNote).not.toContain('animate-pulse');
     expect(createNote).not.toContain('return alert("Browser doesn\'t support speech recognition.")');
     expect(createNote).not.toContain('return alert("Browser doesn\\\'t support speech recognition.")');

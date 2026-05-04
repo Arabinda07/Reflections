@@ -93,16 +93,18 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
 
   it('keeps the original floating bug report and avoids footer feedback mailto actions', () => {
     const layout = read('layouts/DashboardLayout.tsx');
+    const bugReport = read('layouts/BugReportFlow.tsx');
 
-    expect(layout).toContain("import emailjs from '@emailjs/browser';");
-    expect(layout).toContain('handleBugSubmit');
-    expect(layout).toContain('Floating Bug Report Button');
-    expect(layout).toContain('Report a bug');
+    expect(bugReport).toContain("import emailjs from '@emailjs/browser';");
+    expect(bugReport).toContain('handleSubmit');
+    expect(bugReport).toContain('Floating Bug Report Button');
+    expect(bugReport).toContain('Report a bug');
     expect(layout).not.toContain('openFeedbackDraft');
     expect(layout).not.toContain('Send feedback');
-    expect(layout).toContain('const { canInstall, isInstalled, triggerInstall } = usePWAInstall();');
-    expect(layout).toContain('canInstall && !isInstalled');
-    expect(layout).toContain('aria-label="Add Reflections to your home screen"');
+    const sidebar = read('layouts/MobileSidebar.tsx');
+    expect(sidebar).toContain('const { canInstall, isInstalled, triggerInstall } = usePWAInstall();');
+    expect(sidebar).toContain('canInstall && !isInstalled');
+    expect(sidebar).toContain('aria-label="Add Reflections to your home screen"');
   });
 
   it('keeps the FAQ in its prior guide and feature-grid structure', () => {

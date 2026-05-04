@@ -16,9 +16,10 @@ describe('CreateNote regression contract', () => {
   });
 
   it('hydrates the editor with fetched note HTML in edit mode', () => {
+    const noteDraft = read('hooks/useNoteDraft.ts');
     const createNote = read('pages/dashboard/CreateNote.tsx');
 
-    expect(createNote).toContain('setContent(note.content);');
+    expect(noteDraft).toContain('setContent(note.content);');
     expect(createNote).toContain('value={content}');
     expect(createNote).not.toContain('content={content}');
   });

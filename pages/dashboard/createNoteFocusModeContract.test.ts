@@ -8,8 +8,10 @@ const read = (filePath: string) =>
 describe('CreateNote focus mode contract', () => {
   it('keeps focus mode opt-in and does not auto-focus the editor after the entry experience', () => {
     const createNote = read('pages/dashboard/CreateNote.tsx');
+    const focusModeHook = read('hooks/useFocusMode.ts');
 
-    expect(createNote).toContain('const [isFocusModeEnabled, setIsFocusModeEnabled] = useState(false);');
+    expect(focusModeHook).toContain('const [isEnabled, setIsEnabled] = useState(false);');
+    expect(createNote).toContain('useFocusMode');
     expect(createNote).not.toContain('editorInstanceRef.current?.focus();');
   });
 

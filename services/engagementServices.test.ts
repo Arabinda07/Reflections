@@ -8,18 +8,49 @@ import {
   ritualEventService,
 } from './engagementServices';
 import { supabase } from '../src/supabaseClient';
+import {
+  futureLetterRemoteStore,
+  moodRemoteStore,
+  referralRemoteStore,
+  ritualRemoteStore,
+} from './engagementRemoteStore';
 
 vi.mock('../src/supabaseClient', () => ({
   supabase: {
     auth: { getUser: vi.fn() },
-    from: vi.fn(),
-    rpc: vi.fn(),
+  },
+}));
+
+vi.mock('./engagementRemoteStore', () => ({
+  moodRemoteStore: {
+    insert: vi.fn(),
+    list: vi.fn(),
+  },
+  ritualRemoteStore: {
+    insert: vi.fn(),
+    listSince: vi.fn(),
+  },
+  futureLetterRemoteStore: {
+    insert: vi.fn(),
+    list: vi.fn(),
+    fetchById: vi.fn(),
+    updateStatus: vi.fn(),
+  },
+  referralRemoteStore: {
+    fetchByUserId: vi.fn(),
+    insert: vi.fn(),
+    updateLastSharedAt: vi.fn(),
+    acceptInvite: vi.fn(),
+    getAcceptedCount: vi.fn(),
   },
 }));
 
 const mockAuth = vi.mocked(supabase.auth.getUser);
-const mockFrom = vi.mocked(supabase.from);
-const mockRpc = vi.mocked(supabase.rpc);
+const mockMoodInsert = vi.mocked(moodRemoteStore.insert);
+const mockRitualInsert = vi.mocked(ritualRemoteStore.insert);
+const mockFutureLetterFetch = vi.mocked(futureLetterRemoteStore.fetchById);
+const mockFutureLetterUpdate = vi.mocked(futureLetterRemoteStore.updateStatus);
+const mockReferralAccept = vi.mocked(referralRemoteStore.acceptInvite);
 
 const storage = () => {
   const values = new Map<string, string>();
@@ -37,22 +68,14 @@ describe('moodCheckinService', () => {
   });
 
   it('creates standalone mood check-ins without note content', async () => {
-    const chain = {
-      insert: vi.fn().mockReturnThis(),
-      select: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValue({
-        data: {
-          id: 'checkin-1',
-          user_id: 'user-1',
-          mood: 'steady',
-          label: 'morning',
-          source: 'home',
-          created_at: '2026-04-29T08:00:00.000Z',
-        },
-        error: null,
-      }),
-    };
-    mockFrom.mockReturnValue(chain as any);
+    mockMoodInsert.mockResolvedValue({
+      id: 'checkin-1',
+      userId: 'user-1',
+      mood: 'steady',
+      label: 'morning',
+      source: 'home',
+      createdAt: '2026-04-29T08:00:00.000Z',
+    } as any);
 
     const checkin = await moodCheckinService.create({
       mood: 'steady',
@@ -60,15 +83,8 @@ describe('moodCheckinService', () => {
       source: 'home',
     });
 
-    expect(mockFrom).toHaveBeenCalledWith('mood_checkins');
-    expect(chain.insert).toHaveBeenCalledWith({
-      user_id: 'user-1',
-      mood: 'steady',
-      label: 'morning',
-      source: 'home',
-    });
+    expect(mockMoodInsert).toHaveBeenCalledWith('user-1', 'steady', 'morning', 'home');
     expect(checkin.userId).toBe('user-1');
-    expect(JSON.stringify(chain.insert.mock.calls[0][0])).not.toContain('content');
   });
 });
 
@@ -79,105 +95,68 @@ describe('futureLetterService', () => {
   });
 
   it('refuses to open a future letter before its selected open date', async () => {
-    const selectChain = {
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValue({
-        data: {
-          id: 'letter-1',
-          user_id: 'user-1',
-          title: 'Later',
-          content: 'Read this later',
-          open_at: '2026-05-10T00:00:00.000Z',
-          opened_at: null,
-          created_at: '2026-04-29T00:00:00.000Z',
-          updated_at: '2026-04-29T00:00:00.000Z',
-          status: 'scheduled',
-        },
-        error: null,
-      }),
-    };
-    mockFrom.mockReturnValue(selectChain as any);
+    mockFutureLetterFetch.mockResolvedValue({
+      id: 'letter-1',
+      userId: 'user-1',
+      title: 'Later',
+      content: 'Read this later',
+      openAt: '2026-05-10T00:00:00.000Z',
+      openedAt: undefined,
+      createdAt: '2026-04-29T00:00:00.000Z',
+      updatedAt: '2026-04-29T00:00:00.000Z',
+      status: 'scheduled',
+    } as any);
 
     await expect(
       futureLetterService.open('letter-1', new Date('2026-04-29T12:00:00.000Z')),
     ).rejects.toThrow('LETTER_LOCKED_UNTIL_OPEN_DATE');
 
-    expect(mockFrom).toHaveBeenCalledTimes(1);
-    expect(selectChain.eq).toHaveBeenCalledWith('id', 'letter-1');
-    expect(selectChain.eq).toHaveBeenCalledWith('user_id', 'user-1');
+    expect(mockFutureLetterFetch).toHaveBeenCalledWith('user-1', 'letter-1');
   });
 
   it('marks an openable letter as opened and records a content-free ritual event', async () => {
-    const selectChain = {
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValue({
-        data: {
-          id: 'letter-1',
-          user_id: 'user-1',
-          title: 'Today',
-          content: 'A private note to myself',
-          open_at: '2026-04-20T00:00:00.000Z',
-          opened_at: null,
-          created_at: '2026-04-01T00:00:00.000Z',
-          updated_at: '2026-04-01T00:00:00.000Z',
-          status: 'scheduled',
-        },
-        error: null,
-      }),
-    };
-    const updateChain = {
-      update: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      select: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValue({
-        data: {
-          id: 'letter-1',
-          user_id: 'user-1',
-          title: 'Today',
-          content: 'A private note to myself',
-          open_at: '2026-04-20T00:00:00.000Z',
-          opened_at: '2026-04-29T12:00:00.000Z',
-          created_at: '2026-04-01T00:00:00.000Z',
-          updated_at: '2026-04-29T12:00:00.000Z',
-          status: 'opened',
-        },
-        error: null,
-      }),
-    };
-    const eventChain = {
-      insert: vi.fn().mockReturnThis(),
-      select: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValue({
-        data: {
-          id: 'event-1',
-          user_id: 'user-1',
-          event_type: 'letter_opened',
-          source_id: 'letter-1',
-          created_at: '2026-04-29T12:00:00.000Z',
-        },
-        error: null,
-      }),
-    };
-    mockFrom
-      .mockReturnValueOnce(selectChain as any)
-      .mockReturnValueOnce(updateChain as any)
-      .mockReturnValueOnce(eventChain as any);
+    mockFutureLetterFetch.mockResolvedValue({
+      id: 'letter-1',
+      userId: 'user-1',
+      title: 'Today',
+      content: 'A private note to myself',
+      openAt: '2026-04-20T00:00:00.000Z',
+      openedAt: undefined,
+      createdAt: '2026-04-01T00:00:00.000Z',
+      updatedAt: '2026-04-01T00:00:00.000Z',
+      status: 'scheduled',
+    } as any);
+
+    mockFutureLetterUpdate.mockResolvedValue({
+      id: 'letter-1',
+      userId: 'user-1',
+      title: 'Today',
+      content: 'A private note to myself',
+      openAt: '2026-04-20T00:00:00.000Z',
+      openedAt: '2026-04-29T12:00:00.000Z',
+      createdAt: '2026-04-01T00:00:00.000Z',
+      updatedAt: '2026-04-29T12:00:00.000Z',
+      status: 'opened',
+    } as any);
+
+    mockRitualInsert.mockResolvedValue({
+      id: 'event-1',
+      userId: 'user-1',
+      eventType: 'letter_opened',
+      sourceId: 'letter-1',
+      createdAt: '2026-04-29T12:00:00.000Z',
+    } as any);
 
     const letter = await futureLetterService.open('letter-1', new Date('2026-04-29T12:00:00.000Z'));
 
     expect(letter.status).toBe('opened');
-    expect(updateChain.update).toHaveBeenCalledWith({
-      opened_at: '2026-04-29T12:00:00.000Z',
-      status: 'opened',
-      updated_at: '2026-04-29T12:00:00.000Z',
-    });
-    expect(eventChain.insert).toHaveBeenCalledWith({
-      user_id: 'user-1',
-      event_type: 'letter_opened',
-      source_id: 'letter-1',
-    });
+    expect(mockFutureLetterUpdate).toHaveBeenCalledWith(
+      'user-1',
+      'letter-1',
+      'opened',
+      '2026-04-29T12:00:00.000Z'
+    );
+    expect(mockRitualInsert).toHaveBeenCalledWith('user-1', 'letter_opened', 'letter-1');
   });
 });
 
@@ -219,31 +198,17 @@ describe('ritualEventService', () => {
   });
 
   it('records release completion as a content-free event', async () => {
-    const chain = {
-      insert: vi.fn().mockReturnThis(),
-      select: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValue({
-        data: {
-          id: 'event-1',
-          user_id: 'user-1',
-          event_type: 'release_completed',
-          source_id: null,
-          created_at: '2026-04-29T12:00:00.000Z',
-        },
-        error: null,
-      }),
-    };
-    mockFrom.mockReturnValue(chain as any);
+    mockRitualInsert.mockResolvedValue({
+      id: 'event-1',
+      userId: 'user-1',
+      eventType: 'release_completed',
+      sourceId: undefined,
+      createdAt: '2026-04-29T12:00:00.000Z',
+    } as any);
 
     await ritualEventService.recordReleaseCompleted();
 
-    expect(mockFrom).toHaveBeenCalledWith('ritual_events');
-    expect(chain.insert).toHaveBeenCalledWith({
-      user_id: 'user-1',
-      event_type: 'release_completed',
-      source_id: undefined,
-    });
-    expect(JSON.stringify(chain.insert.mock.calls[0][0])).not.toMatch(/content|text|note/i);
+    expect(mockRitualInsert).toHaveBeenCalledWith('user-1', 'release_completed', undefined);
   });
 });
 
@@ -273,14 +238,11 @@ describe('referralService', () => {
   it('records an accepted referral after profile creation and clears the stored code', async () => {
     const fakeStorage = storage();
     referralService.captureReferralCode('?ref=friend-code', fakeStorage);
-    mockRpc.mockResolvedValue({ data: true, error: null } as any);
+    mockReferralAccept.mockResolvedValue(true);
 
     await expect(referralService.recordAcceptedReferral(fakeStorage)).resolves.toBe(true);
 
-    expect(mockFrom).not.toHaveBeenCalledWith('referral_invites');
-    expect(mockRpc).toHaveBeenCalledWith('accept_referral_invite', {
-      referral_code: 'friend-code',
-    });
+    expect(mockReferralAccept).toHaveBeenCalledWith('friend-code');
     expect(fakeStorage.removeItem).toHaveBeenCalledWith('reflections.referral_code');
   });
 });

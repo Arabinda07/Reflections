@@ -36,12 +36,12 @@ describe('entrypoint vendor loading contract', () => {
     const events = read('src/analytics/events.ts');
     const index = read('index.tsx');
     const app = read('App.tsx');
-    const authContext = read('context/AuthContext.tsx');
+    const authBootstrapper = read('hooks/useAuthBootstrapper.ts');
     const routeTracker = read('src/analytics/AnalyticsRouteTracker.tsx');
 
     expect(index).not.toContain('getPostHogBootstrapConfig');
     expect(app).not.toContain("from './src/analytics/events'");
-    expect(authContext).not.toContain("from '../src/analytics/events'");
+    expect(authBootstrapper).not.toContain("from '../src/analytics/events'");
     expect(routeTracker).not.toContain("from './events'");
     expect(routeTracker).toContain('captureAnalyticsEventDeferred');
     expect(events).not.toContain("import posthog from 'posthog-js'");

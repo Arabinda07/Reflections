@@ -8,9 +8,9 @@ const read = (filePath: string) =>
 describe('app router compatibility', () => {
   it('keeps CreateNote route blocking on a data router shell', () => {
     const app = read('App.tsx');
-    const createNote = read('pages/dashboard/CreateNote.tsx');
+    const noteDraft = read('hooks/useNoteDraft.ts');
 
-    expect(createNote).toContain('useBlocker(');
+    expect(noteDraft).toContain('useBlocker(');
     expect(app).toContain('createBrowserRouter');
     expect(app).toContain('RouterProvider');
     expect(app).not.toContain('HashRouter as Router');

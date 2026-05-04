@@ -3,7 +3,7 @@ import { CheckCircle, Crown, Check } from '@phosphor-icons/react';
 import { Button } from './Button';
 import { ModalSheet } from './ModalSheet';
 import { supabase } from '../../src/supabaseClient';
-import { useAuth } from '../../context/AuthContext';
+import { useAuthStore } from '../../hooks/useAuthStore';
 import { NEWSLETTER_SIGNUP_LABEL } from '../../src/newsletter';
 
 interface ProUpgradeCTAProps {
@@ -13,7 +13,7 @@ interface ProUpgradeCTAProps {
 }
 
 export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, className = '', variant = 'card' }) => {
-  useAuth();
+  useAuthStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);

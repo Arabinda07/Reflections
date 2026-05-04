@@ -7,11 +7,12 @@ const read = (path: string) => readFileSync(join(process.cwd(), path), 'utf8');
 describe('mobile Insights and Sanctuary navigation contract', () => {
   it('hides the shared mobile navbar on Insights and Sanctuary while preserving desktop nav', () => {
     const layout = read('layouts/DashboardLayout.tsx');
+    const navBar = read('layouts/NavigationBar.tsx');
 
     expect(layout).toContain('isMobileNavSuppressedRoute');
     expect(layout).toContain('location.pathname === RoutePath.INSIGHTS');
     expect(layout).toContain('location.pathname.startsWith(RoutePath.SANCTUARY)');
-    expect(layout).toContain("isMobileNavSuppressedRoute ? 'hidden lg:flex' : 'flex'");
+    expect(navBar).toContain("isMobileNavSuppressed ? 'hidden lg:flex' : 'flex'");
   });
 
   it('uses page-owned back buttons for the intended mobile route flow', () => {

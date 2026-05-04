@@ -24,7 +24,7 @@ import { AmbientMusicButton } from '../../components/ui/AmbientMusicButton';
 import { Button } from '../../components/ui/Button';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { useToast } from '../../components/ui/Toast';
-import { useAuth } from '../../context/AuthContext';
+import { useAuthStore } from '../../hooks/useAuthStore';
 import { aiService } from '../../services/aiService';
 import { moodCheckinService } from '../../services/engagementServices';
 import { noteService } from '../../services/noteService';
@@ -118,7 +118,7 @@ export const HomeAuthenticated: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isFromSave = location.state?.fromSave;
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   const [noteCount, setNoteCount] = useState<number | null>(null);
   const [displayCount, setDisplayCount] = useState<number | string>('...');
   const [isCountLoading, setIsCountLoading] = useState(false);
@@ -393,7 +393,7 @@ export const HomeAuthenticated: React.FC = () => {
       setIsIntentionModalOpen(false);
       showToast('Intention added');
     } catch (err) {
-      console.error('Failed to create intention', err);
+      console.error('Could not create intention', err);
       showToast('Could not save intention');
     } finally {
       setIsCreatingTask(false);

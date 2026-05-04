@@ -27,7 +27,7 @@ describe('PostHog integration contract', () => {
     const oauthHook = read('hooks/useNativeOAuthListener.ts');
     const createNote = read('pages/dashboard/CreateNote.tsx');
     const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
-    const authContext = read('context/AuthContext.tsx');
+    const authBootstrapper = read('hooks/useAuthBootstrapper.ts');
     const routeTracker = read('src/analytics/AnalyticsRouteTracker.tsx');
 
     expect(signIn).toContain('trackGoogleAuthStarted');
@@ -36,11 +36,12 @@ describe('PostHog integration contract', () => {
     expect(app).toContain('useNativeOAuthListener');
     expect(oauthHook).toContain('trackGoogleAuthSucceededDeferred');
     expect(oauthHook).toContain('trackGoogleAuthFailedDeferred');
-    expect(createNote).toContain('trackNoteSaved');
+    const orchestrator = read('services/notePublishingOrchestrator.ts');
+    expect(orchestrator).toContain('trackNoteSaved');
     expect(lifeWiki).toContain('trackLifeWikiRefreshed');
-    expect(authContext).not.toContain("from '../src/analytics/events'");
-    expect(authContext).toContain('identifyAnalyticsUserDeferred');
-    expect(authContext).toContain('resetAnalyticsUserDeferred');
+    expect(authBootstrapper).not.toContain("from '../src/analytics/events'");
+    expect(authBootstrapper).toContain('identifyAnalyticsUserDeferred');
+    expect(authBootstrapper).toContain('resetAnalyticsUserDeferred');
     expect(routeTracker).not.toContain("from './events'");
     expect(routeTracker).toContain('captureAnalyticsEventDeferred');
   });

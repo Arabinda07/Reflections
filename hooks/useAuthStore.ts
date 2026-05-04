@@ -21,8 +21,10 @@ interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isHydrated: boolean;
+  isInitialCheckDone: boolean;
   setUser: (user: User | null) => void;
   setHydrated: (val: boolean) => void;
+  setInitialCheckDone: (val: boolean) => void;
   logout: () => Promise<void>;
 }
 
@@ -32,8 +34,10 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isAuthenticated: false,
       isHydrated: false,
+      isInitialCheckDone: false,
       setUser: (user) => set({ user, isAuthenticated: !!user }),
       setHydrated: (isHydrated) => set({ isHydrated }),
+      setInitialCheckDone: (isInitialCheckDone) => set({ isInitialCheckDone }),
       logout: async () => {
         await supabase.auth.signOut();
         set({ user: null, isAuthenticated: false });

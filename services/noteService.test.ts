@@ -2,12 +2,29 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { noteService } from './noteService';
 import { supabase } from '../src/supabaseClient';
 import { offlineStorage } from './offlineStorage';
+import { noteRemoteStore } from './noteRemoteStore';
+import { syncEngine } from './syncEngine';
 
 vi.mock('../src/supabaseClient', () => ({
   supabase: {
     auth: { getUser: vi.fn() },
     from: vi.fn(),
   },
+}));
+
+vi.mock('./noteRemoteStore', () => ({
+  noteRemoteStore: {
+    fetchAll: vi.fn(),
+    fetchById: vi.fn(),
+    insert: vi.fn(),
+    update: vi.fn(),
+    upsert: vi.fn(),
+    remove: vi.fn(),
+    count: vi.fn(),
+    monthlyCount: vi.fn(),
+  },
+  mapToNote: vi.fn(),
+  mapToDbNote: vi.fn(),
 }));
 
 vi.mock('./offlineStorage', () => ({
@@ -20,12 +37,24 @@ vi.mock('./offlineStorage', () => ({
   },
 }));
 
+vi.mock('./syncEngine', () => ({
+  syncEngine: {
+    enqueueInsert: vi.fn(),
+    enqueueUpdate: vi.fn(),
+    enqueueDelete: vi.fn(),
+  },
+}));
+
 const mockAuth = vi.mocked(supabase.auth.getUser);
 const mockFrom = vi.mocked(supabase.from);
 const mockGetAllNotes = vi.mocked(offlineStorage.getAllNotes);
 const mockGetNoteById = vi.mocked(offlineStorage.getNoteById);
 const mockSaveNote = vi.mocked(offlineStorage.saveNote);
 const mockMarkAsSynced = vi.mocked(offlineStorage.markAsSynced);
+const mockRemoteCount = vi.mocked(noteRemoteStore.count);
+const mockRemoteMonthlyCount = vi.mocked(noteRemoteStore.monthlyCount);
+const mockEnqueueInsert = vi.mocked(syncEngine.enqueueInsert);
+const mockEnqueueUpdate = vi.mocked(syncEngine.enqueueUpdate);
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -62,27 +91,17 @@ describe('noteService.getById', () => {
 });
 
 describe('noteService.getCount', () => {
-  it('queries Supabase with count:exact and returns the integer', async () => {
-    const chain = {
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockResolvedValue({ count: 7, error: null }),
-    };
-    mockFrom.mockReturnValue(chain as any);
+  it('queries noteRemoteStore.count and returns the integer', async () => {
+    mockRemoteCount.mockResolvedValue(7);
 
     const result = await noteService.getCount();
 
-    expect(mockFrom).toHaveBeenCalledWith('notes');
-    expect(chain.select).toHaveBeenCalledWith('*', { count: 'exact', head: true });
-    expect(chain.eq).toHaveBeenCalledWith('user_id', 'uid-1');
+    expect(mockRemoteCount).toHaveBeenCalledWith('uid-1');
     expect(result).toBe(7);
   });
 
-  it('falls back to Dexie when Supabase throws', async () => {
-    const chain = {
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockResolvedValue({ count: null, error: new Error('offline') }),
-    };
-    mockFrom.mockReturnValue(chain as any);
+  it('falls back to Dexie when remote store throws', async () => {
+    mockRemoteCount.mockRejectedValue(new Error('offline'));
     mockGetAllNotes.mockResolvedValue([
       { id: 'a', createdAt: '2026-04-01T00:00:00.000Z' } as any,
       { id: 'b', createdAt: '2026-04-02T00:00:00.000Z' } as any,
@@ -94,51 +113,28 @@ describe('noteService.getCount', () => {
     expect(result).toBe(2);
   });
 
-  it('returns 0 when user is not authenticated', async () => {
+  it('throws when user is not authenticated', async () => {
     mockAuth.mockResolvedValue({ data: { user: null } } as any);
 
-    const result = await noteService.getCount();
-
-    expect(result).toBe(0);
+    await expect(noteService.getCount()).rejects.toThrow('User not authenticated');
     expect(mockFrom).not.toHaveBeenCalled();
   });
 });
 
 describe('noteService.getMonthlyCount', () => {
-  it('queries Supabase with month range and returns the integer', async () => {
-    const chain = {
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      gte: vi.fn().mockReturnThis(),
-      lt: vi.fn().mockResolvedValue({ count: 4, error: null }),
-    };
-    mockFrom.mockReturnValue(chain as any);
-
-    const now = new Date();
-    const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString();
-    const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1)).toISOString();
+  it('queries noteRemoteStore.monthlyCount and returns the integer', async () => {
+    mockRemoteMonthlyCount.mockResolvedValue(4);
 
     const result = await noteService.getMonthlyCount();
 
-    expect(mockFrom).toHaveBeenCalledWith('notes');
-    expect(chain.select).toHaveBeenCalledWith('*', { count: 'exact', head: true });
-    expect(chain.eq).toHaveBeenCalledWith('user_id', 'uid-1');
-    expect(chain.gte).toHaveBeenCalledWith('created_at', start);
-    expect(chain.lt).toHaveBeenCalledWith('created_at', end);
+    expect(mockRemoteMonthlyCount).toHaveBeenCalledWith('uid-1');
     expect(result).toBe(4);
   });
 
-  it('falls back to Dexie when Supabase throws', async () => {
-    const chain = {
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      gte: vi.fn().mockReturnThis(),
-      lt: vi.fn().mockResolvedValue({ count: null, error: new Error('offline') }),
-    };
-    mockFrom.mockReturnValue(chain as any);
+  it('falls back to Dexie when remote store throws', async () => {
+    mockRemoteMonthlyCount.mockRejectedValue(new Error('offline'));
 
     const now = new Date();
-    // Use UTC boundaries to match the implementation
     const inMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 10)).toISOString();
     const outOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 10)).toISOString();
 
@@ -154,76 +150,35 @@ describe('noteService.getMonthlyCount', () => {
     expect(result).toBe(2);
   });
 
-  it('returns 0 when user is not authenticated', async () => {
+  it('throws when user is not authenticated', async () => {
     mockAuth.mockResolvedValue({ data: { user: null } } as any);
 
-    const result = await noteService.getMonthlyCount();
-
-    expect(result).toBe(0);
+    await expect(noteService.getMonthlyCount()).rejects.toThrow('User not authenticated');
     expect(mockFrom).not.toHaveBeenCalled();
   });
 });
 
 describe('noteService.create', () => {
-  it('waits for the create insert to settle before resolving', async () => {
+  it('calls syncEngine.enqueueInsert and returns the note', async () => {
     const randomUUID = vi
       .spyOn(crypto, 'randomUUID')
       .mockReturnValue('note-1' as `${string}-${string}-${string}-${string}-${string}`);
-    let resolveInsert: (value: { error: null }) => void = () => {};
-    const insertResult = new Promise<{ error: null }>((resolve) => {
-      resolveInsert = resolve;
-    });
-    const chain = {
-      insert: vi.fn().mockReturnValue(insertResult),
-    };
-    mockFrom.mockReturnValue(chain as any);
 
-    const created = noteService.create({
+    const created = await noteService.create({
       title: 'Draft',
       content: 'A note',
       tasks: [{ id: 'task-1', text: 'Follow up', completed: false }],
     });
-    let settled = false;
-    void created.then(() => {
-      settled = true;
-    });
 
-    await new Promise((resolve) => setTimeout(resolve, 0));
-
-    expect(chain.insert).toHaveBeenCalled();
-    expect(settled).toBe(false);
-    expect(chain.insert).toHaveBeenCalledWith(
-      expect.objectContaining({
-        id: 'note-1',
-        user_id: 'uid-1',
-        title: 'Draft',
-        content: 'A note',
-        tasks: [{ id: 'task-1', text: 'Follow up', completed: false }],
-      }),
-    );
-
-    resolveInsert({ error: null });
-    await expect(created).resolves.toMatchObject({ id: 'note-1', title: 'Draft' });
-    expect(mockSaveNote).toHaveBeenCalledWith(expect.objectContaining({ syncStatus: 'pending_insert' }));
-    expect(mockMarkAsSynced).toHaveBeenCalledWith('note-1');
+    expect(mockEnqueueInsert).toHaveBeenCalledWith('uid-1', expect.objectContaining({ id: 'note-1', title: 'Draft' }));
+    expect(created).toMatchObject({ id: 'note-1', title: 'Draft' });
     randomUUID.mockRestore();
   });
 });
 
 describe('noteService.update', () => {
-  it('upserts the full note when the local note is still pending insert', async () => {
-    const upsert = vi.fn().mockResolvedValue({ error: null });
-    mockFrom.mockReturnValue({ upsert } as any);
-    mockGetNoteById.mockResolvedValue({
-      id: 'note-1',
-      userId: 'uid-1',
-      syncStatus: 'pending_insert',
-      title: 'Draft',
-      content: 'Old content',
-      createdAt: '2026-04-20T00:00:00.000Z',
-      updatedAt: '2026-04-20T00:00:00.000Z',
-      tasks: [{ id: 'task-1', text: 'Follow up', completed: false }],
-    } as any);
+  it('calls syncEngine.enqueueUpdate', async () => {
+    mockEnqueueUpdate.mockResolvedValue({} as any);
 
     await noteService.update('note-1', {
       content: 'Final content',
@@ -238,25 +193,6 @@ describe('noteService.update', () => {
       ],
     });
 
-    expect(upsert).toHaveBeenCalledWith(
-      expect.objectContaining({
-        id: 'note-1',
-        user_id: 'uid-1',
-        title: 'Draft',
-        content: 'Final content',
-        attachments: [
-          {
-            id: 'attachment-1',
-            name: 'voice.m4a',
-            path: 'notes/note-1/voice.m4a',
-            size: 123,
-            type: 'audio/mp4',
-          },
-        ],
-        tasks: [{ id: 'task-1', text: 'Follow up', completed: false }],
-        created_at: '2026-04-20T00:00:00.000Z',
-      }),
-    );
-    expect(mockMarkAsSynced).toHaveBeenCalledWith('note-1');
+    expect(mockEnqueueUpdate).toHaveBeenCalledWith('uid-1', 'note-1', expect.objectContaining({ content: 'Final content' }));
   });
 });

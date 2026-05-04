@@ -25,7 +25,7 @@ describe('public navigation shell contract', () => {
 
     for (const source of [shell, header]) {
       expect(source).not.toContain('DashboardLayout');
-      expect(source).not.toContain('AuthProvider');
+
       expect(source).not.toContain('PWAInstallProvider');
       expect(source).not.toContain('motion/');
       expect(source).not.toContain('@phosphor-icons/react');

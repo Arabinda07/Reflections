@@ -6,15 +6,15 @@ const read = (path: string) => readFileSync(join(process.cwd(), path), 'utf8');
 
 describe('Mobile sidebar navigation contract', () => {
   it('uses a right-docked sidebar shell instead of the copied mobile header panel', () => {
-    const layout = read('layouts/DashboardLayout.tsx');
+    const sidebar = read('layouts/MobileSidebar.tsx');
     const css = read('index.css');
 
-    expect(layout).toContain('mobile-sidebar-shell');
-    expect(layout).toContain('mobile-sidebar-scrim');
-    expect(layout).toContain('mobile-sidebar-link');
-    expect(layout).toContain('aria-label="Close menu"');
-    expect(layout).toContain("width: 'min(86vw, 352px)'");
-    expect(layout).not.toContain('border-l-2');
+    expect(sidebar).toContain('mobile-sidebar-shell');
+    expect(sidebar).toContain('mobile-sidebar-scrim');
+    expect(sidebar).toContain('mobile-sidebar-link');
+    expect(sidebar).toContain('aria-label="Close menu"');
+    expect(sidebar).toContain("width: 'min(86vw, 352px)'");
+    expect(sidebar).not.toContain('border-l-2');
 
     expect(css).toContain('.mobile-sidebar-shell');
     expect(css).toContain('.mobile-sidebar-scrim');

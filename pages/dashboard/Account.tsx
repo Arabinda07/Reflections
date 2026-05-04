@@ -32,7 +32,7 @@ import { RoutePath, WellnessAccess } from '../../types';
 import { noteService } from '../../services/noteService';
 import { storageService } from '../../services/storageService';
 import { offlineStorage } from '../../services/offlineStorage';
-import { useAuth } from '../../context/AuthContext';
+import { useAuthStore } from '../../hooks/useAuthStore';
 import { profileService } from '../../services/profileService';
 import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
 import { aiService, type GreatIngestProgress } from '../../services/aiService';
@@ -54,7 +54,7 @@ type FeedbackState =
 
 export const Account: React.FC = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [isSaved, setIsSaved] = useState(false);

@@ -29,22 +29,22 @@ describe('landing first-paint contract', () => {
     const app = read('App.tsx');
     const landing = read('pages/dashboard/Landing.tsx');
 
-    expect(app).not.toContain('<AuthProvider>');
+
     expect(app).not.toContain('<Home />');
     expect(landing).toContain("import('../../src/supabaseClient')");
     expect(landing).toContain('navigate(RoutePath.DASHBOARD, { replace: true })');
   });
 
   it('lets the startup overlay fade over already-rendered app content', () => {
-    const authContext = read('context/AuthContext.tsx');
+    const appBootstrapper = read('components/ui/AppBootstrapper.tsx');
 
-    expect(authContext).toContain("className=\"flex min-h-0 flex-1 flex-col\"");
-    expect(authContext).toContain("const isStartupBlocking = showStartup || !startupExitDone;");
-    expect(authContext).toContain("pointerEvents: isStartupBlocking ? 'none' : 'auto'");
-    expect(authContext).not.toContain('opacity: showStartup ? 0 : 1');
-    expect(authContext).not.toContain('transition: `opacity ${NATIVE_STARTUP_FADE_MS}ms');
-    expect(authContext).not.toContain("visibility: showStartup ? 'hidden' : 'visible'");
-    expect(authContext).not.toContain('className="flex-1 contents"');
+    expect(appBootstrapper).toContain("className=\"flex min-h-0 flex-1 flex-col\"");
+    expect(appBootstrapper).toContain("const isStartupBlocking = showStartup || !startupExitDone;");
+    expect(appBootstrapper).toContain("pointerEvents: isStartupBlocking ? 'none' : 'auto'");
+    expect(appBootstrapper).not.toContain('opacity: showStartup ? 0 : 1');
+    expect(appBootstrapper).not.toContain('transition: `opacity ${NATIVE_STARTUP_FADE_MS}ms');
+    expect(appBootstrapper).not.toContain("visibility: showStartup ? 'hidden' : 'visible'");
+    expect(appBootstrapper).not.toContain('className="flex-1 contents"');
   });
 
   it('keeps the startup poster visible while video fades above it', () => {

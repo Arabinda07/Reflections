@@ -36,7 +36,8 @@ describe('engagement routes source contract', () => {
     expect(homeAuthenticated).toContain('RoutePath.FUTURE_LETTERS');
     expect(homeAuthenticated).toContain('Future letter');
     expect(homeAuthenticated).not.toContain('RoutePath.RELEASE');
-    expect(createNote).toContain('recordReleaseCompleted');
+    const noteDraft = read('hooks/useNoteDraft.ts');
+    expect(noteDraft).toContain('recordReleaseCompleted');
     expect(createNote).toContain('Choose what this becomes');
     expect(homeAuthenticated.toLowerCase()).not.toMatch(/\b(streak|xp|leaderboard|lost|failed)\b/);
   });

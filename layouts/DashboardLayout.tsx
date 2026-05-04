@@ -1,19 +1,8 @@
-import React, { useEffect, useId, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'motion/react';
-import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import emailjs from '@emailjs/browser';
-import { 
-  List, 
-  X, 
-  Moon, 
-  Sun, 
-  DownloadSimple, 
-  CaretRight,
-  Bug,
-  Leaf,
-  PaperPlaneTilt,
-  CheckCircle,
+import React, { useEffect, useState } from 'react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { PaperPlaneTilt } from '@phosphor-icons/react';
+import {
   House,
   Question,
   SignIn,
@@ -21,666 +10,155 @@ import {
   Notebook,
   PencilSimpleLine,
   UserCircle,
-  SignOut
 } from '@phosphor-icons/react';
 import { RoutePath } from '../types';
-import { useAuth } from '../context/AuthContext';
+import { useAuthStore } from '../hooks/useAuthStore';
 import { useKeyboardShortcut } from '../src/hooks/useKeyboardShortcut';
-import { usePWAInstall } from '../context/PWAInstallContext';
 import { AnalyticsRouteTracker } from '../src/analytics/AnalyticsRouteTracker';
-import { Button } from '../components/ui/Button';
 import { ModalSheet } from '../components/ui/ModalSheet';
 import { ReferralInvitePanel } from '../components/ui/ReferralInvitePanel';
 import { SyncBanner } from '../components/ui/SyncBanner';
-import { StorageImage } from '../components/ui/StorageImage';
 import { referralService } from '../services/engagementServices';
-import { registerAndroidBackAction } from '../src/native/androidBack';
-import { NATIVE_PAGE_TOP_PADDING, NATIVE_TOP_CONTROL_OFFSET } from '../src/native/safeArea';
 import { useAndroidBackHandler } from '../src/native/useAndroidBackHandler';
-import { useHaptics } from '../hooks/useHaptics';
-import { useSound } from '../hooks/useSound';
 
-const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY; 
+import { useSurfaceScope } from './SurfaceScope';
+import { NavigationBar } from './NavigationBar';
+import { MobileSidebar, type SidebarNavItem } from './MobileSidebar';
+import { BugReportFlow } from './BugReportFlow';
 
-const ROUTE_SURFACE_SCOPE_CLASS: Partial<Record<RoutePath, string>> = {
-  [RoutePath.HOME]: 'surface-scope-sage',
-  [RoutePath.DASHBOARD]: 'surface-scope-sage',
-  [RoutePath.NOTES]: 'surface-scope-sage',
-  [RoutePath.CREATE_NOTE]: 'surface-scope-paper',
-  [RoutePath.RELEASE]: 'surface-scope-clay',
-  [RoutePath.FUTURE_LETTERS]: 'surface-scope-honey',
-  [RoutePath.ACCOUNT]: 'surface-scope-paper',
-  [RoutePath.INSIGHTS]: 'surface-scope-sky',
-  [RoutePath.FAQ]: 'surface-scope-sky',
-  [RoutePath.ABOUT]: 'surface-scope-paper',
-  [RoutePath.PRIVACY]: 'surface-scope-paper',
-  [RoutePath.LOGIN]: 'surface-scope-paper',
-  [RoutePath.SIGNUP]: 'surface-scope-paper',
-  [RoutePath.RESET_PASSWORD]: 'surface-scope-paper',
-  [RoutePath.AUTH_CALLBACK]: 'surface-scope-paper',
-  [RoutePath.WIKI]: 'surface-scope-sage',
-  [RoutePath.SANCTUARY]: 'surface-scope-sage',
-};
+const GUEST_NAV_ITEMS: SidebarNavItem[] = [
+  { label: 'Homepage', path: RoutePath.HOME, icon: House, description: 'Start from the opening page.' },
+  { label: 'FAQ', path: RoutePath.FAQ, icon: Question, description: 'Answers about privacy, writing, and care.' },
+];
 
-const getRouteSurfaceScopeClass = (pathname: string) => {
-  if (pathname.startsWith('/notes/') && pathname !== RoutePath.CREATE_NOTE) {
-    return 'surface-scope-paper';
-  }
+const AUTH_NAV_ITEMS: SidebarNavItem[] = [
+  { label: 'My notes', path: RoutePath.NOTES, icon: Notebook, description: 'Return to your saved reflections.' },
+  { label: 'Create note', path: RoutePath.CREATE_NOTE, icon: PencilSimpleLine, description: 'Open a fresh writing surface.' },
+  { label: 'Account', path: RoutePath.ACCOUNT, icon: UserCircle, description: 'Manage your profile and plan.' },
+  { label: 'FAQ', path: RoutePath.FAQ, icon: Question, description: 'Read how Reflections works.' },
+];
 
-  if (pathname.startsWith(RoutePath.SANCTUARY)) {
-    return 'surface-scope-sage';
-  }
+const GUEST_SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
+  ...GUEST_NAV_ITEMS,
+  { label: 'Sign In', path: RoutePath.LOGIN, icon: SignIn, description: 'Enter your private journal.' },
+  { label: 'Sign Up', path: RoutePath.SIGNUP, icon: UserPlus, description: 'Create a writing space.' },
+];
 
-  return ROUTE_SURFACE_SCOPE_CLASS[pathname as RoutePath] ?? 'surface-scope-sage';
-};
+const footerLinkClass =
+  'inline-flex min-h-11 min-w-11 items-center justify-center text-[11px] font-black uppercase tracking-widest text-gray-nav transition-colors hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
 
 export const DashboardLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, user, logout } = useAuth();
-  const { canInstall, isInstalled, triggerInstall } = usePWAInstall();
+  const { isAuthenticated } = useAuthStore();
+  const routeSurfaceScopeClass = useSurfaceScope();
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const mobileMenuId = useId();
-  const mobileMenuTitleId = useId();
-  const mobileMenuDescriptionId = useId();
-  const mobileMenuCloseRef = useRef<HTMLButtonElement | null>(null);
-  const mobileMenuPanelRef = useRef<HTMLDivElement | null>(null);
-  const previousFocusRef = useRef<HTMLElement | null>(null);
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    return document.documentElement.classList.contains('dark');
-  });
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
-  const haptics = useHaptics();
-  const { playSaveChime } = useSound();
+  useAndroidBackHandler();
 
+  // Keyboard shortcut: Ctrl/Cmd + N → new reflection
   useKeyboardShortcut(
     { key: 'n', ctrlOrCmd: true },
     (e) => {
       e.preventDefault();
       navigate(RoutePath.CREATE_NOTE);
     },
-    [navigate]
+    [navigate],
   );
 
-  // Bug Report State
-  const [isBugModalOpen, setIsBugModalOpen] = useState(false);
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-  const [bugMessage, setBugMessage] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
-
-  useAndroidBackHandler();
-
+  // Capture referral codes from URL params
   useEffect(() => {
     referralService.captureReferralCode(location.search);
   }, [location.search]);
 
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDarkMode]);
-
-  useEffect(() => {
-    if (!isMobileMenuOpen) return;
-
-    previousFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsMobileMenuOpen(false);
-        return;
-      }
-
-      if (event.key === 'Tab' && mobileMenuPanelRef.current) {
-        const focusableElements = mobileMenuPanelRef.current.querySelectorAll<HTMLElement>(
-          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-        );
-
-        if (focusableElements.length === 0) {
-          event.preventDefault();
-          return;
-        }
-
-        const first = focusableElements[0];
-        const last = focusableElements[focusableElements.length - 1];
-        const activeElement = document.activeElement;
-
-        if (event.shiftKey && activeElement === first) {
-          event.preventDefault();
-          last.focus();
-        } else if (!event.shiftKey && activeElement === last) {
-          event.preventDefault();
-          first.focus();
-        }
-      }
-    };
-
-    const focusTimer = window.setTimeout(() => {
-      mobileMenuCloseRef.current?.focus();
-    }, 40);
-
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.clearTimeout(focusTimer);
-      previousFocusRef.current?.focus();
-    };
-  }, [isMobileMenuOpen]);
-
-  useEffect(() => {
-    if (!isMobileMenuOpen) return;
-
-    return registerAndroidBackAction(() => {
-      setIsMobileMenuOpen(false);
-      return true;
-    });
-  }, [isMobileMenuOpen]);
-
-  useEffect(() => {
-    if (!isBugModalOpen) return;
-
-    return registerAndroidBackAction(() => {
-      setIsBugModalOpen(false);
-      return true;
-    });
-  }, [isBugModalOpen]);
-
-  useEffect(() => {
-    document.documentElement.classList.toggle('no-scroll', isMobileMenuOpen);
-
-    return () => {
-      document.documentElement.classList.remove('no-scroll');
-    };
-  }, [isMobileMenuOpen]);
-
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-  };
-
-  const handleNavigation = (path: string) => {
-    navigate(path);
-    setIsMobileMenuOpen(false);
-  };
-
-  const handleBugSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!bugMessage.trim()) return;
-    
-    setIsSubmitting(true);
-    setSubmitError(null);
-    
-    try {
-      const templateParams = {
-        from_name: user?.email || 'Guest User',
-        message: bugMessage,
-        page_url: window.location.href,
-        timestamp: new Date().toLocaleString(),
-      };
-
-      await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        EMAILJS_TEMPLATE_ID,
-        templateParams,
-        EMAILJS_PUBLIC_KEY
-      );
-      
-      setIsSubmitting(false);
-      setIsSubmitted(true);
-      setBugMessage('');
-      
-      haptics.confirming();
-      playSaveChime();
-      
-      setTimeout(() => {
-        setIsBugModalOpen(false);
-        setTimeout(() => setIsSubmitted(false), 500);
-      }, 2500);
-    } catch (error) {
-      console.error('Failed to send bug report:', error);
-      setIsSubmitting(false);
-      setSubmitError('I couldn\'t send your report just now. Please try again or email us directly.');
-    }
-  };
-
-  const guestNavItems = [
-    { label: 'Homepage', path: RoutePath.HOME, icon: House, description: 'Start from the opening page.' },
-    { label: 'FAQ', path: RoutePath.FAQ, icon: Question, description: 'Answers about privacy, writing, and care.' },
-  ];
-
-  const authNavItems = [
-    { label: 'My notes', path: RoutePath.NOTES, icon: Notebook, description: 'Return to your saved reflections.' },
-    { label: 'Create note', path: RoutePath.CREATE_NOTE, icon: PencilSimpleLine, description: 'Open a fresh writing surface.' },
-    { label: 'Account', path: RoutePath.ACCOUNT, icon: UserCircle, description: 'Manage your profile and plan.' },
-    { label: 'FAQ', path: RoutePath.FAQ, icon: Question, description: 'Read how Reflections works.' },
-  ];
-
-  const navItems = isAuthenticated ? authNavItems : guestNavItems;
-  const guestSidebarNavItems = [
-    ...guestNavItems,
-    { label: 'Sign In', path: RoutePath.LOGIN, icon: SignIn, description: 'Enter your private journal.' },
-    { label: 'Sign Up', path: RoutePath.SIGNUP, icon: UserPlus, description: 'Create a writing space.' },
-  ];
-  const sidebarNavItems = isAuthenticated ? authNavItems : guestSidebarNavItems;
-  const primarySidebarItems = sidebarNavItems.filter(item => item.path !== RoutePath.ACCOUNT);
-  const accountSidebarItem = sidebarNavItems.find(item => item.path === RoutePath.ACCOUNT);
+  // Derived route flags
   const isWritingRoute =
     location.pathname === RoutePath.RELEASE ||
     location.pathname.includes('/new') ||
     location.pathname.includes('/edit') ||
     (location.pathname.startsWith('/notes/') && location.pathname !== '/notes/');
+
   const isMobileNavSuppressedRoute =
     location.pathname === RoutePath.INSIGHTS ||
     location.pathname.startsWith(RoutePath.SANCTUARY);
+
   const isLandingRoute = location.pathname === RoutePath.HOME && !isAuthenticated;
-  const landingControlClass = isLandingRoute
-    ? 'hero-ink hover:text-green hover:bg-white/10'
-    : 'text-gray-nav hover:text-green hover:bg-green/5';
-  const footerLinkClass =
-    'inline-flex min-h-11 min-w-11 items-center justify-center text-[11px] font-black uppercase tracking-widest text-gray-nav transition-colors hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
-  const routeSurfaceScopeClass = getRouteSurfaceScopeClass(location.pathname);
+
+  const navItems = isAuthenticated ? AUTH_NAV_ITEMS : GUEST_NAV_ITEMS;
+  const sidebarNavItems = isAuthenticated ? AUTH_NAV_ITEMS : GUEST_SIDEBAR_NAV_ITEMS;
 
   return (
-    <div className={`${routeSurfaceScopeClass} page-wash relative flex h-[100dvh] min-h-[100dvh] flex-col overflow-hidden bg-body font-sans selection:bg-green/30 selection:text-green`}>
+    <div
+      className={`${routeSurfaceScopeClass} page-wash relative flex h-[100dvh] min-h-[100dvh] flex-col overflow-hidden bg-body font-sans selection:bg-green/30 selection:text-green`}
+    >
       <AnalyticsRouteTracker />
       <a href="#main-content" className="skip-link">
         Skip to content
       </a>
 
-      {/* Navbar — flex-none keeps it outside the scroll container, no sticky needed */}
+      {/* Navigation Bar — hidden on writing routes */}
       {!isWritingRoute && (
-        <nav className={`z-[100] flex-none flex justify-center transition-colors duration-500 ${isLandingRoute ? 'landing-nav-scrim fixed left-0 right-0 top-0 pt-[env(safe-area-inset-top)]' : 'bg-body/95 pt-[env(safe-area-inset-top)]'}`}>
-          <div className="flex h-14 w-full max-w-[1440px] min-w-0 items-center justify-between gap-3 px-4 md:px-8 xl:px-10">
-          {/* Left Side */}
-          <div className="flex items-center gap-4">
-            <Link 
-              to={RoutePath.HOME}
-              className="group flex min-h-11 items-center gap-2"
-              aria-label="Reflections — go to home"
-            >
-              <div className="h-10 w-10 rounded-xl bg-green flex items-center justify-center text-white shadow-sm transition-transform duration-300 group-hover:scale-105 group-hover:-rotate-12">
-                <Leaf size={24} weight="fill" />
-              </div>
-              <span className="font-serif italic text-[22px] sm:text-[26px] text-green tracking-normal truncate max-w-[150px] sm:max-w-none">
-                Reflections
-              </span>
-            </Link>
-          </div>
-
-          {/* Right Side - Desktop Nav */}
-          <div className={`${isMobileNavSuppressedRoute ? 'hidden lg:flex' : 'flex'} hidden lg:flex items-center gap-1.5 xl:gap-2`}>
-            <button 
-              onClick={toggleDarkMode}
-              className={`relative flex h-11 w-11 items-center justify-center rounded-xl transition-colors ${landingControlClass}`}
-              title="Toggle Dark Mode"
-              aria-label={isDarkMode ? 'Use light mode' : 'Use dark mode'}
-            >
-              <AnimatePresence mode="popLayout" initial={false}>
-                <motion.div
-                  key={isDarkMode ? 'dark' : 'light'}
-                  initial={{ rotate: -90, opacity: 0, scale: 0.5 }}
-                  animate={{ rotate: 0, opacity: 1, scale: 1 }}
-                  exit={{ rotate: 90, opacity: 0, scale: 0.5 }}
-                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                >
-                  {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-                </motion.div>
-              </AnimatePresence>
-            </button>
-            {navItems.map((item) => {
-              const isActive = location.pathname === item.path;
-              return (
-                <Link
-                  key={item.label}
-                  to={item.path}
-                  aria-current={isActive ? 'page' : undefined}
-                  className={`inline-flex min-h-11 items-center rounded-xl border px-3 py-2 text-[12px] font-extrabold transition-colors duration-200 hover:border-green/20 hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-1 xl:px-4 xl:text-[13px] ${
-                    isActive ? 'border-green bg-green/5 text-green shadow-sm shadow-green/5' : 'border-transparent text-gray-nav'
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-            <div className="w-[1px] h-[24px] bg-border mx-2" role="separator" aria-orientation="vertical"></div>
-            {isAuthenticated ? (
-              <>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setIsInviteModalOpen(true)}
-                  className="gap-2 px-3 xl:px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
-                >
-                  Invite
-                  <PaperPlaneTilt size={16} weight="regular" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => logout()}
-                  className="px-3 text-clay hover:bg-clay/5 xl:px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
-                >
-                  Logout
-                </Button>
-              </>
-            ) : (
-              <div className="flex gap-2">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => navigate(RoutePath.LOGIN)}
-                  className="px-3 xl:px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
-                >
-                  Sign in
-                </Button>
-                <Button 
-                  variant="primary" 
-                  size="sm" 
-                  onClick={() => navigate(RoutePath.SIGNUP)}
-                  className="px-3 xl:px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green"
-                >
-                  Sign up
-                </Button>
-              </div>
-            )}
-          </div>
-
-          {/* Mobile Menu Icon */}
-          <div className={`${isMobileNavSuppressedRoute ? 'hidden' : 'flex'} lg:hidden items-center gap-2`}>
-            <button 
-              onClick={toggleDarkMode}
-              className={`relative flex h-11 w-11 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green ${landingControlClass}`}
-              title="Toggle Dark Mode"
-              aria-label={isDarkMode ? 'Use light mode' : 'Use dark mode'}
-            >
-              <AnimatePresence mode="popLayout" initial={false}>
-                <motion.div
-                  key={isDarkMode ? 'dark' : 'light'}
-                  initial={{ rotate: -90, opacity: 0, scale: 0.5 }}
-                  animate={{ rotate: 0, opacity: 1, scale: 1 }}
-                  exit={{ rotate: 90, opacity: 0, scale: 0.5 }}
-                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                >
-                  {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-                </motion.div>
-              </AnimatePresence>
-            </button>
-            <button 
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className={`z-[110] flex h-11 w-11 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green ${landingControlClass}`}
-              aria-label="Toggle menu"
-              aria-expanded={isMobileMenuOpen}
-              aria-controls={mobileMenuId}
-            >
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.div
-                  key={isMobileMenuOpen ? 'close' : 'open'}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                >
-                  {isMobileMenuOpen ? <X size={24} weight="regular" /> : <List size={24} weight="regular" />}
-                </motion.div>
-              </AnimatePresence>
-            </button>
-          </div>
-        </div>
-      </nav>
+        <NavigationBar
+          navItems={navItems}
+          isLandingRoute={isLandingRoute}
+          isMobileNavSuppressed={isMobileNavSuppressedRoute}
+          isMobileMenuOpen={isMobileMenuOpen}
+          onMobileMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          onInvite={() => setIsInviteModalOpen(true)}
+        />
       )}
 
-      {/* Mobile sidebar portal - outside nav to avoid header clipping */}
-      {typeof document !== 'undefined' && isMobileMenuOpen
-        ? createPortal(
-            <div className="fixed inset-x-0 top-0 bottom-0 z-[105] h-[100dvh] overflow-hidden lg:hidden">
-              <motion.div
-                className="mobile-sidebar-scrim fixed inset-x-0 top-0 bottom-0 h-[100dvh]"
-                onClick={() => setIsMobileMenuOpen(false)}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
-              />
-
-              <motion.div
-                ref={mobileMenuPanelRef}
-                id={mobileMenuId}
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby={mobileMenuTitleId}
-                aria-describedby={mobileMenuDescriptionId}
-                initial={{ x: 36, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: 36, opacity: 0 }}
-                transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
-                className="mobile-sidebar-shell fixed right-0 top-0 bottom-0 z-[110] h-[100dvh]"
-                style={{
-                  paddingTop: NATIVE_PAGE_TOP_PADDING,
-                  width: 'min(86vw, 352px)',
-                }}
-              >
-                <div className="flex h-full min-h-0 flex-col">
-                  <h2 id={mobileMenuTitleId} className="sr-only">
-                    Navigation menu
-                  </h2>
-                  <p id={mobileMenuDescriptionId} className="sr-only">
-                    Use this menu to move around Reflections and close it when you are ready to return to the page.
-                  </p>
-                  <div className="flex shrink-0 items-start justify-between gap-4 px-5 pb-4 sm:px-6">
-                    <div className="flex min-w-0 items-center gap-3 pt-1">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-chip)] bg-green text-[rgb(var(--panel-bg-rgb))] shadow-sm shadow-green/10">
-                        <Leaf size={20} weight="fill" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-[10px] font-black uppercase tracking-[0.22em] text-gray-nav">Menu</p>
-                        <p className="font-serif text-[22px] italic leading-tight text-green">Reflections</p>
-                      </div>
-                    </div>
-
-                    <button
-                      ref={mobileMenuCloseRef}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="mobile-sidebar-close"
-                      style={{ marginTop: `calc(${NATIVE_TOP_CONTROL_OFFSET} - ${NATIVE_PAGE_TOP_PADDING})` }}
-                      aria-label="Close menu"
-                    >
-                      <X size={20} />
-                    </button>
-                  </div>
-
-                  {/* User Header Section */}
-                  {isAuthenticated && user && (
-                    <div className="mobile-sidebar-user-header">
-                      <div className="mobile-sidebar-user-avatar">
-                        {user.avatarUrl ? (
-                          <StorageImage 
-                            path={user.avatarUrl} 
-                            alt="" 
-                            className="h-full w-full rounded-full object-cover" 
-                            showLoading={false}
-                          />
-                        ) : (
-                          <span>{user.name?.charAt(0).toUpperCase()}</span>
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-[15px] font-extrabold leading-tight text-gray-text">{user.name}</p>
-                        <p className="truncate text-[12px] font-semibold text-gray-nav">{user.email}</p>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5 sm:px-5">
-                    <nav aria-label="Mobile navigation" className="flex flex-col gap-1.5">
-                      {primarySidebarItems.map((item) => {
-                        const isActive = location.pathname === item.path;
-                        const Icon = item.icon;
-
-                        return (
-                          <button
-                            key={item.label}
-                            onClick={() => handleNavigation(item.path)}
-                            aria-current={isActive ? 'page' : undefined}
-                            className="mobile-sidebar-link group"
-                            data-active={isActive ? 'true' : 'false'}
-                          >
-                            <span className="mobile-sidebar-link-icon">
-                              <Icon size={20} weight={isActive ? 'fill' : 'regular'} />
-                            </span>
-                            <span className="min-w-0 flex-1">
-                              <span className="block truncate text-[15px] font-extrabold leading-tight">
-                                {item.label}
-                              </span>
-                              <span className="mt-1 block text-[12px] font-semibold leading-snug text-gray-nav">
-                                {item.description}
-                              </span>
-                            </span>
-                            <CaretRight
-                              size={16}
-                              weight="regular"
-                              className="mobile-sidebar-link-caret"
-                              aria-hidden="true"
-                            />
-                          </button>
-                        );
-                      })}
-                    </nav>
-                  </div>
-
-                  {/* Footer Actions Section */}
-                  <div className="mobile-sidebar-footer">
-                    {accountSidebarItem && (
-                      <button
-                        onClick={() => handleNavigation(accountSidebarItem.path)}
-                        className="mobile-sidebar-link group"
-                        data-active={location.pathname === accountSidebarItem.path ? 'true' : 'false'}
-                      >
-                        <span className="mobile-sidebar-link-icon">
-                          <accountSidebarItem.icon size={20} weight={location.pathname === accountSidebarItem.path ? 'fill' : 'regular'} />
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block truncate text-[15px] font-extrabold leading-tight">Settings</span>
-                          <span className="mt-0.5 block text-[11px] font-semibold leading-snug text-gray-nav">Manage profile and plan.</span>
-                        </span>
-                        <CaretRight size={16} weight="regular" className="mobile-sidebar-link-caret" />
-                      </button>
-                    )}
-
-                    {canInstall && !isInstalled && (
-                      <button
-                        onClick={async () => {
-                          await triggerInstall();
-                          setIsMobileMenuOpen(false);
-                        }}
-                        aria-label="Add Reflections to your home screen"
-                        className="mobile-sidebar-link mobile-sidebar-link--action"
-                      >
-                        <span className="mobile-sidebar-link-icon">
-                          <DownloadSimple size={20} weight="regular" />
-                        </span>
-                        <span className="min-w-0 flex-1 text-left">
-                          <span className="block text-[15px] font-extrabold leading-tight">Install app</span>
-                        </span>
-                      </button>
-                    )}
-
-                    <button
-                      onClick={() => {
-                        setIsBugModalOpen(true);
-                        setIsMobileMenuOpen(false);
-                      }}
-                      aria-label="Report a bug"
-                      className="mobile-sidebar-link mobile-sidebar-link--action"
-                    >
-                      <span className="mobile-sidebar-link-icon">
-                        <Bug size={20} weight="regular" />
-                      </span>
-                      <span className="min-w-0 flex-1 text-left">
-                        <span className="block text-[15px] font-extrabold leading-tight">Report a bug</span>
-                        <span className="mt-0.5 block text-[11px] font-semibold leading-snug text-gray-nav">Tell us what felt off.</span>
-                      </span>
-                    </button>
-
-                    {isAuthenticated && (
-                      <div className="flex gap-2 mt-1">
-                        <button
-                          onClick={() => {
-                            setIsInviteModalOpen(true);
-                            setIsMobileMenuOpen(false);
-                          }}
-                          className="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl bg-green/5 text-green text-[13px] font-extrabold hover:bg-green/10 transition-colors"
-                        >
-                          <PaperPlaneTilt size={18} weight="regular" />
-                          Invite
-                        </button>
-                        <button
-                          onClick={() => {
-                            logout();
-                            setIsMobileMenuOpen(false);
-                          }}
-                          className="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl bg-clay/5 text-clay text-[13px] font-extrabold hover:bg-clay/10 transition-colors"
-                        >
-                          <SignOut size={18} weight="regular" />
-                          Logout
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            </div>,
-            document.body,
-          )
-        : null}
+      {/* Mobile Sidebar */}
+      <MobileSidebar
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+        navItems={sidebarNavItems}
+        onBugReport={() => {
+          /* BugReportFlow manages its own state */
+        }}
+        onInvite={() => setIsInviteModalOpen(true)}
+      />
 
       {/* Main Content — sole scroll container in the shell */}
-      <main id="main-content" tabIndex={-1} className="relative flex min-h-0 w-full flex-1 flex-col overflow-y-auto custom-scrollbar">
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="relative flex min-h-0 w-full flex-1 flex-col overflow-y-auto custom-scrollbar"
+      >
         <SyncBanner />
         <div className="w-full flex-1 flex flex-col">
           <Outlet />
         </div>
-        
+
         {/* Global Footer - Positioned for full-width background with centered content */}
         {!isWritingRoute && (
           <footer className="screen-scrim screen-scrim--strong mt-auto w-full border-t border-border py-12 transition-colors duration-300">
             <div className="max-w-[1440px] mx-auto px-6 md:px-16 flex flex-col sm:flex-row items-center justify-between gap-8">
-              <nav aria-label="Footer navigation" className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 sm:gap-10">
-                <Link 
-                  to={RoutePath.HOME}
-                  className={footerLinkClass}
-                >
+              <nav
+                aria-label="Footer navigation"
+                className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 sm:gap-10"
+              >
+                <Link to={RoutePath.HOME} className={footerLinkClass}>
                   Home
                 </Link>
-                <Link 
-                  to={RoutePath.FAQ}
-                  className={footerLinkClass}
-                >
+                <Link to={RoutePath.FAQ} className={footerLinkClass}>
                   FAQ
                 </Link>
-                <Link
-                  to={RoutePath.ABOUT}
-                  className={footerLinkClass}
-                >
+                <Link to={RoutePath.ABOUT} className={footerLinkClass}>
                   About
                 </Link>
-                <Link 
-                  to={RoutePath.PRIVACY}
-                  className={footerLinkClass}
-                >
+                <Link to={RoutePath.PRIVACY} className={footerLinkClass}>
                   Privacy
                 </Link>
               </nav>
 
               <div className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">
-                © 2026 <a 
-                  href="https://arabinda07.github.io/" 
-                  target="_blank" 
+                © 2026{' '}
+                <a
+                  href="https://arabinda07.github.io/"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex min-h-11 items-center transition-colors duration-300 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
                   aria-label="Arabinda's portfolio (opens in new tab)"
@@ -693,84 +171,10 @@ export const DashboardLayout: React.FC = () => {
         )}
       </main>
 
-      {!isWritingRoute && (
-        <>
-          {/* Floating Bug Report Button */}
-          <button
-            onClick={() => setIsBugModalOpen(!isBugModalOpen)}
-            className={`fixed bottom-4 left-6 z-[110] hidden h-11 w-11 items-center justify-center rounded-2xl transition duration-300 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/20 group shadow-sm md:flex ${
-              isBugModalOpen
-                ? 'bg-green text-white border-[1.5px] border-green'
-                : 'surface-floating hover:text-green'
-            }`}
-            aria-label={isBugModalOpen ? "Close bug report" : "Report a bug"}
-          >
-            {isBugModalOpen ? (
-              <X size={20} weight="regular" />
-            ) : (
-              <Bug size={20} weight="regular" className="transition-transform group-hover:rotate-12" />
-            )}
-          </button>
+      {/* Bug Report Flow — self-contained with floating trigger + modal */}
+      {!isWritingRoute && <BugReportFlow />}
 
-          <ModalSheet
-            isOpen={isBugModalOpen}
-            onClose={() => setIsBugModalOpen(false)}
-            title="Report a bug"
-            description="Tell us what broke or felt off. Add the page or step if you can."
-            icon={<Bug size={20} weight="duotone" />}
-            tone="sage"
-            size="md"
-          >
-            {!isSubmitted ? (
-              <form onSubmit={handleBugSubmit} className="space-y-5">
-                <div className="space-y-2">
-                  <label htmlFor="bug-message" className="sr-only">
-                    Describe the bug
-                  </label>
-                  <textarea
-                    id="bug-message"
-                    autoFocus
-                    data-autofocus="true"
-                    required
-                    placeholder="Describe what happened..."
-                    value={bugMessage}
-                    onChange={(e) => setBugMessage(e.target.value)}
-                    className="w-full min-h-[160px] resize-none rounded-[20px] border border-border/40 bg-body/50 p-5 font-serif text-[17px] leading-relaxed text-gray-text transition-colors placeholder:text-gray-nav/50 focus:border-green/30 focus:outline-none focus:ring-2 focus:ring-green/10"
-                  />
-                  {submitError && (
-                    <p className="text-[12px] font-bold text-clay animate-in fade-in slide-in-from-top-1">
-                      {submitError}
-                    </p>
-                  )}
-                </div>
-
-                <Button
-                  type="submit"
-                  variant="primary"
-                  size="sm"
-                  isLoading={isSubmitting}
-                  disabled={!bugMessage.trim()}
-                  className="h-11 w-full rounded-xl"
-                >
-                  Send report
-                  <PaperPlaneTilt size={16} weight="regular" className="ml-2" />
-                </Button>
-              </form>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-6 text-center animate-in fade-in zoom-in duration-500">
-                <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-green/10 text-green">
-                  <CheckCircle size={36} weight="fill" />
-                </div>
-                <h3 className="label-caps mb-2">Thank you</h3>
-                <p className="font-serif text-[16px] italic leading-relaxed text-gray-light">
-                  We've received your report. <br /> Your feedback helps a lot.
-                </p>
-              </div>
-            )}
-          </ModalSheet>
-        </>
-      )}
-
+      {/* Invite Modal */}
       <ModalSheet
         isOpen={isInviteModalOpen}
         onClose={() => setIsInviteModalOpen(false)}

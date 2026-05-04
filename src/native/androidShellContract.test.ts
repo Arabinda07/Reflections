@@ -12,7 +12,7 @@ describe('Android shell contract', () => {
     const authenticatedShell = read('layouts/AuthenticatedAppShell.tsx');
     const statusBarHook = read('hooks/useNativeStatusBar.ts');
     const styles = read('android/app/src/main/res/values/styles.xml');
-    const authContext = read('context/AuthContext.tsx');
+    const appBootstrapper = read('components/ui/AppBootstrapper.tsx');
 
     expect(app).not.toContain("import { useNativeStatusBar }");
     expect(authenticatedShell).toContain('useNativeStatusBar');
@@ -21,8 +21,8 @@ describe('Android shell contract', () => {
     expect(app).not.toContain('@capacitor/splash-screen');
     expect(app).not.toContain('SplashScreen.hide');
     expect(styles).not.toContain('Theme.SplashScreen');
-    expect(authContext).toContain('NATIVE_STARTUP_MIN_MS');
-    expect(authContext).not.toContain('2500');
+    expect(appBootstrapper).toContain('NATIVE_STARTUP_MIN_MS');
+    expect(appBootstrapper).not.toContain('2500');
   });
 
   it('routes Android back presses through the shared registry and native toast bridge', () => {
@@ -31,6 +31,8 @@ describe('Android shell contract', () => {
     const dashboardLayout = read('layouts/DashboardLayout.tsx');
     const mainActivity = read('android/app/src/main/java/com/arabinda/reflections/MainActivity.java');
 
+    const mobileSidebar = read('layouts/MobileSidebar.tsx');
+
     expect(modalSheet).toContain('registerAndroidBackAction');
     expect(backHook).toContain('Press back again to exit');
     expect(backHook).toContain('App.exitApp');
@@ -38,7 +40,7 @@ describe('Android shell contract', () => {
     expect(backHook).toContain("navigate(fallbackOutcome.path)");
     expect(backHook).toContain('isListenerActive');
     expect(backHook).toContain('lastExitPromptAtRef.current = null');
-    expect(dashboardLayout).toContain('setIsBugModalOpen(false)');
+    expect(mobileSidebar).toContain('onBugReport');
     expect(mainActivity).toContain('registerPlugin(NativeToastPlugin.class);');
   });
 
@@ -51,14 +53,15 @@ describe('Android shell contract', () => {
     const createNote = read('pages/dashboard/CreateNote.tsx');
     const safeArea = read('src/native/safeArea.ts');
 
-    expect(app).not.toContain("import { useNativeOAuthListener }");
-    expect(authenticatedShell).toContain('useNativeOAuthListener');
+    expect(app).toContain("import { useNativeOAuthListener }");
+    expect(authenticatedShell).not.toContain('useNativeOAuthListener');
     expect(oauthHook).toContain('consumeNativeGoogleAuthSuccessRedirectPath');
     expect(oauthHook).toContain("import('@capacitor/browser')");
     expect(googleOAuth).toContain('skipBrowserRedirect: true');
     expect(googleOAuth).toContain("import('@capacitor/browser')");
     expect(googleOAuth).toContain('Browser.open');
-    expect(dashboardLayout).toContain('NATIVE_TOP_CONTROL_OFFSET');
+    const mobileSidebar = read('layouts/MobileSidebar.tsx');
+    expect(mobileSidebar).toContain('NATIVE_TOP_CONTROL_OFFSET');
     expect(createNote).toContain('NATIVE_TOP_CONTROL_OFFSET');
     expect(createNote).toContain('NATIVE_PAGE_TOP_PADDING');
     expect(safeArea).toContain('env(safe-area-inset-top)');

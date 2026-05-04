@@ -1,6 +1,6 @@
 import React, { Suspense, lazy, useEffect, useState } from 'react';
 import { MotionConfig } from 'motion/react';
-import { AuthProvider } from '../context/AuthContext';
+
 import { PWAInstallProvider } from '../context/PWAInstallContext';
 import { ToastProvider } from '../components/ui/Toast';
 import { useSync } from '../hooks/useSync';
@@ -62,7 +62,7 @@ const SyncBoundary: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 export const AuthenticatedAppShell: React.FC = () => {
   return (
     <PWAInstallProvider>
-      <AuthProvider>
+
         <ToastProvider>
           <DeferredVercelVitals />
           <SyncBoundary>
@@ -71,7 +71,7 @@ export const AuthenticatedAppShell: React.FC = () => {
             </MotionConfig>
           </SyncBoundary>
         </ToastProvider>
-      </AuthProvider>
+
     </PWAInstallProvider>
   );
 };

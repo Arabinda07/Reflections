@@ -5,3 +5,5 @@ export const getAuthenticatedUser = async () => {
   if (!user) throw new Error('User not authenticated');
   return user;
 };
+
+export const getAuthenticatedUserId = async () => (await getAuthenticatedUser()).id;

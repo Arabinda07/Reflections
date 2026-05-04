@@ -1,11 +1,11 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useAuthStore } from '../../hooks/useAuthStore';
 import { RoutePath } from '../../types';
 import { RouteLoadingFrame } from '../ui/RouteLoadingFrame';
 
 export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated, isInitialCheckDone } = useAuth();
+  const { isAuthenticated, isInitialCheckDone } = useAuthStore();
   const location = useLocation();
 
   if (!isInitialCheckDone) {

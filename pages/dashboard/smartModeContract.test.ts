@@ -23,9 +23,10 @@ describe('Smart Mode Sanctuary contract', () => {
     expect(account).toContain('Turn off Smart Mode');
     expect(account).toContain('Enable Smart Mode');
 
-    expect(createNote).toContain('smartModeEnabled');
-    expect(createNote).toContain('autoIngestSavedNote');
-    expect(createNote).not.toContain('processNoteIntoWiki');
+    const noteDraft = read('hooks/useNoteDraft.ts');
+    expect(noteDraft).toContain('smartModeEnabled');
+    expect(noteDraft).toContain('autoIngestSavedNote');
+    expect(noteDraft).not.toContain('processNoteIntoWiki');
   });
 
   it('persists Smart Mode and absorb state in the schema and profile access model', () => {

@@ -16,7 +16,7 @@ describe('public landing performance contract', () => {
     expect(app).toContain("import { Landing } from './pages/dashboard/Landing';");
     expect(app).toContain('path={RoutePath.HOME} element={<Landing />}');
     expect(app).toContain("const AuthenticatedAppShell = lazy(() => import('./layouts/AuthenticatedAppShell')");
-    expect(app).not.toContain("import { AuthProvider } from './context/AuthContext';");
+
     expect(app).not.toContain("import { PWAInstallProvider } from './context/PWAInstallContext';");
     expect(app).not.toContain("import { ProtectedRoute } from './components/auth/ProtectedRoute';");
     expect(app).not.toContain("import { ToastProvider } from './components/ui/Toast';");
@@ -27,7 +27,7 @@ describe('public landing performance contract', () => {
     expect(app).not.toContain("import { useNativeOAuthListener } from './hooks/useNativeOAuthListener';");
 
     const shell = read('layouts/AuthenticatedAppShell.tsx');
-    expect(shell).toContain("import { AuthProvider } from '../context/AuthContext';");
+
     expect(shell).toContain("import { PWAInstallProvider } from '../context/PWAInstallContext';");
     expect(shell).toContain("import { DashboardLayout } from './DashboardLayout';");
     expect(shell).toContain("import { MotionConfig } from 'motion/react';");

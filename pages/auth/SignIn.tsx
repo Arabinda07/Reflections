@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { Surface } from '@/components/ui/Surface';
 import { RoutePath } from '@/types';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthStore } from '@/hooks/useAuthStore';
 import { useDocumentMeta } from '@/hooks/useDocumentMeta';
 import { supabase } from '@/src/supabaseClient';
 import {
@@ -34,7 +34,7 @@ export const SignIn: React.FC = () => {
   });
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, isInitialCheckDone } = useAuth();
+  const { isAuthenticated, isInitialCheckDone } = useAuthStore();
   const [loading, setLoading] = useState(() => isGoogleOAuthCallbackUrl(window.location.href));
   const [error, setError] = useState<string | null>(null);
   const [email, setEmail] = useState(location.state?.email || '');

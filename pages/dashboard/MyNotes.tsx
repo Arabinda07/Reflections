@@ -25,7 +25,7 @@ import { PageContainer } from '../../components/ui/PageContainer';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { StorageImage } from '../../components/ui/StorageImage';
 import { Surface } from '../../components/ui/Surface';
-import { useAuth } from '../../context/AuthContext';
+import { useAuthStore } from '../../hooks/useAuthStore';
 import { noteService } from '../../services/noteService';
 import { Note, RoutePath } from '../../types';
 import { buildNotePreviewText } from './noteContent';
@@ -39,7 +39,7 @@ const MyNotesCalendar = lazy(() =>
 export const MyNotes: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
