@@ -461,7 +461,7 @@ export const Insights: React.FC = () => {
               </div>
             </div>
             {/* Subtle background glow effect on hover */}
-            <div className="dashboard-accent-glow pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+
           </Surface>
 
           <Surface variant="bezel" tone="sage" className="group relative overflow-hidden rounded-[2.5rem] transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_rgba(34,197,94,0.05)]">

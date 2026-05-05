@@ -431,7 +431,7 @@ export const LifeWiki: React.FC = () => {
             </MetadataPill>
           </div>
         </Link>
-        <div className="dashboard-accent-glow pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+
       </div>
     );
   };

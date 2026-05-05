@@ -891,14 +891,6 @@ select:focus-visible,
     border-color: oklch(from var(--surface-current-accent) l c h / 0.26);
   }
 
-  .dashboard-accent-glow {
-    background:
-      linear-gradient(
-        135deg,
-        oklch(from var(--surface-current-accent) 0.76 0.08 h / 0.08),
-        transparent 64%
-      );
-  }
 
   .tabular-nums {
     font-variant-numeric: tabular-nums;
