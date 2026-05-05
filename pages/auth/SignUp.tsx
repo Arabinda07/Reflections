@@ -105,7 +105,7 @@ export const SignUp: React.FC = () => {
         });
       } else if (data.session) {
         await recordAcceptedReferral();
-        navigate(postLoginPath, { replace: true });
+        navigate(postLoginPath, { replace: true, state: { justLoggedIn: true } });
       }
     } catch (err) {
       console.error('Signup error:', err);
@@ -153,7 +153,7 @@ export const SignUp: React.FC = () => {
         setLoading(false);
       } else {
         await recordAcceptedReferral();
-        navigate(postLoginPath, { replace: true });
+        navigate(postLoginPath, { replace: true, state: { justLoggedIn: true } });
       }
     } catch (err) {
       console.error('Verified Email error:', err);
@@ -187,41 +187,47 @@ export const SignUp: React.FC = () => {
             />
 
             <form onSubmit={handleSubmit} className="space-y-5">
-              <Input
-                id="name"
-                name="name"
-                type="text"
-                label="Full name"
-                required
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                placeholder="Enter your name"
-                icon={User}
-              />
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                label="Email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                placeholder="Enter your email"
-                icon={Envelope}
-              />
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                label="Password"
-                autoComplete="new-password"
-                required
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                placeholder="Create a password"
-                icon={Lock}
-              />
+              <motion.div 
+                animate={error ? { x: [-8, 8, -6, 6, -4, 4, 0] } : {}} 
+                transition={{ duration: 0.4 }}
+                className="space-y-5"
+              >
+                <Input
+                  id="name"
+                  name="name"
+                  type="text"
+                  label="Full name"
+                  required
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  placeholder="Enter your name"
+                  icon={User}
+                />
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  label="Email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  placeholder="Enter your email"
+                  icon={Envelope}
+                />
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  label="Password"
+                  autoComplete="new-password"
+                  required
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  placeholder="Create a password"
+                  icon={Lock}
+                />
+              </motion.div>
 
               <label htmlFor="newsletter" className="mt-4 flex min-h-11 cursor-pointer select-none items-center gap-3 rounded-[var(--radius-control)] pr-2 text-[14px] font-medium text-gray-text">
                 <span className="relative flex h-11 w-11 shrink-0 items-center justify-center">

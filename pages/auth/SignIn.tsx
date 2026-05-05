@@ -74,7 +74,7 @@ export const SignIn: React.FC = () => {
       if (signInError) {
         setError(signInError.message);
       } else {
-        navigate(postLoginPath, { replace: true });
+        navigate(postLoginPath, { replace: true, state: { justLoggedIn: true } });
       }
     } catch (err) {
       console.error('Login error:', err);
@@ -122,7 +122,7 @@ export const SignIn: React.FC = () => {
         setError(authError || 'Failed to sign in with verified email.');
         setLoading(false);
       } else {
-        navigate(postLoginPath, { replace: true });
+        navigate(postLoginPath, { replace: true, state: { justLoggedIn: true } });
       }
     } catch (err) {
       console.error('Verified Email error:', err);
@@ -201,30 +201,36 @@ export const SignIn: React.FC = () => {
             ) : null}
 
             <form onSubmit={handleSubmit} className="space-y-5">
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                label="Email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                placeholder="Enter your email"
-                icon={Envelope}
-              />
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                label="Password"
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                placeholder="Enter your password"
-                icon={Lock}
-              />
+              <motion.div 
+                animate={error ? { x: [-8, 8, -6, 6, -4, 4, 0] } : {}} 
+                transition={{ duration: 0.4 }}
+                className="space-y-5"
+              >
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  label="Email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  placeholder="Enter your email"
+                  icon={Envelope}
+                />
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  label="Password"
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  placeholder="Enter your password"
+                  icon={Lock}
+                />
+              </motion.div>
 
               <div className="flex justify-end">
                 <button

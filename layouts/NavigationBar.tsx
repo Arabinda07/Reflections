@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'motion/react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Moon,
@@ -184,12 +185,11 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
             aria-expanded={isMobileMenuOpen}
           >
             <div className="relative h-6 w-6">
-              <div className={`absolute inset-0 transition-all duration-200 ease-out-expo ${isMobileMenuOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
-                <X size={24} weight="regular" />
-              </div>
-              <div className={`absolute inset-0 transition-all duration-200 ease-out-expo ${!isMobileMenuOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}>
-                <List size={24} weight="regular" />
-              </div>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-current">
+                <motion.line x1="4" y1="6" x2="20" y2="6" animate={isMobileMenuOpen ? { x1: 6, y1: 6, x2: 18, y2: 18 } : { x1: 4, y1: 6, x2: 20, y2: 6 }} transition={{ duration: 0.3 }} />
+                <motion.line x1="4" y1="12" x2="20" y2="12" animate={isMobileMenuOpen ? { opacity: 0 } : { opacity: 1 }} transition={{ duration: 0.2 }} />
+                <motion.line x1="4" y1="18" x2="20" y2="18" animate={isMobileMenuOpen ? { x1: 6, y1: 18, x2: 18, y2: 6 } : { x1: 4, y1: 18, x2: 20, y2: 18 }} transition={{ duration: 0.3 }} />
+              </svg>
             </div>
           </button>
         </div>

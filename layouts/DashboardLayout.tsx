@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, useOutlet } from 'react-router-dom';
+import { motion, AnimatePresence } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { PaperPlaneTilt } from '@phosphor-icons/react';
 import {
@@ -52,6 +53,7 @@ const footerLinkClass =
 export const DashboardLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const outlet = useOutlet();
   const { isAuthenticated } = useAuthStore();
   const routeSurfaceScopeClass = useSurfaceScope();
 
@@ -137,7 +139,18 @@ export const DashboardLayout: React.FC = () => {
           <SyncBanner />
         </React.Suspense>
         <div className="w-full flex-1 flex flex-col">
-          <Outlet />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="flex-1 flex flex-col w-full"
+            >
+              {outlet}
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         {/* Global Footer - Positioned for full-width background with centered content */}

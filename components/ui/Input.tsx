@@ -22,7 +22,7 @@ export const Input: React.FC<InputProps> = ({ label, error, icon: Icon, classNam
           </div>
         )}
         <input
-          className={`input-surface w-full h-12 px-4 text-[15px] font-semibold placeholder:text-gray-nav placeholder:font-medium disabled:cursor-not-allowed disabled:opacity-50 focus:border-green focus:ring-2 focus:ring-green/10 ${
+          className={`input-surface w-full h-12 px-4 text-[15px] font-semibold placeholder:text-gray-nav placeholder:font-medium disabled:cursor-not-allowed disabled:opacity-50 focus:border-green focus:ring-2 focus:ring-green/10 transition-all duration-300 ease-out-expo ${
             Icon ? 'pl-12' : ''
           } ${error ? 'border-clay' : ''} ${className}`}
           {...props}

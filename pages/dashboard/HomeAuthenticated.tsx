@@ -25,6 +25,7 @@ import { Button } from '../../components/ui/Button';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { useToast } from '../../components/ui/Toast';
 import { useAuthStore } from '../../hooks/useAuthStore';
+import { useHaptics } from '../../hooks/useHaptics';
 import { aiService } from '../../services/aiService';
 import { moodCheckinService } from '../../services/engagementServices';
 import { noteService } from '../../services/noteService';
@@ -117,6 +118,7 @@ const BENTO_VIEWPORT_CONFIG = { once: true, margin: "-100px" };
 export const HomeAuthenticated: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const haptics = useHaptics();
   const isFromSave = location.state?.fromSave;
   const { user } = useAuthStore();
   const [noteCount, setNoteCount] = useState<number | null>(null);
@@ -267,6 +269,14 @@ export const HomeAuthenticated: React.FC = () => {
   const handlePreviousOnboardingStep = useCallback(() => {
     setOnboardingStep((current) => Math.max(current - 1, 0));
   }, []);
+
+  useEffect(() => {
+    if (location.state?.justLoggedIn) {
+      haptics.success();
+      // Clear the state so it doesn't trigger again on reload
+      window.history.replaceState({}, '');
+    }
+  }, [location.state, haptics]);
 
   useEffect(() => {
     const fetchCount = async () => {
@@ -660,8 +670,19 @@ export const HomeAuthenticated: React.FC = () => {
               </div>
 
               <div className="mb-6">
-                <p className="dashboard-stat-value">
-                  {isCountLoading ? '...' : displayCount}
+                <p className="dashboard-stat-value flex items-center overflow-hidden h-[1.2em]">
+                  <AnimatePresence mode="popLayout">
+                    <motion.span
+                      key={isCountLoading ? 'loading' : displayCount}
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      exit={{ y: -20, opacity: 0 }}
+                      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                      className="inline-block"
+                    >
+                      {isCountLoading ? '...' : displayCount}
+                    </motion.span>
+                  </AnimatePresence>
                 </p>
                 <p className="mt-1 text-sm font-semibold text-gray-nav">reflections saved</p>
               </div>
@@ -673,7 +694,7 @@ export const HomeAuthenticated: React.FC = () => {
                   aria-label="View all reflections"
                 >
                   <div className="flex items-center gap-3">
-                    <FolderOpen size={18} weight="duotone" className="text-gray-nav group-hover:text-green transition-colors" />
+                    <FolderOpen size={18} weight="duotone" className="text-gray-nav group-hover:text-green transition-transform duration-300 group-hover:rotate-6" />
                     <div>
                       <p className="dashboard-action-title dashboard-hover-title">View archive</p>
                       <p className="dashboard-action-description">Read saved reflections</p>
@@ -688,7 +709,7 @@ export const HomeAuthenticated: React.FC = () => {
                   aria-label="View writing patterns"
                 >
                   <div className="flex items-center gap-3">
-                    <Brain size={18} weight="duotone" className="text-sky group-hover:text-sky transition-colors" />
+                    <Brain size={18} weight="duotone" className="text-sky transition-transform duration-300 group-hover:-rotate-6" />
                     <div>
                       <p className="dashboard-action-title dashboard-hover-title">Writing patterns</p>
                       <p className="dashboard-action-description">Mood, rhythm, and recurring themes</p>

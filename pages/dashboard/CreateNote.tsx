@@ -84,13 +84,21 @@ interface TaskRowProps {
 
 const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeTask }) => {
   const [showCompletedText, setShowCompletedText] = useState(task.completed);
+  const [isSwipingToDelete, setIsSwipingToDelete] = useState(false);
   const [rippleKey, setRippleKey] = useState(0);
+  const haptics = useHaptics();
   const wasCompleted = useRef(task.completed);
   const taskLabel = task.text.trim() || 'untitled task';
 
   useEffect(() => {
     if (task.completed) {
-      if (!wasCompleted.current) setRippleKey((key) => key + 1);
+      if (!wasCompleted.current) {
+        setRippleKey((key) => key + 1);
+        // Fire haptic when checking off
+        if (window.navigator && window.navigator.vibrate) {
+            window.navigator.vibrate(10);
+        }
+      }
       const timer = window.setTimeout(() => setShowCompletedText(true), 180);
       wasCompleted.current = true;
       return () => window.clearTimeout(timer);
@@ -102,14 +110,23 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
   return (
     <div className="relative overflow-hidden rounded-2xl mb-1 group/row">
       <div className="absolute inset-0 flex items-center justify-end bg-clay/10 px-5 rounded-2xl">
-        <Trash size={18} weight="fill" className="text-clay transition-transform group-hover/row:scale-110" />
+        <Trash size={18} weight="fill" className={`text-clay transition-transform duration-300 ${isSwipingToDelete ? 'scale-125' : 'group-hover/row:scale-110'}`} />
       </div>
       <motion.div
         drag="x"
-        dragConstraints={{ left: -80, right: 0 }}
-        dragElastic={0.2}
+        dragConstraints={{ left: -100, right: 0 }}
+        dragElastic={0.4}
+        onDrag={(e, info) => {
+          if (info.offset.x < -60 && !isSwipingToDelete) {
+             setIsSwipingToDelete(true);
+             haptics.impactMedium();
+          } else if (info.offset.x >= -60 && isSwipingToDelete) {
+             setIsSwipingToDelete(false);
+          }
+        }}
         onDragEnd={(e, { offset, velocity }) => {
-          if (offset.x < -50 || velocity.x < -500) {
+          setIsSwipingToDelete(false);
+          if (offset.x < -60 || velocity.x < -500) {
             removeTask(task.id);
           }
         }}
@@ -144,17 +161,26 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
         </div>
       </button>
 
-      <input
-        type="text"
-        value={task.text}
-        onChange={(e) => updateTask(task.id, { text: e.target.value })}
-        readOnly={task.completed}
-        placeholder="What needs to be done?"
-        aria-label={`Edit task: ${taskLabel}`}
-        className={`relative z-10 flex-1 bg-transparent border-none outline-none font-bold text-[14px] text-gray-text placeholder:text-gray-nav/40 transition-colors ${
-          showCompletedText ? 'line-through text-gray-nav decoration-green decoration-2' : ''
-        }`}
-      />
+      <div className="relative flex-1 z-10 flex items-center">
+        <input
+          type="text"
+          value={task.text}
+          onChange={(e) => updateTask(task.id, { text: e.target.value })}
+          readOnly={task.completed}
+          placeholder="What needs to be done?"
+          aria-label={`Edit task: ${taskLabel}`}
+          className={`w-full bg-transparent border-none outline-none font-bold text-[14px] placeholder:text-gray-nav/40 transition-all duration-300 ${
+            showCompletedText ? 'text-gray-text/40' : 'text-gray-text'
+          }`}
+        />
+        {/* Animated Strikethrough */}
+        <motion.div
+          initial={false}
+          animate={{ scaleX: showCompletedText ? 1 : 0, opacity: showCompletedText ? 1 : 0 }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
+          className="pointer-events-none absolute left-0 right-0 top-1/2 h-[2px] -translate-y-1/2 origin-left bg-green"
+        />
+      </div>
 
       <button
         type="button"
@@ -511,7 +537,7 @@ export const CreateNote: React.FC = () => {
         className="relative flex-1 w-full pb-40 px-6 sm:px-12 md:px-16 lg:px-24 transition-[padding] duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]"
         style={{ paddingTop: NATIVE_PAGE_TOP_PADDING }}
       >
-        <div className={`editor-writing-measure transition-[margin,width] duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isFocusModeActive ? 'mx-auto' : 'mr-auto lg:ml-12 xl:ml-24'}`}>
+        <div className={`editor-writing-measure transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isFocusModeActive ? 'mx-auto scale-[1.02]' : 'mr-auto lg:ml-12 xl:ml-24 scale-100'}`}>
           
           {/* Cover Image */}
           {imagePreview && (
@@ -661,11 +687,24 @@ export const CreateNote: React.FC = () => {
                   setIsSaveChoiceOpen(true);
                 }}
                 disabled={saving || isReleasing}
-                className="group relative h-16 w-16 rounded-full bg-green text-white shadow-2xl shadow-green/40 flex items-center justify-center transition-transform hover:scale-105"
+                className="group relative h-16 w-16 rounded-full bg-green text-white shadow-2xl shadow-green/40 flex items-center justify-center transition-transform hover:scale-105 disabled:opacity-90"
                 aria-label="Choose what to do with this reflection"
               >
+                {/* Breathing Pulse Effect during save */}
+                <AnimatePresence>
+                  {(saving || isReleasing) && (
+                    <motion.div
+                      initial={{ scale: 1, opacity: 0.8 }}
+                      animate={{ scale: 1.2, opacity: 0 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: 'easeOut' }}
+                      className="absolute inset-0 rounded-full bg-green pointer-events-none"
+                    />
+                  )}
+                </AnimatePresence>
+                
                 <div className="absolute inset-2 rounded-full bg-white/12 group-hover:scale-110 transition-transform duration-500 ease-out" />
-                {saving || isReleasing ? <CircleNotch size={28} className="animate-spin" /> : <FloppyDisk size={26} weight="fill" className="relative z-10" />}
+                {saving || isReleasing ? <CircleNotch size={28} className="relative z-10 animate-spin" /> : <FloppyDisk size={26} weight="fill" className="relative z-10" />}
               </motion.button>
             </Magnetic>
           )}

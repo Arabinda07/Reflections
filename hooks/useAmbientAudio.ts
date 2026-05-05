@@ -72,7 +72,7 @@ export function useAmbientAudio() {
   }, [activeId, volume]);
 
   const stopAll = useCallback(() => {
-    audioEngine.stopAll(1.5);
+    audioEngine.stopAll(0.8); // 800ms fade-out on pause
     setActiveId(null);
   }, []);
 

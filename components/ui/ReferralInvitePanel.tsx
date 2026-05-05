@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { motion } from 'motion/react';
 import { Check, CopySimple, PaperPlaneTilt, WarningCircle } from '@phosphor-icons/react';
 import { Button } from './Button';
 import { MetadataPill } from './MetadataPill';
@@ -129,9 +130,16 @@ export const ReferralInvitePanel: React.FC<ReferralInvitePanelProps> = ({ compac
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row">
-        <Button type="button" size="sm" onClick={handleShare} disabled={!inviteLink} className="min-h-11 w-full sm:w-auto">
-          Invite
-          <PaperPlaneTilt size={16} weight="bold" className="ml-2" />
+        <Button type="button" size="sm" onClick={handleShare} disabled={!inviteLink} className="min-h-11 w-full sm:w-auto overflow-hidden group relative">
+          <span className="relative z-10 flex items-center">
+            Invite
+            <motion.div
+              animate={status === 'Invite shared.' ? { x: 30, y: -30, opacity: 0, scale: 0.5 } : { x: 0, y: 0, opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <PaperPlaneTilt size={16} weight="bold" className="ml-2" />
+            </motion.div>
+          </span>
         </Button>
         <Button type="button" variant="secondary" size="sm" onClick={handleCopy} disabled={!inviteLink} className="min-h-11 w-full sm:w-auto">
           Copy link

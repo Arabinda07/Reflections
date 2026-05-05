@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import {
   ArrowLeft,
@@ -265,7 +265,8 @@ export const Insights: React.FC = () => {
             className="insights-section-header"
           />
 
-          {loading ? (
+          <div aria-live="polite" aria-busy={loading} className="w-full">
+            {loading ? (
             <Surface variant="flat" tone="sky" className="p-8 md:p-10">
               <WeeklyRecapLoadingSkeleton />
             </Surface>
@@ -615,6 +616,7 @@ export const Insights: React.FC = () => {
             </Link>
           </Surface>
           </>)}
+          </div>
         </div>
       </PageContainer>
     </>
