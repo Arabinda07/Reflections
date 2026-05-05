@@ -2,6 +2,7 @@ import type { FutureLetter } from '../types';
 import { getAuthenticatedUser } from './authUtils';
 import { futureLetterRemoteStore } from './futureLetterRemoteStore';
 import { ritualEventService } from './ritualService';
+import { formatLongDateUTC } from '../src/utils/dateFormatter';
 
 interface FutureLetterInput {
   title: string;
@@ -9,13 +10,7 @@ interface FutureLetterInput {
   openAt: string;
 }
 
-const formatOpenDate = (date: Date) =>
-  new Intl.DateTimeFormat('en', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-    timeZone: 'UTC',
-  }).format(date);
+
 
 export type FutureLetterOpenState = {
   letter: FutureLetter;
@@ -40,7 +35,7 @@ export const getFutureLetterOpenState = (
     return {
       letter,
       state: 'locked',
-      actionLabel: `Locked until ${formatOpenDate(openDate)}`,
+      actionLabel: `Locked until ${formatLongDateUTC(openDate)}`,
     };
   }
 

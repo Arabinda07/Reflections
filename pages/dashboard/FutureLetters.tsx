@@ -14,6 +14,7 @@ import {
   getFutureLetterOpenState,
 } from '../../services/futureLetterService';
 import { FutureLetter, RoutePath } from '../../types';
+import { formatLongDateUTC } from '../../src/utils/dateFormatter';
 
 type DateOptionId = '7d' | '30d' | '6m' | '1y' | 'custom';
 
@@ -44,14 +45,6 @@ const toDateInputValue = (date: Date) => {
   return `${year}-${month}-${day}`;
 };
 
-const dateFormatter = new Intl.DateTimeFormat('en', {
-  month: 'short',
-  day: 'numeric',
-  year: 'numeric',
-});
-
-const formatDate = (date: string | Date) =>
-  dateFormatter.format(date instanceof Date ? date : new Date(date));
 
 const getOpenDate = (optionId: DateOptionId, customDate: string) => {
   if (optionId === 'custom') {
@@ -258,7 +251,7 @@ export const FutureLetters: React.FC = () => {
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <p className="dashboard-supporting-text">
                     {isOpenDateValid
-                      ? `This letter opens on ${formatDate(openDate)}.`
+                      ? `This letter opens on ${formatLongDateUTC(openDate)}.`
                       : 'Choose an open date before scheduling.'}
                   </p>
                   <Button type="submit" disabled={!content.trim() || !isOpenDateValid} isLoading={isScheduling} className="w-full sm:w-auto">
@@ -315,7 +308,7 @@ export const FutureLetters: React.FC = () => {
                                     {letter.title}
                                   </h3>
                                   <p className="dashboard-caption mt-1 opacity-70">
-                                    Opens {formatDate(letter.openAt)}
+                                    Opens {formatLongDateUTC(letter.openAt)}
                                   </p>
                                 </div>
                                 <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-500 group-hover:scale-110 ${isLocked ? 'bg-body/50 text-gray-nav' : 'bg-green/10 text-green group-hover:rotate-12'}`}>
@@ -343,7 +336,7 @@ export const FutureLetters: React.FC = () => {
                                   isOpening
                                     ? `Opening ${letter.title}`
                                     : isLocked
-                                      ? `Locked until ${formatDate(letter.openAt)}`
+                                      ? `Locked until ${formatLongDateUTC(letter.openAt)}`
                                       : openState.actionLabel
                                 }
                               >
@@ -372,7 +365,7 @@ export const FutureLetters: React.FC = () => {
         {openedLetter ? (
           <div className="space-y-5">
             <p className="dashboard-caption opacity-70">
-              Opened {openedLetter.openedAt ? formatDate(openedLetter.openedAt) : 'today'}
+              Opened {openedLetter.openedAt ? formatLongDateUTC(openedLetter.openedAt) : 'today'}
             </p>
             <div className="surface-inline-panel dashboard-letter-text whitespace-pre-wrap rounded-[22px] p-5">
               {openedLetter.content}
