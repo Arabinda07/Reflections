@@ -174,8 +174,7 @@ export default defineConfig(() => {
               !dep.includes('vendor-analytics') && 
               !dep.includes('vendor-supabase') &&
               !dep.includes('vendor-calendar') &&
-              !dep.includes('vendor-editor') &&
-              !dep.includes('vendor-lottie')
+              !dep.includes('vendor-editor')
             );
           }
         },

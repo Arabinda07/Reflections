@@ -32,8 +32,8 @@ const reloadWithCacheBust = () => {
 };
 
 window.addEventListener('vite:preloadError', () => {
-  console.warn("Vite preload error detected. Silently reloading to fetch new chunks...");
-  reloadWithCacheBust();
+  console.warn("Vite preload error detected. Attempting to recover from stale app shell...");
+  void recoverFromStaleAppShell("vite:preloadError");
 });
 
 const clearBrowserManagedAppCaches = async () => {
