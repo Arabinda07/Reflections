@@ -10,7 +10,8 @@ import {
   Hash,
   Leaf,
 } from '@phosphor-icons/react';
-import { DotLottieReact, type DotLottie } from '@lottiefiles/dotlottie-react';
+import { type DotLottie } from '@lottiefiles/dotlottie-react';
+import { LottieAnimation } from '../../components/ui/LottieAnimation';
 import { Button } from '../../components/ui/Button';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { CompletionCardActions } from '../../components/ui/CompletionCardActions';
@@ -25,7 +26,8 @@ import { wikiService } from '../../services/wikiService';
 import { profileService } from '../../services/profileService';
 import { FREE_WIKI_MINIMUM_ENTRIES, getWikiInsightsGate } from '../../services/wellnessPolicy';
 import { buildWeeklyRecap } from '../../services/weeklyRecapService';
-import { moodCheckinService, ritualEventService } from '../../services/engagementServices';
+import { moodCheckinService } from '../../services/moodService';
+import { ritualEventService } from '../../services/ritualService';
 import { buildCompletionCardPayload } from '../../services/completionCardPayload';
 import { SANCTUARY_LEVEL_UP_ANIMATION_SRC } from '../../src/lottie/sanctuaryAnimation';
 import { DEFAULT_MOOD_TONE, getMoodConfig } from './moodConfig';
@@ -221,7 +223,7 @@ export const Insights: React.FC = () => {
               className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
             >
               <div className="h-[min(66vmin,34rem)] w-[min(66vmin,34rem)]">
-                <DotLottieReact
+                <LottieAnimation
                   src={SANCTUARY_LEVEL_UP_ANIMATION_SRC}
                   autoplay
                   loop={false}
@@ -274,7 +276,7 @@ export const Insights: React.FC = () => {
           ) : notes.length === 0 && weeklyRecap.writingDays === 0 ? (
             <EmptyState
               surface="bezel"
-              illustration={<DotLottieReact src="/assets/lottie/empty%20notes.json" className="h-full w-full" autoplay loop />}
+              illustration={<LottieAnimation src="/assets/lottie/empty notes.json" className="h-full w-full" autoplay loop />}
               title="Your story is being written."
               description="Patterns and insights will gather here as you continue to write and check in."
               action={
@@ -591,7 +593,7 @@ export const Insights: React.FC = () => {
               <div className="space-y-5">
                 {isWikiReadyToBuild ? (
                   <div className="h-28 w-28 overflow-hidden rounded-[2rem] bg-[oklch(from_var(--color-accent)_l_c_h_/_0.16)] transition-transform duration-500 group-hover:scale-105 group-hover:rotate-3">
-                    <DotLottieReact src={SANCTUARY_LEVEL_UP_ANIMATION_SRC} autoplay loop />
+                    <LottieAnimation src={SANCTUARY_LEVEL_UP_ANIMATION_SRC} autoplay loop />
                   </div>
                 ) : (
                   <div className="tone-icon tone-icon-sage h-14 w-14 rounded-2xl transition-transform duration-500 ease-out-expo group-hover:scale-110 group-hover:rotate-6">

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { CompletionCardActions } from '../../components/ui/CompletionCardActions';
 import { buildCompletionCardPayload, type CompletionCardPayload } from '../../services/completionCardPayload';
-import { ritualEventService } from '../../services/engagementServices';
+import { ritualEventService } from '../../services/ritualService';
 import { RoutePath } from '../../types';
 
 export const ReleaseMode: React.FC = () => {

@@ -6,7 +6,7 @@ import { RoutePath } from '../types';
 import { noteService } from '../services/noteService';
 import { notePublishingOrchestrator } from '../services/notePublishingOrchestrator';
 import { profileService } from '../services/profileService';
-import { ritualEventService } from '../services/engagementServices';
+import { ritualEventService } from '../services/ritualService';
 import { getMonthlyNoteUsage } from '../services/wellnessPolicy';
 import {
   buildCreateNoteDraftSnapshot,

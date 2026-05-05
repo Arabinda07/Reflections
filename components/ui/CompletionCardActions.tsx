@@ -3,7 +3,7 @@ import { CopySimple, DownloadSimple, ShareNetwork } from '@phosphor-icons/react'
 import { Button } from './Button';
 import { CompletionCardPreview } from './CompletionCardPreview';
 import type { CompletionCardPayload } from '../../services/completionCardPayload';
-import { ritualEventService } from '../../services/engagementServices';
+import { ritualEventService } from '../../services/ritualService';
 
 interface CompletionCardActionsProps {
   payload: CompletionCardPayload;

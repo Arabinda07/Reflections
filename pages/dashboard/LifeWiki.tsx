@@ -9,7 +9,7 @@ import {
   Sparkle,
   Warning,
 } from '@phosphor-icons/react';
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { LottieAnimation } from '../../components/ui/LottieAnimation';
 import { Button } from '../../components/ui/Button';
 import { Alert } from '../../components/ui/Alert';
 import { MetadataPill } from '../../components/ui/MetadataPill';
@@ -456,7 +456,7 @@ export const LifeWiki: React.FC = () => {
             className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
           >
             <div className="h-[min(66vmin,34rem)] w-[min(66vmin,34rem)]">
-              <DotLottieReact src={SANCTUARY_LEVEL_UP_ANIMATION_SRC} autoplay loop={isRefreshingWiki || isEnteringWiki} />
+              <LottieAnimation src={SANCTUARY_LEVEL_UP_ANIMATION_SRC} autoplay loop={isRefreshingWiki || isEnteringWiki} />
             </div>
           </motion.div>
           <motion.div

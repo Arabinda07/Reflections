@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import { Check, CopySimple, PaperPlaneTilt, WarningCircle } from '@phosphor-icons/react';
 import { Button } from './Button';
 import { MetadataPill } from './MetadataPill';
-import { buildReferralLink, referralService } from '../../services/engagementServices';
+import { buildReferralLink, referralService } from '../../services/referralService';
 import type { ReferralInvite } from '../../types';
 import { useHaptics } from '../../hooks/useHaptics';
 import { useSound } from '../../hooks/useSound';

@@ -27,7 +27,7 @@ import { useToast } from '../../components/ui/Toast';
 import { useAuthStore } from '../../hooks/useAuthStore';
 import { useHaptics } from '../../hooks/useHaptics';
 import { aiService } from '../../services/aiService';
-import { moodCheckinService } from '../../services/engagementServices';
+import { moodCheckinService } from '../../services/moodService';
 import { noteService } from '../../services/noteService';
 import { DEFAULT_WELLNESS_PROMPTS } from '../../services/wellnessPrompts';
 import { supabase } from '../../src/supabaseClient';

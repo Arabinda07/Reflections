@@ -16,7 +16,7 @@ import {
 import { format, isSameDay } from 'date-fns';
 import { Button } from '../../components/ui/Button';
 import { Chip } from '../../components/ui/Chip';
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { LottieAnimation } from '../../components/ui/LottieAnimation';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
 import { LoadingState } from '../../components/ui/LoadingState';
@@ -396,7 +396,7 @@ export const MyNotes: React.FC = () => {
             ) : (
               <EmptyState
                 surface="bezel"
-                illustration={<DotLottieReact src="/assets/lottie/empty%20notes.json" className="h-full w-full" autoplay loop />}
+                illustration={<LottieAnimation src="/assets/lottie/empty notes.json" className="h-full w-full" autoplay loop />}
                 title={tagFilter ? `No reflections with “${tagFilter}” yet.` : 'Your library is ready when you are.'}
                 description={
                   tagFilter

@@ -24,7 +24,7 @@ import {
   requestVerifiedEmail,
 } from '@/src/auth/credentialManager';
 import { NEWSLETTER_SIGNUP_LABEL, buildNewsletterOptInMetadata } from '@/src/newsletter';
-import { referralService } from '@/services/engagementServices';
+import { referralService } from '@/services/referralService';
 import { trackGoogleAuthStartedDeferred } from '@/src/analytics/deferredEvents';
 
 export const SignUp: React.FC = () => {

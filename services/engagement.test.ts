@@ -1,19 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  buildReferralLink,
-  futureLetterService,
-  getFutureLetterOpenState,
-  moodCheckinService,
-  referralService,
-  ritualEventService,
-} from './engagementServices';
+import { moodCheckinService } from './moodService';
+import { ritualEventService } from './ritualService';
+import { futureLetterService, getFutureLetterOpenState } from './futureLetterService';
+import { buildReferralLink, referralService } from './referralService';
 import { supabase } from '../src/supabaseClient';
-import {
-  futureLetterRemoteStore,
-  moodRemoteStore,
-  referralRemoteStore,
-  ritualRemoteStore,
-} from './engagementRemoteStore';
+import { moodRemoteStore } from './moodRemoteStore';
+import { ritualRemoteStore } from './ritualRemoteStore';
+import { futureLetterRemoteStore } from './futureLetterRemoteStore';
+import { referralRemoteStore } from './referralRemoteStore';
 
 vi.mock('../src/supabaseClient', () => ({
   supabase: {
@@ -21,21 +15,30 @@ vi.mock('../src/supabaseClient', () => ({
   },
 }));
 
-vi.mock('./engagementRemoteStore', () => ({
+vi.mock('./moodRemoteStore', () => ({
   moodRemoteStore: {
     insert: vi.fn(),
     list: vi.fn(),
   },
+}));
+
+vi.mock('./ritualRemoteStore', () => ({
   ritualRemoteStore: {
     insert: vi.fn(),
     listSince: vi.fn(),
   },
+}));
+
+vi.mock('./futureLetterRemoteStore', () => ({
   futureLetterRemoteStore: {
     insert: vi.fn(),
     list: vi.fn(),
     fetchById: vi.fn(),
     updateStatus: vi.fn(),
   },
+}));
+
+vi.mock('./referralRemoteStore', () => ({
   referralRemoteStore: {
     fetchByUserId: vi.fn(),
     insert: vi.fn(),

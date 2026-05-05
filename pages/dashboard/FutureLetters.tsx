@@ -12,7 +12,7 @@ import { buildCompletionCardPayload, type CompletionCardPayload } from '../../se
 import {
   futureLetterService,
   getFutureLetterOpenState,
-} from '../../services/engagementServices';
+} from '../../services/futureLetterService';
 import { FutureLetter, RoutePath } from '../../types';
 
 type DateOptionId = '7d' | '30d' | '6m' | '1y' | 'custom';

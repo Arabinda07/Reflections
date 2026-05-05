@@ -16,7 +16,7 @@ import { RoutePath } from '../types';
 import { useAuthStore } from '../hooks/useAuthStore';
 import { useKeyboardShortcut } from '../src/hooks/useKeyboardShortcut';
 import { AnalyticsRouteTracker } from '../src/analytics/AnalyticsRouteTracker';
-import { referralService } from '../services/engagementServices';
+import { referralService } from '../services/referralService';
 import { useAndroidBackHandler } from '../src/native/useAndroidBackHandler';
 
 import { useSurfaceScope } from './SurfaceScope';
