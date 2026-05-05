@@ -99,6 +99,43 @@ export default {
         'space-12': 'var(--space-12)',
         'space-16': 'var(--space-16)',
       },
+      keyframes: {
+        'fade-in-up': {
+          from: { opacity: '0', transform: 'translateY(15px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
+        'fade-in': {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
+        },
+        'shake-x': {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '20%': { transform: 'translateX(-4px)' },
+          '40%': { transform: 'translateX(4px)' },
+          '60%': { transform: 'translateX(-4px)' },
+          '80%': { transform: 'translateX(4px)' },
+        },
+        'scale-in': {
+          from: { opacity: '0', transform: 'scale(0.95)' },
+          to: { opacity: '1', transform: 'scale(1)' },
+        },
+        'accordion-open': {
+          from: { 'grid-template-rows': '0fr', opacity: '0' },
+          to: { 'grid-template-rows': '1fr', opacity: '1' },
+        },
+        'accordion-close': {
+          from: { 'grid-template-rows': '1fr', opacity: '1' },
+          to: { 'grid-template-rows': '0fr', opacity: '0' },
+        },
+      },
+      animation: {
+        'fade-in-up': 'fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both',
+        'fade-in': 'fade-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both',
+        'shake-x': 'shake-x 0.4s ease-in-out',
+        'scale-in': 'scale-in 0.36s cubic-bezier(0.16, 1, 0.3, 1) both',
+        'accordion-open': 'accordion-open 0.35s cubic-bezier(0.16, 1, 0.3, 1) both',
+        'accordion-close': 'accordion-close 0.25s cubic-bezier(0.16, 1, 0.3, 1) both',
+      },
       transitionTimingFunction: {
         'out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',
       },

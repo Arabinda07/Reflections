@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+
 import { ArrowLeft, Feather, Wind } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
@@ -10,7 +10,7 @@ import { RoutePath } from '../../types';
 
 export const ReleaseMode: React.FC = () => {
   const navigate = useNavigate();
-  const shouldReduceMotion = useReducedMotion();
+
   const [text, setText] = useState('');
   const [isReleasing, setIsReleasing] = useState(false);
   const [isReleased, setIsReleased] = useState(false);
@@ -27,6 +27,7 @@ export const ReleaseMode: React.FC = () => {
     try {
       await ritualEventService.recordReleaseCompleted();
       setIsReleased(true);
+      setText('');
       setCardPayload(
         buildCompletionCardPayload({
           kind: 'release_completed',
@@ -68,12 +69,8 @@ export const ReleaseMode: React.FC = () => {
             </p>
           </div>
 
-          <AnimatePresence mode="wait" initial={false} onExitComplete={() => setText('')}>
             {!isReleased ? (
-              <motion.div
-                key="release-writing"
-                exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -18, filter: 'blur(10px)' }}
-                transition={{ duration: shouldReduceMotion ? 0 : 0.52, ease: [0.16, 1, 0.3, 1] }}
+              <div
                 className="release-writing-measure w-full space-y-7"
               >
                 <div className="surface-flat p-4 sm:p-6">
@@ -111,14 +108,10 @@ export const ReleaseMode: React.FC = () => {
                     Release
                   </Button>
                 </div>
-              </motion.div>
+              </div>
             ) : (
-              <motion.div
-                key="release-complete"
-                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: shouldReduceMotion ? 0 : 0.36, ease: [0.16, 1, 0.3, 1] }}
-                className="mx-auto w-full max-w-xl space-y-4 text-center"
+              <div
+                className="mx-auto w-full max-w-xl space-y-4 text-center animate-scale-in"
               >
                 <p className="font-serif text-2xl italic leading-relaxed text-gray-text">
                   Released. This can stay quiet now.
@@ -127,9 +120,8 @@ export const ReleaseMode: React.FC = () => {
                 <Button variant="ghost" onClick={() => navigate(RoutePath.HOME)} className="mx-auto">
                   Return home
                 </Button>
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
         </section>
       </div>
     </div>

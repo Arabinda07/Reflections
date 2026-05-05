@@ -15,7 +15,7 @@ import {
   Sparkle,
   Target,
 } from '@phosphor-icons/react';
-import { animate, motion, useReducedMotion, AnimatePresence, Variants } from 'motion/react';
+
 import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { isSameDay } from 'date-fns';
@@ -39,28 +39,7 @@ import {
   type HomeIntentionSummary,
 } from './homeIntentions';
 import { MOOD_CONFIG, MOOD_OPTIONS } from './moodConfig';
-const bentoContainerVariants: Variants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2,
-    },
-  },
-};
 
-const bentoItemVariants: Variants = {
-  hidden: { opacity: 0, y: 15 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.6,
-      ease: [0.16, 1, 0.3, 1] as [number, number, number, number],
-    },
-  },
-};
 
 const WRITING_NOTES = [
   {
@@ -113,7 +92,7 @@ const ONBOARDING_STEPS = [
 
 const onboardingStepIcons = [NotePencil, Feather, LockKey, Archive] as const;
 
-const BENTO_VIEWPORT_CONFIG = { once: true, margin: "-100px" };
+
 
 export const HomeAuthenticated: React.FC = () => {
   const navigate = useNavigate();
@@ -141,7 +120,7 @@ export const HomeAuthenticated: React.FC = () => {
   const [isCreatingTask, setIsCreatingTask] = useState(false);
   const [isIntentionModalOpen, setIsIntentionModalOpen] = useState(false);
   const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const { showToast } = useToast();
 
   const entranceDuration = isFromSave ? 0.3 : 0.8;
@@ -224,15 +203,19 @@ export const HomeAuthenticated: React.FC = () => {
       return;
     }
 
-    const controls = animate(0, noteCount, {
-      duration: 2,
-      ease: [0.16, 1, 0.3, 1],
-      onUpdate(value) {
-        setDisplayCount(Math.round(value));
-      },
-    });
+    let raf: number;
+    const start = performance.now();
+    const duration = 2000;
+    const step = (now: number) => {
+      const t = Math.min((now - start) / duration, 1);
+      // cubic-bezier(0.16, 1, 0.3, 1) approximation
+      const eased = 1 - Math.pow(1 - t, 3);
+      setDisplayCount(Math.round(eased * noteCount));
+      if (t < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
 
-    return () => controls.stop();
+    return () => cancelAnimationFrame(raf);
   }, [noteCount, shouldReduceMotion]);
 
   const handleCloseOnboarding = useCallback(() => {
@@ -451,14 +434,8 @@ export const HomeAuthenticated: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-body via-transparent to-transparent z-10" />
 
           <div className="relative z-20 h-full flex flex-col items-center justify-start pt-[10vh] text-center px-6">
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: entranceDuration,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-              className="max-w-4xl"
+            <div
+              className="max-w-4xl animate-fade-in-up"
             >
               <h1 className="h1-hero hero-ink mb-12 text-balance">
                 <span className="whitespace-nowrap">Welcome back,</span> <br />
@@ -466,22 +443,17 @@ export const HomeAuthenticated: React.FC = () => {
                   {user?.name?.split(' ')[0] || 'Reflector'}
                 </span>
               </h1>
-            </motion.div>
+            </div>
           </div>
 
 
         </section>
 
-        <motion.section
-          variants={bentoContainerVariants}
-          initial="hidden"
-          whileInView="show"
-          viewport={BENTO_VIEWPORT_CONFIG}
+        <section
           className="core-bento-grid"
         >
-          <motion.div
-            variants={bentoItemVariants}
-            className="group relative surface-flat overflow-hidden rounded-[2.5rem] p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full transition-[border-color,box-shadow] duration-500 ease-out-expo hover:shadow-[0_20px_50px_rgba(34,197,94,0.05)] hover:border-green/10"
+          <div
+            className="group relative surface-flat overflow-hidden rounded-[2.5rem] p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full transition-[border-color,box-shadow] duration-500 ease-out-expo hover:shadow-[0_20px_50px_rgba(34,197,94,0.05)] hover:border-green/10 animate-fade-in-up"
           >
             <div className="relative z-10">
               <div className="flex items-center justify-between mb-8">
@@ -562,17 +534,11 @@ export const HomeAuthenticated: React.FC = () => {
               </div>
 
               <div className="space-y-3 mt-4">
-                <AnimatePresence mode="popLayout">
                   {intentionSummary.items.length > 0 ? (
                     intentionSummary.items.slice(0, 3).map((intention) => (
-                      <motion.button
+                      <button
                         key={intention.id}
-                        layout
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        whileTap={{ scale: 0.98 }}
-                        className="w-full flex items-center gap-4 p-4 rounded-2xl border border-honey/15 bg-honey/5 hover:border-honey/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-honey/40 transition-colors text-left shadow-none group/btn"
+                        className="w-full flex items-center gap-4 p-4 rounded-2xl border border-honey/15 bg-honey/5 hover:border-honey/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-honey/40 transition-[colors,opacity,transform] text-left shadow-none group/btn active:scale-[0.98]"
                         onClick={() => handleToggleIntention(intention.noteId, intention.id)}
                         aria-label={`Mark "${intention.text}" from ${intention.noteTitle} as complete`}
                       >
@@ -584,19 +550,15 @@ export const HomeAuthenticated: React.FC = () => {
                             {intention.text}
                           </span>
                         </span>
-                      </motion.button>
+                      </button>
                     ))
                   ) : null}
 
                   {/* Completed intentions — crossed-off state */}
                   {intentionSummary.completedItems.map((intention) => (
-                    <motion.div
+                    <div
                       key={`done-${intention.id}`}
-                      layout
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 0.5 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      className="flex items-center gap-4 p-4 rounded-2xl text-left"
+                      className="flex items-center gap-4 p-4 rounded-2xl text-left opacity-50"
                     >
                       <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 border-green bg-green text-white">
                         <CheckCircleIcon size={12} weight="bold" />
@@ -606,9 +568,8 @@ export const HomeAuthenticated: React.FC = () => {
                           {intention.text}
                         </span>
                       </span>
-                    </motion.div>
+                    </div>
                   ))}
-                </AnimatePresence>
 
                 {/* Empty state — horizontal layout so icon doesn't push text down */}
                 {intentionSummary.items.length === 0 && intentionSummary.completedItems.length === 0 && (
@@ -649,12 +610,12 @@ export const HomeAuthenticated: React.FC = () => {
             </div>
             {/* Subtle background glow effect on hover */}
             <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-green/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-          </motion.div>
+          </div>
 
           <div className="grid gap-6">
-            <motion.div
-              variants={bentoItemVariants}
-              className="group relative surface-flat surface-tone-sky overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_rgba(14,165,233,0.05)]"
+            <div
+              className="group relative surface-flat surface-tone-sky overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_rgba(14,165,233,0.05)] animate-fade-in-up"
+              style={{ animationDelay: '0.1s' }}
             >
               <div className="relative z-10">
               <div className="mb-6 flex items-center gap-2 text-gray-nav">
@@ -666,18 +627,11 @@ export const HomeAuthenticated: React.FC = () => {
 
               <div className="mb-6">
                 <p className="dashboard-stat-value flex items-center overflow-hidden h-[1.2em]">
-                  <AnimatePresence mode="popLayout">
-                    <motion.span
-                      key={isCountLoading ? 'loading' : displayCount}
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      exit={{ y: -20, opacity: 0 }}
-                      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                    <span
                       className="inline-block"
                     >
                       {isCountLoading ? '...' : displayCount}
-                    </motion.span>
-                  </AnimatePresence>
+                    </span>
                 </p>
                 <p className="mt-1 text-sm font-semibold text-gray-nav">reflections saved</p>
               </div>
@@ -716,11 +670,11 @@ export const HomeAuthenticated: React.FC = () => {
             </div>
             {/* Subtle background glow effect on hover */}
 
-          </motion.div>
+          </div>
 
-            <motion.div
-              variants={bentoItemVariants}
-              className="group relative surface-flat surface-tone-honey overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_rgba(245,158,11,0.05)]"
+            <div
+              className="group relative surface-flat surface-tone-honey overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_rgba(245,158,11,0.05)] animate-fade-in-up"
+              style={{ animationDelay: '0.2s' }}
             >
               <div className="relative z-10">
               <div className="mb-8 flex items-center gap-2 text-gray-nav">
@@ -750,9 +704,9 @@ export const HomeAuthenticated: React.FC = () => {
               </div>
               {/* Subtle sweep effect on hover */}
               <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-honey/0 via-honey/5 to-honey/0 translate-x-[-100%] transition-transform duration-1000 group-hover:translate-x-[100%]" />
-            </motion.div>
+            </div>
           </div>
-        </motion.section>
+        </section>
       </div>
 
       <ModalSheet
@@ -795,17 +749,9 @@ export const HomeAuthenticated: React.FC = () => {
           </div>
         }
       >
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
+          <div
             key={currentOnboardingStep.title}
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
-            animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
-            exit={shouldReduceMotion ? undefined : { opacity: 0, y: -8 }}
-            transition={{
-              duration: shouldReduceMotion ? 0 : 0.24,
-              ease: [0.16, 1, 0.3, 1],
-            }}
-            className="onboarding-step-copy flex min-h-[18rem] flex-col justify-between gap-6 pb-1 sm:min-h-[19rem]"
+            className="onboarding-step-copy flex min-h-[18rem] flex-col justify-between gap-6 pb-1 sm:min-h-[19rem] animate-fade-in-up"
           >
             <div className="space-y-4">
               <p className="label-caps text-green" aria-live="polite">
@@ -839,8 +785,7 @@ export const HomeAuthenticated: React.FC = () => {
                 </div>
               </div>
             </div>
-          </motion.div>
-        </AnimatePresence>
+          </div>
       </ModalSheet>
 
       <ModalSheet
@@ -859,13 +804,8 @@ export const HomeAuthenticated: React.FC = () => {
           <p className="text-base font-medium leading-relaxed text-gray-light">
             Name the weather of this moment without writing a full reflection.
           </p>
-          <AnimatePresence mode="wait">
             {!checkInFeedback ? (
-              <motion.div
-                key="grid"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
+              <div
                 className="grid grid-cols-2 gap-3"
               >
                 {MOOD_OPTIONS.map((moodOption) => {
@@ -887,38 +827,28 @@ export const HomeAuthenticated: React.FC = () => {
                     </button>
                   );
                 })}
-              </motion.div>
+              </div>
             ) : (
-              <motion.div
-                key="success"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="flex flex-col items-center justify-center py-10 text-center"
+              <div
+                className="flex flex-col items-center justify-center py-10 text-center animate-scale-in"
               >
                 {checkInFeedback === 'error' ? (
                   <p className="text-sm font-bold text-clay">Could not save that just now.</p>
                 ) : (
                   <>
-                    <motion.div 
-                      animate={{ 
-                        scale: [1, 1.2, 1],
-                        rotate: [0, -10, 10, -10, 0]
-                      }}
-                      transition={{ duration: 0.6, ease: "easeOut" }}
-                      className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green/10 text-green"
+                    <div 
+                      className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green/10 text-green animate-shake-x"
                     >
                       {MOOD_CONFIG[checkInFeedback]?.icon && React.createElement(MOOD_CONFIG[checkInFeedback].icon, { size: 32, weight: "fill" })}
-                    </motion.div>
+                    </div>
                     <h3 className="label-caps mb-2 text-green">Recorded</h3>
                     <p className="font-serif text-[16px] italic leading-relaxed text-gray-light">
                       Your mood has been saved.
                     </p>
                   </>
                 )}
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
         </div>
       </ModalSheet>
       <ModalSheet

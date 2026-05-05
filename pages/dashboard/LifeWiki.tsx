@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+
 import ReactMarkdown from 'react-markdown';
 import {
   ArrowLeft,
@@ -214,7 +214,7 @@ export const LifeWiki: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { pageType } = useParams();
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const cameFromInsights = Boolean(location.state?.fromInsights);
   const shouldPlayEntryAnimation =
     !shouldReduceMotion && (location.pathname === RoutePath.WIKI || location.pathname === RoutePath.SANCTUARY);
@@ -437,33 +437,22 @@ export const LifeWiki: React.FC = () => {
   };
 
   const renderEntrance = () => (
-    <AnimatePresence>
-      {(isRefreshingWiki || isEnteringWiki) && (
-        <motion.div
-          initial={shouldReduceMotion ? false : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: shouldReduceMotion ? 0 : 0.35, ease: [0.16, 1, 0.3, 1] }}
-          className="fixed inset-0 z-overlay flex items-center justify-center overflow-hidden bg-body px-6"
+      (isRefreshingWiki || isEnteringWiki) ? (
+        <div
+          className="fixed inset-0 z-overlay flex items-center justify-center overflow-hidden bg-body px-6 animate-fade-in"
         >
           <div className="sanctuary-entrance-glow absolute inset-0" />
           <div className="sanctuary-entrance-scrim absolute inset-0" />
-          <motion.div
+          <div
             aria-hidden="true"
-            initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.96 }}
-            animate={{ opacity: shouldReduceMotion ? 0.14 : 0.8, scale: 1 }}
-            transition={{ delay: shouldReduceMotion ? 0 : 0.08, duration: shouldReduceMotion ? 0 : 0.55, ease: [0.16, 1, 0.3, 1] }}
-            className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
+            className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center animate-scale-in"
           >
             <div className="h-[min(66vmin,34rem)] w-[min(66vmin,34rem)]">
               <LottieAnimation src={SANCTUARY_LEVEL_UP_ANIMATION_SRC} autoplay loop={isRefreshingWiki || isEnteringWiki} />
             </div>
-          </motion.div>
-          <motion.div
-            initial={shouldReduceMotion ? false : { y: 16, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: shouldReduceMotion ? 0 : 0.12, duration: shouldReduceMotion ? 0 : 0.45, ease: [0.16, 1, 0.3, 1] }}
-            className="relative z-10 flex max-w-[42rem] flex-col items-center text-center"
+          </div>
+          <div
+            className="relative z-10 flex max-w-[42rem] flex-col items-center text-center animate-fade-in-up"
           >
             <p className="label-caps text-green">
               {isRefreshingWiki ? 'Reading only your saved notes' : 'Private reading room'}
@@ -476,10 +465,9 @@ export const LifeWiki: React.FC = () => {
                 ? 'The library is rebuilding from the writing you saved here.'
                 : 'Crossing into the library without leaving the calm of the page.'}
             </p>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          </div>
+        </div>
+      ) : null
   );
 
   if (articlePageType) {
@@ -492,11 +480,8 @@ export const LifeWiki: React.FC = () => {
           <div className="sanctuary-page-fade absolute inset-0 opacity-50" />
         </div>
         <PageContainer size="narrow" className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10 relative z-10">
-          <motion.div 
-            className="core-page-stack"
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 15 }}
-            animate={{ opacity: isEnteringWiki ? 0 : 1, y: isEnteringWiki ? 15 : 0 }}
-            transition={{ duration: shouldReduceMotion ? 0 : 0.6, ease: [0.16, 1, 0.3, 1] }}
+          <div 
+            className={`core-page-stack transition-[opacity,transform] duration-500 ease-out-expo ${isEnteringWiki ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}
           >
             <button
               onClick={() => navigate(RoutePath.SANCTUARY)}
@@ -678,7 +663,7 @@ export const LifeWiki: React.FC = () => {
                 </Surface>
               </article>
             )}
-            </motion.div>
+            </div>
         </PageContainer>
       </>
     );
@@ -692,11 +677,8 @@ export const LifeWiki: React.FC = () => {
       </div>
 
       <PageContainer className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10 relative z-10">
-        <motion.div 
-          className="core-page-stack"
-          initial={shouldReduceMotion ? false : { opacity: 0, y: 15 }}
-          animate={{ opacity: isEnteringWiki ? 0 : 1, y: isEnteringWiki ? 15 : 0 }}
-          transition={{ duration: shouldReduceMotion ? 0 : 0.6, ease: [0.16, 1, 0.3, 1] }}
+        <div 
+          className={`core-page-stack transition-[opacity,transform] duration-500 ease-out-expo ${isEnteringWiki ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}
         >
           <div className="flex items-center justify-between gap-4">
             <button 
@@ -876,7 +858,7 @@ export const LifeWiki: React.FC = () => {
               </div>
             </section>
           ) : null}
-        </motion.div>
+        </div>
       </PageContainer>
     </>
   );

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { 
   ArrowLeft, 
   FloppyDisk, 
@@ -133,18 +133,7 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
         layout="position"
         className={`group relative z-10 flex items-center gap-3 rounded-2xl p-3 bg-surface transition-colors duration-300 hover:bg-green/5 dark:hover:bg-white/5 ${task.completed ? 'opacity-60' : ''}`}
       >
-        <AnimatePresence>
-        {rippleKey > 0 && task.completed && (
-          <motion.span
-            key={rippleKey}
-            initial={{ scale: 0.2, opacity: 0.4 }}
-            animate={{ scale: 4, opacity: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-            className="pointer-events-none absolute left-5 top-1/2 h-10 w-10 -translate-y-1/2 rounded-full bg-green/30"
-          />
-        )}
-      </AnimatePresence>
+
 
       <button
         type="button"
@@ -155,9 +144,9 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
         <div className={`flex h-6 w-6 items-center justify-center rounded-lg border-2 transition-colors duration-300 ${
           task.completed ? 'border-green bg-green text-white' : 'border-border text-transparent group-hover/checkbox:border-green/50'
         }`}>
-          <motion.span animate={{ scale: task.completed ? 1 : 0 }}>
+          <span className={`transition-transform duration-300 ${task.completed ? 'scale-100' : 'scale-0'}`}>
             <Check size={14} weight="bold" />
-          </motion.span>
+          </span>
         </div>
       </button>
 
@@ -174,11 +163,8 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
           }`}
         />
         {/* Animated Strikethrough */}
-        <motion.div
-          initial={false}
-          animate={{ scaleX: showCompletedText ? 1 : 0, opacity: showCompletedText ? 1 : 0 }}
-          transition={{ duration: 0.3, ease: 'easeOut' }}
-          className="pointer-events-none absolute left-0 right-0 top-1/2 h-[2px] -translate-y-1/2 origin-left bg-green"
+        <div
+          className={`pointer-events-none absolute left-0 right-0 top-1/2 h-[2px] -translate-y-1/2 origin-left bg-green transition-transform duration-300 ease-out ${showCompletedText ? 'scale-x-100 opacity-100' : 'scale-x-0 opacity-0'}`}
         />
       </div>
 
@@ -416,11 +402,8 @@ export const CreateNote: React.FC = () => {
   if (showEntryExperience) {
     return (
       <div className="relative flex min-h-[100dvh] flex-1 items-center justify-center overflow-hidden bg-body px-6 text-center">
-        <motion.div
-          initial={{ opacity: 0.72, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-          className="relative z-10 flex max-w-md flex-col items-center"
+        <div
+          className="relative z-10 flex max-w-md flex-col items-center animate-fade-in-up"
         >
           <div className="mb-8 h-48 w-48 max-w-full" aria-hidden="true">
             <DotLottieReact data={trailLoadingAnimation} autoplay loop />
@@ -428,7 +411,7 @@ export const CreateNote: React.FC = () => {
 
           <h2 className="h2-section mb-4">Take a breath.</h2>
           <p className="body-editorial max-w-sm">Let the noise settle before you start.</p>
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -541,7 +524,7 @@ export const CreateNote: React.FC = () => {
           
           {/* Cover Image */}
           {imagePreview && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="surface-flat group relative mb-12 w-full aspect-[21/9] overflow-hidden rounded-[2rem]">
+            <div className="surface-flat group relative mb-12 w-full aspect-[21/9] overflow-hidden rounded-[2rem] animate-fade-in-up">
               <img src={imagePreview} alt="Cover" className="w-full h-full object-cover" />
               <button
                 onClick={() => setImagePreview(null)}
@@ -550,7 +533,7 @@ export const CreateNote: React.FC = () => {
               >
                 <X size={20} weight="regular" />
               </button>
-            </motion.div>
+            </div>
           )}
 
           {/* Eyebrow Date */}
@@ -607,13 +590,11 @@ export const CreateNote: React.FC = () => {
             className="editor-title-input"
           />
 
-          <AnimatePresence>
             {isWhispering && interimTranscript && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-8 p-4 rounded-[2rem] bg-green/5 border border-green/10 text-green font-serif italic text-[18px]">
+              <div className="mb-8 p-4 rounded-[2rem] bg-green/5 border border-green/10 text-green font-serif italic text-[18px] animate-fade-in-up">
                 {interimTranscript}...
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
 
           <Editor 
             ref={editorInstanceRef} 
@@ -655,60 +636,42 @@ export const CreateNote: React.FC = () => {
         )}
 
         {/* Interchangeable Action FAB (Spark / Save) */}
-        <AnimatePresence mode="wait">
           {!hasContent ? (
             <Magnetic key="spark-mag" strength={20}>
-              <motion.button
+              <button
                 key="spark-fab"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
                 onClick={cycleSparkPrompt}
-                className="surface-floating group relative flex h-16 w-16 items-center justify-center rounded-full text-green"
+                className="surface-floating group relative flex h-16 w-16 items-center justify-center rounded-full text-green transition-transform hover:scale-105 active:scale-95"
                 aria-label="Show another writing prompt"
               >
                 <div className="absolute inset-2 rounded-full bg-green/5 group-hover:bg-green/10 transition-colors" />
                 <Target size={28} weight="fill" />
-              </motion.button>
+              </button>
             </Magnetic>
           ) : (
             <Magnetic key="save-mag" strength={20}>
-              <motion.button
+              <button
                 key="save-fab"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
                 onClick={() => {
                   setReleaseError(null);
                   setIsSaveChoiceOpen(true);
                 }}
                 disabled={saving || isReleasing}
-                className="group relative h-16 w-16 rounded-full bg-green text-white shadow-2xl shadow-green/40 flex items-center justify-center transition-transform hover:scale-105 disabled:opacity-90"
+                className="group relative h-16 w-16 rounded-full bg-green text-white shadow-2xl shadow-green/40 flex items-center justify-center transition-transform hover:scale-105 active:scale-95 disabled:opacity-90"
                 aria-label="Choose what to do with this reflection"
               >
                 {/* Breathing Pulse Effect during save */}
-                <AnimatePresence>
-                  {(saving || isReleasing) && (
-                    <motion.div
-                      initial={{ scale: 1, opacity: 0.8 }}
-                      animate={{ scale: 1.2, opacity: 0 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 1.5, repeat: Infinity, ease: 'easeOut' }}
-                      className="absolute inset-0 rounded-full bg-green pointer-events-none"
-                    />
-                  )}
-                </AnimatePresence>
+                {(saving || isReleasing) && (
+                  <div
+                    className="absolute inset-0 rounded-full bg-green pointer-events-none animate-ping opacity-40"
+                  />
+                )}
                 
                 <div className="absolute inset-2 rounded-full bg-white/12 group-hover:scale-110 transition-transform duration-500 ease-out" />
                 {saving || isReleasing ? <CircleNotch size={28} className="relative z-10 animate-spin" /> : <FloppyDisk size={26} weight="fill" className="relative z-10" />}
-              </motion.button>
+              </button>
             </Magnetic>
           )}
-        </AnimatePresence>
       </div>
 
       {/* Ã¢â€â‚¬Ã¢â€â‚¬ Shared Sheets Ã¢â€â‚¬Ã¢â€â‚¬ */}

@@ -104,6 +104,20 @@ export default defineConfig(() => {
             ],
             runtimeCaching: [
               {
+                urlPattern: /\/assets\/lottie\/.*\.(json|lottie)$/,
+                handler: 'CacheFirst',
+                options: {
+                  cacheName: 'lottie-assets',
+                  expiration: {
+                    maxEntries: 20,
+                    maxAgeSeconds: 60 * 60 * 24 * 90, // 90 days
+                  },
+                  cacheableResponse: {
+                    statuses: [0, 200],
+                  },
+                },
+              },
+              {
                 urlPattern: /^https:\/\/.*\.supabase\.co\/auth\/.*/i,
                 handler: 'NetworkOnly',
               },

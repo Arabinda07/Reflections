@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+
 import {
   ArrowLeft,
   Heart,
@@ -45,7 +45,7 @@ const getWeekSignalSince = () => {
 
 export const Insights: React.FC = () => {
   const navigate = useNavigate();
-  const shouldReduceMotion = useReducedMotion();
+
   const [notes, setNotes] = useState<Note[]>([]);
   const [themes, setThemes] = useState<LifeTheme[]>([]);
   const [moodCheckins, setMoodCheckins] = useState<MoodCheckin[]>([]);
@@ -202,25 +202,17 @@ export const Insights: React.FC = () => {
 
   return (
     <>
-      <AnimatePresence>
-        {isOpeningSanctuary ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 z-overlay flex items-center justify-center overflow-hidden bg-body px-6"
+      {isOpeningSanctuary ? (
+          <div
+            className="fixed inset-0 z-overlay flex items-center justify-center overflow-hidden bg-body px-6 animate-fade-in"
             aria-live="polite"
             aria-label="Opening Sanctuary"
           >
             <div className="sanctuary-entrance-glow absolute inset-0" />
             <div className="sanctuary-entrance-scrim absolute inset-0" />
-            <motion.div
+            <div
               aria-hidden="true"
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 0.8, scale: 1 }}
-              transition={{ delay: 0.08, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-              className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
+              className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center animate-scale-in"
             >
               <div className="h-[min(66vmin,34rem)] w-[min(66vmin,34rem)]">
                 <LottieAnimation
@@ -230,12 +222,9 @@ export const Insights: React.FC = () => {
                   dotLottieRefCallback={bindSanctuaryEntrancePlayer}
                 />
               </div>
-            </motion.div>
-            <motion.div
-              initial={{ y: 16, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.12, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-              className="relative z-10 flex max-w-[42rem] flex-col items-center text-center"
+            </div>
+            <div
+              className="relative z-10 flex max-w-[42rem] flex-col items-center text-center animate-fade-in-up"
             >
               <p className="label-caps text-green">
                 Private reading room
@@ -246,10 +235,9 @@ export const Insights: React.FC = () => {
               <p className="mt-4 max-w-[65ch] text-base font-medium leading-relaxed text-gray-light">
                 Crossing into the library without breaking the calm of the page.
               </p>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         ) : null}
-      </AnimatePresence>
 
       <PageContainer className="surface-scope-sky page-wash pb-24 pt-6 md:pt-10">
         <div className="core-page-stack">
@@ -276,7 +264,7 @@ export const Insights: React.FC = () => {
           ) : notes.length === 0 && weeklyRecap.writingDays === 0 ? (
             <EmptyState
               surface="bezel"
-              illustration={<LottieAnimation src="/assets/lottie/empty notes.json" className="h-full w-full" autoplay loop />}
+              illustration={<LottieAnimation src="/assets/lottie/empty-notes.json" className="h-full w-full" autoplay loop />}
               title="Your story is being written."
               description="Patterns and insights will gather here as you continue to write and check in."
               action={
@@ -338,16 +326,10 @@ export const Insights: React.FC = () => {
                   />
                 </button>
 
-                <AnimatePresence initial={false}>
-                  {isMoodOpen ? (
-                    <motion.div
-                      id="insights-mood-panel"
-                      initial={{ gridTemplateRows: '0fr', opacity: 0 }}
-                      animate={{ gridTemplateRows: '1fr', opacity: 1 }}
-                      exit={{ gridTemplateRows: '0fr', opacity: 0 }}
-                      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                      className="grid overflow-hidden"
-                    >
+                <div
+                  id="insights-mood-panel"
+                  className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-out-expo ${isMoodOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+                >
                       <div className="min-h-0 pb-8">
                         {weeklyRecap.moodData.length === 0 ? (
                           <EmptyState
@@ -370,11 +352,9 @@ export const Insights: React.FC = () => {
                                     {moodConfig?.label || entry.name}
                                   </span>
                                   <div className={`relative h-10 flex-1 overflow-hidden rounded-2xl ${tone.trackClass}`}>
-                                    <motion.div
-                                      initial={{ scaleX: 0 }}
-                                      animate={{ scaleX: percent / 100 }}
-                                      transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-                                      className={`absolute inset-y-0 left-0 w-full origin-left rounded-2xl ${tone.fillClass}`}
+                                    <div
+                                      className={`absolute inset-y-0 left-0 w-full origin-left rounded-2xl transition-transform duration-1000 ease-out-expo ${tone.fillClass}`}
+                                      style={{ transform: isMoodOpen ? `scaleX(${percent / 100})` : 'scaleX(0)' }}
                                     />
                                     <div className="absolute inset-0 bg-white/5 opacity-0 transition-opacity group-hover/bar:opacity-100" />
                                   </div>
@@ -387,9 +367,7 @@ export const Insights: React.FC = () => {
                           </div>
                         )}
                       </div>
-                    </motion.div>
-                  ) : null}
-                </AnimatePresence>
+                    </div>
               </div>
 
               {/* Recurring Tags Accordion */}
@@ -414,16 +392,10 @@ export const Insights: React.FC = () => {
                   />
                 </button>
 
-                <AnimatePresence initial={false}>
-                  {isTagsOpen ? (
-                    <motion.div
-                      id="insights-tags-panel"
-                      initial={{ gridTemplateRows: '0fr', opacity: 0 }}
-                      animate={{ gridTemplateRows: '1fr', opacity: 1 }}
-                      exit={{ gridTemplateRows: '0fr', opacity: 0 }}
-                      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                      className="grid overflow-hidden"
-                    >
+                <div
+                  id="insights-tags-panel"
+                  className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-out-expo ${isTagsOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+                >
                       <div className="min-h-0 pb-8">
                         {weeklyRecap.recurringTags.length === 0 ? (
                           <EmptyState
@@ -437,11 +409,8 @@ export const Insights: React.FC = () => {
                             {weeklyRecap.recurringTags.map(({ tag, count }, index) => {
                               const scale = Math.min(1.45, Math.max(0.92, count / 2.4));
                               return (
-                                <motion.span
+                                <span
                                   key={tag}
-                                  initial={{ opacity: 0, scale: 0.9 }}
-                                  animate={{ opacity: 1, scale: 1 }}
-                                  transition={{ delay: index * 0.05 }}
                                   className={`font-display font-bold lowercase transition-transform hover:scale-110 cursor-default ${TAG_TONE_CLASSES[index % TAG_TONE_CLASSES.length]}`}
                                   style={{
                                     fontSize: `${scale}rem`,
@@ -449,15 +418,13 @@ export const Insights: React.FC = () => {
                                   }}
                                 >
                                   #{tag}
-                                </motion.span>
+                                </span>
                               );
                             })}
                           </div>
                         )}
                       </div>
-                    </motion.div>
-                  ) : null}
-                </AnimatePresence>
+                    </div>
               </div>
             </div>
             {/* Subtle background glow effect on hover */}
@@ -490,15 +457,9 @@ export const Insights: React.FC = () => {
               />
             </button>
 
-            <AnimatePresence initial={false}>
-              {isOverviewOpen ? (
-                <motion.div
+            <div
                   id="insights-overview-panel"
-                  initial={{ gridTemplateRows: '0fr', opacity: 0 }}
-                  animate={{ gridTemplateRows: '1fr', opacity: 1 }}
-                  exit={{ gridTemplateRows: '0fr', opacity: 0 }}
-                  transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                  className="grid overflow-hidden"
+                  className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-out-expo ${isOverviewOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
                 >
                   <div className="min-h-0 space-y-5 border-t border-border/60 p-6 md:p-8">
                     <div className="flex flex-wrap items-center gap-2">
@@ -514,9 +475,7 @@ export const Insights: React.FC = () => {
                       .
                     </p>
                   </div>
-                </motion.div>
-              ) : null}
-            </AnimatePresence>
+                </div>
           </Surface>
 
           <Surface variant="flat" tone="honey" className="group relative overflow-hidden rounded-[2.5rem] transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_rgba(245,158,11,0.05)]">
@@ -543,15 +502,9 @@ export const Insights: React.FC = () => {
               />
             </button>
 
-            <AnimatePresence initial={false}>
-              {isCompletionOpen ? (
-                <motion.div
+            <div
                   id="insights-completion-panel"
-                  initial={{ gridTemplateRows: '0fr', opacity: 0 }}
-                  animate={{ gridTemplateRows: '1fr', opacity: 1 }}
-                  exit={{ gridTemplateRows: '0fr', opacity: 0 }}
-                  transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                  className="grid overflow-hidden"
+                  className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-out-expo ${isCompletionOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
                 >
                   <div className="min-h-0 space-y-5 border-t border-border/60 p-6 md:p-8">
                     <div className="space-y-2">
@@ -573,9 +526,7 @@ export const Insights: React.FC = () => {
                     </div>
                     <CompletionCardActions payload={weeklyCardPayload} />
                   </div>
-                </motion.div>
-              ) : null}
-            </AnimatePresence>
+                </div>
           </Surface>
 
           <Surface

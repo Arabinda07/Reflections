@@ -1,6 +1,6 @@
 import React, { Suspense, lazy, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { motion } from 'motion/react';
+
 import {
   Plus,
   FileText,
@@ -271,11 +271,8 @@ export const MyNotes: React.FC = () => {
 
       {!loading ? (
         <PageContainer className="surface-scope-sage page-wash pb-14 pt-4 md:pt-8">
-          <motion.div 
-            className="core-page-stack"
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          <div 
+            className="core-page-stack animate-fade-in-up"
           >
             <SectionHeader
               title="Saved reflections"
@@ -396,7 +393,7 @@ export const MyNotes: React.FC = () => {
             ) : (
               <EmptyState
                 surface="bezel"
-                illustration={<LottieAnimation src="/assets/lottie/empty notes.json" className="h-full w-full" autoplay loop />}
+                illustration={<LottieAnimation src="/assets/lottie/empty-notes.json" className="h-full w-full" autoplay loop />}
                 title={tagFilter ? `No reflections with “${tagFilter}” yet.` : 'Your library is ready when you are.'}
                 description={
                   tagFilter
@@ -416,7 +413,7 @@ export const MyNotes: React.FC = () => {
                 }
               />
             )}
-          </motion.div>
+          </div>
         </PageContainer>
       ) : null}
 

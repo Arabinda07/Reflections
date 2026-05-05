@@ -24,8 +24,8 @@ describe('lottie surface mapping contract', () => {
     expect(routeErrorBoundary).toContain("import('../components/ui/LottieAnimation')");
     expect(routeErrorBoundary).toContain('error404Animation');
     expect(lottieAnimation).toContain("from '@lottiefiles/dotlottie-react'");
-    expect(notFound).toContain('/assets/lottie/Error 404.json');
-    expect(myNotes).toContain('/assets/lottie/empty%20notes.json');
+    expect(notFound).toContain('/assets/lottie/error-404.json');
+    expect(myNotes).toContain('/assets/lottie/empty-notes.json');
     expect(lifeWiki).toContain('SANCTUARY_LEVEL_UP_ANIMATION_SRC');
     expect(lifeWiki).toContain('const [isEnteringWiki, setIsEnteringWiki]');
     expect(lifeWiki).toContain('location.pathname === RoutePath.WIKI');

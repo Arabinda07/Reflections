@@ -10,7 +10,7 @@ export const NotFound: React.FC = () => {
   return (
     <div className="flex min-h-[80vh] flex-col items-center justify-center p-4 text-center">
       <div className="mb-4 h-48 w-48 sm:h-64 sm:w-64 max-w-full">
-        <LottieAnimation src="/assets/lottie/Error 404.json" className="h-full w-full" autoplay loop />
+        <LottieAnimation src="/assets/lottie/error-404.json" className="h-full w-full" autoplay loop />
       </div>
       <h1 className="text-4xl font-display text-gray-text mb-4">A quiet corner.</h1>
       <p className="max-w-md text-gray-light font-medium mb-10">

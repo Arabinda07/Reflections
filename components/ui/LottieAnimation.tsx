@@ -12,7 +12,12 @@ export const LottieAnimation: React.FC<LottieAnimationProps> = (props) => {
   useEffect(() => {
     if (props.src && props.src.endsWith('.json')) {
       fetch(props.src)
-        .then((res) => res.json())
+        .then((res) => {
+          if (!res.ok) throw new Error(`Lottie fetch failed: ${res.status} ${res.url}`);
+          const ct = res.headers.get('content-type') || '';
+          if (!ct.includes('json')) throw new Error(`Lottie got non-JSON response (${ct}) for ${res.url}`);
+          return res.json();
+        })
         .then((data) => setAnimationData(data))
         .catch((err) => console.error('Failed to load lottie JSON:', err));
     }

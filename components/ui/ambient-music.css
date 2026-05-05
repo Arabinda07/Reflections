@@ -14,7 +14,7 @@ html.no-scroll .floating-audio-container {
 
 @media (max-width: 640px) {
     .floating-audio-container {
-      position: absolute;
+      position: fixed;
       top: auto;
       right: clamp(1rem, 5vw, 1.5rem);
       bottom: clamp(1rem, 4dvh, 2rem);

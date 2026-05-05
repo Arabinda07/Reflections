@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { motion } from 'motion/react';
+
 import { ArrowLeft, CalendarBlank, EnvelopeOpen, LockKey, PaperPlaneTilt } from '@phosphor-icons/react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
@@ -313,12 +313,9 @@ export const FutureLetters: React.FC = () => {
                                 </div>
                                 <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-500 group-hover:scale-110 ${isLocked ? 'bg-body/50 text-gray-nav' : 'bg-green/10 text-green group-hover:rotate-12'}`}>
                                   {isLocked ? (
-                                    <motion.div
-                                      animate={shakeLetterId === letter.id ? { x: [-4, 4, -4, 4, 0] } : {}}
-                                      transition={{ duration: 0.4, ease: "easeInOut" }}
-                                    >
+                                    <div className={shakeLetterId === letter.id ? 'animate-shake-x' : ''}>
                                       <LockKey size={20} weight="duotone" />
-                                    </motion.div>
+                                    </div>
                                   ) : (
                                     <EnvelopeOpen size={20} weight="duotone" />
                                   )}

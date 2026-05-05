@@ -43,8 +43,8 @@ describe('remaining roadmap contract', () => {
     expect(paperPlaneToast).toContain('DotLottieReact');
     expect(companionObservation).toContain('DotLottieReact');
     expect(notFound).toContain('DotLottieReact');
-    expect(notFound).toContain('/assets/lottie/Error 404.json');
-    expect(myNotes).toContain('/assets/lottie/empty%20notes.json');
+    expect(notFound).toContain('/assets/lottie/error-404.json');
+    expect(myNotes).toContain('/assets/lottie/empty-notes.json');
     expect(lifeWiki).toContain('SANCTUARY_LEVEL_UP_ANIMATION_SRC');
   });
 

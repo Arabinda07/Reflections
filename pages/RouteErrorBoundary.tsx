@@ -2,7 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { isRouteErrorResponse, useNavigate, useRouteError } from 'react-router-dom';
 import { RoutePath } from '../types';
 
-const error404Animation = '/assets/lottie/Error%20404.json';
+const error404Animation = '/assets/lottie/error-404.json';
 
 const LottieAnimation = lazy(() => import('../components/ui/LottieAnimation')
   .then((module) => ({
