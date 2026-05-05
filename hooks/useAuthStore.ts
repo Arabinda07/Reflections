@@ -1,17 +1,18 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { get, set, del } from 'idb-keyval';
 import { User } from '../types';
-
 // Custom storage engine using IndexedDB via idb-keyval
 const storage = {
   getItem: async (name: string): Promise<string | null> => {
+    const { get } = await import('idb-keyval');
     return (await get(name)) || null;
   },
   setItem: async (name: string, value: string): Promise<void> => {
+    const { set } = await import('idb-keyval');
     await set(name, value);
   },
   removeItem: async (name: string): Promise<void> => {
+    const { del } = await import('idb-keyval');
     await del(name);
   },
 };

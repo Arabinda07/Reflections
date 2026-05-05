@@ -113,12 +113,12 @@ export const AmbientMusicButton: React.FC = () => {
     : 'var(--floating-panel-shadow)';
   const iconStroke = isPlaying ? accentColor : isHovered ? 'var(--green)' : 'var(--gray-text)';
 
-  const pickerBg = 'rgba(var(--panel-bg-rgb), 0.97)';
+  const pickerBg = 'var(--floating-panel-bg-strong, rgba(var(--panel-bg-rgb), 0.98))';
   const pickerBorder = 'var(--floating-panel-border)';
   const pickerShadow = 'var(--floating-panel-shadow-strong)';
-  const trackHoverBg = 'oklch(from var(--green) l c h / 0.06)';
-  const trackBg = 'rgba(var(--panel-bg-rgb), 0.76)';
-  const trackBorder = 'oklch(from var(--border-color) l c h / 0.72)';
+  const trackHoverBg = 'oklch(from var(--green) l c h / 0.08)';
+  const trackBg = 'var(--floating-panel-bg, rgba(var(--panel-bg-rgb), 0.9))';
+  const trackBorder = 'var(--border-color)';
 
   const renderTrackRow = (track: (typeof AMBIENT_TRACKS)[0], compact = false) => {
     const isActive = activeTrack?.id === track.id;

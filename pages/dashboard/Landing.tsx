@@ -252,14 +252,14 @@ export const Landing: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => navigate(RoutePath.LOGIN)}
-                  className="inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap px-1 text-btn-sm font-bold text-gray-nav transition-colors duration-300 ease-out-expo hover:text-green"
+                  className="inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap px-1 text-btn-sm font-bold text-gray-nav transition-all duration-300 ease-out-expo hover:-translate-y-px hover:text-green active:translate-y-px"
                 >
                   Sign in
                 </button>
 
                 <a
                   href={RoutePath.FAQ}
-                  className="inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap px-1 text-btn-sm font-bold text-gray-nav transition-colors duration-300 ease-out-expo hover:text-green"
+                  className="inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap px-1 text-btn-sm font-bold text-gray-nav transition-all duration-300 ease-out-expo hover:-translate-y-px hover:text-green active:translate-y-px"
                 >
                   How it works
                 </a>

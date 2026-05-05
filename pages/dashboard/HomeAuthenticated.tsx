@@ -469,9 +469,7 @@ export const HomeAuthenticated: React.FC = () => {
             </motion.div>
           </div>
 
-          <div className="floating-audio-container">
-            <AmbientMusicButton />
-          </div>
+
         </section>
 
         <motion.section
@@ -514,8 +512,7 @@ export const HomeAuthenticated: React.FC = () => {
                 <div className="flex max-w-xl flex-col gap-3">
                   <Button
                     variant="primary"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+
                     className="h-14 w-full px-8 rounded-xl text-base font-bold bg-green text-white hover:bg-green/90 transition-colors shadow-none sm:w-fit"
                     onClick={() => handleCreateClick(dailyPrompt)}
                     aria-label="Begin writing with today's prompt"
@@ -526,8 +523,7 @@ export const HomeAuthenticated: React.FC = () => {
                   <div className="grid gap-3 sm:grid-cols-2">
                     <Button
                       variant="secondary"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+
                       className="h-12 w-full rounded-xl px-6 text-base font-bold"
                       onClick={() => setIsCheckInOpen(true)}
                       aria-label="Save a quick mood check-in"
@@ -537,8 +533,7 @@ export const HomeAuthenticated: React.FC = () => {
                     </Button>
                     <Button
                       variant="outline"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+
                       className="h-12 w-full justify-center rounded-xl border-sky/25 bg-sky/5 px-6 text-sky hover:bg-sky/10"
                       onClick={() => navigate(RoutePath.FUTURE_LETTERS)}
                       aria-label="Write a future letter"
@@ -998,6 +993,9 @@ export const HomeAuthenticated: React.FC = () => {
           ) : null}
         </div>
       </ModalSheet>
+      <div className="floating-audio-container">
+        <AmbientMusicButton />
+      </div>
     </>
   );
 };

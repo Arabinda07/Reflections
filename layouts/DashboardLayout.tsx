@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate, useOutlet } from 'react-router-dom';
-import { motion, AnimatePresence } from 'motion/react';
+
 import { Link } from 'react-router-dom';
 import { PaperPlaneTilt } from '@phosphor-icons/react';
 import {
@@ -139,18 +139,12 @@ export const DashboardLayout: React.FC = () => {
           <SyncBanner />
         </React.Suspense>
         <div className="w-full flex-1 flex flex-col">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={location.pathname}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
-              className="flex-1 flex flex-col w-full"
-            >
-              {outlet}
-            </motion.div>
-          </AnimatePresence>
+          <div
+            key={location.pathname}
+            className="flex-1 flex flex-col w-full animate-in fade-in duration-300 ease-out-expo"
+          >
+            {outlet}
+          </div>
         </div>
 
         {/* Global Footer - Positioned for full-width background with centered content */}

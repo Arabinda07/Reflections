@@ -318,7 +318,7 @@ export const CreateNote: React.FC = () => {
     if (error) {
       setReleaseError(error);
     } else {
-      setReleaseSuccess('saved. new task added');
+      setReleaseSuccess('Released.');
       setTimeout(() => {
         setIsSaveChoiceOpen(false);
         setReleaseSuccess(null);
@@ -791,7 +791,7 @@ export const CreateNote: React.FC = () => {
           ) : null}
 
           {releaseSuccess ? (
-            <p className="text-sm font-bold text-green mt-2 text-center" aria-live="polite">
+            <p className="text-sm font-bold text-clay mt-2 text-center" aria-live="polite">
               {releaseSuccess}
             </p>
           ) : null}

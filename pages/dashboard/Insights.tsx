@@ -274,7 +274,7 @@ export const Insights: React.FC = () => {
           ) : notes.length === 0 && weeklyRecap.writingDays === 0 ? (
             <EmptyState
               surface="bezel"
-              illustration={<DotLottieReact src="/assets/lottie/empty%20notes.json" autoplay loop />}
+              illustration={<DotLottieReact src="/assets/lottie/empty%20notes.json" className="h-full w-full" autoplay loop />}
               title="Your story is being written."
               description="Patterns and insights will gather here as you continue to write and check in."
               action={

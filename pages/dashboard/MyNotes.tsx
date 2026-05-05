@@ -396,7 +396,7 @@ export const MyNotes: React.FC = () => {
             ) : (
               <EmptyState
                 surface="bezel"
-                illustration={<DotLottieReact src="/assets/lottie/empty%20notes.json" autoplay loop />}
+                illustration={<DotLottieReact src="/assets/lottie/empty%20notes.json" className="h-full w-full" autoplay loop />}
                 title={tagFilter ? `No reflections with “${tagFilter}” yet.` : 'Your library is ready when you are.'}
                 description={
                   tagFilter
