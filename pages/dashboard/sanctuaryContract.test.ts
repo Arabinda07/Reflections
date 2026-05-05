@@ -95,6 +95,7 @@ describe('Sanctuary Life Wiki contract', () => {
     expect(insights).toContain('isOpeningSanctuary');
     expect(insights).toContain('handleOpenSanctuary');
     expect(insights).toContain('event.preventDefault()');
+    expect(insights).toContain('const shouldReduceMotion =');
     expect(insights).toContain('loop={false}');
     expect(insights).toContain('dotLottieRefCallback={bindSanctuaryEntrancePlayer}');
     expect(insights).toContain("addEventListener('complete'");
@@ -103,7 +104,10 @@ describe('Sanctuary Life Wiki contract', () => {
     expect(lifeWiki).not.toContain("from '@/src/lottie/level-up-animation.json'");
     expect(insights).toContain('src={SANCTUARY_LEVEL_UP_ANIMATION_SRC}');
     expect(lifeWiki).toContain('src={SANCTUARY_LEVEL_UP_ANIMATION_SRC}');
+    expect(insights).toContain('animationId={SANCTUARY_LEVEL_UP_ANIMATION_ID}');
+    expect(lifeWiki).toContain('animationId={SANCTUARY_LEVEL_UP_ANIMATION_ID}');
     expect(sanctuaryAnimation).toContain('/assets/lottie/level-up-animation.lottie');
+    expect(sanctuaryAnimation).toContain("SANCTUARY_LEVEL_UP_ANIMATION_ID = 'level-up-animation'");
     expect(sanctuaryAnimation).not.toContain('level-up-animation.json');
     expect(lifeWiki).toContain('const cameFromInsights = Boolean(location.state?.fromInsights);');
     expect(lifeWiki).toContain('const [isEnteringWiki, setIsEnteringWiki] = useState(shouldPlayEntryAnimation && !cameFromInsights);');

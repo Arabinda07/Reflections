@@ -3,11 +3,11 @@ import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 type LottieAnimationProps = Pick<
   React.ComponentProps<typeof DotLottieReact>,
-  'autoplay' | 'className' | 'data' | 'dotLottieRefCallback' | 'loop' | 'speed' | 'src'
+  'animationId' | 'autoplay' | 'className' | 'data' | 'dotLottieRefCallback' | 'loop' | 'speed' | 'src'
 >;
 
 export const LottieAnimation: React.FC<LottieAnimationProps> = (props) => {
-  const [animationData, setAnimationData] = useState<unknown | null>(null);
+  const [animationData, setAnimationData] = useState<LottieAnimationProps['data'] | null>(null);
 
   useEffect(() => {
     if (props.src && props.src.endsWith('.json')) {

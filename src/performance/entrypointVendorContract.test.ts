@@ -49,6 +49,40 @@ describe('entrypoint vendor loading contract', () => {
     expect(events).toContain('posthog.init');
   });
 
+  it('keeps auth wiring out of the public root while auth shells stay live', () => {
+    const app = read('App.tsx');
+    const authBootstrapper = read('hooks/useAuthBootstrapper.ts');
+    const publicShell = read('layouts/PublicAppShell.tsx');
+
+    expect(app).not.toContain('<AppBootstrapper>\n      <RouterProvider router={router} />\n    </AppBootstrapper>');
+    expect(app).not.toContain("import { AppBootstrapper } from './components/ui/AppBootstrapper';");
+    expect(app).toContain("const AppBootstrapper = lazy(() => import('./components/ui/AppBootstrapper')");
+    expect(app).toContain('element={withBootstrappedShell(<AuthAppShell />)}');
+    expect(app).toContain('element={withBootstrappedShell(<AuthenticatedAppShell />)}');
+    expect(publicShell).not.toContain('AppBootstrapper');
+    expect(publicShell).not.toContain('supabaseClient');
+    expect(authBootstrapper).toContain('const markAuthCheckComplete = () => {');
+    expect(authBootstrapper).toContain('supabase.auth.onAuthStateChange');
+    expect(authBootstrapper).not.toContain('if (!hasStoredAuthSessionHint()) {');
+  });
+
+  it('does not fire analytics route tracking for public guest routes', () => {
+    const layout = read('layouts/DashboardLayout.tsx');
+
+    expect(layout).toContain('{isAuthenticated ? <AnalyticsRouteTracker /> : null}');
+  });
+
+  it('keeps public routes out of dashboard-only shell work', () => {
+    const publicShell = read('layouts/PublicAppShell.tsx');
+
+    expect(publicShell).not.toContain('DashboardLayout');
+    expect(publicShell).not.toContain('SyncBanner');
+    expect(publicShell).not.toContain('ReferralInvitePanel');
+    expect(publicShell).not.toContain('PWAInstallProvider');
+    expect(publicShell).toContain('<PublicHeader isLandingRoute={isLandingRoute} />');
+    expect(publicShell).toContain('{!isLandingRoute && <PublicFooter />}');
+  });
+
   it('keeps route-error Lottie outside the app shell', () => {
     const routeErrorBoundary = read('pages/RouteErrorBoundary.tsx');
 

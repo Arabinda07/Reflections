@@ -56,6 +56,19 @@
     <link rel="stylesheet" href="/index.css" />
     <!-- Quill is now loaded via npm dependency in Editor.tsx -->
 
+    <!-- ── Dark mode FOUC prevention ───────────────────────────────── -->
+    <script>
+      (function(){
+        try {
+          var stored = localStorage.getItem('reflections-theme');
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (stored === 'dark' || (!stored && prefersDark)) {
+            document.documentElement.classList.add('dark');
+          }
+        } catch(e) {}
+      })();
+    </script>
+
     <!-- ── Inline critical styles ──────────────────────────────────── -->
     <style>
       body {

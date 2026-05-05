@@ -2,6 +2,7 @@ import React, { Suspense, lazy, useEffect, useState } from 'react';
 
 import { PWAInstallProvider } from '../context/PWAInstallContext';
 import { ToastProvider } from '../components/ui/Toast';
+import { useNativeStatusBar } from '../hooks/useNativeStatusBar';
 import { useSync } from '../hooks/useSync';
 import { DashboardLayout } from './DashboardLayout';
 
@@ -59,6 +60,8 @@ const SyncBoundary: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 };
 
 export const AuthenticatedAppShell: React.FC = () => {
+  useNativeStatusBar();
+
   return (
     <PWAInstallProvider>
 

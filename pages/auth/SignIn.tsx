@@ -25,6 +25,7 @@ import {
   requestVerifiedEmail,
 } from '@/src/auth/credentialManager';
 import { trackGoogleAuthStartedDeferred } from '@/src/analytics/deferredEvents';
+import { commitAuthSession } from '@/src/auth/sessionUser';
 
 export const SignIn: React.FC = () => {
   useDocumentMeta({
@@ -66,7 +67,7 @@ export const SignIn: React.FC = () => {
     setResetMessage(null);
 
     try {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -74,6 +75,9 @@ export const SignIn: React.FC = () => {
       if (signInError) {
         setError(signInError.message);
       } else {
+        if (data.session) {
+          commitAuthSession(data.session);
+        }
         navigate(postLoginPath, { replace: true, state: { justLoggedIn: true } });
       }
     } catch (err) {
@@ -110,18 +114,22 @@ export const SignIn: React.FC = () => {
     setLoading(true);
 
     try {
-      const result = await requestVerifiedEmail();
-      if (!result) {
+      const credential = await requestVerifiedEmail();
+      if (!credential) {
         setLoading(false);
         return; // User cancelled or error already logged
       }
 
-      const { success, error: authError } = await signInWithVerifiedEmail(result.assertion);
+      const authResult = await signInWithVerifiedEmail(credential.assertion);
+      const { success, error: authError } = authResult;
 
       if (!success) {
         setError(authError || 'Failed to sign in with verified email.');
         setLoading(false);
       } else {
+        if (authResult.data?.session) {
+          commitAuthSession(authResult.data.session);
+        }
         navigate(postLoginPath, { replace: true, state: { justLoggedIn: true } });
       }
     } catch (err) {

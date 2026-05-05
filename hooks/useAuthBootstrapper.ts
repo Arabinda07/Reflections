@@ -1,24 +1,11 @@
 import { useEffect, useRef } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { useAuthStore } from './useAuthStore';
-import { User } from '../types';
 import {
   identifyAnalyticsUserDeferred,
   resetAnalyticsUserDeferred,
 } from '../src/analytics/deferredEvents';
-
-const getSessionAvatarUrl = (session: Session) =>
-  session.user.user_metadata?.avatar_url ||
-  session.user.user_metadata?.picture ||
-  session.user.user_metadata?.avatar ||
-  null;
-
-const mapSessionToUser = (session: Session): User => ({
-  id: session.user.id,
-  email: session.user.email || '',
-  name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
-  avatarUrl: getSessionAvatarUrl(session) || undefined,
-});
+import { mapSessionToUser } from '../src/auth/sessionUser';
 
 export const useAuthBootstrapper = () => {
   const { setHydrated, setUser, setInitialCheckDone } = useAuthStore();
@@ -41,6 +28,13 @@ export const useAuthBootstrapper = () => {
 
   useEffect(() => {
     let mounted = true;
+    let authSubscription: { unsubscribe: () => void } | null = null;
+
+    const markAuthCheckComplete = () => {
+      if (!mounted) return;
+      setHydrated(true);
+      setInitialCheckDone(true);
+    };
 
     const checkSession = async () => {
       try {
@@ -65,23 +59,19 @@ export const useAuthBootstrapper = () => {
             setUser(null);
             syncAnalyticsSession(null);
           }
-          setHydrated(true);
-          setInitialCheckDone(true);
+          markAuthCheckComplete();
         }
       } catch (err) {
         console.error('Fatal auth check error:', err);
-        if (mounted) {
-          setHydrated(true);
-          setInitialCheckDone(true);
-        }
+        markAuthCheckComplete();
       }
     };
 
-    checkSession();
-
-    let authSubscription: any;
+    void checkSession();
     
-    import('../src/supabaseClient').then(({ supabase }) => {
+    void import('../src/supabaseClient').then(({ supabase }) => {
+      if (!mounted) return;
+
       const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
         if (!mounted) return;
         if (session) {
@@ -93,6 +83,12 @@ export const useAuthBootstrapper = () => {
         }
         setInitialCheckDone(true);
       });
+
+      if (!mounted) {
+        subscription.unsubscribe();
+        return;
+      }
+
       authSubscription = subscription;
     });
 

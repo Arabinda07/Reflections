@@ -13,6 +13,10 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
     flowType: "pkce",
-    detectSessionInUrl: true,
+    // Disabled: AuthCallback.tsx and the native listener each call
+    // exchangeCodeForSession() manually. Keeping this true causes a
+    // double-consumption race that destroys the PKCE code verifier
+    // before the manual call can use it.
+    detectSessionInUrl: false,
   },
 });

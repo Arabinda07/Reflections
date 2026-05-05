@@ -119,7 +119,7 @@ export const FutureLetters: React.FC = () => {
     setError(null);
     try {
       const letter = await futureLetterService.create({
-        title: title.trim() || `Letter for ${formatDate(openDate)}`,
+        title: title.trim() || `Letter for ${formatLongDateUTC(openDate)}`,
         content: content.trim(),
         openAt: openDate.toISOString(),
       });

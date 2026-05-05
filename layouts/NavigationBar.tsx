@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { motion } from 'motion/react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Moon,
@@ -47,14 +46,26 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
     return document.documentElement.classList.contains('dark');
   });
 
+  // Sync with OS-level preference changes
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => {
+      // Only follow OS if user hasn't set an explicit preference
+      if (!localStorage.getItem('reflections-theme')) {
+        const shouldBeDark = e.matches;
+        setIsDarkMode(shouldBeDark);
+        document.documentElement.classList.toggle('dark', shouldBeDark);
+      }
+    };
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
   const toggleDarkMode = () => {
     const next = !isDarkMode;
     setIsDarkMode(next);
-    if (next) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    document.documentElement.classList.toggle('dark', next);
+    localStorage.setItem('reflections-theme', next ? 'dark' : 'light');
   };
 
   const landingControlClass = isLandingRoute
@@ -81,6 +92,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
 
   return (
     <nav
+      aria-label="Dashboard navigation"
       className={`z-[100] flex-none flex justify-center transition-colors duration-500 ${
         isLandingRoute
           ? 'landing-nav-scrim fixed left-0 right-0 top-0 pt-[env(safe-area-inset-top)]'
@@ -186,9 +198,9 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
           >
             <div className="relative h-6 w-6">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-current">
-                <motion.line x1="4" y1="6" x2="20" y2="6" animate={isMobileMenuOpen ? { x1: 6, y1: 6, x2: 18, y2: 18 } : { x1: 4, y1: 6, x2: 20, y2: 6 }} transition={{ duration: 0.3 }} />
-                <motion.line x1="4" y1="12" x2="20" y2="12" animate={isMobileMenuOpen ? { opacity: 0 } : { opacity: 1 }} transition={{ duration: 0.2 }} />
-                <motion.line x1="4" y1="18" x2="20" y2="18" animate={isMobileMenuOpen ? { x1: 6, y1: 18, x2: 18, y2: 6 } : { x1: 4, y1: 18, x2: 20, y2: 18 }} transition={{ duration: 0.3 }} />
+                <line x1={isMobileMenuOpen ? 6 : 4} y1="6" x2={isMobileMenuOpen ? 18 : 20} y2={isMobileMenuOpen ? 18 : 6} style={{ transition: 'x1 0.3s ease, x2 0.3s ease, y2 0.3s ease' }} />
+                <line x1="4" y1="12" x2="20" y2="12" style={{ opacity: isMobileMenuOpen ? 0 : 1, transition: 'opacity 0.2s ease' }} />
+                <line x1={isMobileMenuOpen ? 6 : 4} y1="18" x2={isMobileMenuOpen ? 18 : 20} y2={isMobileMenuOpen ? 6 : 18} style={{ transition: 'x1 0.3s ease, x2 0.3s ease, y2 0.3s ease' }} />
               </svg>
             </div>
           </button>

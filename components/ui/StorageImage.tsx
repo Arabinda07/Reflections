@@ -72,6 +72,8 @@ export const StorageImage: React.FC<StorageImageProps> = ({
     <img
       src={src}
       alt={alt}
+      loading="lazy"
+      decoding="async"
       className={className}
       referrerPolicy="no-referrer"
       onError={() => setSrc(fallbackSrc || null)}

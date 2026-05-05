@@ -40,7 +40,7 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
             alt=""
             aria-hidden="true"
             loading="eager"
-            fetchpriority="high"
+            fetchPriority="high"
             decoding="async"
             className="absolute inset-0 z-0 h-full w-full object-cover opacity-85"
           />

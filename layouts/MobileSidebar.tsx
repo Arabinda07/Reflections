@@ -205,7 +205,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                 {user.avatarUrl ? (
                   <StorageImage
                     path={user.avatarUrl}
-                    alt=""
+                    alt={`${user.name}'s profile photo`}
                     className="h-full w-full rounded-full object-cover"
                     showLoading={false}
                   />

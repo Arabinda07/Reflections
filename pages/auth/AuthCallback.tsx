@@ -8,10 +8,15 @@ import {
   getPendingGoogleAuthPath,
   stashGoogleAuthError,
 } from '../../src/auth/googleOAuth';
+import { commitAuthSession } from '../../src/auth/sessionUser';
 
 /**
- * Handles the Supabase OAuth PKCE callback.
- * Exchanges the 'code' for a session and redirects to the intended path.
+ * Handles the Supabase OAuth PKCE callback for web.
+ *
+ * Architecture: `detectSessionInUrl` is disabled in supabaseClient.js,
+ * so this component is the SOLE consumer of the PKCE code verifier on web.
+ * The native flow uses consumeNativeGoogleOAuthCallback() instead.
+ * Having exactly one consumer eliminates PKCE double-consumption races.
  */
 export const AuthCallback: React.FC = () => {
   const navigate = useNavigate();
@@ -37,32 +42,31 @@ export const AuthCallback: React.FC = () => {
       }
 
       if (!code) {
-        // If we landed here without a code and no error, something is wrong.
-        // Try to see if we already have a session (sometimes Supabase handles it).
+        // No code and no error — check if we already have a session somehow
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
+          commitAuthSession(session);
           const redirectPath = consumePendingGoogleAuthRedirectPath(sourcePath) || RoutePath.DASHBOARD;
           navigate(redirectPath, { replace: true });
         } else {
-          navigate(RoutePath.LOGIN, { replace: true });
+          stashGoogleAuthError('No authorization code received. Please try signing in again.');
+          navigate(sourcePath, { replace: true });
         }
         return;
       }
 
       try {
-        // Exchange the code for a session
         const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
         if (exchangeError) throw exchangeError;
 
-        // Double check we have a session now
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         if (sessionError) throw sessionError;
-
         if (!session) {
           throw new Error('Session could not be established after code exchange.');
         }
 
-        // Success! Consume the redirect path and go home/dashboard
+        commitAuthSession(session);
+
         const redirectPath = consumePendingGoogleAuthRedirectPath(sourcePath) || RoutePath.DASHBOARD;
         navigate(redirectPath, { replace: true });
       } catch (err) {

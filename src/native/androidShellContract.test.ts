@@ -9,12 +9,14 @@ describe('Android shell contract', () => {
   it('drops the placeholder native splash and keeps launch polish in the in-app startup screen', () => {
     const capacitorConfig = read('capacitor.config.ts');
     const app = read('App.tsx');
+    const authShell = read('layouts/AuthAppShell.tsx');
     const authenticatedShell = read('layouts/AuthenticatedAppShell.tsx');
     const statusBarHook = read('hooks/useNativeStatusBar.ts');
     const styles = read('android/app/src/main/res/values/styles.xml');
     const appBootstrapper = read('components/ui/AppBootstrapper.tsx');
 
     expect(app).not.toContain("import { useNativeStatusBar }");
+    expect(authShell).toContain('useNativeStatusBar');
     expect(authenticatedShell).toContain('useNativeStatusBar');
     expect(statusBarHook).toContain('StatusBar.setOverlaysWebView');
     expect(capacitorConfig).not.toContain('SplashScreen: {');

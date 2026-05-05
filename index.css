@@ -998,8 +998,6 @@ details:focus-visible,
     background: var(--surface-current-bg);
     border-radius: calc(var(--radius-shell) - 1px);
     border: 1.5px solid var(--surface-current-border);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
     height: 100%;
     width: 100%;
   }
@@ -2132,14 +2130,14 @@ details:focus-visible,
   }
 
   .panel-label {
-    font-size: 11px;
+    font-size: var(--text-xs);
     font-weight: 800;
-    letter-spacing: 2px;
+    letter-spacing: var(--tracking-caps);
     color: var(--nav-text);
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 24px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
   }
 
   .panel-label::after {
@@ -2183,12 +2181,18 @@ details:focus-visible,
     border-color: var(--floating-panel-border);
     box-shadow: var(--floating-panel-shadow-strong);
   }
+
+  /* ── Animation stagger utilities ── */
+  .anim-delay-1 { animation-delay: 0.1s; }
+  .anim-delay-2 { animation-delay: 0.2s; }
+  .anim-delay-3 { animation-delay: 0.3s; }
+  .anim-delay-4 { animation-delay: 0.4s; }
 }
 
-/* Hide Spline Watermark */
-#logo,
-canvas+div,
-canvas~div {
+/* Hide Spline Watermark — scoped to Spline containers */
+.spline-container #logo,
+.spline-container canvas+div,
+.spline-container canvas~div {
   display: none !important;
   opacity: 0 !important;
   pointer-events: none !important;

@@ -98,7 +98,7 @@ export const DashboardLayout: React.FC = () => {
     <div
       className={`${routeSurfaceScopeClass} page-wash relative flex h-[100dvh] min-h-[100dvh] flex-col overflow-hidden bg-body font-sans selection:bg-green/30 selection:text-green`}
     >
-      <AnalyticsRouteTracker />
+      {isAuthenticated ? <AnalyticsRouteTracker /> : null}
       <a href="#main-content" className="skip-link">
         Skip to content
       </a>

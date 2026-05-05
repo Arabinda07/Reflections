@@ -26,6 +26,7 @@ import {
 import { NEWSLETTER_SIGNUP_LABEL, buildNewsletterOptInMetadata } from '@/src/newsletter';
 import { referralService } from '@/services/referralService';
 import { trackGoogleAuthStartedDeferred } from '@/src/analytics/deferredEvents';
+import { commitAuthSession } from '@/src/auth/sessionUser';
 
 export const SignUp: React.FC = () => {
   useDocumentMeta({
@@ -104,6 +105,7 @@ export const SignUp: React.FC = () => {
           },
         });
       } else if (data.session) {
+        commitAuthSession(data.session);
         await recordAcceptedReferral();
         navigate(postLoginPath, { replace: true, state: { justLoggedIn: true } });
       }
@@ -140,18 +142,22 @@ export const SignUp: React.FC = () => {
     setLoading(true);
 
     try {
-      const result = await requestVerifiedEmail();
-      if (!result) {
+      const credential = await requestVerifiedEmail();
+      if (!credential) {
         setLoading(false);
         return;
       }
 
-      const { success, error: authError } = await signInWithVerifiedEmail(result.assertion);
+      const authResult = await signInWithVerifiedEmail(credential.assertion);
+      const { success, error: authError } = authResult;
 
       if (!success) {
         setError(authError || 'Failed to sign up with verified email.');
         setLoading(false);
       } else {
+        if (authResult.data?.session) {
+          commitAuthSession(authResult.data.session);
+        }
         await recordAcceptedReferral();
         navigate(postLoginPath, { replace: true, state: { justLoggedIn: true } });
       }

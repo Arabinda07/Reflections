@@ -29,7 +29,10 @@ import { buildWeeklyRecap } from '../../services/weeklyRecapService';
 import { moodCheckinService } from '../../services/moodService';
 import { ritualEventService } from '../../services/ritualService';
 import { buildCompletionCardPayload } from '../../services/completionCardPayload';
-import { SANCTUARY_LEVEL_UP_ANIMATION_SRC } from '../../src/lottie/sanctuaryAnimation';
+import {
+  SANCTUARY_LEVEL_UP_ANIMATION_ID,
+  SANCTUARY_LEVEL_UP_ANIMATION_SRC,
+} from '../../src/lottie/sanctuaryAnimation';
 import { DEFAULT_MOOD_TONE, getMoodConfig } from './moodConfig';
 
 const TAG_TONE_CLASSES = ['text-green', 'text-green/80', 'text-green/70', 'text-green/60'];
@@ -60,6 +63,8 @@ export const Insights: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const isOpeningSanctuaryRef = useRef(false);
   const openingTimerRef = useRef<number | null>(null);
+  const shouldReduceMotion =
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -217,6 +222,7 @@ export const Insights: React.FC = () => {
               <div className="h-[min(66vmin,34rem)] w-[min(66vmin,34rem)]">
                 <LottieAnimation
                   src={SANCTUARY_LEVEL_UP_ANIMATION_SRC}
+                  animationId={SANCTUARY_LEVEL_UP_ANIMATION_ID}
                   autoplay
                   loop={false}
                   dotLottieRefCallback={bindSanctuaryEntrancePlayer}
@@ -544,7 +550,7 @@ export const Insights: React.FC = () => {
               <div className="space-y-5">
                 {isWikiReadyToBuild ? (
                   <div className="h-28 w-28 overflow-hidden rounded-[2rem] bg-[oklch(from_var(--color-accent)_l_c_h_/_0.16)] transition-transform duration-500 group-hover:scale-105 group-hover:rotate-3">
-                    <LottieAnimation src={SANCTUARY_LEVEL_UP_ANIMATION_SRC} autoplay loop />
+                    <LottieAnimation src={SANCTUARY_LEVEL_UP_ANIMATION_SRC} animationId={SANCTUARY_LEVEL_UP_ANIMATION_ID} autoplay loop />
                   </div>
                 ) : (
                   <div className="tone-icon tone-icon-sage h-14 w-14 rounded-2xl transition-transform duration-500 ease-out-expo group-hover:scale-110 group-hover:rotate-6">

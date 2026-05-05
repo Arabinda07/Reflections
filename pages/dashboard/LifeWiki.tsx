@@ -28,7 +28,10 @@ import {
   type WikiPageType,
 } from '../../services/wikiTypes';
 import { trackLifeWikiRefreshedDeferred } from '../../src/analytics/deferredEvents';
-import { SANCTUARY_LEVEL_UP_ANIMATION_SRC } from '../../src/lottie/sanctuaryAnimation';
+import {
+  SANCTUARY_LEVEL_UP_ANIMATION_ID,
+  SANCTUARY_LEVEL_UP_ANIMATION_SRC,
+} from '../../src/lottie/sanctuaryAnimation';
 
 type RefreshFeedback = {
   variant: 'warning' | 'error';
@@ -448,7 +451,12 @@ export const LifeWiki: React.FC = () => {
             className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center animate-scale-in"
           >
             <div className="h-[min(66vmin,34rem)] w-[min(66vmin,34rem)]">
-              <LottieAnimation src={SANCTUARY_LEVEL_UP_ANIMATION_SRC} autoplay loop={isRefreshingWiki || isEnteringWiki} />
+              <LottieAnimation
+                src={SANCTUARY_LEVEL_UP_ANIMATION_SRC}
+                animationId={SANCTUARY_LEVEL_UP_ANIMATION_ID}
+                autoplay
+                loop={isRefreshingWiki || isEnteringWiki}
+              />
             </div>
           </div>
           <div
@@ -499,9 +507,9 @@ export const LifeWiki: React.FC = () => {
                     <p className="label-caps text-green">
                       Opening room
                     </p>
-                    <h1 className="mt-3 text-4xl font-display font-bold text-gray-text">
+                    <h2 className="mt-3 text-4xl font-display font-bold text-gray-text">
                       Reading the shelf...
-                    </h1>
+                    </h2>
                   </div>
                 </Surface>
               ) : !canShowSanctuaryRooms ? (
@@ -510,9 +518,9 @@ export const LifeWiki: React.FC = () => {
                     <p className="label-caps text-green">
                       Life Wiki unlocks after 3 entries
                     </p>
-                    <h1 className="mt-3 text-4xl font-display font-bold text-gray-text">
+                    <h2 className="mt-3 text-4xl font-display font-bold text-gray-text">
                       Still gathering enough signal.
-                    </h1>
+                    </h2>
                     <p className="mx-auto mt-4 max-w-[65ch] text-base font-medium leading-relaxed text-gray-light">
                       Write {entriesNeededForWiki} more {entriesNeededForWiki === 1 ? 'entry' : 'entries'} before this Sanctuary room opens.
                     </p>
@@ -548,7 +556,7 @@ export const LifeWiki: React.FC = () => {
                         Awaiting your signal
                       </h2>
                       <p className="mt-4 mb-8 text-base font-medium leading-relaxed text-gray-light">
-                        This Sanctuary room is ready to be drafted. The AI will read through your saved reflections and organize the patterns it finds here.
+                        This Sanctuary room is ready, but it has not been written yet. The AI will read through your saved reflections and organize the patterns it finds here.
                       </p>
                       {!gate?.requiresUpgrade ? (
                         <Button

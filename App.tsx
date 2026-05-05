@@ -4,38 +4,36 @@ import { RouteLoadingFrame } from './components/ui/RouteLoadingFrame';
 import { RouteErrorBoundary } from './pages/RouteErrorBoundary';
 import { RoutePath } from './types';
 import { useNativeOAuthListener } from './hooks/useNativeOAuthListener';
-import { useNativeStatusBar } from './hooks/useNativeStatusBar';
-import { AppBootstrapper } from './components/ui/AppBootstrapper';
 
 const AuthenticatedAppShell = lazy(() => import('./layouts/AuthenticatedAppShell').then((m) => ({ default: m.AuthenticatedAppShell })));
 const AuthAppShell = lazy(() => import('./layouts/AuthAppShell').then((m) => ({ default: m.AuthAppShell })));
 const PublicAppShell = lazy(() => import('./layouts/PublicAppShell').then((m) => ({ default: m.PublicAppShell })));
 const ProtectedRoute = lazy(() => import('./components/auth/ProtectedRoute').then((m) => ({ default: m.ProtectedRoute })));
+const AppBootstrapper = lazy(() => import('./components/ui/AppBootstrapper').then((m) => ({ default: m.AppBootstrapper })));
 
-const NativeBridge: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const NativeOAuthBridge: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   useNativeOAuthListener();
-  useNativeStatusBar();
   return <>{children}</>;
 };
 
-const Landing = lazy(() => import('@/pages/dashboard/Landing.tsx').then((m) => ({ default: m.Landing })));
-const SignIn = lazy(() => import('@/pages/auth/SignIn.tsx').then((m) => ({ default: m.SignIn })));
-const SignUp = lazy(() => import('@/pages/auth/SignUp.tsx').then((m) => ({ default: m.SignUp })));
-const ResetPassword = lazy(() => import('@/pages/auth/ResetPassword.tsx').then((m) => ({ default: m.ResetPassword })));
-const MyNotes = lazy(() => import('@/pages/dashboard/MyNotes.tsx').then((m) => ({ default: m.MyNotes })));
-const CreateNote = lazy(() => import('@/pages/dashboard/CreateNote.tsx').then((m) => ({ default: m.CreateNote })));
-const SingleNote = lazy(() => import('@/pages/dashboard/SingleNote.tsx').then((m) => ({ default: m.SingleNote })));
-const ReleaseMode = lazy(() => import('@/pages/dashboard/ReleaseMode.tsx').then((m) => ({ default: m.ReleaseMode })));
-const FutureLetters = lazy(() => import('@/pages/dashboard/FutureLetters.tsx').then((m) => ({ default: m.FutureLetters })));
-const Account = lazy(() => import('@/pages/dashboard/Account.tsx').then((m) => ({ default: m.Account })));
-const Insights = lazy(() => import('@/pages/dashboard/Insights.tsx').then((m) => ({ default: m.Insights })));
-const LifeWiki = lazy(() => import('@/pages/dashboard/LifeWiki.tsx').then((m) => ({ default: m.LifeWiki })));
-const FAQ = lazy(() => import('@/pages/dashboard/FAQ.tsx').then((m) => ({ default: m.FAQ })));
-const AboutArabinda = lazy(() => import('@/pages/dashboard/AboutArabinda.tsx').then((m) => ({ default: m.AboutArabinda })));
-const PrivacyPolicy = lazy(() => import('@/pages/dashboard/PrivacyPolicy.tsx').then((m) => ({ default: m.PrivacyPolicy })));
-const AuthCallback = lazy(() => import('@/pages/auth/AuthCallback.tsx').then((m) => ({ default: m.AuthCallback })));
-const HomeAuthenticated = lazy(() => import('@/pages/dashboard/HomeAuthenticated.tsx').then((m) => ({ default: m.HomeAuthenticated })));
-const NotFound = lazy(() => import('@/pages/NotFound.tsx').then((m) => ({ default: m.NotFound })));
+const Landing = lazy(() => import('@/pages/dashboard/Landing').then((m) => ({ default: m.Landing })));
+const SignIn = lazy(() => import('@/pages/auth/SignIn').then((m) => ({ default: m.SignIn })));
+const SignUp = lazy(() => import('@/pages/auth/SignUp').then((m) => ({ default: m.SignUp })));
+const ResetPassword = lazy(() => import('@/pages/auth/ResetPassword').then((m) => ({ default: m.ResetPassword })));
+const MyNotes = lazy(() => import('@/pages/dashboard/MyNotes').then((m) => ({ default: m.MyNotes })));
+const CreateNote = lazy(() => import('@/pages/dashboard/CreateNote').then((m) => ({ default: m.CreateNote })));
+const SingleNote = lazy(() => import('@/pages/dashboard/SingleNote').then((m) => ({ default: m.SingleNote })));
+const ReleaseMode = lazy(() => import('@/pages/dashboard/ReleaseMode').then((m) => ({ default: m.ReleaseMode })));
+const FutureLetters = lazy(() => import('@/pages/dashboard/FutureLetters').then((m) => ({ default: m.FutureLetters })));
+const Account = lazy(() => import('@/pages/dashboard/Account').then((m) => ({ default: m.Account })));
+const Insights = lazy(() => import('@/pages/dashboard/Insights').then((m) => ({ default: m.Insights })));
+const LifeWiki = lazy(() => import('@/pages/dashboard/LifeWiki').then((m) => ({ default: m.LifeWiki })));
+const FAQ = lazy(() => import('@/pages/dashboard/FAQ').then((m) => ({ default: m.FAQ })));
+const AboutArabinda = lazy(() => import('@/pages/dashboard/AboutArabinda').then((m) => ({ default: m.AboutArabinda })));
+const PrivacyPolicy = lazy(() => import('@/pages/dashboard/PrivacyPolicy').then((m) => ({ default: m.PrivacyPolicy })));
+const AuthCallback = lazy(() => import('@/pages/auth/AuthCallback').then((m) => ({ default: m.AuthCallback })));
+const HomeAuthenticated = lazy(() => import('@/pages/dashboard/HomeAuthenticated').then((m) => ({ default: m.HomeAuthenticated })));
+const NotFound = lazy(() => import('@/pages/NotFound').then((m) => ({ default: m.NotFound })));
 
 const withRouteFallback = (element: React.ReactNode) => (
   <Suspense fallback={<RouteLoadingFrame />}>{element}</Suspense>
@@ -43,6 +41,13 @@ const withRouteFallback = (element: React.ReactNode) => (
 
 const withProtectedRoute = (element: React.ReactNode) =>
   withRouteFallback(<ProtectedRoute>{element}</ProtectedRoute>);
+
+const withBootstrappedShell = (element: React.ReactNode) =>
+  withRouteFallback(
+    <NativeOAuthBridge>
+      <AppBootstrapper>{withRouteFallback(element)}</AppBootstrapper>
+    </NativeOAuthBridge>,
+  );
 
 const RootLayout = () => (
   <>
@@ -61,7 +66,10 @@ const router = createBrowserRouter(
         <Route path={RoutePath.PRIVACY} element={withRouteFallback(<PrivacyPolicy />)} />
       </Route>
 
-      <Route element={<NativeBridge>{withRouteFallback(<AuthAppShell />)}</NativeBridge>} errorElement={<RouteErrorBoundary />}>
+      <Route
+        element={withBootstrappedShell(<AuthAppShell />)}
+        errorElement={<RouteErrorBoundary />}
+      >
         <Route path="/signin" element={<Navigate to={RoutePath.LOGIN} replace />} />
         <Route path="/sign-in" element={<Navigate to={RoutePath.LOGIN} replace />} />
         <Route path={RoutePath.LOGIN} element={withRouteFallback(<SignIn />)} />
@@ -70,7 +78,10 @@ const router = createBrowserRouter(
         <Route path={RoutePath.AUTH_CALLBACK} element={withRouteFallback(<AuthCallback />)} />
       </Route>
 
-      <Route element={<NativeBridge>{withRouteFallback(<AuthenticatedAppShell />)}</NativeBridge>} errorElement={<RouteErrorBoundary />}>
+      <Route
+        element={withBootstrappedShell(<AuthenticatedAppShell />)}
+        errorElement={<RouteErrorBoundary />}
+      >
         <Route path={RoutePath.DASHBOARD_ALIAS} element={<Navigate to={RoutePath.DASHBOARD} replace />} />
         <Route path={RoutePath.DASHBOARD} element={withProtectedRoute(withRouteFallback(<HomeAuthenticated />))} />
         <Route path={RoutePath.NOTES} element={withProtectedRoute(withRouteFallback(<MyNotes />))} />
@@ -92,11 +103,7 @@ const router = createBrowserRouter(
 );
 
 function App() {
-  return (
-    <AppBootstrapper>
-      <RouterProvider router={router} />
-    </AppBootstrapper>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;
