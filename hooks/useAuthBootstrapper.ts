@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { supabase } from '../src/supabaseClient';
-import { Session } from '@supabase/supabase-js';
+import type { Session } from '@supabase/supabase-js';
 import { useAuthStore } from './useAuthStore';
 import { User } from '../types';
 import {
@@ -45,7 +44,7 @@ export const useAuthBootstrapper = () => {
 
     const checkSession = async () => {
       try {
-        // First check Supabase (if online)
+        const { supabase } = await import('../src/supabaseClient');
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (mounted) {
@@ -80,21 +79,28 @@ export const useAuthBootstrapper = () => {
 
     checkSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!mounted) return;
-      if (session) {
-        setUser(mapSessionToUser(session));
-        syncAnalyticsSession(session);
-      } else {
-        setUser(null);
-        syncAnalyticsSession(null);
-      }
-      setInitialCheckDone(true);
+    let authSubscription: any;
+    
+    import('../src/supabaseClient').then(({ supabase }) => {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (!mounted) return;
+        if (session) {
+          setUser(mapSessionToUser(session));
+          syncAnalyticsSession(session);
+        } else {
+          setUser(null);
+          syncAnalyticsSession(null);
+        }
+        setInitialCheckDone(true);
+      });
+      authSubscription = subscription;
     });
 
     return () => {
       mounted = false;
-      subscription.unsubscribe();
+      if (authSubscription) {
+        authSubscription.unsubscribe();
+      }
     };
   }, [setUser, setHydrated, setInitialCheckDone]);
 };

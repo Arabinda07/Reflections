@@ -70,21 +70,7 @@ const scheduleIdleTask = (callback: () => void, timeout = 2400) => {
   return () => window.clearTimeout(handle);
 };
 
-const hasStoredAuthSessionHint = () => {
-  try {
-    for (let index = 0; index < window.localStorage.length; index += 1) {
-      const key = window.localStorage.key(index);
-
-      if (key?.startsWith('sb-') && key.endsWith('-auth-token')) {
-        return true;
-      }
-    }
-  } catch (error) {
-    console.warn('Could not inspect local auth storage from landing.', error);
-  }
-
-  return false;
-};
+import { hasStoredAuthSessionHint } from '../../src/utils/authHints';
 
 export const Landing: React.FC = () => {
   useDocumentMeta({

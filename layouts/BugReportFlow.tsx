@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import emailjs from '@emailjs/browser';
 import {
   Bug,
@@ -12,22 +12,26 @@ import { useAuthStore } from '../hooks/useAuthStore';
 import { useHaptics } from '../hooks/useHaptics';
 import { useSound } from '../hooks/useSound';
 import { registerAndroidBackAction } from '../src/native/androidBack';
-import { useEffect } from 'react';
 
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
 const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
+interface BugReportFlowProps {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
 /**
  * Self-contained bug report flow.
- * Owns its own open/close state, form state, EmailJS submission, and success feedback.
+ * Owns its form state, EmailJS submission, and success feedback.
+ * Its open/close state is controlled by its parent to allow triggers from multiple places.
  */
-export const BugReportFlow: React.FC = () => {
+export const BugReportFlow: React.FC<BugReportFlowProps> = ({ isOpen, onOpenChange }) => {
   const { user } = useAuthStore();
   const haptics = useHaptics();
   const { playSaveChime } = useSound();
 
-  const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -38,10 +42,10 @@ export const BugReportFlow: React.FC = () => {
     if (!isOpen) return;
 
     return registerAndroidBackAction(() => {
-      setIsOpen(false);
+      onOpenChange(false);
       return true;
     });
-  }, [isOpen]);
+  }, [isOpen, onOpenChange]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,7 +77,7 @@ export const BugReportFlow: React.FC = () => {
       playSaveChime();
 
       setTimeout(() => {
-        setIsOpen(false);
+        onOpenChange(false);
         setTimeout(() => setIsSubmitted(false), 500);
       }, 2500);
     } catch (error) {
@@ -89,7 +93,7 @@ export const BugReportFlow: React.FC = () => {
     <>
       {/* Floating Bug Report Button — desktop only */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => onOpenChange(!isOpen)}
         className={`fixed bottom-4 left-6 z-[110] hidden h-11 w-11 items-center justify-center rounded-2xl transition duration-300 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/20 group shadow-sm md:flex ${
           isOpen
             ? 'bg-green text-white border-[1.5px] border-green'
@@ -110,7 +114,7 @@ export const BugReportFlow: React.FC = () => {
 
       <ModalSheet
         isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
+        onClose={() => onOpenChange(false)}
         title="Report a bug"
         description="Tell us what broke or felt off. Add the page or step if you can."
         icon={<Bug size={20} weight="duotone" />}

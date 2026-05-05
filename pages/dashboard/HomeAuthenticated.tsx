@@ -325,14 +325,14 @@ export const HomeAuthenticated: React.FC = () => {
         mood,
         source: 'home',
       });
-      setCheckInFeedback('saved. new task added');
+      setCheckInFeedback(mood);
       setTimeout(() => {
         setIsCheckInOpen(false);
-        setCheckInFeedback(null);
+        setTimeout(() => setCheckInFeedback(null), 300);
       }, 1500);
     } catch (error) {
       console.error('Could not save mood check-in:', error);
-      setCheckInFeedback('Could not save that just now.');
+      setCheckInFeedback('error');
     } finally {
       setIsSavingCheckIn(false);
     }
@@ -394,7 +394,7 @@ export const HomeAuthenticated: React.FC = () => {
         updateIntentionSummary(taskNotes.map(n => n.id === targetNote.id ? updatedNote : n));
       }
       setNewTaskText('');
-      setIntentionFeedback('saved. new task added');
+      setIntentionFeedback('Intention saved.');
       setTimeout(() => {
         setIsIntentionModalOpen(false);
         setIntentionFeedback(null);
@@ -843,32 +843,66 @@ export const HomeAuthenticated: React.FC = () => {
           <p className="text-base font-medium leading-relaxed text-gray-light">
             Name the weather of this moment without writing a full reflection.
           </p>
-          <div className="grid grid-cols-2 gap-3">
-            {MOOD_OPTIONS.map((moodOption) => {
-              const moodConfig = MOOD_CONFIG[moodOption];
-              const Icon = moodConfig.icon;
+          <AnimatePresence mode="wait">
+            {!checkInFeedback ? (
+              <motion.div
+                key="grid"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="grid grid-cols-2 gap-3"
+              >
+                {MOOD_OPTIONS.map((moodOption) => {
+                  const moodConfig = MOOD_CONFIG[moodOption];
+                  const Icon = moodConfig.icon;
 
-              return (
-                <button
-                  key={moodOption}
-                  type="button"
-                  onClick={() => handleMoodCheckIn(moodOption)}
-                  disabled={isSavingCheckIn}
-                  className={`group rounded-[1.5rem] border p-5 text-left transition-[border-color,background-color,box-shadow,transform,opacity] duration-300 ease-out-expo disabled:opacity-60 hover:scale-[1.02] hover:shadow-lg ${moodConfig.option}`}
-                >
-                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-body/50 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-12">
-                    <Icon size={24} weight="duotone" className={moodConfig.labelClass} />
-                  </div>
-                  <span className="text-base font-bold text-gray-text transition-colors group-hover:text-green">{moodConfig.label}</span>
-                </button>
-              );
-            })}
-          </div>
-          {checkInFeedback ? (
-            <p className="text-sm font-bold text-green" aria-live="polite">
-              {checkInFeedback}
-            </p>
-          ) : null}
+                  return (
+                    <button
+                      key={moodOption}
+                      type="button"
+                      onClick={() => handleMoodCheckIn(moodOption)}
+                      disabled={isSavingCheckIn}
+                      className={`group rounded-[1.5rem] border p-5 text-left transition-[border-color,background-color,box-shadow,transform,opacity] duration-300 ease-out-expo disabled:opacity-60 hover:scale-[1.02] hover:shadow-lg ${moodConfig.option}`}
+                    >
+                      <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-body/50 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-12">
+                        <Icon size={24} weight="duotone" className={moodConfig.labelClass} />
+                      </div>
+                      <span className="text-base font-bold text-gray-text transition-colors group-hover:text-green">{moodConfig.label}</span>
+                    </button>
+                  );
+                })}
+              </motion.div>
+            ) : (
+              <motion.div
+                key="success"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="flex flex-col items-center justify-center py-10 text-center"
+              >
+                {checkInFeedback === 'error' ? (
+                  <p className="text-sm font-bold text-clay">Could not save that just now.</p>
+                ) : (
+                  <>
+                    <motion.div 
+                      animate={{ 
+                        scale: [1, 1.2, 1],
+                        rotate: [0, -10, 10, -10, 0]
+                      }}
+                      transition={{ duration: 0.6, ease: "easeOut" }}
+                      className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green/10 text-green"
+                    >
+                      {MOOD_CONFIG[checkInFeedback]?.icon && React.createElement(MOOD_CONFIG[checkInFeedback].icon, { size: 32, weight: "fill" })}
+                    </motion.div>
+                    <h3 className="label-caps mb-2 text-green">Recorded</h3>
+                    <p className="font-serif text-[16px] italic leading-relaxed text-gray-light">
+                      Your mood has been saved.
+                    </p>
+                  </>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </ModalSheet>
       <ModalSheet

@@ -57,6 +57,7 @@ export const DashboardLayout: React.FC = () => {
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [isBugReportOpen, setIsBugReportOpen] = useState(false);
 
   useAndroidBackHandler();
 
@@ -119,7 +120,8 @@ export const DashboardLayout: React.FC = () => {
           onClose={() => setIsMobileMenuOpen(false)}
           navItems={sidebarNavItems}
           onBugReport={() => {
-            /* BugReportFlow manages its own state */
+            setIsMobileMenuOpen(false);
+            setIsBugReportOpen(true);
           }}
           onInvite={() => setIsInviteModalOpen(true)}
         />
@@ -180,7 +182,7 @@ export const DashboardLayout: React.FC = () => {
       {/* Bug Report Flow — self-contained with floating trigger + modal */}
       {!isWritingRoute && (
         <React.Suspense fallback={null}>
-          <BugReportFlow />
+          <BugReportFlow isOpen={isBugReportOpen} onOpenChange={setIsBugReportOpen} />
         </React.Suspense>
       )}
 

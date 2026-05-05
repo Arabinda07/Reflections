@@ -3,6 +3,7 @@ import { StartupScreen } from './StartupScreen';
 import { useAuthBootstrapper } from '../../hooks/useAuthBootstrapper';
 import { useAuthStore } from '../../hooks/useAuthStore';
 import { NATIVE_STARTUP_FADE_MS, NATIVE_STARTUP_MIN_MS } from '../../src/native/appLaunch';
+import { hasStoredAuthSessionHint } from '../../src/utils/authHints';
 
 const STARTUP_EXIT_ANIMATION_MS = 350;
 
@@ -11,6 +12,7 @@ export const AppBootstrapper: React.FC<{ children: React.ReactNode }> = ({ child
   const { isInitialCheckDone, isHydrated } = useAuthStore();
 
   const [showStartup, setShowStartup] = useState(() => {
+    if (!hasStoredAuthSessionHint()) return false;
     return !sessionStorage.getItem('startup_shown');
   });
   const [minTimeReached, setMinTimeReached] = useState(false);
