@@ -2,9 +2,8 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { get, set, del } from 'idb-keyval';
 import { User } from '../types';
-import { supabase } from '../src/supabaseClient';
 
-// Custom storage engine using idb-keyval as requested
+// Custom storage engine using IndexedDB via idb-keyval
 const storage = {
   getItem: async (name: string): Promise<string | null> => {
     return (await get(name)) || null;
@@ -39,6 +38,7 @@ export const useAuthStore = create<AuthState>()(
       setHydrated: (isHydrated) => set({ isHydrated }),
       setInitialCheckDone: (isInitialCheckDone) => set({ isInitialCheckDone }),
       logout: async () => {
+        const { supabase } = await import('../src/supabaseClient');
         await supabase.auth.signOut();
         set({ user: null, isAuthenticated: false });
       },

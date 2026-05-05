@@ -48,5 +48,6 @@ export function useHaptics() {
     light: useCallback(() => trigger('light'), [trigger]),
     soft: useCallback(() => trigger('soft'), [trigger]),
     confirming: useCallback(() => trigger('confirming'), [trigger]),
+    success: useCallback(() => trigger('soft'), [trigger]),
   };
 }

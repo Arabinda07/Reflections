@@ -10,10 +10,26 @@ type NoteSavedPayload = Parameters<AnalyticsEventsModule['trackNoteSaved']>[0];
 let analyticsEventsPromise: Promise<AnalyticsEventsModule> | null = null;
 
 const loadAnalyticsEvents = () => {
-  analyticsEventsPromise ??= import('./events').catch((error) => {
-    analyticsEventsPromise = null;
-    throw error;
-  });
+  if (!analyticsEventsPromise) {
+    analyticsEventsPromise = new Promise((resolve, reject) => {
+      const idleWindow = window as Window & {
+        requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
+      };
+      
+      const doImport = () => {
+        import('./events').then(resolve).catch(reject);
+      };
+
+      if (idleWindow.requestIdleCallback) {
+        idleWindow.requestIdleCallback(doImport, { timeout: 5000 });
+      } else {
+        setTimeout(doImport, 2000);
+      }
+    }).catch((error) => {
+      analyticsEventsPromise = null;
+      throw error;
+    }) as Promise<AnalyticsEventsModule>;
+  }
 
   return analyticsEventsPromise;
 };

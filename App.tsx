@@ -2,7 +2,6 @@ import React, { Suspense, lazy } from 'react';
 import { Navigate, Route, RouterProvider, createBrowserRouter, createRoutesFromElements, ScrollRestoration, Outlet } from 'react-router-dom';
 import { RouteLoadingFrame } from './components/ui/RouteLoadingFrame';
 import { RouteErrorBoundary } from './pages/RouteErrorBoundary';
-import { Landing } from './pages/dashboard/Landing';
 import { RoutePath } from './types';
 import { useNativeOAuthListener } from './hooks/useNativeOAuthListener';
 import { useNativeStatusBar } from './hooks/useNativeStatusBar';
@@ -19,6 +18,7 @@ const NativeBridge: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   return <>{children}</>;
 };
 
+const Landing = lazy(() => import('@/pages/dashboard/Landing.tsx').then((m) => ({ default: m.Landing })));
 const SignIn = lazy(() => import('@/pages/auth/SignIn.tsx').then((m) => ({ default: m.SignIn })));
 const SignUp = lazy(() => import('@/pages/auth/SignUp.tsx').then((m) => ({ default: m.SignUp })));
 const ResetPassword = lazy(() => import('@/pages/auth/ResetPassword.tsx').then((m) => ({ default: m.ResetPassword })));
@@ -55,7 +55,7 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <Route element={<RootLayout />}>
       <Route element={withRouteFallback(<PublicAppShell />)} errorElement={<RouteErrorBoundary />}>
-        <Route path={RoutePath.HOME} element={<Landing />} />
+        <Route path={RoutePath.HOME} element={withRouteFallback(<Landing />)} />
         <Route path={RoutePath.FAQ} element={withRouteFallback(<FAQ />)} />
         <Route path={RoutePath.ABOUT} element={withRouteFallback(<AboutArabinda />)} />
         <Route path={RoutePath.PRIVACY} element={withRouteFallback(<PrivacyPolicy />)} />

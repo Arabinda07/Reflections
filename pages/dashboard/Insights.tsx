@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import {
   ArrowLeft,
@@ -11,6 +11,7 @@ import {
   Leaf,
 } from '@phosphor-icons/react';
 import { DotLottieReact, type DotLottie } from '@lottiefiles/dotlottie-react';
+import { Button } from '../../components/ui/Button';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { CompletionCardActions } from '../../components/ui/CompletionCardActions';
 import { MetadataPill } from '../../components/ui/MetadataPill';
