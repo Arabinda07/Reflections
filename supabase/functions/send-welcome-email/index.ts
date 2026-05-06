@@ -64,7 +64,7 @@ serve(async (req) => {
     }
 
     const email = record.email
-    const fullName = record.full_name || 'there'
+    const fullName = record.raw_user_meta_data?.full_name || 'there'
     const firstName = fullName.split(' ')[0]
 
     // Render the React Email template to HTML

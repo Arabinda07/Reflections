@@ -86,13 +86,13 @@ describe('entrypoint vendor loading contract', () => {
   it('keeps route-error Lottie outside the app shell', () => {
     const routeErrorBoundary = read('pages/RouteErrorBoundary.tsx');
 
-    expect(routeErrorBoundary).not.toContain('@lottiefiles/dotlottie-react');
+    expect(routeErrorBoundary).not.toContain('lottie-react');
     expect(routeErrorBoundary).not.toContain("from '@/src/lottie/error-404.json'");
     expect(routeErrorBoundary).toContain("lazy(() => import('../components/ui/LottieAnimation')");
 
     expect(existsSync(path.resolve(process.cwd(), 'components/ui/LottieAnimation.tsx'))).toBe(true);
     const lottieAnimation = read('components/ui/LottieAnimation.tsx');
-    expect(lottieAnimation).toContain("from '@lottiefiles/dotlottie-react'");
+    expect(lottieAnimation).toContain("from 'lottie-react'");
   });
 
   it('keeps heavy async vendors out of the PWA precache manifest', () => {

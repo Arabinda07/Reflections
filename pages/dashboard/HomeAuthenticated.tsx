@@ -123,7 +123,7 @@ export const HomeAuthenticated: React.FC = () => {
   const shouldReduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const { showToast } = useToast();
 
-  const entranceDuration = isFromSave ? 0.3 : 0.8;
+
   const currentOnboardingStep = ONBOARDING_STEPS[onboardingStep];
   const isLastOnboardingStep = onboardingStep === ONBOARDING_STEPS.length - 1;
   const CurrentOnboardingIcon = onboardingStepIcons[onboardingStep];
@@ -148,7 +148,7 @@ export const HomeAuthenticated: React.FC = () => {
             quotesPool = [...WRITING_NOTES, ...parsed];
           }
         } catch (e) {
-          console.error('Could not parse cached quotes', e);
+          // Silently discard corrupted cache — user will get default quotes
         }
       } else {
         // Fetch new quotes from AI
@@ -160,7 +160,7 @@ export const HomeAuthenticated: React.FC = () => {
             quotesPool = [...WRITING_NOTES, ...freshQuotes];
           }
         } catch (e) {
-          console.error('Could not fetch dynamic quotes', e);
+          // Failed to fetch — fallback to static quotes pool
         }
       }
 
@@ -324,7 +324,7 @@ export const HomeAuthenticated: React.FC = () => {
         setTimeout(() => setCheckInFeedback(null), 300);
       }, 1500);
     } catch (error) {
-      console.error('Could not save mood check-in:', error);
+      // Mood check-in save failed — feedback shown to user via UI
       setCheckInFeedback('error');
     } finally {
       setIsSavingCheckIn(false);
@@ -345,7 +345,7 @@ export const HomeAuthenticated: React.FC = () => {
         : [...taskNotes, updatedNote];
       updateIntentionSummary(nextNotes);
     } catch (err) {
-      console.error('Could not update intention:', err);
+      // Intention toggle failed — UI remains in previous state
     }
   };
 
@@ -393,7 +393,7 @@ export const HomeAuthenticated: React.FC = () => {
         setIntentionFeedback(null);
       }, 1500);
     } catch (err) {
-      console.error('Could not create intention', err);
+      // Intention creation failed — toast shown to user
       showToast('Could not save intention');
     } finally {
       setIsCreatingTask(false);
@@ -404,7 +404,7 @@ export const HomeAuthenticated: React.FC = () => {
     <>
       <div
         className="surface-scope-sage page-wash relative min-h-full flex flex-col flex-1 bg-body selection:bg-green/10"
-        {...((showOnboarding ? { 'aria-hidden': 'true' } : {}) as any)}
+        aria-hidden={showOnboarding ? 'true' : undefined}
       >
         <section className="relative isolate h-[56dvh] min-h-[360px] w-full overflow-hidden bg-body sm:h-[60dvh] sm:min-h-[450px]">
           <img
@@ -542,7 +542,7 @@ export const HomeAuthenticated: React.FC = () => {
                         onClick={() => handleToggleIntention(intention.noteId, intention.id)}
                         aria-label={`Mark "${intention.text}" from ${intention.noteTitle} as complete`}
                       >
-                        <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 border-border group-hover/btn:border-honey transition-colors">
+                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-2 border-border group-hover/btn:border-honey transition-colors">
                            <div className="h-2 w-2 rounded-full bg-honey opacity-0 group-hover/btn:opacity-100 transition-opacity" />
                         </div>
                         <span className="min-w-0 flex-1">
@@ -560,7 +560,7 @@ export const HomeAuthenticated: React.FC = () => {
                       key={`done-${intention.id}`}
                       className="flex items-center gap-4 p-4 rounded-2xl text-left opacity-50"
                     >
-                      <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 border-green bg-green text-white">
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-2 border-green bg-green text-white">
                         <CheckCircleIcon size={12} weight="bold" />
                       </div>
                       <span className="min-w-0 flex-1">
@@ -872,7 +872,7 @@ export const HomeAuthenticated: React.FC = () => {
                   onClick={() => handleToggleIntention(intention.noteId, intention.id)}
                   className="group relative flex w-full items-center gap-3 rounded-2xl p-3 text-left transition-colors hover:bg-green/5"
                 >
-                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border-2 border-border text-transparent transition-colors group-hover:border-green/50">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border-2 border-border text-transparent transition-colors group-hover:border-green/50">
                     <span />
                   </div>
                   <span className="flex-1 text-[14px] font-bold text-gray-text line-clamp-2">{intention.text}</span>

@@ -27,10 +27,12 @@ export const BaseEmailLayout = ({ children, previewText }: BaseEmailLayoutProps)
       >
         <Head />
         {previewText && <Preview>{previewText}</Preview>}
-        <Body className="bg-brand-bg text-brand-text font-sans py-10 antialiased">
-          <Container className="mx-auto max-w-[600px] bg-white rounded-[2rem] p-8 sm:p-12 shadow-sm border border-black/5">
-            {children}
-          </Container>
+        <Body className="bg-brand-bg text-brand-text font-sans antialiased">
+          <div className="px-4 py-8 sm:px-6 sm:py-12">
+            <Container className="mx-auto w-full max-w-[600px] bg-white rounded-3xl p-8 sm:p-12 shadow-sm border border-black/5">
+              {children}
+            </Container>
+          </div>
         </Body>
       </Tailwind>
     </Html>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import Lottie from 'lottie-react';
 import loadingAnimation from '@/src/lottie/loading.json';
 import { OverlayFeedback } from './OverlayFeedback';
 
@@ -18,7 +18,7 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
     <OverlayFeedback isVisible={isVisible} overlayClassName="overlay-feedback--screen">
       <div className="flex flex-col items-center justify-center text-center">
         <div className="mb-8 h-72 w-72 max-w-full" aria-hidden="true">
-          <DotLottieReact data={animationData} autoplay loop />
+          <Lottie animationData={animationData as unknown} autoplay loop />
         </div>
 
         <div className="overlay-feedback-copy body-editorial sr-only">

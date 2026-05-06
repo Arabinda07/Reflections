@@ -21,7 +21,7 @@ const vendorChunk = (id: string) => {
   if (id.includes('quill')) return 'vendor-editor';
   if (id.includes('@supabase') || id.includes('idb-keyval')) return 'vendor-supabase';
   if (id.includes('dexie')) return 'vendor-dexie';
-  if (id.includes('@lottiefiles')) return 'vendor-lottie';
+  if (id.includes('lottie-react') || id.includes('lottie-web')) return 'vendor-lottie';
   if (id.includes('motion')) return 'vendor-motion';
   if (id.includes('@phosphor-icons')) return 'vendor-icons';
   if (id.includes('@google/genai') || id.includes('@splinetool/runtime')) return 'vendor-ai';
@@ -91,6 +91,8 @@ export default defineConfig(() => {
             ]
           },
           workbox: {
+            navigateFallback: '/index.html',
+            navigateFallbackAllowlist: [/^(?!\/__).*$/],
             cleanupOutdatedCaches: true,
             maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
             globPatterns: [

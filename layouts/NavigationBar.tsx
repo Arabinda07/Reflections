@@ -5,8 +5,6 @@ import {
   Sun,
   Leaf,
   PaperPlaneTilt,
-  List,
-  X,
 } from '@phosphor-icons/react';
 import { Button } from '../components/ui/Button';
 import { useAuthStore } from '../hooks/useAuthStore';
@@ -107,7 +105,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
             className="group flex min-h-11 items-center gap-2"
             aria-label="Reflections — go to home"
           >
-            <div className="h-10 w-10 rounded-xl bg-green flex items-center justify-center text-white shadow-sm transition-transform duration-300 group-hover:scale-105 group-hover:-rotate-12">
+            <div className="h-10 w-10 rounded-xl bg-green flex items-center justify-center text-on-accent shadow-sm transition-transform duration-300 group-hover:scale-105 group-hover:-rotate-12">
               <Leaf size={24} weight="fill" />
             </div>
             <span className="font-serif italic text-[22px] sm:text-[26px] text-green tracking-normal truncate max-w-[150px] sm:max-w-none">
@@ -118,7 +116,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
 
         {/* Right Side - Desktop Nav */}
         <div
-          className={`${isMobileNavSuppressed ? 'hidden lg:flex' : 'flex'} hidden lg:flex items-center gap-1.5 xl:gap-2`}
+          className={`hidden lg:flex items-center gap-1.5 xl:gap-2`}
         >
           {DarkModeToggle}
           {navItems.map((item) => {
@@ -149,7 +147,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
                 variant="secondary"
                 size="sm"
                 onClick={onInvite}
-                className="gap-2 px-3 xl:px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+                className="gap-2 px-3 xl:px-4"
               >
                 Invite
                 <PaperPlaneTilt size={16} weight="regular" />
@@ -158,7 +156,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={() => logout()}
-                className="px-3 text-clay hover:bg-clay/5 xl:px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+                className="px-3 text-clay hover:bg-clay/5 xl:px-4"
               >
                 Logout
               </Button>
@@ -169,7 +167,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate(RoutePath.LOGIN)}
-                className="px-3 xl:px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+                className="px-3 xl:px-4"
               >
                 Sign in
               </Button>
@@ -177,7 +175,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
                 variant="primary"
                 size="sm"
                 onClick={() => navigate(RoutePath.SIGNUP)}
-                className="px-3 xl:px-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-green"
+                className="px-3 xl:px-4"
               >
                 Sign up
               </Button>
@@ -198,9 +196,9 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
           >
             <div className="relative h-6 w-6">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-current">
-                <line x1={isMobileMenuOpen ? 6 : 4} y1="6" x2={isMobileMenuOpen ? 18 : 20} y2={isMobileMenuOpen ? 18 : 6} style={{ transition: 'x1 0.3s ease, x2 0.3s ease, y2 0.3s ease' }} />
-                <line x1="4" y1="12" x2="20" y2="12" style={{ opacity: isMobileMenuOpen ? 0 : 1, transition: 'opacity 0.2s ease' }} />
-                <line x1={isMobileMenuOpen ? 6 : 4} y1="18" x2={isMobileMenuOpen ? 18 : 20} y2={isMobileMenuOpen ? 6 : 18} style={{ transition: 'x1 0.3s ease, x2 0.3s ease, y2 0.3s ease' }} />
+                <line x1={isMobileMenuOpen ? 6 : 4} y1="6" x2={isMobileMenuOpen ? 18 : 20} y2={isMobileMenuOpen ? 18 : 6} className="hamburger-line" />
+                <line x1="4" y1="12" x2="20" y2="12" className={`hamburger-line ${isMobileMenuOpen ? 'hamburger-line--hidden' : ''}`} />
+                <line x1={isMobileMenuOpen ? 6 : 4} y1="18" x2={isMobileMenuOpen ? 18 : 20} y2={isMobileMenuOpen ? 6 : 18} className="hamburger-line" />
               </svg>
             </div>
           </button>

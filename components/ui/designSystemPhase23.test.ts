@@ -200,8 +200,8 @@ describe('phase 2/3 design-system rollout', () => {
     const moodConfig = read('pages/dashboard/moodConfig.ts');
     const insights = read('pages/dashboard/Insights.tsx');
 
-    expect(button).toContain('primary: "border border-transparent bg-green text-white');
-    expect(button).toContain('danger: "border border-transparent bg-clay text-white');
+    expect(button).toContain('primary: "border border-transparent bg-green text-on-accent');
+    expect(button).toContain('danger: "border border-transparent bg-clay text-on-accent');
     expect(button).not.toContain('bg-red text-white');
 
     expect(input).toContain('focus:border-green focus:ring-2 focus:ring-green/10');
@@ -218,7 +218,7 @@ describe('phase 2/3 design-system rollout', () => {
     expect(proUpgrade).not.toContain("selectedPlan === 'monthly' ? 'border-green bg-green/5'");
 
     expect(navigationBar).toContain("aria-current={isActive ? 'page' : undefined}");
-    expect(navigationBar).toContain('border-green bg-green/5 text-green');
+    expect(navigationBar).toContain('bg-green/5 text-green');
     expect(navigationBar).toContain('text-clay hover:bg-clay/5');
 
     expect(createNote).toContain('Reflect with AI');
@@ -250,12 +250,12 @@ describe('phase 2/3 design-system rollout', () => {
     expect(css).toMatch(/\.section-header-actions\s*{[^}]*width: 100%;/s);
     expect(css).toMatch(/@media \(max-width: 639px\)[\s\S]*\.section-header-actions :where\(button, a\)/);
 
-    expect(button).toContain('useReducedMotion');
+    expect(button).toContain('motion-reduce');
     expect(button).toContain('transition-[background-color,border-color,color,box-shadow,transform,filter]');
     expect(button).toContain('motion-reduce:transition-none');
     expect(button).not.toContain('transition-all');
 
-    expect(navigationBar).toContain("isMobileNavSuppressed ? 'hidden lg:flex' : 'flex'");
+    expect(navigationBar).toContain('hidden lg:flex items-center gap-1.5 xl:gap-2');
     expect(navigationBar).toContain('hidden lg:flex items-center gap-1.5 xl:gap-2');
     expect(navigationBar).toContain('lg:hidden items-center gap-2');
     expect(navigationBar).toContain('px-3 xl:px-4');

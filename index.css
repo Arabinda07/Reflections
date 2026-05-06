@@ -571,6 +571,15 @@ details:focus-visible,
   transition: outline-offset 150ms ease, box-shadow 150ms ease;
 }
 
+/* Hamburger → X morph transition (moved from inline styles for prefers-reduced-motion compliance) */
+.hamburger-line {
+  transition: x1 0.3s ease, x2 0.3s ease, y1 0.3s ease, y2 0.3s ease, opacity 0.2s ease;
+}
+
+.hamburger-line--hidden {
+  opacity: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -1281,7 +1290,7 @@ details:focus-visible,
     justify-content: center;
     border-radius: 9999px;
     background: var(--green);
-    color: white;
+    color: var(--hero-ink);
     font-size: 1.125rem;
     font-weight: 800;
     box-shadow: 0 4px 12px oklch(from var(--green-shadow) l c h / 0.2);

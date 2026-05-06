@@ -18,7 +18,7 @@ describe('design-system primitives', () => {
     const markup = renderToStaticMarkup(<Button variant="primary">Save changes</Button>);
 
     expect(markup).toContain('bg-green');
-    expect(markup).toContain('text-white');
+    expect(markup).toContain('text-on-accent');
     expect(markup).not.toContain('text-blue');
   });
 
@@ -26,7 +26,7 @@ describe('design-system primitives', () => {
     const markup = renderToStaticMarkup(<Button variant="danger">Delete</Button>);
 
     expect(markup).toContain('bg-clay');
-    expect(markup).toContain('text-white');
+    expect(markup).toContain('text-on-accent');
     expect(markup).not.toContain('bg-red');
   });
 

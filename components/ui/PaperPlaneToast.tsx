@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import Lottie from 'lottie-react';
 import { motion } from 'motion/react';
 import paperPlaneData from '@/src/lottie/paperplane.json';
 import { OverlayFeedback } from './OverlayFeedback';
@@ -38,11 +38,10 @@ export const PaperPlaneToast: React.FC<PaperPlaneToastProps> = ({
         className="flex items-center gap-3"
       >
         <div className="w-[80px] h-[80px] shrink-0 -my-3 -ml-2">
-          <DotLottieReact
-            data={paperPlaneData}
+          <Lottie
+            animationData={paperPlaneData as unknown}
             autoplay
             loop
-            speed={1.5}
             className="w-full h-full"
           />
         </div>

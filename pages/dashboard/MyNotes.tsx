@@ -160,7 +160,7 @@ export const MyNotes: React.FC = () => {
                   <StorageImage
                     path={note.thumbnailUrl}
                     alt={note.title}
-                    className="h-full w-full object-cover transition-transform duration-700 ease-out will-change-transform group-hover:scale-110"
+                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
                   />
                 </>
               ) : (

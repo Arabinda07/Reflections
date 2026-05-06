@@ -10,7 +10,7 @@ import {
   Hash,
   Leaf,
 } from '@phosphor-icons/react';
-import { type DotLottie } from '@lottiefiles/dotlottie-react';
+
 import { LottieAnimation } from '../../components/ui/LottieAnimation';
 import { Button } from '../../components/ui/Button';
 import { EmptyState } from '../../components/ui/EmptyState';
@@ -192,10 +192,7 @@ export const Insights: React.FC = () => {
     openingTimerRef.current = window.setTimeout(completeOpenSanctuary, SANCTUARY_ENTRANCE_FALLBACK_MS);
   }, [completeOpenSanctuary, navigate, shouldReduceMotion]);
 
-  const bindSanctuaryEntrancePlayer = useCallback((dotLottie: DotLottie | null) => {
-    if (!dotLottie) return;
-    dotLottie.addEventListener('complete', completeOpenSanctuary);
-  }, [completeOpenSanctuary]);
+
 
   useEffect(() => {
     return () => {
@@ -225,7 +222,7 @@ export const Insights: React.FC = () => {
                   animationId={SANCTUARY_LEVEL_UP_ANIMATION_ID}
                   autoplay
                   loop={false}
-                  dotLottieRefCallback={bindSanctuaryEntrancePlayer}
+                  onComplete={completeOpenSanctuary}
                 />
               </div>
             </div>

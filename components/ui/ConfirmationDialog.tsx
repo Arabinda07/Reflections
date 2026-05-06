@@ -70,8 +70,6 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
         </div>
       }
       bodyClassName="pt-2"
-    >
-      <div className="sr-only">Confirmation required</div>
-    </ModalSheet>
+    />
   );
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import Lottie from 'lottie-react';
 import { motion } from 'motion/react';
 import { 
   ArrowLeft, 
@@ -406,7 +406,7 @@ export const CreateNote: React.FC = () => {
           className="relative z-10 flex max-w-md flex-col items-center animate-fade-in-up"
         >
           <div className="mb-8 h-48 w-48 max-w-full" aria-hidden="true">
-            <DotLottieReact data={trailLoadingAnimation} autoplay loop />
+            <Lottie animationData={trailLoadingAnimation} autoplay loop />
           </div>
 
           <h2 className="h2-section mb-4">Take a breath.</h2>
@@ -525,7 +525,7 @@ export const CreateNote: React.FC = () => {
           {/* Cover Image */}
           {imagePreview && (
             <div className="surface-flat group relative mb-12 w-full aspect-[21/9] overflow-hidden rounded-[2rem] animate-fade-in-up">
-              <img src={imagePreview} alt="Cover" className="w-full h-full object-cover" />
+              <img src={imagePreview} alt="" aria-hidden="true" className="w-full h-full object-cover" />
               <button
                 onClick={() => setImagePreview(null)}
                 className="surface-floating surface-floating--media absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import Lottie from 'lottie-react';
 import { motion } from 'motion/react';
 import trailData from '@/src/lottie/trail-loading.json';
 import { OverlayFeedback } from './OverlayFeedback';
@@ -29,7 +29,7 @@ export const CompanionObservation: React.FC<CompanionObservationProps> = ({
     <OverlayFeedback isVisible={isVisible} overlayClassName="overlay-feedback--veil">
       <div className="flex flex-col items-center justify-center text-center">
         <div className="w-72 h-72 md:w-96 md:h-96 -mt-10">
-          <DotLottieReact data={trailData} autoplay loop />
+          <Lottie animationData={trailData as unknown} autoplay loop />
         </div>
 
         <motion.div

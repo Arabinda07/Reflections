@@ -81,6 +81,9 @@ export default {
           angry: 'var(--color-mood-angry)',
           tired: 'var(--color-mood-tired)',
         },
+        /* Text-on-accent: tinted near-white for text on green/accent backgrounds.
+           Uses --hero-ink (oklch 0.98 0.01 135) instead of pure #fff. */
+        'on-accent': 'var(--hero-ink)',
       },
       backgroundColor: {
         body: 'var(--bg-color)',
