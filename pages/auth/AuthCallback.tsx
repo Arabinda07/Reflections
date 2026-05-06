@@ -31,6 +31,7 @@ export const AuthCallback: React.FC = () => {
       const code = params.get('code');
       const error = params.get('error');
       const errorDescription = params.get('error_description');
+      const nextPath = params.get('next');
 
       const sourcePath = getPendingGoogleAuthPath() || RoutePath.LOGIN;
 
@@ -46,7 +47,7 @@ export const AuthCallback: React.FC = () => {
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
           commitAuthSession(session);
-          const redirectPath = consumePendingGoogleAuthRedirectPath(sourcePath) || RoutePath.DASHBOARD;
+          const redirectPath = nextPath || consumePendingGoogleAuthRedirectPath(sourcePath) || RoutePath.DASHBOARD;
           navigate(redirectPath, { replace: true });
         } else {
           stashGoogleAuthError('No authorization code received. Please try signing in again.');
@@ -67,7 +68,7 @@ export const AuthCallback: React.FC = () => {
 
         commitAuthSession(session);
 
-        const redirectPath = consumePendingGoogleAuthRedirectPath(sourcePath) || RoutePath.DASHBOARD;
+        const redirectPath = nextPath || consumePendingGoogleAuthRedirectPath(sourcePath) || RoutePath.DASHBOARD;
         navigate(redirectPath, { replace: true });
       } catch (err) {
         console.error('OAuth callback error:', err);

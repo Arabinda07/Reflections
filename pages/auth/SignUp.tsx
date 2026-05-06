@@ -88,6 +88,7 @@ export const SignUp: React.FC = () => {
         email,
         password,
         options: {
+          emailRedirectTo: `${window.location.origin}${RoutePath.AUTH_CALLBACK}`,
           data: {
             full_name: name,
             ...buildNewsletterOptInMetadata(newsletterOptIn),

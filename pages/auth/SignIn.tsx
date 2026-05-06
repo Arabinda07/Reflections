@@ -152,7 +152,7 @@ export const SignIn: React.FC = () => {
 
     try {
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}${RoutePath.RESET_PASSWORD}`,
+        redirectTo: `${window.location.origin}${RoutePath.AUTH_CALLBACK}?next=${RoutePath.RESET_PASSWORD}`,
       });
 
       if (resetError) throw resetError;
