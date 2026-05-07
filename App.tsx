@@ -1,22 +1,16 @@
 import React, { Suspense, lazy } from 'react';
+import { MotionConfig } from 'motion/react';
 import { Navigate, Route, RouterProvider, createBrowserRouter, createRoutesFromElements, ScrollRestoration, Outlet } from 'react-router-dom';
 import { RouteLoadingFrame } from './components/ui/RouteLoadingFrame';
 import { RouteErrorBoundary } from './pages/RouteErrorBoundary';
+import { Landing } from './pages/dashboard/Landing';
 import { RoutePath } from './types';
-import { useNativeOAuthListener } from './hooks/useNativeOAuthListener';
 
+const PublicAppShell = lazy(() => import('./layouts/PublicAppShell').then((m) => ({ default: m.PublicAppShell })));
 const AuthenticatedAppShell = lazy(() => import('./layouts/AuthenticatedAppShell').then((m) => ({ default: m.AuthenticatedAppShell })));
 const AuthAppShell = lazy(() => import('./layouts/AuthAppShell').then((m) => ({ default: m.AuthAppShell })));
-const PublicAppShell = lazy(() => import('./layouts/PublicAppShell').then((m) => ({ default: m.PublicAppShell })));
 const ProtectedRoute = lazy(() => import('./components/auth/ProtectedRoute').then((m) => ({ default: m.ProtectedRoute })));
-const AppBootstrapper = lazy(() => import('./components/ui/AppBootstrapper').then((m) => ({ default: m.AppBootstrapper })));
 
-const NativeOAuthBridge: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  useNativeOAuthListener();
-  return <>{children}</>;
-};
-
-const Landing = lazy(() => import('@/pages/dashboard/Landing').then((m) => ({ default: m.Landing })));
 const SignIn = lazy(() => import('@/pages/auth/SignIn').then((m) => ({ default: m.SignIn })));
 const SignUp = lazy(() => import('@/pages/auth/SignUp').then((m) => ({ default: m.SignUp })));
 const ResetPassword = lazy(() => import('@/pages/auth/ResetPassword').then((m) => ({ default: m.ResetPassword })));
@@ -42,13 +36,6 @@ const withRouteFallback = (element: React.ReactNode) => (
 const withProtectedRoute = (element: React.ReactNode) =>
   withRouteFallback(<ProtectedRoute>{element}</ProtectedRoute>);
 
-const withBootstrappedShell = (element: React.ReactNode) =>
-  withRouteFallback(
-    <NativeOAuthBridge>
-      <AppBootstrapper>{withRouteFallback(element)}</AppBootstrapper>
-    </NativeOAuthBridge>,
-  );
-
 const RootLayout = () => (
   <>
     <ScrollRestoration />
@@ -60,16 +47,13 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <Route element={<RootLayout />}>
       <Route element={withRouteFallback(<PublicAppShell />)} errorElement={<RouteErrorBoundary />}>
-        <Route path={RoutePath.HOME} element={withRouteFallback(<Landing />)} />
+        <Route path={RoutePath.HOME} element={<Landing />} />
         <Route path={RoutePath.FAQ} element={withRouteFallback(<FAQ />)} />
         <Route path={RoutePath.ABOUT} element={withRouteFallback(<AboutArabinda />)} />
         <Route path={RoutePath.PRIVACY} element={withRouteFallback(<PrivacyPolicy />)} />
       </Route>
 
-      <Route
-        element={withBootstrappedShell(<AuthAppShell />)}
-        errorElement={<RouteErrorBoundary />}
-      >
+      <Route element={withRouteFallback(<AuthAppShell />)} errorElement={<RouteErrorBoundary />}>
         <Route path="/signin" element={<Navigate to={RoutePath.LOGIN} replace />} />
         <Route path="/sign-in" element={<Navigate to={RoutePath.LOGIN} replace />} />
         <Route path={RoutePath.LOGIN} element={withRouteFallback(<SignIn />)} />
@@ -78,10 +62,7 @@ const router = createBrowserRouter(
         <Route path={RoutePath.AUTH_CALLBACK} element={withRouteFallback(<AuthCallback />)} />
       </Route>
 
-      <Route
-        element={withBootstrappedShell(<AuthenticatedAppShell />)}
-        errorElement={<RouteErrorBoundary />}
-      >
+      <Route element={withRouteFallback(<AuthenticatedAppShell />)} errorElement={<RouteErrorBoundary />}>
         <Route path={RoutePath.DASHBOARD_ALIAS} element={<Navigate to={RoutePath.DASHBOARD} replace />} />
         <Route path={RoutePath.DASHBOARD} element={withProtectedRoute(withRouteFallback(<HomeAuthenticated />))} />
         <Route path={RoutePath.NOTES} element={withProtectedRoute(withRouteFallback(<MyNotes />))} />
@@ -103,7 +84,11 @@ const router = createBrowserRouter(
 );
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <MotionConfig reducedMotion="user">
+      <RouterProvider router={router} />
+    </MotionConfig>
+  );
 }
 
 export default App;

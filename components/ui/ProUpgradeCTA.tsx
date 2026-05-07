@@ -12,6 +12,22 @@ interface ProUpgradeCTAProps {
   variant?: 'card' | 'fullscreen';
 }
 
+const getRazorpayThemeColor = () => {
+  if (typeof document === 'undefined' || !document.body) {
+    return 'var(--honey)';
+  }
+
+  const probe = document.createElement('span');
+  probe.style.color = 'var(--honey)';
+  probe.style.position = 'absolute';
+  probe.style.visibility = 'hidden';
+  document.body.appendChild(probe);
+  const color = getComputedStyle(probe).color;
+  probe.remove();
+
+  return color || 'var(--honey)';
+};
+
 export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, className = '', variant = 'card' }) => {
   useAuthStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -120,7 +136,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
           }
         },
         theme: {
-          color: '#936F1F' // honey
+          color: getRazorpayThemeColor()
         }
       };
 

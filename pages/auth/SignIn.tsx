@@ -189,7 +189,6 @@ export const SignIn: React.FC = () => {
                 </div>
               }
             />
-
             {successMessage ? (
               <Alert
                 variant="success"

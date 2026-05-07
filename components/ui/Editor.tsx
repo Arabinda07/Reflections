@@ -2,6 +2,60 @@ import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import Quill from 'quill';
 import './quill-snow.css';
 
+const QUILL_TOOL_LABELS: Record<string, string> = {
+  align: 'Text alignment',
+  background: 'Highlight color',
+  blockquote: 'Block quote',
+  bold: 'Bold',
+  clean: 'Clear formatting',
+  code: 'Code',
+  'code-block': 'Code block',
+  color: 'Text color',
+  header: 'Text style',
+  italic: 'Italic',
+  link: 'Insert link',
+  'list:bullet': 'Bulleted list',
+  'list:ordered': 'Numbered list',
+  strike: 'Strikethrough',
+  underline: 'Underline',
+};
+
+const getToolbarControlLabel = (control: Element) => {
+  const controlClass = Array.from(control.classList)
+    .find((className) => className.startsWith('ql-'))
+    ?.replace('ql-', '');
+
+  if (!controlClass) return null;
+
+  const value = control.getAttribute('value');
+  const valueKey = value ? `${controlClass}:${value}` : controlClass;
+
+  return QUILL_TOOL_LABELS[valueKey] ?? QUILL_TOOL_LABELS[controlClass] ?? null;
+};
+
+const applyToolbarAccessibility = (toolbar: HTMLElement | null) => {
+  if (!toolbar) return;
+
+  toolbar.setAttribute('aria-label', 'Formatting toolbar');
+
+  toolbar.querySelectorAll<HTMLButtonElement>('button').forEach((button) => {
+    const label = getToolbarControlLabel(button);
+    if (label) {
+      button.setAttribute('aria-label', label);
+      button.setAttribute('title', label);
+    }
+    button.setAttribute('type', 'button');
+  });
+
+  toolbar.querySelectorAll<HTMLElement>('.ql-picker-label').forEach((pickerLabel) => {
+    const label = getToolbarControlLabel(pickerLabel.parentElement ?? pickerLabel);
+    if (label) {
+      pickerLabel.setAttribute('aria-label', label);
+      pickerLabel.setAttribute('title', label);
+    }
+    pickerLabel.setAttribute('role', 'button');
+  });
+};
 
 interface EditorProps {
   value: string;
@@ -55,6 +109,7 @@ export const Editor = forwardRef<EditorRef, EditorProps>(({ value, onChange, onF
           ]
         }
       });
+      applyToolbarAccessibility(editorRef.current.parentElement?.querySelector<HTMLElement>('.ql-toolbar') ?? null);
 
       const handleTextChange = () => {
         const html = quillInstance.current!.root.innerHTML;

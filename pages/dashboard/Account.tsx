@@ -435,12 +435,14 @@ export const Account: React.FC = () => {
                 <div className="space-y-8">
                   <div className="grid gap-6 md:grid-cols-2">
                     <Input
+                      id="account-full-name"
                       label="Full Name"
                       name="fullName"
                       value={formData.fullName}
                       onChange={handleChange}
                     />
                     <Input
+                      id="account-display-name"
                       label="Display Name"
                       name="displayName"
                       value={formData.displayName}
@@ -449,11 +451,12 @@ export const Account: React.FC = () => {
                   </div>
 
                   <div className="grid gap-6 md:grid-cols-2">
-                    <Input label="Email" name="email" value={email} disabled />
+                    <Input id="account-email" label="Email" name="email" value={email} disabled />
 
                     <div className="w-full space-y-2">
-                      <label className="ml-1 block text-[11px] font-extrabold text-gray-nav">Timezone</label>
+                      <label htmlFor="account-timezone" className="ml-1 block text-[11px] font-extrabold text-gray-nav">Timezone</label>
                       <select
+                        id="account-timezone"
                         name="timezone"
                         value={formData.timezone}
                         onChange={handleChange}

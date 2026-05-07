@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDocumentMeta } from '../../hooks/useDocumentMeta';
+import { hasStoredAuthSessionHint } from '../../src/utils/authHints';
 import { RoutePath } from '../../types';
 
 type TinyIconProps = {
@@ -69,8 +70,6 @@ const scheduleIdleTask = (callback: () => void, timeout = 2400) => {
   const handle = window.setTimeout(callback, timeout);
   return () => window.clearTimeout(handle);
 };
-
-import { hasStoredAuthSessionHint } from '../../src/utils/authHints';
 
 export const Landing: React.FC = () => {
   useDocumentMeta({
@@ -171,7 +170,7 @@ export const Landing: React.FC = () => {
   };
 
   return (
-    <main aria-label="Welcome" className="surface-scope-sage page-wash relative min-h-[100dvh] overflow-x-hidden selection:bg-green/20 selection:text-green bg-body text-gray-text">
+    <div role="region" aria-label="Welcome" className="surface-scope-sage page-wash relative min-h-[100dvh] overflow-x-hidden selection:bg-green/20 selection:text-green bg-body text-gray-text">
       <div className="relative isolate min-h-[100dvh] w-full overflow-hidden bg-body">
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <div className="video-mask video-mask--mobile lg:hidden" />
@@ -231,7 +230,7 @@ export const Landing: React.FC = () => {
               <span>organized</span>
             </h1>
 
-            <p className="pointer-events-auto max-w-[26ch] sm:max-w-[32ch] lg:max-w-[40ch] font-sans text-base font-normal leading-relaxed text-gray-text/85 sm:text-lg tracking-[-0.01em]">
+            <p className="pointer-events-auto max-w-[26ch] sm:max-w-[32ch] lg:max-w-[40ch] font-sans text-base font-normal leading-relaxed text-gray-text/85 sm:text-lg">
               A private journal. Write what's on your mind, notice the patterns, and keep it to yourself
             </p>
           </div>
@@ -268,7 +267,7 @@ export const Landing: React.FC = () => {
               <button
                 type="button"
                 onClick={toggleMute}
-                className="surface-floating surface-floating--media flex h-12 min-h-12 w-12 min-w-12 shrink-0 items-center justify-center rounded-2xl text-gray-nav transition-[color,border-color,transform] duration-300 ease-out-expo hover:scale-[1.03] hover:border-green/40 hover:text-green active:scale-95 motion-reduce:transition-none"
+                className="surface-floating surface-floating--media flex h-12 min-h-12 w-12 min-w-12 shrink-0 items-center justify-center rounded-2xl !text-gray-text transition-[color,border-color,transform] duration-300 ease-out-expo hover:scale-[1.03] hover:border-green/40 hover:!text-gray-text active:scale-95 motion-reduce:transition-none"
                 aria-label={isMuted ? 'Unmute video' : 'Mute video'}
               >
                 {isMuted ? (
@@ -281,6 +280,6 @@ export const Landing: React.FC = () => {
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 };

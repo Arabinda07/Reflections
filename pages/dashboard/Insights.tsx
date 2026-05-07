@@ -38,6 +38,13 @@ import { DEFAULT_MOOD_TONE, getMoodConfig } from './moodConfig';
 const TAG_TONE_CLASSES = ['text-green', 'text-green/80', 'text-green/70', 'text-green/60'];
 
 const SANCTUARY_ENTRANCE_FALLBACK_MS = 2200;
+const OPEN_ACCORDION_GRID_STYLE = { gridTemplateRows: '1fr' } as const;
+const CLOSED_ACCORDION_GRID_STYLE = { gridTemplateRows: '0fr' } as const;
+
+const getAccordionGridStyle = (isOpen: boolean) =>
+  isOpen ? OPEN_ACCORDION_GRID_STYLE : CLOSED_ACCORDION_GRID_STYLE;
+
+const getMoodBarScale = (percent: number) => ({ scaleX: percent / 100 });
 
 const getWeekSignalSince = () => {
   const start = new Date();
@@ -277,7 +284,7 @@ export const Insights: React.FC = () => {
               }
             />
           ) : (<>
-          <Surface variant="flat" tone="sky" className="group relative overflow-hidden rounded-[2.5rem] p-8 md:p-10 transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_rgba(14,165,233,0.05)]">
+          <Surface variant="flat" tone="sky" className="group relative overflow-hidden rounded-[2.5rem] p-8 md:p-10 transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-sky/5">
             <div className="relative z-10">
             <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
               <div className="space-y-5">
@@ -331,7 +338,8 @@ export const Insights: React.FC = () => {
 
                 <div
                   id="insights-mood-panel"
-                  className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-out-expo ${isMoodOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+                  className={`grid overflow-hidden transition-opacity duration-200 ease-out-expo ${isMoodOpen ? 'opacity-100' : 'opacity-0'}`}
+                  style={getAccordionGridStyle(isMoodOpen)}
                 >
                       <div className="min-h-0 pb-8">
                         {weeklyRecap.moodData.length === 0 ? (
@@ -346,6 +354,7 @@ export const Insights: React.FC = () => {
                             {weeklyRecap.moodData.map((entry) => {
                               const maxValue = weeklyRecap.moodData[0].value;
                               const percent = Math.round((entry.value / maxValue) * 100);
+                              const { scaleX } = getMoodBarScale(percent);
                               const moodConfig = getMoodConfig(entry.name);
                               const tone = moodConfig || DEFAULT_MOOD_TONE;
 
@@ -357,7 +366,7 @@ export const Insights: React.FC = () => {
                                   <div className={`relative h-10 flex-1 overflow-hidden rounded-2xl ${tone.trackClass}`}>
                                     <div
                                       className={`absolute inset-y-0 left-0 w-full origin-left rounded-2xl transition-transform duration-1000 ease-out-expo ${tone.fillClass}`}
-                                      style={{ transform: isMoodOpen ? `scaleX(${percent / 100})` : 'scaleX(0)' }}
+                                      style={{ transform: `scaleX(${isMoodOpen ? scaleX : 0})` }}
                                     />
                                     <div className="absolute inset-0 bg-white/5 opacity-0 transition-opacity group-hover/bar:opacity-100" />
                                   </div>
@@ -397,7 +406,8 @@ export const Insights: React.FC = () => {
 
                 <div
                   id="insights-tags-panel"
-                  className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-out-expo ${isTagsOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+                  className={`grid overflow-hidden transition-opacity duration-200 ease-out-expo ${isTagsOpen ? 'opacity-100' : 'opacity-0'}`}
+                  style={getAccordionGridStyle(isTagsOpen)}
                 >
                       <div className="min-h-0 pb-8">
                         {weeklyRecap.recurringTags.length === 0 ? (
@@ -434,7 +444,7 @@ export const Insights: React.FC = () => {
 
           </Surface>
 
-          <Surface variant="bezel" tone="sage" className="group relative overflow-hidden rounded-[2.5rem] transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_rgba(34,197,94,0.05)]">
+          <Surface variant="bezel" tone="sage" className="group relative overflow-hidden rounded-[2.5rem] transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-green/5">
             <button
               type="button"
               onClick={() => setIsOverviewOpen((current) => !current)}
@@ -462,7 +472,8 @@ export const Insights: React.FC = () => {
 
             <div
                   id="insights-overview-panel"
-                  className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-out-expo ${isOverviewOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+                  className={`grid overflow-hidden transition-opacity duration-200 ease-out-expo ${isOverviewOpen ? 'opacity-100' : 'opacity-0'}`}
+                  style={getAccordionGridStyle(isOverviewOpen)}
                 >
                   <div className="min-h-0 space-y-5 border-t border-border/60 p-6 md:p-8">
                     <div className="flex flex-wrap items-center gap-2">
@@ -481,7 +492,7 @@ export const Insights: React.FC = () => {
                 </div>
           </Surface>
 
-          <Surface variant="flat" tone="honey" className="group relative overflow-hidden rounded-[2.5rem] transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_rgba(245,158,11,0.05)]">
+          <Surface variant="flat" tone="honey" className="group relative overflow-hidden rounded-[2.5rem] transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-honey/5">
             <button
               type="button"
               onClick={() => setIsCompletionOpen((prev) => !prev)}
@@ -507,7 +518,8 @@ export const Insights: React.FC = () => {
 
             <div
                   id="insights-completion-panel"
-                  className={`grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-out-expo ${isCompletionOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+                  className={`grid overflow-hidden transition-opacity duration-200 ease-out-expo ${isCompletionOpen ? 'opacity-100' : 'opacity-0'}`}
+                  style={getAccordionGridStyle(isCompletionOpen)}
                 >
                   <div className="min-h-0 space-y-5 border-t border-border/60 p-6 md:p-8">
                     <div className="space-y-2">
@@ -535,7 +547,7 @@ export const Insights: React.FC = () => {
           <Surface
             variant="flat"
             tone="sage"
-            className="group relative overflow-hidden rounded-[2.5rem] border border-transparent transition-[border-color,box-shadow] duration-500 ease-out-expo hover:border-green/20 hover:shadow-[0_20px_50px_rgba(34,197,94,0.05)]"
+            className="group relative overflow-hidden rounded-[2.5rem] border border-transparent transition-[border-color,box-shadow] duration-500 ease-out-expo hover:border-green/20 hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-green/5"
           >
             <Link
               to={RoutePath.SANCTUARY}

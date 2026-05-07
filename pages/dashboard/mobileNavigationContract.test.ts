@@ -12,7 +12,8 @@ describe('mobile Insights and Sanctuary navigation contract', () => {
     expect(layout).toContain('isMobileNavSuppressedRoute');
     expect(layout).toContain('location.pathname === RoutePath.INSIGHTS');
     expect(layout).toContain('location.pathname.startsWith(RoutePath.SANCTUARY)');
-    expect(navBar).toContain("isMobileNavSuppressed ? 'hidden lg:flex' : 'flex'");
+    expect(navBar).toContain("isMobileNavSuppressed ? 'hidden' : 'flex'");
+    expect(navBar).not.toContain("isMobileNavSuppressed ? 'hidden lg:flex' : 'flex'");
   });
 
   it('uses page-owned back buttons for the intended mobile route flow', () => {

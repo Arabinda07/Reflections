@@ -24,6 +24,8 @@ describe('PostHog integration contract', () => {
     const signIn = read('pages/auth/SignIn.tsx');
     const signUp = read('pages/auth/SignUp.tsx');
     const app = read('App.tsx');
+    const authShell = read('layouts/AuthAppShell.tsx');
+    const authenticatedShell = read('layouts/AuthenticatedAppShell.tsx');
     const oauthHook = read('hooks/useNativeOAuthListener.ts');
     const createNote = read('pages/dashboard/CreateNote.tsx');
     const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
@@ -33,7 +35,9 @@ describe('PostHog integration contract', () => {
     expect(signIn).toContain('trackGoogleAuthStarted');
     expect(signUp).toContain('trackGoogleAuthStarted');
     expect(app).not.toContain("from './src/analytics/events'");
-    expect(app).toContain('useNativeOAuthListener');
+    expect(app).not.toContain('useNativeOAuthListener');
+    expect(authShell).toContain('useNativeOAuthListener');
+    expect(authenticatedShell).toContain('useNativeOAuthListener');
     expect(oauthHook).toContain('trackGoogleAuthSucceededDeferred');
     expect(oauthHook).toContain('trackGoogleAuthFailedDeferred');
     const orchestrator = read('services/notePublishingOrchestrator.ts');

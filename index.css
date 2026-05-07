@@ -595,6 +595,11 @@ details:focus-visible,
 
 @layer components {
 
+  .touch-target-44 {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
   /* Typography Standard */
   .h1-hero {
     font-family: var(--font-display);

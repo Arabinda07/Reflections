@@ -31,6 +31,8 @@ describe('optimize audit contract', () => {
     expect(vite).toContain("return 'vendor-analytics'");
     expect(vite).toContain("return 'vendor-lottie'");
     expect(vite).toContain("return 'vendor-state'");
+    expect(vite).toContain("const lottieLightPlayer = path.resolve(__dirname, 'node_modules/lottie-web/build/player/esm/lottie_light.min.js');");
+    expect(vite).toContain("'lottie-web': lottieLightPlayer,");
     expect(vite).toContain('const hasSentryAuthToken = Boolean(process.env.SENTRY_AUTH_TOKEN);');
     expect(vite).toContain("const sentrySourcemap: false | 'hidden' = hasSentryAuthToken ? 'hidden' : false;");
     expect(vite).toContain('sourcemap: sentrySourcemap');

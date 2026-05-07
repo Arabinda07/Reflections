@@ -224,7 +224,7 @@ describe('SEO crawlability contract', () => {
     expect(footer).toContain("href: RoutePath.PRIVACY");
     expect(header).toContain('Public navigation');
     expect(header).toContain('Mobile public navigation');
-    expect(header).toContain('to={item.href}');
+    expect(header).toContain('href={item.href}');
   });
 
   it('keeps FAQ guide sections with key product questions for AI extractability', () => {

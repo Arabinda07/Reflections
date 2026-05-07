@@ -51,14 +51,31 @@ describe('entrypoint vendor loading contract', () => {
 
   it('keeps auth wiring out of the public root while auth shells stay live', () => {
     const app = read('App.tsx');
+    const authShell = read('layouts/AuthAppShell.tsx');
+    const authenticatedShell = read('layouts/AuthenticatedAppShell.tsx');
     const authBootstrapper = read('hooks/useAuthBootstrapper.ts');
     const publicShell = read('layouts/PublicAppShell.tsx');
 
     expect(app).not.toContain('<AppBootstrapper>\n      <RouterProvider router={router} />\n    </AppBootstrapper>');
     expect(app).not.toContain("import { AppBootstrapper } from './components/ui/AppBootstrapper';");
-    expect(app).toContain("const AppBootstrapper = lazy(() => import('./components/ui/AppBootstrapper')");
-    expect(app).toContain('element={withBootstrappedShell(<AuthAppShell />)}');
-    expect(app).toContain('element={withBootstrappedShell(<AuthenticatedAppShell />)}');
+    expect(app).not.toContain("import { useNativeOAuthListener } from './hooks/useNativeOAuthListener';");
+    expect(app).not.toContain('useNativeOAuthListener();');
+    expect(app).not.toContain('withBootstrappedShell');
+    expect(app).toContain("const PublicAppShell = lazy(() => import('./layouts/PublicAppShell')");
+    expect(app).toContain("const AuthAppShell = lazy(() => import('./layouts/AuthAppShell')");
+    expect(app).toContain("const AuthenticatedAppShell = lazy(() => import('./layouts/AuthenticatedAppShell')");
+    expect(app).toContain('<Route element={withRouteFallback(<PublicAppShell />)} errorElement={<RouteErrorBoundary />}>');
+    expect(app).toContain('<Route element={withRouteFallback(<AuthAppShell />)} errorElement={<RouteErrorBoundary />}>');
+    expect(app).toContain('<Route element={withRouteFallback(<AuthenticatedAppShell />)} errorElement={<RouteErrorBoundary />}>');
+    expect(authShell).toContain("import { useAuthBootstrapper } from '../hooks/useAuthBootstrapper';");
+    expect(authShell).toContain("import { useNativeOAuthListener } from '../hooks/useNativeOAuthListener';");
+    expect(authShell).toContain('useAuthBootstrapper();');
+    expect(authShell).toContain('useNativeOAuthListener();');
+    expect(authShell).not.toContain('AppBootstrapper');
+    expect(authenticatedShell).toContain("import { AppBootstrapper } from '../components/ui/AppBootstrapper';");
+    expect(authenticatedShell).toContain("import { useNativeOAuthListener } from '../hooks/useNativeOAuthListener';");
+    expect(authenticatedShell).toContain('useNativeOAuthListener();');
+    expect(authenticatedShell).toContain('<AppBootstrapper>');
     expect(publicShell).not.toContain('AppBootstrapper');
     expect(publicShell).not.toContain('supabaseClient');
     expect(authBootstrapper).toContain('const markAuthCheckComplete = () => {');

@@ -48,7 +48,7 @@ export const AboutArabinda: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <PageContainer as="main" size="app" className="py-12 sm:py-16">
+    <PageContainer as="section" size="app" className="py-12 sm:py-16">
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
         <button
           onClick={() => navigate(RoutePath.HOME)}
@@ -60,7 +60,7 @@ export const AboutArabinda: React.FC = () => {
         </button>
 
         {/* Hero Section */}
-        <section className="mb-24 grid gap-12 md:grid-cols-12 md:gap-16 lg:gap-24 items-center">
+        <section className="mb-24 grid gap-12 md:grid-cols-12 md:gap-16 lg:gap-12 xl:gap-16 items-center">
           <div className="md:col-span-5 order-last md:order-first">
             <div className="aspect-[4/5] overflow-hidden rounded-[2rem] shadow-sm">
               <img

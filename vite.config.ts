@@ -4,6 +4,8 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { sentryVitePlugin } from '@sentry/vite-plugin';
 
+const lottieLightPlayer = path.resolve(__dirname, 'node_modules/lottie-web/build/player/esm/lottie_light.min.js');
+
 const vendorChunk = (id: string) => {
   if (id.includes('vite/preload-helper')) return 'vendor-core';
   if (!id.includes('node_modules')) return undefined;
@@ -203,6 +205,7 @@ export default defineConfig(() => {
       resolve: {
         alias: {
           '@': path.resolve(__dirname, '.'),
+          'lottie-web': lottieLightPlayer,
         }
       }
     };

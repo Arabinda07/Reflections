@@ -1,8 +1,12 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
+import { useAuthBootstrapper } from '../hooks/useAuthBootstrapper';
+import { useNativeOAuthListener } from '../hooks/useNativeOAuthListener';
 import { useNativeStatusBar } from '../hooks/useNativeStatusBar';
 
 export const AuthAppShell: React.FC = () => {
+  useAuthBootstrapper();
+  useNativeOAuthListener();
   useNativeStatusBar();
 
   return (

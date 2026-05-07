@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import { Icon as PhosphorIcon } from '@phosphor-icons/react';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -8,10 +8,13 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input: React.FC<InputProps> = ({ label, error, icon: Icon, className = '', ...props }) => {
+  const generatedId = useId();
+  const inputId = props.id ?? generatedId;
+
   return (
     <div className="w-full space-y-2">
       {label && (
-        <label htmlFor={props.id} className="ml-1 block text-[11px] font-extrabold text-gray-nav dark:text-zinc-300">
+        <label htmlFor={inputId} className="ml-1 block text-[11px] font-extrabold text-gray-nav dark:text-zinc-300">
           {label}
         </label>
       )}
@@ -22,10 +25,11 @@ export const Input: React.FC<InputProps> = ({ label, error, icon: Icon, classNam
           </div>
         )}
         <input
-          className={`input-surface w-full h-12 px-4 text-[15px] font-semibold placeholder:text-gray-nav placeholder:font-medium disabled:cursor-not-allowed disabled:opacity-50 focus:border-green focus:ring-2 focus:ring-green/10 transition-all duration-300 ease-out-expo ${
+          className={`input-surface w-full h-12 px-4 text-[15px] font-semibold placeholder:text-gray-nav placeholder:font-medium disabled:cursor-not-allowed disabled:opacity-50 focus:border-green focus:ring-2 focus:ring-green/10 transition-[background-color,border-color,box-shadow,color] duration-200 ease-out-expo ${
             Icon ? 'pl-12' : ''
           } ${error ? 'border-clay' : ''} ${className}`}
           {...props}
+          id={inputId}
         />
       </div>
       {error && <p className="mt-1.5 text-xs font-bold text-clay ml-1">{error}</p>}

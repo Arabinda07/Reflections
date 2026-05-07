@@ -428,11 +428,15 @@
   background: none;
   border: none;
   cursor: pointer;
-  display: inline-block;
+  display: inline-flex;
   float: left;
-  height: 24px;
-  padding: 3px 5px;
-  width: 28px;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 10px;
+  width: 44px;
 }
 .ql-snow.ql-toolbar button svg,
 .ql-snow .ql-toolbar button svg {
@@ -671,14 +675,18 @@
   float: left;
   font-size: 14px;
   font-weight: 500;
-  height: 24px;
+  height: 44px;
+  min-height: 44px;
   position: relative;
   vertical-align: middle;
 }
 .ql-snow .ql-picker-label {
+  align-items: center;
   cursor: pointer;
-  display: inline-block;
+  display: inline-flex;
   height: 100%;
+  min-height: 44px;
+  min-width: 44px;
   padding-left: 8px;
   padding-right: 2px;
   position: relative;
@@ -720,7 +728,7 @@
 }
 .ql-snow .ql-color-picker,
 .ql-snow .ql-icon-picker {
-  width: 28px;
+  width: 44px;
 }
 .ql-snow .ql-color-picker .ql-picker-label,
 .ql-snow .ql-icon-picker .ql-picker-label {
@@ -734,21 +742,21 @@
   padding: 4px 0px;
 }
 .ql-snow .ql-icon-picker .ql-picker-item {
-  height: 24px;
-  width: 24px;
+  height: 44px;
+  width: 44px;
   padding: 2px 4px;
 }
 .ql-snow .ql-color-picker .ql-picker-options {
   padding: 3px 5px;
-  width: 152px;
+  width: 248px;
 }
 .ql-snow .ql-color-picker .ql-picker-item {
   border: 1px solid transparent;
   float: left;
-  height: 16px;
+  height: 44px;
   margin: 2px;
   padding: 0px;
-  width: 16px;
+  width: 44px;
 }
 .ql-snow .ql-picker:not(.ql-color-picker):not(.ql-icon-picker) svg {
   position: absolute;

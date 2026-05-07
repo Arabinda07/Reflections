@@ -32,7 +32,8 @@ describe('audit fix source contract', () => {
     expect(home).not.toContain('dark:bg-white/60');
 
     expect(faq).not.toContain('animate-pulse');
-    expect(signIn).toContain('loading="lazy"');
+    expect(signIn).not.toContain('<noscript>');
+    expect(signIn).not.toContain('og-social.webp');
     expect(tailwind).not.toContain('spring-bounce');
     expect(insights).not.toContain('#f97316');
     expect(insights).not.toContain('#10b981');

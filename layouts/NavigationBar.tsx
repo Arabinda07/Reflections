@@ -78,10 +78,10 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
       aria-label={isDarkMode ? 'Use light mode' : 'Use dark mode'}
     >
       <div className="relative h-5 w-5">
-        <div className={`absolute inset-0 transition-all duration-300 ease-out-expo ${isDarkMode ? 'rotate-0 opacity-100 scale-100' : 'rotate-90 opacity-0 scale-50'}`}>
+        <div className={`absolute inset-0 transition-[opacity,transform] duration-300 ease-out-expo ${isDarkMode ? 'rotate-0 opacity-100 scale-100' : 'rotate-90 opacity-0 scale-50'}`}>
           <Sun size={20} />
         </div>
-        <div className={`absolute inset-0 transition-all duration-300 ease-out-expo ${!isDarkMode ? 'rotate-0 opacity-100 scale-100' : '-rotate-90 opacity-0 scale-50'}`}>
+        <div className={`absolute inset-0 transition-[opacity,transform] duration-300 ease-out-expo ${!isDarkMode ? 'rotate-0 opacity-100 scale-100' : '-rotate-90 opacity-0 scale-50'}`}>
           <Moon size={20} />
         </div>
       </div>
@@ -126,7 +126,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
                 key={item.label}
                 to={item.path}
                 aria-current={isActive ? 'page' : undefined}
-                className={`inline-flex min-h-11 items-center rounded-xl px-3 py-2 text-[12px] font-extrabold transition-all duration-200 hover:bg-green/5 hover:text-green xl:px-4 xl:text-[13px] ${
+                className={`inline-flex min-h-11 items-center rounded-xl px-3 py-2 text-[12px] font-extrabold transition-[background-color,color] duration-200 hover:bg-green/5 hover:text-green xl:px-4 xl:text-[13px] ${
                   isActive
                     ? 'bg-green/5 text-green'
                     : 'text-gray-nav'

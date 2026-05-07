@@ -26,6 +26,7 @@ describe('polish surface contract', () => {
     const insights = read('pages/dashboard/Insights.tsx');
     const ambientButton = read('components/ui/AmbientMusicButton.tsx');
     const audioHook = read('hooks/useAmbientAudio.ts');
+    const proUpgrade = read('components/ui/ProUpgradeCTA.tsx');
 
     expect(home).not.toContain('text-[rgb(255,255,255)]');
     expect(home).not.toContain('bg-[linear-gradient(180deg,rgba(14,28,18,0.18),rgba(14,28,18,0.3))]');
@@ -56,5 +57,8 @@ describe('polish surface contract', () => {
     expect(ambientButton).not.toContain("'#58cc02'");
     expect(ambientButton).not.toContain("'#ffffff'");
     expect(ambientButton).not.toContain("'rgba(39,39,42,0.86)'");
+
+    expect(proUpgrade).not.toContain("color: '#936F1F'");
+    expect(proUpgrade).toContain('color: getRazorpayThemeColor()');
   });
 });

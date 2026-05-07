@@ -1,18 +1,46 @@
 import React, { useEffect, useState } from 'react';
+import { strFromU8, unzipSync } from 'fflate';
 import Lottie from 'lottie-react';
 
-type LottieAnimationProps = {
+type LottieAnimationProps = Omit<React.ComponentProps<typeof Lottie>, 'animationData'> & {
   src?: string;
   animationData?: unknown;
-  className?: string;
-  autoplay?: boolean;
-  loop?: boolean;
-  speed?: number;
+  animationId?: string;
+};
+
+const getDotLottieAnimation = async (response: Response) => {
+  const files = unzipSync(new Uint8Array(await response.arrayBuffer()));
+  const manifest = files['manifest.json'] ? JSON.parse(strFromU8(files['manifest.json'])) : null;
+  const manifestPath = manifest?.animations?.[0]?.id
+    ? `animations/${manifest.animations[0].id}.json`
+    : undefined;
+  const animationPath =
+    manifestPath && files[manifestPath]
+      ? manifestPath
+      : Object.keys(files).find((filePath) => filePath.startsWith('animations/') && filePath.endsWith('.json'));
+
+  if (!animationPath) {
+    throw new Error('DotLottie archive did not contain a JSON animation.');
+  }
+
+  return JSON.parse(strFromU8(files[animationPath]));
+};
+
+const loadLottieAnimation = async (src: string) => {
+  const response = await fetch(src);
+  if (!response.ok) throw new Error(`Lottie fetch failed: ${response.status}`);
+
+  if (src.endsWith('.lottie')) {
+    return getDotLottieAnimation(response);
+  }
+
+  return response.json();
 };
 
 export const LottieAnimation: React.FC<LottieAnimationProps> = ({
   src,
   animationData: providedData,
+  animationId,
   className,
   autoplay = true,
   loop = true,
@@ -22,11 +50,7 @@ export const LottieAnimation: React.FC<LottieAnimationProps> = ({
 
   useEffect(() => {
     if (src && !providedData) {
-      fetch(src)
-        .then((res) => {
-          if (!res.ok) throw new Error(`Lottie fetch failed: ${res.status}`);
-          return res.json();
-        })
+      loadLottieAnimation(src)
         .then((data) => setAnimationData(data))
         .catch((err) => console.error('Failed to load lottie JSON:', err));
     }
@@ -37,12 +61,13 @@ export const LottieAnimation: React.FC<LottieAnimationProps> = ({
   }
 
   return (
-    <Lottie 
-      animationData={animationData} 
-      className={className} 
-      autoplay={autoplay} 
-      loop={loop} 
-      {...rest} 
+    <Lottie
+      {...rest}
+      id={animationId}
+      animationData={animationData}
+      className={className}
+      autoplay={autoplay}
+      loop={loop}
     />
   );
 };

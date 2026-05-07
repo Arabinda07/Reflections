@@ -158,7 +158,7 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
           readOnly={task.completed}
           placeholder="What needs to be done?"
           aria-label={`Edit task: ${taskLabel}`}
-          className={`w-full bg-transparent border-none outline-none font-bold text-[14px] placeholder:text-gray-nav/40 transition-all duration-300 ${
+          className={`w-full bg-transparent border-none outline-none font-bold text-[14px] placeholder:text-gray-nav/40 transition-colors duration-300 ${
             showCompletedText ? 'text-gray-text/40' : 'text-gray-text'
           }`}
         />
@@ -515,12 +515,14 @@ export const CreateNote: React.FC = () => {
         </aside>
       )}
 
-      {/* Ã¢â€â‚¬Ã¢â€â‚¬ Main Canvas Ã¢â€â‚¬Ã¢â€â‚¬ */}
-      <main
+      {/* Main Canvas */}
+      <section
+        aria-labelledby="create-note-heading"
         className="relative flex-1 w-full pb-40 px-6 sm:px-12 md:px-16 lg:px-24 transition-[padding] duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]"
         style={{ paddingTop: NATIVE_PAGE_TOP_PADDING }}
       >
-        <div className={`editor-writing-measure transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isFocusModeActive ? 'mx-auto scale-[1.02]' : 'mr-auto lg:ml-12 xl:ml-24 scale-100'}`}>
+        <h1 id="create-note-heading" className="sr-only">New reflection</h1>
+        <div className={`editor-writing-measure transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isFocusModeActive ? 'mx-auto scale-[1.02]' : 'mr-auto lg:ml-12 xl:ml-24 scale-100'}`}>
           
           {/* Cover Image */}
           {imagePreview && (
@@ -578,7 +580,7 @@ export const CreateNote: React.FC = () => {
             </div>
           ) : null}
 
-          {/* Title as H1 */}
+          {/* Reflection title field */}
           <input
             type="text"
             aria-label="Reflection title"
@@ -587,7 +589,7 @@ export const CreateNote: React.FC = () => {
             onChange={e => setTitle(e.target.value)}
             onFocus={() => { setIsFocused(true); setIsTitleFocused(true); }}
             onBlur={() => { setIsFocused(false); setIsTitleFocused(false); }}
-            className="editor-title-input"
+            className="editor-title-input min-h-11"
           />
 
             {isWhispering && interimTranscript && (
@@ -616,7 +618,7 @@ export const CreateNote: React.FC = () => {
             </p>
           )}
         </div>
-      </main>
+      </section>
 
       {/* Ã¢â€â‚¬Ã¢â€â‚¬ Floating Actions Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <div 

@@ -21,7 +21,8 @@ describe('public landing performance contract', () => {
     expect(app).not.toContain("import { ProtectedRoute } from './components/auth/ProtectedRoute';");
     expect(app).not.toContain("import { ToastProvider } from './components/ui/Toast';");
     expect(app).not.toContain("import { DashboardLayout } from './layouts/DashboardLayout';");
-    expect(app).not.toContain("import { MotionConfig } from 'motion/react';");
+    expect(app).toContain("import { MotionConfig } from 'motion/react';");
+    expect(app).toContain('<MotionConfig reducedMotion="user">');
     expect(app).not.toContain("import { useSync } from './hooks/useSync';");
     expect(app).not.toContain("import { useNativeStatusBar } from './hooks/useNativeStatusBar';");
     expect(app).not.toContain("import { useNativeOAuthListener } from './hooks/useNativeOAuthListener';");
@@ -30,7 +31,7 @@ describe('public landing performance contract', () => {
 
     expect(shell).toContain("import { PWAInstallProvider } from '../context/PWAInstallContext';");
     expect(shell).toContain("import { DashboardLayout } from './DashboardLayout';");
-    expect(shell).toContain("import { MotionConfig } from 'motion/react';");
+    expect(shell).not.toContain("import { MotionConfig } from 'motion/react';");
     expect(shell).toContain('useNativeStatusBar();');
     expect(shell).toContain('useNativeOAuthListener();');
   });
@@ -61,9 +62,11 @@ describe('public landing performance contract', () => {
 
   it('does not import Supabase on guest landing sessions without an auth hint', () => {
     const landing = read('pages/dashboard/Landing.tsx');
+    const authHints = read('src/utils/authHints.ts');
 
-    expect(landing).toContain('const hasStoredAuthSessionHint = () => {');
-    expect(landing).toContain("key?.startsWith('sb-') && key.endsWith('-auth-token')");
+    expect(landing).toContain("import { hasStoredAuthSessionHint } from '../../src/utils/authHints';");
+    expect(authHints).toContain('export const hasStoredAuthSessionHint = (): boolean => {');
+    expect(authHints).toContain("key?.startsWith('sb-') && key.endsWith('-auth-token')");
     expect(landing).toContain('if (!hasStoredAuthSessionHint())');
     expect(landing).toContain("import('../../src/supabaseClient')");
   });
@@ -84,8 +87,8 @@ describe('public landing performance contract', () => {
     expect(indexHtml).toContain('rel="preload" href="/assets/videos/landing_video_mobile.webp" as="image" type="image/webp" fetchpriority="high" media="(max-width: 1023px)"');
     expect(indexHtml).toContain('rel="preload" href="/assets/videos/landing_video.webp" as="image" type="image/webp" fetchpriority="high" media="(min-width: 1024px)"');
     expect(indexHtml).toContain('rel="preload" href="/assets/fonts/Manrope-Variable.woff2"');
+    expect(indexHtml).toContain('rel="preload" href="/assets/fonts/Spectral-Regular.woff2"');
     expect(indexHtml).toContain('rel="preload" href="/assets/fonts/Spectral-Italic.woff2"');
-    expect(indexHtml).not.toContain('rel="preload" href="/assets/fonts/Spectral-Regular.woff2"');
   });
 
   it('keeps component-only chrome out of the public landing stylesheet', () => {

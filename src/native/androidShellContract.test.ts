@@ -48,6 +48,7 @@ describe('Android shell contract', () => {
 
   it('returns successful native Google auth to home and keeps floating mobile chrome below the status bar', () => {
     const app = read('App.tsx');
+    const authShell = read('layouts/AuthAppShell.tsx');
     const authenticatedShell = read('layouts/AuthenticatedAppShell.tsx');
     const oauthHook = read('hooks/useNativeOAuthListener.ts');
     const googleOAuth = read('src/auth/googleOAuth.ts');
@@ -55,8 +56,9 @@ describe('Android shell contract', () => {
     const createNote = read('pages/dashboard/CreateNote.tsx');
     const safeArea = read('src/native/safeArea.ts');
 
-    expect(app).toContain("import { useNativeOAuthListener }");
-    expect(authenticatedShell).not.toContain('useNativeOAuthListener');
+    expect(app).not.toContain("import { useNativeOAuthListener }");
+    expect(authShell).toContain('useNativeOAuthListener');
+    expect(authenticatedShell).toContain('useNativeOAuthListener');
     expect(oauthHook).toContain('consumeNativeGoogleAuthSuccessRedirectPath');
     expect(oauthHook).toContain("import('@capacitor/browser')");
     expect(googleOAuth).toContain('skipBrowserRedirect: true');

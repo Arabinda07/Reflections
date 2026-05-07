@@ -453,7 +453,7 @@ export const HomeAuthenticated: React.FC = () => {
           className="core-bento-grid"
         >
           <div
-            className="group relative surface-flat overflow-hidden rounded-[2.5rem] p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full transition-[border-color,box-shadow] duration-500 ease-out-expo hover:shadow-[0_20px_50px_rgba(34,197,94,0.05)] hover:border-green/10 animate-fade-in-up"
+            className="group relative surface-flat overflow-hidden rounded-[2.5rem] p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full transition-[border-color,box-shadow] duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-green/5 hover:border-green/10 animate-fade-in-up"
           >
             <div className="relative z-10">
               <div className="flex items-center justify-between mb-8">
@@ -614,7 +614,7 @@ export const HomeAuthenticated: React.FC = () => {
 
           <div className="grid gap-6">
             <div
-              className="group relative surface-flat surface-tone-sky overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_rgba(14,165,233,0.05)] animate-fade-in-up anim-delay-1"
+              className="group relative surface-flat surface-tone-sky overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-sky/5 animate-fade-in-up anim-delay-1"
             >
               <div className="relative z-10">
               <div className="mb-6 flex items-center gap-2 text-gray-nav">
@@ -672,7 +672,7 @@ export const HomeAuthenticated: React.FC = () => {
           </div>
 
             <div
-              className="group relative surface-flat surface-tone-honey overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_rgba(245,158,11,0.05)] animate-fade-in-up anim-delay-2"
+              className="group relative surface-flat surface-tone-honey overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-honey/5 animate-fade-in-up anim-delay-2"
             >
               <div className="relative z-10">
               <div className="mb-8 flex items-center gap-2 text-gray-nav">

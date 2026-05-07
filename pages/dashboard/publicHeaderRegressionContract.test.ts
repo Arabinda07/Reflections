@@ -29,9 +29,11 @@ describe('public header regression fixes', () => {
     expect(header).toContain('const ThemeModeButton');
     expect(header).toContain("aria-label={isDarkMode ? 'Use light mode' : 'Use dark mode'}");
     expect(header).toContain("document.documentElement.classList.toggle('dark', isDarkMode)");
+    expect(header).toContain("const PUBLIC_THEME_STORAGE_KEY = 'reflections-theme';");
     expect(header).toContain('public-theme-toggle public-theme-toggle--desktop');
     expect(header).toContain('public-theme-toggle public-theme-toggle--mobile-header');
     expect(header).toContain('public-theme-toggle public-theme-toggle--mobile-menu');
+    expect(header).not.toContain('reflections.public-theme');
     expect(header).not.toContain('motion/');
   });
 
