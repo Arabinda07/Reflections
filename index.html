@@ -53,10 +53,6 @@
 
     <link rel="dns-prefetch" href="https://supabase.co" />
 
-    <!-- ── Stylesheets ─────────────────────────────────────────────── -->
-    <link rel="stylesheet" href="/index.css" />
-    <!-- Quill is now loaded via npm dependency in Editor.tsx -->
-
     <!-- ── Dark mode FOUC prevention ───────────────────────────────── -->
     <script>
       (function(){
@@ -71,13 +67,549 @@
     </script>
 
     <!-- ── Inline critical styles ──────────────────────────────────── -->
-    <style>
+    <style id="critical-landing-css">
+      @font-face {
+        font-family: 'Manrope';
+        src: url('/assets/fonts/Manrope-Variable.woff2') format('woff2');
+        font-weight: 200 800;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      @font-face {
+        font-family: 'Spectral';
+        src: url('/assets/fonts/Spectral-Regular.woff2') format('woff2');
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      @font-face {
+        font-family: 'Spectral';
+        src: url('/assets/fonts/Spectral-Italic.woff2') format('woff2');
+        font-weight: 400;
+        font-style: italic;
+        font-display: swap;
+      }
+
+      *,
+      ::before,
+      ::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        scrollbar-gutter: stable;
+      }
+
+      :root {
+        --font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+        --font-serif: 'Spectral', serif;
+        --font-display: 'Manrope', sans-serif;
+        --header-height: 3.5rem;
+        --green: oklch(0.47 0.18 135);
+        --green-hover: oklch(0.41 0.16 135);
+        --green-shadow: oklch(0.35 0.14 135);
+        --gray-text: oklch(0.25 0.01 135);
+        --gray-light: oklch(0.43 0.01 135);
+        --nav-text: oklch(0.46 0.01 135);
+        --border-color: oklch(0.92 0.01 135);
+        --bg-color: oklch(0.99 0.01 135);
+        --panel-bg-rgb: 247 248 246;
+        --radius-control: 1rem;
+        --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        --page-wash: radial-gradient(circle at 12% 10%, oklch(from var(--green) 0.955 0.028 h / 0.6), transparent 36%),
+          linear-gradient(145deg, oklch(from var(--green) 0.982 0.014 h), var(--bg-color) 46%, oklch(0.978 0.012 245 / 0.62));
+        --surface-current-border: oklch(from var(--green) l c h / 0.2);
+        --surface-current-bg: linear-gradient(145deg, oklch(from var(--green) 0.965 0.022 h / 0.92), rgba(var(--panel-bg-rgb), 0.94));
+        --surface-tinted-shadow: 0 20px 44px -30px rgba(0, 0, 0, 0.2), 0 8px 18px -14px rgba(0, 0, 0, 0.08);
+        --floating-panel-media-bg: rgba(var(--panel-bg-rgb), 0.64);
+        --floating-panel-media-border: rgba(255, 255, 255, 0.16);
+      }
+
+      .dark {
+        --green: oklch(0.68 0.15 138);
+        --green-hover: oklch(0.74 0.17 138);
+        --green-shadow: oklch(0.45 0.14 138);
+        --gray-text: oklch(0.85 0.02 135);
+        --gray-light: oklch(0.65 0.02 135);
+        --nav-text: oklch(0.70 0.02 135);
+        --border-color: oklch(0.25 0.02 135);
+        --bg-color: oklch(0.18 0.012 135);
+        --panel-bg-rgb: 40 42 39;
+        --page-wash: radial-gradient(circle at 12% 10%, oklch(from var(--green) 0.25 0.04 h / 0.44), transparent 38%),
+          linear-gradient(145deg, oklch(from var(--green) 0.19 0.02 h / 0.92), var(--bg-color) 50%, oklch(0.18 0.018 245 / 0.64));
+      }
+
       body {
-        font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Noto Sans Devanagari', 'Noto Sans Bengali', sans-serif;
+        margin: 0;
+        font-family: var(--font-sans);
         background-color: var(--bg-color);
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         color: var(--gray-text);
+        line-height: 1.5;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      button {
+        margin: 0;
+        border: 0;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      img,
+      svg,
+      video {
+        display: block;
+        max-width: 100%;
+      }
+
+      .public-shell {
+        display: flex;
+        min-height: 100dvh;
+        flex-direction: column;
+        background: var(--bg-color);
+        color: var(--gray-text);
+      }
+
+      .page-wash {
+        background: var(--page-wash);
+        background-size: cover;
+      }
+
+      #main-content {
+        display: flex;
+        min-height: 0;
+        flex: 1 1 0%;
+        flex-direction: column;
+      }
+
+      .skip-link {
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        z-index: 10001;
+        transform: translateY(-140%);
+      }
+
+      .public-header {
+        position: fixed;
+        inset-inline: 0;
+        top: 0;
+        z-index: 100;
+        padding-top: env(safe-area-inset-top);
+      }
+
+      .landing-nav-scrim {
+        background: linear-gradient(to bottom, rgba(var(--panel-bg-rgb), 0.94), rgba(var(--panel-bg-rgb), 0.72) 56%, rgba(var(--panel-bg-rgb), 0));
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+
+      .public-header > div {
+        display: flex;
+        height: 3.5rem;
+        width: 100%;
+        max-width: 1440px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-inline: auto;
+        padding-inline: 1rem;
+      }
+
+      .public-header a[aria-label="Reflections - go to home"] {
+        display: flex;
+        min-height: 2.75rem;
+        min-width: 0;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .public-header a[aria-label="Reflections - go to home"] > span:first-child {
+        display: flex;
+        height: 2.5rem;
+        width: 2.5rem;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.75rem;
+        background: var(--green);
+        color: white;
+      }
+
+      .public-header a[aria-label="Reflections - go to home"] > span:last-child {
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-family: var(--font-serif);
+        font-size: 22px;
+        font-style: italic;
+        color: var(--green);
+      }
+
+      .public-header nav[aria-label="Public navigation"] {
+        display: none;
+      }
+
+      .public-header nav[aria-label="Public navigation"] button,
+      .public-header nav[aria-label="Public navigation"] a {
+        display: inline-flex;
+        min-height: 2.75rem;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.75rem;
+        color: var(--nav-text);
+        font-size: 0.75rem;
+        font-weight: 800;
+        line-height: 1;
+        white-space: nowrap;
+      }
+
+      .public-header nav[aria-label="Public navigation"] a {
+        border: 1px solid transparent;
+        padding: 0.5rem 0.75rem;
+      }
+
+      .public-header nav[aria-label="Public navigation"] a[aria-current="page"] {
+        border-color: var(--green);
+        background: oklch(from var(--green) 0.965 0.022 h / 0.92);
+        color: var(--green);
+        box-shadow: 0 1px 2px oklch(from var(--green) l c h / 0.05);
+      }
+
+      .public-header nav[aria-label="Public navigation"] > span {
+        display: block;
+        width: 1px;
+        height: 1.5rem;
+        margin-inline: 0.5rem;
+        background: var(--border-color);
+      }
+
+      .public-header nav[aria-label="Public navigation"] > a[href="/signup"] {
+        border-color: var(--green);
+        background: var(--green);
+        padding-inline: 1rem;
+        color: white;
+        box-shadow: 0 1px 2px oklch(from var(--green) l c h / 0.1);
+      }
+
+      .public-header > div > div:last-child {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .public-header button {
+        display: inline-flex;
+        height: 2.75rem;
+        width: 2.75rem;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.75rem;
+        color: var(--gray-text);
+      }
+
+      [aria-label="Welcome"] {
+        position: relative;
+        min-height: 100dvh;
+        overflow-x: hidden;
+        background: var(--bg-color);
+        color: var(--gray-text);
+      }
+
+      [aria-label="Welcome"] > div {
+        position: relative;
+        isolation: isolate;
+        min-height: 100dvh;
+        width: 100%;
+        overflow: hidden;
+        background: var(--bg-color);
+      }
+
+      [aria-label="Welcome"] > div > div:first-child {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        overflow: hidden;
+        pointer-events: none;
+      }
+
+      [aria-label="Welcome"] picture img,
+      [aria-label="Welcome"] video {
+        position: absolute;
+        inset: 0;
+        height: 100%;
+        min-height: 100%;
+        width: 100%;
+        min-width: 100%;
+        object-fit: cover;
+        object-position: 48% center;
+      }
+
+      .video-mask {
+        position: absolute;
+        inset: 0;
+        z-index: 10;
+        pointer-events: none;
+      }
+
+      .video-mask--mobile {
+        background:
+          linear-gradient(to bottom, rgba(var(--panel-bg-rgb), 0.92), rgba(var(--panel-bg-rgb), 0.76) 18%, rgba(var(--panel-bg-rgb), 0.2) 40%, transparent 60%),
+          linear-gradient(to right, rgba(var(--panel-bg-rgb), 0.9), rgba(var(--panel-bg-rgb), 0.66) 28%, rgba(var(--panel-bg-rgb), 0.16) 56%, transparent 76%),
+          linear-gradient(to top, rgba(var(--panel-bg-rgb), 0.44), transparent 24%);
+      }
+
+      .video-mask--desktop {
+        display: none;
+      }
+
+      [aria-label="Welcome"] > div > div:last-child {
+        position: relative;
+        z-index: 20;
+        display: flex;
+        min-height: 100dvh;
+        flex-direction: column;
+        padding: calc(env(safe-area-inset-top) + var(--header-height) + 1.5rem) 1.5rem calc(env(safe-area-inset-bottom) + 1.75rem);
+        pointer-events: none;
+      }
+
+      [aria-label="Welcome"] > div > div:last-child > div:first-child {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      [aria-label="Welcome"] h1 {
+        display: flex;
+        max-width: 11ch;
+        flex-direction: column;
+        margin: 0;
+        color: var(--gray-text);
+        font-family: var(--font-display);
+        font-size: clamp(2.5rem, 5vw + 1rem, 4.5rem);
+        font-weight: 800;
+        line-height: 1.05;
+        letter-spacing: 0;
+        pointer-events: auto;
+      }
+
+      [aria-label="Welcome"] h1 span:nth-child(2) {
+        color: var(--green);
+        font-family: var(--font-serif);
+        font-style: italic;
+        font-weight: 400;
+      }
+
+      [aria-label="Welcome"] p {
+        max-width: 26ch;
+        margin: 0;
+        color: color-mix(in oklch, var(--gray-text) 85%, transparent);
+        font-family: var(--font-sans);
+        font-size: 1rem;
+        line-height: 1.625;
+        pointer-events: auto;
+      }
+
+      [aria-label="Welcome"] > div > div:last-child > div:last-child {
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2rem;
+        margin-top: auto;
+        pointer-events: auto;
+      }
+
+      [aria-label="Welcome"] button[aria-label="Begin writing"] {
+        display: inline-flex;
+        height: 4rem;
+        min-width: 0;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-control);
+        background: var(--green);
+        padding-inline: 2.5rem;
+        color: white;
+        font-family: var(--font-sans);
+        font-size: 1.25rem;
+        font-weight: 800;
+        line-height: 1.2;
+        white-space: nowrap;
+        box-shadow: 0 12px 28px -10px var(--green-shadow);
+      }
+
+      [aria-label="Welcome"] button[aria-label="Begin writing"] svg {
+        width: 1.25rem;
+        height: 1.25rem;
+        margin-left: 0.75rem;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      [aria-label="Welcome"] > div > div:last-child > div:last-child > div:last-child {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.25rem;
+        margin-top: 1rem;
+      }
+
+      [aria-label="Welcome"] > div > div:last-child > div:last-child > div:last-child > div:first-child {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        gap: 2rem;
+      }
+
+      [aria-label="Welcome"] a,
+      [aria-label="Welcome"] button:not([aria-label="Begin writing"]) {
+        display: inline-flex;
+        min-height: 2.75rem;
+        align-items: center;
+        justify-content: center;
+        color: var(--nav-text);
+        font-size: 0.8125rem;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      [aria-label="Welcome"] button[aria-label="Mute video"],
+      [aria-label="Welcome"] button[aria-label="Unmute video"] {
+        width: 3rem;
+        height: 3rem;
+        min-width: 3rem;
+        flex-shrink: 0;
+        border: 1.5px solid var(--floating-panel-media-border);
+        border-radius: 1rem;
+        background: var(--floating-panel-media-bg);
+        color: var(--gray-text);
+        box-shadow: var(--surface-tinted-shadow);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+      }
+
+      @media (min-width: 640px) {
+        .public-header a[aria-label="Reflections - go to home"] > span:last-child {
+          max-width: none;
+          font-size: 26px;
+        }
+
+        [aria-label="Welcome"] > div > div:last-child {
+          padding-inline: 3rem;
+          padding-top: calc(env(safe-area-inset-top) + var(--header-height) + 2rem);
+        }
+
+        [aria-label="Welcome"] picture img,
+        [aria-label="Welcome"] video {
+          object-position: 64% center;
+        }
+
+        [aria-label="Welcome"] p {
+          max-width: 32ch;
+          font-size: 1.125rem;
+        }
+
+        [aria-label="Welcome"] > div > div:last-child > div:last-child {
+          max-width: none;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        [aria-label="Welcome"] > div > div:last-child > div:last-child > div:last-child {
+          width: auto;
+          margin-top: 0;
+          column-gap: 2.5rem;
+        }
+      }
+
+      @media (min-width: 768px) {
+        .public-header > div {
+          padding-inline: 2rem;
+        }
+      }
+
+      @media (min-width: 1024px) {
+        .public-header nav[aria-label="Public navigation"] {
+          display: flex;
+          align-items: center;
+          gap: 0.375rem;
+        }
+
+        .public-header nav[aria-label="Public navigation"] a {
+          font-size: 0.8125rem;
+        }
+
+        .public-header > div > div:last-child {
+          display: none;
+        }
+
+        .video-mask--mobile {
+          display: none;
+        }
+
+        .video-mask--desktop {
+          display: block;
+          background:
+            linear-gradient(to right, var(--bg-color), var(--bg-color) 40%, transparent 80%),
+            linear-gradient(to bottom, var(--bg-color), transparent 15%, transparent 85%, var(--bg-color));
+        }
+
+        [aria-label="Welcome"] > div > div:last-child {
+          justify-content: space-between;
+          padding: 28vh 4rem 3rem;
+        }
+
+        [aria-label="Welcome"] > div > div:last-child > div:first-child {
+          width: 60%;
+          gap: 2rem;
+        }
+
+        [aria-label="Welcome"] h1 {
+          max-width: 64rem;
+          line-height: 0.96;
+        }
+
+        [aria-label="Welcome"] p {
+          max-width: 40ch;
+        }
+
+        [aria-label="Welcome"] > div > div:last-child > div:last-child {
+          margin-top: 0;
+        }
+      }
+
+      @media (min-width: 1280px) {
+        .public-header > div {
+          padding-inline: 2.5rem;
+        }
+
+        .public-header nav[aria-label="Public navigation"] {
+          gap: 0.5rem;
+        }
+
+        .public-header nav[aria-label="Public navigation"] a {
+          padding-inline: 1rem;
+        }
+
+        [aria-label="Welcome"] > div > div:last-child {
+          padding-inline: 6rem;
+        }
+
+        [aria-label="Welcome"] > div > div:last-child > div:first-child {
+          width: 55%;
+        }
       }
       /* Hide SEO content from users but keep for crawlers (sr-only pattern) */
       #public-seo-content {
@@ -92,6 +624,10 @@
         border: 0;
       }
     </style>
+
+    <!-- ── Stylesheets ─────────────────────────────────────────────── -->
+    <link rel="stylesheet" href="/index.css" />
+    <!-- Quill is now loaded via npm dependency in Editor.tsx -->
 
     <!-- ── Structured Data (JSON-LD) ──────────────────────────────── -->
     <script type="application/ld+json">

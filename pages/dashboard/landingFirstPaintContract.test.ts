@@ -65,8 +65,8 @@ describe('landing first-paint contract', () => {
     const landing = read('pages/dashboard/Landing.tsx');
     const indexHtml = read('index.html');
 
-    expect(indexHtml).toContain('rel="preload" href="/assets/videos/landing_video_mobile.webp" as="image" type="image/webp" fetchpriority="high" media="(max-width: 1023px)"');
-    expect(indexHtml).toContain('rel="preload" href="/assets/videos/landing_video.webp" as="image" type="image/webp" fetchpriority="high" media="(min-width: 1024px)"');
+    expect(indexHtml).not.toContain('landing_video_mobile.webp" as="image"');
+    expect(indexHtml).not.toContain('landing_video.webp" as="image"');
     expect(landing).toContain('const [shouldLoadHeroVideo, setShouldLoadHeroVideo] = useState(false);');
     expect(landing).toContain('const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);');
     expect(landing).not.toContain("const desktopHeroVideoQuery = window.matchMedia('(min-width: 1024px)');");

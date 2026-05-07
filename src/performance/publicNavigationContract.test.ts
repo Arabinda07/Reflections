@@ -9,7 +9,8 @@ describe('public navigation shell contract', () => {
   it('routes public pages through the lightweight public shell only', () => {
     const app = read('App.tsx');
 
-    expect(app).toContain("const PublicAppShell = lazy(() => import('./layouts/PublicAppShell')");
+    expect(app).toContain("import { PublicAppShell } from './layouts/PublicAppShell';");
+    expect(app).not.toContain("const PublicAppShell = lazy(() => import('./layouts/PublicAppShell')");
     expect(app).toContain('<Route element={withRouteFallback(<PublicAppShell />)} errorElement={<RouteErrorBoundary />}>');
     expect(app).toContain('path={RoutePath.HOME} element={<Landing />}');
     expect(app).toContain('path={RoutePath.FAQ} element={withRouteFallback(<FAQ />)}');

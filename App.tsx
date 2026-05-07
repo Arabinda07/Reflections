@@ -1,12 +1,11 @@
 import React, { Suspense, lazy } from 'react';
-import { MotionConfig } from 'motion/react';
 import { Navigate, Route, RouterProvider, createBrowserRouter, createRoutesFromElements, ScrollRestoration, Outlet } from 'react-router-dom';
 import { RouteLoadingFrame } from './components/ui/RouteLoadingFrame';
+import { PublicAppShell } from './layouts/PublicAppShell';
 import { RouteErrorBoundary } from './pages/RouteErrorBoundary';
 import { Landing } from './pages/dashboard/Landing';
 import { RoutePath } from './types';
 
-const PublicAppShell = lazy(() => import('./layouts/PublicAppShell').then((m) => ({ default: m.PublicAppShell })));
 const AuthenticatedAppShell = lazy(() => import('./layouts/AuthenticatedAppShell').then((m) => ({ default: m.AuthenticatedAppShell })));
 const AuthAppShell = lazy(() => import('./layouts/AuthAppShell').then((m) => ({ default: m.AuthAppShell })));
 const ProtectedRoute = lazy(() => import('./components/auth/ProtectedRoute').then((m) => ({ default: m.ProtectedRoute })));
@@ -84,11 +83,7 @@ const router = createBrowserRouter(
 );
 
 function App() {
-  return (
-    <MotionConfig reducedMotion="user">
-      <RouterProvider router={router} />
-    </MotionConfig>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;

@@ -21,8 +21,10 @@ describe('public landing performance contract', () => {
     expect(app).not.toContain("import { ProtectedRoute } from './components/auth/ProtectedRoute';");
     expect(app).not.toContain("import { ToastProvider } from './components/ui/Toast';");
     expect(app).not.toContain("import { DashboardLayout } from './layouts/DashboardLayout';");
-    expect(app).toContain("import { MotionConfig } from 'motion/react';");
-    expect(app).toContain('<MotionConfig reducedMotion="user">');
+    expect(app).toContain("import { PublicAppShell } from './layouts/PublicAppShell';");
+    expect(app).not.toContain("const PublicAppShell = lazy(() => import('./layouts/PublicAppShell')");
+    expect(app).not.toContain("import { MotionConfig } from 'motion/react';");
+    expect(app).not.toContain('<MotionConfig reducedMotion="user">');
     expect(app).not.toContain("import { useSync } from './hooks/useSync';");
     expect(app).not.toContain("import { useNativeStatusBar } from './hooks/useNativeStatusBar';");
     expect(app).not.toContain("import { useNativeOAuthListener } from './hooks/useNativeOAuthListener';");
@@ -84,11 +86,33 @@ describe('public landing performance contract', () => {
   it('keeps first-paint media and font hints mobile friendly', () => {
     const indexHtml = read('index.html');
 
-    expect(indexHtml).toContain('rel="preload" href="/assets/videos/landing_video_mobile.webp" as="image" type="image/webp" fetchpriority="high" media="(max-width: 1023px)"');
-    expect(indexHtml).toContain('rel="preload" href="/assets/videos/landing_video.webp" as="image" type="image/webp" fetchpriority="high" media="(min-width: 1024px)"');
+    expect(indexHtml).not.toContain('landing_video_mobile.webp" as="image"');
+    expect(indexHtml).not.toContain('landing_video.webp" as="image"');
     expect(indexHtml).toContain('rel="preload" href="/assets/fonts/Manrope-Variable.woff2"');
     expect(indexHtml).toContain('rel="preload" href="/assets/fonts/Spectral-Regular.woff2"');
     expect(indexHtml).toContain('rel="preload" href="/assets/fonts/Spectral-Italic.woff2"');
+  });
+
+  it('loads the global stylesheet without blocking the first render', () => {
+    const indexHtml = read('index.html');
+    const viteConfig = read('vite.config.ts');
+    const criticalStyleIndex = indexHtml.indexOf('<style id="critical-landing-css">');
+    const stylesheetIndex = indexHtml.indexOf('<link rel="stylesheet" href="/index.css" />');
+
+    expect(criticalStyleIndex).toBeGreaterThan(-1);
+    expect(stylesheetIndex).toBeGreaterThan(criticalStyleIndex);
+    expect(indexHtml).toContain('.public-shell');
+    expect(indexHtml).toContain('[aria-label="Welcome"]');
+    expect(indexHtml).toContain('button[aria-label="Begin writing"]');
+    expect(indexHtml).toContain('.video-mask--mobile');
+    expect(indexHtml).toContain('.public-header nav[aria-label="Public navigation"] a[aria-current="page"]');
+    expect(indexHtml).toContain('.public-header nav[aria-label="Public navigation"] > a[href="/signup"]');
+    expect(indexHtml).toContain('scrollbar-gutter: stable;');
+    expect(viteConfig).toContain('const nonBlockingGlobalCssPlugin');
+    expect(viteConfig).toContain('transformIndexHtml');
+    expect(viteConfig).toContain('media="print"');
+    expect(viteConfig).toContain('onload="this.media=\'all\'"');
+    expect(viteConfig).toContain('<noscript><link rel="stylesheet" href="${href}"></noscript>');
   });
 
   it('keeps component-only chrome out of the public landing stylesheet', () => {

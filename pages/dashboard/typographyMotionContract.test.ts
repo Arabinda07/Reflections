@@ -90,12 +90,13 @@ describe('Typography and motion contract', () => {
     });
   });
 
-  it('keeps motion reduced-motion safe across CSS and Motion components', () => {
+  it('keeps motion reduced-motion safe without loading the Motion runtime on the public app shell', () => {
     const app = read('App.tsx');
     const indexCss = read('index.css');
     const home = read('pages/dashboard/HomeAuthenticated.tsx');
 
-    expect(app).toContain('<MotionConfig reducedMotion="user">');
+    expect(app).not.toContain("import { MotionConfig } from 'motion/react';");
+    expect(app).not.toContain('<MotionConfig reducedMotion="user">');
     expect(indexCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(indexCss).toContain('animation-duration: 0.01ms !important');
     expect(home).toContain('if (shouldReduceMotion)');

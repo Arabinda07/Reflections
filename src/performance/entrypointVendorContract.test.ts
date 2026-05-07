@@ -61,7 +61,8 @@ describe('entrypoint vendor loading contract', () => {
     expect(app).not.toContain("import { useNativeOAuthListener } from './hooks/useNativeOAuthListener';");
     expect(app).not.toContain('useNativeOAuthListener();');
     expect(app).not.toContain('withBootstrappedShell');
-    expect(app).toContain("const PublicAppShell = lazy(() => import('./layouts/PublicAppShell')");
+    expect(app).toContain("import { PublicAppShell } from './layouts/PublicAppShell';");
+    expect(app).not.toContain("const PublicAppShell = lazy(() => import('./layouts/PublicAppShell')");
     expect(app).toContain("const AuthAppShell = lazy(() => import('./layouts/AuthAppShell')");
     expect(app).toContain("const AuthenticatedAppShell = lazy(() => import('./layouts/AuthenticatedAppShell')");
     expect(app).toContain('<Route element={withRouteFallback(<PublicAppShell />)} errorElement={<RouteErrorBoundary />}>');
