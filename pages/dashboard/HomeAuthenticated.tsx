@@ -887,15 +887,17 @@ export const HomeAuthenticated: React.FC = () => {
               <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border-2 border-dashed border-border">
                 <Plus size={12} weight="bold" className="text-gray-nav/40" />
               </div>
-              <input
-                type="text"
-                autoFocus
-                value={newTaskText}
-                onChange={(e) => setNewTaskText(e.target.value)}
-                placeholder="What needs to be done?"
-                disabled={isCreatingTask}
-                className="flex-1 bg-transparent border-none outline-none font-bold text-[14px] text-gray-text placeholder:text-gray-nav/40"
-              />
+              <div className="intention-entry-control flex-1">
+                <input
+                  type="text"
+                  autoFocus
+                  value={newTaskText}
+                  onChange={(e) => setNewTaskText(e.target.value)}
+                  placeholder="What needs to be done?"
+                  disabled={isCreatingTask}
+                  className="intention-entry-input"
+                />
+              </div>
               {newTaskText.trim() && (
                 <Button
                   type="submit"

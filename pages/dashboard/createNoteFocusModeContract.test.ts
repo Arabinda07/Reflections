@@ -23,4 +23,32 @@ describe('CreateNote focus mode contract', () => {
     expect(createNote).toContain('Exit focus');
     expect(createNote).not.toContain('opacity-40 scale-[0.98]');
   });
+
+  it('keeps the focus mode toggle at the shared touch target size on desktop', () => {
+    const createNote = read('pages/dashboard/CreateNote.tsx');
+    const focusModeAttribute = 'aria-pressed={isFocusModeEnabled}';
+    const focusModeIndex = createNote.indexOf(focusModeAttribute);
+
+    expect(focusModeIndex).toBeGreaterThan(-1);
+
+    const focusModeButtonBlock = createNote.slice(focusModeIndex, focusModeIndex + 520);
+
+    expect(focusModeButtonBlock).toContain('min-h-11');
+    expect(focusModeButtonBlock).not.toContain('sm:min-h-0');
+    expect(focusModeButtonBlock).not.toContain('sm:py-1');
+  });
+
+  it('keeps the reflect with AI action at the shared touch target size on desktop', () => {
+    const createNote = read('pages/dashboard/CreateNote.tsx');
+    const reflectActionLabel = 'Reflect with AI';
+    const reflectActionIndex = createNote.indexOf(reflectActionLabel);
+
+    expect(reflectActionIndex).toBeGreaterThan(-1);
+
+    const reflectActionButtonBlock = createNote.slice(reflectActionIndex - 520, reflectActionIndex + 120);
+
+    expect(reflectActionButtonBlock).toContain('min-h-11');
+    expect(reflectActionButtonBlock).not.toContain('sm:min-h-0');
+    expect(reflectActionButtonBlock).not.toContain('sm:py-1');
+  });
 });

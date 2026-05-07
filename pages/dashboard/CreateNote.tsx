@@ -550,7 +550,7 @@ export const CreateNote: React.FC = () => {
               onClick={() => {
                 focusMode.toggle();
               }}
-              className={`inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 label-caps transition-colors sm:min-h-0 sm:px-3 sm:py-1 ${
+              className={`inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 label-caps transition-colors sm:px-3 ${
                 isFocusModeEnabled
                   ? 'bg-green text-white'
                   : 'control-surface text-gray-text hover:bg-green/10 hover:text-green'
@@ -560,7 +560,7 @@ export const CreateNote: React.FC = () => {
               Focus mode
             </button>
             {canReflect && (
-              <button onClick={handleAiReflect} disabled={isReflecting} className="inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-[var(--radius-control)] bg-green px-4 py-2 label-caps text-white transition-colors hover:bg-green-hover disabled:opacity-60 sm:min-h-0 sm:px-3 sm:py-1">
+              <button onClick={handleAiReflect} disabled={isReflecting} className="inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-[var(--radius-control)] bg-green px-4 py-2 label-caps text-white transition-colors hover:bg-green-hover disabled:opacity-60 sm:px-3">
                 <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center sm:h-3 sm:w-3">
                   {isReflecting ? <CircleNotch size={14} className="animate-spin" /> : <Brain size={14} weight="regular" />}
                 </span>
@@ -797,13 +797,15 @@ export const CreateNote: React.FC = () => {
             <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border-2 border-dashed border-border">
               <Plus size={12} weight="bold" className="text-gray-nav/40" />
             </div>
-            <input
-              type="text"
-              value={newTaskText}
-              onChange={(e) => setNewTaskText(e.target.value)}
-              placeholder="What needs to be done?"
-              className="flex-1 bg-transparent border-none outline-none font-bold text-[14px] text-gray-text placeholder:text-gray-nav/40"
-            />
+            <div className="intention-entry-control flex-1">
+              <input
+                type="text"
+                value={newTaskText}
+                onChange={(e) => setNewTaskText(e.target.value)}
+                placeholder="What needs to be done?"
+                className="intention-entry-input"
+              />
+            </div>
             {newTaskText.trim() && (
               <Button type="submit" variant="primary" size="sm" className="shrink-0">
                 Add

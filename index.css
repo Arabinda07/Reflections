@@ -1162,6 +1162,56 @@ details:focus-visible,
     opacity: 0.72;
   }
 
+  .intention-entry-control {
+    display: flex;
+    min-height: 46px;
+    min-width: 0;
+    align-items: center;
+    border: 1.5px solid oklch(from var(--surface-current-border) l c h / 0.76);
+    border-radius: var(--radius-control);
+    background: rgba(var(--panel-bg-rgb), 0.52);
+    box-shadow: 0 10px 22px -22px rgba(0, 0, 0, 0.16);
+    padding: 0 0.85rem;
+    transition:
+      background-color 200ms var(--ease-out-expo),
+      border-color 200ms var(--ease-out-expo),
+      box-shadow 200ms var(--ease-out-expo);
+  }
+
+  .intention-entry-control:hover {
+    border-color: oklch(from var(--surface-current-accent) l c h / 0.18);
+    background: rgba(var(--panel-bg-rgb), 0.68);
+  }
+
+  .intention-entry-control:focus-within {
+    border-color: oklch(from var(--surface-current-accent) l c h / 0.24);
+    background: rgba(var(--panel-bg-rgb), 0.74);
+    box-shadow:
+      0 0 0 3px oklch(from var(--surface-current-accent) l c h / 0.08),
+      0 14px 26px -24px rgba(0, 0, 0, 0.18);
+  }
+
+  .intention-entry-input {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    color: var(--gray-text);
+    font-size: 0.875rem;
+    font-weight: 800;
+    outline: none;
+  }
+
+  .intention-entry-input::placeholder {
+    color: var(--nav-text);
+    opacity: 0.62;
+  }
+
+  .intention-entry-input:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+
   .hero-scrim {
     background: var(--hero-scrim);
   }
