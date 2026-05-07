@@ -37,6 +37,22 @@ describe('public header regression fixes', () => {
     expect(header).not.toContain('motion/');
   });
 
+  it('keeps the active public nav item quieter than the primary signup action', () => {
+    const header = read('components/ui/PublicHeader.tsx');
+    const indexHtml = read('index.html');
+    const activeCriticalRule = cssBlock(
+      indexHtml,
+      '.public-header nav[aria-label="Public navigation"] a[aria-current="page"]',
+    );
+
+    expect(header).toContain("isActive ? 'border-green/20 bg-green/[0.025] text-green'");
+    expect(header).not.toContain("isActive ? 'border-green bg-green/5 text-green shadow-sm shadow-green/5'");
+    expect(activeCriticalRule).toContain('border-color: oklch(from var(--green) l c h / 0.2);');
+    expect(activeCriticalRule).toContain('background: oklch(from var(--green) l c h / 0.025);');
+    expect(activeCriticalRule).toContain('box-shadow: none;');
+    expect(activeCriticalRule).not.toContain('background: oklch(from var(--green) 0.965 0.022 h / 0.92);');
+  });
+
   it('portals the public mobile menu outside the backdrop-filtered header', () => {
     const header = read('components/ui/PublicHeader.tsx');
 

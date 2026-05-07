@@ -281,10 +281,10 @@
       }
 
       .public-header nav[aria-label="Public navigation"] a[aria-current="page"] {
-        border-color: var(--green);
-        background: oklch(from var(--green) 0.965 0.022 h / 0.92);
+        border-color: oklch(from var(--green) l c h / 0.2);
+        background: oklch(from var(--green) l c h / 0.025);
         color: var(--green);
-        box-shadow: 0 1px 2px oklch(from var(--green) l c h / 0.05);
+        box-shadow: none;
       }
 
       .public-header nav[aria-label="Public navigation"] > span {

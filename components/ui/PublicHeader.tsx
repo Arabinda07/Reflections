@@ -426,7 +426,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
                   href={item.href}
                   aria-current={isActive ? 'page' : undefined}
                   className={`inline-flex min-h-11 items-center rounded-xl border px-3 py-2 text-[12px] font-extrabold transition-colors duration-200 hover:border-green/20 hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-1 xl:px-4 xl:text-[13px] ${
-                    isActive ? 'border-green bg-green/5 text-green shadow-sm shadow-green/5' : 'border-transparent text-gray-nav'
+                    isActive ? 'border-green/20 bg-green/[0.025] text-green' : 'border-transparent text-gray-nav'
                   }`}
                 >
                   {item.label}
