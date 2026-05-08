@@ -159,6 +159,61 @@ describe('shareCompletionCard', () => {
       files: expect.any(Array),
     }));
   });
+
+  it('returns cancelled when the native share sheet is dismissed', async () => {
+    const payload = buildCompletionCardPayload({
+      kind: 'release_completed',
+      date: new Date('2026-04-29T12:00:00.000Z'),
+    });
+    const blob = new Blob(['png'], { type: 'image/png' });
+    const abortError = new Error('Share cancelled');
+    abortError.name = 'AbortError';
+
+    const result = await shareCompletionCard(payload, {
+      render: vi.fn().mockResolvedValue(blob),
+      navigator: {
+        share: vi.fn().mockRejectedValue(abortError),
+        canShare: vi.fn().mockReturnValue(true),
+      } as unknown as Navigator,
+    });
+
+    expect(result).toBe('cancelled');
+  });
+
+  it('returns unsupported without rendering when Web Share is unavailable', async () => {
+    const payload = buildCompletionCardPayload({
+      kind: 'release_completed',
+      date: new Date('2026-04-29T12:00:00.000Z'),
+    });
+    const render = vi.fn().mockResolvedValue(new Blob(['png'], { type: 'image/png' }));
+
+    const result = await shareCompletionCard(payload, {
+      render,
+      navigator: {} as Navigator,
+    });
+
+    expect(result).toBe('unsupported');
+    expect(render).not.toHaveBeenCalled();
+  });
+
+  it('returns unsupported when file sharing is unavailable', async () => {
+    const payload = buildCompletionCardPayload({
+      kind: 'release_completed',
+      date: new Date('2026-04-29T12:00:00.000Z'),
+    });
+    const share = vi.fn().mockResolvedValue(undefined);
+
+    const result = await shareCompletionCard(payload, {
+      render: vi.fn().mockResolvedValue(new Blob(['png'], { type: 'image/png' })),
+      navigator: {
+        share,
+        canShare: vi.fn().mockReturnValue(false),
+      } as unknown as Navigator,
+    });
+
+    expect(result).toBe('unsupported');
+    expect(share).not.toHaveBeenCalled();
+  });
 });
 
 describe('copyCompletionCardToClipboard', () => {

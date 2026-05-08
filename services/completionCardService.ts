@@ -3,7 +3,7 @@ import type { CompletionCardPayload } from './completionCardPayload';
 export { buildCompletionCardPayload } from './completionCardPayload';
 export type { CompletionCardKind, CompletionCardPayload } from './completionCardPayload';
 
-export type CompletionCardShareResult = 'shared' | 'unsupported';
+export type CompletionCardShareResult = 'shared' | 'unsupported' | 'cancelled';
 
 const CARD_WIDTH = 1200;
 const CARD_HEIGHT = 630;
@@ -239,6 +239,12 @@ interface CompletionCardClipboardOptions {
   clipboardItem?: typeof ClipboardItem;
 }
 
+const isAbortError = (error: unknown): boolean => (
+  typeof DOMException !== 'undefined' && error instanceof DOMException
+    ? error.name === 'AbortError'
+    : error instanceof Error && error.name === 'AbortError'
+);
+
 export async function shareCompletionCard(
   payload: CompletionCardPayload,
   options: CompletionCardShareOptions = {},
@@ -261,8 +267,16 @@ export async function shareCompletionCard(
     return 'unsupported';
   }
 
-  await browserNavigator.share(shareData);
-  return 'shared';
+  try {
+    await browserNavigator.share(shareData);
+    return 'shared';
+  } catch (error) {
+    if (isAbortError(error)) {
+      return 'cancelled';
+    }
+
+    throw error;
+  }
 }
 
 export async function downloadCompletionCard(
