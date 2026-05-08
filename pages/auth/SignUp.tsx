@@ -38,7 +38,7 @@ export const SignUp: React.FC = () => {
   const location = useLocation();
   const { isAuthenticated, isInitialCheckDone } = useAuthStore();
   const [loading, setLoading] = useState(() => isGoogleOAuthCallbackUrl(window.location.href));
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(location.state?.errorMessage || null);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
