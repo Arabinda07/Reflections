@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { render } from "@react-email/render"
 import React from "react"
 import { WelcomeEmail } from "../../../emails/templates/WelcomeEmail.tsx"
+import { NewsletterWelcomeEmail } from "../../../emails/templates/NewsletterWelcomeEmail.tsx"
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
 const FUNCTION_SECRET = Deno.env.get('FUNCTION_SECRET')
@@ -66,10 +67,13 @@ serve(async (req) => {
     const email = record.email
     const fullName = record.raw_user_meta_data?.full_name || 'there'
     const firstName = fullName.split(' ')[0]
+    const newsletterOptIn = record.raw_user_meta_data?.newsletter_opt_in === true || record.raw_user_meta_data?.newsletter_opt_in === 'true'
+
+    const EmailComponent = newsletterOptIn ? NewsletterWelcomeEmail : WelcomeEmail;
 
     // Render the React Email template to HTML
     const emailHtml = render(
-      React.createElement(WelcomeEmail, {
+      React.createElement(EmailComponent, {
         userName: firstName,
         loginUrl: 'https://reflections.app/login',
         unsubscribeUrl: 'https://reflections.app/account',

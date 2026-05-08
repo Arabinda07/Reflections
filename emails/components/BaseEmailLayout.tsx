@@ -1,4 +1,4 @@
-import { Html, Head, Body, Container, Tailwind, Preview } from '@react-email/components';
+import { Html, Head, Body, Container, Tailwind, Preview, Section } from '@react-email/components';
 import React from 'react';
 
 interface BaseEmailLayoutProps {
@@ -29,8 +29,10 @@ export const BaseEmailLayout = ({ children, previewText }: BaseEmailLayoutProps)
         {previewText && <Preview>{previewText}</Preview>}
         <Body className="bg-brand-bg text-brand-text font-sans antialiased">
           <div className="px-4 py-8 sm:px-6 sm:py-12">
-            <Container className="mx-auto w-full max-w-[600px] bg-white rounded-3xl p-8 sm:p-12 shadow-sm border border-black/5">
-              {children}
+            <Container className="mx-auto w-full max-w-[600px] bg-white rounded-3xl shadow-sm border border-black/5 overflow-hidden">
+              <Section className="px-6 py-8 sm:px-12 sm:py-12">
+                {children}
+              </Section>
             </Container>
           </div>
         </Body>
