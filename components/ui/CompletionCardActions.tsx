@@ -36,6 +36,10 @@ export const CompletionCardActions: React.FC<CompletionCardActionsProps> = ({
     try {
       const { downloadCompletionCard, shareCompletionCard } = await loadCompletionCardService();
       const result = await shareCompletionCard(payload);
+      if (result === 'cancelled') {
+        return;
+      }
+
       if (result === 'unsupported') {
         await downloadCompletionCard(payload);
         setStatus('Card downloaded.');
