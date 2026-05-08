@@ -88,6 +88,8 @@ export const SignUp: React.FC = () => {
         email,
         password,
         options: {
+          // Supabase hosted auth must allow-list this exact production callback URL
+          // in Authentication -> URL Configuration, or signup confirmation links will fail.
           emailRedirectTo: `${window.location.origin}${RoutePath.AUTH_CALLBACK}`,
           data: {
             full_name: name,
