@@ -64,6 +64,8 @@ export const Account: React.FC = () => {
   const [avatarPath, setAvatarPath] = useState<string | null>(null);
   const [lastSignIn, setLastSignIn] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<FeedbackState>(null);
+  const [passwordResetFeedback, setPasswordResetFeedback] = useState<FeedbackState>(null);
+  const [isPasswordResetting, setIsPasswordResetting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeletingData, setIsDeletingData] = useState(false);
   const [isSmartModeChanging, setIsSmartModeChanging] = useState(false);
@@ -214,25 +216,33 @@ export const Account: React.FC = () => {
   };
 
   const handlePasswordReset = async () => {
-    if (!email) return;
+    if (!email || isPasswordResetting) return;
 
     setFeedback(null);
+    setPasswordResetFeedback(null);
+    setIsPasswordResetting(true);
+
     try {
-      await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}${RoutePath.RESET_PASSWORD}`,
+      const response = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}${RoutePath.AUTH_CALLBACK}?next=${RoutePath.RESET_PASSWORD}`,
       });
-      setFeedback({
+
+      if (response.error) throw response.error;
+
+      setPasswordResetFeedback({
         variant: 'info',
         title: 'Password reset email sent.',
         description: 'Check your inbox for a secure recovery link.',
       });
     } catch (err) {
       console.error(err);
-      setFeedback({
+      setPasswordResetFeedback({
         variant: 'error',
         title: 'Password reset could not be sent.',
-        description: 'Please try again in a moment.',
+        description: err instanceof Error ? err.message : 'Please try again in a moment.',
       });
+    } finally {
+      setIsPasswordResetting(false);
     }
   };
 
@@ -525,19 +535,41 @@ export const Account: React.FC = () => {
                       </div>
                     </summary>
                     <div className="border-t border-border/50 p-5 pt-4 space-y-4">
-                      <button
-                        type="button"
-                        onClick={handlePasswordReset}
-                        className="surface-inline-panel flex w-full items-center justify-between px-4 py-4 text-left transition-colors hover:border-border/80"
-                      >
-                        <div className="flex items-center gap-3">
-                          <Key size={20} weight="regular" className="text-gray-nav" />
-                          <div>
-                            <p className="text-[14px] font-bold text-gray-text">Password reset</p>
+                      <div className="space-y-3">
+                        <button
+                          type="button"
+                          onClick={handlePasswordReset}
+                          disabled={isPasswordResetting || !email}
+                          className="surface-inline-panel flex w-full items-center justify-between px-4 py-4 text-left transition-colors hover:border-border/80 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          <div className="flex items-center gap-3">
+                            <Key size={20} weight="regular" className="text-gray-nav" />
+                            <div>
+                              <p className="text-[14px] font-bold text-gray-text">Password reset</p>
+                            </div>
                           </div>
-                        </div>
-                        <EnvelopeSimple size={18} weight="regular" className="text-gray-nav" />
-                      </button>
+                          {isPasswordResetting ? (
+                            <CircleNotch size={18} className="animate-spin text-gray-nav" />
+                          ) : (
+                            <EnvelopeSimple size={18} weight="regular" className="text-gray-nav" />
+                          )}
+                        </button>
+
+                        {passwordResetFeedback ? (
+                          <Alert
+                            variant={passwordResetFeedback.variant}
+                            title={passwordResetFeedback.title}
+                            description={passwordResetFeedback.description}
+                            icon={
+                              passwordResetFeedback.variant === 'error' ? (
+                                <Warning size={20} weight="fill" />
+                              ) : (
+                                <EnvelopeSimple size={20} weight="duotone" />
+                              )
+                            }
+                          />
+                        ) : null}
+                      </div>
 
                       <div className="surface-inline-panel flex items-center justify-between px-4 py-4 opacity-70">
                         <div className="flex items-center gap-3">
