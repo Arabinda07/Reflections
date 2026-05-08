@@ -6,9 +6,39 @@ import { RouteLoadingFrame } from '../../components/ui/RouteLoadingFrame';
 import {
   consumePendingGoogleAuthRedirectPath,
   getPendingGoogleAuthPath,
-  stashGoogleAuthError,
 } from '../../src/auth/googleOAuth';
 import { commitAuthSession } from '../../src/auth/sessionUser';
+
+type AuthCallbackFeedback = {
+  successMessage?: string;
+  errorMessage?: string;
+};
+
+const SIGNUP_CONFIRMATION_SUCCESS = 'Your email has been confirmed. Welcome to Reflections.';
+const LOGIN_CONFIRMATION_SUCCESS = 'Your email has been confirmed. Please sign in to continue.';
+
+const resolveSafeNextPath = (nextPath: string | null) => {
+  if (!nextPath) return null;
+
+  try {
+    const url = new URL(nextPath, window.location.origin);
+    if (url.origin !== window.location.origin) return null;
+    if (url.pathname === RoutePath.RESET_PASSWORD && !url.search && !url.hash) {
+      return RoutePath.RESET_PASSWORD;
+    }
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return null;
+  }
+};
+
+const navigateWithFeedback = (
+  navigate: ReturnType<typeof useNavigate>,
+  path: string,
+  feedback: AuthCallbackFeedback,
+) => {
+  navigate(path, { replace: true, state: feedback });
+};
 
 /**
  * Handles the Supabase OAuth PKCE callback for web.
@@ -33,25 +63,27 @@ export const AuthCallback: React.FC = () => {
       const errorDescription = params.get('error_description');
       const nextPath = params.get('next');
 
-      const sourcePath = getPendingGoogleAuthPath() || RoutePath.LOGIN;
+      const pendingSourcePath = getPendingGoogleAuthPath();
+      const sourcePath = pendingSourcePath || RoutePath.LOGIN;
+      const safeNextPath = resolveSafeNextPath(nextPath);
 
       if (error || errorDescription) {
-        const message = errorDescription || error || 'Google authentication failed.';
-        stashGoogleAuthError(message);
-        navigate(sourcePath, { replace: true });
+        const message = errorDescription || error || 'Authentication failed.';
+        navigateWithFeedback(navigate, sourcePath, { errorMessage: message });
         return;
       }
 
       if (!code) {
-        // No code and no error — check if we already have a session somehow
+        // No code and no error — check if we already have a session somehow.
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
           commitAuthSession(session);
-          const redirectPath = nextPath || consumePendingGoogleAuthRedirectPath(sourcePath) || RoutePath.DASHBOARD;
+          const redirectPath = safeNextPath || consumePendingGoogleAuthRedirectPath(sourcePath) || RoutePath.DASHBOARD;
           navigate(redirectPath, { replace: true });
         } else {
-          stashGoogleAuthError('No authorization code received. Please try signing in again.');
-          navigate(sourcePath, { replace: true });
+          navigateWithFeedback(navigate, sourcePath, {
+            errorMessage: 'This sign-in link is missing an authorization code. Please request a new link and try again.',
+          });
         }
         return;
       }
@@ -62,18 +94,37 @@ export const AuthCallback: React.FC = () => {
 
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         if (sessionError) throw sessionError;
-        if (!session) {
-          throw new Error('Session could not be established after code exchange.');
+
+        if (session) {
+          commitAuthSession(session);
         }
 
-        commitAuthSession(session);
+        if (safeNextPath) {
+          navigate(safeNextPath, { replace: true });
+          return;
+        }
 
-        const redirectPath = nextPath || consumePendingGoogleAuthRedirectPath(sourcePath) || RoutePath.DASHBOARD;
-        navigate(redirectPath, { replace: true });
+        if (pendingSourcePath) {
+          const redirectPath = consumePendingGoogleAuthRedirectPath(pendingSourcePath) || RoutePath.DASHBOARD;
+          navigate(redirectPath, { replace: true });
+          return;
+        }
+
+        if (session) {
+          navigate(RoutePath.DASHBOARD, {
+            replace: true,
+            state: { successMessage: SIGNUP_CONFIRMATION_SUCCESS, justLoggedIn: true },
+          });
+        } else {
+          navigateWithFeedback(navigate, RoutePath.LOGIN, {
+            successMessage: LOGIN_CONFIRMATION_SUCCESS,
+          });
+        }
       } catch (err) {
-        console.error('OAuth callback error:', err);
-        stashGoogleAuthError(err instanceof Error ? err.message : 'Failed to establish session.');
-        navigate(sourcePath, { replace: true });
+        console.error('Auth callback error:', err);
+        navigateWithFeedback(navigate, sourcePath, {
+          errorMessage: err instanceof Error ? err.message : 'We could not verify this auth link. Please request a new link and try again.',
+        });
       }
     };
 
