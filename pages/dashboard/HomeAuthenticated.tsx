@@ -122,6 +122,7 @@ export const HomeAuthenticated: React.FC = () => {
   const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);
   const shouldReduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const { showToast } = useToast();
+  const authStoreDisplayName = user?.name?.trim() || 'Reflector';
 
 
   const currentOnboardingStep = ONBOARDING_STEPS[onboardingStep];
@@ -440,7 +441,7 @@ export const HomeAuthenticated: React.FC = () => {
               <h1 className="h1-hero hero-ink mb-12 text-balance">
                 <span className="whitespace-nowrap">Welcome back,</span> <br />
                 <span className="font-serif italic hero-ink-accent">
-                  {user?.name?.split(' ')[0] || 'Reflector'}
+                  {authStoreDisplayName}
                 </span>
               </h1>
             </div>

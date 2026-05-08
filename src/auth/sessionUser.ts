@@ -9,10 +9,28 @@ const getSessionAvatarUrl = (session: Session) =>
   session.user.user_metadata?.avatar ||
   null;
 
+const getTrimmedMetadataValue = (session: Session, key: 'full_name' | 'display_name' | 'name') => {
+  const value = session.user.user_metadata?.[key];
+
+  return typeof value === 'string' ? value.trim() : '';
+};
+
+const getSessionDisplayName = (session: Session) => {
+  const emailPrefix = session.user.email?.split('@')[0]?.trim() || '';
+
+  return (
+    getTrimmedMetadataValue(session, 'full_name') ||
+    getTrimmedMetadataValue(session, 'display_name') ||
+    getTrimmedMetadataValue(session, 'name') ||
+    emailPrefix ||
+    'User'
+  );
+};
+
 export const mapSessionToUser = (session: Session): User => ({
   id: session.user.id,
   email: session.user.email || '',
-  name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
+  name: getSessionDisplayName(session),
   avatarUrl: getSessionAvatarUrl(session) || undefined,
 });
 
