@@ -68,12 +68,30 @@ export const ReferralInvitePanel: React.FC<ReferralInvitePanelProps> = ({ compac
     }
   };
 
+  const isShareCancellation = (error: unknown) => {
+    if (!(error instanceof Error)) return false;
+
+    const message = error.message.toLowerCase();
+    return (
+      error.name === 'AbortError' ||
+      message.includes('cancel') ||
+      message.includes('abort') ||
+      message.includes('dismiss')
+    );
+  };
+
+  const copyInviteLink = async (markAsShared = true) => {
+    await navigator.clipboard.writeText(inviteLink);
+    if (markAsShared) {
+      await markShared();
+    }
+  };
+
   const handleCopy = async () => {
     if (!inviteLink) return;
 
     try {
-      await navigator.clipboard.writeText(inviteLink);
-      await markShared();
+      await copyInviteLink();
       setStatus('Invite link copied.');
       haptics.confirming();
       playSaveChime();
@@ -102,8 +120,19 @@ export const ReferralInvitePanel: React.FC<ReferralInvitePanelProps> = ({ compac
 
       await handleCopy();
     } catch (error) {
+      if (isShareCancellation(error)) {
+        setStatus(null);
+        return;
+      }
+
       console.error('Could not share invite:', error);
-      setStatus('I could not share the invite just now.');
+      try {
+        await copyInviteLink(false);
+        setStatus('I could not share the invite, so I copied the link instead.');
+      } catch (copyError) {
+        console.error('Could not copy invite link after share failed:', copyError);
+        setStatus('I could not share or copy the invite just now.');
+      }
     }
   };
 
