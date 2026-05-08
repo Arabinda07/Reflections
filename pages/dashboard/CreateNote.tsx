@@ -241,6 +241,12 @@ export const CreateNote: React.FC = () => {
     return () => { isUnmounted.current = true; };
   }, []);
 
+  useEffect(() => {
+    return () => {
+      stopMusic();
+    };
+  }, [stopMusic]);
+
   // Aliases from draft hook for template readability
   const { title, setTitle, content, setContent, mood, setMood, tags, setTags, tasks, setTasks } = draft;
   const { imagePreview, setImagePreview, loading, saving, releasing: isReleasing, canCreateNote, setCanCreateNote, hasUnsavedChanges } = draft;
@@ -248,6 +254,7 @@ export const CreateNote: React.FC = () => {
   const id = undefined as string | undefined; // id is read internally by useNoteDraft via useParams
 
   const handleMobileBack = useCallback(() => {
+    stopMusic();
     if (
       typeof window !== 'undefined' &&
       canNavigateBackInApp(
@@ -259,7 +266,7 @@ export const CreateNote: React.FC = () => {
       return;
     }
     navigate(RoutePath.NOTES);
-  }, [navigate]);
+  }, [navigate, stopMusic]);
 
   // Blocker â†’ leave dialog sync
   useEffect(() => {
@@ -291,6 +298,7 @@ export const CreateNote: React.FC = () => {
       setObservationText(result.observation.text);
       setShowObservation(true);
     } else {
+      stopMusic();
       navigateWithBypass(RoutePath.HOME, { state: { fromSave: true } });
     }
   };
@@ -308,6 +316,7 @@ export const CreateNote: React.FC = () => {
       setTimeout(() => {
         setIsSaveChoiceOpen(false);
         setReleaseSuccess(null);
+        stopMusic();
         navigateWithBypass(RoutePath.HOME, { state: { fromSave: true } });
       }, 1500);
     }
@@ -391,6 +400,7 @@ export const CreateNote: React.FC = () => {
   const handleLeaveDraft = () => {
     setShowLeaveDialog(false);
     if (blocker.state === 'blocked') {
+      stopMusic();
       blocker.proceed();
     }
   };
