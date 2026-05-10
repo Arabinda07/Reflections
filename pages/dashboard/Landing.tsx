@@ -247,18 +247,18 @@ export const Landing: React.FC = () => {
             </p>
           </div>
 
-          <div className="pointer-events-auto mt-auto flex w-full flex-col items-start gap-8 sm:max-w-none sm:flex-row sm:items-center sm:justify-between lg:mt-0">
+          <div className="pointer-events-auto mt-auto flex w-full flex-col items-start gap-4 sm:max-w-none sm:flex-row sm:items-center sm:justify-between sm:gap-8 lg:mt-0">
             <button
               type="button"
               onClick={() => navigate(RoutePath.SIGNUP)}
-              className="group relative inline-flex h-16 min-w-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-control)] bg-green px-10 font-sans text-btn-lg font-bold text-white shadow-[0_12px_28px_-10px_var(--green-shadow)] transition-[transform,box-shadow,background-color] duration-300 ease-out-expo hover:scale-[1.03] hover:bg-green-hover hover:shadow-[0_16px_36px_-10px_var(--green-shadow)] active:scale-[0.97] motion-reduce:transition-none"
+              className="group relative inline-flex h-14 min-w-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-control)] bg-green px-8 font-sans text-ui-base font-bold text-white shadow-[0_10px_24px_-10px_var(--green-shadow)] transition-[transform,box-shadow,background-color] duration-300 ease-out-expo hover:scale-[1.03] hover:bg-green-hover hover:shadow-[0_14px_32px_-10px_var(--green-shadow)] active:scale-[0.97] motion-reduce:transition-none sm:h-16 sm:px-10 sm:text-btn-lg sm:shadow-[0_12px_28px_-10px_var(--green-shadow)] sm:hover:shadow-[0_16px_36px_-10px_var(--green-shadow)]"
               aria-label="Begin writing"
             >
               Begin writing
-              <ArrowRightIcon className="ml-3 h-5 w-5 text-white/80 transition-transform duration-500 ease-out-expo group-hover:translate-x-1.5" />
+              <ArrowRightIcon className="ml-2.5 h-[1.125rem] w-[1.125rem] text-white/80 transition-transform duration-500 ease-out-expo group-hover:translate-x-1.5 sm:ml-3 sm:h-5 sm:w-5" />
             </button>
 
-            <div className="mt-4 flex w-full items-center justify-between gap-5 sm:mt-0 sm:w-auto sm:gap-x-10 lg:gap-x-12">
+            <div className="flex w-full items-center justify-between gap-4 sm:w-auto sm:gap-x-10 lg:gap-x-12">
               <div className="flex min-w-0 items-center gap-x-8 sm:gap-x-10">
                 <a
                   href={RoutePath.LOGIN}

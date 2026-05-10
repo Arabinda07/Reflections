@@ -439,7 +439,7 @@
         width: 100%;
         flex-direction: column;
         align-items: flex-start;
-        gap: 2rem;
+        gap: 1rem;
         margin-top: auto;
         pointer-events: auto;
       }
@@ -447,27 +447,27 @@
       [aria-label="Welcome"] button[aria-label="Begin writing"],
       [aria-label="Welcome"] a[aria-label="Begin writing"] {
         display: inline-flex;
-        height: 4rem;
+        height: 3.5rem;
         min-width: 0;
         align-items: center;
         justify-content: center;
         border-radius: var(--radius-control);
         background: var(--green);
-        padding-inline: 2.5rem;
+        padding-inline: 2rem;
         color: white;
         font-family: var(--font-sans);
-        font-size: 1.25rem;
-        font-weight: 800;
-        line-height: 1.2;
+        font-size: 1rem;
+        font-weight: 700;
+        line-height: 1.5;
         white-space: nowrap;
-        box-shadow: 0 12px 28px -10px var(--green-shadow);
+        box-shadow: 0 10px 24px -10px var(--green-shadow);
       }
 
       [aria-label="Welcome"] button[aria-label="Begin writing"] svg,
       [aria-label="Welcome"] a[aria-label="Begin writing"] svg {
-        width: 1.25rem;
-        height: 1.25rem;
-        margin-left: 0.75rem;
+        width: 1.125rem;
+        height: 1.125rem;
+        margin-left: 0.625rem;
         color: rgba(255, 255, 255, 0.8);
       }
 
@@ -476,8 +476,7 @@
         width: 100%;
         align-items: center;
         justify-content: space-between;
-        gap: 1.25rem;
-        margin-top: 1rem;
+        gap: 1rem;
       }
 
       [aria-label="Welcome"] > div > div:last-child > div:last-child > div:last-child > div:first-child {
@@ -540,11 +539,28 @@
           flex-direction: row;
           align-items: center;
           justify-content: space-between;
+          gap: 2rem;
+        }
+
+        [aria-label="Welcome"] button[aria-label="Begin writing"],
+        [aria-label="Welcome"] a[aria-label="Begin writing"] {
+          height: 4rem;
+          padding-inline: 2.5rem;
+          font-size: 1.25rem;
+          font-weight: 800;
+          line-height: 1.2;
+          box-shadow: 0 12px 28px -10px var(--green-shadow);
+        }
+
+        [aria-label="Welcome"] button[aria-label="Begin writing"] svg,
+        [aria-label="Welcome"] a[aria-label="Begin writing"] svg {
+          width: 1.25rem;
+          height: 1.25rem;
+          margin-left: 0.75rem;
         }
 
         [aria-label="Welcome"] > div > div:last-child > div:last-child > div:last-child {
           width: auto;
-          margin-top: 0;
           column-gap: 2.5rem;
         }
       }

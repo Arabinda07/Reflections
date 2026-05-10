@@ -50,6 +50,25 @@ describe('public landing performance contract', () => {
     expect(landing).toContain('const SpeakerMutedIcon');
   });
 
+  it('keeps the mobile landing CTA cluster compact and visually grouped', () => {
+    const landing = read('pages/dashboard/Landing.tsx');
+    const indexHtml = read('index.html');
+
+    expect(landing).toContain('items-start gap-4 sm:max-w-none sm:flex-row');
+    expect(landing).toContain('h-14 min-w-0 items-center');
+    expect(landing).toContain('px-8 font-sans text-ui-base font-bold');
+    expect(landing).toContain('sm:h-16 sm:px-10 sm:text-btn-lg');
+    expect(landing).toContain('ml-2.5 h-[1.125rem] w-[1.125rem]');
+    expect(landing).toContain('flex w-full items-center justify-between gap-4 sm:w-auto');
+    expect(landing).not.toContain('mt-4 flex w-full items-center justify-between gap-5');
+
+    expect(indexHtml).toContain('gap: 1rem;');
+    expect(indexHtml).toContain('height: 3.5rem;');
+    expect(indexHtml).toContain('padding-inline: 2rem;');
+    expect(indexHtml).toContain('font-size: 1rem;');
+    expect(indexHtml).toContain('height: 4rem;');
+  });
+
   it('serves mobile-specific hero video without forcing the desktop poster', () => {
     const landing = read('pages/dashboard/Landing.tsx');
 
