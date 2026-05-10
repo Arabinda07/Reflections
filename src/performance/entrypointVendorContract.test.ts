@@ -41,6 +41,8 @@ describe('entrypoint vendor loading contract', () => {
 
     expect(index).not.toContain('getPostHogBootstrapConfig');
     expect(app).not.toContain("from './src/analytics/events'");
+    expect(app).not.toContain("from './src/auth/AuthContext'");
+    expect(app).not.toContain('<AuthProvider>');
     expect(authBootstrapper).not.toContain("from '../src/analytics/events'");
     expect(routeTracker).not.toContain("from './events'");
     expect(routeTracker).toContain('captureAnalyticsEventDeferred');

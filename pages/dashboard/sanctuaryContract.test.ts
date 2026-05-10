@@ -38,7 +38,7 @@ describe('Sanctuary Life Wiki contract', () => {
 
     expect(lifeWiki).toContain('SANCTUARY_LEVEL_UP_ANIMATION_SRC');
     expect(lifeWiki).toContain('SUPPORTING_WIKI_PAGES');
-    expect(lifeWiki).toContain('Sanctuary pages');
+    expect(lifeWiki).toContain('Life Wiki pages');
     expect(lifeWiki).toContain('Supporting shelf');
     expect(lifeWiki).toContain('hasEnoughEntriesForWiki');
     expect(lifeWiki).toContain('primaryPages.length > 0');
@@ -47,12 +47,12 @@ describe('Sanctuary Life Wiki contract', () => {
     expect(lifeWiki).toContain('Refresh with AI');
   });
 
-  it('keeps all five Sanctuary rooms designed once the Life Wiki is unlocked, even before every page has content', () => {
+  it('keeps all five Life Wiki rooms designed once the Life Wiki is ready, even before every page has content', () => {
     const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
 
     expect(lifeWiki).toContain('const canShowSanctuaryRooms = hasEnoughEntriesForWiki || primaryPages.length > 0;');
     expect(lifeWiki).toContain('Room awaiting signal');
-    expect(lifeWiki).toContain('This Sanctuary room is ready, but it has not been written yet.');
+    expect(lifeWiki).toContain('This Life Wiki room is ready, but it has not been written yet.');
     expect(lifeWiki).toContain('SANCTUARY_META.map((meta) => renderPageCard(meta, pageMap.get(meta.pageType)))');
     expect(lifeWiki).toContain('font-serif');
     expect(lifeWiki).toContain('italic');
@@ -66,7 +66,7 @@ describe('Sanctuary Life Wiki contract', () => {
     expect(policy).toContain('FREE_WIKI_INSIGHT_GENERATIONS = 1');
     expect(policy).toContain("reason: 'free_limit_reached'");
     expect(lifeWiki).toContain('Still gathering enough signal.');
-    expect(lifeWiki).toContain('Life Wiki unlocks after 3 entries');
+    expect(lifeWiki).toContain('Life Wiki opens after 3 entries');
     expect(lifeWiki).toContain('Existing generated pages stay readable');
     expect(lifeWiki).toContain('gate?.requiresUpgrade');
   });
@@ -97,8 +97,7 @@ describe('Sanctuary Life Wiki contract', () => {
     expect(insights).toContain('event.preventDefault()');
     expect(insights).toContain('const shouldReduceMotion =');
     expect(insights).toContain('loop={false}');
-    expect(insights).toContain('dotLottieRefCallback={bindSanctuaryEntrancePlayer}');
-    expect(insights).toContain("addEventListener('complete'");
+    expect(insights).toContain('onComplete={completeOpenSanctuary}');
     expect(insights).toContain('window.setTimeout(completeOpenSanctuary, SANCTUARY_ENTRANCE_FALLBACK_MS)');
     expect(insights).not.toContain("from '@/src/lottie/level-up-animation.json'");
     expect(lifeWiki).not.toContain("from '@/src/lottie/level-up-animation.json'");

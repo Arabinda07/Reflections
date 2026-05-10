@@ -77,6 +77,7 @@ describe('SEO crawlability contract', () => {
     expect(generator).toContain("path: '/privacy'");
     expect(generator).toContain("path: '/about'");
     expect(generator).toContain('<meta name="robots" content="index, follow" />');
+    expect(generator).toContain('renderStaticLandingShell');
     expect(generator).toContain('<main id="public-seo-content" data-seo-snapshot="true" class="sr-only"');
     expect(generator).toContain('Private journal for notes, mood, and reflection');
     expect(generator).toContain('FAQ about private journaling');
@@ -123,6 +124,19 @@ describe('SEO crawlability contract', () => {
     expect(rewriteSources).not.toContain('/privacy');
     expect(rewriteSources).not.toContain('/about');
     expect(rewriteSources).not.toContain('/(.*)');
+  });
+
+  it('generates noindex app-shell fallbacks for cold app route requests', () => {
+    const generator = read('scripts/generate-public-seo-pages.mjs');
+
+    expect(generator).toContain('const appShellRoutes = [');
+    expect(generator).toContain("path: '/login'");
+    expect(generator).toContain("path: '/signup'");
+    expect(generator).toContain("path: '/auth/callback'");
+    expect(generator).toContain("path: '/home'");
+    expect(generator).toContain('<meta name="robots" content="noindex, nofollow" />');
+    expect(generator).toContain('data-app-shell-fallback="true"');
+    expect(generator).toContain('outputFilesForAppPath');
   });
 
   it('uses real public anchors from the landing page to crawlable public routes', () => {

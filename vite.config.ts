@@ -70,7 +70,7 @@ export default defineConfig(() => {
           manifest: {
             name: 'Reflections',
             short_name: 'Reflections',
-            description: 'A journal for writing, mood tracking, and reflection. AI runs only when you ask.',
+            description: 'A journal for writing, mood tracking, and reflection. AI stays on demand unless you turn on Smart Mode.',
             theme_color: '#f7f8f6',
             background_color: '#f7f8f6',
             display: 'standalone',

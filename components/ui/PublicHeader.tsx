@@ -1,6 +1,6 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { usePWAInstallPrompt } from '../../hooks/usePWAInstallPrompt';
 import { RoutePath } from '../../types';
 
@@ -191,6 +191,7 @@ const ThemeModeButton: React.FC<ThemeModeButtonProps> = ({
 
 export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = false }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(getInitialDarkMode);
   const { canInstall, isInstalled, triggerInstall } = usePWAInstallPrompt();
@@ -236,6 +237,23 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
 
   const toggleDarkMode = () => {
     setIsDarkMode((currentMode) => !currentMode);
+  };
+
+  const handleAppRouteNavigation = (event: React.MouseEvent<HTMLAnchorElement>, href: RoutePath) => {
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.shiftKey
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    setIsMobileMenuOpen(false);
+    navigate(href);
   };
 
   const handleMobileMenuKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
@@ -372,7 +390,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
                 <a
                   key={item.href}
                   href={item.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={(event) => handleAppRouteNavigation(event, item.href)}
                   className="mobile-sidebar-link mobile-sidebar-link--action group"
                 >
                   <span className="mobile-sidebar-link-icon">
@@ -435,12 +453,14 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
             <span className="mx-2 h-6 w-px bg-border" aria-hidden="true" />
             <a
               href={RoutePath.LOGIN}
+              onClick={(event) => handleAppRouteNavigation(event, RoutePath.LOGIN)}
               className="inline-flex min-h-11 items-center rounded-xl px-3 py-2 text-[13px] font-extrabold text-gray-nav transition-colors hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
             >
               Sign in
             </a>
             <a
               href={RoutePath.SIGNUP}
+              onClick={(event) => handleAppRouteNavigation(event, RoutePath.SIGNUP)}
               className="inline-flex min-h-11 items-center rounded-xl bg-green px-4 py-2 text-[13px] font-extrabold text-white shadow-sm shadow-green/10 transition-colors hover:bg-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
             >
               Sign up

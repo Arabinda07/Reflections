@@ -4,7 +4,6 @@ import { RouteLoadingFrame } from './components/ui/RouteLoadingFrame';
 import { PublicAppShell } from './layouts/PublicAppShell';
 import { RouteErrorBoundary } from './pages/RouteErrorBoundary';
 import { Landing } from './pages/dashboard/Landing';
-import { AuthProvider } from './src/auth/AuthContext';
 import { RoutePath } from './types';
 
 const AuthenticatedAppShell = lazy(() => import('./layouts/AuthenticatedAppShell').then((m) => ({ default: m.AuthenticatedAppShell })));
@@ -84,11 +83,7 @@ const router = createBrowserRouter(
 );
 
 function App() {
-  return (
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;

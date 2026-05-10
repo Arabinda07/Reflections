@@ -278,15 +278,15 @@ export const Account: React.FC = () => {
           title: result.pageCount > 0 ? 'Smart Mode is ready.' : 'Smart Mode is on.',
           description:
             result.pageCount > 0
-              ? 'Your Sanctuary has been refreshed from your saved notes. New saves can keep it up to date while Smart Mode is on.'
-              : 'There was not enough writing to build the Sanctuary yet. It will try again after future saves.',
+              ? 'Your Life Wiki has been refreshed from your saved notes. New saves can keep it up to date while Smart Mode is on.'
+              : 'There was not enough writing to build the Life Wiki yet. It will try again after future saves.',
         });
       } catch (ingestError) {
         console.error(ingestError);
         setFeedback({
           variant: 'warning',
           title: 'Smart Mode is on.',
-          description: 'The first Sanctuary refresh could not finish. It will try again after future saves.',
+          description: 'The first Life Wiki refresh could not finish. It will try again after future saves.',
         });
       }
     } catch (err) {
@@ -617,7 +617,7 @@ export const Account: React.FC = () => {
                           <Sparkle size={24} weight="duotone" className="text-green" />
                         </div>
                         <div>
-                          <p className="dashboard-caption text-gray-nav/60">Sanctuary</p>
+                          <p className="dashboard-caption text-gray-nav/60">Life Wiki</p>
                           <h3 className="text-[20px] font-display font-bold text-gray-text group-hover:text-green transition-colors">Smart Mode</h3>
                         </div>
                       </div>
@@ -633,7 +633,7 @@ export const Account: React.FC = () => {
                       {greatIngestProgress ? (
                         <div className="surface-inline-panel p-4">
                           <p className="dashboard-caption text-gray-nav/60">
-                            Preparing Sanctuary
+                            Preparing Life Wiki
                           </p>
                           <p className="mt-2 text-[14px] font-bold text-gray-text">
                             Processing entry {greatIngestProgress.processedCount} of {greatIngestProgress.totalCount}

@@ -517,13 +517,13 @@ export const LifeWiki: React.FC = () => {
                 <Surface variant="bezel" tone="sage" innerClassName="p-8 md:p-10">
                   <div className="mx-auto max-w-2xl text-center">
                     <p className="label-caps text-green">
-                      Life Wiki unlocks after 3 entries
+                      Life Wiki opens after 3 entries
                     </p>
                     <h2 className="mt-3 text-4xl font-display font-bold text-gray-text">
                       Still gathering enough signal.
                     </h2>
                     <p className="mx-auto mt-4 max-w-[65ch] text-base font-medium leading-relaxed text-gray-light">
-                      Write {entriesNeededForWiki} more {entriesNeededForWiki === 1 ? 'entry' : 'entries'} before this Sanctuary room opens.
+                      Write {entriesNeededForWiki} more {entriesNeededForWiki === 1 ? 'entry' : 'entries'} before this Life Wiki room opens.
                     </p>
                     <Button
                       variant="primary"
@@ -557,7 +557,7 @@ export const LifeWiki: React.FC = () => {
                         Awaiting your signal
                       </h2>
                       <p className="mt-4 mb-8 text-base font-medium leading-relaxed text-gray-light">
-                        This Sanctuary room is ready, but it has not been written yet. The AI will read through your saved reflections and organize the patterns it finds here.
+                        This Life Wiki room is ready, but it has not been written yet. The AI will read through your saved reflections and organize the patterns it finds here.
                       </p>
                       {!gate?.requiresUpgrade ? (
                         <Button
@@ -717,7 +717,7 @@ export const LifeWiki: React.FC = () => {
               Your Life Wiki
             </h1>
             <p className="mx-auto max-w-[65ch] text-lg font-medium leading-relaxed text-gray-light">
-              A dedicated Sanctuary library of AI-generated wiki pages, refreshed only when you ask.
+              A dedicated Life Wiki library of AI-generated pages, refreshed when you ask or when Smart Mode is on.
             </p>
           </header>
 
@@ -765,14 +765,14 @@ export const LifeWiki: React.FC = () => {
               <div className="flex flex-col gap-7 md:flex-row md:items-end md:justify-between">
                 <div className="max-w-2xl space-y-5">
                   <p className="label-caps text-green">
-                    Life Wiki unlocks after 3 entries
+                    Life Wiki opens after 3 entries
                   </p>
                   <div className="space-y-3">
                     <h2 className="text-3xl font-display font-bold leading-tight text-gray-text md:text-4xl">
                       Still gathering enough signal.
                     </h2>
                     <p className="text-base font-medium leading-relaxed text-gray-light">
-                      Write {entriesNeededForWiki} more {entriesNeededForWiki === 1 ? 'entry' : 'entries'} before the Sanctuary can build pages that are grounded in your notes.
+                      Write {entriesNeededForWiki} more {entriesNeededForWiki === 1 ? 'entry' : 'entries'} before the Life Wiki can build pages that are grounded in your notes.
                     </p>
                   </div>
                   <div className="grid max-w-sm grid-cols-3 gap-2" aria-hidden="true">
@@ -802,7 +802,7 @@ export const LifeWiki: React.FC = () => {
               <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                 <div className="max-w-2xl space-y-3">
                   <p className="label-caps text-green">
-                    Sanctuary ready
+                    Life Wiki ready
                   </p>
                   <h2 className="text-3xl font-display font-bold text-gray-text">
                     {gate?.requiresUpgrade ? 'Future Life Wiki refreshes are locked.' : 'Your first Life Wiki refresh is ready.'}
@@ -810,7 +810,7 @@ export const LifeWiki: React.FC = () => {
                   <p className="text-base font-medium leading-relaxed text-gray-light">
                     {gate?.requiresUpgrade
                       ? 'This account has used its free Life Wiki refresh. Existing generated pages stay readable; another refresh needs Pro.'
-                      : 'Refresh with AI to create the five Sanctuary pages from the entries you have saved here.'}
+                      : 'Refresh with AI to create the five Life Wiki pages from the entries you have saved here.'}
                   </p>
                 </div>
                 {!gate?.requiresUpgrade ? (
@@ -839,9 +839,9 @@ export const LifeWiki: React.FC = () => {
             <section className="space-y-5">
               <div className="max-w-2xl">
                 <div>
-                  <h2 className="text-2xl font-display font-bold text-gray-text">Sanctuary pages</h2>
+                  <h2 className="text-2xl font-display font-bold text-gray-text">Life Wiki pages</h2>
                   <p className="mt-2 text-sm font-medium text-gray-light">
-                    The five main rooms for this library, kept visible once your Life Wiki is unlocked.
+                    The five main rooms for this library, kept visible once your Life Wiki is ready.
                   </p>
                 </div>
               </div>
@@ -857,7 +857,7 @@ export const LifeWiki: React.FC = () => {
               <div>
                 <h2 className="text-2xl font-display font-bold text-gray-text">Supporting shelf</h2>
                 <p className="mt-2 text-sm font-medium text-gray-light">
-                  Earlier generated summaries remain readable, but the five Sanctuary pages are the main surface.
+                  Earlier generated summaries remain readable, but the five Life Wiki pages are the main surface.
                 </p>
               </div>
               <div className="grid grid-cols-1 gap-5 md:grid-cols-2">

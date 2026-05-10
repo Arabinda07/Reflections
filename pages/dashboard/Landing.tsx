@@ -75,7 +75,7 @@ const scheduleIdleTask = (callback: () => void, timeout = 2400) => {
 export const Landing: React.FC = () => {
   useDocumentMeta({
     title: 'Reflections - Private Journal for Notes, Mood & Reflection',
-    description: 'A private journal for writing notes, naming moods, and noticing patterns. AI runs only when you ask. No streaks, no pressure.',
+    description: 'A private journal for writing notes, naming moods, and noticing patterns. AI stays on demand unless you turn on Smart Mode. No streaks, no pressure.',
     path: '/',
   });
   const navigate = useNavigate();
@@ -104,8 +104,8 @@ export const Landing: React.FC = () => {
 
     let cancelVideoLoad: (() => void) | undefined;
     const videoDelay = window.setTimeout(() => {
-      cancelVideoLoad = scheduleIdleTask(() => setShouldLoadHeroVideo(true), 1800);
-    }, 3200);
+      cancelVideoLoad = scheduleIdleTask(() => setShouldLoadHeroVideo(true), 3000);
+    }, 6500);
 
     return () => {
       window.clearTimeout(videoDelay);
@@ -162,6 +162,22 @@ export const Landing: React.FC = () => {
         setIsMuted(true);
       });
     }
+  };
+
+  const handleAppRouteNavigation = (event: React.MouseEvent<HTMLAnchorElement>, href: RoutePath) => {
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.shiftKey
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    navigate(href);
   };
 
   return (
@@ -246,6 +262,7 @@ export const Landing: React.FC = () => {
               <div className="flex min-w-0 items-center gap-x-8 sm:gap-x-10">
                 <a
                   href={RoutePath.LOGIN}
+                  onClick={(event) => handleAppRouteNavigation(event, RoutePath.LOGIN)}
                   className="inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap px-1 text-btn-sm font-bold text-gray-nav transition-all duration-300 ease-out-expo hover:-translate-y-px hover:text-green active:translate-y-px"
                 >
                   Sign in

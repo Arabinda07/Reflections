@@ -78,8 +78,8 @@ describe('public landing performance contract', () => {
 
     expect(landing).not.toContain('window.requestAnimationFrame(() => {\n      setShouldLoadHeroVideo(true);');
     expect(landing).toContain('const videoDelay = window.setTimeout(() => {');
-    expect(landing).toContain('cancelVideoLoad = scheduleIdleTask(() => setShouldLoadHeroVideo(true), 1800);');
-    expect(landing).toContain('}, 3200);');
+    expect(landing).toContain('cancelVideoLoad = scheduleIdleTask(() => setShouldLoadHeroVideo(true), 3000);');
+    expect(landing).toContain('}, 6500);');
     expect(landing).toContain('cancelVideoLoad?.();');
   });
 
