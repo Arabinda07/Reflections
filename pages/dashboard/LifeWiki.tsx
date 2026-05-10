@@ -401,7 +401,7 @@ export const LifeWiki: React.FC = () => {
       >
         <Link
           to={articlePath(meta.pageType)}
-          className="relative z-10 flex h-full min-h-[260px] flex-col justify-between p-8 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 md:p-10"
+          className="relative z-10 flex h-full min-h-64 flex-col justify-between p-8 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 md:p-10"
           aria-label={`Open ${meta.label} Sanctuary page`}
         >
           <div className="space-y-6">
