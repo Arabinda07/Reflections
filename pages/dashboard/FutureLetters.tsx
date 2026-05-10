@@ -311,7 +311,7 @@ export const FutureLetters: React.FC = () => {
                                     Opens {formatLongDateUTC(letter.openAt)}
                                   </p>
                                 </div>
-                                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-500 group-hover:scale-110 ${isLocked ? 'bg-body/50 text-gray-nav' : 'bg-green/10 text-green group-hover:rotate-12'}`}>
+                                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-500 group-hover:scale-110 ${isLocked ? '[background-color:oklch(from_var(--bg-color)_l_c_h_/_0.5)] text-gray-nav' : 'bg-green/10 text-green group-hover:rotate-12'}`}>
                                   {isLocked ? (
                                     <div className={shakeLetterId === letter.id ? 'animate-shake-x' : ''}>
                                       <LockKey size={20} weight="duotone" />

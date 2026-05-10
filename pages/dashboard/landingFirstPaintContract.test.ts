@@ -38,9 +38,9 @@ describe('landing first-paint contract', () => {
   it('lets the startup overlay fade over already-rendered app content', () => {
     const appBootstrapper = read('components/ui/AppBootstrapper.tsx');
 
-    expect(appBootstrapper).toContain("className=\"flex min-h-0 flex-1 flex-col\"");
+    expect(appBootstrapper).toContain('flex min-h-0 flex-1 flex-col');
     expect(appBootstrapper).toContain("const isStartupBlocking = showStartup || !startupExitDone;");
-    expect(appBootstrapper).toContain("pointerEvents: isStartupBlocking ? 'none' : 'auto'");
+    expect(appBootstrapper).toContain("isStartupBlocking ? 'pointer-events-none' : 'pointer-events-auto'");
     expect(appBootstrapper).not.toContain('opacity: showStartup ? 0 : 1');
     expect(appBootstrapper).not.toContain('transition: `opacity ${NATIVE_STARTUP_FADE_MS}ms');
     expect(appBootstrapper).not.toContain("visibility: showStartup ? 'hidden' : 'visible'");
@@ -83,8 +83,8 @@ describe('landing first-paint contract', () => {
     expect(landing).not.toContain('setIsHeroPosterReady');
     expect(landing).not.toContain('onLoad={() => setIsHeroPosterReady(true)}');
     expect(landing).toContain("navigator as Navigator & { connection?: { saveData?: boolean } }");
-    expect(landing).toContain("const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');");
-    expect(landing).toContain('if (saveData || reducedMotionQuery.matches) return;');
+    expect(landing).toContain("const shouldReduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)');");
+    expect(landing).toContain('if (saveData || shouldReduceMotion) return;');
     expect(landing).toContain('requestIdleCallback');
     expect(landing).toContain('cancelIdleCallback');
     expect(landing).toContain('preload="metadata"');
@@ -96,6 +96,28 @@ describe('landing first-paint contract', () => {
     expect(landing).toContain('onPlaying={() => setIsHeroVideoReady(true)}');
     expect(landing).toContain("isHeroVideoReady ? 'opacity-90' : 'opacity-0'");
     expect(landing).not.toContain('poster="/assets/videos/landing_video.png"');
+  });
+
+  it('keeps the landing video visible behind the cross-fade mask', () => {
+    const landing = read('pages/dashboard/Landing.tsx');
+    const styles = read('index.css');
+
+    expect(landing).toContain('video-mask video-mask--mobile lg:hidden');
+    expect(landing).toContain('video-mask video-mask--desktop hidden lg:block');
+    expect(landing).not.toContain('landing-media-wash');
+    expect(landing).toContain("isHeroVideoReady ? 'opacity-90' : 'opacity-0'");
+    expect(styles).toContain('.video-mask');
+    expect(styles).toContain('.video-mask--desktop');
+    expect(styles).toContain('.video-mask--mobile');
+    expect(styles).not.toContain('.landing-media-wash');
+  });
+
+  it('uses real links for secondary landing navigation so hover states are consistent', () => {
+    const landing = read('pages/dashboard/Landing.tsx');
+
+    expect(landing).toContain('<a\n                  href={RoutePath.LOGIN}');
+    expect(landing).toContain('<a\n                  href={RoutePath.FAQ}');
+    expect(landing).not.toContain('onClick={() => navigate(RoutePath.LOGIN)}');
   });
 
   it('renders landing hero copy and calls to action on the first paint', () => {

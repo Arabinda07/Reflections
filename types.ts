@@ -1,4 +1,5 @@
 import type { WikiPageType } from './services/wikiTypes';
+export type { MoodName } from './pages/dashboard/moodConfig';
 
 export interface NoteAttachment {
   name: string;
@@ -12,6 +13,7 @@ export interface Task {
   id: string;
   text: string;
   completed: boolean;
+  completedAt?: string;
   dueDate?: string;
 }
 

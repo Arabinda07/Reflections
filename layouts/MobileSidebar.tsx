@@ -156,11 +156,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: 36, opacity: 0 }}
         transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
-        className="mobile-sidebar-shell fixed right-0 top-0 bottom-0 z-[110] h-[100dvh]"
-        style={{
-          paddingTop: NATIVE_PAGE_TOP_PADDING,
-          width: 'min(86vw, 352px)',
-        }}
+        className="mobile-sidebar-shell fixed right-0 top-0 bottom-0 z-[110] h-[100dvh] pt-[var(--native-page-top-padding)] w-[min(86vw,352px)]"
       >
         <div className="flex h-full min-h-0 flex-col">
           <h2 id={mobileMenuTitleId} className="sr-only">
@@ -172,7 +168,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
           </p>
           <div className="flex shrink-0 items-start justify-between gap-4 px-5 pb-4 sm:px-6">
             <div className="flex min-w-0 items-center gap-3 pt-1">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-chip)] bg-green text-[rgb(var(--panel-bg-rgb))] shadow-sm shadow-green/10">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-chip)] bg-green text-white shadow-sm shadow-green/10">
                 <Leaf size={20} weight="fill" />
               </div>
               <div className="min-w-0">
@@ -188,10 +184,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
             <button
               ref={closeRef}
               onClick={onClose}
-              className="mobile-sidebar-close"
-              style={{
-                marginTop: `calc(${NATIVE_TOP_CONTROL_OFFSET} - ${NATIVE_PAGE_TOP_PADDING})`,
-              }}
+              className="mobile-sidebar-close mt-[calc(var(--native-top-control-offset)-var(--native-page-top-padding))]"
               aria-label="Close menu"
             >
               <X size={20} />

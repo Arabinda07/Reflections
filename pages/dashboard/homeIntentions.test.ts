@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { Note } from '../../types';
+import type { Note, Task } from '../../types';
 import {
   buildHomeIntentionSummary,
   getHomeIntentionToggleUpdate,
@@ -25,7 +25,12 @@ describe('homeIntentions', () => {
           updatedAt: '2026-04-20T10:00:00.000Z',
           tasks: [
             { id: 'older-open', text: 'Pack the journal', completed: false },
-            { id: 'older-done', text: 'Finished task', completed: true },
+            {
+              id: 'older-done',
+              text: 'Finished task',
+              completed: true,
+              completedAt: '2026-04-21T11:00:00.000Z',
+            },
           ],
         }),
         note({
@@ -40,6 +45,7 @@ describe('homeIntentions', () => {
         }),
       ],
       2,
+      new Date('2026-04-21T12:00:00.000Z'),
     );
 
     expect(summary.openCount).toBe(3);
@@ -74,14 +80,49 @@ describe('homeIntentions', () => {
     expect(
       buildHomeIntentionSummary([
         note({
+          updatedAt: '2026-05-10T08:00:00.000Z',
           tasks: [{ id: 'done', text: 'Already handled', completed: true }],
         }),
-      ]),
+        ],
+        undefined,
+        new Date('2026-05-10T09:00:00.000Z'),
+      ),
     ).toMatchObject({
       openCount: 0,
       completedCount: 1,
       hasAnyTasks: true,
     });
+  });
+
+  it('hides completed intentions from the home card 24 hours after completion', () => {
+    const summary = buildHomeIntentionSummary(
+      [
+        note({
+          updatedAt: '2026-05-10T08:00:00.000Z',
+          tasks: [
+            {
+              id: 'fresh-done',
+              text: 'Freshly crossed off',
+              completed: true,
+              completedAt: '2026-05-09T08:01:00.000Z',
+            } satisfies Task,
+            {
+              id: 'old-done',
+              text: 'Already faded',
+              completed: true,
+              completedAt: '2026-05-09T08:00:00.000Z',
+            } satisfies Task,
+            { id: 'still-open', text: 'Keep showing this', completed: false },
+          ],
+        }),
+      ],
+      5,
+      new Date('2026-05-10T08:00:00.000Z'),
+    );
+
+    expect(summary.completedItems.map((item) => item.id)).toEqual(['fresh-done']);
+    expect(summary.completedCount).toBe(1);
+    expect(summary.hasAnyTasks).toBe(true);
   });
 
   it('returns the note update for completing a home intention', () => {
@@ -93,9 +134,10 @@ describe('homeIntentions', () => {
       'task-1',
     );
 
-    expect(update).toEqual({
+    expect(update).toMatchObject({
       tasks: [{ id: 'task-1', text: 'Reply to Mira', completed: true }],
       content: '<p>[x] Reply to Mira</p>',
     });
+    expect(update?.tasks[0].completedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
   });
 });

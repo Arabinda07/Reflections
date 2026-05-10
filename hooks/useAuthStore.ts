@@ -39,8 +39,8 @@ export const useAuthStore = create<AuthState>()(
       setHydrated: (isHydrated) => set({ isHydrated }),
       setInitialCheckDone: (isInitialCheckDone) => set({ isInitialCheckDone }),
       logout: async () => {
-        const { supabase } = await import('../src/supabaseClient');
-        await supabase.auth.signOut();
+        const { getAuthAdapter } = await import('../src/auth/AuthRuntime');
+        await getAuthAdapter().signOut();
         set({ user: null, isAuthenticated: false });
       },
     }),

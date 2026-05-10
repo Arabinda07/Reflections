@@ -96,7 +96,7 @@ export const AboutArabinda: React.FC = () => {
               className="group flex flex-col md:flex-row gap-6 md:gap-12 rounded-[2rem] p-6 md:p-10 transition-colors duration-500 hover:bg-gray-text/[0.03]"
             >
               <div className="md:w-1/3 shrink-0 flex flex-col items-start gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[rgb(var(--panel-bg-rgb))] shadow-sm ring-1 ring-border/70 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[oklch(from_var(--panel-bg)_l_c_h)] shadow-sm ring-1 ring-border/70 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
                   <PublicPageIcon name={section.icon} size={24} className={section.iconClassName} />
                 </div>
                 <h2 className="text-[22px] font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green">

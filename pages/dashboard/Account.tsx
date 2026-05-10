@@ -486,7 +486,7 @@ export const Account: React.FC = () => {
               <div className="grid gap-4 p-6 md:grid-cols-2 lg:p-8">
                 <Surface variant="bezel" tone="paper">
                   <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors duration-300 hover:bg-gray-text/[0.03] focus-visible:bg-gray-text/[0.06]">
+                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors duration-300 hover:bg-gray-text/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green">
                       <div className="flex items-center gap-3">
                         <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
                           <Sparkle size={24} weight="duotone" className="text-green" />
@@ -520,7 +520,7 @@ export const Account: React.FC = () => {
 
                 <Surface variant="bezel" tone="paper">
                   <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors duration-300 hover:bg-gray-text/[0.03] focus-visible:bg-gray-text/[0.06]">
+                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors duration-300 hover:bg-gray-text/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky">
                       <div className="flex items-center gap-3">
                         <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
                           <ShieldCheck size={24} weight="duotone" className="text-sky" />
@@ -586,7 +586,7 @@ export const Account: React.FC = () => {
 
                 <Surface variant="bezel" tone="paper">
                   <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors duration-300 hover:bg-gray-text/[0.03] focus-visible:bg-gray-text/[0.06]">
+                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors duration-300 hover:bg-gray-text/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-honey">
                       <div className="flex items-center gap-3">
                         <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12">
                           <EnvelopeSimple size={24} weight="duotone" className="text-honey" />
@@ -611,7 +611,7 @@ export const Account: React.FC = () => {
 
                 <Surface variant="bezel" tone="paper">
                   <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors duration-300 hover:bg-gray-text/[0.03] focus-visible:bg-gray-text/[0.06]">
+                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors duration-300 hover:bg-gray-text/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green">
                       <div className="flex items-center gap-3">
                         <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-12">
                           <Sparkle size={24} weight="duotone" className="text-green" />
@@ -689,7 +689,7 @@ export const Account: React.FC = () => {
               <div className="p-6 lg:p-8">
                 <Surface variant="bezel" tone="clay">
                   <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors hover:bg-clay/5 focus-visible:bg-clay/10">
+                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors hover:bg-clay/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-clay">
                       <div className="flex items-center gap-3">
                         <div className="icon-block icon-block-sm">
                           <Warning size={24} weight="duotone" className="text-clay" />

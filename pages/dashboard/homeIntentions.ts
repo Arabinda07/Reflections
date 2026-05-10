@@ -1,6 +1,7 @@
 import type { Note, Task } from '../../types';
 
 export const HOME_INTENTION_VISIBLE_LIMIT = 5;
+export const COMPLETED_INTENTION_VISIBLE_MS = 24 * 60 * 60 * 1000;
 
 export interface HomeIntention {
   id: string;
@@ -8,6 +9,7 @@ export interface HomeIntention {
   noteId: string;
   noteTitle: string;
   completed: boolean;
+  completedAt?: string;
 }
 
 export interface HomeIntentionSummary {
@@ -28,10 +30,25 @@ const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\
 
 export const MAX_ACTIVE_INTENTIONS = 3;
 
+const getCompletedAtTimestamp = (task: Task, note: Note) => {
+  const completedAt = task.completedAt || note.updatedAt;
+  const timestamp = Date.parse(completedAt);
+  return Number.isFinite(timestamp) ? timestamp : null;
+};
+
+const isCompletedIntentionVisible = (task: Task, note: Note, referenceTimestamp: number) => {
+  const completedAtTimestamp = getCompletedAtTimestamp(task, note);
+  if (completedAtTimestamp === null) return true;
+
+  return referenceTimestamp - completedAtTimestamp < COMPLETED_INTENTION_VISIBLE_MS;
+};
+
 export function buildHomeIntentionSummary(
   notes: Note[],
   visibleLimit = HOME_INTENTION_VISIBLE_LIMIT,
+  referenceDate = new Date(),
 ): HomeIntentionSummary {
+  const referenceTimestamp = referenceDate.getTime();
   const orderedNotes = notes
     .map((note, index) => ({ note, index }))
     .sort((a, b) => getNoteTimestamp(b.note) - getNoteTimestamp(a.note) || a.index - b.index);
@@ -52,9 +69,11 @@ export function buildHomeIntentionSummary(
         noteId: note.id,
         noteTitle,
         completed: task.completed,
+        completedAt: task.completedAt,
       };
 
       if (task.completed) {
+        if (!isCompletedIntentionVisible(task, note, referenceTimestamp)) continue;
         completedIntentions.push(intention);
       } else {
         openIntentions.push(intention);
@@ -82,7 +101,13 @@ export function getHomeIntentionToggleUpdate(
 
   const nextCompleted = !taskToToggle.completed;
   const tasks: Task[] = currentTasks.map((task) =>
-    task.id === taskId ? { ...task, completed: nextCompleted } : task,
+    task.id === taskId
+      ? {
+          ...task,
+          completed: nextCompleted,
+          completedAt: nextCompleted ? new Date().toISOString() : undefined,
+        }
+      : task,
   );
 
   const taskText = taskToToggle.text.trim();

@@ -1,5 +1,5 @@
 import { supabase } from '../src/supabaseClient';
-import type { Note, NoteAttachment, Task } from '../types';
+import type { Note, NoteAttachment, Task, MoodName } from '../types';
 
 export interface SupabaseNoteRow {
   id: string;
@@ -26,7 +26,7 @@ export const mapToNote = (data: SupabaseNoteRow): Note => ({
   thumbnailUrl: data.thumbnail_url || undefined,
   tags: data.tags || [],
   attachments: data.attachments || [],
-  mood: data.mood || undefined,
+  mood: (data.mood as MoodName) || undefined,
   tasks: data.tasks || [],
 });
 

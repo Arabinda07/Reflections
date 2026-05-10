@@ -50,6 +50,27 @@ describe('focused product slice source contract', () => {
     expect(myNotes).toContain('aria-label={`Export ${note.title}`}');
   });
 
+  it('gives the My Notes tag filters context without changing URL filtering', () => {
+    const myNotes = read('pages/dashboard/MyNotes.tsx');
+    const chip = read('components/ui/Chip.tsx');
+    const styles = read('index.css');
+
+    expect(myNotes).toContain('tag-filter-shelf');
+    expect(myNotes).toContain('tag-filter-chip-rail');
+    expect(myNotes).toContain('Filter by tag');
+    expect(myNotes).toContain('tagSummaries');
+    expect(myNotes).toContain('countLabel');
+    expect(myNotes).toContain('navigate(`${RoutePath.NOTES}?tag=${encodeURIComponent(tag.name)}`)');
+    expect(myNotes).toContain('Showing reflections tagged');
+    expect(myNotes).toContain('Clear filter');
+    expect(myNotes).toContain("description=\"Cards or calendar");
+    expect(chip).toContain('chip-filter-label');
+    expect(styles).toContain('.chip-filter-label');
+    expect(styles).toContain('text-overflow: ellipsis');
+    expect(styles).toContain('.tag-filter-chip-rail');
+    expect(styles).toContain('scrollbar-width: none');
+  });
+
   it('keeps the single-note page wired to direct markdown export', () => {
     const singleNote = read('pages/dashboard/SingleNote.tsx');
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
@@ -117,7 +117,7 @@ export const SignIn: React.FC = () => {
       const credential = await requestVerifiedEmail();
       if (!credential) {
         setLoading(false);
-        return; // User cancelled or error already logged
+        return; // user cancelled or credential error already logged
       }
 
       const authResult = await signInWithVerifiedEmail(credential.assertion);
@@ -249,11 +249,11 @@ export const SignIn: React.FC = () => {
                 </button>
               </div>
 
-              <Button type="submit" variant="primary" className="w-full h-[52px] text-[15px] font-bold" isLoading={loading}>
+              <Button type="submit" variant="primary" className="w-full min-h-14 text-[15px] font-bold" isLoading={loading}>
                 Sign in
               </Button>
 
-              <div className="min-h-[24px] mt-2 flex items-center justify-center">
+              <div className="min-h-6 mt-2 flex items-center justify-center">
                 <AnimatePresence>
                   {error ? (
                     <motion.p
@@ -282,7 +282,7 @@ export const SignIn: React.FC = () => {
                   type="button"
                   onClick={handleVerifiedEmailLogin}
                   disabled={loading}
-                  className="w-full h-[52px] gap-3"
+                  className="w-full min-h-14 gap-3"
                 >
                   <CheckCircle size={20} weight="fill" className="text-green" />
                   <span className="font-bold text-gray-text">Continue with Verified Email</span>
@@ -294,7 +294,7 @@ export const SignIn: React.FC = () => {
                 type="button"
                 onClick={handleGoogleLogin}
                 disabled={loading}
-                className="w-full h-[52px] gap-3"
+                className="w-full min-h-14 gap-3"
               >
               <GoogleLogo size={20} weight="bold" aria-hidden="true" className="text-gray-text" />
               <span className="font-bold text-gray-text">Continue with Google</span>

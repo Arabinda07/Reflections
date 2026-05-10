@@ -1,9 +1,17 @@
-import { supabase } from '../src/supabaseClient';
+import type { User } from '@supabase/supabase-js';
 
-export const getAuthenticatedUser = async () => {
-  const { data: { user } } = await supabase.auth.getUser();
+import { getAuthAdapter } from '../src/auth/AuthRuntime';
+
+/** Backward-compatible wrapper for getting the current user object. */
+export const getAuthenticatedUser = async (): Promise<User> => {
+  const user = await getAuthAdapter().getUser();
   if (!user) throw new Error('User not authenticated');
   return user;
 };
 
-export const getAuthenticatedUserId = async () => (await getAuthenticatedUser()).id;
+/** Wrapper to retrieve the authenticated user's ID. */
+export const getAuthenticatedUserId = async (): Promise<string> => {
+  const userId = await getAuthAdapter().getUserId();
+  if (!userId) throw new Error('User not authenticated');
+  return userId;
+};

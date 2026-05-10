@@ -1,6 +1,8 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { isRouteErrorResponse, useNavigate, useRouteError } from 'react-router-dom';
 import { RoutePath } from '../types';
+
+const ROUTE_CHUNK_RECOVERY_KEY = 'route_chunk_recovered';
 
 const error404Animation = '/assets/lottie/error-404.json';
 
@@ -48,16 +50,57 @@ const getRouteErrorCopy = (error: unknown) => {
   };
 };
 
+const isDynamicImportFailure = (error: unknown): boolean => {
+  if (!(error instanceof Error)) return false;
+  return (
+    error.message.includes('Failed to fetch dynamically imported module') ||
+    error.message.includes('Importing a module script failed') ||
+    error.name === 'ChunkLoadError'
+  );
+};
+
 const reloadWithCacheBust = () => {
   const currentUrl = new URL(window.location.href);
   currentUrl.searchParams.set('t', Date.now().toString());
   window.location.replace(currentUrl.toString());
 };
 
+const clearBrowserManagedAppCaches = async () => {
+  if ('serviceWorker' in navigator) {
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    await Promise.all(registrations.map((r) => r.unregister()));
+  }
+  if (typeof caches !== 'undefined') {
+    const cacheNames = await caches.keys();
+    await Promise.all(cacheNames.map((name) => caches.delete(name)));
+  }
+};
+
 export const RouteErrorBoundary: React.FC = () => {
   const error = useRouteError();
   const navigate = useNavigate();
   const { title, description, detail } = getRouteErrorCopy(error);
+
+  const isChunkFailure = isDynamicImportFailure(error);
+  const hasAttemptedRecovery = sessionStorage.getItem(ROUTE_CHUNK_RECOVERY_KEY) === 'true';
+
+  useEffect(() => {
+    if (!isChunkFailure || hasAttemptedRecovery) return;
+
+    sessionStorage.setItem(ROUTE_CHUNK_RECOVERY_KEY, 'true');
+    void clearBrowserManagedAppCaches().catch((err) => {
+      console.warn('Could not clear caches before route chunk recovery reload.', err);
+    }).finally(() => reloadWithCacheBust());
+  }, [isChunkFailure, hasAttemptedRecovery]);
+
+  // Auto-recovering — show nothing while the reload is in-flight.
+  if (isChunkFailure && !hasAttemptedRecovery) return null;
+
+  // Recovery failed a second time — let the user manually reload.
+  const onReload = () => {
+    sessionStorage.removeItem(ROUTE_CHUNK_RECOVERY_KEY);
+    reloadWithCacheBust();
+  };
 
   return (
     <div className="relative min-h-[100dvh] overflow-hidden bg-body text-gray-text">
@@ -82,10 +125,10 @@ export const RouteErrorBoundary: React.FC = () => {
         <div className="mt-8 flex w-full max-w-md flex-col gap-3 sm:flex-row sm:justify-center">
           <button
             type="button"
-            onClick={reloadWithCacheBust}
+            onClick={onReload}
             className="inline-flex min-h-14 w-full items-center justify-center rounded-[var(--radius-control)] border border-transparent bg-green px-5 py-4 text-[16px] font-bold text-white shadow-lg shadow-green/20 transition-[background-color,box-shadow,transform] duration-300 ease-out-expo hover:-translate-y-0.5 hover:bg-green-hover hover:shadow-xl hover:shadow-green/30 active:translate-y-0 sm:w-auto sm:px-8"
           >
-            Try again
+            {isChunkFailure ? 'Reload Reflections' : 'Try again'}
           </button>
           <button
             type="button"

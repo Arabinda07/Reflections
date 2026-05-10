@@ -82,7 +82,8 @@ describe('impeccable audit follow-up contract', () => {
     expect(landing).not.toContain('hover:text-white lg:hover:text-gray-text');
     expect(landing).toContain('surface-floating surface-floating--media');
     expect(landing).toContain('rounded-2xl !text-gray-text');
-    expect(css).toContain('rgba(var(--panel-bg-rgb), 0.44) 0%, transparent 24%');
+    expect(css).toContain('oklch(from var(--panel-bg) l c h / 0.44) 0%, transparent 24%');
+    expect(css).not.toContain('panel-bg-rgb');
     expect(css).not.toContain('.landing-secondary-link');
     expect(css).not.toContain('.landing-media-toggle');
     expect(landing).not.toContain('rounded-full bg-[rgb(var(--panel-bg-rgb)/0.82)]');

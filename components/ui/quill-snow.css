@@ -359,7 +359,7 @@
   background-color: var(--ql-editor-swatch-purple);
 }
 .ql-editor .ql-color-white {
-  color: rgb(var(--panel-bg-rgb));
+  color: oklch(from var(--panel-bg) l c h);
 }
 .ql-editor .ql-color-red {
   color: var(--ql-editor-swatch-red);

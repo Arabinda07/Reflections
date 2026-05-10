@@ -39,6 +39,7 @@ import {
   type HomeIntentionSummary,
 } from './homeIntentions';
 import { MOOD_CONFIG, MOOD_OPTIONS } from './moodConfig';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 
 const WRITING_NOTES = [
@@ -120,7 +121,7 @@ export const HomeAuthenticated: React.FC = () => {
   const [isCreatingTask, setIsCreatingTask] = useState(false);
   const [isIntentionModalOpen, setIsIntentionModalOpen] = useState(false);
   const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);
-  const shouldReduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const shouldReduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const { showToast } = useToast();
   const authStoreDisplayName = user?.name?.trim() || 'Reflector';
 
@@ -477,8 +478,7 @@ export const HomeAuthenticated: React.FC = () => {
 
               <div className="mb-12 space-y-8">
                 <p
-                  className="dashboard-prompt-text typographic-measure"
-                  style={{ opacity: isRefreshing ? 0 : 1, transition: 'opacity 0.4s ease' }}
+                  className={`dashboard-prompt-text typographic-measure transition-opacity duration-[400ms] ease-out ${isRefreshing ? 'opacity-0' : 'opacity-100'}`}
                 >
                   {dailyPrompt}
                 </p>
@@ -819,7 +819,7 @@ export const HomeAuthenticated: React.FC = () => {
                       disabled={isSavingCheckIn}
                       className={`group rounded-[1.5rem] border p-5 text-left transition-[border-color,background-color,box-shadow,transform,opacity] duration-300 ease-out-expo disabled:opacity-60 hover:scale-[1.02] hover:shadow-lg ${moodConfig.option}`}
                     >
-                      <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-body/50 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-12">
+                      <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl [background-color:oklch(from_var(--bg-color)_l_c_h_/_0.5)] transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-12">
                         <Icon size={24} weight="duotone" className={moodConfig.labelClass} />
                       </div>
                       <span className="text-base font-bold text-gray-text transition-colors group-hover:text-green">{moodConfig.label}</span>

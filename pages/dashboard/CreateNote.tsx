@@ -440,8 +440,7 @@ export const CreateNote: React.FC = () => {
       {isMobile && (
         <button 
           onClick={handleMobileBack}
-          className={`surface-floating fixed left-4 z-floating flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] transition hover:text-green ${isFocusModeActive ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
-          style={{ top: NATIVE_TOP_CONTROL_OFFSET }}
+          className={`surface-floating fixed left-4 z-floating flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] transition hover:text-green top-[var(--native-top-control-offset)] ${isFocusModeActive ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
           aria-label="Back to notes"
         >
           <ArrowLeft size={20} weight="regular" />
@@ -454,8 +453,7 @@ export const CreateNote: React.FC = () => {
           onClick={() => {
             focusMode.disable();
           }}
-          className="surface-floating fixed right-4 z-sticky-nav inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 label-caps text-green hover:text-green"
-          style={{ top: NATIVE_TOP_CONTROL_OFFSET }}
+          className="surface-floating fixed right-4 z-sticky-nav inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 label-caps text-green hover:text-green top-[var(--native-top-control-offset)]"
         >
           <X size={12} weight="regular" />
           Exit focus
@@ -528,8 +526,7 @@ export const CreateNote: React.FC = () => {
       {/* Main Canvas */}
       <section
         aria-labelledby="create-note-heading"
-        className="relative flex-1 w-full pb-40 px-6 sm:px-12 md:px-16 lg:px-24 transition-[padding] duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]"
-        style={{ paddingTop: NATIVE_PAGE_TOP_PADDING }}
+        className="relative flex-1 w-full pb-40 px-6 sm:px-12 md:px-16 lg:px-24 transition-[padding] duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] pt-[var(--native-page-top-padding)]"
       >
         <h1 id="create-note-heading" className="sr-only">New reflection</h1>
         <div className={`editor-writing-measure transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isFocusModeActive ? 'mx-auto scale-[1.02]' : 'mr-auto lg:ml-12 xl:ml-24 scale-100'}`}>
@@ -632,8 +629,7 @@ export const CreateNote: React.FC = () => {
 
       {/* Ã¢â€â‚¬Ã¢â€â‚¬ Floating Actions Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <div 
-        className={`fixed z-50 flex gap-4 transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isFocusModeActive ? 'opacity-0 translate-y-8' : 'opacity-100 translate-y-0'} ${isMobile ? 'left-6 right-6 justify-between' : 'flex-col'}`}
-        style={{ bottom: isMobile ? 'calc(2rem + env(safe-area-inset-bottom))' : '2.5rem', right: isMobile ? undefined : '2.5rem' }}
+        className={`fixed z-50 flex gap-4 transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isMobile ? 'bottom-[calc(2rem+env(safe-area-inset-bottom))] left-6 right-6 justify-between' : 'bottom-10 right-10 flex-col'} ${isFocusModeActive ? 'opacity-0 translate-y-8' : 'opacity-100 translate-y-0'}`}
       >
         
         {/* Mobile Personalize FAB */}
@@ -788,7 +784,15 @@ export const CreateNote: React.FC = () => {
                 key={task.id}
                 task={task}
                 updateTask={(taskId, updates) => setTasks(tasks.map((item) => item.id === taskId ? { ...item, ...updates } : item))}
-                toggleTask={(taskId) => setTasks(tasks.map((item) => item.id === taskId ? { ...item, completed: !item.completed } : item))}
+                toggleTask={(taskId) => setTasks(tasks.map((item) => {
+                  if (item.id !== taskId) return item;
+                  const completed = !item.completed;
+                  return {
+                    ...item,
+                    completed,
+                    completedAt: completed ? new Date().toISOString() : undefined,
+                  };
+                }))}
                 removeTask={(taskId) => setTasks(tasks.filter((item) => item.id !== taskId))}
               />
             ))}

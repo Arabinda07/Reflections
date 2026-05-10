@@ -80,7 +80,7 @@ describe('entrypoint vendor loading contract', () => {
     expect(publicShell).not.toContain('AppBootstrapper');
     expect(publicShell).not.toContain('supabaseClient');
     expect(authBootstrapper).toContain('const markAuthCheckComplete = () => {');
-    expect(authBootstrapper).toContain('supabase.auth.onAuthStateChange');
+    expect(authBootstrapper).toContain('getAuthAdapter().onAuthChange');
     expect(authBootstrapper).not.toContain('if (!hasStoredAuthSessionHint()) {');
   });
 

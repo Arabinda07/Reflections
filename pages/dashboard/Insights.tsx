@@ -34,6 +34,7 @@ import {
   SANCTUARY_LEVEL_UP_ANIMATION_SRC,
 } from '../../src/lottie/sanctuaryAnimation';
 import { DEFAULT_MOOD_TONE, getMoodConfig } from './moodConfig';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 const TAG_TONE_CLASSES = ['text-green', 'text-green/80', 'text-green/70', 'text-green/60'];
 
@@ -70,8 +71,7 @@ export const Insights: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const isOpeningSanctuaryRef = useRef(false);
   const openingTimerRef = useRef<number | null>(null);
-  const shouldReduceMotion =
-    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const shouldReduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -365,8 +365,8 @@ export const Insights: React.FC = () => {
                                   </span>
                                   <div className={`relative h-10 flex-1 overflow-hidden rounded-2xl ${tone.trackClass}`}>
                                     <div
-                                      className={`absolute inset-y-0 left-0 w-full origin-left rounded-2xl transition-transform duration-1000 ease-out-expo ${tone.fillClass}`}
-                                      style={{ transform: `scaleX(${isMoodOpen ? scaleX : 0})` }}
+                                      className={`absolute inset-y-0 left-0 w-full origin-left rounded-2xl transition-transform duration-1000 ease-out-expo scale-x-[var(--mood-bar-scale)] ${tone.fillClass}`}
+                                      style={{ '--mood-bar-scale': isMoodOpen ? scaleX : 0 } as React.CSSProperties}
                                     />
                                     <div className="absolute inset-0 bg-white/5 opacity-0 transition-opacity group-hover/bar:opacity-100" />
                                   </div>
@@ -424,11 +424,8 @@ export const Insights: React.FC = () => {
                               return (
                                 <span
                                   key={tag}
-                                  className={`font-display font-bold lowercase transition-transform hover:scale-110 cursor-default ${TAG_TONE_CLASSES[index % TAG_TONE_CLASSES.length]}`}
-                                  style={{
-                                    fontSize: `${scale}rem`,
-                                    lineHeight: '1',
-                                  }}
+                                  className={`font-display font-bold lowercase transition-transform hover:scale-110 cursor-default text-[length:var(--tag-font-size)] leading-none ${TAG_TONE_CLASSES[index % TAG_TONE_CLASSES.length]}`}
+                                  style={{ '--tag-font-size': `${scale}rem` } as React.CSSProperties}
                                 >
                                   #{tag}
                                 </span>

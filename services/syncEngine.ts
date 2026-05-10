@@ -78,15 +78,12 @@ export const syncEngine = {
             if (op.syncStatus === 'pending_insert') {
               await noteRemoteStore.insert(userId, op);
               await offlineStorage.markAsSynced(op.id);
-              console.debug(`[SyncEngine] Synced insert for note ${op.id}`);
             } else if (op.syncStatus === 'pending_update') {
               await noteRemoteStore.upsert(userId, op);
               await offlineStorage.markAsSynced(op.id);
-              console.debug(`[SyncEngine] Synced update for note ${op.id}`);
             } else if (op.syncStatus === 'pending_delete') {
               await noteRemoteStore.remove(userId, op.id);
               await offlineStorage.markAsSynced(op.id);
-              console.debug(`[SyncEngine] Synced delete for note ${op.id}`);
             }
           } catch (err) {
             console.warn(`[SyncEngine] Failed to sync op ${op.id}, pausing flush:`, err);

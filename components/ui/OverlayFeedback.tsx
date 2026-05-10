@@ -42,10 +42,11 @@ export const OverlayFeedback: React.FC<OverlayFeedbackProps> = ({
 
   if (!render || typeof document === 'undefined') return null;
 
+  const pointerEventsClass = pointerEvents === 'none' ? 'pointer-events-none' : 'pointer-events-auto';
+
   return createPortal(
     <div
-      className={`overlay-feedback ${overlayClassName} ${animateIn ? 'is-visible' : ''}`.trim()}
-      style={{ pointerEvents }}
+      className={`overlay-feedback ${pointerEventsClass} ${overlayClassName} ${animateIn ? 'is-visible' : ''}`.trim()}
     >
       {contentClassName ? <div className={contentClassName}>{children}</div> : children}
     </div>,

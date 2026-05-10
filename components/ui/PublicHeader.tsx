@@ -1,6 +1,7 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
+import { usePWAInstallPrompt } from '../../hooks/usePWAInstallPrompt';
 import { RoutePath } from '../../types';
 
 type IconProps = {
@@ -11,7 +12,7 @@ type PublicHeaderProps = {
   isLandingRoute?: boolean;
 };
 
-type PublicMenuIconName = 'home' | 'faq' | 'about' | 'privacy' | 'signIn' | 'signUp';
+type PublicMenuIconName = 'home' | 'faq' | 'about' | 'privacy' | 'signIn' | 'signUp' | 'install';
 
 type PublicMenuItem = {
   label: string;
@@ -24,7 +25,6 @@ type ThemeModeButtonProps = {
   isDarkMode: boolean;
   onToggle: () => void;
   className: string;
-  variant?: 'icon' | 'menu';
 };
 
 const publicNavItems = [
@@ -158,6 +158,14 @@ const PublicMenuIcon: React.FC<IconProps & { name: PublicMenuIconName }> = ({ na
           <path d="M17.7 14.4v4.1M15.7 16.4h4.1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
         </svg>
       );
+    case 'install':
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden="true" className={className} fill="none">
+          <path d="M12 4.4v9.2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          <path d="m8.4 10.1 3.6 3.6 3.6-3.6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M5.8 15.4v2.8h12.4v-2.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      );
   }
 };
 
@@ -165,32 +173,8 @@ const ThemeModeButton: React.FC<ThemeModeButtonProps> = ({
   isDarkMode,
   onToggle,
   className,
-  variant = 'icon',
 }) => {
   const Icon = isDarkMode ? SunIcon : MoonIcon;
-  const label = isDarkMode ? 'Light mode' : 'Dark mode';
-  const description = isDarkMode ? 'Use a brighter interface.' : 'Use a quieter dark interface.';
-
-  if (variant === 'menu') {
-    return (
-      <button
-        type="button"
-        onClick={onToggle}
-        className={className}
-        aria-label={isDarkMode ? 'Use light mode' : 'Use dark mode'}
-      >
-        <span className="mobile-sidebar-link-icon">
-          <Icon className="h-5 w-5" />
-        </span>
-        <span className="min-w-0 flex-1 text-left">
-          <span className="block text-[15px] font-black">{label}</span>
-          <span className="mt-0.5 block text-[11px] font-semibold leading-snug text-gray-nav">
-            {description}
-          </span>
-        </span>
-      </button>
-    );
-  }
 
   return (
     <button
@@ -209,6 +193,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(getInitialDarkMode);
+  const { canInstall, isInstalled, triggerInstall } = usePWAInstallPrompt();
   const mobileMenuId = useId();
   const mobileMenuTitleId = useId();
   const mobileMenuDescriptionId = useId();
@@ -290,7 +275,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
   };
 
   const controlTone = isLandingRoute
-    ? 'text-gray-text hover:bg-[rgb(var(--panel-bg-rgb)/0.2)] hover:text-green'
+    ? 'text-gray-text hover:bg-white/20 hover:text-green'
     : 'text-gray-nav hover:bg-green/5 hover:text-green';
 
   const mobileMenu = isMobileMenuOpen && typeof document !== 'undefined'
@@ -308,8 +293,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
             aria-modal="true"
             aria-labelledby={mobileMenuTitleId}
             aria-describedby={mobileMenuDescriptionId}
-            className="public-mobile-menu fixed bottom-0 right-0 top-0 z-[110] h-[100dvh]"
-            style={{ width: 'min(86vw, 352px)' }}
+            className="public-mobile-menu fixed bottom-0 right-0 top-0 z-[110] h-[100dvh] w-[min(86vw,352px)]"
             onKeyDown={handleMobileMenuKeyDown}
           >
             <h2 id={mobileMenuTitleId} className="sr-only">
@@ -363,12 +347,27 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
             </nav>
 
             <div className="mobile-sidebar-footer">
-              <ThemeModeButton
-                isDarkMode={isDarkMode}
-                onToggle={toggleDarkMode}
-                variant="menu"
-                className="public-theme-toggle public-theme-toggle--mobile-menu mobile-sidebar-link mobile-sidebar-link--action group"
-              />
+              {canInstall && !isInstalled && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await triggerInstall();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  aria-label="Add Reflections to your home screen"
+                  className="mobile-sidebar-link mobile-sidebar-link--action group"
+                >
+                  <span className="mobile-sidebar-link-icon">
+                    <PublicMenuIcon name="install" className="h-5 w-5" />
+                  </span>
+                  <span className="min-w-0 flex-1 text-left">
+                    <span className="block text-[15px] font-black">Install app</span>
+                    <span className="mt-0.5 block text-[11px] font-semibold leading-snug text-gray-nav">
+                      Add Reflections to this device.
+                    </span>
+                  </span>
+                </button>
+              )}
               {publicActionItems.map((item) => (
                 <a
                   key={item.href}

@@ -23,7 +23,7 @@ describe('public header regression fixes', () => {
     );
   });
 
-  it('renders a public theme switcher in desktop, mobile header, and mobile menu', () => {
+  it('renders a public theme switcher in desktop and mobile header without duplicating it in the menu', () => {
     const header = read('components/ui/PublicHeader.tsx');
 
     expect(header).toContain('const ThemeModeButton');
@@ -32,9 +32,26 @@ describe('public header regression fixes', () => {
     expect(header).toContain("const PUBLIC_THEME_STORAGE_KEY = 'reflections-theme';");
     expect(header).toContain('public-theme-toggle public-theme-toggle--desktop');
     expect(header).toContain('public-theme-toggle public-theme-toggle--mobile-header');
-    expect(header).toContain('public-theme-toggle public-theme-toggle--mobile-menu');
+    expect(header).not.toContain('public-theme-toggle public-theme-toggle--mobile-menu');
     expect(header).not.toContain('reflections.public-theme');
     expect(header).not.toContain('motion/');
+  });
+
+  it('offers install app from the public hamburger menu without loading dashboard-only PWA providers', () => {
+    const header = read('components/ui/PublicHeader.tsx');
+    const hook = read('hooks/usePWAInstallPrompt.ts');
+
+    expect(header).toContain("import { usePWAInstallPrompt } from '../../hooks/usePWAInstallPrompt';");
+    expect(header).toContain('const { canInstall, isInstalled, triggerInstall } = usePWAInstallPrompt();');
+    expect(header).toContain('canInstall && !isInstalled');
+    expect(header).toContain('aria-label="Add Reflections to your home screen"');
+    expect(header).toContain('Install app');
+    expect(header).toContain('await triggerInstall();');
+    expect(header).not.toContain('PWAInstallProvider');
+
+    expect(hook).toContain("window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)");
+    expect(hook).toContain("window.addEventListener('appinstalled', handleAppInstalled)");
+    expect(hook).toContain('triggerInstall');
   });
 
   it('keeps the active public nav item quieter than the primary signup action', () => {
@@ -51,6 +68,25 @@ describe('public header regression fixes', () => {
     expect(activeCriticalRule).toContain('background: oklch(from var(--green) l c h / 0.025);');
     expect(activeCriticalRule).toContain('box-shadow: none;');
     expect(activeCriticalRule).not.toContain('background: oklch(from var(--green) 0.965 0.022 h / 0.92);');
+  });
+
+  it('keeps public header controls accessible with green hover and visible focus states', () => {
+    const header = read('components/ui/PublicHeader.tsx');
+    const indexHtml = read('index.html');
+
+    expect(header).toContain('public-theme-toggle--desktop inline-flex h-11 w-11');
+    expect(header).toContain('public-theme-toggle--mobile-header inline-flex h-11 w-11');
+    expect(header).toContain('aria-label="Toggle menu"');
+    expect(header).toContain('aria-expanded={isMobileMenuOpen}');
+    expect(header).toContain('aria-controls={mobileMenuId}');
+    expect(header).toContain('text-gray-nav transition-colors hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green');
+    expect(header).toContain('bg-green px-4 py-2 text-[13px] font-extrabold text-white');
+    expect(header).toContain('hover:bg-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green');
+    expect(indexHtml).toContain('.public-header nav[aria-label="Public navigation"] a:hover,');
+    expect(indexHtml).toContain('.public-header nav[aria-label="Public navigation"] button:hover');
+    expect(indexHtml).toContain('color: var(--green);');
+    expect(indexHtml).toContain('.public-header nav[aria-label="Public navigation"] > a[href="/signup"]:hover');
+    expect(indexHtml).toContain('background: var(--green-hover);');
   });
 
   it('portals the public mobile menu outside the backdrop-filtered header', () => {

@@ -135,7 +135,7 @@ export const BugReportFlow: React.FC<BugReportFlowProps> = ({ isOpen, onOpenChan
                 placeholder="Describe what happened..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className="w-full min-h-[160px] resize-none rounded-[20px] border border-border/40 bg-body/50 p-5 font-serif text-[17px] leading-relaxed text-gray-text transition-colors placeholder:text-gray-nav/50 focus:border-green/30 focus:outline-none focus:ring-2 focus:ring-green/10"
+                className="input-surface w-full min-h-[160px] resize-none rounded-[20px] p-5 font-serif text-[17px] leading-relaxed placeholder:text-gray-nav/50"
               />
               {submitError && (
                 <p className="text-[12px] font-bold text-clay animate-in fade-in slide-in-from-top-1">

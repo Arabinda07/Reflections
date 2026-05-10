@@ -28,8 +28,7 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
   return (
     <OverlayFeedback isVisible={isVisible} overlayClassName="overlay-feedback--screen">
       <div
-        className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-body"
-        style={{ touchAction: 'none' }}
+        className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-body touch-none"
       >
         <div className="startup-ambient-wash absolute inset-0 flex items-center justify-center overflow-hidden">
           <div className="startup-video-scrim absolute inset-0 z-10" />
@@ -72,8 +71,7 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
           </span>
 
           <div
-            className="overlay-feedback-divider bg-green/60"
-            style={{ width: 32 }}
+            className="overlay-feedback-divider bg-green/60 w-8"
           />
         </div>
       </div>

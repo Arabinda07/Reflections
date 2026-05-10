@@ -64,6 +64,9 @@
   --green-hover: oklch(0.41 0.16 135);
   --green-shadow: oklch(0.35 0.14 135);
 
+  --native-top-control-offset: calc(1rem + env(safe-area-inset-top));
+  --native-page-top-padding: calc(6rem + env(safe-area-inset-top));
+
   --dark-blue: oklch(0.25 0.05 260);
   --blue: oklch(0.54 0.16 245);
   --blue-shadow: oklch(0.40 0.16 245);
@@ -306,8 +309,8 @@
   --transition-speed: 350ms;
 
   /* System Hardening Tokens */
-  --scrollbar-thumb: rgba(148, 163, 184, 0.4);
-  --scrollbar-thumb-hover: rgba(148, 163, 184, 0.55);
+  --scrollbar-thumb: oklch(from var(--border-color) l c h / 0.5);
+  --scrollbar-thumb-hover: oklch(from var(--border-color) l c h / 0.72);
   --chip-shadow: oklch(from var(--border-color) l c h);
   --popover-bg: var(--panel-bg);
 }
@@ -409,8 +412,8 @@
     0 8px 20px -14px oklch(from var(--bg-color) 0.2 0.01 h / 0.3);
   --hero-ink: oklch(0.95 0.02 135);
   --hero-shadow:
-    0 12px 32px rgba(3, 5, 4, 0.42),
-    0 30px 72px rgba(3, 5, 4, 0.2);
+    0 12px 32px oklch(0.08 0.01 135 / 0.42),
+    0 30px 72px oklch(0.08 0.01 135 / 0.2);
   --hero-scrim: linear-gradient(180deg,
       oklch(0.13 0.02 135 / 0.22),
       oklch(0.1 0.02 135 / 0.48));
@@ -1256,6 +1259,19 @@ details:focus-visible,
     border-bottom: 0;
   }
 
+  .public-header nav[aria-label="Public navigation"] a:hover,
+  .public-header nav[aria-label="Public navigation"] button:hover {
+    border-color: oklch(from var(--green) l c h / 0.2);
+    background: oklch(from var(--green) l c h / 0.05);
+    color: var(--green);
+  }
+
+  .public-header nav[aria-label="Public navigation"] > a[href="/signup"]:hover {
+    border-color: var(--green-hover);
+    background: var(--green-hover);
+    color: white;
+  }
+
   .public-mobile-menu-scrim {
     background:
       linear-gradient(to left,
@@ -1271,9 +1287,9 @@ details:focus-visible,
     border-right: 0;
     background:
       linear-gradient(160deg,
-        rgb(var(--panel-bg-rgb) / 0.99) 0%,
-        rgb(var(--panel-bg-rgb) / 1) 48%,
-        rgb(var(--panel-bg-rgb) / 0.98) 100%);
+        oklch(from var(--panel-bg) l c h / 0.99) 0%,
+        oklch(from var(--panel-bg) l c h / 1) 48%,
+        oklch(from var(--panel-bg) l c h / 0.98) 100%);
     color: var(--gray-text);
     box-shadow:
       -24px 0 58px -42px oklch(from var(--green-shadow) l c h / 0.5),
@@ -1310,9 +1326,9 @@ details:focus-visible,
     border-right: 0;
     background:
       linear-gradient(160deg,
-        rgb(var(--panel-bg-rgb) / 0.88) 0%,
-        rgb(var(--panel-bg-rgb) / 0.94) 48%,
-        rgb(var(--panel-bg-rgb) / 0.88) 100%);
+        oklch(from var(--panel-bg) l c h / 0.88) 0%,
+        oklch(from var(--panel-bg) l c h / 0.94) 48%,
+        oklch(from var(--panel-bg) l c h / 0.88) 100%);
     color: var(--gray-text);
     box-shadow:
       -24px 0 58px -42px oklch(from var(--green-shadow) l c h / 0.5),
@@ -1466,7 +1482,7 @@ details:focus-visible,
   .mobile-sidebar-link:hover .mobile-sidebar-link-icon,
   .mobile-sidebar-link[data-active="true"] .mobile-sidebar-link-icon {
     background: var(--green);
-    color: rgb(var(--panel-bg-rgb));
+    color: oklch(from var(--panel-bg) l c h);
     transform: rotate(-4deg);
   }
 
@@ -1857,6 +1873,8 @@ details:focus-visible,
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
+    max-width: 100%;
+    min-width: 0;
     min-height: 2.75rem;
     padding: 0.4rem 0.8rem;
     border-radius: var(--radius-chip);
@@ -1888,8 +1906,53 @@ details:focus-visible,
 
   .chip-filter-icon {
     display: inline-flex;
+    flex-shrink: 0;
     align-items: center;
     justify-content: center;
+  }
+
+  .chip-filter-label {
+    display: inline-flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.45rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tag-filter-shelf {
+    box-shadow:
+      0 18px 40px -34px oklch(from var(--bg-color) 0.2 0.01 h / 0.2),
+      inset 0 1px 0 oklch(1 0 0 / 0.22);
+  }
+
+  .tag-filter-chip-rail {
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tag-filter-chip-rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tag-filter-chip-rail .chip-filter {
+    flex: 0 0 auto;
+  }
+
+  .tag-filter-count {
+    display: inline-flex;
+    flex-shrink: 0;
+    min-width: 1.35rem;
+    height: 1.35rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: oklch(from var(--surface-current-accent) l c h / 0.1);
+    color: var(--surface-current-accent);
+    font-size: 0.68rem;
+    font-weight: 850;
+    line-height: 1;
   }
 
   .metadata-pill {

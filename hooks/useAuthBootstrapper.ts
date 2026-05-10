@@ -5,6 +5,7 @@ import {
   identifyAnalyticsUserDeferred,
   resetAnalyticsUserDeferred,
 } from '../src/analytics/deferredEvents';
+import { getAuthAdapter } from '../src/auth/AuthRuntime';
 import { mapSessionToUser } from '../src/auth/sessionUser';
 
 export const useAuthBootstrapper = () => {
@@ -38,23 +39,12 @@ export const useAuthBootstrapper = () => {
 
     const checkSession = async () => {
       try {
-        const { supabase } = await import('../src/supabaseClient');
-        const { data: { session }, error } = await supabase.auth.getSession();
+        const session = await getAuthAdapter().getSession();
         
         if (mounted) {
           if (session) {
             setUser(mapSessionToUser(session));
             syncAnalyticsSession(session);
-          } else if (error) {
-            console.warn('Supabase session check failed:', error);
-            if (error.status && error.status >= 400 && error.status < 500) {
-              // 4xx errors mean the session is invalid or expired
-              setUser(null);
-              syncAnalyticsSession(null);
-            } else {
-              console.warn('Likely offline. Using local persisted session.');
-              // Session remains as it was in the persisted Zustand store
-            }
           } else {
             setUser(null);
             syncAnalyticsSession(null);
@@ -68,11 +58,9 @@ export const useAuthBootstrapper = () => {
     };
 
     void checkSession();
-    
-    void import('../src/supabaseClient').then(({ supabase }) => {
-      if (!mounted) return;
 
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    authSubscription = {
+      unsubscribe: getAuthAdapter().onAuthChange((session) => {
         if (!mounted) return;
         if (session) {
           setUser(mapSessionToUser(session));
@@ -82,15 +70,8 @@ export const useAuthBootstrapper = () => {
           syncAnalyticsSession(null);
         }
         setInitialCheckDone(true);
-      });
-
-      if (!mounted) {
-        subscription.unsubscribe();
-        return;
-      }
-
-      authSubscription = subscription;
-    });
+      }),
+    };
 
     return () => {
       mounted = false;

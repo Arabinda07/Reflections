@@ -57,11 +57,8 @@ export const AppBootstrapper: React.FC<{ children: React.ReactNode }> = ({ child
     <>
       <StartupScreen isVisible={showStartup} />
       <div
-        className="flex min-h-0 flex-1 flex-col"
+        className={`flex min-h-0 flex-1 flex-col ${isStartupBlocking ? 'pointer-events-none' : 'pointer-events-auto'}`}
         aria-hidden={isStartupBlocking}
-        style={{
-          pointerEvents: isStartupBlocking ? 'none' : 'auto',
-        }}
       >
         {children}
       </div>

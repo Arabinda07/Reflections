@@ -32,6 +32,7 @@ import {
   SANCTUARY_LEVEL_UP_ANIMATION_ID,
   SANCTUARY_LEVEL_UP_ANIMATION_SRC,
 } from '../../src/lottie/sanctuaryAnimation';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 type RefreshFeedback = {
   variant: 'warning' | 'error';
@@ -217,7 +218,7 @@ export const LifeWiki: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { pageType } = useParams();
-  const shouldReduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const shouldReduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const cameFromInsights = Boolean(location.state?.fromInsights);
   const shouldPlayEntryAnimation =
     !shouldReduceMotion && (location.pathname === RoutePath.WIKI || location.pathname === RoutePath.SANCTUARY);
@@ -397,7 +398,7 @@ export const LifeWiki: React.FC = () => {
     return (
       <div
         key={meta.pageType}
-        className={`group relative h-full overflow-hidden rounded-[2.5rem] surface-flat ${tone.surface} dashboard-tone-card transition-[box-shadow,transform] duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)]`}
+        className={`group relative h-full overflow-hidden rounded-[2.5rem] surface-flat ${tone.surface} dashboard-tone-card transition-[box-shadow,transform] duration-500 ease-out hover:-translate-y-1 hover:[box-shadow:0_20px_50px_-20px_oklch(from_var(--bg-color)_0.2_0.01_h_/_0.18)]`}
       >
         <Link
           to={articlePath(meta.pageType)}

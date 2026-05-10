@@ -62,8 +62,8 @@ export default {
         honey: 'var(--honey)',
         clay: 'var(--clay)',
         surface: 'var(--panel-bg)',
-        white: 'rgb(var(--panel-bg-rgb) / <alpha-value>)',
-        black: 'rgb(var(--black-rgb) / <alpha-value>)',
+        white: 'oklch(from var(--panel-bg) l c h / <alpha-value>)',
+        black: 'oklch(0 0 0 / <alpha-value>)',
         /* Semantic Tokens */
         'surface-muted': 'var(--color-surface-muted)',
         'text-primary': 'var(--color-text-primary)',
@@ -153,5 +153,15 @@ export default {
   },
   plugins: [
     require('@tailwindcss/container-queries'),
+    function ({ addUtilities, matchUtilities }) {
+      addUtilities({
+        '.animation-fill-mode-both': { animationFillMode: 'both' },
+      });
+      matchUtilities({
+        'animation-delay': (value) => ({
+          animationDelay: value,
+        }),
+      });
+    },
   ],
 };

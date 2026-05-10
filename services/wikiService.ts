@@ -2,6 +2,7 @@ import { supabase } from '../src/supabaseClient';
 import type { LifeTheme, ThemeCitation, Note } from '../types';
 import { WikiPageType, STRUCTURED_WIKI_PAGES } from './wikiTypes';
 import { mapToNote, type SupabaseNoteRow } from './noteService';
+import { getAuthenticatedUserId } from './authUtils';
 
 const VALID_THEME_STATES = new Set<LifeTheme['state']>(['active', 'archived', 'resolved']);
 const parseThemeState = (raw: string): LifeTheme['state'] =>
@@ -59,13 +60,12 @@ export const wikiService = {
    * Used by aiService during ingest to avoid Gemini touching structured wiki pages.
    */
   getUserThemes: async (): Promise<LifeTheme[]> => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
+    const userId = await getAuthenticatedUserId();
 
     const { data, error } = await supabase
       .from('life_themes')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .eq('page_type', 'theme')
       .eq('state', 'active')
       .order('updated_at', { ascending: false });
@@ -79,13 +79,12 @@ export const wikiService = {
    * Used by the UI to display everything.
    */
   getAllThemes: async (): Promise<LifeTheme[]> => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
+    const userId = await getAuthenticatedUserId();
 
     const { data, error } = await supabase
       .from('life_themes')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .eq('state', 'active')
       .order('updated_at', { ascending: false });
 
@@ -97,14 +96,13 @@ export const wikiService = {
    * Fetch a single theme by its ID.
    */
   getThemeById: async (themeId: string): Promise<LifeTheme | null> => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
+    const userId = await getAuthenticatedUserId();
 
     const { data, error } = await supabase
       .from('life_themes')
       .select('*')
       .eq('id', themeId)
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .single();
 
     if (error) return null;
@@ -115,13 +113,12 @@ export const wikiService = {
    * Create a new freeform life theme.
    */
   createTheme: async (title: string, content: string): Promise<LifeTheme> => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
+    const userId = await getAuthenticatedUserId();
 
     const { data, error } = await supabase
       .from('life_themes')
       .insert({
-        user_id: user.id,
+        user_id: userId,
         title,
         content,
         state: 'active',
@@ -138,14 +135,13 @@ export const wikiService = {
    * Update the content of an existing theme (freeform or structured).
    */
   updateThemeContent: async (themeId: string, newContent: string): Promise<LifeTheme> => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
+    const userId = await getAuthenticatedUserId();
 
     const { data, error } = await supabase
       .from('life_themes')
       .update({ content: newContent })
       .eq('id', themeId)
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .select()
       .single();
 
@@ -160,13 +156,12 @@ export const wikiService = {
    * Returns null if it hasn't been created yet.
    */
   getWikiPage: async (pageType: WikiPageType): Promise<LifeTheme | null> => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
+    const userId = await getAuthenticatedUserId();
 
     const { data, error } = await supabase
       .from('life_themes')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .eq('page_type', pageType)
       .single();
 
@@ -179,13 +174,12 @@ export const wikiService = {
    * Returns only the pages that have been created so far.
    */
   getAllWikiPages: async (): Promise<LifeTheme[]> => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
+    const userId = await getAuthenticatedUserId();
 
     const { data, error } = await supabase
       .from('life_themes')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .in('page_type', STRUCTURED_WIKI_PAGES)
       .eq('state', 'active');
 
@@ -202,25 +196,22 @@ export const wikiService = {
     title: string,
     content: string
   ): Promise<LifeTheme> => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
+    const userId = await getAuthenticatedUserId();
 
-    // Check if it already exists so we can update vs insert
-    const existing = await wikiService.getWikiPage(pageType);
-
-    if (existing) {
-      return wikiService.updateThemeContent(existing.id, content);
-    }
-
+    // Single atomic upsert on (user_id, page_type) — avoids two round-trips
+    // and eliminates the race condition in concurrent refresh calls.
     const { data, error } = await supabase
       .from('life_themes')
-      .insert({
-        user_id: user.id,
-        title,
-        content,
-        state: 'active',
-        page_type: pageType,
-      })
+      .upsert(
+        {
+          user_id: userId,
+          page_type: pageType,
+          title,
+          content,
+          state: 'active',
+        },
+        { onConflict: 'user_id,page_type' }
+      )
       .select()
       .single();
 
@@ -253,8 +244,7 @@ export const wikiService = {
    * user_id removed from citations query — RLS handles it.
    */
   getThemeSources: async (themeId: string): Promise<Note[]> => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
+    const userId = await getAuthenticatedUserId();
 
     const { data: citations, error: citeError } = await supabase
       .from('theme_citations')
@@ -270,7 +260,7 @@ export const wikiService = {
       .from('notes')
       .select('*')
       .in('id', noteIds)
-      .eq('user_id', user.id);
+      .eq('user_id', userId);
 
     if (noteError) throw noteError;
 

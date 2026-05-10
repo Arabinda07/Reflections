@@ -113,11 +113,11 @@ export const AmbientMusicButton: React.FC = () => {
     : 'var(--floating-panel-shadow)';
   const iconStroke = isPlaying ? accentColor : isHovered ? 'var(--green)' : 'var(--gray-text)';
 
-  const pickerBg = 'var(--floating-panel-bg-strong, rgba(var(--panel-bg-rgb), 0.98))';
+  const pickerBg = 'var(--floating-panel-bg-strong, oklch(from var(--panel-bg) l c h / 0.98))';
   const pickerBorder = 'var(--floating-panel-border)';
   const pickerShadow = 'var(--floating-panel-shadow-strong)';
   const trackHoverBg = 'oklch(from var(--green) l c h / 0.08)';
-  const trackBg = 'var(--floating-panel-bg, rgba(var(--panel-bg-rgb), 0.9))';
+  const trackBg = 'var(--floating-panel-bg, oklch(from var(--panel-bg) l c h / 0.9))';
   const trackBorder = 'var(--border-color)';
 
   const renderTrackRow = (track: (typeof AMBIENT_TRACKS)[0], compact = false) => {
@@ -147,7 +147,7 @@ export const AmbientMusicButton: React.FC = () => {
               ? `color-mix(in oklch, ${track.color} 12%, transparent)`
               : compact
                 ? trackHoverBg
-                : 'rgba(var(--panel-bg-rgb), 0.92)',
+                : 'oklch(from var(--panel-bg) l c h / 0.92)',
             '--audio-track-active-border': `color-mix(in oklch, ${track.color} 35%, transparent)`,
             '--audio-track-active-bg': `color-mix(in oklch, ${track.color} 12%, transparent)`,
             '--audio-badge-bg': `color-mix(in oklch, ${track.color} 18%, transparent)`,
@@ -264,8 +264,8 @@ export const AmbientMusicButton: React.FC = () => {
           style={
             {
               '--audio-button-bg': isPlaying
-                ? `color-mix(in oklch, ${accentColor} 18%, rgba(var(--panel-bg-rgb), 0.82))`
-                : 'rgba(var(--panel-bg-rgb), 0.84)',
+                ? `color-mix(in oklch, ${accentColor} 18%, oklch(from var(--panel-bg) l c h / 0.82))`
+                : 'oklch(from var(--panel-bg) l c h / 0.84)',
               '--audio-button-border': isPlaying
                 ? `color-mix(in oklch, ${accentColor} 44%, transparent)`
                 : 'var(--floating-panel-border)',

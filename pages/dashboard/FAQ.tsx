@@ -137,7 +137,7 @@ export const FAQ: React.FC = () => {
             </p>
           </article>
 
-          <div className="faq-compact-list rounded-[2rem] border border-border/70 bg-[rgb(var(--panel-bg-rgb)/0.54)]">
+          <div className="faq-compact-list rounded-[2rem] border border-border/70 bg-[oklch(from_var(--panel-bg)_l_c_h_/_0.54)]">
             {guideSections.map((section, index) => (
               <article
                 key={section.title}

@@ -40,11 +40,11 @@ describe('phase 2/3 design-system rollout', () => {
     expect(companionObservation).toContain("from './OverlayFeedback'");
     expect(ambientMusicButton).toContain("from './ModalSheet'");
     expect(homeAuthenticated).toContain('tone="sage"');
-    expect(indexCss).toContain('--modal-sheet-backdrop-bg: rgba(var(--panel-bg-rgb), 0.88);');
+    expect(indexCss).toContain('--modal-sheet-backdrop-bg: oklch(from var(--panel-bg) l c h / 0.88);');
     expect(indexCss).toContain('--modal-sheet-opaque-bg');
     expect(modalCss).toMatch(/\.modal-sheet-backdrop\s*{[^}]*background: var\(--modal-sheet-backdrop-bg\);/s);
     expect(modalCss).toMatch(/\.modal-sheet-panel\s*{[^}]*backdrop-filter: none;/s);
-    expect(modalCss).not.toMatch(/\.modal-sheet-backdrop\s*{[^}]*background:\s*rgba\(var\(--panel-bg-rgb\), 0\.72\);/s);
+    expect(modalCss).not.toMatch(/\.modal-sheet-backdrop\s*{[^}]*background:\s*oklch\(from var\(--panel-bg\) l c h \/ 0\.72\);/s);
 
     expect(loadingState).not.toContain('Schibsted Grotesk');
     expect(paperPlaneToast).not.toContain('Schibsted Grotesk');
@@ -89,8 +89,7 @@ describe('phase 2/3 design-system rollout', () => {
     const surface = read('components/ui/Surface.tsx');
     const surfaceTone = read('components/ui/surfaceTone.ts');
     const metadataPill = read('components/ui/MetadataPill.tsx');
-    const design = read('DESIGN.md');
-    const brandDesign = read('docs/brand/DESIGN.md');
+    const product = read('PRODUCT.md');
     const home = read('pages/dashboard/HomeAuthenticated.tsx');
     const insights = read('pages/dashboard/Insights.tsx');
 
@@ -122,10 +121,10 @@ describe('phase 2/3 design-system rollout', () => {
     expect(surface).toContain('SURFACE_TONE_CLASS[tone]');
     expect(surface).not.toContain('surface-tone-${tone}');
     expect(metadataPill).toContain('METADATA_TONE_CLASS[tone]');
-    expect(design).toContain('Inherited Surface Rule');
-    expect(design).toContain('surface-scope-sage');
-    expect(brandDesign).toContain('Inherited Surface Rule');
-    expect(brandDesign).toContain('neutral` is only a backward-compatible alias');
+    expect(product).toContain('Writing is the sanctuary');
+    expect(product).toContain('Reflections should feel calm');
+    expect(product).toContain('The journal entry is the primary object.');
+    expect(product).toContain('AI is invited, not ambient.');
     expect(home).toContain('surface-scope-sage');
     expect(insights).toContain('tone="sky"');
     expect(insights).toContain('tone="honey"');
@@ -259,6 +258,7 @@ describe('phase 2/3 design-system rollout', () => {
     expect(navigationBar).toContain('hidden lg:flex items-center gap-1.5 xl:gap-2');
     expect(navigationBar).toContain('lg:hidden items-center gap-2');
     expect(navigationBar).toContain('px-3 xl:px-4');
+    expect(navigationBar).not.toContain('bg-body/');
   });
 
   it('keeps card-like surfaces off raw white and panel background escape hatches', () => {
@@ -274,6 +274,7 @@ describe('phase 2/3 design-system rollout', () => {
     for (const filePath of cardSurfaceFiles) {
       const source = read(filePath);
       expect(source, filePath).not.toContain('bg-panel-bg/80');
+      expect(source, filePath).not.toContain('bg-body/');
       expect(source, filePath).not.toContain('bg-white/5');
       expect(source, filePath).not.toContain('bg-white/60');
       expect(source, filePath).toMatch(/surface-(?:inline-panel|scope-|tone-|flat|bezel)/);

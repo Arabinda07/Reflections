@@ -52,7 +52,6 @@ export const SyncBanner: React.FC = () => {
                 : 'border-green/20 text-green-700 dark:border-green/30 dark:text-green-400'
               }
             `}
-            style={{ WebkitBackdropFilter: 'blur(20px)' }}
           >
             {bannerMode === 'offline' ? (
               <CloudSlash size={20} weight="bold" className="shrink-0" />

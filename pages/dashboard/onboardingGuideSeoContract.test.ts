@@ -85,7 +85,7 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
     expect(landing).toContain('beautifully');
     expect(landing).toContain('organized');
     expect(landing).not.toContain('organized.');
-    expect(landing).toContain('font-sans text-[19px] font-bold');
+    expect(landing).toContain('font-sans text-base font-normal');
     expect(tailwind).toContain("editor: ['var(--font-editor)']");
     expect(landing).not.toContain('Plain answers');
     expect(landing).not.toContain('Last updated April 26, 2026');
@@ -99,6 +99,8 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
     expect(bugReport).toContain('handleSubmit');
     expect(bugReport).toContain('Floating Bug Report Button');
     expect(bugReport).toContain('Report a bug');
+    expect(bugReport).toContain('input-surface w-full min-h-[160px]');
+    expect(bugReport).not.toContain('bg-body/50');
     expect(layout).not.toContain('openFeedbackDraft');
     expect(layout).not.toContain('Send feedback');
     const sidebar = read('layouts/MobileSidebar.tsx');

@@ -94,7 +94,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
       className={`z-[100] flex-none flex justify-center transition-colors duration-500 ${
         isLandingRoute
           ? 'landing-nav-scrim fixed left-0 right-0 top-0 pt-[env(safe-area-inset-top)]'
-          : 'bg-body/95 pt-[env(safe-area-inset-top)]'
+          : '[background-color:oklch(from_var(--bg-color)_l_c_h_/_0.95)] pt-[env(safe-area-inset-top)]'
       }`}
     >
       <div className="flex h-14 w-full max-w-[1440px] min-w-0 items-center justify-between gap-3 px-4 md:px-8 xl:px-10">

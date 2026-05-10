@@ -67,7 +67,24 @@ export const MyNotes: React.FC = () => {
   }, []);
 
   const filteredNotes = tagFilter ? notes.filter((note) => note.tags?.includes(tagFilter)) : notes;
-  const allTags = Array.from(new Set(notes.flatMap((note) => note.tags || [])));
+  const tagSummaries = Array.from(
+    notes.reduce((tagCounts, note) => {
+      for (const tag of note.tags || []) {
+        const name = tag.trim();
+        if (!name) continue;
+        tagCounts.set(name, (tagCounts.get(name) || 0) + 1);
+      }
+      return tagCounts;
+    }, new Map<string, number>()),
+  )
+    .map(([name, count]) => ({ name, count }))
+    .sort((left, right) => right.count - left.count || left.name.localeCompare(right.name));
+  const selectedTagSummary = tagSummaries.find((tag) => tag.name === tagFilter);
+  const countLabel = `${tagSummaries.length} ${tagSummaries.length === 1 ? 'tag' : 'tags'}`;
+  const taggedReflectionCount = notes.filter((note) => (note.tags || []).length > 0).length;
+  const taggedReflectionLabel = `${taggedReflectionCount} ${
+    taggedReflectionCount === 1 ? 'reflection' : 'reflections'
+  }`;
   const notesOnSelectedDate = filteredNotes.filter((note) =>
     isSameDay(new Date(note.updatedAt), selectedDate),
   );
@@ -145,8 +162,8 @@ export const MyNotes: React.FC = () => {
         className="group relative overflow-hidden rounded-[2.5rem] border border-border/40 transition-[transform,border-color,box-shadow] duration-500 hover:-translate-y-1 hover:border-green/20 hover:shadow-xl"
       >
         <article
-          className="flex h-full flex-col"
-          style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
+          className="flex h-full flex-col [animation-delay:var(--note-card-delay)] animation-fill-mode-both"
+          style={{ '--note-card-delay': `${index * 50}ms` } as React.CSSProperties}
         >
           <div className="relative h-44 w-full overflow-hidden border-b border-border/40">
             <Link
@@ -276,11 +293,7 @@ export const MyNotes: React.FC = () => {
           >
             <SectionHeader
               title="Saved reflections"
-              description={
-                tagFilter
-                  ? `Showing reflections tagged "${tagFilter}".`
-                  : 'Cards or calendar — pick how you want to look through them.'
-              }
+              description="Cards or calendar: pick how you want to look through them."
               actions={
                 <div className="core-control-cluster">
                   <div className="flex items-center gap-2">
@@ -312,28 +325,55 @@ export const MyNotes: React.FC = () => {
               }
             />
 
-            {tagFilter ? (
-              <div className="flex flex-wrap items-center gap-2">
-                <Chip as="span" active icon={<Tag size={12} weight="regular" />}>
-                  {tagFilter}
-                </Chip>
-                <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.NOTES)} className="text-clay">
-                  <X size={12} weight="regular" className="mr-1" />
-                  Clear filter
-                </Button>
-              </div>
-            ) : allTags.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {allTags.map((tag) => (
-                  <Chip
-                    key={tag}
-                    icon={<Tag size={12} weight="regular" />}
-                    onClick={() => navigate(`${RoutePath.NOTES}?tag=${encodeURIComponent(tag as string)}`)}
-                  >
-                    {tag}
-                  </Chip>
-                ))}
-              </div>
+            {tagSummaries.length > 0 || tagFilter ? (
+              <Surface
+                variant="flat"
+                tone="paper"
+                className="tag-filter-shelf rounded-[2rem] border-border/50 p-5 sm:p-6"
+              >
+                <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 text-gray-nav">
+                      <Tag size={15} weight="duotone" className="text-green" />
+                      <p className="label-caps">Filter by tag</p>
+                    </div>
+                    <p className="text-sm font-semibold leading-relaxed text-gray-light">
+                      {tagFilter
+                        ? `Showing reflections tagged "${tagFilter}".`
+                        : `${countLabel} across ${taggedReflectionLabel}.`}
+                    </p>
+                  </div>
+
+                  {tagFilter ? (
+                    <div className="tag-filter-chip-rail flex max-w-full items-center gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0">
+                      <Chip as="span" active icon={<Tag size={12} weight="regular" />}>
+                        {tagFilter}
+                      </Chip>
+                      <span className="metadata-pill metadata-pill--sage">
+                        {selectedTagSummary?.count || 0} {(selectedTagSummary?.count || 0) === 1 ? 'reflection' : 'reflections'}
+                      </span>
+                      <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.NOTES)} className="text-clay">
+                        <X size={12} weight="regular" className="mr-1" />
+                        Clear filter
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="tag-filter-chip-rail flex max-w-full items-center gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0 lg:justify-end">
+                      {tagSummaries.map((tag) => (
+                        <Chip
+                          key={tag.name}
+                          icon={<Tag size={12} weight="regular" />}
+                          onClick={() => navigate(`${RoutePath.NOTES}?tag=${encodeURIComponent(tag.name)}`)}
+                          aria-label={`Show ${tag.name} reflections`}
+                        >
+                          <span>{tag.name}</span>
+                          <span className="tag-filter-count">{tag.count}</span>
+                        </Chip>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </Surface>
             ) : null}
 
             {viewMode === 'calendar' ? (

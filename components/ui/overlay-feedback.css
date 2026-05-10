@@ -20,13 +20,13 @@
 }
 
 .overlay-feedback--soft {
-    background: rgba(var(--panel-bg-rgb), 0.52);
+    background: oklch(from var(--panel-bg) l c h / 0.52);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
   }
 
   .overlay-feedback--veil {
-    background: rgba(var(--panel-bg-rgb), 0.84);
+    background: oklch(from var(--panel-bg) l c h / 0.84);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
   }
@@ -42,7 +42,7 @@
     padding: 1.25rem 1.5rem;
     border-radius: var(--radius-panel);
     border: 1.5px solid var(--border-color);
-    background: rgba(var(--panel-bg-rgb), 0.94);
+    background: oklch(from var(--panel-bg) l c h / 0.94);
     box-shadow:
       0 28px 52px -28px rgba(0, 0, 0, 0.3),
       0 12px 28px -22px rgba(0, 0, 0, 0.18);

@@ -38,7 +38,7 @@ html.no-scroll .floating-audio-container {
     padding: 1rem;
     border-radius: var(--radius-panel);
     border: 1.5px solid var(--audio-picker-border, var(--border-color));
-    background: var(--audio-picker-bg, rgba(var(--panel-bg-rgb), 0.96));
+    background: var(--audio-picker-bg, oklch(from var(--panel-bg) l c h / 0.96));
     box-shadow: var(--audio-picker-shadow, 0 18px 32px -20px rgba(0, 0, 0, 0.18));
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
@@ -74,7 +74,7 @@ html.no-scroll .floating-audio-container {
     padding: 0.75rem 0.9rem;
     border-radius: var(--radius-panel);
     border: 1.5px solid var(--audio-track-border, var(--border-color));
-    background: var(--audio-track-bg, rgba(var(--panel-bg-rgb), 0.92));
+    background: var(--audio-track-bg, oklch(from var(--panel-bg) l c h / 0.92));
     transition:
       background-color 180ms ease,
       border-color 180ms ease,
@@ -82,7 +82,7 @@ html.no-scroll .floating-audio-container {
   }
 
   .audio-track-row:hover {
-    background: var(--audio-track-hover, rgba(var(--panel-bg-rgb), 1));
+    background: var(--audio-track-hover, oklch(from var(--panel-bg) l c h / 1));
   }
 
   .audio-track-row--active {

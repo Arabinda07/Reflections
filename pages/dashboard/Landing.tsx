@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDocumentMeta } from '../../hooks/useDocumentMeta';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { hasStoredAuthSessionHint } from '../../src/utils/authHints';
 import { RoutePath } from '../../types';
 
@@ -83,29 +84,23 @@ export const Landing: React.FC = () => {
   const [shouldLoadHeroVideo, setShouldLoadHeroVideo] = useState(false);
   const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);
 
+  const shouldReduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
+
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const handleMotionChange = (e: MediaQueryListEvent) => {
-      if (e.matches && videoRef.current) {
-        videoRef.current.pause();
-      } else if (!e.matches && videoRef.current && isHeroVideoReady) {
-        videoRef.current.play().catch(() => {});
-      }
-    };
-    
-    mediaQuery.addEventListener('change', handleMotionChange);
-    return () => mediaQuery.removeEventListener('change', handleMotionChange);
-  }, [isHeroVideoReady]);
+    if (!shouldReduceMotion) return;
+    if (videoRef.current) {
+      videoRef.current.pause();
+    }
+  }, [shouldReduceMotion]);
 
   useEffect(() => {
     if (shouldLoadHeroVideo) return;
 
-    const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     const saveData = Boolean(
       (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData,
     );
 
-    if (saveData || reducedMotionQuery.matches) return;
+    if (saveData || shouldReduceMotion) return;
 
     let cancelVideoLoad: (() => void) | undefined;
     const videoDelay = window.setTimeout(() => {
@@ -116,7 +111,7 @@ export const Landing: React.FC = () => {
       window.clearTimeout(videoDelay);
       cancelVideoLoad?.();
     };
-  }, [shouldLoadHeroVideo]);
+  }, [shouldLoadHeroVideo, shouldReduceMotion]);
 
   useEffect(() => {
     if (!hasStoredAuthSessionHint()) {
@@ -175,6 +170,7 @@ export const Landing: React.FC = () => {
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <div className="video-mask video-mask--mobile lg:hidden" />
           <div className="video-mask video-mask--desktop hidden lg:block" />
+
           <picture>
             <source srcSet="/assets/videos/landing_video.webp" type="image/webp" media="(min-width: 1024px)" />
             <source srcSet="/assets/videos/landing_video_mobile.webp" type="image/webp" media="(max-width: 1023px)" />
@@ -224,7 +220,7 @@ export const Landing: React.FC = () => {
               className="pointer-events-auto flex max-w-[11ch] flex-col text-mk-display font-display font-extrabold tracking-normal text-gray-text leading-[1.05] sm:leading-[1.0] lg:max-w-5xl lg:leading-[0.96]"
             >
               <span>Your mind</span>
-              <span className="font-serif italic font-normal text-green" style={{ lineHeight: 1.15 }}>
+              <span className="font-serif italic font-normal text-green leading-[1.15]">
                 beautifully
               </span>
               <span>organized</span>
@@ -248,13 +244,12 @@ export const Landing: React.FC = () => {
 
             <div className="mt-4 flex w-full items-center justify-between gap-5 sm:mt-0 sm:w-auto sm:gap-x-10 lg:gap-x-12">
               <div className="flex min-w-0 items-center gap-x-8 sm:gap-x-10">
-                <button
-                  type="button"
-                  onClick={() => navigate(RoutePath.LOGIN)}
+                <a
+                  href={RoutePath.LOGIN}
                   className="inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap px-1 text-btn-sm font-bold text-gray-nav transition-all duration-300 ease-out-expo hover:-translate-y-px hover:text-green active:translate-y-px"
                 >
                   Sign in
-                </button>
+                </a>
 
                 <a
                   href={RoutePath.FAQ}
@@ -267,7 +262,7 @@ export const Landing: React.FC = () => {
               <button
                 type="button"
                 onClick={toggleMute}
-                className="surface-floating surface-floating--media flex h-12 min-h-12 w-12 min-w-12 shrink-0 items-center justify-center rounded-2xl !text-gray-text transition-[color,border-color,transform] duration-300 ease-out-expo hover:scale-[1.03] hover:border-green/40 hover:!text-gray-text active:scale-95 motion-reduce:transition-none"
+                className="surface-floating surface-floating--media flex h-12 min-h-12 w-12 min-w-12 shrink-0 items-center justify-center rounded-2xl !text-gray-text transition-[color,border-color,transform] duration-300 ease-out-expo hover:scale-[1.03] hover:border-green/40 hover:!text-gray-text active:scale-95 motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-green/40"
                 aria-label={isMuted ? 'Unmute video' : 'Mute video'}
               >
                 {isMuted ? (

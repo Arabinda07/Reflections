@@ -120,9 +120,15 @@ export const SingleNote: React.FC = () => {
   const toggleTask = async (taskId: string) => {
     if (!note?.tasks) return;
 
-    const updatedTasks = note.tasks.map((task) =>
-      task.id === taskId ? { ...task, completed: !task.completed } : task,
-    );
+    const updatedTasks = note.tasks.map((task) => {
+      if (task.id !== taskId) return task;
+      const completed = !task.completed;
+      return {
+        ...task,
+        completed,
+        completedAt: completed ? new Date().toISOString() : undefined,
+      };
+    });
 
     await persistNote({ tasks: updatedTasks });
   };

@@ -43,8 +43,18 @@ export const mergeTasks = (existingTasks: Task[], newTasks: Task[]): Task[] => {
   return newTasks.map(newTask => {
     const existing = existingTasks.find(et => et.text === newTask.text);
     if (existing) {
-      return { ...existing, completed: newTask.completed };
+      const completedAt = newTask.completed
+        ? existing.completedAt || new Date().toISOString()
+        : undefined;
+
+      return { ...existing, completed: newTask.completed, completedAt };
     }
-    return newTask;
+
+    if (!newTask.completed) return { ...newTask, completedAt: undefined };
+
+    return {
+      ...newTask,
+      completedAt: newTask.completedAt || new Date().toISOString(),
+    };
   });
 };

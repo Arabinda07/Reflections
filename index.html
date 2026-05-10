@@ -280,6 +280,13 @@
         padding: 0.5rem 0.75rem;
       }
 
+      .public-header nav[aria-label="Public navigation"] a:hover,
+      .public-header nav[aria-label="Public navigation"] button:hover {
+        border-color: oklch(from var(--green) l c h / 0.2);
+        background: oklch(from var(--green) l c h / 0.05);
+        color: var(--green);
+      }
+
       .public-header nav[aria-label="Public navigation"] a[aria-current="page"] {
         border-color: oklch(from var(--green) l c h / 0.2);
         background: oklch(from var(--green) l c h / 0.025);
@@ -301,6 +308,12 @@
         padding-inline: 1rem;
         color: white;
         box-shadow: 0 1px 2px oklch(from var(--green) l c h / 0.1);
+      }
+
+      .public-header nav[aria-label="Public navigation"] > a[href="/signup"]:hover {
+        border-color: var(--green-hover);
+        background: var(--green-hover);
+        color: white;
       }
 
       .public-header > div > div:last-child {

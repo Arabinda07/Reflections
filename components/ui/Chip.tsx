@@ -30,7 +30,7 @@ export const Chip: React.FC<ChipProps> = ({
   const content = (
     <>
       {icon ? <span className="chip-filter-icon">{icon}</span> : null}
-      <span>{children}</span>
+      <span className="chip-filter-label">{children}</span>
     </>
   );
 

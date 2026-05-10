@@ -155,7 +155,7 @@ export const PrivacyPolicy: React.FC = () => {
             </div>
           </article>
 
-          <aside className="privacy-compact-list rounded-[2rem] border border-border/70 bg-[rgb(var(--panel-bg-rgb)/0.54)]">
+          <aside className="privacy-compact-list rounded-[2rem] border border-border/70 bg-[oklch(from_var(--panel-bg)_l_c_h_/_0.54)]">
             {policySections.slice(0, 3).map((section) => (
               <article key={section.title} className="group flex gap-5 border-b border-border/60 p-6 last:border-b-0 md:p-8">
                 <div className={`tone-icon ${section.color} mt-1 h-12 w-12 flex-none rounded-2xl transition-transform duration-500 ease-out-expo group-hover:scale-105`}>
