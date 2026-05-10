@@ -6,22 +6,6 @@ import { sentryVitePlugin } from '@sentry/vite-plugin';
 
 const lottieLightPlayer = path.resolve(__dirname, 'node_modules/lottie-web/build/player/esm/lottie_light.min.js');
 
-const nonBlockingGlobalCssPlugin = () => ({
-  name: 'reflections-non-blocking-global-css',
-  transformIndexHtml: {
-    order: 'post' as const,
-    handler(html: string) {
-      return html.replace(
-        /<link rel="stylesheet"([^>]*?)href="([^"]*\/assets\/index-[^"]+\.css)"([^>]*)>/,
-        (_match, beforeHref: string, href: string, afterHref: string) => {
-          const attrs = `${beforeHref}href="${href}"${afterHref}`.trim();
-          return `<link rel="stylesheet" ${attrs} media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="${href}"></noscript>`;
-        },
-      );
-    },
-  },
-});
-
 const vendorChunk = (id: string) => {
   if (id.includes('vite/preload-helper')) return 'vendor-core';
   if (!id.includes('node_modules')) return undefined;
@@ -62,7 +46,6 @@ export default defineConfig(() => {
       },
       plugins: [
         react(),
-        nonBlockingGlobalCssPlugin(),
         VitePWA({
           registerType: 'autoUpdate',
           injectRegister: 'script-defer',
