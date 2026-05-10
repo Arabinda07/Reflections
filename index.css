@@ -570,6 +570,22 @@ details:focus-visible,
   transition: outline-offset 150ms ease, box-shadow 150ms ease;
 }
 
+.editor-title-input:focus-visible,
+.note-editor [contenteditable]:focus-visible {
+  outline: none;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.editor-title-input:focus-visible {
+  caret-color: var(--green);
+  color: color-mix(in oklch, var(--gray-text) 92%, var(--green));
+}
+
+.note-editor [contenteditable]:focus-visible {
+  caret-color: var(--green);
+}
+
 /* Hamburger → X morph transition (moved from inline styles for prefers-reduced-motion compliance) */
 .hamburger-line {
   transition: x1 0.3s ease, x2 0.3s ease, y1 0.3s ease, y2 0.3s ease, opacity 0.2s ease;
@@ -880,6 +896,10 @@ details:focus-visible,
 
   .editor-title-input::placeholder {
     color: oklch(from var(--border-color) l c h / 0.65);
+  }
+
+  .editor-title-input:focus-visible::placeholder {
+    color: oklch(from var(--border-color) l c h / 0.48);
   }
 
   @media (min-width: 640px) {

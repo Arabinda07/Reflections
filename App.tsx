@@ -28,12 +28,26 @@ const AuthCallback = lazy(() => import('@/pages/auth/AuthCallback').then((m) => 
 const HomeAuthenticated = lazy(() => import('@/pages/dashboard/HomeAuthenticated').then((m) => ({ default: m.HomeAuthenticated })));
 const NotFound = lazy(() => import('@/pages/NotFound').then((m) => ({ default: m.NotFound })));
 
-const withRouteFallback = (element: React.ReactNode) => (
-  <Suspense fallback={<RouteLoadingFrame />}>{element}</Suspense>
+const defaultRouteFallback = <RouteLoadingFrame />;
+const writingRouteFallback = (
+  <RouteLoadingFrame className="surface-scope-paper page-wash min-h-[100dvh] bg-body" />
 );
 
-const withProtectedRoute = (element: React.ReactNode) =>
-  withRouteFallback(<ProtectedRoute>{element}</ProtectedRoute>);
+const withRouteFallback = (
+  element: React.ReactNode,
+  fallback: React.ReactNode = defaultRouteFallback,
+) => (
+  <Suspense fallback={fallback}>{element}</Suspense>
+);
+
+const withProtectedRoute = (
+  element: React.ReactNode,
+  fallback: React.ReactNode = defaultRouteFallback,
+) =>
+  withRouteFallback(<ProtectedRoute fallback={fallback}>{element}</ProtectedRoute>, fallback);
+
+const withWritingProtectedRoute = (element: React.ReactNode) =>
+  withProtectedRoute(withRouteFallback(element, writingRouteFallback), writingRouteFallback);
 
 const RootLayout = () => (
   <>
@@ -65,8 +79,8 @@ const router = createBrowserRouter(
         <Route path={RoutePath.DASHBOARD_ALIAS} element={<Navigate to={RoutePath.DASHBOARD} replace />} />
         <Route path={RoutePath.DASHBOARD} element={withProtectedRoute(withRouteFallback(<HomeAuthenticated />))} />
         <Route path={RoutePath.NOTES} element={withProtectedRoute(withRouteFallback(<MyNotes />))} />
-        <Route path={RoutePath.CREATE_NOTE} element={withProtectedRoute(withRouteFallback(<CreateNote />))} />
-        <Route path={RoutePath.EDIT_NOTE} element={withProtectedRoute(withRouteFallback(<CreateNote />))} />
+        <Route path={RoutePath.CREATE_NOTE} element={withWritingProtectedRoute(<CreateNote />)} />
+        <Route path={RoutePath.EDIT_NOTE} element={withWritingProtectedRoute(<CreateNote />)} />
         <Route path={RoutePath.NOTE_DETAIL} element={withProtectedRoute(withRouteFallback(<SingleNote />))} />
         <Route path={RoutePath.RELEASE} element={withProtectedRoute(withRouteFallback(<ReleaseMode />))} />
         <Route path={RoutePath.FUTURE_LETTERS} element={withProtectedRoute(withRouteFallback(<FutureLetters />))} />

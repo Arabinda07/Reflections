@@ -90,6 +90,7 @@ export const DashboardLayout: React.FC = () => {
     location.pathname.startsWith(RoutePath.SANCTUARY);
 
   const isLandingRoute = location.pathname === RoutePath.HOME && !isAuthenticated;
+  const routeTransitionClass = isWritingRoute ? '' : 'animate-in fade-in duration-300 ease-out-expo';
 
   const navItems = isAuthenticated ? AUTH_NAV_ITEMS : GUEST_NAV_ITEMS;
   const sidebarNavItems = isAuthenticated ? AUTH_NAV_ITEMS : GUEST_SIDEBAR_NAV_ITEMS;
@@ -141,7 +142,7 @@ export const DashboardLayout: React.FC = () => {
         <div className="w-full flex-1 flex flex-col">
           <div
             key={location.pathname}
-            className="flex-1 flex flex-col w-full animate-in fade-in duration-300 ease-out-expo"
+            className={`flex-1 flex flex-col w-full ${routeTransitionClass}`.trim()}
           >
             {outlet}
           </div>

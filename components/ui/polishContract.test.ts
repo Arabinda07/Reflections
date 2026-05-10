@@ -37,4 +37,22 @@ describe('polish contract', () => {
     expect(startupScreen).not.toContain('animate-pulse');
     expect(appLaunch).toContain('NATIVE_STARTUP_MIN_MS = 650');
   });
+
+  it('uses the destination writing surface while Create Note auth and route chunks load', () => {
+    const app = read('App.tsx');
+    const protectedRoute = read('components/auth/ProtectedRoute.tsx');
+    const dashboardLayout = read('layouts/DashboardLayout.tsx');
+
+    expect(app).toContain('const writingRouteFallback');
+    expect(app).toContain('surface-scope-paper page-wash min-h-[100dvh] bg-body');
+    expect(app).toContain('const withWritingProtectedRoute');
+    expect(app).toContain('path={RoutePath.CREATE_NOTE} element={withWritingProtectedRoute(<CreateNote />)}');
+    expect(app).toContain('path={RoutePath.EDIT_NOTE} element={withWritingProtectedRoute(<CreateNote />)}');
+
+    expect(protectedRoute).toContain('fallback?: React.ReactNode;');
+    expect(protectedRoute).toContain('return <>{fallback}</>;');
+
+    expect(dashboardLayout).toContain("const routeTransitionClass = isWritingRoute ? '' : 'animate-in fade-in duration-300 ease-out-expo';");
+    expect(dashboardLayout).toContain('className={`flex-1 flex flex-col w-full ${routeTransitionClass}`.trim()}');
+  });
 });

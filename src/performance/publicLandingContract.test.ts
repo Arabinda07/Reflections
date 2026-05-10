@@ -112,7 +112,7 @@ describe('public landing performance contract', () => {
     expect(indexHtml).toContain('rel="preload" href="/assets/fonts/Spectral-Italic.woff2"');
   });
 
-  it('loads the global stylesheet without blocking the first render', () => {
+  it('keeps the global stylesheet render-blocking after the inline landing critical CSS', () => {
     const indexHtml = read('index.html');
     const viteConfig = read('vite.config.ts');
     const criticalStyleIndex = indexHtml.indexOf('<style id="critical-landing-css">');
@@ -127,11 +127,10 @@ describe('public landing performance contract', () => {
     expect(indexHtml).toContain('.public-header nav[aria-label="Public navigation"] a[aria-current="page"]');
     expect(indexHtml).toContain('.public-header nav[aria-label="Public navigation"] > a[href="/signup"]');
     expect(indexHtml).toContain('scrollbar-gutter: stable;');
-    expect(viteConfig).toContain('const nonBlockingGlobalCssPlugin');
-    expect(viteConfig).toContain('transformIndexHtml');
-    expect(viteConfig).toContain('media="print"');
-    expect(viteConfig).toContain('onload="this.media=\'all\'"');
-    expect(viteConfig).toContain('<noscript><link rel="stylesheet" href="${href}"></noscript>');
+    expect(viteConfig).not.toContain('nonBlockingGlobalCssPlugin');
+    expect(viteConfig).not.toContain('media="print"');
+    expect(viteConfig).not.toContain("this.media='all'");
+    expect(viteConfig).not.toContain('transformIndexHtml');
   });
 
   it('keeps component-only chrome out of the public landing stylesheet', () => {

@@ -4,12 +4,20 @@ import { useAuthStore } from '../../hooks/useAuthStore';
 import { RoutePath } from '../../types';
 import { RouteLoadingFrame } from '../ui/RouteLoadingFrame';
 
-export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
+}
+
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  children,
+  fallback = <RouteLoadingFrame />,
+}) => {
   const { isAuthenticated, isInitialCheckDone } = useAuthStore();
   const location = useLocation();
 
   if (!isInitialCheckDone) {
-    return <RouteLoadingFrame />;
+    return <>{fallback}</>;
   }
 
   if (!isAuthenticated) {

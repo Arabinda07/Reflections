@@ -30,4 +30,23 @@ describe('quill and chooser color contract', () => {
     expect(css).not.toContain('var(--popover-bg, #ffffff)');
     expect(css).not.toContain('dark:text-slate-300');
   });
+
+  it('keeps the Create Note writing surface quiet while preserving control focus states', () => {
+    const css = read('index.css');
+    const quill = read('components/ui/quill-snow.css');
+
+    expect(quill).toContain('@media (min-width: 641px) and (pointer: fine)');
+    expect(quill).toContain('width: 32px;');
+    expect(quill).toContain('height: 32px;');
+    expect(quill).toContain('stroke-width: 1.65;');
+    expect(quill).toContain('padding: 0 0 16px !important;');
+    expect(quill).not.toContain('border-bottom: 1px solid var(--border-color) !important;');
+    expect(quill).toContain('.note-editor .ql-toolbar.ql-snow button:focus-visible');
+    expect(quill).toContain('color: var(--green) !important;');
+
+    expect(css).toContain('.editor-title-input:focus-visible');
+    expect(css).toContain('.note-editor [contenteditable]:focus-visible');
+    expect(css).toContain('caret-color: var(--green);');
+    expect(css).toContain('box-shadow: none;');
+  });
 });
