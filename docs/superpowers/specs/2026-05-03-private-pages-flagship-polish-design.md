@@ -132,7 +132,7 @@ Tighten search, filtering, note cards, empty states, and calendar/list transitio
 
 ### CreateNote
 
-Protect the writing surface. Polish side panels, mobile controls, metadata chips, tasks, tags, cover image controls, AI reflection panels, and focus mode without changing save behavior.
+Protect the writing surface. Keep secondary controls behind Writing tools, and polish mobile controls, metadata chips, tasks, tags, cover image controls, and AI reflection panels without changing save behavior.
 
 ### SingleNote
 

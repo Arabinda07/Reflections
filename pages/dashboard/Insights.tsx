@@ -15,6 +15,7 @@ import { LottieAnimation } from '../../components/ui/LottieAnimation';
 import { Button } from '../../components/ui/Button';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { CompletionCardActions } from '../../components/ui/CompletionCardActions';
+import { GuideRow } from '../../components/ui/GuideRow';
 import { MetadataPill } from '../../components/ui/MetadataPill';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { SectionHeader } from '../../components/ui/SectionHeader';
@@ -316,25 +317,18 @@ export const Insights: React.FC = () => {
 
             <div className="mt-8 border-t border-border/60 pt-0">
               {/* Mood Frequency Accordion */}
-                <button
-                  type="button"
+                <GuideRow
+                  as="button"
                   onClick={() => setIsMoodOpen((prev) => !prev)}
-                  aria-expanded={isMoodOpen}
-                  aria-controls="insights-mood-panel"
-                  className="group/acc flex w-full items-center justify-between gap-4 py-6 text-left"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="tone-icon tone-icon-sky h-12 w-12 rounded-2xl transition-transform duration-500 ease-out-expo group-hover/acc:scale-110 group-hover/acc:rotate-6">
-                      <Heart size={18} weight="duotone" />
-                    </div>
-                    <h3 className="text-lg font-display font-bold text-gray-text transition-colors group-hover/acc:text-sky">Mood frequency</h3>
-                  </div>
-                  <CaretRight
-                    size={18}
-                    weight="bold"
-                    className={`shrink-0 text-gray-nav/40 transition-[color,transform] duration-500 ease-out-expo ${isMoodOpen ? 'rotate-90 text-sky' : 'group-hover/acc:translate-x-1'}`}
-                  />
-                </button>
+                  expanded={isMoodOpen}
+                  controls="insights-mood-panel"
+                  tone="sky"
+                  icon={<Heart size={18} weight="duotone" />}
+                  label="Mood"
+                  title="Mood frequency"
+                  titleAs="h2"
+                  className="py-6"
+                />
 
                 <div
                   id="insights-mood-panel"
@@ -384,25 +378,18 @@ export const Insights: React.FC = () => {
 
               {/* Recurring Tags Accordion */}
               <div>
-                <button
-                  type="button"
+                <GuideRow
+                  as="button"
                   onClick={() => setIsTagsOpen((prev) => !prev)}
-                  aria-expanded={isTagsOpen}
-                  aria-controls="insights-tags-panel"
-                  className="group/acc flex w-full items-center justify-between gap-4 py-6 text-left"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="tone-icon tone-icon-honey h-12 w-12 rounded-2xl transition-transform duration-500 ease-out-expo group-hover/acc:scale-110 group-hover/acc:-rotate-6">
-                      <Hash size={18} weight="duotone" />
-                    </div>
-                    <h3 className="text-lg font-display font-bold text-gray-text transition-colors group-hover/acc:text-honey">Recurring tags</h3>
-                  </div>
-                  <CaretRight
-                    size={18}
-                    weight="bold"
-                    className={`shrink-0 text-gray-nav/40 transition-[color,transform] duration-500 ease-out-expo ${isTagsOpen ? 'rotate-90 text-honey' : 'group-hover/acc:translate-x-1'}`}
-                  />
-                </button>
+                  expanded={isTagsOpen}
+                  controls="insights-tags-panel"
+                  tone="honey"
+                  icon={<Hash size={18} weight="duotone" />}
+                  label="Tags"
+                  title="Recurring tags"
+                  titleAs="h2"
+                  className="py-6"
+                />
 
                 <div
                   id="insights-tags-panel"
@@ -442,30 +429,19 @@ export const Insights: React.FC = () => {
           </Surface>
 
           <Surface variant="bezel" tone="sage" className="group relative overflow-hidden rounded-[2.5rem] transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-green/5">
-            <button
-              type="button"
+            <GuideRow
+              as="button"
               onClick={() => setIsOverviewOpen((current) => !current)}
-              aria-expanded={isOverviewOpen}
-              aria-controls="insights-overview-panel"
-              className="flex w-full items-center justify-between gap-4 p-6 text-left md:p-8"
-            >
-              <div className="flex items-center gap-3">
-                <div className="tone-icon tone-icon-sage h-12 w-12 rounded-2xl transition-transform duration-500 ease-out-expo group-hover:scale-110 group-hover:rotate-6">
-                  <Book size={18} weight="duotone" />
-                </div>
-                <div>
-                  <p className="label-caps text-green">Overview</p>
-                  <h2 className="mt-1 text-2xl font-display font-bold text-gray-text group-hover:text-green transition-colors duration-300">
-                    {stats.monthNotes} reflections this month
-                  </h2>
-                </div>
-              </div>
-              <CaretRight
-                size={18}
-                weight="bold"
-                className={`shrink-0 text-gray-nav/40 transition-[color,transform] duration-500 ease-out-expo ${isOverviewOpen ? 'rotate-90 text-green' : 'group-hover:translate-x-1'}`}
-              />
-            </button>
+              expanded={isOverviewOpen}
+              controls="insights-overview-panel"
+              tone="sage"
+              icon={<Book size={18} weight="duotone" />}
+              label="Overview"
+              title={`${stats.monthNotes} reflections this month`}
+              titleAs="h2"
+              className="p-6 md:p-8"
+              titleClassName="text-2xl"
+            />
 
             <div
                   id="insights-overview-panel"
@@ -490,28 +466,19 @@ export const Insights: React.FC = () => {
           </Surface>
 
           <Surface variant="flat" tone="honey" className="group relative overflow-hidden rounded-[2.5rem] transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-honey/5">
-            <button
-              type="button"
+            <GuideRow
+              as="button"
               onClick={() => setIsCompletionOpen((prev) => !prev)}
-              aria-expanded={isCompletionOpen}
-              aria-controls="insights-completion-panel"
-              className="flex w-full items-center justify-between gap-4 p-6 text-left md:p-8"
-            >
-              <div className="flex items-center gap-3">
-                <div className="tone-icon tone-icon-honey h-12 w-12 rounded-2xl transition-transform duration-500 ease-out-expo group-hover:scale-110 group-hover:-rotate-12">
-                  <Leaf size={18} weight="fill" />
-                </div>
-                <div>
-                  <p className="label-caps text-honey">Completion card</p>
-                  <h2 className="mt-1 text-2xl font-display font-bold text-gray-text group-hover:text-honey transition-colors duration-300">This week's card</h2>
-                </div>
-              </div>
-              <CaretRight
-                size={18}
-                weight="bold"
-                className={`shrink-0 text-gray-nav/40 transition-[color,transform] duration-500 ease-out-expo ${isCompletionOpen ? 'rotate-90 text-honey' : 'group-hover:translate-x-1'}`}
-              />
-            </button>
+              expanded={isCompletionOpen}
+              controls="insights-completion-panel"
+              tone="honey"
+              icon={<Leaf size={18} weight="fill" />}
+              label="Completion card"
+              title="This week's card"
+              titleAs="h2"
+              className="p-6 md:p-8"
+              titleClassName="text-2xl"
+            />
 
             <div
                   id="insights-completion-panel"

@@ -11,7 +11,7 @@ describe('polish contract', () => {
 
     expect(createNote).toContain('aria-label="Back to notes"');
     expect(createNote).toContain('aria-label="Remove cover image"');
-    expect(createNote).toContain('aria-label="Open reflection options"');
+    expect(createNote).toContain('aria-label="Open writing tools"');
     expect(createNote).toContain('aria-label="Show another writing prompt"');
     expect(createNote).toContain('aria-label="Save reflection"');
     expect(createNote).toContain('aria-label="Reflection title"');

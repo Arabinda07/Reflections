@@ -90,15 +90,15 @@ describe('focused product slice source contract', () => {
     expect(homeAuthenticated).toContain('Future letter');
     expect(homeAuthenticated).toContain('Your Rhythm');
     expect(homeAuthenticated).toContain('Before you write');
-    expect(homeAuthenticated).toContain('lg:grid-cols-[minmax(0,2fr)_minmax(20rem,0.95fr)]');
+    expect(homeAuthenticated).toContain('core-bento-grid');
+    expect(homeAuthenticated).toContain('aria-labelledby="today-reflection-heading"');
     expect(homeAuthenticated).not.toContain('Daily Focus');
     expect(homeAuthenticated).not.toContain('Start Reflection');
     expect(homeAuthenticated).not.toContain('Reflections Overview');
     expect(homeAuthenticated).not.toContain('Writing note');
     expect(homeAuthenticated).not.toContain('lg:grid-cols-3');
     
-    // Check for the specific combination of classes that was removed from the prompt
-    expect(homeAuthenticated).toContain('text-2xl md:text-3xl text-gray-text font-serif italic leading-relaxed');
+    expect(homeAuthenticated).toContain('dashboard-prompt-text');
   });
 
   it('removes quietly from live app and AI copy', () => {
