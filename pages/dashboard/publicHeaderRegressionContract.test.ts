@@ -126,7 +126,7 @@ describe('auth route shell contract', () => {
 
     expect(existsSync(path.resolve(process.cwd(), 'layouts/AuthAppShell.tsx'))).toBe(true);
     expect(app).toContain("const AuthAppShell = lazy(() => import('./layouts/AuthAppShell')");
-    expect(app).toContain('<Route element={withRouteFallback(<AuthAppShell />)} errorElement={<RouteErrorBoundary />}>');
+    expect(app).toContain('<Route element={withRouteFallback(<AuthAppShell />, authRouteFallback)} errorElement={<RouteErrorBoundary />}>');
 
     const authShellRoute = app.match(
       /<Route element={withRouteFallback\(<AuthAppShell \/>[^>]*>[\s\S]*?<\/Route>/,

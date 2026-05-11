@@ -8,13 +8,15 @@ interface NewsletterWelcomeEmailProps {
   loginUrl: string;
   unsubscribeUrl: string;
   preferencesUrl: string;
+  mailingAddress: string;
 }
 
 export const NewsletterWelcomeEmail = ({ 
   userName = 'there', 
   loginUrl = 'https://reflections.app/login',
-  unsubscribeUrl = 'https://reflections.app/account',
-  preferencesUrl = 'https://reflections.app/account'
+  unsubscribeUrl,
+  preferencesUrl = 'https://reflections.app/account',
+  mailingAddress
 }: NewsletterWelcomeEmailProps) => {
   return (
     <BaseEmailLayout previewText="Welcome to Reflections. You're subscribed to the weekly note.">
@@ -46,7 +48,11 @@ export const NewsletterWelcomeEmail = ({
         We're glad you're here. Take a few minutes before the day ends.
       </Text>
 
-      <UnsubscribeFooter unsubscribeUrl={unsubscribeUrl} preferencesUrl={preferencesUrl} />
+      <UnsubscribeFooter
+        unsubscribeUrl={unsubscribeUrl}
+        preferencesUrl={preferencesUrl}
+        mailingAddress={mailingAddress}
+      />
     </BaseEmailLayout>
   );
 };

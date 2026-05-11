@@ -6,6 +6,22 @@ const read = (filePath: string) =>
   readFileSync(path.resolve(process.cwd(), filePath), 'utf8');
 
 describe('auth route session handoff contract', () => {
+  it('keeps auth route lazy waits on a quiet paper surface', () => {
+    const app = read('App.tsx');
+
+    expect(app).toContain('const authRouteFallback = (');
+    expect(app).toContain('className="surface-scope-paper page-wash min-h-[100dvh] bg-body"');
+    expect(app).toContain('const withAuthRouteFallback = (element: React.ReactNode) =>');
+    expect(app).toContain('withRouteFallback(element, authRouteFallback);');
+    expect(app).toContain('<Route element={withRouteFallback(<AuthAppShell />, authRouteFallback)} errorElement={<RouteErrorBoundary />}>');
+    expect(app).toContain('path={RoutePath.LOGIN} element={withAuthRouteFallback(<SignIn />)}');
+    expect(app).toContain('path={RoutePath.SIGNUP} element={withAuthRouteFallback(<SignUp />)}');
+    expect(app).toContain('path={RoutePath.RESET_PASSWORD} element={withAuthRouteFallback(<ResetPassword />)}');
+    expect(app).toContain('path={RoutePath.AUTH_CALLBACK} element={withAuthRouteFallback(<AuthCallback />)}');
+    expect(app).toContain('const defaultRouteFallback = <RouteLoadingFrame />;');
+    expect(app).toContain('path={RoutePath.HOME} element={<Landing />}');
+  });
+
   it('commits a Supabase session before redirecting from auth flows', () => {
     const callback = read('pages/auth/AuthCallback.tsx');
     const signIn = read('pages/auth/SignIn.tsx');

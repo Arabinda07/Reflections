@@ -36,6 +36,8 @@ create table if not exists profiles (
   full_name text,
   avatar_url text,
   plan text default 'free', -- 'free' or 'pro'
+  newsletter_opt_in boolean default false,
+  newsletter_unsubscribed_at timestamptz,
   free_ai_reflections_used int default 0,
   free_wiki_insights_used int default 0,
   updated_at timestamp with time zone default timezone('utc'::text, now())
@@ -99,8 +101,13 @@ for each row execute function enforce_note_limit();
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.profiles (id, full_name, avatar_url)
-  values (new.id, new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'avatar_url');
+  insert into public.profiles (id, full_name, avatar_url, newsletter_opt_in)
+  values (
+    new.id,
+    new.raw_user_meta_data->>'full_name',
+    new.raw_user_meta_data->>'avatar_url',
+    coalesce((new.raw_user_meta_data->>'newsletter_opt_in')::boolean, false)
+  );
   return new;
 end;
 $$ language plpgsql security definer;

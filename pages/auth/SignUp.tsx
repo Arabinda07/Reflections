@@ -42,7 +42,7 @@ export const SignUp: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [newsletterOptIn, setNewsletterOptIn] = useState(true);
+  const [newsletterOptIn, setNewsletterOptIn] = useState(false);
   const postLoginPath = resolvePostAuthRedirectPath(location.state?.from);
   const referralRecordedRef = useRef(false);
 

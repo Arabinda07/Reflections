@@ -1,20 +1,18 @@
 import { Text, Button, Section } from '@react-email/components';
 import { BaseEmailLayout } from '../components/BaseEmailLayout.tsx';
 import { EmailHeader } from '../components/EmailHeader.tsx';
-import { UnsubscribeFooter } from '../components/UnsubscribeFooter.tsx';
+import { SupportFooter } from '../components/SupportFooter.tsx';
 
 interface WelcomeEmailProps {
   userName?: string;
   loginUrl: string;
-  unsubscribeUrl: string;
-  preferencesUrl: string;
+  supportEmail: string;
 }
 
 export const WelcomeEmail = ({ 
   userName = 'there', 
   loginUrl = 'https://reflections.app/login',
-  unsubscribeUrl = 'https://reflections.app/account',
-  preferencesUrl = 'https://reflections.app/account'
+  supportEmail = 'robinsaha434@gmail.com'
 }: WelcomeEmailProps) => {
   return (
     <BaseEmailLayout previewText="Welcome to Reflections. A place for your thoughts.">
@@ -42,7 +40,7 @@ export const WelcomeEmail = ({
         We're glad you're here. Take a few minutes before the day ends.
       </Text>
 
-      <UnsubscribeFooter unsubscribeUrl={unsubscribeUrl} preferencesUrl={preferencesUrl} />
+      <SupportFooter supportEmail={supportEmail} />
     </BaseEmailLayout>
   );
 };

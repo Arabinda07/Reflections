@@ -16,6 +16,17 @@ begin
   end if;
 end $$;
 
+-- 1b. Add newsletter_unsubscribed_at column to profiles if it doesn't exist
+do $$
+begin
+  if not exists (
+    select 1 from information_schema.columns
+    where table_name = 'profiles' and column_name = 'newsletter_unsubscribed_at'
+  ) then
+    alter table profiles add column newsletter_unsubscribed_at timestamptz;
+  end if;
+end $$;
+
 -- 2. Add smart_mode_enabled column to profiles if it doesn't exist
 do $$
 begin

@@ -13,8 +13,9 @@ describe('landing first-paint contract', () => {
     expect(existsSync(path.resolve(process.cwd(), 'components/ui/RouteLoadingFrame.tsx'))).toBe(true);
     expect(app).toContain("import { RouteLoadingFrame } from './components/ui/RouteLoadingFrame';");
     expect(app).toContain("import { Landing } from './pages/dashboard/Landing';");
-    expect(app).toContain('const withRouteFallback = (element: React.ReactNode) => (');
-    expect(app).toContain('fallback={<RouteLoadingFrame />}');
+    expect(app).toContain('const defaultRouteFallback = <RouteLoadingFrame />;');
+    expect(app).toContain('const withRouteFallback = (');
+    expect(app).toContain('fallback: React.ReactNode = defaultRouteFallback');
     expect(app).toContain('path={RoutePath.HOME} element={<Landing />}');
     expect(app).not.toContain('const PageLoader');
     expect(app).not.toContain('<Suspense fallback={<PageLoader />}>');

@@ -16,6 +16,7 @@ describe('newsletter CTA contract', () => {
     expect(signUp).toContain('NEWSLETTER_SIGNUP_LABEL');
     expect(signUp).toContain('buildNewsletterOptInMetadata(newsletterOptIn)');
     expect(signUp).toContain('{NEWSLETTER_SIGNUP_LABEL}');
+    expect(signUp).toContain('useState(false)');
 
     expect(proUpgrade).toContain('NEWSLETTER_SIGNUP_LABEL');
     expect(proUpgrade).toContain('{NEWSLETTER_SIGNUP_LABEL}');

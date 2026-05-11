@@ -18,6 +18,7 @@ create table if not exists profiles (
   avatar_url text,
   plan text default 'free',
   newsletter_opt_in boolean default false,
+  newsletter_unsubscribed_at timestamptz,
   free_ai_reflections_used int default 0,
   free_wiki_insights_used int default 0,
   smart_mode_enabled boolean default false,
@@ -480,6 +481,14 @@ begin
     where table_name = 'profiles' and column_name = 'newsletter_opt_in'
   ) then
     alter table profiles add column newsletter_opt_in boolean default false;
+  end if;
+
+  -- Add newsletter_unsubscribed_at column to profiles if missing
+  if not exists (
+    select 1 from information_schema.columns
+    where table_name = 'profiles' and column_name = 'newsletter_unsubscribed_at'
+  ) then
+    alter table profiles add column newsletter_unsubscribed_at timestamptz;
   end if;
 
   -- Add smart_mode_enabled column to profiles if missing

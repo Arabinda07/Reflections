@@ -29,6 +29,12 @@ const HomeAuthenticated = lazy(() => import('@/pages/dashboard/HomeAuthenticated
 const NotFound = lazy(() => import('@/pages/NotFound').then((m) => ({ default: m.NotFound })));
 
 const defaultRouteFallback = <RouteLoadingFrame />;
+const authRouteFallback = (
+  <div
+    aria-hidden="true"
+    className="surface-scope-paper page-wash min-h-[100dvh] bg-body"
+  />
+);
 const writingRouteFallback = (
   <RouteLoadingFrame className="surface-scope-paper page-wash min-h-[100dvh] bg-body" />
 );
@@ -45,6 +51,9 @@ const withProtectedRoute = (
   fallback: React.ReactNode = defaultRouteFallback,
 ) =>
   withRouteFallback(<ProtectedRoute fallback={fallback}>{element}</ProtectedRoute>, fallback);
+
+const withAuthRouteFallback = (element: React.ReactNode) =>
+  withRouteFallback(element, authRouteFallback);
 
 const withWritingProtectedRoute = (element: React.ReactNode) =>
   withProtectedRoute(withRouteFallback(element, writingRouteFallback), writingRouteFallback);
@@ -66,13 +75,13 @@ const router = createBrowserRouter(
         <Route path={RoutePath.PRIVACY} element={withRouteFallback(<PrivacyPolicy />)} />
       </Route>
 
-      <Route element={withRouteFallback(<AuthAppShell />)} errorElement={<RouteErrorBoundary />}>
+      <Route element={withRouteFallback(<AuthAppShell />, authRouteFallback)} errorElement={<RouteErrorBoundary />}>
         <Route path="/signin" element={<Navigate to={RoutePath.LOGIN} replace />} />
         <Route path="/sign-in" element={<Navigate to={RoutePath.LOGIN} replace />} />
-        <Route path={RoutePath.LOGIN} element={withRouteFallback(<SignIn />)} />
-        <Route path={RoutePath.SIGNUP} element={withRouteFallback(<SignUp />)} />
-        <Route path={RoutePath.RESET_PASSWORD} element={withRouteFallback(<ResetPassword />)} />
-        <Route path={RoutePath.AUTH_CALLBACK} element={withRouteFallback(<AuthCallback />)} />
+        <Route path={RoutePath.LOGIN} element={withAuthRouteFallback(<SignIn />)} />
+        <Route path={RoutePath.SIGNUP} element={withAuthRouteFallback(<SignUp />)} />
+        <Route path={RoutePath.RESET_PASSWORD} element={withAuthRouteFallback(<ResetPassword />)} />
+        <Route path={RoutePath.AUTH_CALLBACK} element={withAuthRouteFallback(<AuthCallback />)} />
       </Route>
 
       <Route element={withRouteFallback(<AuthenticatedAppShell />)} errorElement={<RouteErrorBoundary />}>

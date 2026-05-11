@@ -49,6 +49,7 @@ grant select (
   full_name,
   avatar_url,
   newsletter_opt_in,
+  newsletter_unsubscribed_at,
   smart_mode_enabled,
   updated_at
 ) on table public.profiles to authenticated;
