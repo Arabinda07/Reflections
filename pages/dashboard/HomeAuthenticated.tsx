@@ -2,7 +2,6 @@ import {
   Archive,
   ArrowsClockwise,
   Brain,
-  CaretRight,
   CheckCircle as CheckCircleIcon,
   Feather,
   FolderOpen,
@@ -18,10 +17,10 @@ import {
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { isSameDay } from 'date-fns';
 
 import { AmbientMusicButton } from '../../components/ui/AmbientMusicButton';
 import { Button } from '../../components/ui/Button';
+import { GuideRow } from '../../components/ui/GuideRow';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { useToast } from '../../components/ui/Toast';
 import { useAuthStore } from '../../hooks/useAuthStore';
@@ -41,6 +40,8 @@ import {
 import { MOOD_CONFIG, MOOD_OPTIONS } from './moodConfig';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 
+const HOME_WELCOME_INTRO_SESSION_KEY = 'reflections.homeWelcomeIntro.dismissed';
+const WELCOME_INTRO_AUTO_DISMISS_MS = 1800;
 
 const WRITING_NOTES = [
   {
@@ -93,6 +94,76 @@ const ONBOARDING_STEPS = [
 
 const onboardingStepIcons = [NotePencil, Feather, LockKey, Archive] as const;
 
+type HomeWelcomeIntroProps = {
+  displayName: string;
+  shouldReduceMotion: boolean;
+  onDismiss: () => void;
+};
+
+const HomeWelcomeIntro: React.FC<HomeWelcomeIntroProps> = ({
+  displayName,
+  shouldReduceMotion,
+  onDismiss,
+}) => {
+  const [isIntroVideoReady, setIsIntroVideoReady] = useState(false);
+
+  useEffect(() => {
+    const timer = window.setTimeout(onDismiss, WELCOME_INTRO_AUTO_DISMISS_MS);
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onDismiss();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onDismiss]);
+
+  return (
+    <div
+      className="home-welcome-intro"
+    >
+      <img
+        src="/assets/videos/field.png"
+        alt=""
+        aria-hidden="true"
+        loading="eager"
+        decoding="async"
+        className="home-welcome-intro__media opacity-100"
+      />
+      {!shouldReduceMotion ? (
+        <video
+          src="/assets/videos/field.mp4"
+          poster="/assets/videos/field.png"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
+          onLoadedData={() => setIsIntroVideoReady(true)}
+          className={`home-welcome-intro__media bg-transparent transition-opacity duration-500 ease-out-expo ${
+            isIntroVideoReady ? 'opacity-95' : 'opacity-0'
+          }`}
+        />
+      ) : null}
+      <div className="home-welcome-intro__scrim" aria-hidden="true" />
+      <button type="button" onClick={onDismiss} className="home-welcome-intro__skip">
+        Skip
+      </button>
+      <div className="home-welcome-intro__copy">
+        <p className="label-caps text-white/80">Welcome back</p>
+        <h2 className="mt-4 text-[clamp(3rem,12vw,7.5rem)] font-display font-extrabold leading-none tracking-normal text-white text-balance">
+          {displayName}
+        </h2>
+      </div>
+    </div>
+  );
+};
+
 
 
 export const HomeAuthenticated: React.FC = () => {
@@ -120,10 +191,20 @@ export const HomeAuthenticated: React.FC = () => {
   const [newTaskText, setNewTaskText] = useState('');
   const [isCreatingTask, setIsCreatingTask] = useState(false);
   const [isIntentionModalOpen, setIsIntentionModalOpen] = useState(false);
-  const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);
+  const [hasSeenOnboardingBefore, setHasSeenOnboardingBefore] = useState(false);
+  const [isWelcomeIntroDismissed, setIsWelcomeIntroDismissed] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return window.sessionStorage.getItem(HOME_WELCOME_INTRO_SESSION_KEY) === 'true';
+  });
   const shouldReduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const { showToast } = useToast();
   const authStoreDisplayName = user?.name?.trim() || 'Reflector';
+  const shouldShowWelcomeIntro =
+    hasSeenOnboardingBefore &&
+    !showOnboarding &&
+    !isFromSave &&
+    !shouldReduceMotion &&
+    !isWelcomeIntroDismissed;
 
 
   const currentOnboardingStep = ONBOARDING_STEPS[onboardingStep];
@@ -172,6 +253,7 @@ export const HomeAuthenticated: React.FC = () => {
     loadQuotes();
 
     const hasSeen = localStorage.getItem('hasSeenOnboarding');
+    setHasSeenOnboardingBefore(Boolean(hasSeen));
     if (!hasSeen) setShowOnboarding(true);
   }, []);
 
@@ -308,6 +390,17 @@ export const HomeAuthenticated: React.FC = () => {
     navigate(RoutePath.CREATE_NOTE);
   };
 
+  const dismissWelcomeIntro = useCallback(() => {
+    sessionStorage.setItem(HOME_WELCOME_INTRO_SESSION_KEY, 'true');
+    setIsWelcomeIntroDismissed(true);
+  }, []);
+
+  useEffect(() => {
+    if (shouldReduceMotion && !isWelcomeIntroDismissed) {
+      dismissWelcomeIntro();
+    }
+  }, [dismissWelcomeIntro, isWelcomeIntroDismissed, shouldReduceMotion]);
+
 
   const handleMoodCheckIn = async (mood: string) => {
     if (isSavingCheckIn) return;
@@ -408,67 +501,31 @@ export const HomeAuthenticated: React.FC = () => {
         className="surface-scope-sage page-wash relative min-h-full flex flex-col flex-1 bg-body selection:bg-green/10"
         aria-hidden={showOnboarding ? 'true' : undefined}
       >
-        <section className="relative isolate h-[56dvh] min-h-[360px] w-full overflow-hidden bg-body sm:h-[60dvh] sm:min-h-[450px]">
-          <img
-            src="/assets/videos/field.png"
-            alt=""
-            aria-hidden="true"
-            loading="eager"
-            decoding="async"
-            className="absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center opacity-100"
-          />
-          <video
-            src="/assets/videos/field.mp4"
-            poster="/assets/videos/field.png"
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="metadata"
-            onLoadedData={() => setIsHeroVideoReady(true)}
-            className={`absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center bg-transparent transition-opacity duration-700 ease-out-expo ${
-              isHeroVideoReady ? 'opacity-95' : 'opacity-0'
-            }`}
-          >
-          </video>
-          <div className="absolute inset-0 z-10 hero-scrim" />
-          <div className="absolute inset-0 z-10 screen-scrim opacity-20" />
-          <div className="absolute inset-0 bg-gradient-to-t from-body via-transparent to-transparent z-10" />
-
-          <div className="relative z-20 h-full flex flex-col items-center justify-start pt-[10vh] text-center px-6">
-            <div
-              className="max-w-4xl animate-fade-in-up"
-            >
-              <h1 className="h1-hero hero-ink mb-12 text-balance">
-                <span className="whitespace-nowrap">Welcome back,</span> <br />
-                <span className="font-serif italic hero-ink-accent">
-                  {authStoreDisplayName}
-                </span>
-              </h1>
-            </div>
-          </div>
-
-
+        <section className="mx-auto w-full max-w-[1440px] px-6 pt-8 sm:px-10 lg:px-16 lg:pt-10">
+          <p className="text-sm font-bold text-gray-nav">
+            Welcome back, <span className="font-serif italic text-gray-text">{authStoreDisplayName}</span>
+          </p>
         </section>
 
         <section
           className="core-bento-grid"
         >
           <div
-            className="group relative surface-flat overflow-hidden rounded-[2.5rem] p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full transition-[border-color,box-shadow] duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-green/5 hover:border-green/10 animate-fade-in-up"
+            aria-labelledby="today-reflection-heading"
+            className="group relative surface-flat overflow-hidden rounded-[2.5rem] p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full transition-[border-color,box-shadow] duration-300 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-green/5 hover:border-green/10"
           >
             <div className="relative z-10">
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-2 text-gray-nav">
                   <Target size={18} weight="duotone" className="text-green" />
-                  <span className="label-caps">
+                  <h1 id="today-reflection-heading" className="label-caps">
                     Today's Reflection
-                  </span>
+                  </h1>
                 </div>
                 <button
                   onClick={refreshPrompt}
                   className={`flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] text-gray-nav transition-colors hover:text-green ${
-                    isRefreshing ? 'animate-spin' : ''
+                    isRefreshing ? 'opacity-50' : 'opacity-100'
                   }`}
                   aria-label="Refresh today's reflection prompt"
                 >
@@ -609,13 +666,11 @@ export const HomeAuthenticated: React.FC = () => {
                 )}
               </div>
             </div>
-            {/* Subtle background glow effect on hover */}
-            <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-green/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
           </div>
 
           <div className="grid gap-6">
             <div
-              className="group relative surface-flat surface-tone-sky overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-sky/5 animate-fade-in-up anim-delay-1"
+              className="group relative surface-flat surface-tone-sky overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-shadow duration-300 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-sky/5"
             >
               <div className="relative z-10">
               <div className="mb-6 flex items-center gap-2 text-gray-nav">
@@ -637,43 +692,35 @@ export const HomeAuthenticated: React.FC = () => {
               </div>
 
               <div className="space-y-3">
-                <button
+                <GuideRow
+                  as="button"
                   onClick={() => navigate(RoutePath.NOTES)}
-                  className="surface-inline-panel surface-tone-sage dashboard-tone-card group flex w-full items-center justify-between p-4 text-left transition-colors"
-                  aria-label="View all reflections"
-                >
-                  <div className="flex items-center gap-3">
-                    <FolderOpen size={18} weight="duotone" className="text-gray-nav group-hover:text-green transition-transform duration-300 group-hover:rotate-6" />
-                    <div>
-                      <p className="dashboard-action-title dashboard-hover-title">View archive</p>
-                      <p className="dashboard-action-description">Read saved reflections</p>
-                    </div>
-                  </div>
-                  <CaretRight size={16} weight="regular" className="text-gray-nav/40 group-hover:text-green transition-colors" />
-                </button>
+                  tone="sage"
+                  icon={<FolderOpen size={18} weight="duotone" />}
+                  label="Archive"
+                  title="View archive"
+                  description="Read saved reflections"
+                  className="surface-inline-panel surface-tone-sage dashboard-tone-card p-4"
+                  ariaLabel="View all reflections"
+                />
 
-                <button
+                <GuideRow
+                  as="button"
                   onClick={() => navigate(RoutePath.INSIGHTS)}
-                  className="surface-inline-panel surface-tone-sky dashboard-tone-card group flex w-full items-center justify-between p-4 text-left transition-colors"
-                  aria-label="View writing patterns"
-                >
-                  <div className="flex items-center gap-3">
-                    <Brain size={18} weight="duotone" className="text-sky transition-transform duration-300 group-hover:-rotate-6" />
-                    <div>
-                      <p className="dashboard-action-title dashboard-hover-title">Writing patterns</p>
-                      <p className="dashboard-action-description">Mood, rhythm, and recurring themes</p>
-                    </div>
-                  </div>
-                  <CaretRight size={16} weight="regular" className="text-gray-nav/40 group-hover:text-sky transition-colors" />
-                </button>
+                  tone="sky"
+                  icon={<Brain size={18} weight="duotone" />}
+                  label="Patterns"
+                  title="Writing patterns"
+                  description="Mood, rhythm, and recurring themes"
+                  className="surface-inline-panel surface-tone-sky dashboard-tone-card p-4"
+                  ariaLabel="View writing patterns"
+                />
               </div>
             </div>
-            {/* Subtle background glow effect on hover */}
-
           </div>
 
             <div
-              className="group relative surface-flat surface-tone-honey overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-honey/5 animate-fade-in-up anim-delay-2"
+              className="group relative surface-flat surface-tone-honey overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-shadow duration-300 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-honey/5"
             >
               <div className="relative z-10">
               <div className="mb-8 flex items-center gap-2 text-gray-nav">
@@ -701,12 +748,18 @@ export const HomeAuthenticated: React.FC = () => {
                 </div>
                 </div>
               </div>
-              {/* Subtle sweep effect on hover */}
-              <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-honey/0 via-honey/5 to-honey/0 translate-x-[-100%] transition-transform duration-1000 group-hover:translate-x-[100%]" />
             </div>
           </div>
         </section>
       </div>
+
+      {shouldShowWelcomeIntro ? (
+        <HomeWelcomeIntro
+          displayName={authStoreDisplayName}
+          shouldReduceMotion={shouldReduceMotion}
+          onDismiss={dismissWelcomeIntro}
+        />
+      ) : null}
 
       <ModalSheet
         isOpen={showOnboarding}
@@ -750,7 +803,7 @@ export const HomeAuthenticated: React.FC = () => {
       >
           <div
             key={currentOnboardingStep.title}
-            className="onboarding-step-copy flex min-h-[18rem] flex-col justify-between gap-6 pb-1 sm:min-h-[19rem] animate-fade-in-up"
+            className="onboarding-step-copy flex min-h-[18rem] flex-col justify-between gap-6 pb-1 sm:min-h-[19rem]"
           >
             <div className="space-y-4">
               <p className="label-caps text-green" aria-live="polite">
@@ -817,9 +870,9 @@ export const HomeAuthenticated: React.FC = () => {
                       type="button"
                       onClick={() => handleMoodCheckIn(moodOption)}
                       disabled={isSavingCheckIn}
-                      className={`group rounded-[1.5rem] border p-5 text-left transition-[border-color,background-color,box-shadow,transform,opacity] duration-300 ease-out-expo disabled:opacity-60 hover:scale-[1.02] hover:shadow-lg ${moodConfig.option}`}
+                      className={`group rounded-[1.5rem] border p-5 text-left transition-[border-color,background-color,box-shadow,opacity] duration-300 ease-out-expo disabled:opacity-60 hover:shadow-lg ${moodConfig.option}`}
                     >
-                      <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl [background-color:oklch(from_var(--bg-color)_l_c_h_/_0.5)] transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-12">
+                      <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl [background-color:oklch(from_var(--bg-color)_l_c_h_/_0.5)]">
                         <Icon size={24} weight="duotone" className={moodConfig.labelClass} />
                       </div>
                       <span className="text-base font-bold text-gray-text transition-colors group-hover:text-green">{moodConfig.label}</span>
@@ -835,9 +888,7 @@ export const HomeAuthenticated: React.FC = () => {
                   <p className="text-sm font-bold text-clay">Could not save that just now.</p>
                 ) : (
                   <>
-                    <div 
-                      className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green/10 text-green animate-shake-x"
-                    >
+                    <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green/10 text-green">
                       {MOOD_CONFIG[checkInFeedback]?.icon && React.createElement(MOOD_CONFIG[checkInFeedback].icon, { size: 32, weight: "fill" })}
                     </div>
                     <h3 className="label-caps mb-2 text-green">Recorded</h3>

@@ -159,8 +159,8 @@ describe('private flagship polish contract', () => {
     const createNote = read('pages/dashboard/CreateNote.tsx');
     const singleNote = read('pages/dashboard/SingleNote.tsx');
 
-    expect(createNote).toContain('aria-label="Exit focus mode"');
-    expect(createNote).toContain('aria-pressed={isFocusModeEnabled}');
+    expect(createNote).toContain('aria-label="Open writing tools"');
+    expect(createNote).toContain('Writing tools');
     expect(createNote).toContain('aria-label={`Remove ${tag} tag`}');
     expect(createNote).toMatch(/aria-label=\{`Remove \$\{tag\} tag`\}[\s\S]*min-h-11[\s\S]*min-w-11/);
     expect(createNote).toMatch(/MOOD_OPTIONS\.map[\s\S]*min-h-11/);
@@ -641,58 +641,25 @@ Expected: commit succeeds and touches only `pages/dashboard/LifeWiki.tsx`.
 - Test: `pages/dashboard/visualParityContract.test.ts`
 - Test: `pages/dashboard/taskAccessibilityContract.test.ts`
 
-- [ ] **Step 1: Label the focus-mode exit control**
+- [ ] **Step 1: Keep Writing tools as the secondary controls entrypoint**
 
-In `pages/dashboard/CreateNote.tsx`, replace:
+In `pages/dashboard/CreateNote.tsx`, keep secondary controls behind the Writing tools sheet. The contract should expect:
 
-```tsx
-className="surface-floating fixed right-4 z-[85] inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 label-caps text-green hover:text-green"
-style={{ top: NATIVE_TOP_CONTROL_OFFSET }}
->
+```ts
+expect(createNote).toContain('isWritingToolsOpen');
+expect(createNote).toContain('renderWritingToolGrid');
+expect(createNote).toContain('aria-label="Open writing tools"');
 ```
 
-with:
+- [ ] **Step 2: Keep the editor layout stable**
+
+In `pages/dashboard/CreateNote.tsx`, keep the editor measure fixed to the normal writing layout:
 
 ```tsx
-className="surface-floating fixed right-4 z-[85] inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 label-caps text-green hover:text-green"
-style={{ top: NATIVE_TOP_CONTROL_OFFSET }}
-aria-label="Exit focus mode"
->
+className="editor-writing-measure mr-auto lg:ml-12 xl:ml-24"
 ```
 
-- [ ] **Step 2: Add pressed state to the focus-mode toggle**
-
-In `pages/dashboard/CreateNote.tsx`, find the focus-mode toggle button with `Focus mode` text. Add:
-
-```tsx
-aria-pressed={isFocusModeEnabled}
-```
-
-The opening button should include:
-
-```tsx
-<button
-  type="button"
-  onClick={() => {
-    setIsFocusModeEnabled((current) => {
-      const next = !current;
-      if (!next) {
-        setIsFlowing(false);
-      } else {
-        setIsFlowing(true);
-        lastFocusToggleRef.current = Date.now();
-      }
-      return next;
-    });
-  }}
-  aria-pressed={isFocusModeEnabled}
-  className={`inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 label-caps transition-colors sm:min-h-0 sm:px-3 sm:py-1 ${
-    isFocusModeEnabled
-      ? 'bg-green text-white'
-      : 'control-surface text-gray-text hover:bg-green/10 hover:text-green'
-  }`}
->
-```
+The surrounding chrome should remain available while writing tools are invited explicitly.
 
 - [ ] **Step 3: Make tag removal controls easier to operate**
 

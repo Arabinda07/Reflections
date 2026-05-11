@@ -15,9 +15,9 @@ import {
   Check,
   CircleNotch,
   EnvelopeSimple,
-  CaretDown,
 } from '@phosphor-icons/react';
 import { Button } from '../../components/ui/Button';
+import { GuideRow } from '../../components/ui/GuideRow';
 import { Input } from '../../components/ui/Input';
 import { Alert } from '../../components/ui/Alert';
 import { MetadataPill } from '../../components/ui/MetadataPill';
@@ -486,22 +486,17 @@ export const Account: React.FC = () => {
               <div className="grid gap-4 p-6 md:grid-cols-2 lg:p-8">
                 <Surface variant="bezel" tone="paper">
                   <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors duration-300 hover:bg-gray-text/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green">
-                      <div className="flex items-center gap-3">
-                        <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
-                          <Sparkle size={24} weight="duotone" className="text-green" />
-                        </div>
-                        <div>
-                          <p className="dashboard-caption text-gray-nav/60">Membership</p>
-                          <h3 className="text-[20px] font-display font-bold text-gray-text capitalize group-hover:text-green transition-colors">
-                            {access?.planTier || 'Free'} plan
-                          </h3>
-                        </div>
-                      </div>
-                      <div className="text-gray-nav/40 transition-[color,transform] duration-500 group-open:rotate-180 group-hover:text-green">
-                        <CaretDown size={20} weight="bold" />
-                      </div>
-                    </summary>
+                    <GuideRow
+                      as="summary"
+                      caret="down"
+                      tone="sage"
+                      icon={<Sparkle size={22} weight="duotone" />}
+                      label="Membership"
+                      title={`${access?.planTier || 'Free'} plan`}
+                      titleAs="h3"
+                      className="p-5"
+                      titleClassName="capitalize"
+                    />
                     <div className="border-t border-border/50 p-5 pt-4 space-y-4">
                       <div className="flex flex-wrap gap-2">
                         <MetadataPill tone={access?.planTier === 'pro' ? 'green' : undefined}>
@@ -520,20 +515,16 @@ export const Account: React.FC = () => {
 
                 <Surface variant="bezel" tone="paper">
                   <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors duration-300 hover:bg-gray-text/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky">
-                      <div className="flex items-center gap-3">
-                        <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
-                          <ShieldCheck size={24} weight="duotone" className="text-sky" />
-                        </div>
-                        <div>
-                          <p className="dashboard-caption text-gray-nav/60">Security</p>
-                          <h3 className="text-[20px] font-display font-bold text-gray-text group-hover:text-sky transition-colors">Keep this private</h3>
-                        </div>
-                      </div>
-                      <div className="text-gray-nav/40 transition-[color,transform] duration-500 group-open:rotate-180 group-hover:text-sky">
-                        <CaretDown size={20} weight="bold" />
-                      </div>
-                    </summary>
+                    <GuideRow
+                      as="summary"
+                      caret="down"
+                      tone="sky"
+                      icon={<ShieldCheck size={22} weight="duotone" />}
+                      label="Security"
+                      title="Keep this private"
+                      titleAs="h3"
+                      className="p-5"
+                    />
                     <div className="border-t border-border/50 p-5 pt-4 space-y-4">
                       <div className="space-y-3">
                         <button
@@ -586,20 +577,16 @@ export const Account: React.FC = () => {
 
                 <Surface variant="bezel" tone="paper">
                   <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors duration-300 hover:bg-gray-text/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-honey">
-                      <div className="flex items-center gap-3">
-                        <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12">
-                          <EnvelopeSimple size={24} weight="duotone" className="text-honey" />
-                        </div>
-                        <div>
-                          <p className="dashboard-caption text-gray-nav/60">Invites</p>
-                          <h3 className="text-[20px] font-display font-bold text-gray-text group-hover:text-honey transition-colors">Share Reflections</h3>
-                        </div>
-                      </div>
-                      <div className="text-gray-nav/40 transition-[color,transform] duration-500 group-open:rotate-180 group-hover:text-honey">
-                        <CaretDown size={20} weight="bold" />
-                      </div>
-                    </summary>
+                    <GuideRow
+                      as="summary"
+                      caret="down"
+                      tone="honey"
+                      icon={<EnvelopeSimple size={22} weight="duotone" />}
+                      label="Invites"
+                      title="Share Reflections"
+                      titleAs="h3"
+                      className="p-5"
+                    />
                     <div className="border-t border-border/50 p-5 pt-4 space-y-4">
                       <p className="text-[14px] font-medium leading-relaxed text-gray-light">
                         Account tracks how many people joined from your invite. There is no prize or public list.
@@ -611,20 +598,16 @@ export const Account: React.FC = () => {
 
                 <Surface variant="bezel" tone="paper">
                   <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors duration-300 hover:bg-gray-text/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green">
-                      <div className="flex items-center gap-3">
-                        <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-12">
-                          <Sparkle size={24} weight="duotone" className="text-green" />
-                        </div>
-                        <div>
-                          <p className="dashboard-caption text-gray-nav/60">Life Wiki</p>
-                          <h3 className="text-[20px] font-display font-bold text-gray-text group-hover:text-green transition-colors">Smart Mode</h3>
-                        </div>
-                      </div>
-                      <div className="text-gray-nav/40 transition-[color,transform] duration-500 group-open:rotate-180 group-hover:text-green">
-                        <CaretDown size={20} weight="bold" />
-                      </div>
-                    </summary>
+                    <GuideRow
+                      as="summary"
+                      caret="down"
+                      tone="sage"
+                      icon={<Sparkle size={22} weight="duotone" />}
+                      label="Life Wiki"
+                      title="Smart Mode"
+                      titleAs="h3"
+                      className="p-5"
+                    />
                     <div className="border-t border-border/50 p-5 pt-4 space-y-4">
                       <p className="text-[14px] font-medium leading-relaxed text-gray-light">
                         Keep AI on demand by default, or let Smart Mode refresh the Life Wiki after saves. Your writing screen stays quiet either way.
@@ -689,20 +672,17 @@ export const Account: React.FC = () => {
               <div className="p-6 lg:p-8">
                 <Surface variant="bezel" tone="clay">
                   <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors hover:bg-clay/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-clay">
-                      <div className="flex items-center gap-3">
-                        <div className="icon-block icon-block-sm">
-                          <Warning size={24} weight="duotone" className="text-clay" />
-                        </div>
-                        <div>
-                          <p className="dashboard-caption text-clay/60">Danger zone</p>
-                          <h3 className="text-[20px] font-display font-bold text-clay">Delete account</h3>
-                        </div>
-                      </div>
-                      <div className="text-clay/60 transition-transform duration-300 group-open:rotate-180">
-                        <CaretDown size={20} weight="bold" />
-                      </div>
-                    </summary>
+                    <GuideRow
+                      as="summary"
+                      caret="down"
+                      tone="clay"
+                      icon={<Warning size={22} weight="duotone" />}
+                      label="Danger zone"
+                      title="Delete account"
+                      titleAs="h3"
+                      className="p-5"
+                      titleClassName="text-clay"
+                    />
                     <div className="border-t border-clay/10 p-5 pt-4 space-y-4">
                       <p className="max-w-xl text-[14px] font-medium leading-relaxed text-clay/80">
                         Saved writing and app data will be removed.

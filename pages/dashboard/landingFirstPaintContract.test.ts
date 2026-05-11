@@ -21,7 +21,8 @@ describe('landing first-paint contract', () => {
     expect(app).not.toContain('<Suspense fallback={<PageLoader />}>');
 
     expect(protectedRoute).toContain("import { RouteLoadingFrame } from '../ui/RouteLoadingFrame';");
-    expect(protectedRoute).toContain('return <RouteLoadingFrame />;');
+    expect(protectedRoute).toContain('fallback = <RouteLoadingFrame />');
+    expect(protectedRoute).toContain('return <>{fallback}</>;');
     expect(protectedRoute).not.toContain('return null;');
     expect(protectedRoute).not.toContain('StartupScreen is covering this visually');
   });
@@ -149,10 +150,12 @@ describe('landing first-paint contract', () => {
     expect(layout).toContain('min-h-0 w-full flex-1 flex-col overflow-y-auto');
     expect(landing).toContain('relative isolate min-h-[100dvh] w-full overflow-hidden bg-body');
     expect(landing).toContain('h-full min-h-full w-full min-w-full transform-gpu object-cover');
-    expect(homeAuthenticated).toContain('relative isolate h-[56dvh] min-h-[360px] w-full overflow-hidden bg-body sm:h-[60dvh] sm:min-h-[450px]');
+    expect(homeAuthenticated).toContain('aria-labelledby="today-reflection-heading"');
+    expect(homeAuthenticated).not.toContain('relative isolate h-[56dvh] min-h-[360px] w-full overflow-hidden bg-body sm:h-[60dvh] sm:min-h-[450px]');
+    expect(homeAuthenticated).toContain('HomeWelcomeIntro');
     expect(homeAuthenticated).toContain('src="/assets/videos/field.png"');
-    expect(homeAuthenticated).toContain('h-full min-h-full w-full min-w-full object-cover object-center');
-    expect(homeAuthenticated).toContain('object-cover object-center opacity-100');
+    expect(homeAuthenticated).toContain('home-welcome-intro__media opacity-100');
+    expect(homeAuthenticated).toContain('home-welcome-intro__media bg-transparent');
     expect(homeAuthenticated).not.toContain('isHeroPosterReady');
     expect(homeAuthenticated).not.toContain("isHeroPosterReady && !isHeroVideoReady ? 'opacity-100' : 'opacity-0'");
     expect(homeAuthenticated).not.toContain("filter: 'blur(10px) brightness(0.8)'");

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { GuideRow, type GuideRowTone } from '../../components/ui/GuideRow';
 import { PublicPageIcon, type PublicPageIconName } from '../../components/ui/PublicPageIcon';
 import { useDocumentMeta } from '../../hooks/useDocumentMeta';
 import { RoutePath } from '../../types';
@@ -13,6 +14,100 @@ type PolicySection = {
   color: string;
   body: string[];
 };
+
+type PrivacyNavItem = {
+  href: string;
+  icon: PublicPageIconName;
+  label: string;
+  title: string;
+  body: string;
+  tone: GuideRowTone;
+};
+
+const PRIVACY_NAV_ITEMS: PrivacyNavItem[] = [
+  {
+    href: '#short-version',
+    icon: 'shield',
+    label: 'Start',
+    title: 'Short version',
+    body: 'The plain summary before the full policy.',
+    tone: 'sage',
+  },
+  {
+    href: '#privacy-principles',
+    icon: 'lock',
+    label: 'Principles',
+    title: 'What leaves',
+    body: 'Private by default, AI by explicit action.',
+    tone: 'sky',
+  },
+  {
+    href: '#full-policy',
+    icon: 'database',
+    label: 'Full policy',
+    title: 'Data picture',
+    body: 'Everything stored, synced, processed, or removed.',
+    tone: 'paper',
+  },
+  {
+    href: '#account-deletion',
+    icon: 'trash',
+    label: 'Account',
+    title: 'Deletion',
+    body: 'How to remove writing and close the sign-in account.',
+    tone: 'clay',
+  },
+];
+
+const PRIVACY_SECTION_CONTINUATION_ITEMS: Record<string, PrivacyNavItem> = {
+  shortVersion: {
+    href: '#privacy-principles',
+    icon: 'lock',
+    label: 'Next',
+    title: 'What leaves',
+    body: 'Continue to the privacy principles.',
+    tone: 'sky',
+  },
+  privacyPrinciples: {
+    href: '#full-policy',
+    icon: 'database',
+    label: 'Next',
+    title: 'Data picture',
+    body: 'Read the full policy detail.',
+    tone: 'paper',
+  },
+  fullPolicy: {
+    href: '#account-deletion',
+    icon: 'trash',
+    label: 'Next',
+    title: 'Deletion',
+    body: 'See removal and support options.',
+    tone: 'clay',
+  },
+  accountDeletion: {
+    href: '#privacy-sections',
+    icon: 'shield',
+    label: 'Back',
+    title: 'Back to privacy sections',
+    body: 'Return to the section guide.',
+    tone: 'sage',
+  },
+};
+
+const renderPrivacySectionContinuation = (item: PrivacyNavItem) => (
+  <div className="mt-8 md:hidden lg:col-span-2">
+    <GuideRow
+      as="a"
+      href={item.href}
+      tone={item.tone}
+      icon={<PublicPageIcon name={item.icon} size={20} />}
+      label={item.label}
+      title={item.title}
+      description={item.body}
+      className="surface-inline-panel p-4"
+    />
+  </div>
+);
 
 const policySections: PolicySection[] = [
   {
@@ -138,8 +233,30 @@ export const PrivacyPolicy: React.FC = () => {
         </div>
       </section>
 
+      <nav
+        id="privacy-sections"
+        aria-label="Privacy sections"
+        className="mx-auto w-full max-w-[1440px] px-6 pb-8 sm:px-10 lg:px-16"
+      >
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {PRIVACY_NAV_ITEMS.map((item) => (
+            <GuideRow
+              key={item.href}
+              as="a"
+              href={item.href}
+              tone={item.tone}
+              icon={<PublicPageIcon name={item.icon} size={20} />}
+              label={item.label}
+              title={item.title}
+              description={item.body}
+              className="surface-inline-panel p-4"
+            />
+          ))}
+        </div>
+      </nav>
+
       <div className="mx-auto w-full max-w-[1440px] px-6 sm:px-10 lg:px-16">
-        <section className="privacy-editorial-lead mb-20 grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+        <section id="short-version" className="privacy-editorial-lead mb-20 grid scroll-mt-24 gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
           <article className="surface-flat surface-tone-paper rounded-[2rem] p-8 md:p-12">
             <p className="label-caps text-green">Short version</p>
             <h2 className="mt-5 max-w-[14ch] text-mk-h2 font-display font-bold leading-tight text-gray-text">
@@ -172,9 +289,10 @@ export const PrivacyPolicy: React.FC = () => {
               </article>
             ))}
           </aside>
+          {renderPrivacySectionContinuation(PRIVACY_SECTION_CONTINUATION_ITEMS.shortVersion)}
         </section>
 
-        <section className="privacy-comparison-band mb-20 surface-flat surface-tone-sage rounded-[2rem] p-7 md:p-10">
+        <section id="privacy-principles" className="privacy-comparison-band mb-20 surface-flat surface-tone-sage scroll-mt-24 rounded-[2rem] p-7 md:p-10">
           <div className="privacy-principle-strip grid gap-8 lg:grid-cols-3">
             {[
               {
@@ -204,9 +322,10 @@ export const PrivacyPolicy: React.FC = () => {
               </article>
             ))}
           </div>
+          {renderPrivacySectionContinuation(PRIVACY_SECTION_CONTINUATION_ITEMS.privacyPrinciples)}
         </section>
 
-        <section className="privacy-policy-ledger mb-20">
+        <section id="full-policy" className="privacy-policy-ledger mb-20 scroll-mt-24">
           <div className="mb-8 flex flex-col gap-3 border-t border-border pt-10 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="label-caps text-green">Full policy</p>
@@ -241,9 +360,10 @@ export const PrivacyPolicy: React.FC = () => {
               </article>
             ))}
           </div>
+          {renderPrivacySectionContinuation(PRIVACY_SECTION_CONTINUATION_ITEMS.fullPolicy)}
         </section>
 
-        <section className="mb-28 surface-flat surface-tone-paper rounded-[2rem] p-8 md:p-10">
+        <section id="account-deletion" className="mb-28 surface-flat surface-tone-paper scroll-mt-24 rounded-[2rem] p-8 md:p-10">
           <div className="flex flex-col gap-6 md:flex-row md:items-center md:gap-12">
             <div className="tone-icon tone-icon-sage h-14 w-14 flex-none rounded-2xl">
               <PublicPageIcon name="envelope" size={26} />
@@ -264,6 +384,7 @@ export const PrivacyPolicy: React.FC = () => {
               </a>
             </div>
           </div>
+          {renderPrivacySectionContinuation(PRIVACY_SECTION_CONTINUATION_ITEMS.accountDeletion)}
         </section>
       </div>
     </div>

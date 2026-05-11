@@ -38,8 +38,10 @@ describe('adapt and distill source contract', () => {
     expect(layout).not.toContain('grain-overlay');
     expect(createNote).not.toContain('grain-overlay');
     expect(createNote).toContain('editor-title-input');
-    expect(home).toContain('h-[56dvh] min-h-[360px]');
-    expect(faq).toContain('flex flex-col gap-4 sm:flex-row sm:gap-6');
+    expect(home).toContain('aria-labelledby="today-reflection-heading"');
+    expect(home).not.toContain('h-[56dvh] min-h-[360px]');
+    expect(faq).toContain('FAQ_NAV_ITEMS');
+    expect(faq).toContain("href: '#quick-guide'");
     expect(css).toContain('@media (max-width: 768px)');
     expect(css).toContain('background-attachment: scroll');
     expect(faq).not.toContain('bezel-outer group');

@@ -5,13 +5,13 @@ import ReactMarkdown from 'react-markdown';
 import {
   ArrowLeft,
   Book,
-  CaretRight,
   Sparkle,
   Warning,
 } from '@phosphor-icons/react';
 import { LottieAnimation } from '../../components/ui/LottieAnimation';
 import { Button } from '../../components/ui/Button';
 import { Alert } from '../../components/ui/Alert';
+import { GuideRow, type GuideRowTone } from '../../components/ui/GuideRow';
 import { MetadataPill } from '../../components/ui/MetadataPill';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { Surface } from '../../components/ui/Surface';
@@ -149,6 +149,14 @@ const ROOM_TONE_CLASSES: Record<PageMeta['tone'], {
     surface: 'surface-tone-clay',
     text: 'text-clay',
   },
+};
+
+const ROOM_GUIDE_TONES: Record<PageMeta['tone'], GuideRowTone> = {
+  blue: 'sky',
+  darkBlue: 'sky',
+  golden: 'honey',
+  green: 'sage',
+  orange: 'clay',
 };
 
 const SOURCE_LINK_PREFIX = 'source-note:';
@@ -406,14 +414,15 @@ export const LifeWiki: React.FC = () => {
           aria-label={`Open ${meta.label} Sanctuary page`}
         >
           <div className="space-y-6">
-            <div className="flex items-center justify-between gap-4">
-              <span className={`dashboard-caption ${tone.accent}`}>
-                {isSupporting ? 'Supporting page' : isEmptyRoom ? 'Room awaiting signal' : 'Generated page'}
-              </span>
-              <CaretRight size={18} weight="bold" className={`${tone.text} transition-transform duration-500 ease-out-expo group-hover:translate-x-1`} />
-            </div>
             <div className="space-y-4">
-              <h2 className="dashboard-card-title-lg dashboard-hover-title">{meta.label}</h2>
+              <GuideRow
+                tone={ROOM_GUIDE_TONES[meta.tone]}
+                icon={<Book size={18} weight="duotone" />}
+                label={isSupporting ? 'Supporting page' : isEmptyRoom ? 'Room awaiting signal' : 'Generated page'}
+                title={meta.label}
+                titleAs="h2"
+                className="p-0"
+              />
               <p className="dashboard-editorial-preview line-clamp-4 transition-colors duration-300 group-hover:text-gray-text">
                 {isEmptyRoom ? meta.emptyLine || meta.description : previewText(page.content)}
               </p>

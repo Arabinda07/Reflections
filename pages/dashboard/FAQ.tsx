@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { GuideRow, type GuideRowTone } from '../../components/ui/GuideRow';
 import { PublicPageIcon, type PublicPageIconName } from '../../components/ui/PublicPageIcon';
 import { useDocumentMeta } from '../../hooks/useDocumentMeta';
 
@@ -8,6 +9,116 @@ type PublicIconCard = {
   body: string;
   label?: string;
 };
+
+type TrustNavItem = {
+  href: string;
+  icon: PublicPageIconName;
+  label: string;
+  title: string;
+  body: string;
+  tone: GuideRowTone;
+};
+
+const FAQ_NAV_ITEMS: TrustNavItem[] = [
+  {
+    href: '#quick-guide',
+    icon: 'book',
+    label: 'Start',
+    title: 'Quick guide',
+    body: 'What Reflections is and how writing stays central.',
+    tone: 'sage',
+  },
+  {
+    href: '#practice',
+    icon: 'pen',
+    label: 'Practice',
+    title: 'How writing works',
+    body: 'Prompts, moods, tools, and the page-first rhythm.',
+    tone: 'sky',
+  },
+  {
+    href: '#details',
+    icon: 'shield',
+    label: 'Details',
+    title: 'Privacy and AI',
+    body: 'What stays private and when support appears.',
+    tone: 'sage',
+  },
+  {
+    href: '#features',
+    icon: 'sparkle',
+    label: 'Tools',
+    title: 'Feature shelf',
+    body: 'The smaller tools that sit close to the page.',
+    tone: 'honey',
+  },
+  {
+    href: '#contact',
+    icon: 'envelope',
+    label: 'Help',
+    title: 'Contact',
+    body: 'Where to send questions about Reflections.',
+    tone: 'paper',
+  },
+];
+
+const FAQ_SECTION_CONTINUATION_ITEMS: Record<string, TrustNavItem> = {
+  quickGuide: {
+    href: '#practice',
+    icon: 'pen',
+    label: 'Next',
+    title: 'How writing works',
+    body: 'Continue to the writing practice.',
+    tone: 'sky',
+  },
+  practice: {
+    href: '#details',
+    icon: 'shield',
+    label: 'Next',
+    title: 'Privacy and AI',
+    body: 'Read the details behind the support tools.',
+    tone: 'sage',
+  },
+  details: {
+    href: '#features',
+    icon: 'sparkle',
+    label: 'Next',
+    title: 'Feature shelf',
+    body: 'See the smaller tools near the page.',
+    tone: 'honey',
+  },
+  features: {
+    href: '#contact',
+    icon: 'envelope',
+    label: 'Next',
+    title: 'Contact',
+    body: 'Find where to send questions.',
+    tone: 'paper',
+  },
+  contact: {
+    href: '#faq-sections',
+    icon: 'book',
+    label: 'Back',
+    title: 'Back to FAQ sections',
+    body: 'Return to the section guide.',
+    tone: 'sage',
+  },
+};
+
+const renderFaqSectionContinuation = (item: TrustNavItem) => (
+  <div className="mt-8 md:hidden lg:col-span-2">
+    <GuideRow
+      as="a"
+      href={item.href}
+      tone={item.tone}
+      icon={<PublicPageIcon name={item.icon} size={20} />}
+      label={item.label}
+      title={item.title}
+      description={item.body}
+      className="surface-inline-panel p-4"
+    />
+  </div>
+);
 
 const guideSections: PublicIconCard[] = [
   {
@@ -47,8 +158,8 @@ const practiceItems: PublicIconCard[] = [
     icon: 'tag',
   },
   {
-    title: 'Just you and the page',
-    body: 'Focus Mode lets the interface fade away. No distractions, just you and your words.',
+    title: 'Tools when invited',
+    body: 'Writing tools keep moods, tags, sounds, tasks, files, and covers tucked away until you ask for them.',
     icon: 'shield',
   },
   {
@@ -125,8 +236,30 @@ export const FAQ: React.FC = () => {
         </div>
       </section>
 
+      <nav
+        id="faq-sections"
+        aria-label="FAQ sections"
+        className="mx-auto w-full max-w-[1440px] px-6 pb-8 sm:px-10 lg:px-16"
+      >
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+          {FAQ_NAV_ITEMS.map((item) => (
+            <GuideRow
+              key={item.href}
+              as="a"
+              href={item.href}
+              tone={item.tone}
+              icon={<PublicPageIcon name={item.icon} size={20} />}
+              label={item.label}
+              title={item.title}
+              description={item.body}
+              className="surface-inline-panel p-4"
+            />
+          ))}
+        </div>
+      </nav>
+
       <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-20 px-6 sm:px-10 lg:gap-28 lg:px-16">
-        <section className="faq-editorial-lead grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-stretch">
+        <section id="quick-guide" className="faq-editorial-lead grid scroll-mt-24 gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-stretch">
           <article className="surface-flat surface-tone-sage rounded-[2rem] p-8 md:p-12">
             <p className="label-caps text-green">Quick guide</p>
             <h2 className="mt-5 max-w-[12ch] text-mk-h2 font-display font-bold leading-tight text-gray-text">
@@ -158,9 +291,10 @@ export const FAQ: React.FC = () => {
               </article>
             ))}
           </div>
+          {renderFaqSectionContinuation(FAQ_SECTION_CONTINUATION_ITEMS.quickGuide)}
         </section>
 
-        <section className="grid gap-10 border-y border-border py-16 lg:grid-cols-[0.72fr_1.28fr] lg:py-20">
+        <section id="practice" className="grid scroll-mt-24 gap-10 border-y border-border py-16 lg:grid-cols-[0.72fr_1.28fr] lg:py-20">
           <div className="space-y-4">
             <p className="label-caps text-green">The practice</p>
             <h2 className="text-mk-h2 font-display font-bold text-gray-text">A space to write, one reflection at a time</h2>
@@ -184,9 +318,10 @@ export const FAQ: React.FC = () => {
               </article>
             ))}
           </div>
+          {renderFaqSectionContinuation(FAQ_SECTION_CONTINUATION_ITEMS.practice)}
         </section>
 
-        <section className="faq-comparison-band surface-flat surface-tone-sky rounded-[2rem] p-7 md:p-10">
+        <section id="details" className="faq-comparison-band surface-flat surface-tone-sky scroll-mt-24 rounded-[2rem] p-7 md:p-10">
           <div className="mb-10 max-w-3xl space-y-4">
             <p className="label-caps text-green">The details</p>
             <h2 className="text-mk-h2 font-display font-bold text-gray-text">Tools built to support you without getting in the way</h2>
@@ -206,9 +341,10 @@ export const FAQ: React.FC = () => {
               </article>
             ))}
           </div>
+          {renderFaqSectionContinuation(FAQ_SECTION_CONTINUATION_ITEMS.details)}
         </section>
 
-        <section className="grid gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+        <section id="features" className="grid scroll-mt-24 gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
           <div className="space-y-4">
             <p className="label-caps text-green">Feature shelf</p>
             <h2 className="text-mk-h2 font-display font-bold text-gray-text">Small tools, close to the page</h2>
@@ -227,10 +363,11 @@ export const FAQ: React.FC = () => {
               </article>
             ))}
           </div>
+          {renderFaqSectionContinuation(FAQ_SECTION_CONTINUATION_ITEMS.features)}
         </section>
 
 
-        <section className="border-t border-border pt-10">
+        <section id="contact" className="scroll-mt-24 border-t border-border pt-10">
           <p className="label-caps text-green">Contact</p>
           <p className="mt-3 max-w-[42rem] font-sans text-[16px] leading-relaxed text-gray-light">
             Questions about Reflections can go to{' '}
@@ -242,6 +379,7 @@ export const FAQ: React.FC = () => {
             </a>
             .
           </p>
+          {renderFaqSectionContinuation(FAQ_SECTION_CONTINUATION_ITEMS.contact)}
         </section>
 
       </div>

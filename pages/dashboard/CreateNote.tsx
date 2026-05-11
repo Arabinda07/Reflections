@@ -19,7 +19,6 @@ import {
   MicrophoneSlash, 
   Headphones,
   CircleNotch,
-  CaretRight,
   Brain,
   Target,
   DotsThreeCircle,
@@ -32,7 +31,7 @@ import { useSound } from '../../hooks/useSound';
 import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
 import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
-import { Editor, EditorRef } from '../../components/ui/Editor';
+import { Editor } from '../../components/ui/Editor';
 import { RoutePath, Task } from '../../types';
 import { CompanionObservation } from '../../components/ui/CompanionObservation';
 import { ModalSheet } from '../../components/ui/ModalSheet';
@@ -42,11 +41,9 @@ import { DEFAULT_WELLNESS_PROMPTS, getCurrentWellnessPrompt, getNextWellnessProm
 import { aiService } from '../../services/aiService';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useNoteDraft } from '../../hooks/useNoteDraft';
-import { useFocusMode } from '../../hooks/useFocusMode';
 import { useWhisperInput } from '../../hooks/useWhisperInput';
-import { getOrderedTasks, getTaskDrawerTriggerLabel } from './createNoteTasks';
+import { getOrderedTasks } from './createNoteTasks';
 import { canNavigateBackInApp } from '../../src/native/androidBack';
-import { NATIVE_PAGE_TOP_PADDING, NATIVE_TOP_CONTROL_OFFSET } from '../../src/native/safeArea';
 import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
 import trailLoadingAnimation from '@/src/lottie/trail-loading.json';
 import { MOOD_CONFIG, MOOD_OPTIONS, getMoodConfig } from './moodConfig';
@@ -63,17 +60,6 @@ const getSurfaceScopeForMood = (mood?: string) => {
   }
 };
 
-const getSurfacePanelForMood = (mood?: string) => {
-  switch (mood) {
-    case 'happy': return 'surface-panel-sky';
-    case 'calm': return 'surface-panel-sage';
-    case 'anxious': return 'surface-panel-neutral';
-    case 'sad': return 'surface-panel-sky';
-    case 'angry': return 'surface-panel-neutral';
-    case 'tired': return 'surface-panel-paper';
-    default: return 'surface-panel-sage';
-  }
-};
 // --- Sub-Component: TaskRow ---
 interface TaskRowProps {
   task: Task;
@@ -189,11 +175,6 @@ export const CreateNote: React.FC = () => {
   // â”€â”€ Core draft lifecycle (state, save, release, navigation blocking) â”€â”€
   const draft = useNoteDraft();
 
-  // â”€â”€ Focus/flow mode â”€â”€
-  const [isFocused, setIsFocused] = useState(false);
-  const [isTitleFocused, setIsTitleFocused] = useState(false);
-  const focusMode = useFocusMode({ isEditorFocused: isFocused, isTitleFocused });
-
   // â”€â”€ Whisper (speech-to-text) â”€â”€
   const whisper = useWhisperInput(
     useCallback((text: string) => {
@@ -214,7 +195,7 @@ export const CreateNote: React.FC = () => {
   const [promptIndex, setPromptIndex] = useState(0);
   const [isReflecting, setIsReflecting] = useState(false);
   const [aiReflection, setAiReflection] = useState<string | null>(null);
-  const [isMobileOptionsOpen, setIsMobileOptionsOpen] = useState(false);
+  const [isWritingToolsOpen, setIsWritingToolsOpen] = useState(false);
   const [isMoodOpen, setIsMoodOpen] = useState(false);
   const [isTagsOpen, setIsTagsOpen] = useState(false);
   const [isMusicOpen, setIsMusicOpen] = useState(false);
@@ -233,7 +214,8 @@ export const CreateNote: React.FC = () => {
   const haptics = useHaptics();
   const { playSaveChime } = useSound();
   const ActiveMoodIcon = getMoodConfig(draft.mood)?.icon || Smiley;
-  const editorInstanceRef = useRef<EditorRef>(null);
+  const filesInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
   const isUnmounted = useRef(false);
 
   useEffect(() => {
@@ -253,6 +235,11 @@ export const CreateNote: React.FC = () => {
   const { blocker, navigateWithBypass } = draft;
   const id = undefined as string | undefined; // id is read internally by useNoteDraft via useParams
 
+  const handleBackToNotes = useCallback(() => {
+    stopMusic();
+    navigate(RoutePath.NOTES);
+  }, [navigate, stopMusic]);
+
   const handleMobileBack = useCallback(() => {
     stopMusic();
     if (
@@ -265,8 +252,8 @@ export const CreateNote: React.FC = () => {
       navigate(-1);
       return;
     }
-    navigate(RoutePath.NOTES);
-  }, [navigate, stopMusic]);
+    handleBackToNotes();
+  }, [handleBackToNotes, navigate, stopMusic]);
 
   // Blocker â†’ leave dialog sync
   useEffect(() => {
@@ -378,13 +365,11 @@ export const CreateNote: React.FC = () => {
   };
 
   // â”€â”€ Derived values â”€â”€
-  const hasContent = Boolean(draft.currentSnapshot.content);
+  const hasDraftText = Boolean(draft.currentSnapshot.title || draft.currentSnapshot.content);
   const wordCount = React.useMemo(() => {
     return draft.currentSnapshot.content.replace(/<[^>]*>/g, '').trim().split(/\s+/).filter(Boolean).length;
   }, [draft.currentSnapshot.content]);
   const canReflect = wordCount >= 100;
-  const isFocusModeActive = focusMode.isActive;
-  const isFocusModeEnabled = focusMode.isEnabled;
   const isWhispering = whisper.isWhispering;
   const interimTranscript = whisper.interimTranscript;
   const whisperFeedback = whisper.feedback;
@@ -405,6 +390,126 @@ export const CreateNote: React.FC = () => {
     }
   };
 
+  const closeWritingTools = () => {
+    setIsWritingToolsOpen(false);
+  };
+
+  const openWritingTools = () => {
+    setIsWritingToolsOpen(true);
+  };
+
+  const openFilesInput = () => {
+    filesInputRef.current?.click();
+  };
+
+  const openCoverInput = () => {
+    coverInputRef.current?.click();
+  };
+
+  const renderWritingToolGrid = () => (
+    <div className="grid grid-cols-2 gap-3">
+      <button
+        type="button"
+        onClick={() => {
+          closeWritingTools();
+          setIsMoodOpen(true);
+        }}
+        className={`flex min-h-16 items-center gap-3 rounded-2xl border p-4 ${mood ? getMoodConfig(mood)?.nav || 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}
+      >
+        <ActiveMoodIcon size={24} weight={mood ? 'fill' : 'regular'} />
+        <span className="text-[14px] font-bold capitalize">{mood ? getMoodConfig(mood)?.label || mood : 'Mood'}</span>
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          closeWritingTools();
+          setIsTagsOpen(true);
+        }}
+        className={`flex min-h-16 items-center gap-3 rounded-2xl border p-4 ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}
+      >
+        <TagIcon size={24} weight={tags.length > 0 ? 'fill' : 'regular'} />
+        <span className="text-[14px] font-bold">Tags</span>
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          closeWritingTools();
+          setIsMusicOpen(true);
+        }}
+        className={`flex min-h-16 items-center gap-3 rounded-2xl border p-4 ${musicPlaying ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}
+      >
+        <Headphones size={24} weight={musicPlaying ? 'fill' : 'regular'} />
+        <span className="text-[14px] font-bold">Sounds</span>
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          closeWritingTools();
+          setIsTasksOpen(true);
+        }}
+        className={`flex min-h-16 items-center gap-3 rounded-2xl border p-4 ${tasks.some((task) => !task.completed) ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}
+      >
+        <ListChecks size={24} weight={tasks.some((task) => !task.completed) ? 'fill' : 'regular'} />
+        <span className="text-[14px] font-bold">Tasks</span>
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          toggleWhisper();
+          closeWritingTools();
+        }}
+        className={`flex min-h-16 items-center gap-3 rounded-2xl border p-4 ${isWhispering ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}
+      >
+        {isWhispering ? <Microphone size={24} weight="fill" /> : <MicrophoneSlash size={24} weight="regular" />}
+        <span className="text-[14px] font-bold">Whisper</span>
+      </button>
+
+      <button
+        type="button"
+        onClick={openFilesInput}
+        className="control-surface flex min-h-16 items-center gap-3 rounded-2xl p-4 text-left text-gray-text transition-colors hover:border-green/20 hover:bg-green/5"
+        aria-label="Add files"
+      >
+        <Paperclip size={24} weight="regular" />
+        <span className="text-[14px] font-bold">Files</span>
+      </button>
+      <input
+        ref={filesInputRef}
+        type="file"
+        multiple
+        tabIndex={-1}
+        className="sr-only"
+        onChange={(e) => {
+          if (e.target.files) {
+            draft.addFiles(Array.from(e.target.files || []));
+          }
+          closeWritingTools();
+        }}
+      />
+      <button
+        type="button"
+        onClick={openCoverInput}
+        className="control-surface flex min-h-16 items-center gap-3 rounded-2xl p-4 text-left text-gray-text transition-colors hover:border-green/20 hover:bg-green/5"
+        aria-label="Choose cover image"
+      >
+        <ImageIcon size={24} weight="regular" />
+        <span className="text-[14px] font-bold">Cover</span>
+      </button>
+      <input
+        ref={coverInputRef}
+        type="file"
+        tabIndex={-1}
+        className="sr-only"
+        accept="image/*"
+        onChange={(e) => {
+          if (e.target.files?.[0]) {
+            setImagePreview(URL.createObjectURL(e.target.files[0]));
+          }
+          closeWritingTools();
+        }}
+      />
+    </div>
+  );
 
 
 
@@ -440,87 +545,11 @@ export const CreateNote: React.FC = () => {
       {isMobile && (
         <button 
           onClick={handleMobileBack}
-          className={`surface-floating fixed left-4 z-floating flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] transition hover:text-green top-[var(--native-top-control-offset)] ${isFocusModeActive ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
+          className="surface-floating fixed left-4 z-floating flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] transition hover:text-green top-[var(--native-top-control-offset)]"
           aria-label="Back to notes"
         >
           <ArrowLeft size={20} weight="regular" />
         </button>
-      )}
-
-      {isFocusModeActive ? (
-        <button
-          type="button"
-          onClick={() => {
-            focusMode.disable();
-          }}
-          className="surface-floating fixed right-4 z-sticky-nav inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 label-caps text-green hover:text-green top-[var(--native-top-control-offset)]"
-        >
-          <X size={12} weight="regular" />
-          Exit focus
-        </button>
-      ) : null}
-
-      {/* â”€â”€ Desktop Sidebar â”€â”€ */}
-      {!isMobile && (
-        <aside className={`${getSurfacePanelForMood(mood)} flex flex-col min-h-0 z-40 transition-[width,opacity,transform,border] duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] border-r border-green/15 ${isFocusModeActive ? 'w-0 opacity-0 -translate-x-full overflow-hidden border-r-0' : 'w-60 shrink-0 opacity-100 translate-x-0'}`}>
-          <div className="pt-8 px-6 pb-6 flex-1 overflow-y-auto custom-scrollbar space-y-4">
-            
-            {/* Desktop Back Button */}
-            <button 
-              onClick={() => navigate(RoutePath.NOTES)}
-              className="flex min-h-11 items-center gap-2 text-gray-nav hover:text-gray-text text-[13px] font-bold mb-8 group transition-colors"
-            >
-              <div className="control-surface flex h-8 w-8 items-center justify-center transition-colors group-hover:border-green/20 group-hover:bg-green/5">
-                <ArrowLeft size={14} weight="regular" />
-              </div>
-              Back to Notes
-            </button>
-
-            <span className="label-caps ml-2 text-gray-nav opacity-50">Personalize</span>
-            
-            {/* Options */}
-            <button onClick={() => setIsMoodOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-[20px] transition-colors border border-border/40 ${mood ? getMoodConfig(mood)?.nav || 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>
-              <div className="flex items-center gap-3"><ActiveMoodIcon size={20} weight={mood ? "fill" : "regular"} /><span className="text-[13px] font-bold capitalize">{mood ? getMoodConfig(mood)?.label || mood : 'Mood'}</span></div>
-              <CaretRight size={14} className="opacity-40" />
-            </button>
-
-            <button onClick={() => setIsTagsOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-[20px] transition-colors border border-border/40 ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>
-              <div className="flex items-center gap-3"><TagIcon size={20} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-[13px] font-bold">{tags.length > 0 ? `${tags.length} Tags` : 'Tags'}</span></div>
-              <CaretRight size={14} className="opacity-40" />
-            </button>
-
-            <button onClick={() => setIsMusicOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-[20px] transition-colors border border-border/40 ${musicPlaying ? 'bg-honey/10 border-honey/25 text-honey' : 'control-surface text-gray-text'}`}>
-              <div className="flex items-center gap-3"><Headphones size={20} weight={musicPlaying ? "fill" : "regular"} /><span className="text-[13px] font-bold">{musicPlaying && activeMusicTrack ? activeMusicTrack.emoji : 'Sounds'}</span></div>
-              <CaretRight size={14} className="opacity-40" />
-            </button>
-
-            <button onClick={toggleWhisper} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-[20px] transition-colors border border-border/40 ${isWhispering ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>
-              <div className="flex items-center gap-3">{isWhispering ? <Microphone size={20} weight="fill" /> : <MicrophoneSlash size={20} weight="regular" />}<span className="text-[13px] font-bold">Whisper</span></div>
-            </button>
-
-            <button onClick={() => setIsTasksOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-[20px] transition-colors border border-border/40 ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>
-              <div className="flex items-center gap-3"><ListChecks size={20} weight={tasks.some(t => !t.completed) ? "fill" : "regular"} /><span className="text-[13px] font-bold">{getTaskDrawerTriggerLabel(tasks).label}</span></div>
-              <CaretRight size={14} className="opacity-40" />
-            </button>
-            
-            <div className="grid grid-cols-2 gap-2 pt-2">
-              <label className="control-surface flex flex-col items-center justify-center p-4 rounded-[20px] text-gray-text transition-colors cursor-pointer">
-                <Paperclip size={20} className="mb-2" /><span className="text-[10px] font-bold uppercase">Files</span>
-                <input type="file" multiple className="hidden" onChange={(e) => {
-                  if (e.target.files) {
-                draft.addFiles(Array.from(e.target.files || []));
-                  }
-                }} />
-              </label>
-              <label className="control-surface flex flex-col items-center justify-center p-4 rounded-[20px] text-gray-text transition-colors cursor-pointer">
-                <ImageIcon size={20} className="mb-2" /><span className="text-[10px] font-bold uppercase">Cover</span>
-                <input type="file" className="hidden" accept="image/*" onChange={(e) => {
-                  if (e.target.files?.[0]) setImagePreview(URL.createObjectURL(e.target.files[0]));
-                }} />
-              </label>
-            </div>
-          </div>
-        </aside>
       )}
 
       {/* Main Canvas */}
@@ -529,7 +558,7 @@ export const CreateNote: React.FC = () => {
         className="relative flex-1 w-full pb-40 px-6 sm:px-12 md:px-16 lg:px-24 transition-[padding] duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] pt-[var(--native-page-top-padding)]"
       >
         <h1 id="create-note-heading" className="sr-only">New reflection</h1>
-        <div className={`editor-writing-measure transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isFocusModeActive ? 'mx-auto scale-[1.02]' : 'mr-auto lg:ml-12 xl:ml-24 scale-100'}`}>
+        <div className="editor-writing-measure mr-auto lg:ml-12 xl:ml-24">
           
           {/* Cover Image */}
           {imagePreview && (
@@ -547,31 +576,38 @@ export const CreateNote: React.FC = () => {
 
           {/* Eyebrow Date */}
           <div className="mb-6 flex flex-wrap items-center gap-2">
+            {!isMobile && (
+              <button
+                type="button"
+                onClick={handleBackToNotes}
+                className="inline-flex min-h-11 items-center gap-2 rounded-full px-3 py-2 label-caps text-gray-nav transition-colors hover:bg-green/5 hover:text-green"
+                aria-label="Back to notes"
+              >
+                <ArrowLeft size={12} weight="bold" />
+                Back
+              </button>
+            )}
             <span className="label-caps flex items-center gap-2 rounded-full bg-green/10 px-3 py-1 text-green">
               <CalendarBlank size={12} weight="regular" />
               {new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'long', day: 'numeric' })}
             </span>
-            <button
-              type="button"
-              aria-pressed={isFocusModeEnabled}
-              onClick={() => {
-                focusMode.toggle();
-              }}
-              className={`inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 label-caps transition-colors sm:px-3 ${
-                isFocusModeEnabled
-                  ? 'bg-green text-white'
-                  : 'control-surface text-gray-text hover:bg-green/10 hover:text-green'
-              }`}
-            >
-              <Target size={12} weight={isFocusModeEnabled ? 'fill' : 'bold'} />
-              Focus mode
-            </button>
             {canReflect && (
               <button onClick={handleAiReflect} disabled={isReflecting} className="inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-[var(--radius-control)] bg-green px-4 py-2 label-caps text-white transition-colors hover:bg-green-hover disabled:opacity-60 sm:px-3">
                 <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center sm:h-3 sm:w-3">
                   {isReflecting ? <CircleNotch size={14} className="animate-spin" /> : <Brain size={14} weight="regular" />}
                 </span>
                 <span className="leading-none">Reflect with AI</span>
+              </button>
+            )}
+            {!isMobile && (
+              <button
+                type="button"
+                onClick={openWritingTools}
+                className="inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 label-caps control-surface text-gray-text hover:bg-green/10 hover:text-green sm:px-3"
+                aria-label="Open writing tools"
+              >
+                <DotsThreeCircle size={16} weight="fill" />
+                Writing tools
               </button>
             )}
           </div>
@@ -594,8 +630,6 @@ export const CreateNote: React.FC = () => {
             placeholder="Untitled Reflection"
             value={title}
             onChange={e => setTitle(e.target.value)}
-            onFocus={() => { setIsFocused(true); setIsTitleFocused(true); }}
-            onBlur={() => { setIsFocused(false); setIsTitleFocused(false); }}
             className="editor-title-input min-h-11"
           />
 
@@ -606,12 +640,8 @@ export const CreateNote: React.FC = () => {
             )}
 
           <Editor 
-            ref={editorInstanceRef} 
             value={content} 
             onChange={setContent} 
-            onFocusChange={(nextIsFocused) => {
-              setIsFocused(nextIsFocused);
-            }}
             placeholder={activePlaceholder || "What's on your mind?"} 
             ariaLabel="Reflection body"
             hideToolbar={isMobile}
@@ -629,22 +659,22 @@ export const CreateNote: React.FC = () => {
 
       {/* Ã¢â€â‚¬Ã¢â€â‚¬ Floating Actions Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <div 
-        className={`fixed z-50 flex gap-4 transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isMobile ? 'bottom-[calc(2rem+env(safe-area-inset-bottom))] left-6 right-6 justify-between' : 'bottom-10 right-10 flex-col'} ${isFocusModeActive ? 'opacity-0 translate-y-8' : 'opacity-100 translate-y-0'}`}
+        className={`fixed z-50 flex gap-4 transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isMobile ? 'bottom-[calc(2rem+env(safe-area-inset-bottom))] left-6 right-6 justify-between' : 'bottom-10 right-10 flex-col'} opacity-100 translate-y-0`}
       >
         
-        {/* Mobile Personalize FAB */}
+        {/* Mobile writing tools FAB */}
         {isMobile && (
           <button 
-            onClick={() => setIsMobileOptionsOpen(true)}
+            onClick={openWritingTools}
             className="surface-floating group relative flex h-16 w-16 items-center justify-center rounded-full hover:text-green"
-            aria-label="Open reflection options"
+            aria-label="Open writing tools"
           >
             <DotsThreeCircle size={28} weight="fill" className="opacity-80" />
           </button>
         )}
 
         {/* Interchangeable Action FAB (Spark / Save) */}
-          {!hasContent ? (
+          {!hasDraftText ? (
             <Magnetic key="spark-mag" strength={20}>
               <button
                 key="spark-fab"
@@ -684,36 +714,14 @@ export const CreateNote: React.FC = () => {
 
       {/* Ã¢â€â‚¬Ã¢â€â‚¬ Shared Sheets Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <ModalSheet
-        isOpen={isMobile && isMobileOptionsOpen}
-        onClose={() => setIsMobileOptionsOpen(false)}
-        title="Personalize"
+        isOpen={isWritingToolsOpen}
+        onClose={closeWritingTools}
+        title="Writing tools"
+        icon={<DotsThreeCircle size={22} weight="duotone" />}
         size="sm"
         bodyClassName="pt-2"
       >
-        <div className="grid grid-cols-2 gap-3">
-          <button onClick={() => { setIsMobileOptionsOpen(false); setIsMoodOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${mood ? getMoodConfig(mood)?.nav || 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><ActiveMoodIcon size={24} weight={mood ? "fill" : "regular"} /><span className="text-[14px] font-bold capitalize">{mood ? getMoodConfig(mood)?.label || mood : 'Mood'}</span></button>
-          <button onClick={() => { setIsMobileOptionsOpen(false); setIsTagsOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><TagIcon size={24} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-[14px] font-bold">Tags</span></button>
-          <button onClick={() => { setIsMobileOptionsOpen(false); setIsMusicOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${musicPlaying ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><Headphones size={24} weight={musicPlaying ? "fill" : "regular"} /><span className="text-[14px] font-bold">Sounds</span></button>
-          <button onClick={() => { setIsMobileOptionsOpen(false); setIsTasksOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><ListChecks size={24} weight={tasks.some(t => !t.completed) ? "fill" : "regular"} /><span className="text-[14px] font-bold">Tasks</span></button>
-          <button onClick={toggleWhisper} className={`flex items-center gap-3 rounded-2xl border p-4 ${isWhispering ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>{isWhispering ? <Microphone size={24} weight="fill" /> : <MicrophoneSlash size={24} weight="regular" />}<span className="text-[14px] font-bold">Whisper</span></button>
-
-          <label className="control-surface flex cursor-pointer items-center gap-3 rounded-2xl p-4 text-gray-text transition-colors hover:border-green/20 hover:bg-green/5">
-            <Paperclip size={24} weight="regular" /><span className="text-[14px] font-bold">Files</span>
-            <input type="file" multiple className="hidden" onChange={(e) => {
-              if (e.target.files) {
-                draft.addFiles(Array.from(e.target.files || []));
-              }
-              setIsMobileOptionsOpen(false);
-            }} />
-          </label>
-          <label className="control-surface flex cursor-pointer items-center gap-3 rounded-2xl p-4 text-gray-text transition-colors hover:border-green/20 hover:bg-green/5">
-            <ImageIcon size={24} weight="regular" /><span className="text-[14px] font-bold">Cover</span>
-            <input type="file" className="hidden" accept="image/*" onChange={(e) => {
-              if (e.target.files?.[0]) setImagePreview(URL.createObjectURL(e.target.files[0]));
-              setIsMobileOptionsOpen(false);
-            }} />
-          </label>
-        </div>
+        {renderWritingToolGrid()}
       </ModalSheet>
 
       <ModalSheet

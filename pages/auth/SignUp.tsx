@@ -28,6 +28,12 @@ import { referralService } from '@/services/referralService';
 import { trackGoogleAuthStartedDeferred } from '@/src/analytics/deferredEvents';
 import { commitAuthSession } from '@/src/auth/sessionUser';
 
+const SIGNUP_TRUST_POINTS = [
+  'Your notes stay private to your account.',
+  'AI waits until you ask for it.',
+  'Delete saved writing from Account.',
+] as const;
+
 export const SignUp: React.FC = () => {
   useDocumentMeta({
     title: 'Reflections – A Calm Space to Write and Reflect',
@@ -194,6 +200,23 @@ export const SignUp: React.FC = () => {
                 </div>
               }
             />
+
+            <div className="border-y border-border/60 py-4">
+              <ul className="space-y-3">
+                {SIGNUP_TRUST_POINTS.map((point) => (
+                  <li key={point} className="flex gap-3 text-[13px] font-bold leading-relaxed text-gray-text">
+                    <CheckCircle size={16} weight="fill" className="mt-0.5 shrink-0 text-green" />
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link
+                to={RoutePath.PRIVACY}
+                className="mt-3 inline-flex min-h-11 items-center rounded-[var(--radius-control)] text-[13px] font-bold text-green transition-colors hover:text-green/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
+              >
+                Read the privacy details
+              </Link>
+            </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <motion.div 
