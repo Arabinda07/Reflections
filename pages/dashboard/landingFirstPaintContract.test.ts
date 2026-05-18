@@ -12,16 +12,17 @@ describe('landing first-paint contract', () => {
 
     expect(existsSync(path.resolve(process.cwd(), 'components/ui/RouteLoadingFrame.tsx'))).toBe(true);
     expect(app).toContain("import { RouteLoadingFrame } from './components/ui/RouteLoadingFrame';");
-    expect(app).toContain("import { Landing } from './pages/dashboard/Landing';");
+    expect(app).toContain("import { LandingRoute } from './pages/dashboard/LandingRoute';");
     expect(app).toContain('const defaultRouteFallback = <RouteLoadingFrame />;');
     expect(app).toContain('const withRouteFallback = (');
     expect(app).toContain('fallback: React.ReactNode = defaultRouteFallback');
-    expect(app).toContain('path={RoutePath.HOME} element={<Landing />}');
+    expect(app).toContain('path={RoutePath.HOME} element={<LandingRoute />}');
     expect(app).not.toContain('const PageLoader');
     expect(app).not.toContain('<Suspense fallback={<PageLoader />}>');
 
     expect(protectedRoute).toContain("import { RouteLoadingFrame } from '../ui/RouteLoadingFrame';");
-    expect(protectedRoute).toContain('return <RouteLoadingFrame />;');
+    expect(protectedRoute).toContain('fallback = <RouteLoadingFrame />');
+    expect(protectedRoute).toContain('return <>{fallback}</>;');
     expect(protectedRoute).not.toContain('return null;');
     expect(protectedRoute).not.toContain('StartupScreen is covering this visually');
   });
@@ -29,11 +30,19 @@ describe('landing first-paint contract', () => {
   it('keeps guests on the landing frame without waiting for auth hydration', () => {
     const app = read('App.tsx');
     const landing = read('pages/dashboard/Landing.tsx');
+    const landingRoute = read('pages/dashboard/LandingRoute.tsx');
+    const seoGenerator = read('scripts/generate-public-seo-pages.mjs');
 
 
     expect(app).not.toContain('<Home />');
-    expect(landing).toContain("import('../../src/supabaseClient')");
-    expect(landing).toContain('navigate(RoutePath.DASHBOARD, { replace: true })');
+    expect(landing).not.toContain("import('../../src/supabaseClient')");
+    expect(landingRoute).toContain("await import('../../src/supabaseClient')");
+    expect(landingRoute).toContain('hasStrongStoredAuthSessionHint()');
+    expect(landingRoute).toContain('syncStoredAuthSessionHintStatus(null);');
+    expect(landingRoute).toContain('navigate(RoutePath.DASHBOARD, { replace: true, state: location.state });');
+    expect(seoGenerator).toContain("document.documentElement.classList.add('auth-hint-pending');");
+    expect(seoGenerator).toContain('landing-auth-gate');
+    expect(seoGenerator).toContain('AUTH_HINT_STALE_STORAGE_KEY');
   });
 
   it('lets the startup overlay fade over already-rendered app content', () => {

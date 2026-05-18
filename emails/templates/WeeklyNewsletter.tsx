@@ -17,7 +17,7 @@ export const WeeklyNewsletter = ({
   issueNumber = 1,
   content = "This week I've been thinking about the pace of our daily lives. How often do we let silence sit without reaching for a distraction? \n\nI encourage you to take five minutes today to just be.",
   unsubscribeUrl,
-  preferencesUrl = 'https://reflections.app/account',
+  preferencesUrl = 'https://www.reflections-sanctuary.space/account',
   mailingAddress
 }: WeeklyNewsletterProps) => {
   return (

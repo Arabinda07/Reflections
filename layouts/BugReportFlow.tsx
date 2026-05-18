@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import emailjs from '@emailjs/browser';
-import {
-  Bug,
-  X,
-  PaperPlaneTilt,
-  CheckCircle,
-} from '@phosphor-icons/react';
+import { Bug } from '@phosphor-icons/react/Bug';
+import { CheckCircle } from '@phosphor-icons/react/CheckCircle';
+import { PaperPlaneTilt } from '@phosphor-icons/react/PaperPlaneTilt';
+import { X } from '@phosphor-icons/react/X';
 import { Button } from '../components/ui/Button';
 import { ModalSheet } from '../components/ui/ModalSheet';
 import { useAuthStore } from '../hooks/useAuthStore';

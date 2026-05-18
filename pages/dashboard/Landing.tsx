@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDocumentMeta } from '../../hooks/useDocumentMeta';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
-import { hasStoredAuthSessionHint } from '../../src/utils/authHints';
 import { RoutePath } from '../../types';
 
 type TinyIconProps = {
@@ -112,36 +111,6 @@ export const Landing: React.FC = () => {
       cancelVideoLoad?.();
     };
   }, [shouldLoadHeroVideo, shouldReduceMotion]);
-
-  useEffect(() => {
-    if (!hasStoredAuthSessionHint()) {
-      return;
-    }
-
-    let isActive = true;
-
-    const redirectAuthenticatedUser = async () => {
-      try {
-        const { supabase } = await import('../../src/supabaseClient');
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-
-        if (isActive && session) {
-          navigate(RoutePath.DASHBOARD, { replace: true });
-        }
-      } catch (error) {
-        console.warn('Could not check the existing auth session from landing.', error);
-      }
-    };
-
-    const cancelIdleCheck = scheduleIdleTask(redirectAuthenticatedUser, 5200);
-
-    return () => {
-      isActive = false;
-      cancelIdleCheck();
-    };
-  }, [navigate]);
 
   const toggleMute = () => {
     const nextMuted = !isMuted;

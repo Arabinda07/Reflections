@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { storageService } from '../../services/storageService';
-import { CircleNotch, Image as ImageSquare } from '@phosphor-icons/react';
+import { CircleNotch } from '@phosphor-icons/react/CircleNotch';
+import { Image as ImageSquare } from '@phosphor-icons/react/Image';
 
 interface StorageImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   path?: string | null;

@@ -7,6 +7,7 @@ import {
   consumeNativeGoogleOAuthCallback,
   consumeNativeGoogleAuthSuccessRedirectPath,
   consumePendingGoogleAuthRedirectPath,
+  getGoogleOAuthRedirectTo,
   resolvePostAuthRedirectPath,
   startGoogleOAuthFlow,
 } from './googleOAuth';
@@ -60,9 +61,12 @@ class SessionStorageMock {
   }
 }
 
-const createWindow = (href = 'https://reflections-ebon.vercel.app/login') => ({
+const createWindow = (
+  href = 'https://www.reflections-sanctuary.space/login',
+  origin = 'https://www.reflections-sanctuary.space',
+) => ({
   location: {
-    origin: 'https://reflections-ebon.vercel.app',
+    origin,
     pathname: '/',
     href,
     replace: vi.fn(),
@@ -108,9 +112,40 @@ describe('googleOAuth', () => {
     expect(mockSignInWithOAuth).toHaveBeenCalledWith({
       provider: 'google',
       options: {
-        redirectTo: 'https://reflections-ebon.vercel.app/auth/callback',
+        redirectTo: 'https://www.reflections-sanctuary.space/auth/callback',
       },
     });
+  });
+
+  it('builds the browser OAuth callback from the current custom-domain origin', () => {
+    (globalThis as any).window = createWindow(
+      'https://www.reflections-sanctuary.space/login',
+      'https://www.reflections-sanctuary.space',
+    );
+
+    expect(getGoogleOAuthRedirectTo()).toBe(
+      'https://www.reflections-sanctuary.space/auth/callback',
+    );
+  });
+
+  it('builds the browser OAuth callback from the current localhost origin', () => {
+    (globalThis as any).window = createWindow(
+      'http://localhost:3000/login',
+      'http://localhost:3000',
+    );
+
+    expect(getGoogleOAuthRedirectTo()).toBe('http://localhost:3000/auth/callback');
+  });
+
+  it('builds the browser OAuth callback from the current Vercel preview origin', () => {
+    (globalThis as any).window = createWindow(
+      'https://reflections-git-feature-team.vercel.app/login',
+      'https://reflections-git-feature-team.vercel.app',
+    );
+
+    expect(getGoogleOAuthRedirectTo()).toBe(
+      'https://reflections-git-feature-team.vercel.app/auth/callback',
+    );
   });
 
   it('cleans up stored intent when Supabase refuses to launch Google OAuth', async () => {
@@ -189,7 +224,7 @@ describe('googleOAuth', () => {
 
   it('reads Google callback errors from the current URL on the matching auth route', () => {
     (globalThis as any).window = createWindow(
-      'https://reflections-ebon.vercel.app/?error_description=Account%20is%20not%20allowed#/signup',
+      'https://www.reflections-sanctuary.space/?error_description=Account%20is%20not%20allowed#/signup',
     );
 
     const sessionStorage = getSessionStorage();
@@ -231,7 +266,7 @@ describe('googleOAuth', () => {
 
   it('exchanges the native callback code for a session', async () => {
     const result = await consumeNativeGoogleOAuthCallback(
-      'https://reflections-ebon.vercel.app/?code=oauth-code',
+      'https://www.reflections-sanctuary.space/?code=oauth-code',
     );
 
     expect(result).toEqual({ handled: true, success: true });
@@ -240,7 +275,7 @@ describe('googleOAuth', () => {
 
   it('returns native callback errors without attempting a session exchange', async () => {
     const result = await consumeNativeGoogleOAuthCallback(
-      'https://reflections-ebon.vercel.app/?error=access_denied',
+      'https://www.reflections-sanctuary.space/?error=access_denied',
     );
 
     expect(result).toEqual({

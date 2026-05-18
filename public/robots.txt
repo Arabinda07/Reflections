@@ -55,4 +55,4 @@ Disallow: /wiki
 Disallow: /sanctuary
 Disallow: /auth/
 
-Sitemap: https://reflections-ebon.vercel.app/sitemap.xml
+Sitemap: https://www.reflections-sanctuary.space/sitemap.xml

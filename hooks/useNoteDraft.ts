@@ -207,7 +207,7 @@ export const useNoteDraft = (): NoteDraftState => {
             if (!isUnmountedRef.current) setLoading(false);
           }, 1200);
         } else {
-          navigate(RoutePath.HOME);
+          navigate(RoutePath.DASHBOARD);
         }
       } catch {
         setLoading(false);
@@ -231,7 +231,7 @@ export const useNoteDraft = (): NoteDraftState => {
     const nuclearTimer = window.setTimeout(() => {
       if (!isUnmountedRef.current) {
         setSaving(false);
-        navigateWithBypass(RoutePath.HOME);
+        navigateWithBypass(RoutePath.DASHBOARD);
       }
     }, 5000);
 

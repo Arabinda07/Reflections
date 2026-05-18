@@ -23,7 +23,7 @@ describe('public header regression fixes', () => {
     );
   });
 
-  it('renders a public theme switcher in desktop and mobile header without duplicating it in the menu', () => {
+  it('renders a public theme switcher on desktop and inside the mobile sheet', () => {
     const header = read('components/ui/PublicHeader.tsx');
 
     expect(header).toContain('const ThemeModeButton');
@@ -31,8 +31,11 @@ describe('public header regression fixes', () => {
     expect(header).toContain("document.documentElement.classList.toggle('dark', isDarkMode)");
     expect(header).toContain("const PUBLIC_THEME_STORAGE_KEY = 'reflections-theme';");
     expect(header).toContain('public-theme-toggle public-theme-toggle--desktop');
-    expect(header).toContain('public-theme-toggle public-theme-toggle--mobile-header');
-    expect(header).not.toContain('public-theme-toggle public-theme-toggle--mobile-menu');
+    expect(header).not.toContain('public-theme-toggle public-theme-toggle--mobile-header');
+    expect(header).toContain('public-theme-toggle public-theme-toggle--mobile-sheet');
+    expect(header).toContain('public-mobile-menu-section-title">Display');
+    expect(header).toContain("aria-pressed={isDarkMode}");
+    expect(header).toContain("aria-label={isDarkMode ? 'Display preference: use light mode' : 'Display preference: use dark mode'}");
     expect(header).not.toContain('reflections.public-theme');
     expect(header).not.toContain('motion/');
   });
@@ -47,6 +50,8 @@ describe('public header regression fixes', () => {
     expect(header).toContain('aria-label="Add Reflections to your home screen"');
     expect(header).toContain('Install app');
     expect(header).toContain('await triggerInstall();');
+    expect(header).toContain('public-mobile-menu-secondary-actions');
+    expect(header).toContain('public-mobile-menu-secondary-action');
     expect(header).not.toContain('PWAInstallProvider');
 
     expect(hook).toContain("window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)");
@@ -75,7 +80,6 @@ describe('public header regression fixes', () => {
     const indexHtml = read('index.html');
 
     expect(header).toContain('public-theme-toggle--desktop inline-flex h-11 w-11');
-    expect(header).toContain('public-theme-toggle--mobile-header inline-flex h-11 w-11');
     expect(header).toContain('aria-label="Toggle menu"');
     expect(header).toContain('aria-expanded={isMobileMenuOpen}');
     expect(header).toContain('aria-controls={mobileMenuId}');
@@ -100,23 +104,61 @@ describe('public header regression fixes', () => {
   it('presents the public mobile menu as a modal dialog with managed background focus', () => {
     const header = read('components/ui/PublicHeader.tsx');
 
+    expect(header).toContain('public-mobile-menu-overlay');
+    expect(header).toContain('public-mobile-menu-sheet');
+    expect(header).toContain('public-mobile-menu-close');
+    expect(header).toContain('public-mobile-menu-link');
     expect(header).toContain('role="dialog"');
     expect(header).toContain('aria-modal="true"');
     expect(header).toContain('aria-labelledby={mobileMenuTitleId}');
     expect(header).toContain('aria-describedby={mobileMenuDescriptionId}');
     expect(header).toContain('mobileMenuPanelRef');
     expect(header).toContain('handleMobileMenuKeyDown');
+    expect(header).toContain("document.body.classList.add('no-scroll')");
+    expect(header).toContain("document.body.classList.remove('no-scroll')");
+    expect(header).not.toContain('public-mobile-menu-scrim');
+    expect(header).not.toContain('mobile-sidebar-link');
   });
 
   it('keeps the public mobile overlay from blurring the header', () => {
     const css = read('index.css');
-    const publicScrim = cssBlock(css, '.public-mobile-menu-scrim');
-    const publicPanel = cssBlock(css, '.public-mobile-menu.mobile-sidebar-shell');
+    const publicOverlay = cssBlock(css, '.public-mobile-menu-overlay');
+    const publicSheet = cssBlock(css, '.public-mobile-menu-sheet');
 
-    expect(publicScrim).not.toContain('backdrop-filter');
-    expect(publicScrim).not.toContain('-webkit-backdrop-filter');
-    expect(publicPanel).not.toContain('backdrop-filter');
-    expect(publicPanel).not.toContain('-webkit-backdrop-filter');
+    expect(publicOverlay).not.toContain('backdrop-filter');
+    expect(publicOverlay).not.toContain('-webkit-backdrop-filter');
+    expect(publicSheet).not.toContain('backdrop-filter');
+    expect(publicSheet).not.toContain('-webkit-backdrop-filter');
+  });
+
+  it('keeps the public mobile sheet public-only without auth-aware rows', () => {
+    const header = read('components/ui/PublicHeader.tsx');
+
+    expect(header).toContain("{ label: 'Home', href: RoutePath.HOME }");
+    expect(header).toContain("label: 'FAQ'");
+    expect(header).toContain("label: 'About'");
+    expect(header).toContain("label: 'Privacy'");
+    expect(header).toContain("label: 'Begin writing'");
+    expect(header).toContain('href: RoutePath.SIGNUP');
+    expect(header).toContain('public-mobile-menu-compact-action');
+    expect(header).not.toContain('const hasAuthHint = homeHref === RoutePath.DASHBOARD;');
+    expect(header).not.toContain("label: hasAuthHint ? 'Go to dashboard' : 'Home'");
+    expect(header).not.toContain('href: hasAuthHint ? RoutePath.DASHBOARD : RoutePath.HOME');
+    expect(header).not.toContain("label: 'Sign in'");
+    expect(header).not.toContain("label: 'Account'");
+    expect(header).not.toContain('href: RoutePath.ACCOUNT');
+    expect(header).not.toContain('supabase');
+  });
+
+  it('gives the public mobile sheet a warm content-sized surface', () => {
+    const css = read('index.css');
+    const publicSheet = cssBlock(css, '.public-mobile-menu-sheet');
+
+    expect(publicSheet).toContain('max-height: min(78dvh, 520px);');
+    expect(publicSheet).toContain('oklch(from var(--green) 0.985 0.012 h / 0.98)');
+    expect(publicSheet).toContain('box-shadow: 0 -12px 30px -26px');
+    expect(publicSheet).toContain('padding-bottom: calc(1rem + env(safe-area-inset-bottom));');
+    expect(css).toContain('min-height: 50px;');
   });
 });
 

@@ -2,15 +2,13 @@ import React, { useEffect, useId, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'motion/react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import {
-  X,
-  CaretRight,
-  DownloadSimple,
-  Bug,
-  Leaf,
-  PaperPlaneTilt,
-  SignOut,
-} from '@phosphor-icons/react';
+import { Bug } from '@phosphor-icons/react/Bug';
+import { CaretRight } from '@phosphor-icons/react/CaretRight';
+import { DownloadSimple } from '@phosphor-icons/react/DownloadSimple';
+import { Leaf } from '@phosphor-icons/react/Leaf';
+import { PaperPlaneTilt } from '@phosphor-icons/react/PaperPlaneTilt';
+import { SignOut } from '@phosphor-icons/react/SignOut';
+import { X } from '@phosphor-icons/react/X';
 import { StorageImage } from '../components/ui/StorageImage';
 import { useAuthStore } from '../hooks/useAuthStore';
 import { usePWAInstall } from '../context/PWAInstallContext';

@@ -1,5 +1,5 @@
 import React, { useId } from 'react';
-import { Icon as PhosphorIcon } from '@phosphor-icons/react';
+import type { Icon as PhosphorIcon } from '@phosphor-icons/react/lib';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;

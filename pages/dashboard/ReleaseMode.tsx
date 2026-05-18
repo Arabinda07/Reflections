@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 
-import { ArrowLeft, Feather, Wind } from '@phosphor-icons/react';
+import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
+import { Feather } from '@phosphor-icons/react/Feather';
+import { Wind } from '@phosphor-icons/react/Wind';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { CompletionCardActions } from '../../components/ui/CompletionCardActions';
@@ -46,7 +48,7 @@ export const ReleaseMode: React.FC = () => {
     <div className="surface-scope-clay page-wash flex min-h-[100dvh] flex-1 flex-col bg-body">
       <div className="mx-auto flex min-h-[100dvh] w-full max-w-4xl flex-col px-5 py-5 sm:px-8 sm:py-8">
         <div className="mb-5 flex items-center justify-between">
-          <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.HOME)} className="-ml-2 min-h-11">
+          <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.DASHBOARD)} className="-ml-2 min-h-11">
             <ArrowLeft size={16} weight="bold" className="mr-2" />
             Home
           </Button>
@@ -95,7 +97,7 @@ export const ReleaseMode: React.FC = () => {
                 ) : null}
 
                 <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
-                  <Button variant="secondary" onClick={() => navigate(RoutePath.HOME)} className="w-full sm:w-auto">
+                  <Button variant="secondary" onClick={() => navigate(RoutePath.DASHBOARD)} className="w-full sm:w-auto">
                     Cancel
                   </Button>
                   <Button
@@ -117,7 +119,7 @@ export const ReleaseMode: React.FC = () => {
                   Released. This can stay quiet now.
                 </p>
                 {cardPayload ? <CompletionCardActions payload={cardPayload} /> : null}
-                <Button variant="ghost" onClick={() => navigate(RoutePath.HOME)} className="mx-auto">
+                <Button variant="ghost" onClick={() => navigate(RoutePath.DASHBOARD)} className="mx-auto">
                   Return home
                 </Button>
               </div>

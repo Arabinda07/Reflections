@@ -11,7 +11,7 @@ export const FounderNoteBlock = ({ content }: FounderNoteBlockProps) => (
         <Column className="w-12">
           {/* We use a public absolute URL for images in email */}
           <Img
-            src="https://reflections-app.vercel.app/assets/images/founder.png"
+            src="https://www.reflections-sanctuary.space/assets/images/founder.png"
             width="40"
             height="40"
             alt="Arabinda"

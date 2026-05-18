@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { PublicPageIcon, type PublicPageIconName } from '../../components/ui/PublicPageIcon';
 import { useDocumentMeta } from '../../hooks/useDocumentMeta';
+import { getPublicHomePath } from '../../src/utils/authHints';
 import { RoutePath } from '../../types';
 
 const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
@@ -108,6 +109,7 @@ export const PrivacyPolicy: React.FC = () => {
     path: '/privacy',
   });
   const navigate = useNavigate();
+  const homePath = getPublicHomePath();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -119,7 +121,7 @@ export const PrivacyPolicy: React.FC = () => {
         <div className="lg:col-span-8">
           <button
             type="button"
-            onClick={() => navigate(RoutePath.HOME)}
+            onClick={() => navigate(homePath)}
             className="-ml-2 mb-8 inline-flex min-h-11 items-center rounded-[var(--radius-control)] px-3 text-[13px] font-bold text-gray-nav transition-colors hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
           >
             <PublicPageIcon name="arrowLeft" size={16} className="mr-2" />

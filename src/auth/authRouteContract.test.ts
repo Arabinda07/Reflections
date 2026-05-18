@@ -19,7 +19,7 @@ describe('auth route session handoff contract', () => {
     expect(app).toContain('path={RoutePath.RESET_PASSWORD} element={withAuthRouteFallback(<ResetPassword />)}');
     expect(app).toContain('path={RoutePath.AUTH_CALLBACK} element={withAuthRouteFallback(<AuthCallback />)}');
     expect(app).toContain('const defaultRouteFallback = <RouteLoadingFrame />;');
-    expect(app).toContain('path={RoutePath.HOME} element={<Landing />}');
+    expect(app).toContain('path={RoutePath.HOME} element={<LandingRoute />}');
   });
 
   it('commits a Supabase session before redirecting from auth flows', () => {

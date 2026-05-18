@@ -1,20 +1,18 @@
-import {
-  Archive,
-  ArrowsClockwise,
-  Brain,
-  CaretRight,
-  CheckCircle as CheckCircleIcon,
-  Feather,
-  FolderOpen,
-  Heart,
-  ListChecks,
-  LockKey,
-  NotePencil,
-  EnvelopeSimple,
-  Plus,
-  Sparkle,
-  Target,
-} from '@phosphor-icons/react';
+import { Archive } from '@phosphor-icons/react/Archive';
+import { ArrowsClockwise } from '@phosphor-icons/react/ArrowsClockwise';
+import { Brain } from '@phosphor-icons/react/Brain';
+import { CaretRight } from '@phosphor-icons/react/CaretRight';
+import { CheckCircle as CheckCircleIcon } from '@phosphor-icons/react/CheckCircle';
+import { EnvelopeSimple } from '@phosphor-icons/react/EnvelopeSimple';
+import { Feather } from '@phosphor-icons/react/Feather';
+import { FolderOpen } from '@phosphor-icons/react/FolderOpen';
+import { Heart } from '@phosphor-icons/react/Heart';
+import { ListChecks } from '@phosphor-icons/react/ListChecks';
+import { LockKey } from '@phosphor-icons/react/LockKey';
+import { NotePencil } from '@phosphor-icons/react/NotePencil';
+import { Plus } from '@phosphor-icons/react/Plus';
+import { Sparkle } from '@phosphor-icons/react/Sparkle';
+import { Target } from '@phosphor-icons/react/Target';
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';

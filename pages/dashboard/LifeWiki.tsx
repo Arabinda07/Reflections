@@ -2,13 +2,11 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import ReactMarkdown from 'react-markdown';
-import {
-  ArrowLeft,
-  Book,
-  CaretRight,
-  Sparkle,
-  Warning,
-} from '@phosphor-icons/react';
+import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
+import { Book } from '@phosphor-icons/react/Book';
+import { CaretRight } from '@phosphor-icons/react/CaretRight';
+import { Sparkle } from '@phosphor-icons/react/Sparkle';
+import { Warning } from '@phosphor-icons/react/Warning';
 import { LottieAnimation } from '../../components/ui/LottieAnimation';
 import { Button } from '../../components/ui/Button';
 import { Alert } from '../../components/ui/Alert';

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LockKey, CheckCircle, Warning } from '@phosphor-icons/react';
+import { CheckCircle } from '@phosphor-icons/react/CheckCircle';
+import { LockKey } from '@phosphor-icons/react/LockKey';
+import { Warning } from '@phosphor-icons/react/Warning';
 import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';

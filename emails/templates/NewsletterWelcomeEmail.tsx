@@ -13,9 +13,9 @@ interface NewsletterWelcomeEmailProps {
 
 export const NewsletterWelcomeEmail = ({ 
   userName = 'there', 
-  loginUrl = 'https://reflections.app/login',
+  loginUrl = 'https://www.reflections-sanctuary.space/login',
   unsubscribeUrl,
-  preferencesUrl = 'https://reflections.app/account',
+  preferencesUrl = 'https://www.reflections-sanctuary.space/account',
   mailingAddress
 }: NewsletterWelcomeEmailProps) => {
   return (

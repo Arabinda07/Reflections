@@ -11,7 +11,7 @@ interface WelcomeEmailProps {
 
 export const WelcomeEmail = ({ 
   userName = 'there', 
-  loginUrl = 'https://reflections.app/login',
+  loginUrl = 'https://www.reflections-sanctuary.space/login',
   supportEmail = 'robinsaha434@gmail.com'
 }: WelcomeEmailProps) => {
   return (

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { PublicPageIcon, type PublicPageIconName } from '../../components/ui/PublicPageIcon';
 import { useDocumentMeta } from '../../hooks/useDocumentMeta';
+import { getPublicHomePath } from '../../src/utils/authHints';
 import { RoutePath } from '../../types';
 
 type AboutSection = {
@@ -46,12 +47,13 @@ export const AboutArabinda: React.FC = () => {
     path: '/about',
   });
   const navigate = useNavigate();
+  const homePath = getPublicHomePath();
 
   return (
     <PageContainer as="section" size="app" className="py-12 sm:py-16">
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
         <button
-          onClick={() => navigate(RoutePath.HOME)}
+          onClick={() => navigate(homePath)}
           className="group -ml-2 mb-12 flex min-h-11 w-fit items-center gap-2 px-2 text-sm font-bold text-gray-nav transition-[color,transform] duration-300 hover:-translate-x-1 hover:text-green"
           aria-label="Back to home"
         >

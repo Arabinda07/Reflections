@@ -1,8 +1,11 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-
-const SITE_ORIGIN = 'https://reflections-ebon.vercel.app';
+import {
+  buildPublicCanonicalUrl,
+  CANONICAL_PUBLIC_ORIGIN,
+  FALLBACK_PUBLIC_ORIGIN,
+} from '../../src/config/publicSite.js';
 
 const read = (filePath: string) =>
   readFileSync(path.resolve(process.cwd(), filePath), 'utf8');
@@ -20,12 +23,13 @@ describe('SEO crawlability contract', () => {
     expect(sitemap).toMatch(/^<\?xml version="1\.0" encoding="UTF-8"\?>/);
     expect(sitemap).toContain('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">');
     expect(locations).toEqual([
-      `${SITE_ORIGIN}/`,
-      `${SITE_ORIGIN}/faq`,
-      `${SITE_ORIGIN}/privacy`,
-      `${SITE_ORIGIN}/about`,
+      `${CANONICAL_PUBLIC_ORIGIN}/`,
+      `${CANONICAL_PUBLIC_ORIGIN}/faq`,
+      `${CANONICAL_PUBLIC_ORIGIN}/privacy`,
+      `${CANONICAL_PUBLIC_ORIGIN}/about`,
     ]);
     expect(sitemap).not.toContain('localhost');
+    expect(sitemap).not.toContain(FALLBACK_PUBLIC_ORIGIN);
 
     for (const privateRoute of [
       '/home',
@@ -40,7 +44,7 @@ describe('SEO crawlability contract', () => {
       '/login',
       '/signup',
     ]) {
-      expect(locations).not.toContain(`${SITE_ORIGIN}${privateRoute}`);
+      expect(locations).not.toContain(`${CANONICAL_PUBLIC_ORIGIN}${privateRoute}`);
     }
   });
 
@@ -49,7 +53,7 @@ describe('SEO crawlability contract', () => {
 
     expect(robots).toContain('User-agent: *');
     expect(robots).toContain('Allow: /');
-    expect(robots).toContain(`Sitemap: ${SITE_ORIGIN}/sitemap.xml`);
+    expect(robots).toContain(`Sitemap: ${CANONICAL_PUBLIC_ORIGIN}/sitemap.xml`);
     expect(robots).toContain('Disallow: /home');
     expect(robots).toContain('Disallow: /notes');
     expect(robots).toContain('Disallow: /wiki');
@@ -57,6 +61,7 @@ describe('SEO crawlability contract', () => {
     expect(robots).not.toMatch(/Disallow:\s*\/faq\b/);
     expect(robots).not.toMatch(/Disallow:\s*\/privacy\b/);
     expect(robots).not.toMatch(/Disallow:\s*\/about\b/);
+    expect(robots).not.toContain(FALLBACK_PUBLIC_ORIGIN);
   });
 
   it('exposes a focused SEO audit script for crawl-file regressions', () => {
@@ -159,7 +164,8 @@ describe('SEO crawlability contract', () => {
 
     expect(llms).toContain('Reflections');
     expect(llms).toContain('journal');
-    expect(llms).toContain('https://reflections-ebon.vercel.app/');
+    expect(llms).toContain(`${CANONICAL_PUBLIC_ORIGIN}/`);
+    expect(llms).not.toContain(FALLBACK_PUBLIC_ORIGIN);
     expect(llms).toContain('Pricing');
   });
 
@@ -189,6 +195,17 @@ describe('SEO crawlability contract', () => {
     expect(html).toContain('og:image:height" content="630"');
     expect(html).toContain('og-social.webp');
     expect(html).not.toMatch(/og:image:width" content="512"/);
+  });
+
+  it('emits the canonical custom domain in the document head and structured data', () => {
+    const html = read('index.html');
+
+    expect(html).toContain(`<link rel="canonical" href="${buildPublicCanonicalUrl('/')}" />`);
+    expect(html).toContain(`property="og:url" content="${buildPublicCanonicalUrl('/')}"`);
+    expect(html).toContain(`content="${CANONICAL_PUBLIC_ORIGIN}/assets/images/og-social.webp"`);
+    expect(html).toContain(`"url": "${CANONICAL_PUBLIC_ORIGIN}/"`);
+    expect(html).toContain(`"logo": "${CANONICAL_PUBLIC_ORIGIN}/icons/icon-512.png"`);
+    expect(html).not.toContain(FALLBACK_PUBLIC_ORIGIN);
   });
 
   it('includes dateModified in structured data schemas', () => {
@@ -232,13 +249,14 @@ describe('SEO crawlability contract', () => {
     const header = read('components/ui/PublicHeader.tsx');
 
     expect(footer).toContain('Public pages');
-    expect(footer).toContain("href: RoutePath.HOME");
+    expect(footer).toContain('const homeHref = usePublicHomePath();');
     expect(footer).toContain("href: RoutePath.FAQ");
     expect(footer).toContain("href: RoutePath.ABOUT");
     expect(footer).toContain("href: RoutePath.PRIVACY");
     expect(header).toContain('Public navigation');
     expect(header).toContain('Mobile public navigation');
     expect(header).toContain('href={item.href}');
+    expect(header).toContain('const homeHref = usePublicHomePath();');
   });
 
   it('keeps FAQ guide sections with key product questions for AI extractability', () => {

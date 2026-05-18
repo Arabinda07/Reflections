@@ -2,16 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate, useOutlet } from 'react-router-dom';
 
 import { Link } from 'react-router-dom';
-import { PaperPlaneTilt } from '@phosphor-icons/react';
-import {
-  House,
-  Question,
-  SignIn,
-  UserPlus,
-  Notebook,
-  PencilSimpleLine,
-  UserCircle,
-} from '@phosphor-icons/react';
+import { House } from '@phosphor-icons/react/House';
+import { Notebook } from '@phosphor-icons/react/Notebook';
+import { PaperPlaneTilt } from '@phosphor-icons/react/PaperPlaneTilt';
+import { PencilSimpleLine } from '@phosphor-icons/react/PencilSimpleLine';
+import { Question } from '@phosphor-icons/react/Question';
+import { SignIn } from '@phosphor-icons/react/SignIn';
+import { UserCircle } from '@phosphor-icons/react/UserCircle';
+import { UserPlus } from '@phosphor-icons/react/UserPlus';
 import { RoutePath } from '../types';
 import { useAuthStore } from '../hooks/useAuthStore';
 import { useKeyboardShortcut } from '../src/hooks/useKeyboardShortcut';
@@ -28,6 +26,7 @@ const ReferralInvitePanel = React.lazy(() => import('../components/ui/ReferralIn
 const SyncBanner = React.lazy(() => import('../components/ui/SyncBanner').then(m => ({ default: m.SyncBanner })));
 const MobileSidebar = React.lazy(() => import('./MobileSidebar').then(m => ({ default: m.MobileSidebar })));
 const BugReportFlow = React.lazy(() => import('./BugReportFlow').then(m => ({ default: m.BugReportFlow })));
+const AuthenticatedMobileNav = React.lazy(() => import('./AuthenticatedMobileNav').then(m => ({ default: m.AuthenticatedMobileNav })));
 
 const GUEST_NAV_ITEMS: SidebarNavItem[] = [
   { label: 'Homepage', path: RoutePath.HOME, icon: House, description: 'Start from the opening page.' },
@@ -79,18 +78,22 @@ export const DashboardLayout: React.FC = () => {
   }, [location.search]);
 
   // Derived route flags
+  const isNoteEditRoute =
+    location.pathname.startsWith(`${RoutePath.NOTES}/`) && location.pathname.endsWith('/edit');
+
   const isWritingRoute =
     location.pathname === RoutePath.RELEASE ||
-    location.pathname.includes('/new') ||
-    location.pathname.includes('/edit') ||
-    (location.pathname.startsWith('/notes/') && location.pathname !== '/notes/');
+    location.pathname === RoutePath.CREATE_NOTE ||
+    isNoteEditRoute;
 
   const isMobileNavSuppressedRoute =
     location.pathname === RoutePath.INSIGHTS ||
     location.pathname.startsWith(RoutePath.SANCTUARY);
 
+  const shouldShowAuthenticatedMobileNav = isAuthenticated && !isWritingRoute;
   const isLandingRoute = location.pathname === RoutePath.HOME && !isAuthenticated;
   const routeTransitionClass = isWritingRoute ? '' : 'animate-in fade-in duration-300 ease-out-expo';
+  const homePath = isAuthenticated ? RoutePath.DASHBOARD : RoutePath.HOME;
 
   const navItems = isAuthenticated ? AUTH_NAV_ITEMS : GUEST_NAV_ITEMS;
   const sidebarNavItems = isAuthenticated ? AUTH_NAV_ITEMS : GUEST_SIDEBAR_NAV_ITEMS;
@@ -109,7 +112,7 @@ export const DashboardLayout: React.FC = () => {
         <NavigationBar
           navItems={navItems}
           isLandingRoute={isLandingRoute}
-          isMobileNavSuppressed={isMobileNavSuppressedRoute}
+          isMobileNavSuppressed={isAuthenticated ? true : isMobileNavSuppressedRoute}
           isMobileMenuOpen={isMobileMenuOpen}
           onMobileMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           onInvite={() => setIsInviteModalOpen(true)}
@@ -117,24 +120,26 @@ export const DashboardLayout: React.FC = () => {
       )}
 
       {/* Mobile Sidebar */}
-      <React.Suspense fallback={null}>
-        <MobileSidebar
-          isOpen={isMobileMenuOpen}
-          onClose={() => setIsMobileMenuOpen(false)}
-          navItems={sidebarNavItems}
-          onBugReport={() => {
-            setIsMobileMenuOpen(false);
-            setIsBugReportOpen(true);
-          }}
-          onInvite={() => setIsInviteModalOpen(true)}
-        />
-      </React.Suspense>
+      {!isAuthenticated && (
+        <React.Suspense fallback={null}>
+          <MobileSidebar
+            isOpen={isMobileMenuOpen}
+            onClose={() => setIsMobileMenuOpen(false)}
+            navItems={sidebarNavItems}
+            onBugReport={() => {
+              setIsMobileMenuOpen(false);
+              setIsBugReportOpen(true);
+            }}
+            onInvite={() => setIsInviteModalOpen(true)}
+          />
+        </React.Suspense>
+      )}
 
       {/* Main Content — sole scroll container in the shell */}
       <main
         id="main-content"
         tabIndex={-1}
-        className="relative flex min-h-0 w-full flex-1 flex-col overflow-y-auto custom-scrollbar"
+        className={`relative flex min-h-0 w-full flex-1 flex-col overflow-y-auto custom-scrollbar ${shouldShowAuthenticatedMobileNav ? 'auth-mobile-scroll-space' : ''}`.trim()}
       >
         <React.Suspense fallback={null}>
           <SyncBanner />
@@ -156,7 +161,7 @@ export const DashboardLayout: React.FC = () => {
                 aria-label="Footer navigation"
                 className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 sm:gap-10"
               >
-                <Link to={RoutePath.HOME} className={footerLinkClass}>
+                <Link to={homePath} className={footerLinkClass}>
                   Home
                 </Link>
                 <Link to={RoutePath.FAQ} className={footerLinkClass}>
@@ -186,6 +191,15 @@ export const DashboardLayout: React.FC = () => {
           </footer>
         )}
       </main>
+
+      {shouldShowAuthenticatedMobileNav && (
+        <React.Suspense fallback={null}>
+          <AuthenticatedMobileNav
+            onBugReport={() => setIsBugReportOpen(true)}
+            onInvite={() => setIsInviteModalOpen(true)}
+          />
+        </React.Suspense>
+      )}
 
       {/* Bug Report Flow — self-contained with floating trigger + modal */}
       {!isWritingRoute && (

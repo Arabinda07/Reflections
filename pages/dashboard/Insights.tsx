@@ -1,15 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import {
-  ArrowLeft,
-  Heart,
-  Book,
-  CaretRight,
-  CalendarCheck,
-  Hash,
-  Leaf,
-} from '@phosphor-icons/react';
+import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
+import { Book } from '@phosphor-icons/react/Book';
+import { CalendarCheck } from '@phosphor-icons/react/CalendarCheck';
+import { CaretRight } from '@phosphor-icons/react/CaretRight';
+import { Hash } from '@phosphor-icons/react/Hash';
+import { Heart } from '@phosphor-icons/react/Heart';
+import { Leaf } from '@phosphor-icons/react/Leaf';
 
 import { LottieAnimation } from '../../components/ui/LottieAnimation';
 import { Button } from '../../components/ui/Button';
@@ -252,7 +250,7 @@ export const Insights: React.FC = () => {
       <PageContainer className="surface-scope-sky page-wash pb-24 pt-6 md:pt-10">
         <div className="core-page-stack">
           <button 
-            onClick={() => navigate(RoutePath.HOME)}
+            onClick={() => navigate(RoutePath.DASHBOARD)}
             className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-green/5 hover:text-green"
             aria-label="Back to home"
           >
