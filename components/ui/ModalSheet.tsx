@@ -18,6 +18,7 @@ interface ModalSheetProps {
   backdropClassName?: string;
   bodyClassName?: string;
   panelClassName?: string;
+  panelId?: string;
   hideClose?: boolean;
   closeLabel?: string;
   mobilePlacement?: 'bottom' | 'center';
@@ -50,6 +51,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
   backdropClassName = '',
   bodyClassName = '',
   panelClassName = '',
+  panelId,
   hideClose = false,
   closeLabel = 'Close dialog',
   mobilePlacement = 'bottom',
@@ -172,6 +174,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
           <div className={`surface-bezel ${SURFACE_TONE_CLASS[tone]}`}>
             <div
               ref={panelRef}
+              id={panelId}
               className={`surface-bezel-inner modal-sheet-panel ${panelClassName}`.trim()}
               role="dialog"
               aria-modal="true"

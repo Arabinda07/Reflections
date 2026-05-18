@@ -21,9 +21,13 @@ describe('public header regression fixes', () => {
     expect(header).toContain(
       'M223.45,40.07a8,8,0,0,0-7.52-7.52C139.8,28.08,78.82,51,52.82,94',
     );
+    expect(header).toContain('const HomeLineIcon');
+    expect(header).toContain('const HelpBubbleIcon');
+    expect(header).toContain('const PeopleSparkIcon');
+    expect(header).toContain('const ShieldLeafIcon');
   });
 
-  it('renders a public theme switcher on desktop and inside the mobile sheet', () => {
+  it('renders public theme controls in the header without duplicating them in the mobile sheet', () => {
     const header = read('components/ui/PublicHeader.tsx');
 
     expect(header).toContain('const ThemeModeButton');
@@ -31,11 +35,11 @@ describe('public header regression fixes', () => {
     expect(header).toContain("document.documentElement.classList.toggle('dark', isDarkMode)");
     expect(header).toContain("const PUBLIC_THEME_STORAGE_KEY = 'reflections-theme';");
     expect(header).toContain('public-theme-toggle public-theme-toggle--desktop');
-    expect(header).not.toContain('public-theme-toggle public-theme-toggle--mobile-header');
-    expect(header).toContain('public-theme-toggle public-theme-toggle--mobile-sheet');
-    expect(header).toContain('public-mobile-menu-section-title">Display');
-    expect(header).toContain("aria-pressed={isDarkMode}");
-    expect(header).toContain("aria-label={isDarkMode ? 'Display preference: use light mode' : 'Display preference: use dark mode'}");
+    expect(header).toContain('public-theme-toggle public-theme-toggle--mobile-header');
+    expect(header).not.toContain('public-theme-toggle public-theme-toggle--mobile-sheet');
+    expect(header).not.toContain('public-mobile-menu-section-title">Display');
+    expect(header).not.toContain("aria-pressed={isDarkMode}");
+    expect(header).not.toContain("aria-label={isDarkMode ? 'Display preference: use light mode' : 'Display preference: use dark mode'}");
     expect(header).not.toContain('reflections.public-theme');
     expect(header).not.toContain('motion/');
   });
@@ -80,6 +84,7 @@ describe('public header regression fixes', () => {
     const indexHtml = read('index.html');
 
     expect(header).toContain('public-theme-toggle--desktop inline-flex h-11 w-11');
+    expect(header).toContain('public-theme-toggle--mobile-header inline-flex h-11 w-11');
     expect(header).toContain('aria-label="Toggle menu"');
     expect(header).toContain('aria-expanded={isMobileMenuOpen}');
     expect(header).toContain('aria-controls={mobileMenuId}');
@@ -108,6 +113,9 @@ describe('public header regression fixes', () => {
     expect(header).toContain('public-mobile-menu-sheet');
     expect(header).toContain('public-mobile-menu-close');
     expect(header).toContain('public-mobile-menu-link');
+    expect(header).toContain('public-mobile-menu-link-leading');
+    expect(header).toContain('public-mobile-menu-link-icon');
+    expect(header).toContain('public-mobile-menu-link-chevron');
     expect(header).toContain('role="dialog"');
     expect(header).toContain('aria-modal="true"');
     expect(header).toContain('aria-labelledby={mobileMenuTitleId}');
@@ -134,17 +142,22 @@ describe('public header regression fixes', () => {
   it('keeps the public mobile sheet public-only without auth-aware rows', () => {
     const header = read('components/ui/PublicHeader.tsx');
 
-    expect(header).toContain("{ label: 'Home', href: RoutePath.HOME }");
+    expect(header).toContain("label: 'Home', href: RoutePath.HOME, icon: HomeLineIcon");
     expect(header).toContain("label: 'FAQ'");
     expect(header).toContain("label: 'About'");
     expect(header).toContain("label: 'Privacy'");
+    expect(header).toContain('icon: HomeLineIcon');
+    expect(header).toContain('icon: HelpBubbleIcon');
+    expect(header).toContain('icon: PeopleSparkIcon');
+    expect(header).toContain('icon: ShieldLeafIcon');
     expect(header).toContain("label: 'Begin writing'");
     expect(header).toContain('href: RoutePath.SIGNUP');
     expect(header).toContain('public-mobile-menu-compact-action');
+    expect(header).toContain('href={RoutePath.LOGIN}');
+    expect(header).toContain('Sign in');
     expect(header).not.toContain('const hasAuthHint = homeHref === RoutePath.DASHBOARD;');
     expect(header).not.toContain("label: hasAuthHint ? 'Go to dashboard' : 'Home'");
     expect(header).not.toContain('href: hasAuthHint ? RoutePath.DASHBOARD : RoutePath.HOME');
-    expect(header).not.toContain("label: 'Sign in'");
     expect(header).not.toContain("label: 'Account'");
     expect(header).not.toContain('href: RoutePath.ACCOUNT');
     expect(header).not.toContain('supabase');
@@ -155,10 +168,21 @@ describe('public header regression fixes', () => {
     const publicSheet = cssBlock(css, '.public-mobile-menu-sheet');
 
     expect(publicSheet).toContain('max-height: min(78dvh, 520px);');
+    expect(publicSheet).toContain('border: 1.5px solid');
     expect(publicSheet).toContain('oklch(from var(--green) 0.985 0.012 h / 0.98)');
     expect(publicSheet).toContain('box-shadow: 0 -12px 30px -26px');
     expect(publicSheet).toContain('padding-bottom: calc(1rem + env(safe-area-inset-bottom));');
+    expect(publicSheet).toContain('overflow-y: auto;');
+    expect(publicSheet).toContain('scrollbar-width: none;');
+    expect(publicSheet).toContain('-ms-overflow-style: none;');
+    expect(css).toContain('.public-mobile-menu-sheet::-webkit-scrollbar');
+    expect(css).toContain('display: none;');
     expect(css).toContain('min-height: 50px;');
+    expect(css).toContain('.public-mobile-menu-link-icon');
+    expect(css).toContain('.public-mobile-menu-link-chevron');
+    expect(css).toContain('background: var(--green);');
+    expect(css).not.toContain('.public-mobile-menu-preference-row');
+    expect(css).not.toContain('.public-mobile-menu-preference-state');
   });
 });
 

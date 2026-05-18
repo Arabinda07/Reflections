@@ -403,7 +403,7 @@ export const HomeAuthenticated: React.FC = () => {
   return (
     <>
       <div
-        className="surface-scope-sage page-wash relative min-h-full flex flex-col flex-1 bg-body selection:bg-green/10"
+        className="home-authenticated-mobile-safe surface-scope-sage page-wash relative min-h-full flex flex-col flex-1 bg-body selection:bg-green/10"
         aria-hidden={showOnboarding ? 'true' : undefined}
       >
         <section className="relative isolate h-[56dvh] min-h-[360px] w-full overflow-hidden bg-body sm:h-[60dvh] sm:min-h-[450px]">
@@ -453,7 +453,7 @@ export const HomeAuthenticated: React.FC = () => {
           className="core-bento-grid"
         >
           <div
-            className="group relative surface-flat overflow-hidden rounded-[2.5rem] p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full transition-[border-color,box-shadow] duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-green/5 hover:border-green/10 animate-fade-in-up"
+            className="home-primary-reflection-card group relative surface-flat overflow-hidden rounded-[2.5rem] p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full transition-[border-color,box-shadow] duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-green/5 hover:border-green/10 animate-fade-in-up"
           >
             <div className="relative z-10">
               <div className="flex items-center justify-between mb-8">
@@ -480,7 +480,7 @@ export const HomeAuthenticated: React.FC = () => {
                 >
                   {dailyPrompt}
                 </p>
-                <div className="flex max-w-xl flex-col gap-3">
+                <div className="home-primary-action-cluster flex max-w-xl flex-col gap-3">
                   <Button
                     variant="primary"
 

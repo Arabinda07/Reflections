@@ -18,6 +18,10 @@ type PublicMenuItem = {
   href: RoutePath;
 };
 
+type PublicMobileMenuItem = PublicMenuItem & {
+  icon: React.FC<IconProps>;
+};
+
 type ThemeModeButtonProps = {
   isDarkMode: boolean;
   onToggle: () => void;
@@ -101,6 +105,75 @@ const MoonIcon: React.FC<IconProps> = ({ className = '' }) => (
   </svg>
 );
 
+const HomeLineIcon: React.FC<IconProps> = ({ className = '' }) => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" className={className} fill="none">
+    <path
+      d="M4.8 11.2 12 5.1l7.2 6.1v7.2a1.6 1.6 0 0 1-1.6 1.6h-3.1v-5.3h-5V20H6.4a1.6 1.6 0 0 1-1.6-1.6v-7.2Z"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+const HelpBubbleIcon: React.FC<IconProps> = ({ className = '' }) => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" className={className} fill="none">
+    <path
+      d="M7.1 18.4 4.8 20l.6-3.1A7.9 7.9 0 1 1 7.1 18.4Z"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M9.6 9.2a2.7 2.7 0 0 1 5.1 1.3c0 1.8-1.9 2.2-2.4 3.2M12.2 16.5h.01"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+const PeopleSparkIcon: React.FC<IconProps> = ({ className = '' }) => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" className={className} fill="none">
+    <path
+      d="M8.5 11.2a2.9 2.9 0 1 0 0-5.8 2.9 2.9 0 0 0 0 5.8ZM3.9 18.6a4.7 4.7 0 0 1 9.2 0"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M16.4 6.5v3.1M18 8h-3.1M17.6 14.1a3.7 3.7 0 0 1 2.5 3.5"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+const ShieldLeafIcon: React.FC<IconProps> = ({ className = '' }) => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" className={className} fill="none">
+    <path
+      d="M12 3.8 18.6 6v5.1c0 4.2-2.6 7.5-6.6 9.1-4-1.6-6.6-4.9-6.6-9.1V6L12 3.8Z"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M9.3 12.6c2.5-.2 4-1.4 4.7-3.6 1.1 2.9-.1 5.4-3.6 6.2"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 const ThemeModeButton: React.FC<ThemeModeButtonProps> = ({
   isDarkMode,
   onToggle,
@@ -131,7 +204,6 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
   const mobileMenuId = useId();
   const mobileMenuTitleId = useId();
   const mobileMenuDescriptionId = useId();
-  const mobileMenuDisplayTitleId = useId();
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
   const mobileMenuPanelRef = useRef<HTMLElement | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -143,12 +215,13 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
   ] satisfies PublicMenuItem[];
 
   const mobileMenuItems = [
-    { label: 'Home', href: RoutePath.HOME },
-    ...publicInfoNavItems,
-  ] satisfies PublicMenuItem[];
+    { label: 'Home', href: RoutePath.HOME, icon: HomeLineIcon },
+    { label: 'FAQ', href: RoutePath.FAQ, icon: HelpBubbleIcon },
+    { label: 'About', href: RoutePath.ABOUT, icon: PeopleSparkIcon },
+    { label: 'Privacy', href: RoutePath.PRIVACY, icon: ShieldLeafIcon },
+  ] satisfies PublicMobileMenuItem[];
 
   const mobileCompactAction = { label: 'Begin writing', href: RoutePath.SIGNUP } satisfies PublicMenuItem;
-  const CurrentThemeIcon = isDarkMode ? MoonIcon : SunIcon;
 
   const isPublicRouteActive = (href: RoutePath) =>
     href === RoutePath.HOME ? location.pathname === RoutePath.HOME : location.pathname === href;
@@ -292,11 +365,12 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
                 </button>
               </div>
               <p id={mobileMenuDescriptionId} className="sr-only">
-                Use this menu to explore public Reflections pages, adjust display, and close it when you are ready to return to the page.
+                Use this menu to explore public Reflections pages and close it when you are ready to return to the page.
               </p>
 
               <nav aria-label="Mobile public navigation" className="public-mobile-menu-list">
                 {mobileMenuItems.map((item) => {
+                  const Icon = item.icon;
                   const isActive = isPublicRouteActive(item.href);
 
                   return (
@@ -308,7 +382,13 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
                       data-active={isActive ? 'true' : undefined}
                       aria-current={isActive ? 'page' : undefined}
                     >
-                      <span>{item.label}</span>
+                      <span className="public-mobile-menu-link-leading">
+                        <span className="public-mobile-menu-link-icon">
+                          <Icon className="h-4 w-4" />
+                        </span>
+                        <span>{item.label}</span>
+                      </span>
+                      <ChevronRightIcon className="public-mobile-menu-link-chevron h-4 w-4" />
                     </a>
                   );
                 })}
@@ -325,26 +405,16 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
                 </a>
               </div>
 
-              <div className="public-mobile-menu-section" aria-labelledby={mobileMenuDisplayTitleId}>
-                <p id={mobileMenuDisplayTitleId} className="public-mobile-menu-section-title">Display</p>
-                <button
-                  type="button"
-                  onClick={toggleDarkMode}
-                  aria-pressed={isDarkMode}
-                  aria-label={isDarkMode ? 'Display preference: use light mode' : 'Display preference: use dark mode'}
-                  title={isDarkMode ? 'Use light mode' : 'Use dark mode'}
-                  className="public-theme-toggle public-theme-toggle--mobile-sheet public-mobile-menu-preference-row"
+              <div className="public-mobile-menu-secondary-actions">
+                <a
+                  href={RoutePath.LOGIN}
+                  onClick={(event) => handleAppRouteNavigation(event, RoutePath.LOGIN)}
+                  className="public-mobile-menu-secondary-action"
                 >
-                  <span>Theme</span>
-                  <span className="public-mobile-menu-preference-state">
-                    <CurrentThemeIcon className="h-4 w-4" />
-                    <span>{isDarkMode ? 'Dark' : 'Light'}</span>
-                  </span>
-                </button>
-              </div>
-
-              {canInstall && !isInstalled && (
-                <div className="public-mobile-menu-secondary-actions">
+                  <span>Sign in</span>
+                  <ChevronRightIcon className="h-4 w-4" />
+                </a>
+                {canInstall && !isInstalled && (
                   <button
                     type="button"
                     onClick={async () => {
@@ -356,8 +426,8 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
                   >
                     <span>Install app</span>
                   </button>
-                </div>
-              )}
+                )}
+              </div>
             </section>
           </div>
         </div>,
@@ -424,6 +494,11 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
           </nav>
 
           <div className="flex items-center gap-2 lg:hidden">
+            <ThemeModeButton
+              isDarkMode={isDarkMode}
+              onToggle={toggleDarkMode}
+              className={`public-theme-toggle public-theme-toggle--mobile-header inline-flex h-11 w-11 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green ${controlTone}`}
+            />
             <button
               ref={menuButtonRef}
               type="button"

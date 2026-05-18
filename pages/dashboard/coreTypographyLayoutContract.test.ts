@@ -50,19 +50,26 @@ describe('core app typography and layout contract', () => {
 
   it('keeps the home audio control away from the mobile primary CTA path', () => {
     const audioCss = read('components/ui/ambient-music.css');
+    const css = read('index.css');
     const home = read('pages/dashboard/HomeAuthenticated.tsx');
 
     expect(audioCss).toContain('@media (max-width: 640px)');
-    expect(audioCss).toContain('position: absolute;');
-    expect(audioCss).toContain('bottom: clamp(1rem, 4dvh, 2rem);');
+    expect(audioCss).toContain('position: fixed;');
+    expect(audioCss).toContain('bottom: calc(var(--mobile-bottom-nav-height, 5.75rem) + env(safe-area-inset-bottom) + 1.25rem);');
     expect(audioCss).toContain('z-index: 30;');
     expect(audioCss).toContain('.floating-audio-container .audio-hint');
     expect(audioCss).toContain('display: none;');
+    expect(css).toContain('--mobile-bottom-nav-reserved-space');
+    expect(css).toContain('.home-authenticated-mobile-safe .core-bento-grid');
+    expect(css).toContain('padding-bottom: calc(var(--mobile-bottom-nav-reserved-space) + env(safe-area-inset-bottom) + 1rem);');
+    expect(home).toContain('home-authenticated-mobile-safe');
+    expect(home).toContain('home-primary-reflection-card');
+    expect(home).toContain('home-primary-action-cluster');
     const audioPosition = home.indexOf('<div className="floating-audio-container">');
     const cardsPosition = home.indexOf('className="core-bento-grid"');
 
     expect(audioPosition).toBeGreaterThan(-1);
     expect(cardsPosition).toBeGreaterThan(-1);
-    expect(audioPosition).toBeLessThan(cardsPosition);
+    expect(audioPosition).toBeGreaterThan(cardsPosition);
   });
 });

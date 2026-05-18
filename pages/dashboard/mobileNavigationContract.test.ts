@@ -20,13 +20,22 @@ describe('signed-in mobile navigation contract', () => {
     expect(mobileNav).toContain("label: 'Write'");
     expect(mobileNav).toContain("label: 'Notes'");
     expect(mobileNav).toContain("label: 'More'");
+    expect(mobileNav).toContain('auth-mobile-tab-label');
     expect(mobileNav).toContain('RoutePath.DASHBOARD');
     expect(mobileNav).toContain('RoutePath.CREATE_NOTE');
     expect(mobileNav).toContain('RoutePath.NOTES');
     expect(mobileNav).toContain("aria-current={isActive ? 'page' : undefined}");
+    expect(mobileNav).toContain('aria-label="Open more navigation"');
+    expect(mobileNav).toContain('aria-haspopup="dialog"');
     expect(mobileNav).toContain('aria-expanded={isMoreOpen}');
     expect(mobileNav).toContain('aria-controls={moreSheetId}');
+    expect(mobileNav).not.toContain('<span>{tab.label}</span>');
+    expect(mobileNav).toContain('title="Navigation"');
+    expect(mobileNav).not.toContain('title="More"');
+    expect(mobileNav).not.toContain('More places inside Reflections.');
+    expect(mobileNav).not.toContain('description=');
     expect(mobileNav).toContain('mobilePlacement="bottom"');
+    expect(mobileNav).toContain('panelId={moreSheetId}');
     expect(mobileNav).toContain('data-autofocus');
   });
 
@@ -70,6 +79,9 @@ describe('signed-in mobile navigation contract', () => {
     expect(mobileNav).toContain('data-active={isActive ? \'true\' : undefined}');
     expect(mobileNav).toContain("aria-current={isActive ? 'page' : undefined}");
     expect(mobileNav).toContain('const neutralIconTileClass');
+    expect(mobileNav).toContain('auth-mobile-more-link-content');
+    expect(mobileNav).toContain('auth-mobile-more-link-chevron');
+    expect(mobileNav).toContain("import { CaretRight } from '@phosphor-icons/react/CaretRight';");
     expect(mobileNav).not.toContain('bg-honey/10 text-honey');
     expect(mobileNav).not.toContain('bg-sky/10 text-sky');
   });
@@ -82,13 +94,22 @@ describe('signed-in mobile navigation contract', () => {
     expect(mobileNav).toContain('backdropClassName="auth-mobile-more-backdrop"');
     expect(mobileNav).not.toContain('icon={<DotsThreeCircle');
     expect(modalSheet).toContain('backdropClassName?: string');
+    expect(modalSheet).toContain('panelId?: string');
     expect(modalSheet).toContain("backdropClassName = ''");
+    expect(modalSheet).toContain('id={panelId}');
     expect(modalSheet).toContain('modal-sheet-backdrop ${backdropClassName}');
     expect(css).toContain('.auth-mobile-more-backdrop');
     expect(css).toContain('.surface-bezel-inner.modal-sheet-panel.auth-mobile-more-sheet-panel');
+    expect(css).toContain('.auth-mobile-more-sheet-panel .modal-sheet-title');
     expect(css).toContain('.auth-mobile-more-link[data-active="true"]');
+    expect(css).toContain('.auth-mobile-more-link-chevron');
     expect(css).toContain('.auth-mobile-more-sheet-body');
+    expect(css).toContain('.auth-mobile-more-sheet-body::-webkit-scrollbar');
+    expect(css).toMatch(/\.auth-mobile-more-sheet-body\s*{[\s\S]*scrollbar-width: none;/);
     expect(css).toContain('env(safe-area-inset-bottom)');
+    expect(css).toContain('--mobile-bottom-nav-height');
+    expect(css).toContain('--mobile-bottom-nav-reserved-space');
+    expect(css).toContain('scroll-padding-bottom: calc(var(--mobile-bottom-nav-reserved-space) + env(safe-area-inset-bottom));');
   });
 
   it('keeps ModalSheet dismissal and focus behavior available to More', () => {

@@ -2,6 +2,7 @@ import React, { useId, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Book } from '@phosphor-icons/react/Book';
 import { Bug } from '@phosphor-icons/react/Bug';
+import { CaretRight } from '@phosphor-icons/react/CaretRight';
 import { DotsThreeCircle } from '@phosphor-icons/react/DotsThreeCircle';
 import { DownloadSimple } from '@phosphor-icons/react/DownloadSimple';
 import { EnvelopeSimple } from '@phosphor-icons/react/EnvelopeSimple';
@@ -122,16 +123,16 @@ const isMoreNavItemActive = (item: MoreNavItem, pathname: string) =>
   });
 
 const tabBaseClass =
-  'auth-mobile-tab relative flex min-h-11 flex-1 flex-col items-center justify-center gap-1 overflow-hidden rounded-[var(--radius-control)] px-2 py-1.5 text-[12px] font-extrabold leading-none transition-[background-color,color,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
+  'auth-mobile-tab relative flex min-h-11 flex-1 flex-col items-center justify-center gap-1 overflow-hidden rounded-[var(--radius-control)] px-2 py-1.5 text-[12px] font-extrabold leading-none transition-[background-color,border-color,color,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
 
 const moreLinkClass =
-  'auth-mobile-more-link flex min-h-11 w-full items-center gap-3 rounded-[var(--radius-control)] border border-transparent px-3 py-2 text-left text-[14px] font-extrabold text-gray-text transition-colors hover:border-green/15 hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
+  'auth-mobile-more-link flex min-h-11 w-full items-center justify-between gap-3 rounded-[var(--radius-control)] border border-transparent px-3 py-2 text-left text-[14px] font-extrabold text-gray-text transition-colors hover:border-green/15 hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
 
 const neutralIconTileClass =
-  'flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-control)] bg-green/10 text-green';
+  'auth-mobile-more-icon-tile flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-control)] bg-green/10 text-green';
 
 const signOutIconTileClass =
-  'flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-control)] bg-clay/10 text-clay';
+  'auth-mobile-more-icon-tile auth-mobile-more-icon-tile--danger flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-control)] bg-clay/10 text-clay';
 
 export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
   onBugReport,
@@ -172,7 +173,7 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
         aria-label="Signed-in mobile navigation"
         className="auth-mobile-bottom-nav fixed inset-x-0 bottom-0 z-[95] px-3 pb-[calc(0.5rem+env(safe-area-inset-bottom))] lg:hidden"
       >
-        <div className="mx-auto flex min-h-[4rem] max-w-[32rem] items-center gap-1 rounded-[calc(var(--radius-shell)-0.35rem)] border border-border/80 bg-surface/95 p-1.5 shadow-[0_-12px_32px_-28px_oklch(from_var(--green-shadow)_l_c_h_/_0.38)] backdrop-blur-md">
+        <div className="mx-auto flex min-h-[4rem] max-w-[24rem] items-center gap-1 rounded-[calc(var(--radius-shell)-0.35rem)] border border-border/80 bg-surface/95 p-1.5 shadow-[0_-12px_32px_-28px_oklch(from_var(--green-shadow)_l_c_h_/_0.38)] backdrop-blur-md">
           {AUTHENTICATED_MOBILE_TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = tab.matches(location.pathname);
@@ -190,12 +191,13 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
                   className={tabClass}
                   data-active={isActive ? 'true' : undefined}
                   aria-current={isActive ? 'page' : undefined}
+                  aria-label="Open more navigation"
+                  aria-haspopup="dialog"
                   aria-expanded={isMoreOpen}
                   aria-controls={moreSheetId}
                   onClick={() => setIsMoreOpen(true)}
                 >
                   <Icon size={22} weight={isActive ? 'fill' : 'regular'} aria-hidden="true" />
-                  <span>{tab.label}</span>
                 </button>
               );
             }
@@ -209,7 +211,7 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
                 aria-current={isActive ? 'page' : undefined}
               >
                 <Icon size={22} weight={isActive ? 'fill' : 'regular'} aria-hidden="true" />
-                <span>{tab.label}</span>
+                <span className="auth-mobile-tab-label">{tab.label}</span>
               </Link>
             );
           })}
@@ -219,15 +221,16 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
       <ModalSheet
         isOpen={isMoreOpen}
         onClose={closeMore}
-        title="More"
+        title="Navigation"
         size="sm"
         mobilePlacement="bottom"
         closeLabel="Close more navigation"
         backdropClassName="auth-mobile-more-backdrop"
         bodyClassName="auth-mobile-more-sheet-body"
         panelClassName="auth-mobile-more-sheet-panel"
+        panelId={moreSheetId}
       >
-        <div id={moreSheetId} className="space-y-5">
+        <div className="auth-mobile-more-sheet-content space-y-5">
           <nav aria-label="More navigation" className="space-y-4">
             {MORE_NAV_GROUPS.map((group, groupIndex) => (
               <section key={group.label} className="space-y-2">
@@ -249,10 +252,18 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
                         aria-current={isActive ? 'page' : undefined}
                         className={moreLinkClass}
                       >
-                        <span className={neutralIconTileClass}>
-                          <Icon size={19} weight={isActive ? 'fill' : 'regular'} aria-hidden="true" />
+                        <span className="auth-mobile-more-link-content">
+                          <span className={neutralIconTileClass}>
+                            <Icon size={19} weight={isActive ? 'fill' : 'regular'} aria-hidden="true" />
+                          </span>
+                          <span>{item.label}</span>
                         </span>
-                        <span>{item.label}</span>
+                        <CaretRight
+                          size={16}
+                          weight="bold"
+                          aria-hidden="true"
+                          className="auth-mobile-more-link-chevron"
+                        />
                       </Link>
                     );
                   })}
@@ -270,26 +281,32 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
             </h3>
             <div className="space-y-1">
               <button type="button" onClick={handleInvite} className={moreLinkClass}>
-                <span className={neutralIconTileClass}>
-                  <PaperPlaneTilt size={19} weight="regular" aria-hidden="true" />
+                <span className="auth-mobile-more-link-content">
+                  <span className={neutralIconTileClass}>
+                    <PaperPlaneTilt size={19} weight="regular" aria-hidden="true" />
+                  </span>
+                  <span>Invite</span>
                 </span>
-                <span>Invite</span>
               </button>
 
               {canInstall && !isInstalled ? (
                 <button type="button" onClick={handleInstall} className={moreLinkClass}>
-                  <span className={neutralIconTileClass}>
-                    <DownloadSimple size={19} weight="regular" aria-hidden="true" />
+                  <span className="auth-mobile-more-link-content">
+                    <span className={neutralIconTileClass}>
+                      <DownloadSimple size={19} weight="regular" aria-hidden="true" />
+                    </span>
+                    <span>Install app</span>
                   </span>
-                  <span>Install app</span>
                 </button>
               ) : null}
 
               <button type="button" onClick={handleBugReport} className={moreLinkClass}>
-                <span className={neutralIconTileClass}>
-                  <Bug size={19} weight="regular" aria-hidden="true" />
+                <span className="auth-mobile-more-link-content">
+                  <span className={neutralIconTileClass}>
+                    <Bug size={19} weight="regular" aria-hidden="true" />
+                  </span>
+                  <span>Report a bug</span>
                 </span>
-                <span>Report a bug</span>
               </button>
             </div>
           </section>
@@ -304,10 +321,12 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
                 onClick={handleSignOut}
                 className={`${moreLinkClass} auth-mobile-more-signout text-clay hover:border-clay/20 hover:bg-clay/5 hover:text-clay`}
               >
-                <span className={signOutIconTileClass}>
-                  <SignOut size={19} weight="regular" aria-hidden="true" />
+                <span className="auth-mobile-more-link-content">
+                  <span className={signOutIconTileClass}>
+                    <SignOut size={19} weight="regular" aria-hidden="true" />
+                  </span>
+                  <span>Sign out</span>
                 </span>
-                <span>Sign out</span>
               </button>
             </div>
           </section>

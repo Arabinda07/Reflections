@@ -17,7 +17,7 @@ html.no-scroll .floating-audio-container {
       position: fixed;
       top: auto;
       right: clamp(1rem, 5vw, 1.5rem);
-      bottom: clamp(1rem, 4dvh, 2rem);
+      bottom: calc(var(--mobile-bottom-nav-height, 5.75rem) + env(safe-area-inset-bottom) + 1.25rem);
       z-index: 30;
     }
 
@@ -27,7 +27,7 @@ html.no-scroll .floating-audio-container {
 
     html.no-scroll .floating-audio-container {
       top: auto;
-      bottom: clamp(1rem, 4dvh, 2rem);
+      bottom: calc(var(--mobile-bottom-nav-height, 5.75rem) + env(safe-area-inset-bottom) + 1.25rem);
     }
   }
 

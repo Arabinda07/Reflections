@@ -56,6 +56,9 @@
   /* App Shell – single source of truth for header height */
   --header-height: 3.5rem;
   /* 56px – comfortable mobile app-bar */
+  --mobile-bottom-nav-height: 5.75rem;
+  --mobile-bottom-nav-content-clearance: 2rem;
+  --mobile-bottom-nav-reserved-space: calc(var(--mobile-bottom-nav-height) + var(--mobile-bottom-nav-content-clearance));
 
   /* Brand Hue = 135 (Cool botanical green, aligned with tinted neutrals) */
   /* CONTRAST FIX: L=0.47 achieves ~4.95:1 on light bg (passes WCAG AA 4.5:1).
@@ -734,6 +737,20 @@ details:focus-visible,
     padding: var(--space-6);
   }
 
+  @media (max-width: 640px) {
+    .home-authenticated-mobile-safe .core-bento-grid {
+      padding-bottom: calc(var(--mobile-bottom-nav-reserved-space) + env(safe-area-inset-bottom) + 1rem);
+    }
+
+    .home-primary-reflection-card {
+      padding-bottom: calc(2rem + var(--mobile-bottom-nav-content-clearance));
+    }
+
+    .home-primary-action-cluster {
+      padding-bottom: 0.25rem;
+    }
+  }
+
   @media (min-width: 768px) {
     .core-bento-grid {
       padding: var(--space-10);
@@ -1311,7 +1328,7 @@ details:focus-visible,
     max-height: min(78dvh, 520px);
     flex-direction: column;
     border-radius: var(--radius-shell) var(--radius-shell) 0 0;
-    border: 1px solid oklch(from var(--green) 0.78 0.04 h / 0.24);
+    border: 1.5px solid oklch(from var(--green) 0.78 0.04 h / 0.24);
     border-bottom: 0;
     background:
       linear-gradient(180deg,
@@ -1319,9 +1336,20 @@ details:focus-visible,
         oklch(from var(--panel-bg) l c h / 0.995) 100%);
     color: var(--gray-text);
     box-shadow: 0 -12px 30px -26px oklch(from var(--green-shadow) l c h / 0.32);
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     padding-bottom: calc(1rem + env(safe-area-inset-bottom));
     animation: public-mobile-menu-rise 220ms var(--ease-out-expo);
+  }
+
+  .public-mobile-menu-sheet::-webkit-scrollbar {
+    display: none;
+  }
+
+  .public-theme-toggle--mobile-header {
+    flex: 0 0 auto;
   }
 
   .public-mobile-menu-handle {
@@ -1393,13 +1421,11 @@ details:focus-visible,
     gap: 0.25rem;
     padding-inline: 0.75rem;
     min-height: 0;
-    overflow-y: auto;
     padding-block: 0.25rem 0.45rem;
   }
 
   .public-mobile-menu-link,
   .public-mobile-menu-compact-action,
-  .public-mobile-menu-preference-row,
   .public-mobile-menu-secondary-action {
     display: flex;
     min-height: 50px;
@@ -1422,18 +1448,61 @@ details:focus-visible,
       transform 200ms var(--ease-out-expo);
   }
 
+  .public-mobile-menu-link-leading {
+    display: inline-flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .public-mobile-menu-link-icon {
+    display: inline-flex;
+    width: 2rem;
+    height: 2rem;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.9rem;
+    color: var(--green);
+    transition:
+      background-color 200ms var(--ease-out-expo),
+      color 200ms var(--ease-out-expo),
+      transform 200ms var(--ease-out-expo);
+  }
+
+  .public-mobile-menu-link-chevron {
+    flex: 0 0 auto;
+    color: var(--nav-text);
+    opacity: 0.72;
+    transition:
+      color 200ms var(--ease-out-expo),
+      opacity 200ms var(--ease-out-expo),
+      transform 200ms var(--ease-out-expo);
+  }
+
   .public-mobile-menu-link:hover,
   .public-mobile-menu-compact-action:hover,
-  .public-mobile-menu-preference-row:hover,
   .public-mobile-menu-secondary-action:hover {
     border-color: oklch(from var(--green) l c h / 0.18);
     background: oklch(from var(--green) l c h / 0.055);
     color: var(--green);
   }
 
+  .public-mobile-menu-link:hover .public-mobile-menu-link-icon,
+  .public-mobile-menu-link[data-active="true"] .public-mobile-menu-link-icon {
+    background: oklch(from var(--green) l c h / 0.1);
+    transform: translateY(-1px);
+  }
+
+  .public-mobile-menu-link:hover .public-mobile-menu-link-chevron,
+  .public-mobile-menu-link[data-active="true"] .public-mobile-menu-link-chevron {
+    color: var(--green);
+    opacity: 1;
+    transform: translateX(0.12rem);
+  }
+
   .public-mobile-menu-link:active,
   .public-mobile-menu-compact-action:active,
-  .public-mobile-menu-preference-row:active,
   .public-mobile-menu-secondary-action:active {
     transform: translateY(1px);
   }
@@ -1445,7 +1514,6 @@ details:focus-visible,
   }
 
   .public-mobile-menu-compact,
-  .public-mobile-menu-section,
   .public-mobile-menu-secondary-actions {
     padding-inline: 0.75rem;
   }
@@ -1456,57 +1524,36 @@ details:focus-visible,
 
   .public-mobile-menu-compact-action {
     min-height: 48px;
-    border-color: oklch(from var(--green) l c h / 0.16);
-    background: oklch(from var(--green) l c h / 0.065);
-    color: var(--green);
+    border-color: var(--green);
+    background: var(--green);
+    color: oklch(0.985 0.012 135);
     font-size: 0.9rem;
     font-weight: 850;
   }
 
-  .public-mobile-menu-section {
-    border-top: 1px solid oklch(from var(--green) l c h / 0.12);
-    padding-block: 0.65rem 0.4rem;
+  .public-mobile-menu-compact-action:hover {
+    border-color: var(--green-hover);
+    background: var(--green-hover);
+    color: oklch(0.985 0.012 135);
   }
 
-  .public-mobile-menu-section-title {
-    margin: 0 0 0.35rem;
-    color: var(--nav-text);
-    font-size: 0.68rem;
-    font-weight: 850;
-    letter-spacing: 0.12em;
-    line-height: 1;
-    text-transform: uppercase;
-  }
-
-  .public-mobile-menu-preference-row,
   .public-mobile-menu-secondary-action {
     font: inherit;
-  }
-
-  .public-mobile-menu-preference-row {
-    min-height: 48px;
-    background: oklch(from var(--panel-bg) l c h / 0.68);
-    color: var(--gray-text);
-    font-size: 0.9rem;
-    font-weight: 800;
-  }
-
-  .public-mobile-menu-preference-state {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    color: var(--nav-text);
-    font-size: 0.78rem;
-    font-weight: 850;
+    border-color: oklch(from var(--green) l c h / 0.16);
+    color: var(--green);
   }
 
   .public-mobile-menu-secondary-actions {
-    padding-top: 0.35rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    border-top: 1px solid oklch(from var(--green) l c h / 0.12);
+    padding-block: 0.65rem 0;
   }
 
   .public-mobile-menu-secondary-action {
     min-height: 46px;
-    color: var(--nav-text);
+    color: var(--green);
     font-size: 0.84rem;
     font-weight: 800;
   }
@@ -1541,8 +1588,9 @@ details:focus-visible,
 
     .public-mobile-menu-close,
     .public-mobile-menu-link,
+    .public-mobile-menu-link-icon,
+    .public-mobile-menu-link-chevron,
     .public-mobile-menu-compact-action,
-    .public-mobile-menu-preference-row,
     .public-mobile-menu-secondary-action {
       transition-duration: 0.01ms !important;
       transform: none !important;
@@ -1560,7 +1608,8 @@ details:focus-visible,
   }
 
   .auth-mobile-scroll-space {
-    padding-bottom: calc(5.75rem + env(safe-area-inset-bottom));
+    padding-bottom: calc(var(--mobile-bottom-nav-reserved-space) + env(safe-area-inset-bottom));
+    scroll-padding-bottom: calc(var(--mobile-bottom-nav-reserved-space) + env(safe-area-inset-bottom));
   }
 
   .auth-mobile-bottom-nav {
@@ -1569,27 +1618,32 @@ details:focus-visible,
 
   .auth-mobile-bottom-nav > div {
     pointer-events: auto;
+    border: 1.5px solid oklch(from var(--border-color) l c h / 0.92);
+    background:
+      linear-gradient(180deg,
+        oklch(from var(--panel-bg) l c h / 0.98),
+        oklch(from var(--panel-bg) l c h / 0.92));
+    box-shadow:
+      0 -18px 46px -34px oklch(from var(--green-shadow) l c h / 0.48),
+      inset 0 1px 0 oklch(1 0 0 / 0.2);
+    backdrop-filter: blur(16px) saturate(1.04);
+    -webkit-backdrop-filter: blur(16px) saturate(1.04);
   }
 
-  .auth-mobile-tab::after {
-    content: '';
-    position: absolute;
-    top: 0.45rem;
-    width: 1.15rem;
-    height: 0.15rem;
-    border-radius: 999px;
-    background: transparent;
-    transition:
-      background-color 200ms var(--ease-out-expo),
-      opacity 200ms var(--ease-out-expo);
+  .auth-mobile-tab {
+    border: 1px solid transparent;
+    color: var(--nav-text);
   }
 
   .auth-mobile-tab[data-active="true"] {
-    background: oklch(from var(--green) l c h / 0.045);
+    border-color: oklch(from var(--green) l c h / 0.13);
+    background: oklch(from var(--green) l c h / 0.105);
+    color: var(--green);
+    box-shadow: 0 10px 22px -20px oklch(from var(--green-shadow) l c h / 0.5);
   }
 
-  .auth-mobile-tab[data-active="true"]::after {
-    background: var(--green);
+  .auth-mobile-tab svg {
+    flex-shrink: 0;
   }
 
   .modal-sheet-backdrop.auth-mobile-more-backdrop {
@@ -1603,7 +1657,9 @@ details:focus-visible,
   }
 
   .surface-bezel-inner.modal-sheet-panel.auth-mobile-more-sheet-panel {
-    max-height: min(calc(100dvh - 2rem), 720px);
+    max-height: min(calc(100dvh - 1.5rem), 720px);
+    border-color: oklch(from var(--green) l c h / 0.12);
+    border-radius: var(--radius-shell);
     background:
       linear-gradient(180deg,
         oklch(from var(--panel-bg) l c h / 1),
@@ -1612,10 +1668,11 @@ details:focus-visible,
   }
 
   .dark .surface-bezel-inner.modal-sheet-panel.auth-mobile-more-sheet-panel {
+    border-color: oklch(from var(--green) l c h / 0.16);
     background:
       linear-gradient(180deg,
-        oklch(from var(--panel-bg) l c h / 1),
-        oklch(from var(--bg-color) l c h / 0.995));
+        oklch(from var(--panel-bg) l c h / 0.995),
+        oklch(from var(--bg-color) l c h / 0.99));
   }
 
   .auth-mobile-more-sheet-panel .modal-sheet-header {
@@ -1626,10 +1683,69 @@ details:focus-visible,
     min-height: 2.75rem;
   }
 
+  .auth-mobile-more-sheet-panel .modal-sheet-title {
+    font-family: var(--font-serif);
+    font-size: 1.55rem;
+    font-style: italic;
+    font-weight: 700;
+    line-height: 1.05;
+    color: var(--green);
+  }
+
+  .auth-mobile-more-sheet-panel .modal-sheet-close {
+    border-color: oklch(from var(--border-color) l c h / 0.78);
+    background: oklch(from var(--panel-bg) l c h / 0.74);
+  }
+
+  .auth-mobile-more-link {
+    color: var(--gray-text);
+  }
+
+  .auth-mobile-more-link-content {
+    display: inline-flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .auth-mobile-more-link-chevron {
+    flex: 0 0 auto;
+    color: var(--nav-text);
+    opacity: 0.62;
+    transition:
+      color 200ms var(--ease-out-expo),
+      opacity 200ms var(--ease-out-expo),
+      transform 200ms var(--ease-out-expo);
+  }
+
+  .auth-mobile-more-icon-tile {
+    transition:
+      background-color 200ms var(--ease-out-expo),
+      color 200ms var(--ease-out-expo),
+      transform 200ms var(--ease-out-expo);
+  }
+
   .auth-mobile-more-link[data-active="true"] {
     border-color: oklch(from var(--green) l c h / 0.22);
     background: oklch(from var(--green) l c h / 0.075);
     color: var(--green);
+  }
+
+  .auth-mobile-more-link:hover .auth-mobile-more-link-chevron,
+  .auth-mobile-more-link[data-active="true"] .auth-mobile-more-link-chevron {
+    color: var(--green);
+    opacity: 1;
+    transform: translateX(0.12rem);
+  }
+
+  .auth-mobile-more-link:hover .auth-mobile-more-icon-tile,
+  .auth-mobile-more-link[data-active="true"] .auth-mobile-more-icon-tile {
+    background: oklch(from var(--green) l c h / 0.14);
+    transform: translateY(-1px);
+  }
+
+  .auth-mobile-more-link:hover .auth-mobile-more-icon-tile--danger {
+    background: oklch(from var(--clay) l c h / 0.14);
   }
 
   .auth-mobile-more-session {
@@ -1638,11 +1754,18 @@ details:focus-visible,
 
   .auth-mobile-more-sheet-body {
     padding-bottom: calc(1.25rem + env(safe-area-inset-bottom));
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .auth-mobile-more-sheet-body::-webkit-scrollbar {
+    display: none;
   }
 
   @media (min-width: 1024px) {
     .auth-mobile-scroll-space {
       padding-bottom: 0;
+      scroll-padding-bottom: 0;
     }
   }
 
@@ -1844,7 +1967,8 @@ details:focus-visible,
   @media (prefers-reduced-motion: reduce) {
     .auth-mobile-tab,
     .auth-mobile-more-link,
-    .auth-mobile-tab::after,
+    .auth-mobile-more-link-chevron,
+    .auth-mobile-more-icon-tile,
     .mobile-sidebar-shell,
     .mobile-sidebar-scrim,
     .mobile-sidebar-close,
