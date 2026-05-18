@@ -1,6 +1,6 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X } from '@phosphor-icons/react';
+import { X } from '@phosphor-icons/react/X';
 import { registerAndroidBackAction } from '../../src/native/androidBack';
 import { SURFACE_TONE_CLASS, type SurfaceTone } from './surfaceTone';
 import './modal-sheet.css';
@@ -15,6 +15,7 @@ interface ModalSheetProps {
   footer?: React.ReactNode;
   size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
+  backdropClassName?: string;
   bodyClassName?: string;
   panelClassName?: string;
   hideClose?: boolean;
@@ -46,6 +47,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
   footer,
   size = 'md',
   className = '',
+  backdropClassName = '',
   bodyClassName = '',
   panelClassName = '',
   hideClose = false,
@@ -159,7 +161,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
       } ${isOpen ? 'modal-sheet-root--open' : ''}`.trim()}
     >
       <div
-        className="modal-sheet-backdrop"
+        className={`modal-sheet-backdrop ${backdropClassName}`.trim()}
         onClick={onClose}
       />
 

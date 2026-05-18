@@ -1,7 +1,7 @@
 import { StrictMode, type ErrorInfo } from "react";
 import { createRoot } from "react-dom/client";
 import { getMissingClientEnvNames } from "./src/bootstrapEnv";
-import { captureReactRootError, scheduleSentryInitialization } from "./src/instrument";
+import { captureReactRootError } from "./src/instrument";
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
@@ -119,7 +119,6 @@ const bootstrapApp = async () => {
         <App />
       </StrictMode>,
     );
-    scheduleSentryInitialization();
   } catch (error) {
     const detail = error instanceof Error ? error.message : "Unknown startup error";
 

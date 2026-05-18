@@ -717,8 +717,8 @@ Email/password auth works without any extra configuration.
 If you are deploying to a custom domain:
 
 1. Go to **Authentication** → **URL Configuration**
-2. Set **Site URL** to your production domain (e.g. `https://reflections.app`)
-3. Add your domain to **Redirect URLs**
+2. Set **Site URL** to your canonical production domain (e.g. `https://www.reflections-sanctuary.space`)
+3. Add your web callback origins to **Redirect URLs**, including localhost, Vercel previews, the Vercel fallback domain, and the custom domain
 
 For local development, `http://localhost:5173` is allowed by default.
 

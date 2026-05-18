@@ -1,8 +1,15 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  buildPublicCanonicalUrl,
+  CANONICAL_PUBLIC_ORIGIN,
+} from '../src/config/publicSite.js';
+import {
+  AUTH_HINT_STALE_STORAGE_KEY,
+  AUTH_HINT_STALE_VALUE,
+} from '../src/config/authHintKeys.js';
 
-const SITE_ORIGIN = 'https://reflections-ebon.vercel.app';
 const INDEX_FOLLOW_ROBOTS_META = '<meta name="robots" content="index, follow" />';
 const NOINDEX_NOFOLLOW_ROBOTS_META = '<meta name="robots" content="noindex, nofollow" />';
 const distDir = new URL('../dist/', import.meta.url);
@@ -106,7 +113,7 @@ const publicPages = [
       "author": { "@type": "Person", "name": "Arabinda" },
       "datePublished": "2025-01-01",
       "dateModified": "2026-05-02",
-      "publisher": { "@type": "Organization", "name": "Reflections", "url": "https://reflections-ebon.vercel.app/" },
+      "publisher": { "@type": "Organization", "name": "Reflections", "url": `${CANONICAL_PUBLIC_ORIGIN}/` },
       "description": "A note from Arabinda about why Reflections is a personal writing app with mood notes, Life Wiki, and AI that stays out of the way."
     }),
   },
@@ -202,7 +209,105 @@ const renderSpeakerMutedIcon = () => `
     <path d="m17 10 4 4m0-4-4 4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
   </svg>`;
 
+const LANDING_AUTH_GATE_STYLE = `
+    <style id="landing-auth-gate-style">
+      .landing-auth-gate {
+        display: none;
+      }
+
+      html.auth-hint-pending .landing-auth-gate {
+        display: flex;
+        min-height: 100dvh;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        background:
+          radial-gradient(circle at top, oklch(0.96 0.03 135 / 0.75), transparent 55%),
+          oklch(0.99 0.01 135);
+        color: oklch(0.24 0.01 135);
+      }
+
+      html.dark.auth-hint-pending .landing-auth-gate {
+        background:
+          radial-gradient(circle at top, oklch(0.32 0.04 135 / 0.55), transparent 55%),
+          oklch(0.2 0.01 135);
+        color: oklch(0.93 0.01 135);
+      }
+
+      .landing-auth-gate__panel {
+        width: min(100%, 32rem);
+        border: 1px solid oklch(0.89 0.01 135);
+        border-radius: 1.5rem;
+        background: oklch(1 0 0 / 0.72);
+        padding: 1.75rem;
+        box-shadow: 0 20px 44px -30px rgba(0, 0, 0, 0.2);
+      }
+
+      html.dark.auth-hint-pending .landing-auth-gate__panel {
+        border-color: oklch(0.36 0.01 135 / 0.95);
+        background: oklch(0.24 0.01 135 / 0.82);
+      }
+
+      .landing-auth-gate__eyebrow {
+        margin: 0 0 0.75rem;
+        font-size: 0.72rem;
+        font-weight: 900;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: oklch(0.46 0.01 135);
+      }
+
+      .landing-auth-gate__title {
+        font-size: clamp(1.8rem, 6vw, 3rem);
+        line-height: 1;
+        font-weight: 800;
+        letter-spacing: 0;
+      }
+
+      html.auth-hint-pending .public-shell--landing {
+        display: none;
+      }
+    </style>`;
+
+const LANDING_AUTH_GATE_SCRIPT = `
+    <script id="landing-auth-gate-script">
+      (function () {
+        try {
+          var staleKey = ${JSON.stringify(AUTH_HINT_STALE_STORAGE_KEY)};
+          var staleValue = ${JSON.stringify(AUTH_HINT_STALE_VALUE)};
+          var hasAuthHint = false;
+
+          for (var index = 0; index < localStorage.length; index += 1) {
+            var key = localStorage.key(index);
+            if (key && key.indexOf('sb-') === 0 && key.endsWith('-auth-token')) {
+              hasAuthHint = true;
+              break;
+            }
+          }
+
+          if (!hasAuthHint) {
+            return;
+          }
+
+          if (localStorage.getItem(staleKey) === staleValue) {
+            return;
+          }
+
+          document.documentElement.classList.add('auth-hint-pending');
+        } catch (error) {}
+      })();
+    </script>`;
+
+const renderStaticLandingAuthGate = () => `
+  <div class="landing-auth-gate" aria-hidden="true">
+    <div class="landing-auth-gate__panel">
+      <div class="landing-auth-gate__eyebrow">Reflections</div>
+      <div class="landing-auth-gate__title">Opening your space</div>
+    </div>
+  </div>`;
+
 const renderStaticLandingShell = (page) => `
+  ${renderStaticLandingAuthGate()}
   <div class="public-shell public-shell--landing">
     <a href="#main-content" class="skip-link">Skip to content</a>
     <header class="public-header public-header--landing landing-nav-scrim">
@@ -278,7 +383,7 @@ const renderAppShellFallback = (route) => `
   </main>`;
 
 const applyPageSeo = (template, page) => {
-  const url = `${SITE_ORIGIN}${page.path === '/' ? '/' : page.path}`;
+  const url = buildPublicCanonicalUrl(page.path);
   let html = template;
 
   html = page.path === '/' ? html : stripLandingHeroPreloads(html);
@@ -298,6 +403,10 @@ const applyPageSeo = (template, page) => {
     `<div id="root">${page.path === '/' ? renderStaticLandingShell(page) : renderSeoContent(page)}</div>`,
   );
 
+  if (page.path === '/') {
+    html = html.replace('</head>', `${LANDING_AUTH_GATE_STYLE}\n${LANDING_AUTH_GATE_SCRIPT}\n  </head>`);
+  }
+
   if (page.extraSchema) {
     html = html.replace('</head>', `<script type="application/ld+json">${page.extraSchema}</script>\n  </head>`);
   }
@@ -306,7 +415,7 @@ const applyPageSeo = (template, page) => {
 };
 
 const applyAppShellRoute = (template, route) => {
-  const url = `${SITE_ORIGIN}${route.path}`;
+  const url = buildPublicCanonicalUrl(route.path);
   let html = stripLandingHeroPreloads(template);
 
   html = html.replace(/<title>[\s\S]*?<\/title>/, `<title>${escapeHtml(route.title)}</title>`);

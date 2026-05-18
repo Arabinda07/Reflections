@@ -2,6 +2,7 @@ import type { ErrorInfo } from 'react';
 
 type SentryModule = typeof import('@sentry/react');
 type BrowserEnv = Partial<Record<'VITE_SENTRY_DSN' | 'VITE_APP_VERSION' | 'MODE', string | undefined>>;
+type CaptureExtra = Record<string, unknown>;
 
 let sentryModulePromise: Promise<SentryModule> | null = null;
 let initPromise: Promise<boolean> | null = null;
@@ -87,7 +88,7 @@ export const scheduleSentryInitialization = (env: BrowserEnv = import.meta.env) 
   };
 };
 
-export const captureReactRootError = (error: unknown, errorInfo?: ErrorInfo) => {
+export const captureAppError = (error: unknown, extra?: CaptureExtra) => {
   if (!getSentryDsn()) {
     return false;
   }
@@ -101,9 +102,7 @@ export const captureReactRootError = (error: unknown, errorInfo?: ErrorInfo) => 
 
       const Sentry = await loadSentry();
       Sentry.captureException(error, {
-        extra: errorInfo?.componentStack
-          ? { componentStack: errorInfo.componentStack }
-          : undefined,
+        extra,
       });
     })
     .catch((captureError) => {
@@ -112,3 +111,9 @@ export const captureReactRootError = (error: unknown, errorInfo?: ErrorInfo) => 
 
   return true;
 };
+
+export const captureReactRootError = (error: unknown, errorInfo?: ErrorInfo) =>
+  captureAppError(
+    error,
+    errorInfo?.componentStack ? { componentStack: errorInfo.componentStack } : undefined,
+  );

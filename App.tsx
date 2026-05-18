@@ -3,7 +3,7 @@ import { Navigate, Route, RouterProvider, createBrowserRouter, createRoutesFromE
 import { RouteLoadingFrame } from './components/ui/RouteLoadingFrame';
 import { PublicAppShell } from './layouts/PublicAppShell';
 import { RouteErrorBoundary } from './pages/RouteErrorBoundary';
-import { Landing } from './pages/dashboard/Landing';
+import { LandingRoute } from './pages/dashboard/LandingRoute';
 import { RoutePath } from './types';
 
 const AuthenticatedAppShell = lazy(() => import('./layouts/AuthenticatedAppShell').then((m) => ({ default: m.AuthenticatedAppShell })));
@@ -69,7 +69,7 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <Route element={<RootLayout />}>
       <Route element={withRouteFallback(<PublicAppShell />)} errorElement={<RouteErrorBoundary />}>
-        <Route path={RoutePath.HOME} element={<Landing />} />
+        <Route path={RoutePath.HOME} element={<LandingRoute />} />
         <Route path={RoutePath.FAQ} element={withRouteFallback(<FAQ />)} />
         <Route path={RoutePath.ABOUT} element={withRouteFallback(<AboutArabinda />)} />
         <Route path={RoutePath.PRIVACY} element={withRouteFallback(<PrivacyPolicy />)} />

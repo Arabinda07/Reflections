@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CloudSlash, CloudCheck } from '@phosphor-icons/react';
+import { CloudCheck } from '@phosphor-icons/react/CloudCheck';
+import { CloudSlash } from '@phosphor-icons/react/CloudSlash';
 import { useNetworkState } from '../../hooks/useNetworkState';
 
 export const SyncBanner: React.FC = () => {

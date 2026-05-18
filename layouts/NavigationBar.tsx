@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import {
-  Moon,
-  Sun,
-  Leaf,
-  PaperPlaneTilt,
-} from '@phosphor-icons/react';
+import { Leaf } from '@phosphor-icons/react/Leaf';
+import { Moon } from '@phosphor-icons/react/Moon';
+import { PaperPlaneTilt } from '@phosphor-icons/react/PaperPlaneTilt';
+import { Sun } from '@phosphor-icons/react/Sun';
 import { Button } from '../components/ui/Button';
 import { useAuthStore } from '../hooks/useAuthStore';
 import { RoutePath } from '../types';
@@ -69,6 +67,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
   const landingControlClass = isLandingRoute
     ? 'hero-ink hover:text-green hover:bg-white/10'
     : 'text-gray-nav hover:text-green hover:bg-green/5';
+  const homePath = isAuthenticated ? RoutePath.DASHBOARD : RoutePath.HOME;
 
   const DarkModeToggle = (
     <button
@@ -101,7 +100,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
         {/* Left Side */}
         <div className="flex items-center gap-4">
           <Link
-            to={RoutePath.HOME}
+            to={homePath}
             className="group flex min-h-11 items-center gap-2"
             aria-label="Reflections — go to home"
           >
@@ -184,24 +183,24 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
         </div>
 
         {/* Mobile Menu Icon */}
-        <div
-          className={`${isMobileNavSuppressed ? 'hidden' : 'flex'} lg:hidden items-center gap-2`}
-        >
+        <div className="flex items-center gap-2 lg:hidden">
           {DarkModeToggle}
-          <button
-            onClick={onMobileMenuToggle}
-            className={`z-[110] flex h-11 w-11 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green ${landingControlClass}`}
-            aria-label="Toggle menu"
-            aria-expanded={isMobileMenuOpen}
-          >
-            <div className="relative h-6 w-6">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-current">
-                <line x1={isMobileMenuOpen ? 6 : 4} y1="6" x2={isMobileMenuOpen ? 18 : 20} y2={isMobileMenuOpen ? 18 : 6} className="hamburger-line" />
-                <line x1="4" y1="12" x2="20" y2="12" className={`hamburger-line ${isMobileMenuOpen ? 'hamburger-line--hidden' : ''}`} />
-                <line x1={isMobileMenuOpen ? 6 : 4} y1="18" x2={isMobileMenuOpen ? 18 : 20} y2={isMobileMenuOpen ? 6 : 18} className="hamburger-line" />
-              </svg>
-            </div>
-          </button>
+          {!isMobileNavSuppressed && (
+            <button
+              onClick={onMobileMenuToggle}
+              className={`z-[110] flex h-11 w-11 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green ${landingControlClass}`}
+              aria-label="Toggle menu"
+              aria-expanded={isMobileMenuOpen}
+            >
+              <div className="relative h-6 w-6">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-current">
+                  <line x1={isMobileMenuOpen ? 6 : 4} y1="6" x2={isMobileMenuOpen ? 18 : 20} y2={isMobileMenuOpen ? 18 : 6} className="hamburger-line" />
+                  <line x1="4" y1="12" x2="20" y2="12" className={`hamburger-line ${isMobileMenuOpen ? 'hamburger-line--hidden' : ''}`} />
+                  <line x1={isMobileMenuOpen ? 6 : 4} y1="18" x2={isMobileMenuOpen ? 18 : 20} y2={isMobileMenuOpen ? 6 : 18} className="hamburger-line" />
+                </svg>
+              </div>
+            </button>
+          )}
         </div>
       </div>
     </nav>

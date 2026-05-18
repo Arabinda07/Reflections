@@ -1,18 +1,16 @@
 import React, { Suspense, lazy, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
-import {
-  Plus,
-  FileText,
-  ArrowUpRight,
-  Calendar as CalendarIcon,
-  Trash,
-  CircleNotch,
-  Download,
-  SquaresFour,
-  Tag,
-  X,
-} from '@phosphor-icons/react';
+import { ArrowUpRight } from '@phosphor-icons/react/ArrowUpRight';
+import { Calendar as CalendarIcon } from '@phosphor-icons/react/Calendar';
+import { CircleNotch } from '@phosphor-icons/react/CircleNotch';
+import { Download } from '@phosphor-icons/react/Download';
+import { FileText } from '@phosphor-icons/react/FileText';
+import { Plus } from '@phosphor-icons/react/Plus';
+import { SquaresFour } from '@phosphor-icons/react/SquaresFour';
+import { Tag } from '@phosphor-icons/react/Tag';
+import { Trash } from '@phosphor-icons/react/Trash';
+import { X } from '@phosphor-icons/react/X';
 import { format, isSameDay } from 'date-fns';
 import { Button } from '../../components/ui/Button';
 import { Chip } from '../../components/ui/Chip';

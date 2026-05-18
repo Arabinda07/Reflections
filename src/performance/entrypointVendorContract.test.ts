@@ -17,7 +17,7 @@ describe('entrypoint vendor loading contract', () => {
     expect(index).not.toContain('reactErrorHandler');
     expect(index).not.toContain('import "./src/instrument"');
 
-    expect(index).toContain('scheduleSentryInitialization');
+    expect(index).not.toContain('scheduleSentryInitialization');
     expect(index).toContain('captureReactRootError');
 
     const instrument = read('src/instrument.ts');
@@ -27,6 +27,9 @@ describe('entrypoint vendor loading contract', () => {
 
     expect(app).not.toContain("from '@vercel/analytics/react'");
     expect(app).not.toContain("from '@vercel/speed-insights/react'");
+    const authShell = read('layouts/AuthAppShell.tsx');
+    expect(authShell).toContain('scheduleSentryInitialization');
+    expect(authenticatedShell).toContain('scheduleSentryInitialization');
     expect(authenticatedShell).toContain('DeferredVercelVitals');
     expect(authenticatedShell).toContain("import('@vercel/analytics/react')");
     expect(authenticatedShell).toContain("import('@vercel/speed-insights/react')");
@@ -68,7 +71,7 @@ describe('entrypoint vendor loading contract', () => {
     expect(app).toContain("const AuthAppShell = lazy(() => import('./layouts/AuthAppShell')");
     expect(app).toContain("const AuthenticatedAppShell = lazy(() => import('./layouts/AuthenticatedAppShell')");
     expect(app).toContain('<Route element={withRouteFallback(<PublicAppShell />)} errorElement={<RouteErrorBoundary />}>');
-    expect(app).toContain('<Route element={withRouteFallback(<AuthAppShell />)} errorElement={<RouteErrorBoundary />}>');
+    expect(app).toContain('<Route element={withRouteFallback(<AuthAppShell />, authRouteFallback)} errorElement={<RouteErrorBoundary />}>');
     expect(app).toContain('<Route element={withRouteFallback(<AuthenticatedAppShell />)} errorElement={<RouteErrorBoundary />}>');
     expect(authShell).toContain("import { useAuthBootstrapper } from '../hooks/useAuthBootstrapper';");
     expect(authShell).toContain("import { useNativeOAuthListener } from '../hooks/useNativeOAuthListener';");
@@ -119,9 +122,15 @@ describe('entrypoint vendor loading contract', () => {
     const viteConfig = read('vite.config.ts');
 
     expect(viteConfig).toContain('globIgnores');
+    expect(viteConfig).toContain('manifestTransforms');
+    expect(viteConfig).toContain('keepLeanPrecacheEntry');
     expect(viteConfig).toContain('**/vendor-lottie-*.js');
     expect(viteConfig).toContain('**/vendor-analytics-*.js');
     expect(viteConfig).toContain('**/vendor-sentry-*.js');
+    expect(viteConfig).toContain('**/*.mp4');
+    expect(viteConfig).toContain('**/*.webm');
+    expect(viteConfig).toContain('app-route-chunks');
+    expect(viteConfig).not.toContain("return 'vendor-icons'");
   });
 
   it('keeps the Vite preload helper out of the native vendor chunk', () => {

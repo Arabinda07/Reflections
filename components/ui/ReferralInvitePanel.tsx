@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'motion/react';
-import { Check, CopySimple, PaperPlaneTilt, WarningCircle } from '@phosphor-icons/react';
+import { Check } from '@phosphor-icons/react/Check';
+import { CopySimple } from '@phosphor-icons/react/CopySimple';
+import { PaperPlaneTilt } from '@phosphor-icons/react/PaperPlaneTilt';
+import { WarningCircle } from '@phosphor-icons/react/WarningCircle';
 import { Button } from './Button';
 import { MetadataPill } from './MetadataPill';
 import { buildReferralLink, referralService } from '../../services/referralService';

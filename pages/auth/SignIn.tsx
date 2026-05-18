@@ -2,7 +2,11 @@ import { useEffect, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, Envelope, GoogleLogo, Lock } from '@phosphor-icons/react';
+import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
+import { CheckCircle } from '@phosphor-icons/react/CheckCircle';
+import { Envelope } from '@phosphor-icons/react/Envelope';
+import { GoogleLogo } from '@phosphor-icons/react/GoogleLogo';
+import { Lock } from '@phosphor-icons/react/Lock';
 import { Alert } from '@/components/ui/Alert';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
@@ -12,6 +16,7 @@ import { RoutePath } from '@/types';
 import { useAuthStore } from '@/hooks/useAuthStore';
 import { useDocumentMeta } from '@/hooks/useDocumentMeta';
 import { supabase } from '@/src/supabaseClient';
+import { getPublicHomePath } from '@/src/utils/authHints';
 import {
   consumeGoogleAuthError,
   consumePendingGoogleAuthRedirectPath,
@@ -44,6 +49,7 @@ export const SignIn: React.FC = () => {
 
   const successMessage = location.state?.successMessage;
   const postLoginPath = resolvePostAuthRedirectPath(location.state?.from);
+  const homePath = getPublicHomePath();
 
   useEffect(() => {
     const flashError = consumeGoogleAuthError(RoutePath.LOGIN);
@@ -172,7 +178,7 @@ export const SignIn: React.FC = () => {
         <Surface variant="bezel">
           <div className="p-8 sm:p-10 space-y-6">
             <Link
-              to={RoutePath.HOME}
+              to={homePath}
               className="-ml-3 inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] px-3 text-[13px] font-bold text-gray-nav transition-colors hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
               aria-label="Back to home"
             >

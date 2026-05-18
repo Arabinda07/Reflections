@@ -1,6 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { ArrowLeft, CalendarBlank, EnvelopeOpen, LockKey, PaperPlaneTilt } from '@phosphor-icons/react';
+import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
+import { CalendarBlank } from '@phosphor-icons/react/CalendarBlank';
+import { EnvelopeOpen } from '@phosphor-icons/react/EnvelopeOpen';
+import { LockKey } from '@phosphor-icons/react/LockKey';
+import { PaperPlaneTilt } from '@phosphor-icons/react/PaperPlaneTilt';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { CompletionCardActions } from '../../components/ui/CompletionCardActions';
@@ -171,7 +175,7 @@ export const FutureLetters: React.FC = () => {
       <PageContainer size="wide" className="surface-scope-honey page-wash pb-24 pt-6 md:pt-10">
         <div className="core-page-stack">
           <button
-            onClick={() => navigate(RoutePath.HOME)}
+            onClick={() => navigate(RoutePath.DASHBOARD)}
             className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-green/5 hover:text-green"
             aria-label="Back to home"
           >

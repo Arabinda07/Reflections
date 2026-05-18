@@ -1,6 +1,7 @@
 import type { Provider, Session, User } from '@supabase/supabase-js';
 
 import { supabase } from '../supabaseClient';
+import { syncStoredAuthSessionHintStatus } from '../utils/authHints';
 import type { AuthAdapter } from './AuthAdapter';
 
 /** Concrete AuthAdapter implementation using Supabase. */
@@ -21,6 +22,7 @@ export class SupabaseAuthAdapter implements AuthAdapter {
     const { data, error } = await supabase.auth.getSession();
     if (error) throw error;
     this.session = data.session;
+    syncStoredAuthSessionHintStatus(this.session);
     return this.session;
   }
 
@@ -31,6 +33,7 @@ export class SupabaseAuthAdapter implements AuthAdapter {
   async signOut(): Promise<void> {
     await supabase.auth.signOut();
     this.session = null;
+    syncStoredAuthSessionHintStatus(null);
   }
 
   onAuthChange(cb: (session: Session | null) => void): () => void {
@@ -38,6 +41,7 @@ export class SupabaseAuthAdapter implements AuthAdapter {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_, session) => {
       this.session = session;
+      syncStoredAuthSessionHintStatus(session);
       cb(session);
     });
     return () => subscription.unsubscribe();

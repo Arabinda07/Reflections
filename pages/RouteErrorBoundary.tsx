@@ -1,6 +1,7 @@
 import React, { Suspense, lazy, useEffect } from 'react';
 import { isRouteErrorResponse, useNavigate, useRouteError } from 'react-router-dom';
-import { RoutePath } from '../types';
+import { usePublicHomePath } from '../src/utils/authHints';
+import { captureAppError } from '../src/instrument';
 
 const ROUTE_CHUNK_RECOVERY_KEY = 'route_chunk_recovered';
 
@@ -79,19 +80,22 @@ const clearBrowserManagedAppCaches = async () => {
 export const RouteErrorBoundary: React.FC = () => {
   const error = useRouteError();
   const navigate = useNavigate();
+  const homePath = usePublicHomePath();
   const { title, description, detail } = getRouteErrorCopy(error);
 
   const isChunkFailure = isDynamicImportFailure(error);
   const hasAttemptedRecovery = sessionStorage.getItem(ROUTE_CHUNK_RECOVERY_KEY) === 'true';
 
   useEffect(() => {
+    captureAppError(error, { source: 'route_error_boundary' });
+
     if (!isChunkFailure || hasAttemptedRecovery) return;
 
     sessionStorage.setItem(ROUTE_CHUNK_RECOVERY_KEY, 'true');
     void clearBrowserManagedAppCaches().catch((err) => {
       console.warn('Could not clear caches before route chunk recovery reload.', err);
     }).finally(() => reloadWithCacheBust());
-  }, [isChunkFailure, hasAttemptedRecovery]);
+  }, [error, isChunkFailure, hasAttemptedRecovery]);
 
   // Auto-recovering — show nothing while the reload is in-flight.
   if (isChunkFailure && !hasAttemptedRecovery) return null;
@@ -132,7 +136,7 @@ export const RouteErrorBoundary: React.FC = () => {
           </button>
           <button
             type="button"
-            onClick={() => navigate(RoutePath.HOME)}
+            onClick={() => navigate(homePath)}
             className="control-surface inline-flex min-h-14 w-full items-center justify-center rounded-[var(--radius-control)] px-5 py-4 text-[16px] font-bold text-gray-text transition-[background-color,border-color,color,transform] duration-300 ease-out-expo hover:-translate-y-0.5 hover:border-green/20 hover:bg-green/5 active:translate-y-0 sm:w-auto sm:px-8"
           >
             Return home

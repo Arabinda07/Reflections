@@ -21,7 +21,7 @@ People who want a calm place to think in writing — without gamification, publi
 - Pro: unlimited notes (pricing Rs 99/- per month)
 
 ## Links
-- Homepage: https://reflections-ebon.vercel.app/
-- FAQ: https://reflections-ebon.vercel.app/faq
-- Privacy: https://reflections-ebon.vercel.app/privacy
-- About: https://reflections-ebon.vercel.app/about
+- Homepage: https://www.reflections-sanctuary.space/
+- FAQ: https://www.reflections-sanctuary.space/faq
+- Privacy: https://www.reflections-sanctuary.space/privacy
+- About: https://www.reflections-sanctuary.space/about

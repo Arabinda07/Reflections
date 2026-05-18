@@ -6,6 +6,7 @@ import { AppBootstrapper } from '../components/ui/AppBootstrapper';
 import { useNativeOAuthListener } from '../hooks/useNativeOAuthListener';
 import { useNativeStatusBar } from '../hooks/useNativeStatusBar';
 import { useSync } from '../hooks/useSync';
+import { scheduleSentryInitialization } from '../src/instrument';
 import { DashboardLayout } from './DashboardLayout';
 
 const LazyVercelVitals = lazy(async () => {
@@ -64,6 +65,8 @@ const SyncBoundary: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 export const AuthenticatedAppShell: React.FC = () => {
   useNativeOAuthListener();
   useNativeStatusBar();
+
+  useEffect(() => scheduleSentryInitialization(), []);
 
   return (
     <PWAInstallProvider>

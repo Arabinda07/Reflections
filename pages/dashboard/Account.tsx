@@ -1,22 +1,20 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Sparkle,
-  User,
-  ShieldCheck,
-  Warning,
-  FloppyDisk,
-  Camera,
-  Key,
-  Trash,
-  DeviceMobile,
-  SignOut,
-  X,
-  Check,
-  CircleNotch,
-  EnvelopeSimple,
-  CaretDown,
-} from '@phosphor-icons/react';
+import { Camera } from '@phosphor-icons/react/Camera';
+import { CaretDown } from '@phosphor-icons/react/CaretDown';
+import { Check } from '@phosphor-icons/react/Check';
+import { CircleNotch } from '@phosphor-icons/react/CircleNotch';
+import { DeviceMobile } from '@phosphor-icons/react/DeviceMobile';
+import { EnvelopeSimple } from '@phosphor-icons/react/EnvelopeSimple';
+import { FloppyDisk } from '@phosphor-icons/react/FloppyDisk';
+import { Key } from '@phosphor-icons/react/Key';
+import { ShieldCheck } from '@phosphor-icons/react/ShieldCheck';
+import { SignOut } from '@phosphor-icons/react/SignOut';
+import { Sparkle } from '@phosphor-icons/react/Sparkle';
+import { Trash } from '@phosphor-icons/react/Trash';
+import { User } from '@phosphor-icons/react/User';
+import { Warning } from '@phosphor-icons/react/Warning';
+import { X } from '@phosphor-icons/react/X';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Alert } from '../../components/ui/Alert';

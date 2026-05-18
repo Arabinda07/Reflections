@@ -1,5 +1,6 @@
 import React from 'react';
-import { Warning, Sparkle } from '@phosphor-icons/react';
+import { Sparkle } from '@phosphor-icons/react/Sparkle';
+import { Warning } from '@phosphor-icons/react/Warning';
 import { Button } from './Button';
 import { ModalSheet } from './ModalSheet';
 

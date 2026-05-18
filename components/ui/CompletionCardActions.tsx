@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { CopySimple, DownloadSimple, ShareNetwork } from '@phosphor-icons/react';
+import { CopySimple } from '@phosphor-icons/react/CopySimple';
+import { DownloadSimple } from '@phosphor-icons/react/DownloadSimple';
+import { ShareNetwork } from '@phosphor-icons/react/ShareNetwork';
 import { Button } from './Button';
 import { CompletionCardPreview } from './CompletionCardPreview';
 import type { CompletionCardPayload } from '../../services/completionCardPayload';

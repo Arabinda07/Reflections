@@ -1,21 +1,19 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import {
-  PencilSimple,
-  Trash,
-  ArrowLeft,
-  Calendar,
-  WarningCircle,
-  Paperclip,
-  FileText,
-  Download,
-  Smiley,
-  Tag,
-  ListChecks,
-  Check,
-  Plus,
-  X,
-} from '@phosphor-icons/react';
+import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
+import { Calendar } from '@phosphor-icons/react/Calendar';
+import { Check } from '@phosphor-icons/react/Check';
+import { Download } from '@phosphor-icons/react/Download';
+import { FileText } from '@phosphor-icons/react/FileText';
+import { ListChecks } from '@phosphor-icons/react/ListChecks';
+import { Paperclip } from '@phosphor-icons/react/Paperclip';
+import { PencilSimple } from '@phosphor-icons/react/PencilSimple';
+import { Plus } from '@phosphor-icons/react/Plus';
+import { Smiley } from '@phosphor-icons/react/Smiley';
+import { Tag } from '@phosphor-icons/react/Tag';
+import { Trash } from '@phosphor-icons/react/Trash';
+import { WarningCircle } from '@phosphor-icons/react/WarningCircle';
+import { X } from '@phosphor-icons/react/X';
 import { Button } from '../../components/ui/Button';
 import { Chip } from '../../components/ui/Chip';
 import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';

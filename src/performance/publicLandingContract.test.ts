@@ -11,11 +11,18 @@ describe('public landing performance contract', () => {
   it('keeps the root landing route outside the authenticated app shell', () => {
     const app = read('App.tsx');
     const shellPath = path.resolve(process.cwd(), 'layouts/AuthenticatedAppShell.tsx');
+    const landingRoute = read('pages/dashboard/LandingRoute.tsx');
 
     expect(existsSync(shellPath)).toBe(true);
-    expect(app).toContain("import { Landing } from './pages/dashboard/Landing';");
-    expect(app).toContain('path={RoutePath.HOME} element={<Landing />}');
+    expect(app).toContain("import { LandingRoute } from './pages/dashboard/LandingRoute';");
+    expect(app).toContain('path={RoutePath.HOME} element={<LandingRoute />}');
     expect(app).toContain("const AuthenticatedAppShell = lazy(() => import('./layouts/AuthenticatedAppShell')");
+    expect(landingRoute).toContain("import { Landing } from './Landing';");
+    expect(landingRoute).toContain('hasStrongStoredAuthSessionHint(),');
+    expect(landingRoute).toContain("await import('../../src/supabaseClient')");
+    expect(landingRoute).toContain('Promise.race([');
+    expect(landingRoute).toContain('RouteLoadingFrame');
+    expect(landingRoute).toContain('navigate(RoutePath.DASHBOARD, { replace: true, state: location.state });');
 
     expect(app).not.toContain("import { PWAInstallProvider } from './context/PWAInstallContext';");
     expect(app).not.toContain("import { ProtectedRoute } from './components/auth/ProtectedRoute';");
@@ -84,12 +91,25 @@ describe('public landing performance contract', () => {
   it('does not import Supabase on guest landing sessions without an auth hint', () => {
     const landing = read('pages/dashboard/Landing.tsx');
     const authHints = read('src/utils/authHints.ts');
+    const landingRoute = read('pages/dashboard/LandingRoute.tsx');
+    const seoGenerator = read('scripts/generate-public-seo-pages.mjs');
 
-    expect(landing).toContain("import { hasStoredAuthSessionHint } from '../../src/utils/authHints';");
-    expect(authHints).toContain('export const hasStoredAuthSessionHint = (): boolean => {');
+    expect(landing).not.toContain("import { hasStoredAuthSessionHint } from '../../src/utils/authHints';");
+    expect(authHints).toContain('export const hasStoredAuthSessionHint = (');
+    expect(authHints).toContain('export const hasStrongStoredAuthSessionHint = (');
+    expect(authHints).toContain('export const syncStoredAuthSessionHintStatus = (');
+    expect(authHints).toContain("export const AUTH_HINT_CHANGE_EVENT = 'reflections:auth-hint-change';");
+    expect(authHints).toContain("export const AUTH_HINT_PENDING_CLASS = 'auth-hint-pending';");
+    expect(authHints).toContain('export const usePublicHomePath = ()');
+    expect(authHints).toContain('export const clearLandingAuthHintPendingClass = ()');
     expect(authHints).toContain("key?.startsWith('sb-') && key.endsWith('-auth-token')");
-    expect(landing).toContain('if (!hasStoredAuthSessionHint())');
-    expect(landing).toContain("import('../../src/supabaseClient')");
+    expect(authHints).toContain('export const getPublicHomePath = (');
+    expect(authHints).toContain('export const resolveAuthHintLandingPath = async (');
+    expect(landingRoute).toContain('if (!isCheckingSession)');
+    expect(landingRoute).toContain("await import('../../src/supabaseClient')");
+    expect(landingRoute).toContain('clearLandingAuthHintPendingClass();');
+    expect(seoGenerator).toContain("document.documentElement.classList.add('auth-hint-pending');");
+    expect(seoGenerator).toContain('landing-auth-gate');
   });
 
   it('keeps decorative video out of the initial landing network burst', () => {

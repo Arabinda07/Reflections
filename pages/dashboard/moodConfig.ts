@@ -1,12 +1,10 @@
-import {
-  Cloud,
-  Icon as PhosphorIcon,
-  Lightning,
-  Moon,
-  Smiley,
-  SmileySad,
-  Sun,
-} from '@phosphor-icons/react';
+import { Cloud } from '@phosphor-icons/react/Cloud';
+import { Lightning } from '@phosphor-icons/react/Lightning';
+import { Moon } from '@phosphor-icons/react/Moon';
+import { Smiley } from '@phosphor-icons/react/Smiley';
+import { SmileySad } from '@phosphor-icons/react/SmileySad';
+import { Sun } from '@phosphor-icons/react/Sun';
+import type { Icon as PhosphorIcon } from '@phosphor-icons/react/lib';
 
 export const MOOD_OPTIONS = ['happy', 'calm', 'anxious', 'sad', 'angry', 'tired'] as const;
 

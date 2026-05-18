@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { CheckCircle, Crown, Check } from '@phosphor-icons/react';
+import { Check } from '@phosphor-icons/react/Check';
+import { CheckCircle } from '@phosphor-icons/react/CheckCircle';
+import { Crown } from '@phosphor-icons/react/Crown';
 import { Button } from './Button';
 import { ModalSheet } from './ModalSheet';
 import { supabase } from '../../src/supabaseClient';

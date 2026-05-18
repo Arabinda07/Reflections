@@ -7,7 +7,7 @@ interface InviteLinkEmailProps {
 }
 
 export const InviteLinkEmail = ({ 
-  inviteLink = 'https://reflections.app/auth/verify?token=example'
+  inviteLink = 'https://www.reflections-sanctuary.space/auth/verify?token=example'
 }: InviteLinkEmailProps) => {
   return (
     <BaseEmailLayout previewText="Your magic link to enter Reflections.">

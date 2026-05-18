@@ -2,29 +2,27 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Lottie from 'lottie-react';
 import { motion } from 'motion/react';
-import { 
-  ArrowLeft, 
-  FloppyDisk, 
-  Image as ImageIcon, 
-  X, 
-  CalendarBlank, 
-  Paperclip, 
-  Smiley, 
-  Tag as TagIcon, 
-  Check, 
-  Plus, 
-  Trash, 
-  ListChecks, 
-  Microphone, 
-  MicrophoneSlash, 
-  Headphones,
-  CircleNotch,
-  CaretRight,
-  Brain,
-  Target,
-  DotsThreeCircle,
-  Wind,
-} from '@phosphor-icons/react';
+import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
+import { Brain } from '@phosphor-icons/react/Brain';
+import { CalendarBlank } from '@phosphor-icons/react/CalendarBlank';
+import { CaretRight } from '@phosphor-icons/react/CaretRight';
+import { Check } from '@phosphor-icons/react/Check';
+import { CircleNotch } from '@phosphor-icons/react/CircleNotch';
+import { DotsThreeCircle } from '@phosphor-icons/react/DotsThreeCircle';
+import { FloppyDisk } from '@phosphor-icons/react/FloppyDisk';
+import { Headphones } from '@phosphor-icons/react/Headphones';
+import { Image as ImageIcon } from '@phosphor-icons/react/Image';
+import { ListChecks } from '@phosphor-icons/react/ListChecks';
+import { Microphone } from '@phosphor-icons/react/Microphone';
+import { MicrophoneSlash } from '@phosphor-icons/react/MicrophoneSlash';
+import { Paperclip } from '@phosphor-icons/react/Paperclip';
+import { Plus } from '@phosphor-icons/react/Plus';
+import { Smiley } from '@phosphor-icons/react/Smiley';
+import { Tag as TagIcon } from '@phosphor-icons/react/Tag';
+import { Target } from '@phosphor-icons/react/Target';
+import { Trash } from '@phosphor-icons/react/Trash';
+import { Wind } from '@phosphor-icons/react/Wind';
+import { X } from '@phosphor-icons/react/X';
 import { Magnetic } from '../../components/ui/Magnetic';
 import { useAmbientAudio, AMBIENT_TRACKS } from '../../hooks/useAmbientAudio';
 import { useHaptics } from '../../hooks/useHaptics';
@@ -299,7 +297,7 @@ export const CreateNote: React.FC = () => {
       setShowObservation(true);
     } else {
       stopMusic();
-      navigateWithBypass(RoutePath.HOME, { state: { fromSave: true } });
+      navigateWithBypass(RoutePath.DASHBOARD, { state: { fromSave: true } });
     }
   };
 
@@ -317,7 +315,7 @@ export const CreateNote: React.FC = () => {
         setIsSaveChoiceOpen(false);
         setReleaseSuccess(null);
         stopMusic();
-        navigateWithBypass(RoutePath.HOME, { state: { fromSave: true } });
+        navigateWithBypass(RoutePath.DASHBOARD, { state: { fromSave: true } });
       }, 1500);
     }
   };
@@ -969,7 +967,7 @@ export const CreateNote: React.FC = () => {
         confirmLabel="Leave without saving"
         cancelLabel="Keep writing"
       />
-      <CompanionObservation isVisible={showObservation} text={observationText || ""} onComplete={() => { setShowObservation(false); navigateWithBypass(RoutePath.HOME, { state: { fromSave: true } }); }} />
+      <CompanionObservation isVisible={showObservation} text={observationText || ""} onComplete={() => { setShowObservation(false); navigateWithBypass(RoutePath.DASHBOARD, { state: { fromSave: true } }); }} />
       <PaperPlaneToast isVisible={showPlane} onAnimationComplete={() => {}} />
     </div>
   );
