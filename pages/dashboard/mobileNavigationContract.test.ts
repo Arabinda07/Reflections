@@ -30,6 +30,7 @@ describe('signed-in mobile navigation contract', () => {
     expect(mobileNav).toContain('aria-expanded={isMoreOpen}');
     expect(mobileNav).toContain('aria-controls={moreSheetId}');
     expect(mobileNav).not.toContain('<span>{tab.label}</span>');
+    expect(mobileNav).toContain('<span className="auth-mobile-tab-label">{tab.label}</span>');
     expect(mobileNav).toContain('title="Navigation"');
     expect(mobileNav).not.toContain('title="More"');
     expect(mobileNav).not.toContain('More places inside Reflections.');
@@ -37,6 +38,8 @@ describe('signed-in mobile navigation contract', () => {
     expect(mobileNav).toContain('mobilePlacement="bottom"');
     expect(mobileNav).toContain('panelId={moreSheetId}');
     expect(mobileNav).toContain('data-autofocus');
+    expect(mobileNav).toContain('useEffect(() =>');
+    expect(mobileNav).toContain('[location.pathname]');
   });
 
   it('puts only distinct secondary routes plus account/support actions in More', () => {
@@ -45,7 +48,7 @@ describe('signed-in mobile navigation contract', () => {
 
     expect(mobileNav).toContain('MORE_NAV_GROUPS');
     expect(mobileNav).toMatch(
-      /label: 'Insights'[\s\S]*label: 'Life Wiki'[\s\S]*label: 'Future Letters'/,
+      /label: 'Insights'[\s\S]*label: 'Future Letters'[\s\S]*label: 'Life Wiki'/,
     );
     expect(mobileNav).toContain('RoutePath.INSIGHTS');
     expect(mobileNav).toContain('RoutePath.SANCTUARY');
@@ -69,7 +72,7 @@ describe('signed-in mobile navigation contract', () => {
     const mobileNav = read('layouts/AuthenticatedMobileNav.tsx');
 
     expect(mobileNav).toContain('<nav aria-label="More navigation"');
-    expect(mobileNav).toContain('aria-label="Account and support actions"');
+    expect(mobileNav).toContain('aria-label="Share actions"');
     expect(mobileNav).toContain('auth-mobile-more-actions');
     expect(mobileNav).toContain('auth-mobile-more-session');
     expect(mobileNav).toContain('auth-mobile-more-signout');
@@ -106,8 +109,9 @@ describe('signed-in mobile navigation contract', () => {
     expect(css).toContain('.auth-mobile-more-sheet-body');
     expect(css).toContain('.auth-mobile-more-sheet-body::-webkit-scrollbar');
     expect(css).toMatch(/\.auth-mobile-more-sheet-body\s*{[\s\S]*scrollbar-width: none;/);
+    expect(css).toContain('-webkit-overflow-scrolling: touch;');
     expect(css).toContain('env(safe-area-inset-bottom)');
-    expect(css).toContain('--mobile-bottom-nav-height');
+    expect(css).toContain('--mobile-bottom-nav-height: 5.25rem;');
     expect(css).toContain('--mobile-bottom-nav-reserved-space');
     expect(css).toContain('scroll-padding-bottom: calc(var(--mobile-bottom-nav-reserved-space) + env(safe-area-inset-bottom));');
   });

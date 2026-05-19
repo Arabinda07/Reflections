@@ -1,4 +1,4 @@
-import React, { useId, useState } from 'react';
+import React, { useEffect, useId, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Book } from '@phosphor-icons/react/Book';
 import { Bug } from '@phosphor-icons/react/Bug';
@@ -94,17 +94,17 @@ export const MORE_NAV_GROUPS: MoreNavGroup[] = [
     label: 'Reflect',
     items: [
       { label: 'Insights', path: RoutePath.INSIGHTS, icon: Sparkle },
+      { label: 'Future Letters', path: RoutePath.FUTURE_LETTERS, icon: EnvelopeSimple },
       {
         label: 'Life Wiki',
         path: RoutePath.SANCTUARY,
         icon: Book,
         aliases: [RoutePath.WIKI, RoutePath.SANCTUARY_ARTICLE],
       },
-      { label: 'Future Letters', path: RoutePath.FUTURE_LETTERS, icon: EnvelopeSimple },
     ],
   },
   {
-    label: 'Account and help',
+    label: 'Account',
     items: [
       { label: 'Account', path: RoutePath.ACCOUNT, icon: UserCircle },
       { label: 'Help', path: RoutePath.FAQ, icon: Question },
@@ -123,16 +123,16 @@ const isMoreNavItemActive = (item: MoreNavItem, pathname: string) =>
   });
 
 const tabBaseClass =
-  'auth-mobile-tab relative flex min-h-11 flex-1 flex-col items-center justify-center gap-1 overflow-hidden rounded-[var(--radius-control)] px-2 py-1.5 text-[12px] font-extrabold leading-none transition-[background-color,border-color,color,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
+  'auth-mobile-tab relative flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-[0.875rem] px-2 py-1 text-[12px] font-bold leading-none transition-[background-color,border-color,color,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
 
 const moreLinkClass =
-  'auth-mobile-more-link flex min-h-11 w-full items-center justify-between gap-3 rounded-[var(--radius-control)] border border-transparent px-3 py-2 text-left text-[14px] font-extrabold text-gray-text transition-colors hover:border-green/15 hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
+  'auth-mobile-more-link flex min-h-11 w-full items-center justify-between gap-3 rounded-[0.9rem] border border-transparent px-2.5 py-1.5 text-left text-[14px] font-bold text-gray-text transition-colors hover:border-green/15 hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
 
 const neutralIconTileClass =
-  'auth-mobile-more-icon-tile flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-control)] bg-green/10 text-green';
+  'auth-mobile-more-icon-tile flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.8rem] bg-green/10 text-green';
 
 const signOutIconTileClass =
-  'auth-mobile-more-icon-tile auth-mobile-more-icon-tile--danger flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-control)] bg-clay/10 text-clay';
+  'auth-mobile-more-icon-tile auth-mobile-more-icon-tile--danger flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.8rem] bg-clay/10 text-clay';
 
 export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
   onBugReport,
@@ -146,6 +146,10 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
   const moreSheetId = useId();
 
   const closeMore = () => setIsMoreOpen(false);
+
+  useEffect(() => {
+    setIsMoreOpen(false);
+  }, [location.pathname]);
 
   const handleInvite = () => {
     closeMore();
@@ -171,9 +175,9 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
     <>
       <nav
         aria-label="Signed-in mobile navigation"
-        className="auth-mobile-bottom-nav fixed inset-x-0 bottom-0 z-[95] px-3 pb-[calc(0.5rem+env(safe-area-inset-bottom))] lg:hidden"
+        className="auth-mobile-bottom-nav fixed inset-x-0 bottom-0 z-[95] px-3 pb-[calc(0.45rem+env(safe-area-inset-bottom))] lg:hidden"
       >
-        <div className="mx-auto flex min-h-[4rem] max-w-[24rem] items-center gap-1 rounded-[calc(var(--radius-shell)-0.35rem)] border border-border/80 bg-surface/95 p-1.5 shadow-[0_-12px_32px_-28px_oklch(from_var(--green-shadow)_l_c_h_/_0.38)] backdrop-blur-md">
+        <div className="mx-auto flex min-h-[3.625rem] max-w-[23rem] items-center gap-1 rounded-[1.45rem] border border-border/70 bg-surface/95 p-1 shadow-[0_-10px_28px_-24px_oklch(from_var(--green-shadow)_l_c_h_/_0.28)] backdrop-blur-sm">
           {AUTHENTICATED_MOBILE_TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = tab.matches(location.pathname);
@@ -198,6 +202,7 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
                   onClick={() => setIsMoreOpen(true)}
                 >
                   <Icon size={22} weight={isActive ? 'fill' : 'regular'} aria-hidden="true" />
+                  <span className="auth-mobile-tab-label">{tab.label}</span>
                 </button>
               );
             }
@@ -230,11 +235,11 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
         panelClassName="auth-mobile-more-sheet-panel"
         panelId={moreSheetId}
       >
-        <div className="auth-mobile-more-sheet-content space-y-5">
-          <nav aria-label="More navigation" className="space-y-4">
+        <div className="auth-mobile-more-sheet-content space-y-3">
+          <nav aria-label="More navigation" className="space-y-3">
             {MORE_NAV_GROUPS.map((group, groupIndex) => (
-              <section key={group.label} className="space-y-2">
-                <h3 className="px-1 text-[10px] font-black uppercase tracking-[0.2em] text-gray-nav">
+              <section key={group.label} className="space-y-1.5">
+                <h3 className="px-1 text-[10px] font-black uppercase tracking-[0.16em] text-gray-nav">
                   {group.label}
                 </h3>
                 <div className="space-y-1">
@@ -273,11 +278,11 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
           </nav>
 
           <section
-            aria-label="Account and support actions"
-            className="auth-mobile-more-actions space-y-2 border-t border-border/70 pt-4"
+            aria-label="Share actions"
+            className="auth-mobile-more-actions space-y-1.5 border-t border-border/60 pt-3"
           >
-            <h3 className="px-1 text-[10px] font-black uppercase tracking-[0.2em] text-gray-nav">
-              Share and support
+            <h3 className="px-1 text-[10px] font-black uppercase tracking-[0.16em] text-gray-nav">
+              Share
             </h3>
             <div className="space-y-1">
               <button type="button" onClick={handleInvite} className={moreLinkClass}>
@@ -289,31 +294,31 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
                 </span>
               </button>
 
+              <button type="button" onClick={handleBugReport} className={moreLinkClass}>
+                <span className="auth-mobile-more-link-content">
+                  <span className={neutralIconTileClass}>
+                    <Bug size={18} weight="regular" aria-hidden="true" />
+                  </span>
+                  <span>Report a bug</span>
+                </span>
+              </button>
+
               {canInstall && !isInstalled ? (
                 <button type="button" onClick={handleInstall} className={moreLinkClass}>
                   <span className="auth-mobile-more-link-content">
                     <span className={neutralIconTileClass}>
-                      <DownloadSimple size={19} weight="regular" aria-hidden="true" />
+                      <DownloadSimple size={18} weight="regular" aria-hidden="true" />
                     </span>
                     <span>Install app</span>
                   </span>
                 </button>
               ) : null}
-
-              <button type="button" onClick={handleBugReport} className={moreLinkClass}>
-                <span className="auth-mobile-more-link-content">
-                  <span className={neutralIconTileClass}>
-                    <Bug size={19} weight="regular" aria-hidden="true" />
-                  </span>
-                  <span>Report a bug</span>
-                </span>
-              </button>
             </div>
           </section>
 
           <section
             aria-label="Session"
-            className="auth-mobile-more-session space-y-2 border-t border-border/80 pt-4"
+            className="auth-mobile-more-session space-y-1.5 border-t border-border/70 pt-3"
           >
             <div className="space-y-1">
               <button
