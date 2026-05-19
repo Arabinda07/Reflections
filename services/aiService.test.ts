@@ -53,6 +53,11 @@ const baseNote = (overrides: Partial<Note> = {}): Note => ({
   ...overrides,
 });
 
+const sourcedPage = (title: string, allThemeContent = '') => {
+  const sourceId = /Note id: ([^\n]+)/.exec(allThemeContent)?.[1] || 'note-1';
+  return `${title} body [Source: ${sourceId}]`;
+};
+
 describe('aiService.refreshWikiOnDemand', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -72,7 +77,8 @@ describe('aiService.refreshWikiOnDemand', () => {
         return 'Fresh index';
       }
 
-      return `${(payload as { title: string }).title} body`;
+      const request = payload as { title: string; allThemeContent: string };
+      return sourcedPage(request.title, request.allThemeContent);
     });
   });
 
@@ -98,7 +104,7 @@ describe('aiService.refreshWikiOnDemand', () => {
     expect(vi.mocked(wikiService.upsertWikiPage)).toHaveBeenCalledWith(
       'people',
       'People',
-      'People body',
+      'People body [Source: note-1]',
     );
     expect(vi.mocked(wikiService.upsertWikiPage)).not.toHaveBeenCalledWith(
       'mood_patterns',
@@ -111,7 +117,7 @@ describe('aiService.refreshWikiOnDemand', () => {
     vi.mocked(wikiService.getUserThemes).mockResolvedValue([]);
     vi.mocked(aiClient.requestText).mockImplementation(async (_action, payload) => {
       const title = (payload as { title: string }).title;
-      return title === 'People' ? '' : `${title} body [source:note-1]`;
+      return title === 'People' ? '' : sourcedPage(title, (payload as { allThemeContent: string }).allThemeContent);
     });
 
     const refreshWikiOnDemand = (aiService as {
@@ -162,7 +168,8 @@ describe('aiService.runGreatIngest', () => {
     vi.mocked(absorbLogService.logAbsorptions).mockResolvedValue(undefined);
     vi.mocked(aiClient.requestText).mockImplementation(async (action, payload) => {
       if (action === 'index') return 'Fresh index';
-      return `${(payload as { title: string }).title} body [Source: note-1]`;
+      const request = payload as { title: string; allThemeContent: string };
+      return sourcedPage(request.title, request.allThemeContent);
     });
   });
 
@@ -220,7 +227,8 @@ describe('aiService.autoIngestSavedNote', () => {
     vi.mocked(absorbLogService.logAbsorption).mockResolvedValue(undefined);
     vi.mocked(aiClient.requestText).mockImplementation(async (action, payload) => {
       if (action === 'index') return 'Fresh index';
-      return `${(payload as { title: string }).title} body [Source: note-1]`;
+      const request = payload as { title: string; allThemeContent: string };
+      return sourcedPage(request.title, request.allThemeContent);
     });
   });
 

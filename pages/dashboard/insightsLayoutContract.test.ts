@@ -23,7 +23,7 @@ describe('Insights layout contract', () => {
     expect(insights).toContain('ritualEventService.listSince');
     expect(insights).toContain('This week');
     expect(insights).toContain('Mood frequency');
-    expect(insights).toContain('weeklyRecap.moodData');
+    expect(insights).toContain('weeklyRecap.moodFamilyData');
     expect(insights).toContain('Overview');
     expect(insights).toContain('Completion card');
     expect(insights).not.toContain('nextQuestion');

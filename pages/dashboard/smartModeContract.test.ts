@@ -12,20 +12,21 @@ describe('Smart Mode Sanctuary contract', () => {
     const productContract = read('components/ui/productContractPhase1.test.ts');
 
     expect(lifeWiki).toContain('Refresh with AI');
-    expect(lifeWiki).toContain('refreshWikiOnDemand(notes)');
+    expect(lifeWiki).toContain('startLifeWikiRefresh');
     expect(productContract).toContain("expect(createNote).not.toContain('processNoteIntoWiki')");
 
     expect(account).toContain('Smart Mode');
     expect(account).toContain('setSmartModeEnabled');
-    expect(account).toContain('runGreatIngest');
+    expect(account).toContain('startLifeWikiRefresh');
     expect(account).toContain('role="switch"');
     expect(account).toContain('aria-checked={Boolean(access?.smartModeEnabled)}');
     expect(account).toContain('Turn off Smart Mode');
     expect(account).toContain('Enable Smart Mode');
 
     const noteDraft = read('hooks/useNoteDraft.ts');
+    const notePublishingOrchestrator = read('services/notePublishingOrchestrator.ts');
     expect(noteDraft).toContain('smartModeEnabled');
-    expect(noteDraft).toContain('autoIngestSavedNote');
+    expect(notePublishingOrchestrator).toContain('startLifeWikiRefresh');
     expect(noteDraft).not.toContain('processNoteIntoWiki');
   });
 
@@ -36,6 +37,9 @@ describe('Smart Mode Sanctuary contract', () => {
 
     expect(schema).toContain('smart_mode_enabled boolean default false');
     expect(schema).toContain('create table if not exists wiki_absorb_log');
+    expect(schema).toContain('create table if not exists ai_runs');
+    expect(schema).toContain('create table if not exists ai_run_events');
+    expect(schema).toContain('create table if not exists ai_feature_usage_counters');
     expect(schema).toContain('content_hash text not null');
 
     expect(types).toContain('smartModeEnabled: boolean');
@@ -49,6 +53,9 @@ describe('Smart Mode Sanctuary contract', () => {
 
     expect(updateSchema).toContain('smart_mode_enabled');
     expect(updateSchema).toContain('create table if not exists wiki_absorb_log');
+    expect(updateSchema).toContain('create table if not exists ai_runs');
+    expect(updateSchema).toContain('create table if not exists ai_run_events');
+    expect(updateSchema).toContain('create table if not exists ai_feature_usage_counters');
     expect(updateSchema).toContain('content_hash text not null');
   });
 });

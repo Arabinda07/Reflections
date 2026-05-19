@@ -3,7 +3,9 @@ import { wikiService } from './wikiService';
 import { type WikiPageType } from './wikiTypes';
 import { aiClient } from './aiClient';
 import { absorbLogService } from './absorbLogService';
-import { stripHtml } from './collectionUtils';
+import { buildNotesCorpus, getSignalNotes, type NotesCorpus } from './aiContext';
+import { WIKI_PAGE_CONFIGS } from './aiPromptSpecs';
+import { buildWikiRetryInstruction, validateWikiPageOutput } from './aiOutputValidation';
 
 export type WikiRefreshSource = 'themes' | 'notes' | 'none';
 
@@ -31,91 +33,6 @@ export interface AutoIngestResult extends WikiRefreshResult {
 
 const SMART_MODE_BATCH_SIZE = 5;
 
-const WIKI_PAGE_CONFIGS: { pageType: WikiPageType; title: string; instruction: string }[] = [
-  {
-    pageType: 'people',
-    title: 'People',
-    instruction: `Write a compact wiki essay about the people, relationships, and social worlds that appear in the notes.
-Focus on recurring names, roles, tensions, support, and unresolved relationship patterns. Avoid diagnosis or certainty.
-Use an encyclopedic third-person tone. Do not summarize diary events; synthesize durable roles and relationships.
-Every grounded claim must carry an inline source marker in this exact format: [Source: note-id]. Max 420 words.`,
-  },
-  {
-    pageType: 'patterns',
-    title: 'Patterns',
-    instruction: `Write a compact wiki essay about recurring emotional, practical, and attention patterns visible in the notes.
-Focus on repeated situations, rhythms, moods, triggers, and shifts over time. Avoid diagnosis or certainty.
-Use an encyclopedic third-person tone. Do not diagnose or turn patterns into certainty.
-Every grounded claim must carry an inline source marker in this exact format: [Source: note-id]. Max 420 words.`,
-  },
-  {
-    pageType: 'philosophies',
-    title: 'Philosophies',
-    instruction: `Write a compact wiki essay about values, beliefs, principles, and ways of seeing life that show up in the notes.
-Focus on what the person seems to care about and the ideas they return to. Keep the language grounded and tentative.
-Use an encyclopedic third-person tone. Prefer careful synthesis over motivational language.
-Every grounded claim must carry an inline source marker in this exact format: [Source: note-id]. Max 420 words.`,
-  },
-  {
-    pageType: 'eras',
-    title: 'Eras',
-    instruction: `Write a compact wiki essay about seasons, phases, transitions, and periods that appear across the notes.
-Focus on what changed, what repeated, and what may still be forming. Do not overstate the timeline if dates are thin.
-Use an encyclopedic third-person tone. Name eras only when the notes give enough signal.
-Every grounded claim must carry an inline source marker in this exact format: [Source: note-id]. Max 420 words.`,
-  },
-  {
-    pageType: 'decisions',
-    title: 'Decisions',
-    instruction: `Write a compact wiki essay about meaningful decisions, open questions, commitments, and tradeoffs visible in the notes.
-Focus on choices already made, choices being considered, and what seems to make those choices difficult.
-Use an encyclopedic third-person tone. Preserve uncertainty around unresolved choices.
-Every grounded claim must carry an inline source marker in this exact format: [Source: note-id]. Max 420 words.`,
-  },
-];
-
-
-const noteHasSignal = (note: Note) =>
-  Boolean(
-    stripHtml(note.title) ||
-      stripHtml(note.content) ||
-      note.mood ||
-      note.tags?.length ||
-      note.tasks?.length,
-  );
-
-const sortNotesChronologically = (notes: Note[]) =>
-  [...notes].sort((left, right) => new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime());
-
-const getSignalNotes = (notes: Note[]) => sortNotesChronologically(notes.filter(noteHasSignal));
-
-const buildNotesCorpus = (notes: Note[]) =>
-  getSignalNotes(notes)
-    .map((note) => {
-      const plainTitle = stripHtml(note.title) || 'Untitled reflection';
-      const plainContent = stripHtml(note.content);
-      const metadata = [
-        `Note id: ${note.id}`,
-        `Date: ${new Date(note.createdAt).toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-          year: 'numeric',
-        })}`,
-        note.mood ? `Mood: ${note.mood}` : null,
-        note.tags?.length ? `Tags: ${note.tags.join(', ')}` : null,
-        note.tasks?.length
-          ? `Tasks: ${note.tasks
-              .map((task) => `${task.completed ? '[done]' : '[open]'} ${task.text}`)
-              .join('; ')}`
-          : null,
-      ]
-        .filter(Boolean)
-        .join('\n');
-
-      return `## ${plainTitle}\n${metadata}\n\nEntry:\n${plainContent || 'No written body yet.'}`;
-    })
-    .join('\n\n---\n\n');
-
 const getReflectionFallbackMessage = (error: unknown) => {
   if (error instanceof Error) {
     if (error.message.includes('GEMINI_API_KEY is not configured')) {
@@ -133,23 +50,42 @@ const getReflectionFallbackMessage = (error: unknown) => {
   return "I wasn't able to generate a reflection right now. Please try again.";
 };
 
-const refreshStructuredWikiPages = async (allThemeContent: string): Promise<number> => {
+const generateValidatedWikiPage = async (
+  config: { pageType: WikiPageType; title: string; instruction: string },
+  corpus: NotesCorpus,
+) => {
+  const firstDraft = await aiClient.requestText('wikiPage', {
+    title: config.title,
+    instruction: config.instruction,
+    allThemeContent: corpus.text,
+  });
+  const firstValidation = validateWikiPageOutput(firstDraft || '', {
+    allowedSourceIds: corpus.sourceNoteIds,
+  });
+  if (firstValidation.ok === true) return firstValidation.content;
+
+  const retryDraft = await aiClient.requestText('wikiPage', {
+    title: config.title,
+    instruction: config.instruction,
+    allThemeContent: corpus.text,
+    retryInstruction: buildWikiRetryInstruction(firstValidation.reason),
+  });
+  const retryValidation = validateWikiPageOutput(retryDraft || '', {
+    allowedSourceIds: corpus.sourceNoteIds,
+  });
+
+  if (retryValidation.ok === true) return retryValidation.content;
+  throw new Error(retryValidation.reason);
+};
+
+const refreshStructuredWikiPages = async (corpus: NotesCorpus): Promise<number> => {
   let pageCount = 0;
 
   for (const config of WIKI_PAGE_CONFIGS) {
     try {
-      const content = await aiClient.requestText('wikiPage', {
-        title: config.title,
-        instruction: config.instruction,
-        allThemeContent,
-      });
-
-      const trimmedContent = content?.trim();
-
-      if (trimmedContent) {
-        await wikiService.upsertWikiPage(config.pageType, config.title, trimmedContent);
-        pageCount += 1;
-      }
+      const content = await generateValidatedWikiPage(config, corpus);
+      await wikiService.upsertWikiPage(config.pageType, config.title, content);
+      pageCount += 1;
     } catch (error) {
       console.error(`[aiService] Failed to refresh wiki page: ${config.pageType}`, error);
     }
@@ -258,7 +194,7 @@ export const aiService = {
    */
   refreshWikiOnDemand: async (notes: Note[]): Promise<WikiRefreshResult> => {
     const notesCorpus = buildNotesCorpus(notes);
-    if (!notesCorpus.trim()) {
+    if (!notesCorpus.text.trim()) {
       return {
         pageCount: 0,
         source: 'none',
@@ -305,7 +241,7 @@ export const aiService = {
       processedNotes = [...processedNotes, ...batch];
 
       const notesCorpus = buildNotesCorpus(processedNotes);
-      pageCount = notesCorpus.trim() ? await refreshStructuredWikiPages(notesCorpus) : 0;
+      pageCount = notesCorpus.text.trim() ? await refreshStructuredWikiPages(notesCorpus) : 0;
 
       if (pageCount > 0) {
         await absorbLogService.logAbsorptions(batch);

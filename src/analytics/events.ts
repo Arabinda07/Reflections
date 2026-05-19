@@ -1,4 +1,5 @@
 import type { User, PlanTier } from '../../types';
+import type { BillingPeriod } from '../config/pricingCatalog';
 import { RoutePath } from '../../types';
 import { getPostHogBootstrapConfig } from './posthogBootstrap';
 
@@ -157,6 +158,93 @@ export const trackLifeWikiRefreshed = ({
     page_count: pageCount,
     source,
     used_free_refresh: usedFreeRefresh,
+  });
+
+export const trackPaywallViewed = ({
+  surface,
+  defaultPlan,
+}: {
+  surface: 'card' | 'fullscreen';
+  defaultPlan: BillingPeriod;
+}) =>
+  captureAnalyticsEvent('paywall_viewed', {
+    surface,
+    default_plan: defaultPlan,
+  });
+
+export const trackPlanSelected = ({
+  surface,
+  billingPeriod,
+}: {
+  surface: 'card' | 'fullscreen';
+  billingPeriod: BillingPeriod;
+}) =>
+  captureAnalyticsEvent('plan_selected', {
+    surface,
+    billing_period: billingPeriod,
+  });
+
+export const trackTrialStarted = ({
+  billingPeriod,
+  trialDays,
+}: {
+  billingPeriod: BillingPeriod;
+  trialDays: number;
+}) =>
+  captureAnalyticsEvent('trial_started', {
+    billing_period: billingPeriod,
+    trial_days: trialDays,
+  });
+
+export const trackCheckoutFailed = ({
+  billingPeriod,
+  errorCode,
+}: {
+  billingPeriod: BillingPeriod;
+  errorCode?: string | null;
+}) =>
+  captureAnalyticsEvent('checkout_failed', {
+    billing_period: billingPeriod,
+    error_code: sanitizeAnalyticsErrorCode(errorCode),
+  });
+
+export const trackMoodFamilySelected = ({
+  source,
+  familyId,
+}: {
+  source: 'note' | 'home' | 'single_note';
+  familyId: string;
+}) =>
+  captureAnalyticsEvent('mood_family_selected', {
+    source,
+    family_id: familyId,
+  });
+
+export const trackMoodSelected = ({
+  source,
+  mood,
+  familyId,
+}: {
+  source: 'note' | 'home' | 'single_note';
+  mood: string;
+  familyId: string;
+}) =>
+  captureAnalyticsEvent('mood_selected', {
+    source,
+    mood,
+    family_id: familyId,
+  });
+
+export const trackModalDismissed = ({
+  modalId,
+  surface,
+}: {
+  modalId: string;
+  surface?: string;
+}) =>
+  captureAnalyticsEvent('modal_dismissed', {
+    modal_id: modalId,
+    surface,
   });
 
 export const identifyAnalyticsUser = (user: Pick<User, 'id'>) => {

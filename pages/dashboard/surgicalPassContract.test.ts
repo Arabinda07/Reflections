@@ -32,7 +32,7 @@ describe('surgical route and landing contract', () => {
     expect(createNote).not.toContain('const [isBreathing');
     expect(createNote).not.toContain('setIsBreathing');
     expect(createNote).not.toContain('<OverlayFeedback isVisible={loading || isBreathing}');
-    expect(createNote).toContain('DotLottieReact');
+    expect(createNote).toContain("import Lottie from 'lottie-react'");
     expect(createNote).toContain("from '@/src/lottie/trail-loading.json'");
     expect(createNote).toContain('h-48 w-48');
     expect(createNote).toContain('value={content}');
@@ -41,11 +41,13 @@ describe('surgical route and landing contract', () => {
   it('anchors landing actions near the bottom and strengthens mobile framing', () => {
     const landing = read('pages/dashboard/Landing.tsx');
     const layout = read('layouts/DashboardLayout.tsx');
+    const navigationBar = read('layouts/NavigationBar.tsx');
 
     expect(landing).toContain('pb-[calc(env(safe-area-inset-bottom)+1.75rem)]');
     expect(landing).toContain('mt-auto');
     expect(landing).toContain('object-[48%_center]');
     expect(landing).toContain('sm:object-[64%_center]');
-    expect(layout).toContain('landing-nav-scrim');
+    expect(layout).toContain('isLandingRoute');
+    expect(navigationBar).toContain('landing-nav-scrim');
   });
 });

@@ -36,7 +36,8 @@ import {
   MAX_ACTIVE_INTENTIONS,
   type HomeIntentionSummary,
 } from './homeIntentions';
-import { MOOD_CONFIG, MOOD_OPTIONS } from './moodConfig';
+import { getMoodConfig } from './moodConfig';
+import { MoodPicker } from './MoodPicker';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 
@@ -160,7 +161,7 @@ export const HomeAuthenticated: React.FC = () => {
             quotesPool = [...WRITING_NOTES, ...freshQuotes];
           }
         } catch (e) {
-          // Failed to fetch — fallback to static quotes pool
+          // Could not fetch; fall back to the static quotes pool.
         }
       }
 
@@ -324,7 +325,7 @@ export const HomeAuthenticated: React.FC = () => {
         setTimeout(() => setCheckInFeedback(null), 300);
       }, 1500);
     } catch (error) {
-      // Mood check-in save failed — feedback shown to user via UI
+      // Mood check-in could not save; feedback appears in the sheet.
       setCheckInFeedback('error');
     } finally {
       setIsSavingCheckIn(false);
@@ -345,7 +346,7 @@ export const HomeAuthenticated: React.FC = () => {
         : [...taskNotes, updatedNote];
       updateIntentionSummary(nextNotes);
     } catch (err) {
-      // Intention toggle failed — UI remains in previous state
+      // Intention toggle could not save; UI remains in previous state.
     }
   };
 
@@ -393,8 +394,8 @@ export const HomeAuthenticated: React.FC = () => {
         setIntentionFeedback(null);
       }, 1500);
     } catch (err) {
-      // Intention creation failed — toast shown to user
-      showToast('Could not save intention');
+      // Intention creation could not save; toast tells the user.
+      showToast('Could not save intention right now');
     } finally {
       setIsCreatingTask(false);
     }
@@ -791,7 +792,7 @@ export const HomeAuthenticated: React.FC = () => {
           setIsCheckInOpen(false);
           setCheckInFeedback(null);
         }}
-        title="Quick check-in"
+        title="What’s the vibe right now?"
         icon={<Heart size={20} weight="duotone" />}
         size="sm"
         tone="sage"
@@ -799,32 +800,18 @@ export const HomeAuthenticated: React.FC = () => {
       >
         <div className="space-y-5">
           <p className="text-base font-medium leading-relaxed text-gray-light">
-            Name the weather of this moment without writing a full reflection.
+            Feelings, but make them less loud. Pick the closest word.
           </p>
             {!checkInFeedback ? (
-              <div
-                className="grid grid-cols-2 gap-3"
-              >
-                {MOOD_OPTIONS.map((moodOption) => {
-                  const moodConfig = MOOD_CONFIG[moodOption];
-                  const Icon = moodConfig.icon;
-
-                  return (
-                    <button
-                      key={moodOption}
-                      type="button"
-                      onClick={() => handleMoodCheckIn(moodOption)}
-                      disabled={isSavingCheckIn}
-                      className={`group rounded-[1.5rem] border p-5 text-left transition-[border-color,background-color,box-shadow,transform,opacity] duration-300 ease-out-expo disabled:opacity-60 hover:scale-[1.02] hover:shadow-lg ${moodConfig.option}`}
-                    >
-                      <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl [background-color:oklch(from_var(--bg-color)_l_c_h_/_0.5)] transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-12">
-                        <Icon size={24} weight="duotone" className={moodConfig.labelClass} />
-                      </div>
-                      <span className="text-base font-bold text-gray-text transition-colors group-hover:text-green">{moodConfig.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
+              <MoodPicker
+                selectedMood={undefined}
+                source="home"
+                onSelect={(nextMood) => {
+                  if (nextMood) {
+                    void handleMoodCheckIn(nextMood);
+                  }
+                }}
+              />
             ) : (
               <div
                 className="flex flex-col items-center justify-center py-10 text-center animate-scale-in"
@@ -836,11 +823,11 @@ export const HomeAuthenticated: React.FC = () => {
                     <div 
                       className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green/10 text-green animate-shake-x"
                     >
-                      {MOOD_CONFIG[checkInFeedback]?.icon && React.createElement(MOOD_CONFIG[checkInFeedback].icon, { size: 32, weight: "fill" })}
+                      {getMoodConfig(checkInFeedback)?.icon && React.createElement(getMoodConfig(checkInFeedback)!.icon, { size: 32, weight: "fill" })}
                     </div>
                     <h3 className="label-caps mb-2 text-green">Recorded</h3>
                     <p className="font-serif text-[16px] italic leading-relaxed text-gray-light">
-                      Your mood has been saved.
+                      Logged. Tiny check-in, useful signal.
                     </p>
                   </>
                 )}

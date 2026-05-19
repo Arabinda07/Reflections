@@ -12,6 +12,9 @@ describe('Razorpay subscription security contract', () => {
 
     expect(createSubscription).not.toContain('const { planId } = body');
     expect(createSubscription).toContain('RAZORPAY_PLAN_IDS');
+    expect(createSubscription).toContain('RAZORPAY_WEEKLY_PLAN_ID');
+    expect(createSubscription).not.toContain('RAZORPAY_YEARLY_PLAN_ID');
+    expect(createSubscription).toContain('start_at');
     expect(createSubscription).toContain("from('razorpay_subscriptions')");
 
     expect(verifyPayment).toContain("from('razorpay_subscriptions')");
@@ -28,5 +31,12 @@ describe('Razorpay subscription security contract', () => {
     expect(webhook).toContain('subscription.activated');
     expect(webhook).toContain("from('account_entitlements')");
     expect(webhook).toContain("from('razorpay_subscriptions')");
+  });
+
+  it('keeps Razorpay subscription storage compatible with weekly and monthly plans only', () => {
+    const schema = read('supabase_security_lockdown.sql');
+
+    expect(schema).toContain("plan_code in ('weekly', 'monthly')");
+    expect(schema).not.toContain("plan_code in ('monthly', 'yearly')");
   });
 });

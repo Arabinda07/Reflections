@@ -3,22 +3,23 @@
 > A private, writing-first wellness journal. No streaks, no pressure, no automatic AI.
 
 ## What it is
-Reflections is a journaling app where users write notes, name their mood, tag patterns, and optionally use AI to receive personalised reflections informed by their complete writing history via the LLM Wiki system.
+Reflections is a journaling app where users write notes, name their mood, tag patterns, and optionally use AI to receive reflections or refresh their Life Wiki.
 
 ## Who it's for
 People who want a calm place to think in writing — without gamification, public sharing, or AI that runs without being asked.
 
 ## Key features
 - Private rich-text journal with mood tracking, tags, tasks, and attachments
-- LLM Wiki: an AI-maintained personal knowledge base that grows from your writing
-- AI Reflections informed by your full writing history (not just one entry)
+- Life Wiki: AI-generated pages that grow from saved writing when the user asks
+- AI Reflections for moments when users want another lens on a note
 - Ambient soundscapes, whisper-to-text, focus mode, breathing exercises
 - Future Letters: write to your future self
 - Available as web app, PWA, and Android APK
 
 ## Pricing
-- Free: 30 notes/month, all AI features included
-- Pro: unlimited notes (pricing Rs 99/- per month)
+- Free: 30 notes/month, one AI reflection sample, one Life Wiki refresh after enough writing
+- Pro weekly: ₹49/week after a 3-day trial
+- Pro monthly: ₹149/month after a 3-day trial
 
 ## Links
 - Homepage: https://www.reflections-sanctuary.space/

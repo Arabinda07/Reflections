@@ -52,7 +52,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com; worker-src 'self' blob:; connect-src 'self' https://*.supabase.co https://api.razorpay.com https://checkout.razorpay.com https://api.posthog.com https://*.posthog.com https://*.ingest.sentry.io https://vitals.vercel-insights.com; img-src 'self' data: blob: https://*.supabase.co https://lh3.googleusercontent.com; media-src 'self' blob: https://*.supabase.co; style-src 'self' 'unsafe-inline'; font-src 'self' data:; frame-src https://api.razorpay.com https://checkout.razorpay.com; form-action 'self'; upgrade-insecure-requests"
+          "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self' 'unsafe-eval' 'sha256-LeAP5zTAPDfb8+DWAsrNmc4nFnfc3MloiIoeG92dsJU=' 'sha256-6466VQu9KWzBWwKWXd7a3XR/G89m0iNcTO9HI3MuA9Q=' 'sha256-sGEBUAopXe2PS/mrXRvqbHs3dsSMeGR72IS1ZfTx2ZE=' 'sha256-NLPrHuFiNLEFDPLcnATZhLzI5ifofCFxJJMEYr8Z2Ps=' 'sha256-XVeV96j83R8hKhQ/MnaVQt+1VlNpqSZpvh1STOaFehA=' https://checkout.razorpay.com; worker-src 'self' blob:; connect-src 'self' https://*.supabase.co https://api.razorpay.com https://checkout.razorpay.com https://api.posthog.com https://*.posthog.com https://*.ingest.sentry.io https://vitals.vercel-insights.com; img-src 'self' data: blob: https://*.supabase.co https://lh3.googleusercontent.com; media-src 'self' blob: https://*.supabase.co; style-src 'self' 'unsafe-inline'; font-src 'self' data:; frame-src https://api.razorpay.com https://checkout.razorpay.com; form-action 'self'; upgrade-insecure-requests"
         }
       ]
     }

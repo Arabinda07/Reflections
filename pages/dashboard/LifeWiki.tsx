@@ -16,7 +16,7 @@ import { Surface } from '../../components/ui/Surface';
 import { LifeTheme, Note, RoutePath, WellnessAccess } from '../../types';
 import { noteService } from '../../services/noteService';
 import { wikiService } from '../../services/wikiService';
-import { aiService } from '../../services/aiService';
+import { aiRunClient } from '../../services/aiRunClient';
 import { profileService } from '../../services/profileService';
 import { FREE_WIKI_MINIMUM_ENTRIES, getWikiInsightsGate } from '../../services/wellnessPolicy';
 import {
@@ -308,24 +308,11 @@ export const LifeWiki: React.FC = () => {
 
     setIsRefreshingWiki(true);
     setRefreshFeedback(null);
-    let claimedFreeRefresh = false;
 
     try {
-      if (access?.planTier !== 'pro') {
-        claimedFreeRefresh = await profileService.incrementFreeWikiInsights();
+      const refreshResult = await aiRunClient.startLifeWikiRefresh({ trigger: 'manual' });
 
-        if (!claimedFreeRefresh) {
-          const newAccess = await profileService.getWellnessAccess();
-          setAccess(newAccess);
-          return;
-        }
-      }
-
-      const refreshResult = await aiService.refreshWikiOnDemand(notes);
-
-      if (claimedFreeRefresh && (refreshResult.source === 'none' || refreshResult.pageCount === 0)) {
-        await profileService.releaseClaimedFreeWikiInsight();
-        claimedFreeRefresh = false;
+      if (refreshResult.source === 'none' || refreshResult.pageCount === 0) {
         setRefreshFeedback({
           variant: 'warning',
           title: 'Nothing could be built yet',
@@ -339,18 +326,12 @@ export const LifeWiki: React.FC = () => {
           entryCount: notes.length,
           pageCount: refreshResult.pageCount,
           source: refreshResult.source,
-          usedFreeRefresh: claimedFreeRefresh,
+          usedFreeRefresh: access?.planTier !== 'pro',
         });
       }
 
       await loadData();
     } catch (error) {
-      if (claimedFreeRefresh) {
-        await profileService.releaseClaimedFreeWikiInsight().catch((refundError) => {
-          console.error('[LifeWiki] Failed to refund wiki refresh claim:', refundError);
-        });
-      }
-
       const newAccess = await profileService.getWellnessAccess().catch(() => access);
       setAccess(newAccess || null);
       setRefreshFeedback({
@@ -724,7 +705,7 @@ export const LifeWiki: React.FC = () => {
               variant="warning"
               icon={<Warning size={20} weight="fill" />}
               title="You have used your free Life Wiki refresh."
-              description="You can still read what is already here. Upgrade when you want to keep refreshing it with AI."
+              description="You can still read what is already here. Pro adds more refreshes for the weeks when life is a lot."
               actions={
                 <Button size="sm" variant="primary" className="font-bold" onClick={() => navigate(RoutePath.ACCOUNT)}>
                   See Pro options

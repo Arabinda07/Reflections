@@ -1,45 +1,11 @@
 import type { Note } from '../types';
 import { supabase } from '../src/supabaseClient';
 import { getAuthenticatedUser } from './authUtils';
-
-const stableNoteFingerprint = (note: Note) =>
-  JSON.stringify({
-    title: note.title || '',
-    content: note.content || '',
-    mood: note.mood || '',
-    tags: [...(note.tags || [])].sort(),
-    tasks: (note.tasks || []).map((task) => ({
-      id: task.id,
-      text: task.text,
-      completed: task.completed,
-      dueDate: task.dueDate || '',
-    })),
-  });
-
-const toHex = (bytes: ArrayBuffer) =>
-  Array.from(new Uint8Array(bytes))
-    .map((byte) => byte.toString(16).padStart(2, '0'))
-    .join('');
-
-const fallbackHash = (value: string) => {
-  let hash = 5381;
-  for (let index = 0; index < value.length; index += 1) {
-    hash = ((hash << 5) + hash) ^ value.charCodeAt(index);
-  }
-  return `fallback-${(hash >>> 0).toString(16)}`;
-};
+import { getNoteContentHash } from './aiContext';
 
 export const absorbLogService = {
   getNoteContentHash: async (note: Note): Promise<string> => {
-    const fingerprint = stableNoteFingerprint(note);
-    const subtle = globalThis.crypto?.subtle;
-
-    if (!subtle) {
-      return fallbackHash(fingerprint);
-    }
-
-    const digest = await subtle.digest('SHA-256', new TextEncoder().encode(fingerprint));
-    return toHex(digest);
+    return getNoteContentHash(note);
   },
 
   needsReAbsorb: async (note: Note): Promise<boolean> => {

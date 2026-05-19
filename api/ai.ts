@@ -11,24 +11,20 @@ import {
   requireUser,
   sendJson,
 } from '../server/apiUtils';
+import {
+  validateAiRequest,
+  validateIngestDecision,
+  type AiAction,
+  type AiRequest,
+} from '../services/aiContracts';
+import {
+  GEMINI_MODEL,
+  INGEST_MODEL,
+  buildIndexPrompt,
+  buildPrompt,
+  buildWikiPagePrompt,
+} from '../services/aiPromptSpecs';
 
-type AiAction =
-  | 'prompts'
-  | 'reflection'
-  | 'tags'
-  | 'ingestDecision'
-  | 'ingestSynthesis'
-  | 'wikiPage'
-  | 'index'
-  | 'writingNotes';
-
-type AiRequest = {
-  action?: AiAction;
-  payload?: any;
-};
-
-const GEMINI_MODEL = 'gemini-3-flash-preview';
-const INGEST_MODEL = 'gemini-2.5-flash';
 const MAX_BODY_BYTES = 250_000;
 const NOTE_OWNERSHIP_ACTIONS = new Set<AiAction>([
   'reflection',
@@ -89,7 +85,11 @@ const generateJson = async <T>(
     },
   });
 
-  return JSON.parse(cleanJson(response.text || '{}')) as T;
+  try {
+    return JSON.parse(cleanJson(response.text || '{}')) as T;
+  } catch {
+    throw new HttpError(502, 'Malformed AI JSON');
+  }
 };
 
 const generateText = async (prompt: string, model = GEMINI_MODEL): Promise<string> => {
@@ -101,8 +101,6 @@ const generateText = async (prompt: string, model = GEMINI_MODEL): Promise<strin
 
   return response.text?.trim() || '';
 };
-
-const buildPrompt = (parts: string[]) => parts.filter(Boolean).join('\n\n');
 
 const pruneRateBucket = (key: string, now: number) => {
   const cutoff = now - LOCAL_RATE_WINDOW_MS;
@@ -148,6 +146,17 @@ const assertNoteOwnership = async (userId: string, action: AiAction, payload: an
   }
 };
 
+const assertAllowedQuota = (data: unknown) => {
+  const allowed = typeof data === 'object' && data !== null && (data as any).allowed === true;
+  if (allowed) return;
+
+  const reason =
+    typeof data === 'object' && data !== null && typeof (data as any).reason === 'string'
+      ? (data as any).reason
+      : 'AI quota exhausted';
+  throw new HttpError(429, reason);
+};
+
 const claimAiUsage = async (userId: string, action: AiAction, req: any) => {
   const ipHash = hashForLogs(getClientIp(req));
   assertLocalRateLimit(action, userId, ipHash);
@@ -163,14 +172,21 @@ const claimAiUsage = async (userId: string, action: AiAction, req: any) => {
     throw new HttpError(500, 'AI quota check failed');
   }
 
-  const allowed = typeof data === 'object' && data !== null && (data as any).allowed === true;
-  if (!allowed) {
-    const reason =
-      typeof data === 'object' && data !== null && typeof (data as any).reason === 'string'
-        ? (data as any).reason
-        : 'AI quota exhausted';
-    throw new HttpError(429, reason);
+  assertAllowedQuota(data);
+};
+
+const claimAiFeatureUsage = async (userId: string, feature: 'reflection') => {
+  const supabaseAdmin = createSupabaseAdminClient();
+  const { data, error } = await supabaseAdmin.rpc('claim_ai_feature_usage', {
+    p_feature: feature,
+    p_user_id: userId,
+  });
+
+  if (error) {
+    throw new HttpError(500, 'AI feature quota check failed');
   }
+
+  assertAllowedQuota(data);
 };
 
 const handlePrompts = async (payload: any) => {
@@ -272,7 +288,7 @@ const handleIngestDecision = async (payload: any) => {
     'Return only valid JSON with action, themeId, newThemeTitle, and reasoning. Use grounded, non-clinical reasoning.',
   ]);
 
-  return generateJson<{
+  const decision = await generateJson<{
     action: 'append' | 'create' | 'skip';
     themeId: string | null;
     newThemeTitle: string | null;
@@ -287,6 +303,16 @@ const handleIngestDecision = async (payload: any) => {
     },
     required: ['action', 'themeId', 'newThemeTitle', 'reasoning'],
   } as any);
+
+  const validation = validateIngestDecision(
+    decision,
+    themes.map((theme: any) => String(theme.id)),
+  );
+  if (validation.ok === false) {
+    throw new HttpError(502, validation.error);
+  }
+
+  return validation.data;
 };
 
 const handleIngestSynthesis = async (payload: any) => {
@@ -307,30 +333,26 @@ const handleWikiPage = async (payload: any) => {
   const title = String(payload?.title || 'Untitled');
   const instruction = String(payload?.instruction || '');
   const allThemeContent = String(payload?.allThemeContent || '');
+  const retryInstruction = typeof payload?.retryInstruction === 'string' ? payload.retryInstruction : '';
 
-  const prompt = buildPrompt([
-    'You are a careful reader maintaining a Life Wiki for the app Reflections.',
-    `Here is everything they have written across all their Life Themes:\n${allThemeContent}`,
-    `Task: Write the "${title}" wiki page for this person.`,
+  const prompt = buildWikiPagePrompt({
+    title,
     instruction,
-    'Output raw markdown only. Use quiet, observant language. Avoid clinical labels.',
-  ]);
+    allThemeContent,
+    retryInstruction,
+  });
 
   return generateText(prompt, INGEST_MODEL);
 };
 
 const handleIndex = async (payload: any) => {
   const pages = Array.isArray(payload?.pages) ? payload.pages : [];
-  const allContent = pages
-    .map((page: any) => `## ${page.title}\n${String(page.content || '').slice(0, 500)}`)
-    .join('\n\n---\n\n');
-
-  const prompt = buildPrompt([
-    'You are building a quiet index page for a personal Life Wiki.',
-    `Here are all the wiki pages (truncated):\n${allContent}`,
-    "Write a concise index: one bullet per page, format exactly as - **[Page Title]**: one short sentence noticing the page's primary theme.",
-    'Output only the bullet list. Use observant, plain language.',
-  ]);
+  const prompt = buildIndexPrompt(
+    pages.map((page: any) => ({
+      title: String(page.title || 'Untitled'),
+      content: String(page.content || ''),
+    })),
+  );
 
   return generateText(prompt, INGEST_MODEL);
 };
@@ -376,15 +398,19 @@ export default async function handler(req: any, res: any) {
   try {
     const user = await requireUser(supabaseAuth, req.headers?.authorization);
     const body = await parseJsonBody<AiRequest>(req, MAX_BODY_BYTES);
+    const validation = validateAiRequest(body);
 
-    if (!body.action || !(body.action in handlers)) {
-      return sendJson(res, 400, { error: 'Invalid AI action' });
+    if (validation.ok === false) {
+      return sendJson(res, 400, { error: validation.error });
     }
 
-    await assertNoteOwnership(user.id, body.action, body.payload);
-    await claimAiUsage(user.id, body.action, req);
+    await assertNoteOwnership(user.id, validation.action, validation.payload);
+    await claimAiUsage(user.id, validation.action, req);
+    if (validation.action === 'reflection') {
+      await claimAiFeatureUsage(user.id, 'reflection');
+    }
 
-    const data = await handlers[body.action](body.payload);
+    const data = await handlers[validation.action](validation.payload);
     return sendJson(res, 200, { ok: true, data });
   } catch (error: unknown) {
     return sendJson(res, getErrorStatusCode(error), {

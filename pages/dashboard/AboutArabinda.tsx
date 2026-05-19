@@ -18,19 +18,19 @@ const sections: AboutSection[] = [
     title: 'The pace around us',
     icon: 'feather',
     iconClassName: 'text-sky-600',
-    body: 'I have always been fascinated by how consumed we are by work and by the pace of ordinary life now. Even rest has started to move quickly. Reels, episodes, feeds, messages, everything asks us to keep up. We hardly sit down to read, write, draw, or listen to the music we like when it does not match the mainstream choice.',
+    body: 'I keep thinking about how quickly ordinary life moves now. Work, reels, episodes, messages, family expectations, the whole thing. Even rest can start feeling like another tab you forgot to close. Reflections is my attempt at a slower counterweight.',
   },
   {
     title: 'Why writing helps',
     icon: 'feather',
     iconClassName: 'text-sky-600',
-    body: 'Therapy can help, and for many people it is the right support. It is also too expensive for a lot of us. Reflections is not a replacement for trained professionals. It is a smaller thing: a place to write feelings down, recognise what might be there, and take a little time out for yourself.',
+    body: 'Therapy can help, and for many people it is the right support. It is also too expensive for a lot of us. Reflections is not a replacement for trained professionals. It is smaller and more ordinary: write it down before it becomes your whole personality.',
   },
   {
     title: 'Private writing',
     icon: 'lock',
     iconClassName: 'text-honey-600',
-    body: 'I built Reflections to help writing stay private and ordinary. Your notes are yours. You can export them when you want. You can write for 2 minutes before bed, add music if it helps, keep a small rhythm if you like, or restart whenever life gets crowded again.',
+    body: 'I built Reflections to help writing stay private and ordinary. Your notes are yours. You can export them when you want. Write for 2 minutes before bed, add music if it helps, keep a small rhythm if you like, or restart whenever life gets crowded again.',
   },
   {
     title: 'AI that waits',
@@ -83,7 +83,7 @@ export const AboutArabinda: React.FC = () => {
                 Reflections began as a reminder to slow down before the day ends.
               </p>
               <p className="max-w-[55ch] font-sans text-[16px] leading-relaxed text-gray-light">
-                I made this app because we are all part of a mass movement that often prefers fitting in. I wanted a slower counterweight: a place to check in with your emotions, write something down, and leave without being pushed to perform. Thank you for trusting me with a few minutes of your day.
+                I made this app because a lot of us are carrying full days, full phones, and full heads. I wanted one private place to check in, write something down, and leave without being pushed to perform. Thank you for trusting me with a few minutes of your day.
               </p>
               <p className="text-[12px] font-bold uppercase tracking-widest text-gray-nav">Last updated · May 2026</p>
             </div>

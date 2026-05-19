@@ -30,7 +30,8 @@ import { storageService } from '../../services/storageService';
 import { Note, RoutePath, Task } from '../../types';
 import { sanitizeNoteHtml } from './noteContent';
 import { downloadNoteExport } from './noteExport';
-import { MOOD_OPTIONS, getMoodConfig } from './moodConfig';
+import { getMoodConfig } from './moodConfig';
+import { MoodPicker } from './MoodPicker';
 
 export const SingleNote: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -470,32 +471,17 @@ export const SingleNote: React.FC = () => {
       <ModalSheet
         isOpen={isMoodOpen}
         onClose={() => setIsMoodOpen(false)}
-        title="Mood"
+        title="What’s the vibe right now?"
         size="sm"
       >
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {MOOD_OPTIONS.map((moodOption) => {
-            const moodConfig = getMoodConfig(moodOption);
-            const Icon = moodConfig?.icon || Smiley;
-
-            return (
-              <button
-                key={moodOption}
-                type="button"
-                onClick={async () => {
-                  await persistNote({ mood: note.mood === moodOption ? undefined : moodOption });
-                  setIsMoodOpen(false);
-                }}
-                className={`flex flex-col items-center rounded-[var(--radius-panel)] border px-4 py-5 transition-colors ${
-                  note.mood === moodOption ? moodConfig?.selectedOption : moodConfig?.option
-                }`}
-              >
-                <Icon size={16} weight={note.mood === moodOption ? 'fill' : 'regular'} className={`mb-2 ${moodConfig?.labelClass || ''}`} />
-                <span className="text-xs font-bold">{moodConfig?.label || moodOption}</span>
-              </button>
-            );
-          })}
-        </div>
+        <MoodPicker
+          selectedMood={note.mood}
+          source="single_note"
+          onSelect={async (nextMood) => {
+            await persistNote({ mood: nextMood });
+            setIsMoodOpen(false);
+          }}
+        />
       </ModalSheet>
 
       <ModalSheet

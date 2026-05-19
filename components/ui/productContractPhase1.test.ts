@@ -50,7 +50,8 @@ describe('phase 1 product contract and clarity', () => {
     expect(account).toContain('Saved writing and app data will be removed.');
     expect(account).not.toContain('Delete your notes, moods, tags, tasks, and saved profile details here.');
 
-    expect(proUpgrade).toContain('Join Pro');
+    expect(proUpgrade).toContain('Start my free trial');
+    expect(proUpgrade).toContain('More room when life gets loud');
     expect(proUpgrade).toContain('billingPeriod: selectedPlan');
     expect(proUpgrade).toContain('verify-razorpay-payment');
     expect(proUpgrade).not.toContain("plan: 'pro'");

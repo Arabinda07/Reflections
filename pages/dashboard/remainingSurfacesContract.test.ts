@@ -11,13 +11,13 @@ describe('remaining surfaces source contract', () => {
     const myNotes = read('pages/dashboard/MyNotes.tsx');
     const loadingState = read('components/ui/LoadingState.tsx');
 
-    expect(read('App.tsx')).toContain("import('@/pages/dashboard/HomeAuthenticated.tsx')");
+    expect(read('App.tsx')).toContain("import('@/pages/dashboard/HomeAuthenticated')");
     expect(home).not.toContain("from '../../services/noteService'");
     expect(home).not.toContain("from '../../src/supabaseClient'");
 
     expect(myNotes).not.toContain("import ReactCalendar from 'react-calendar'");
     expect(myNotes).not.toContain("import 'react-calendar/dist/Calendar.css'");
-    expect(loadingState).toContain('DotLottieReact');
+    expect(loadingState).toContain('<Lottie');
     expect(loadingState).toContain('loadingAnimation');
   });
 

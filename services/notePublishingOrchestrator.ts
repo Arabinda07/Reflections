@@ -1,6 +1,6 @@
 import { noteService } from './noteService';
 import { storageService } from './storageService';
-import { aiService } from './aiService';
+import { aiRunClient } from './aiRunClient';
 import { ritualEventService } from './ritualService';
 import { observationService } from './observationService';
 import { extractTasksFromContent, mergeTasks } from '../src/utils/taskParser';
@@ -92,9 +92,8 @@ export const notePublishingOrchestrator = {
 
     // Smart mode auto-ingest (fire-and-forget)
     if (input.smartModeEnabled) {
-      noteService
-        .getAll()
-        .then((allNotes) => aiService.autoIngestSavedNote(savedNote, allNotes))
+      aiRunClient
+        .startLifeWikiRefresh({ trigger: 'smart_mode', noteId: savedNote.id })
         .catch((error) => {
           console.error('[NotePublishingOrchestrator] Smart Mode auto-ingest failed:', error);
         });

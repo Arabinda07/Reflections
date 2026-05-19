@@ -14,9 +14,9 @@ describe('engagement routes source contract', () => {
     expect(routes).toContain("RELEASE = '/release'");
     expect(routes).toContain("FUTURE_LETTERS = '/letters'");
     expect(routes).toContain("ABOUT = '/about'");
-    expect(app).toContain("import('@/pages/dashboard/ReleaseMode.tsx')");
-    expect(app).toContain("import('@/pages/dashboard/FutureLetters.tsx')");
-    expect(app).toContain("import('@/pages/dashboard/AboutArabinda.tsx')");
+    expect(app).toContain("import('@/pages/dashboard/ReleaseMode')");
+    expect(app).toContain("import('@/pages/dashboard/FutureLetters')");
+    expect(app).toContain("import('@/pages/dashboard/AboutArabinda')");
     expect(app).toContain('path={RoutePath.RELEASE}');
     expect(app).toContain('path={RoutePath.FUTURE_LETTERS}');
     expect(app).toContain('path={RoutePath.ABOUT}');
@@ -38,7 +38,7 @@ describe('engagement routes source contract', () => {
     expect(homeAuthenticated).not.toContain('RoutePath.RELEASE');
     const noteDraft = read('hooks/useNoteDraft.ts');
     expect(noteDraft).toContain('recordReleaseCompleted');
-    expect(createNote).toContain('Choose what this becomes');
+    expect(createNote).toContain('Keep it, or let it go');
     expect(homeAuthenticated.toLowerCase()).not.toMatch(/\b(streak|xp|leaderboard|lost|failed)\b/);
   });
 
@@ -59,8 +59,6 @@ describe('engagement routes source contract', () => {
     expect(releaseMode).toContain("buildCompletionCardPayload");
     expect(releaseMode).toContain("Release");
     expect(releaseMode).toContain("setText('')");
-    expect(releaseMode).toContain('AnimatePresence');
-    expect(releaseMode).toContain('onExitComplete={() => setText(\'\')}');
     expect(releaseMode).toContain('htmlFor="release-writing"');
     expect(releaseMode).toContain('id="release-writing"');
     expect(releaseMode).toContain('justify-start');
@@ -69,7 +67,6 @@ describe('engagement routes source contract', () => {
     expect(releaseMode).toContain('sm:min-h-[42dvh]');
     expect(releaseMode).toContain('className="-ml-2 min-h-11"');
     expect(read('layouts/DashboardLayout.tsx')).toContain('{!isWritingRoute && (');
-    expect(releaseMode).toContain('useReducedMotion');
     expect(releaseMode).not.toContain('setTimeout');
     expect(releaseMode).not.toContain('noteService');
     expect(releaseMode).not.toMatch(/create\s*\(/);

@@ -31,7 +31,7 @@ import {
   SANCTUARY_LEVEL_UP_ANIMATION_ID,
   SANCTUARY_LEVEL_UP_ANIMATION_SRC,
 } from '../../src/lottie/sanctuaryAnimation';
-import { DEFAULT_MOOD_TONE, getMoodConfig } from './moodConfig';
+import { DEFAULT_MOOD_TONE, getMoodConfig, getMoodFamilyConfig } from './moodConfig';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 const TAG_TONE_CLASSES = ['text-green', 'text-green/80', 'text-green/70', 'text-green/60'];
@@ -340,7 +340,7 @@ export const Insights: React.FC = () => {
                   style={getAccordionGridStyle(isMoodOpen)}
                 >
                       <div className="min-h-0 pb-8">
-                        {weeklyRecap.moodData.length === 0 ? (
+                        {weeklyRecap.moodFamilyData.length === 0 ? (
                           <EmptyState
                             surface="none"
                             icon={<Heart size={22} weight="duotone" />}
@@ -349,17 +349,18 @@ export const Insights: React.FC = () => {
                           />
                         ) : (
                           <div className="flex flex-col gap-5">
-                            {weeklyRecap.moodData.map((entry) => {
-                              const maxValue = weeklyRecap.moodData[0].value;
+                            {weeklyRecap.moodFamilyData.map((entry) => {
+                              const maxValue = weeklyRecap.moodFamilyData[0].value;
                               const percent = Math.round((entry.value / maxValue) * 100);
                               const { scaleX } = getMoodBarScale(percent);
-                              const moodConfig = getMoodConfig(entry.name);
+                              const moodFamily = getMoodFamilyConfig(entry.name);
+                              const moodConfig = getMoodConfig(moodFamily?.options[0] || entry.name);
                               const tone = moodConfig || DEFAULT_MOOD_TONE;
 
                               return (
                                 <div key={entry.name} className="flex items-center gap-4 group/bar">
                                   <span className={`w-20 shrink-0 label-caps transition-colors group-hover/bar:text-gray-text ${tone.labelClass}`}>
-                                    {moodConfig?.label || entry.name}
+                                    {moodFamily?.label || moodConfig?.label || entry.name}
                                   </span>
                                   <div className={`relative h-10 flex-1 overflow-hidden rounded-2xl ${tone.trackClass}`}>
                                     <div

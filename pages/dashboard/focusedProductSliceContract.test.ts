@@ -90,7 +90,7 @@ describe('focused product slice source contract', () => {
     expect(homeAuthenticated).toContain('Future letter');
     expect(homeAuthenticated).toContain('Your Rhythm');
     expect(homeAuthenticated).toContain('Before you write');
-    expect(homeAuthenticated).toContain('lg:grid-cols-[minmax(0,2fr)_minmax(20rem,0.95fr)]');
+    expect(homeAuthenticated).toContain('core-bento-grid');
     expect(homeAuthenticated).not.toContain('Daily Focus');
     expect(homeAuthenticated).not.toContain('Start Reflection');
     expect(homeAuthenticated).not.toContain('Reflections Overview');
@@ -98,7 +98,7 @@ describe('focused product slice source contract', () => {
     expect(homeAuthenticated).not.toContain('lg:grid-cols-3');
     
     // Check for the specific combination of classes that was removed from the prompt
-    expect(homeAuthenticated).toContain('text-2xl md:text-3xl text-gray-text font-serif italic leading-relaxed');
+    expect(homeAuthenticated).toContain('dashboard-prompt-text typographic-measure');
   });
 
   it('removes quietly from live app and AI copy', () => {
@@ -123,11 +123,12 @@ describe('focused product slice source contract', () => {
 
     expect(homeAuthenticated).toContain('moodCheckinService.create');
     expect(homeAuthenticated).toContain('Quick check-in');
-    expect(homeAuthenticated).toContain('MOOD_OPTIONS.map');
-    expect(read('pages/dashboard/moodConfig.ts')).toContain("['happy', 'calm', 'anxious', 'sad', 'angry', 'tired']");
+    expect(homeAuthenticated).toContain('<MoodPicker');
+    expect(read('pages/dashboard/moodConfig.ts')).toContain("'overthinking'");
+    expect(read('pages/dashboard/moodConfig.ts')).toContain("'complex'");
     expect(homeAuthenticated.toLowerCase()).not.toContain('score');
 
-    expect(createNote).toContain('title="Mood"');
+    expect(createNote).toContain('title="What’s the vibe right now?"');
     expect(createNote).not.toContain('Reflection mood');
   });
 

@@ -1,14 +1,5 @@
 import { supabase } from '../src/supabaseClient';
-
-export type AiAction =
-  | 'prompts'
-  | 'reflection'
-  | 'tags'
-  | 'ingestDecision'
-  | 'ingestSynthesis'
-  | 'wikiPage'
-  | 'index'
-  | 'writingNotes';
+import type { AiAction } from './aiContracts';
 
 type AiResponse<T> = {
   ok: true;
@@ -17,7 +8,7 @@ type AiResponse<T> = {
 
 const AI_ENDPOINT = '/api/ai';
 
-const getAccessToken = async () => {
+export const getAccessToken = async () => {
   const { data, error } = await supabase.auth.getSession();
   if (error) throw error;
 

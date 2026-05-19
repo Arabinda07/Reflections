@@ -47,28 +47,31 @@ import { canNavigateBackInApp } from '../../src/native/androidBack';
 import { NATIVE_PAGE_TOP_PADDING, NATIVE_TOP_CONTROL_OFFSET } from '../../src/native/safeArea';
 import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
 import trailLoadingAnimation from '@/src/lottie/trail-loading.json';
-import { MOOD_CONFIG, MOOD_OPTIONS, getMoodConfig } from './moodConfig';
+import { getMoodConfig, getMoodFamilyForMood } from './moodConfig';
+import { MoodPicker } from './MoodPicker';
 
 const getSurfaceScopeForMood = (mood?: string) => {
-  switch (mood) {
-    case 'happy': return 'surface-scope-sky';
-    case 'calm': return 'surface-scope-sage';
-    case 'anxious': return 'surface-scope-neutral';
-    case 'sad': return 'surface-scope-sky';
-    case 'angry': return 'surface-scope-neutral';
-    case 'tired': return 'surface-scope-paper';
+  switch (getMoodFamilyForMood(mood)?.id) {
+    case 'light': return 'surface-scope-sky';
+    case 'steady': return 'surface-scope-sage';
+    case 'restless': return 'surface-scope-neutral';
+    case 'heavy': return 'surface-scope-sky';
+    case 'heated': return 'surface-scope-clay';
+    case 'low': return 'surface-scope-paper';
+    case 'complex': return 'surface-scope-neutral';
     default: return 'surface-scope-paper';
   }
 };
 
 const getSurfacePanelForMood = (mood?: string) => {
-  switch (mood) {
-    case 'happy': return 'surface-panel-sky';
-    case 'calm': return 'surface-panel-sage';
-    case 'anxious': return 'surface-panel-neutral';
-    case 'sad': return 'surface-panel-sky';
-    case 'angry': return 'surface-panel-neutral';
-    case 'tired': return 'surface-panel-paper';
+  switch (getMoodFamilyForMood(mood)?.id) {
+    case 'light': return 'surface-panel-sky';
+    case 'steady': return 'surface-panel-sage';
+    case 'restless': return 'surface-panel-paper';
+    case 'heavy': return 'surface-panel-sky';
+    case 'heated': return 'surface-panel-clay';
+    case 'low': return 'surface-panel-paper';
+    case 'complex': return 'surface-panel-paper';
     default: return 'surface-panel-sage';
   }
 };
@@ -417,8 +420,8 @@ export const CreateNote: React.FC = () => {
             <Lottie animationData={trailLoadingAnimation} autoplay loop />
           </div>
 
-          <h2 className="h2-section mb-4">Take a breath.</h2>
-          <p className="body-editorial max-w-sm">Let the noise settle before you start.</p>
+          <h2 className="h2-section mb-4">Making sense of the swirl.</h2>
+          <p className="body-editorial max-w-sm">Give the page a second to catch up.</p>
         </div>
       </div>
     );
@@ -719,7 +722,7 @@ export const CreateNote: React.FC = () => {
         onClose={() => {
           if (!saving && !isReleasing) setIsSaveChoiceOpen(false);
         }}
-        title="Choose what this becomes"
+        title="Keep it, or let it go"
         icon={<FloppyDisk size={20} weight="duotone" />}
         size="sm"
         bodyClassName="pt-2"
@@ -733,8 +736,8 @@ export const CreateNote: React.FC = () => {
             className="flex min-h-16 w-full items-center justify-between rounded-2xl border border-green bg-green p-4 text-left text-white transition-colors hover:bg-green-hover disabled:opacity-60"
           >
             <span>
-              <span className="block text-[15px] font-bold text-white">Save reflection</span>
-              <span className="mt-1 block text-[12px] font-medium text-white/75">Keep this as a saved note.</span>
+              <span className="block text-[15px] font-bold text-white">Keep this one</span>
+              <span className="mt-1 block text-[12px] font-medium text-white/75">Save it for the version of you who checks later.</span>
             </span>
             {saving ? <CircleNotch size={20} className="animate-spin" /> : <FloppyDisk size={20} weight="regular" />}
           </button>
@@ -747,8 +750,8 @@ export const CreateNote: React.FC = () => {
             className="flex min-h-16 w-full items-center justify-between rounded-2xl border border-clay/20 bg-clay/5 p-4 text-left text-clay transition-colors hover:border-clay/35 hover:bg-clay/10 disabled:opacity-60"
           >
             <span>
-              <span className="block text-[15px] font-bold text-gray-text">Release</span>
-              <span className="mt-1 block text-[12px] font-medium text-gray-light">Let it go without creating a note.</span>
+              <span className="block text-[15px] font-bold text-gray-text">Let it go</span>
+              <span className="mt-1 block text-[12px] font-medium text-gray-light">No archive. Just the exhale.</span>
             </span>
             {isReleasing ? <CircleNotch size={20} className="animate-spin" /> : <Wind size={20} weight="duotone" />}
           </button>
@@ -871,34 +874,18 @@ export const CreateNote: React.FC = () => {
       <ModalSheet
         isOpen={isMoodOpen}
         onClose={() => setIsMoodOpen(false)}
-        title="Mood"
+        title="What’s the vibe right now?"
         size="sm"
         bodyClassName="pt-2"
       >
-        <div className="grid grid-cols-3 gap-3">
-          {MOOD_OPTIONS.map((entry) => {
-            const moodConfig = MOOD_CONFIG[entry];
-            const Icon = moodConfig.icon;
-
-            return (
-              <button
-                key={entry}
-                onClick={() => {
-                  if (mood === entry) {
-                    setMood(undefined);
-                  } else {
-                    setMood(entry);
-                  }
-                  setIsMoodOpen(false);
-                }}
-                className={`flex flex-col items-center rounded-2xl border-2 p-4 transition-colors ${mood === entry ? moodConfig.modal : `${moodConfig.option} dark:bg-white/5`}`}
-              >
-                <Icon size={32} weight={mood === entry ? 'fill' : 'regular'} className="mb-2" />
-                <span className="text-[12px] font-bold">{moodConfig.label}</span>
-              </button>
-            );
-          })}
-        </div>
+        <MoodPicker
+          selectedMood={mood}
+          source="note"
+          onSelect={(nextMood) => {
+            setMood(nextMood);
+            setIsMoodOpen(false);
+          }}
+        />
       </ModalSheet>
 
       <ModalSheet
@@ -943,7 +930,7 @@ export const CreateNote: React.FC = () => {
       <ModalSheet
         isOpen={Boolean(aiReflection)}
         onClose={() => setAiReflection(null)}
-        title="AI reflection"
+        title="A reflection, not a verdict"
         icon={<Brain size={24} weight="duotone" className="text-green" />}
         size="lg"
         tone="sage"

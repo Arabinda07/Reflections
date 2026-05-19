@@ -14,19 +14,19 @@ const guideSections: PublicIconCard[] = [
     icon: 'book',
     title: 'What is Reflections?',
     body:
-      'A journal where writing comes first. You save notes, name moods, tag patterns, and come back to them whenever you want.',
+      'A private place for the mess before it has words. You save notes, name moods, tag patterns, and come back when your brain has cooled down a little.',
   },
   {
     icon: 'heart',
     title: 'Who is Reflections for?',
     body:
-      'It is for people who want a calm place to think in writing. You set the pace, keep your notes to yourself, and choose when to involve AI.',
+      'For people in their 20s and 30s who need one calm tab for the thing they keep replaying. You set the pace, keep your notes private, and choose when AI gets invited.',
   },
   {
     icon: 'pen',
     title: 'Why writing first?',
     body:
-      'Writing is the main practice. AI and Life Wiki refreshes stay in the background until you invite them.',
+      'Because the point is to hear yourself before the app starts talking. AI and Life Wiki refreshes wait until you ask.',
   },
 ];
 
@@ -43,7 +43,7 @@ const practiceItems: PublicIconCard[] = [
   },
   {
     title: 'The daily spark',
-    body: "If you're staring at a blank page, tap the spark. It's a gentle nudge to help you get started.",
+    body: "For the thought that keeps doing laps. Tap the spark when the page is blank but your mind clearly isn't.",
     icon: 'tag',
   },
   {
@@ -53,7 +53,7 @@ const practiceItems: PublicIconCard[] = [
   },
   {
     title: 'Naming the feeling',
-    body: "Check in with your mood. It's how you start noticing the patterns in your emotional life.",
+    body: "Check in with your mood. Feelings, but make them less loud.",
     icon: 'heart',
   },
 ];
@@ -118,8 +118,8 @@ export const FAQ: React.FC = () => {
         <div className="space-y-4 lg:col-span-4">
 
           <p className="max-w-[36rem] font-serif text-[18px] leading-relaxed text-gray-light">
-            Reflections is a calm, private writing space. This guide explains what the product does,
-            how AI fits around the writing, and the choices behind the design
+            Reflections is a calm, private writing space for the thoughts that keep doing laps.
+            This guide explains what the product does, how AI waits, and what stays yours.
           </p>
           <p className="text-[12px] font-bold uppercase tracking-widest text-gray-nav">Last updated · May 2026</p>
         </div>
@@ -133,7 +133,7 @@ export const FAQ: React.FC = () => {
               Writing stays at the center.
             </h2>
             <p className="mt-6 max-w-[52ch] font-serif text-[20px] italic leading-relaxed text-gray-text/75">
-              Reflections is not a feed, a coach, or a scorecard. It is a private place for notes, mood labels, and patterns you choose to inspect.
+              Reflections is not a feed, a coach, or a scoreboard. It is a private place for notes, mood labels, and patterns you choose to inspect.
             </p>
           </article>
 

@@ -55,6 +55,7 @@ describe('adapt and distill source contract', () => {
     expect(lifeWiki).not.toContain('Hash');
     expect(lifeWiki).toContain('SANCTUARY_LEVEL_UP_ANIMATION_SRC');
     expect(proUpgrade).not.toContain('cycling.mp4');
-    expect(proUpgrade).toContain('Keep writing unlimited.');
+    expect(proUpgrade).toContain('More room when life gets loud');
+    expect(proUpgrade).toContain('No surprise charges. No guilt trip. Cancel anytime.');
   });
 });

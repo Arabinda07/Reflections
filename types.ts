@@ -147,6 +147,7 @@ export interface WeeklyRecap {
   lettersScheduled: number;
   lettersOpened: number;
   moodData: Array<{ name: string; value: number }>;
+  moodFamilyData: Array<{ name: string; value: number }>;
   recurringTags: Array<{ tag: string; count: number }>;
   activityDays: string[];
 }

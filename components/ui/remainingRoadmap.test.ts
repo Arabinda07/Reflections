@@ -34,15 +34,15 @@ describe('remaining roadmap contract', () => {
     const myNotes = read('pages/dashboard/MyNotes.tsx');
     const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
 
-    expect(createNote).toContain('DotLottieReact');
+    expect(createNote).toContain("import Lottie from 'lottie-react'");
     expect(createNote).toContain("from '@/src/lottie/trail-loading.json'");
 
     expect(loadingState).toContain("from './OverlayFeedback'");
-    expect(loadingState).toContain('DotLottieReact');
+    expect(loadingState).toContain('<Lottie');
     expect(loadingState).toContain('loadingAnimation');
-    expect(paperPlaneToast).toContain('DotLottieReact');
-    expect(companionObservation).toContain('DotLottieReact');
-    expect(notFound).toContain('DotLottieReact');
+    expect(paperPlaneToast).toContain('<Lottie');
+    expect(companionObservation).toContain('<Lottie');
+    expect(notFound).toContain('<Lottie');
     expect(notFound).toContain('/assets/lottie/error-404.json');
     expect(myNotes).toContain('/assets/lottie/empty-notes.json');
     expect(lifeWiki).toContain('SANCTUARY_LEVEL_UP_ANIMATION_SRC');

@@ -81,7 +81,188 @@ drop policy if exists "Users can delete their own absorb log" on wiki_absorb_log
 create policy "Users can delete their own absorb log"
   on wiki_absorb_log for delete using (auth.uid() = user_id);
 
--- 4. Update the enforce_note_limit function to bypass limits for 'pro' plan users
+-- 4. Add durable AI run ledger and feature-level usage counters
+create table if not exists account_entitlements (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  plan text not null default 'free' check (plan in ('free', 'pro')),
+  pro_status text not null default 'inactive',
+  razorpay_subscription_id text unique,
+  current_period_end timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+insert into account_entitlements (user_id, plan, created_at, updated_at)
+select id, coalesce(nullif(plan, ''), 'free'), now(), now()
+from profiles
+on conflict (user_id) do nothing;
+
+alter table account_entitlements enable row level security;
+
+drop policy if exists "Users can view own entitlements" on account_entitlements;
+create policy "Users can view own entitlements"
+  on account_entitlements for select
+  to authenticated
+  using (auth.uid() = user_id);
+
+create table if not exists ai_feature_usage_counters (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  feature text not null check (feature in ('reflection', 'life_wiki_refresh')),
+  period_start date not null,
+  used integer not null default 0 check (used >= 0),
+  max_allowed integer not null check (max_allowed >= 0),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  primary key (user_id, feature, period_start)
+);
+
+alter table ai_feature_usage_counters enable row level security;
+
+drop policy if exists "Users can view own AI feature usage counters" on ai_feature_usage_counters;
+create policy "Users can view own AI feature usage counters"
+  on ai_feature_usage_counters for select
+  to authenticated
+  using (auth.uid() = user_id);
+
+create table if not exists ai_runs (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) on delete cascade not null,
+  kind text not null check (kind in ('life_wiki_refresh', 'reflection')),
+  trigger text not null default 'manual',
+  status text not null default 'running' check (status in ('running', 'succeeded', 'partial', 'failed', 'skipped')),
+  source_note_ids text[] not null default '{}',
+  source_hash text,
+  prompt_version text,
+  model text,
+  page_count integer not null default 0 check (page_count >= 0),
+  error text,
+  started_at timestamptz not null default now(),
+  finished_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists idx_ai_runs_user_created_at
+  on ai_runs (user_id, created_at desc);
+
+alter table ai_runs enable row level security;
+
+drop policy if exists "Users can view own AI runs" on ai_runs;
+create policy "Users can view own AI runs"
+  on ai_runs for select
+  to authenticated
+  using (auth.uid() = user_id);
+
+create table if not exists ai_run_events (
+  id uuid default gen_random_uuid() primary key,
+  run_id uuid references ai_runs(id) on delete cascade not null,
+  user_id uuid references auth.users(id) on delete cascade not null,
+  event_type text not null,
+  page_type text,
+  status text,
+  message text,
+  metadata jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_ai_run_events_run_created_at
+  on ai_run_events (run_id, created_at);
+
+alter table ai_run_events enable row level security;
+
+drop policy if exists "Users can view own AI run events" on ai_run_events;
+create policy "Users can view own AI run events"
+  on ai_run_events for select
+  to authenticated
+  using (auth.uid() = user_id);
+
+create or replace function public.claim_ai_feature_usage(
+  p_user_id uuid,
+  p_feature text
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_plan text;
+  v_period_start date := date_trunc('month', now())::date;
+  v_month_limit integer;
+  v_used integer;
+begin
+  if p_user_id is null then
+    return jsonb_build_object('allowed', false, 'reason', 'missing_user');
+  end if;
+
+  if p_feature not in ('reflection', 'life_wiki_refresh') then
+    return jsonb_build_object('allowed', false, 'reason', 'invalid_feature');
+  end if;
+
+  select coalesce(plan, 'free')
+  into v_plan
+  from public.account_entitlements
+  where user_id = p_user_id;
+
+  v_plan := coalesce(v_plan, 'free');
+
+  v_month_limit := case
+    when v_plan = 'pro' then
+      case p_feature
+        when 'life_wiki_refresh' then 60
+        else 500
+      end
+    else 1
+  end;
+
+  insert into public.ai_feature_usage_counters (
+    user_id,
+    feature,
+    period_start,
+    used,
+    max_allowed,
+    created_at,
+    updated_at
+  )
+  values (
+    p_user_id,
+    p_feature,
+    v_period_start,
+    1,
+    v_month_limit,
+    now(),
+    now()
+  )
+  on conflict (user_id, feature, period_start)
+  do update
+    set used = public.ai_feature_usage_counters.used + 1,
+        max_allowed = excluded.max_allowed,
+        updated_at = now()
+    where public.ai_feature_usage_counters.used < excluded.max_allowed
+  returning used into v_used;
+
+  if v_used is null then
+    return jsonb_build_object(
+      'allowed', false,
+      'reason', 'monthly_feature_quota_exhausted',
+      'limit', v_month_limit,
+      'plan', v_plan
+    );
+  end if;
+
+  return jsonb_build_object(
+    'allowed', true,
+    'used', v_used,
+    'limit', v_month_limit,
+    'plan', v_plan
+  );
+end;
+$$;
+
+revoke execute on function public.claim_ai_feature_usage(uuid, text) from public, anon, authenticated;
+grant execute on function public.claim_ai_feature_usage(uuid, text) to service_role;
+
+-- 5. Update the enforce_note_limit function to bypass limits for 'pro' plan users
 create or replace function enforce_note_limit()
 returns trigger as $$
 declare
@@ -110,7 +291,7 @@ begin
 end;
 $$ language plpgsql;
 
--- 5. Engagement layer tables
+-- 6. Engagement layer tables
 create table if not exists mood_checkins (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users(id) on delete cascade not null,
@@ -264,11 +445,15 @@ $$;
 
 grant execute on function public.accept_referral_invite(text) to authenticated;
 
--- 6. Keep the Account data deletion helper in sync with engagement data
+-- 7. Keep the Account data deletion helper in sync with engagement and AI data
 create or replace function delete_user_data()
 returns void as $$
 begin
   delete from public.wiki_absorb_log where user_id = auth.uid();
+  delete from public.ai_run_events where user_id = auth.uid();
+  delete from public.ai_runs where user_id = auth.uid();
+  delete from public.ai_feature_usage_counters where user_id = auth.uid();
+  delete from public.account_entitlements where user_id = auth.uid();
   delete from public.theme_citations
     where theme_id in (select id from public.life_themes where user_id = auth.uid());
   delete from public.life_themes where user_id = auth.uid();

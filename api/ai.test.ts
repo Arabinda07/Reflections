@@ -102,6 +102,13 @@ describe('/api/ai', () => {
     );
 
     expect(mockRpc).toHaveBeenCalledWith(
+      'claim_ai_feature_usage',
+      expect.objectContaining({
+        p_feature: 'reflection',
+        p_user_id: 'user-1',
+      }),
+    );
+    expect(mockRpc).toHaveBeenCalledWith(
       'claim_ai_usage',
       expect.objectContaining({
         p_action: 'reflection',
@@ -167,5 +174,40 @@ describe('/api/ai', () => {
 
     expect(response.statusCode).toBe(500);
     expect(mockGoogleGenAI).not.toHaveBeenCalledWith({ apiKey: 'legacy-public-key' });
+  });
+
+  it('rejects malformed payloads before quota or provider calls', async () => {
+    const { default: handler } = await import('./ai');
+    const response = createResponse();
+
+    await handler(
+      createRequest({
+        action: 'wikiPage',
+        payload: { title: 'People' },
+      }),
+      response,
+    );
+
+    expect(response.statusCode).toBe(400);
+    expect(JSON.parse(response.body)).toEqual({ error: 'Invalid wikiPage payload' });
+    expect(mockRpc).not.toHaveBeenCalled();
+    expect(mockGenerateContent).not.toHaveBeenCalled();
+  });
+
+  it('returns a compact provider error when model JSON is malformed', async () => {
+    mockGenerateContent.mockResolvedValueOnce({ text: 'not-json' });
+    const { default: handler } = await import('./ai');
+    const response = createResponse();
+
+    await handler(
+      createRequest({
+        action: 'tags',
+        payload: { content: 'A quiet entry.' },
+      }),
+      response,
+    );
+
+    expect(response.statusCode).toBe(502);
+    expect(JSON.parse(response.body)).toEqual({ error: 'Malformed AI JSON' });
   });
 });

@@ -223,7 +223,7 @@ describe('phase 2/3 design-system rollout', () => {
     expect(createNote).toContain('Reflect with AI');
     expect(createNote).toContain('bg-green px-4 py-2');
     expect(createNote).toContain('text-white');
-    expect(createNote).toContain('title="AI reflection"');
+    expect(createNote).toContain('title="A reflection, not a verdict"');
     expect(createNote).toContain('tone="sage"');
 
     expect(moodConfig).toContain('bg-mood-calm/10 border-mood-calm/20 text-mood-calm');
@@ -256,7 +256,7 @@ describe('phase 2/3 design-system rollout', () => {
 
     expect(navigationBar).toContain('hidden lg:flex items-center gap-1.5 xl:gap-2');
     expect(navigationBar).toContain('hidden lg:flex items-center gap-1.5 xl:gap-2');
-    expect(navigationBar).toContain('lg:hidden items-center gap-2');
+    expect(navigationBar).toContain('flex items-center gap-2 lg:hidden');
     expect(navigationBar).toContain('px-3 xl:px-4');
     expect(navigationBar).not.toContain('bg-body/');
   });

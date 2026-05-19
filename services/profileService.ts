@@ -10,8 +10,8 @@ interface SupabaseEntitlementRow {
   plan: string | null;
 }
 
-interface SupabaseAiUsageRow {
-  action: string;
+interface SupabaseAiFeatureUsageRow {
+  feature: string;
   used: number | null;
 }
 
@@ -26,19 +26,19 @@ const currentPeriodStart = () => {
     .slice(0, 10);
 };
 
-const getUsedCount = (rows: SupabaseAiUsageRow[] | null, action: string) =>
-  rows?.find((row) => row.action === action)?.used || 0;
+const getUsedCount = (rows: SupabaseAiFeatureUsageRow[] | null, feature: string) =>
+  rows?.find((row) => row.feature === feature)?.used || 0;
 
 const mapWellnessAccess = (
   userId: string,
   profile: SupabaseProfileRow | null,
   entitlement: SupabaseEntitlementRow | null,
-  usage: SupabaseAiUsageRow[] | null,
+  usage: SupabaseAiFeatureUsageRow[] | null,
 ): WellnessAccess => ({
   userId,
   planTier: parsePlanTier(entitlement?.plan),
   freeAiReflectionsUsed: getUsedCount(usage, 'reflection'),
-  freeWikiInsightsUsed: getUsedCount(usage, 'wikiPage'),
+  freeWikiInsightsUsed: getUsedCount(usage, 'life_wiki_refresh'),
   smartModeEnabled: Boolean(profile?.smart_mode_enabled),
 });
 
@@ -64,11 +64,11 @@ const getWellnessAccessForUser = async (
       .eq('user_id', userId)
       .maybeSingle(),
     supabase
-      .from('ai_usage_counters')
-      .select('action, used')
+      .from('ai_feature_usage_counters')
+      .select('feature, used')
       .eq('user_id', userId)
       .eq('period_start', periodStart)
-      .in('action', ['reflection', 'wikiPage']),
+      .in('feature', ['reflection', 'life_wiki_refresh']),
   ]);
 
   if (profileResult.error) {

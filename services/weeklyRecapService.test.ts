@@ -72,6 +72,29 @@ describe('buildWeeklyRecap', () => {
 
     expect(recap.moodData).toEqual([{ name: 'calm', value: 2 }]);
   });
+
+  it('groups legacy and expanded moods into mood families without losing exact mood data', () => {
+    const recap = buildWeeklyRecap({
+      notes: [
+        note('one', '2026-04-27T12:00:00.000Z', 'calm', []),
+        note('two', '2026-04-28T12:00:00.000Z', 'settled', []),
+        note('three', '2026-04-29T12:00:00.000Z', 'happy', []),
+      ],
+      moodCheckins: [],
+      ritualEvents: [],
+      now: new Date('2026-04-29T12:00:00'),
+    });
+
+    expect(recap.moodData).toEqual([
+      { name: 'calm', value: 1 },
+      { name: 'happy', value: 1 },
+      { name: 'settled', value: 1 },
+    ]);
+    expect(recap.moodFamilyData).toEqual([
+      { name: 'steady', value: 2 },
+      { name: 'light', value: 1 },
+    ]);
+  });
 });
 
 describe('getWritingRhythm', () => {

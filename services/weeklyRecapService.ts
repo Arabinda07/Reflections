@@ -6,6 +6,7 @@ import type {
   WritingRhythm,
 } from '../types';
 import { countBy, topEntries } from './collectionUtils';
+import { getMoodFamilyForMood } from '../pages/dashboard/moodConfig';
 
 interface WeeklyRecapInput {
   notes: Note[];
@@ -88,6 +89,14 @@ export function buildWeeklyRecap(input: WeeklyRecapInput): WeeklyRecap {
     : weekNotes.map((note) => note.mood || '');
   const moodData = topEntries(countBy(moodSource.filter(Boolean)), 8)
     .map(([name, value]) => ({ name, value }));
+  const moodFamilyData = topEntries(
+    countBy(
+      moodSource
+        .filter(Boolean)
+        .map((name) => getMoodFamilyForMood(name)?.id || name),
+    ),
+    8,
+  ).map(([name, value]) => ({ name, value }));
   const recurringTags = topEntries(countBy(weekNotes.flatMap((note) => note.tags || [])), 5)
     .map(([tag, count]) => ({ tag, count }));
 
@@ -101,6 +110,7 @@ export function buildWeeklyRecap(input: WeeklyRecapInput): WeeklyRecap {
     lettersScheduled: weekEvents.filter((event) => event.eventType === 'letter_scheduled').length,
     lettersOpened: weekEvents.filter((event) => event.eventType === 'letter_opened').length,
     moodData,
+    moodFamilyData,
     recurringTags,
     activityDays,
   };

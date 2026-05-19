@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Check } from '@phosphor-icons/react/Check';
 import { CheckCircle } from '@phosphor-icons/react/CheckCircle';
 import { Crown } from '@phosphor-icons/react/Crown';
@@ -7,6 +7,21 @@ import { ModalSheet } from './ModalSheet';
 import { supabase } from '../../src/supabaseClient';
 import { useAuthStore } from '../../hooks/useAuthStore';
 import { NEWSLETTER_SIGNUP_LABEL } from '../../src/newsletter';
+import {
+  DEFAULT_PRO_PLAN,
+  PRO_PRICING_PLAN_LIST,
+  PRO_PRICING_PLANS,
+  PRO_TRIAL_DAYS,
+  getTrialChargeDateLabel,
+  type BillingPeriod,
+} from '../../src/config/pricingCatalog';
+import {
+  trackCheckoutFailedDeferred,
+  trackModalDismissedDeferred,
+  trackPaywallViewedDeferred,
+  trackPlanSelectedDeferred,
+  trackTrialStartedDeferred,
+} from '../../src/analytics/deferredEvents';
 
 interface ProUpgradeCTAProps {
   onSuccess?: () => void;
@@ -36,8 +51,10 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isUnlocked, setIsUnlocked] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'yearly'>('monthly');
+  const [selectedPlan, setSelectedPlan] = useState<BillingPeriod>(DEFAULT_PRO_PLAN);
   const [wantsNewsletter, setWantsNewsletter] = useState(false);
+  const trialChargeDateLabel = useMemo(() => getTrialChargeDateLabel(), []);
+  const selectedPlanDetails = PRO_PRICING_PLANS[selectedPlan];
 
   const loadRazorpay = () => {
     return new Promise<boolean>((resolve) => {
@@ -71,6 +88,22 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
     });
   };
 
+  const openPaywall = () => {
+    setIsModalOpen(true);
+    trackPaywallViewedDeferred({ surface: variant, defaultPlan: DEFAULT_PRO_PLAN });
+  };
+
+  const closePaywall = () => {
+    if (isUnlocked) return;
+    setIsModalOpen(false);
+    trackModalDismissedDeferred({ modalId: 'pro_upgrade', surface: variant });
+  };
+
+  const selectPlan = (billingPeriod: BillingPeriod) => {
+    setSelectedPlan(billingPeriod);
+    trackPlanSelectedDeferred({ surface: variant, billingPeriod });
+  };
+
   const handleSubscribe = async () => {
     setIsProcessing(true);
     setError(null);
@@ -78,7 +111,6 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
     try {
       const { data: { session } } = await supabase.auth.getSession();
       
-      // 1. Create Subscription
       const res = await fetch('/api/create-razorpay-subscription', {
         method: 'POST',
         headers: {
@@ -91,18 +123,16 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to initialize subscription');
 
-      // 2. Open Razorpay Checkout
       const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        key: data.keyId || import.meta.env.VITE_RAZORPAY_KEY_ID,
         subscription_id: data.subscriptionId,
         name: 'Reflections',
-        description: 'Reflections Pro Subscription',
+        description: `Reflections ${selectedPlanDetails.displayName}`,
         handler: async function (response: any) {
           try {
             setIsProcessing(true);
             const { data: { session } } = await supabase.auth.getSession();
             
-            // 3. Verify Payment
             const verifyRes = await fetch('/api/verify-razorpay-payment', {
               method: 'POST',
               headers: {
@@ -120,10 +150,8 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
             const verifyData = await verifyRes.json();
             if (!verifyRes.ok) throw new Error(verifyData.error || 'Verification failed');
 
-            // 4. Show confirmation while the webhook applies the entitlement.
+            trackTrialStartedDeferred({ billingPeriod: selectedPlan, trialDays: PRO_TRIAL_DAYS });
             setIsUnlocked(true);
-            
-            // Reload user profile data to reflect Pro status
             await supabase.auth.refreshSession();
             
             if (onSuccess) {
@@ -133,6 +161,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
               }, 4000);
             }
           } catch (err: any) {
+            trackCheckoutFailedDeferred({ billingPeriod: selectedPlan, errorCode: err.message });
             setError(err.message || 'Payment verification failed');
             setIsProcessing(false);
           }
@@ -149,6 +178,10 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
 
       const rzp = new (window as any).Razorpay(options);
       rzp.on('payment.failed', function (response: any) {
+        trackCheckoutFailedDeferred({
+          billingPeriod: selectedPlan,
+          errorCode: response?.error?.code || response?.error?.description,
+        });
         setError(response.error.description);
         setIsProcessing(false);
       });
@@ -156,22 +189,23 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
       rzp.open();
     } catch (err: any) {
       console.error('Subscription error:', err);
+      trackCheckoutFailedDeferred({ billingPeriod: selectedPlan, errorCode: err.message });
       setError(err.message || 'Please try again later.');
       setIsProcessing(false);
     }
   };
 
   const features = [
-    'Unlimited monthly reflections',
-    'More on-demand Life Wiki refreshes',
-    'Early access to Pro features',
+    'Unlimited writing after the free room fills',
+    'On-demand AI reflections when your brain is doing laps',
+    'More Life Wiki refreshes for messy weeks',
   ];
 
   const renderSubscriptionModal = () => (
     <ModalSheet
       isOpen={isModalOpen}
-      onClose={() => !isUnlocked && setIsModalOpen(false)}
-      title="Join Pro"
+      onClose={closePaywall}
+      title="More room when life gets loud"
       icon={<Crown size={20} weight="duotone" />}
       size="md"
       tone="honey"
@@ -182,35 +216,31 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
           <>
             <div className="space-y-2">
               <p className="text-base font-medium leading-relaxed text-gray-light">
-                Keep writing unlimited. Add more on-demand reflections and Life Wiki refreshes when you need them.
+                Try Pro free. We’ll tell you before billing starts.
+              </p>
+              <p className="text-sm font-semibold leading-relaxed text-gray-nav">
+                No payment today. First charge {trialChargeDateLabel}: {selectedPlanDetails.displayPrice}/{selectedPlanDetails.intervalLabel}.
               </p>
             </div>
             
             <div className="grid grid-cols-2 gap-4">
-              <button
-                type="button"
-                onClick={() => setSelectedPlan('monthly')}
-                className={`flex flex-col items-start rounded-[var(--radius-control)] border p-4 text-left transition-colors duration-300 ease-out-expo ${
-                  selectedPlan === 'monthly' ? 'border-honey bg-honey/5' : 'control-surface hover:border-honey/30'
-                }`}
-              >
-                <span className={`label-caps ${selectedPlan === 'monthly' ? 'text-honey' : 'text-gray-nav'}`}>Monthly</span>
-                <span className="text-2xl font-serif italic text-gray-text mt-1">₹99<span className="text-sm not-italic text-gray-light">/mo</span></span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setSelectedPlan('yearly')}
-                className={`flex flex-col items-start rounded-[var(--radius-control)] border p-4 text-left transition-colors duration-300 ease-out-expo ${
-                  selectedPlan === 'yearly' ? 'border-honey bg-honey/5' : 'control-surface hover:border-honey/30'
-                }`}
-              >
-                <div className="flex w-full items-center justify-between gap-3">
-                  <span className={`label-caps ${selectedPlan === 'yearly' ? 'text-honey' : 'text-gray-nav'}`}>Yearly</span>
-                  <span className="text-xs font-bold uppercase tracking-wider text-honey">Save 15%</span>
-                </div>
-                <span className="text-2xl font-serif italic text-gray-text mt-1">₹999<span className="text-sm not-italic text-gray-light">/yr</span></span>
-              </button>
+              {PRO_PRICING_PLAN_LIST.map((plan) => (
+                <button
+                  key={plan.code}
+                  type="button"
+                  onClick={() => selectPlan(plan.code)}
+                  className={`flex min-h-32 flex-col items-start justify-between rounded-[var(--radius-control)] border p-4 text-left transition-colors duration-300 ease-out-expo ${
+                    selectedPlan === plan.code ? 'border-honey bg-honey/5' : 'control-surface hover:border-honey/30'
+                  }`}
+                >
+                  <span className={`label-caps ${selectedPlan === plan.code ? 'text-honey' : 'text-gray-nav'}`}>{plan.shortName}</span>
+                  <span className="mt-3 text-2xl font-serif italic text-gray-text">
+                    {plan.displayPrice}
+                    <span className="text-sm not-italic text-gray-light">/{plan.intervalLabel}</span>
+                  </span>
+                  <span className="mt-2 text-xs font-bold leading-snug text-gray-nav">{plan.renewalLabel}</span>
+                </button>
+              ))}
             </div>
 
             <ul className="space-y-2 border-y border-border/50 py-4">
@@ -224,14 +254,14 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
 
             <div>
               <label className="flex items-start gap-3 cursor-pointer group">
-                <div className="control-surface relative flex h-5 w-5 shrink-0 items-center justify-center rounded transition-colors group-hover:border-honey mt-0.5">
+                <div className="control-surface relative mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded transition-colors group-hover:border-honey">
                   <input
                     type="checkbox"
                     checked={wantsNewsletter}
                     onChange={(e) => setWantsNewsletter(e.target.checked)}
                     className="peer absolute h-full w-full cursor-pointer opacity-0"
                   />
-                  <div className="pointer-events-none opacity-0 transition-opacity peer-checked:opacity-100 text-honey">
+                  <div className="pointer-events-none text-honey opacity-0 transition-opacity peer-checked:opacity-100">
                     <Check size={14} weight="bold" />
                   </div>
                 </div>
@@ -239,6 +269,10 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
                   {NEWSLETTER_SIGNUP_LABEL}
                 </span>
               </label>
+            </div>
+
+            <div className="rounded-[var(--radius-control)] border border-honey/20 bg-honey/5 p-3 text-xs font-semibold leading-relaxed text-gray-light">
+              No surprise charges. No guilt trip. Cancel anytime. Free keeps your saved writing, mood history, and monthly note room.
             </div>
 
             {error && <p className="text-clay text-sm font-bold">{error}</p>}
@@ -249,7 +283,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
               isLoading={isProcessing}
               onClick={handleSubscribe}
             >
-              Join Pro
+              {selectedPlanDetails.ctaLabel}
             </Button>
           </>
         ) : (
@@ -257,9 +291,9 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
             <div className="mb-8 flex h-20 w-20 items-center justify-center rounded-[var(--radius-panel)] bg-honey text-white">
               <CheckCircle size={40} weight="fill" />
             </div>
-            <h3 className="text-3xl font-display font-extrabold text-gray-text mb-3">Welcome to Pro</h3>
+            <h3 className="text-3xl font-display font-extrabold text-gray-text mb-3">Your trial has started</h3>
             <p className="text-base font-medium text-gray-light leading-relaxed max-w-[280px]">
-              Payment is verified. Pro access activates as soon as Razorpay confirms the subscription.
+              Pro access activates as soon as Razorpay confirms the subscription. First charge is scheduled for {trialChargeDateLabel}.
             </p>
           </div>
         )}
@@ -275,9 +309,9 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
             <Crown size={40} weight="duotone" />
           </div>
           <div>
-            <h2 className="text-4xl font-display font-extrabold text-gray-text mb-4">Reflections Pro</h2>
+            <h2 className="text-4xl font-display font-extrabold text-gray-text mb-4">More room when life gets loud</h2>
             <p className="text-base text-gray-light leading-relaxed">
-              Unlimited writing and on-demand Life Wiki refreshes.
+              You’ve filled this month’s free writing room. Everything you wrote is still here.
             </p>
           </div>
 
@@ -293,9 +327,9 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
           <Button
             variant="primary"
             className="w-full h-14 text-base rounded-[var(--radius-control)] !bg-honey !text-white border-none hover:opacity-90 whitespace-nowrap"
-            onClick={() => setIsModalOpen(true)}
+            onClick={openPaywall}
           >
-            Join Pro
+            Start my free trial
           </Button>
 
           {renderSubscriptionModal()}
@@ -314,7 +348,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
               <span className="label-caps">Reflections Pro</span>
             </div>
             <p className="text-sm font-medium leading-relaxed text-gray-light">
-              More on-demand reflections, Life Wiki refreshes, and early Pro features.
+              More space for the weeks when life is a lot.
             </p>
           </div>
 
@@ -322,9 +356,9 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
             <Button
               variant="primary"
               className="w-full md:w-auto h-12 px-6 rounded-[var(--radius-control)] !bg-honey !text-white border-none hover:opacity-90 whitespace-nowrap"
-              onClick={() => setIsModalOpen(true)}
+              onClick={openPaywall}
             >
-              Join Pro
+              Start my free trial
             </Button>
           </div>
         </div>

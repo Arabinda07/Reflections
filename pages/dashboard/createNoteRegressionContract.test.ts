@@ -9,7 +9,7 @@ describe('CreateNote regression contract', () => {
   it('keeps the entry experience on a lottie-based loading state', () => {
     const createNote = read('pages/dashboard/CreateNote.tsx');
 
-    expect(createNote).toContain('DotLottieReact');
+    expect(createNote).toContain("import Lottie from 'lottie-react'");
     expect(createNote).toContain("from '@/src/lottie/trail-loading.json'");
     expect(createNote).toContain('h-48 w-48');
     expect(createNote).not.toContain("from '@/src/lottie/loading.json'");

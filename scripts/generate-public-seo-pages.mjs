@@ -36,9 +36,9 @@ const publicPages = [
       'How Reflections works: the writing practice, mood check-ins, optional AI, Life Wiki, and the design choices behind each feature.',
     h1: 'FAQ about private journaling',
     intro:
-      'How Reflections works, what it stores, and how AI fits around private writing.',
+      'How Reflections works, what it stores, and how AI waits around private writing.',
     sections: [
-      ['What is Reflections?', 'A journal built around writing for notes, moods, tags, and personal patterns.'],
+      ['What is Reflections?', 'A private writing space for notes, moods, tags, and the thoughts that keep doing laps.'],
       ['Does AI run automatically?', 'No. AI support runs when you ask for a reflection or Life Wiki refresh, or when you explicitly enable Smart Mode.'],
       ['Is Reflections therapy?', 'No. Reflections is a personal writing tool, not professional mental health care.'],
     ],
@@ -49,7 +49,7 @@ const publicPages = [
         {
           "@type": "Question",
           "name": "What is Reflections?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Reflections is a journal built around writing. You save notes, name your mood, tag patterns, and can ask AI for a personalised reflection that draws on everything you have written before." }
+          "acceptedAnswer": { "@type": "Answer", "text": "Reflections is a journal built around writing. You save notes, name your mood, tag patterns, and can ask AI for a personal reflection when you want help noticing patterns." }
         },
         {
           "@type": "Question",
@@ -59,7 +59,7 @@ const publicPages = [
         {
           "@type": "Question",
           "name": "Is Reflections free?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Yes. The free tier includes 30 notes per month with full AI features. A Pro tier with unlimited notes is planned." }
+          "acceptedAnswer": { "@type": "Answer", "text": "Yes. The free tier includes 30 notes per month, a limited AI reflection sample, and a limited Life Wiki refresh after enough writing. Pro adds weekly or monthly paid plans after a trial." }
         },
         {
           "@type": "Question",

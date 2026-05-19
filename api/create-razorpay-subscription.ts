@@ -8,8 +8,14 @@ import {
   requireUser,
   sendJson,
 } from '../server/apiUtils';
-
-type BillingPeriod = 'monthly' | 'yearly';
+import {
+  DEFAULT_PRO_PLAN,
+  PRO_PRICING_PLANS,
+  PRO_TRIAL_DAYS,
+  getTrialEndsAt,
+  isBillingPeriod,
+  type BillingPeriod,
+} from '../src/config/pricingCatalog';
 
 type CreateSubscriptionRequest = {
   billingPeriod?: BillingPeriod;
@@ -19,19 +25,16 @@ const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || process.env.VITE_RAZORPAY
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || '';
 
 const RAZORPAY_PLAN_IDS: Record<BillingPeriod, string> = {
+  weekly: process.env.RAZORPAY_WEEKLY_PLAN_ID || '',
   monthly: process.env.RAZORPAY_MONTHLY_PLAN_ID || '',
-  yearly: process.env.RAZORPAY_YEARLY_PLAN_ID || '',
 };
 
 const SUBSCRIPTION_TOTAL_COUNT: Record<BillingPeriod, number> = {
-  monthly: 120,
-  yearly: 10,
+  weekly: PRO_PRICING_PLANS.weekly.totalCount,
+  monthly: PRO_PRICING_PLANS.monthly.totalCount,
 };
 
 const supabaseAuth = createSupabaseAuthClient();
-
-const isBillingPeriod = (value: unknown): value is BillingPeriod =>
-  value === 'monthly' || value === 'yearly';
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
@@ -42,7 +45,7 @@ export default async function handler(req: any, res: any) {
   try {
     const user = await requireUser(supabaseAuth, req.headers?.authorization);
     const body = await parseJsonBody<CreateSubscriptionRequest>(req);
-    const billingPeriod = body.billingPeriod || 'monthly';
+    const billingPeriod = body.billingPeriod || DEFAULT_PRO_PLAN;
 
     if (!isBillingPeriod(billingPeriod)) {
       return sendJson(res, 400, { error: 'Invalid billing period' });
@@ -62,12 +65,15 @@ export default async function handler(req: any, res: any) {
       key_secret: RAZORPAY_KEY_SECRET,
     });
 
+    const trialEndsAt = getTrialEndsAt();
     const subscription = await razorpay.subscriptions.create({
       plan_id: planId,
       total_count: SUBSCRIPTION_TOTAL_COUNT[billingPeriod],
       customer_notify: 1,
+      start_at: Math.floor(trialEndsAt.getTime() / 1000),
       notes: {
         billingPeriod,
+        trialDays: String(PRO_TRIAL_DAYS),
         userId: user.id,
       },
     });
@@ -82,7 +88,7 @@ export default async function handler(req: any, res: any) {
           razorpay_plan_id: planId,
           razorpay_subscription_id: subscription.id,
           status: subscription.status || 'created',
-          metadata: { subscription },
+          metadata: { subscription, trialEndsAt: trialEndsAt.toISOString() },
           updated_at: new Date().toISOString(),
         },
         { onConflict: 'razorpay_subscription_id' },
@@ -96,6 +102,7 @@ export default async function handler(req: any, res: any) {
       ok: true,
       keyId: RAZORPAY_KEY_ID,
       subscriptionId: subscription.id,
+      trialEndsAt: trialEndsAt.toISOString(),
     });
   } catch (error: unknown) {
     console.error('Razorpay subscription error:', getErrorMessage(error));

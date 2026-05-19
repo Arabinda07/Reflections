@@ -6,11 +6,11 @@ const read = (filePath: string) =>
   readFileSync(path.resolve(process.cwd(), filePath), 'utf8');
 
 describe('Insights refresh contract', () => {
-  it('uses the on-demand Life Wiki refresh path and refunds unusable refresh claims', () => {
+  it('uses the server-side Life Wiki refresh path with durable run tracking', () => {
     const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
 
-    expect(lifeWiki).toContain('refreshWikiOnDemand(notes)');
-    expect(lifeWiki).toContain('releaseClaimedFreeWikiInsight()');
+    expect(lifeWiki).toContain('startLifeWikiRefresh');
+    expect(lifeWiki).toContain("trigger: 'manual'");
     expect(lifeWiki).toContain("source === 'none'");
     expect(lifeWiki).toContain('pageCount === 0');
   });

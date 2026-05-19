@@ -33,7 +33,7 @@ import { offlineStorage } from '../../services/offlineStorage';
 import { useAuthStore } from '../../hooks/useAuthStore';
 import { profileService } from '../../services/profileService';
 import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
-import { aiService, type GreatIngestProgress } from '../../services/aiService';
+import { aiRunClient, type LifeWikiRunResult } from '../../services/aiRunClient';
 
 const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
 
@@ -67,7 +67,7 @@ export const Account: React.FC = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeletingData, setIsDeletingData] = useState(false);
   const [isSmartModeChanging, setIsSmartModeChanging] = useState(false);
-  const [greatIngestProgress, setGreatIngestProgress] = useState<GreatIngestProgress | null>(null);
+  const [smartModeRun, setSmartModeRun] = useState<LifeWikiRunResult | null>(null);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
 
   const [formData, setFormData] = useState({
@@ -134,10 +134,10 @@ export const Account: React.FC = () => {
     }
 
     if (access?.planTier === 'pro') {
-      return 'Unlimited note writing plus on-demand AI reflections and Life Wiki refreshes are available.';
+      return 'Pro is active. You have more writing room, on-demand AI reflections, and more Life Wiki refreshes for the weeks when life is a lot.';
     }
 
-    return `The free plan includes one AI reflection and one Life Wiki refresh after you have enough writing to support them.`;
+    return `Free gives you 30 notes each month, one AI reflection, and one Life Wiki refresh after there is enough writing to support them.`;
   }, [access]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -249,7 +249,7 @@ export const Account: React.FC = () => {
 
     const nextEnabled = !access.smartModeEnabled;
     setIsSmartModeChanging(true);
-    setGreatIngestProgress(null);
+    setSmartModeRun(null);
     setFeedback(null);
 
     try {
@@ -266,10 +266,8 @@ export const Account: React.FC = () => {
       }
 
       try {
-        const notes = await noteService.getAll();
-        const result = await aiService.runGreatIngest(notes, {
-          onProgress: setGreatIngestProgress,
-        });
+        const result = await aiRunClient.startLifeWikiRefresh({ trigger: 'account_enable' });
+        setSmartModeRun(result);
 
         setFeedback({
           variant: result.pageCount > 0 ? 'success' : 'warning',
@@ -628,13 +626,15 @@ export const Account: React.FC = () => {
                         Keep AI on demand by default, or let Smart Mode refresh the Life Wiki after saves. Your writing screen stays quiet either way.
                       </p>
 
-                      {greatIngestProgress ? (
+                      {smartModeRun ? (
                         <div className="surface-inline-panel p-4">
                           <p className="dashboard-caption text-gray-nav/60">
                             Preparing Life Wiki
                           </p>
                           <p className="mt-2 text-[14px] font-bold text-gray-text">
-                            Processing entry {greatIngestProgress.processedCount} of {greatIngestProgress.totalCount}
+                            {smartModeRun.status === 'skipped'
+                              ? 'No refresh was needed for unchanged writing.'
+                              : `${smartModeRun.pageCount} page${smartModeRun.pageCount === 1 ? '' : 's'} refreshed on the server.`}
                           </p>
                         </div>
                       ) : null}

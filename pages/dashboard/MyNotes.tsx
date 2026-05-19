@@ -412,8 +412,8 @@ export const MyNotes: React.FC = () => {
                       <EmptyState
                         surface="flat"
                         icon={<FileText size={22} weight="duotone" />}
-                        title="No entries for this day"
-                        description="Choose another date or add a fresh reflection here."
+                        title="Nothing here yet. Suspiciously peaceful."
+                        description="Choose another date or drop a fresh reflection here."
                         action={
                           <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.CREATE_NOTE)} className="text-green">
                             Create one now
@@ -432,11 +432,11 @@ export const MyNotes: React.FC = () => {
               <EmptyState
                 surface="bezel"
                 illustration={<LottieAnimation src="/assets/lottie/empty-notes.json" className="h-full w-full" autoplay loop />}
-                title={tagFilter ? `No reflections with “${tagFilter}” yet.` : 'Your library is ready when you are.'}
+                title={tagFilter ? `No reflections with “${tagFilter}” yet.` : 'Nothing here yet. Suspiciously peaceful.'}
                 description={
                   tagFilter
                     ? 'Clear the filter to return to your full reflection library.'
-                    : 'Every entry becomes part of the narrative you can return to later.'
+                    : 'Start with the thought that keeps doing laps.'
                 }
                 action={
                   tagFilter ? (
