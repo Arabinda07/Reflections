@@ -154,6 +154,8 @@ describe('public header regression fixes', () => {
     expect(header).toContain('href: RoutePath.SIGNUP');
     expect(header).toContain('public-mobile-menu-compact-action');
     expect(header).toContain('href={RoutePath.LOGIN}');
+    expect(header).toContain('Already writing?');
+    expect(header).toContain('public-mobile-menu-footer-link');
     expect(header).toContain('Sign in');
     expect(header).not.toContain('const hasAuthHint = homeHref === RoutePath.DASHBOARD;');
     expect(header).not.toContain("label: hasAuthHint ? 'Go to dashboard' : 'Home'");
@@ -167,19 +169,23 @@ describe('public header regression fixes', () => {
     const css = read('index.css');
     const publicSheet = cssBlock(css, '.public-mobile-menu-sheet');
 
-    expect(publicSheet).toContain('max-height: min(78dvh, 520px);');
-    expect(publicSheet).toContain('border: 1.5px solid');
-    expect(publicSheet).toContain('oklch(from var(--green) 0.985 0.012 h / 0.98)');
-    expect(publicSheet).toContain('box-shadow: 0 -12px 30px -26px');
-    expect(publicSheet).toContain('padding-bottom: calc(1rem + env(safe-area-inset-bottom));');
+    expect(publicSheet).toContain('max-height: min(72dvh, 440px);');
+    expect(publicSheet).toContain('border: 1px solid');
+    expect(publicSheet).toContain('oklch(from var(--green) 0.975 0.016 h / 0.99)');
+    expect(publicSheet).toContain('box-shadow: 0 -14px 34px -30px');
+    expect(publicSheet).toContain('padding-bottom: calc(0.85rem + env(safe-area-inset-bottom));');
     expect(publicSheet).toContain('overflow-y: auto;');
     expect(publicSheet).toContain('scrollbar-width: none;');
     expect(publicSheet).toContain('-ms-overflow-style: none;');
+    expect(publicSheet).toContain('-webkit-overflow-scrolling: touch;');
     expect(css).toContain('.public-mobile-menu-sheet::-webkit-scrollbar');
     expect(css).toContain('display: none;');
-    expect(css).toContain('min-height: 50px;');
+    expect(css).toContain('min-height: 46px;');
+    expect(css).toContain('min-height: 44px;');
     expect(css).toContain('.public-mobile-menu-link-icon');
     expect(css).toContain('.public-mobile-menu-link-chevron');
+    expect(css).toContain('.public-mobile-menu-footer-link');
+    expect(css).toContain('.dark .public-mobile-menu-sheet');
     expect(css).toContain('background: var(--green);');
     expect(css).not.toContain('.public-mobile-menu-preference-row');
     expect(css).not.toContain('.public-mobile-menu-preference-state');

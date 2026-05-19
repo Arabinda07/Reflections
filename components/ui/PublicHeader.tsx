@@ -221,7 +221,13 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
     { label: 'Privacy', href: RoutePath.PRIVACY, icon: ShieldLeafIcon },
   ] satisfies PublicMobileMenuItem[];
 
-  const mobileCompactAction = { label: 'Begin writing', href: RoutePath.SIGNUP } satisfies PublicMenuItem;
+  const mobileCompactAction = {
+    label: 'Begin writing',
+    href: RoutePath.SIGNUP,
+  } satisfies PublicMenuItem;
+  const shouldShowSecondarySignIn = !isLandingRoute;
+  const shouldShowInstallAction = canInstall && !isInstalled;
+  const shouldShowMobileMenuFooter = shouldShowInstallAction || shouldShowSecondarySignIn;
 
   const isPublicRouteActive = (href: RoutePath) =>
     href === RoutePath.HOME ? location.pathname === RoutePath.HOME : location.pathname === href;
@@ -405,29 +411,33 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
                 </a>
               </div>
 
-              <div className="public-mobile-menu-secondary-actions">
-                <a
-                  href={RoutePath.LOGIN}
-                  onClick={(event) => handleAppRouteNavigation(event, RoutePath.LOGIN)}
-                  className="public-mobile-menu-secondary-action"
-                >
-                  <span>Sign in</span>
-                  <ChevronRightIcon className="h-4 w-4" />
-                </a>
-                {canInstall && !isInstalled && (
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      await triggerInstall();
-                      setIsMobileMenuOpen(false);
-                    }}
-                    aria-label="Add Reflections to your home screen"
-                    className="public-mobile-menu-secondary-action"
-                  >
-                    <span>Install app</span>
-                  </button>
-                )}
-              </div>
+              {shouldShowMobileMenuFooter && (
+                <div className="public-mobile-menu-secondary-actions">
+                  {shouldShowInstallAction && (
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        await triggerInstall();
+                        setIsMobileMenuOpen(false);
+                      }}
+                      aria-label="Add Reflections to your home screen"
+                      className="public-mobile-menu-secondary-action"
+                    >
+                      <span>Install app</span>
+                    </button>
+                  )}
+                  {shouldShowSecondarySignIn && (
+                    <a
+                      href={RoutePath.LOGIN}
+                      onClick={(event) => handleAppRouteNavigation(event, RoutePath.LOGIN)}
+                      className="public-mobile-menu-footer-link"
+                    >
+                      <span>Already writing?</span>
+                      <span>Sign in</span>
+                    </a>
+                  )}
+                </div>
+              )}
             </section>
           </div>
         </div>,
@@ -438,7 +448,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
   return (
     <>
       <header className={`public-header ${isLandingRoute ? 'public-header--landing landing-nav-scrim' : 'public-header--standard'}`}>
-        <div className="mx-auto flex h-14 w-full max-w-[1440px] items-center justify-between gap-3 px-4 md:px-8 xl:px-10">
+        <div className="mx-auto flex h-14 w-full max-w-[1440px] items-center justify-between gap-2.5 px-4 md:px-8 xl:px-10">
           <a
             href={homeHref}
             onClick={(event) => handleAppRouteNavigation(event, homeHref)}
@@ -493,7 +503,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
             </a>
           </nav>
 
-          <div className="flex items-center gap-2 lg:hidden">
+          <div className="flex shrink-0 items-center gap-1.5 lg:hidden">
             <ThemeModeButton
               isDarkMode={isDarkMode}
               onToggle={toggleDarkMode}

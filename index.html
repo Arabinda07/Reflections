@@ -102,6 +102,17 @@
         scrollbar-gutter: stable;
       }
 
+      @media (max-width: 767px) {
+        html {
+          scrollbar-gutter: auto;
+        }
+
+        html,
+        body {
+          overflow-x: hidden;
+        }
+      }
+
       :root {
         --font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
         --font-serif: 'Spectral', serif;
