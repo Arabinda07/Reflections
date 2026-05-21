@@ -34,8 +34,6 @@ const SUBSCRIPTION_TOTAL_COUNT: Record<BillingPeriod, number> = {
   monthly: PRO_PRICING_PLANS.monthly.totalCount,
 };
 
-const supabaseAuth = createSupabaseAuthClient();
-
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -43,6 +41,7 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
+    const supabaseAuth = createSupabaseAuthClient();
     const user = await requireUser(supabaseAuth, req.headers?.authorization);
     const body = await parseJsonBody<CreateSubscriptionRequest>(req);
     const billingPeriod = body.billingPeriod || DEFAULT_PRO_PLAN;

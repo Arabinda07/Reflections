@@ -9,6 +9,8 @@ describe('Razorpay subscription security contract', () => {
   it('does not trust client supplied plan ids or unlock Pro from checkout verification', () => {
     const createSubscription = read('api/create-razorpay-subscription.ts');
     const verifyPayment = read('api/verify-razorpay-payment.ts');
+    const createSubscriptionModuleScope = createSubscription.split('export default')[0];
+    const verifyPaymentModuleScope = verifyPayment.split('export default')[0];
 
     expect(createSubscription).not.toContain('const { planId } = body');
     expect(createSubscription).toContain('RAZORPAY_PLAN_IDS');
@@ -21,6 +23,8 @@ describe('Razorpay subscription security contract', () => {
     expect(verifyPayment).not.toContain("from('profiles')");
     expect(verifyPayment).not.toContain("plan: 'pro'");
     expect(verifyPayment).not.toContain('SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_ANON_KEY');
+    expect(createSubscriptionModuleScope).not.toContain('createSupabaseAuthClient()');
+    expect(verifyPaymentModuleScope).not.toContain('createSupabaseAuthClient()');
   });
 
   it('adds a verified webhook path for authoritative entitlement changes', () => {
@@ -38,5 +42,16 @@ describe('Razorpay subscription security contract', () => {
 
     expect(schema).toContain("plan_code in ('weekly', 'monthly')");
     expect(schema).not.toContain("plan_code in ('monthly', 'yearly')");
+  });
+
+  it('adds a redacted payment diagnostics endpoint for server config checks', () => {
+    const diagnostics = read('api/payment-diagnostics.ts');
+
+    expect(diagnostics).toContain('buildPaymentDiagnostics');
+    expect(diagnostics).toContain('requiredForCheckout');
+    expect(diagnostics).toContain('requiredForWebhook');
+    expect(diagnostics).toContain('publicKeyMatchesServer');
+    expect(diagnostics).not.toContain('keySecret: process.env.RAZORPAY_KEY_SECRET');
+    expect(diagnostics).not.toContain('serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY');
   });
 });

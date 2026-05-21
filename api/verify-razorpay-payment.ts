@@ -20,7 +20,6 @@ type VerifyPaymentRequest = {
 };
 
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || '';
-const supabaseAuth = createSupabaseAuthClient();
 
 const verifyCheckoutSignature = (paymentId: string, subscriptionId: string, signature: string) => {
   if (!RAZORPAY_KEY_SECRET) {
@@ -44,6 +43,7 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
+    const supabaseAuth = createSupabaseAuthClient();
     const user = await requireUser(supabaseAuth, req.headers?.authorization);
     const body = await parseJsonBody<VerifyPaymentRequest>(req);
     const {
