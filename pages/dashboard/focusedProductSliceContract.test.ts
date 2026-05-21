@@ -125,10 +125,10 @@ describe('focused product slice source contract', () => {
     expect(homeAuthenticated).toContain('Quick check-in');
     expect(homeAuthenticated).toContain('<MoodPicker');
     expect(read('pages/dashboard/moodConfig.ts')).toContain("'overthinking'");
-    expect(read('pages/dashboard/moodConfig.ts')).toContain("'complex'");
+    expect(read('pages/dashboard/moodConfig.ts')).toContain("'charged'");
     expect(homeAuthenticated.toLowerCase()).not.toContain('score');
 
-    expect(createNote).toContain('title="What’s the vibe right now?"');
+    expect(createNote).toContain('title="How does it feel right now?"');
     expect(createNote).not.toContain('Reflection mood');
   });
 

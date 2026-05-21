@@ -391,7 +391,7 @@ export const SingleNote: React.FC = () => {
                       }`}
                     >
                       {note.mood ? getMoodIcon(note.mood) : <Smiley size={14} weight="bold" />}
-                      <span className="mt-0.5">{note.mood || 'Mood'}</span>
+                      <span className="mt-0.5">{noteMoodConfig?.label || note.mood || 'Mood'}</span>
                     </button>
 
                     <button
@@ -471,7 +471,8 @@ export const SingleNote: React.FC = () => {
       <ModalSheet
         isOpen={isMoodOpen}
         onClose={() => setIsMoodOpen(false)}
-        title="What’s the vibe right now?"
+        title="How does it feel right now?"
+        description="Pick a broad mood. Details are optional."
         size="sm"
         panelClassName="modal-sheet-panel--compact"
         bodyClassName="modal-sheet-body--compact"

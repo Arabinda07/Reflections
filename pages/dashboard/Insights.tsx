@@ -31,7 +31,7 @@ import {
   SANCTUARY_LEVEL_UP_ANIMATION_ID,
   SANCTUARY_LEVEL_UP_ANIMATION_SRC,
 } from '../../src/lottie/sanctuaryAnimation';
-import { DEFAULT_MOOD_TONE, getMoodConfig, getMoodFamilyConfig } from './moodConfig';
+import { DEFAULT_MOOD_TONE, getMoodConfig, getMoodGroupConfig } from './moodConfig';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 const TAG_TONE_CLASSES = ['text-green', 'text-green/80', 'text-green/70', 'text-green/60'];
@@ -353,8 +353,8 @@ export const Insights: React.FC = () => {
                               const maxValue = weeklyRecap.moodFamilyData[0].value;
                               const percent = Math.round((entry.value / maxValue) * 100);
                               const { scaleX } = getMoodBarScale(percent);
-                              const moodFamily = getMoodFamilyConfig(entry.name);
-                              const moodConfig = getMoodConfig(moodFamily?.options[0] || entry.name);
+                              const moodFamily = getMoodGroupConfig(entry.name);
+                              const moodConfig = getMoodConfig(moodFamily?.id || entry.name);
                               const tone = moodConfig || DEFAULT_MOOD_TONE;
 
                               return (

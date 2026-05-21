@@ -792,7 +792,8 @@ export const HomeAuthenticated: React.FC = () => {
           setIsCheckInOpen(false);
           setCheckInFeedback(null);
         }}
-        title="What’s the vibe right now?"
+        title="How does it feel right now?"
+        description="Pick a broad mood. Details are optional."
         icon={<Heart size={20} weight="duotone" />}
         size="sm"
         tone="sage"
@@ -800,40 +801,37 @@ export const HomeAuthenticated: React.FC = () => {
         bodyClassName="modal-sheet-body--compact"
       >
         <div className="space-y-3">
-          <p className="text-sm font-medium leading-relaxed text-gray-light">
-            Pick the closest word.
-          </p>
-            {!checkInFeedback ? (
-              <MoodPicker
-                selectedMood={undefined}
-                source="home"
-                onSelect={(nextMood) => {
-                  if (nextMood) {
-                    void handleMoodCheckIn(nextMood);
-                  }
-                }}
-              />
-            ) : (
-              <div
-                className="flex flex-col items-center justify-center py-10 text-center animate-scale-in"
-              >
-                {checkInFeedback === 'error' ? (
-                  <p className="text-sm font-bold text-clay">Could not save that just now.</p>
-                ) : (
-                  <>
-                    <div 
-                      className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green/10 text-green animate-shake-x"
-                    >
-                      {getMoodConfig(checkInFeedback)?.icon && React.createElement(getMoodConfig(checkInFeedback)!.icon, { size: 32, weight: "fill" })}
-                    </div>
-                    <h3 className="label-caps mb-2 text-green">Recorded</h3>
-                    <p className="font-serif text-[16px] italic leading-relaxed text-gray-light">
-                      Logged. Tiny check-in, useful signal.
-                    </p>
-                  </>
-                )}
-              </div>
-            )}
+          {!checkInFeedback ? (
+            <MoodPicker
+              selectedMood={undefined}
+              source="home"
+              onSelect={(nextMood) => {
+                if (nextMood) {
+                  void handleMoodCheckIn(nextMood);
+                }
+              }}
+            />
+          ) : (
+            <div
+              className="flex flex-col items-center justify-center py-10 text-center animate-scale-in"
+            >
+              {checkInFeedback === 'error' ? (
+                <p className="text-sm font-bold text-clay">Could not save that just now.</p>
+              ) : (
+                <>
+                  <div 
+                    className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green/10 text-green animate-shake-x"
+                  >
+                    {getMoodConfig(checkInFeedback)?.icon && React.createElement(getMoodConfig(checkInFeedback)!.icon, { size: 32, weight: "fill" })}
+                  </div>
+                  <h3 className="label-caps mb-2 text-green">Recorded</h3>
+                  <p className="font-serif text-[16px] italic leading-relaxed text-gray-light">
+                    Logged. Tiny check-in, useful signal.
+                  </p>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </ModalSheet>
       <ModalSheet

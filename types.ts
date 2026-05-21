@@ -1,5 +1,5 @@
 import type { WikiPageType } from './services/wikiTypes';
-export type { MoodName } from './pages/dashboard/moodConfig';
+export type { MoodName, MoodValue } from './pages/dashboard/moodConfig';
 
 export interface NoteAttachment {
   name: string;

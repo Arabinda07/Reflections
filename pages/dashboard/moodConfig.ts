@@ -30,16 +30,18 @@ export const MOOD_OPTIONS = [
   'numb',
 ] as const;
 
-export type MoodName = (typeof MOOD_OPTIONS)[number];
+export const MOOD_GROUP_IDS = [
+  'light',
+  'steady',
+  'charged',
+  'heavy',
+  'mixed',
+] as const;
 
-export type MoodFamilyId =
-  | 'light'
-  | 'steady'
-  | 'restless'
-  | 'heavy'
-  | 'heated'
-  | 'low'
-  | 'complex';
+export type MoodName = (typeof MOOD_OPTIONS)[number];
+export type MoodGroupId = (typeof MOOD_GROUP_IDS)[number];
+export type MoodValue = MoodName | MoodGroupId;
+export type MoodFamilyId = MoodGroupId;
 
 interface MoodConfig {
   label: string;
@@ -53,13 +55,15 @@ interface MoodConfig {
   fillClass: string;
 }
 
-export interface MoodFamily {
-  id: MoodFamilyId;
+export interface MoodGroup {
+  id: MoodGroupId;
   label: string;
   helper: string;
   icon: PhosphorIcon;
   options: readonly MoodName[];
 }
+
+export type MoodFamily = MoodGroup;
 
 const TONE_CLASSES = {
   happy: {
@@ -124,7 +128,11 @@ const mood = (label: string, icon: PhosphorIcon, tone: keyof typeof TONE_CLASSES
   ...TONE_CLASSES[tone],
 });
 
-export const MOOD_CONFIG: Record<MoodName, MoodConfig> = {
+export const MOOD_CONFIG: Record<MoodValue, MoodConfig> = {
+  light: mood('Light', Smiley, 'happy'),
+  steady: mood('Steady', Sun, 'calm'),
+  charged: mood('Charged', Lightning, 'anxious'),
+  heavy: mood('Heavy', Moon, 'sad'),
   happy: mood('Happy', Smiley, 'happy'),
   glad: mood('Glad', Smiley, 'happy'),
   sparked: mood('Sparked', Lightning, 'happy'),
@@ -148,57 +156,45 @@ export const MOOD_CONFIG: Record<MoodName, MoodConfig> = {
   numb: mood('Numb', Moon, 'tired'),
 };
 
-export const MOOD_FAMILIES: readonly MoodFamily[] = [
+export const MOOD_PICKER_GROUPS: readonly MoodGroup[] = [
   {
     id: 'light',
     label: 'Light',
-    helper: 'Good, bright, or suddenly alive.',
+    helper: 'Good, bright, or a little more alive.',
     icon: Smiley,
-    options: ['happy', 'glad', 'sparked'],
+    options: ['happy', 'sparked'],
   },
   {
     id: 'steady',
     label: 'Steady',
     helper: 'Calmer, clearer, or more spacious.',
     icon: Sun,
-    options: ['calm', 'settled', 'spacious'],
+    options: ['calm', 'spacious'],
   },
   {
-    id: 'restless',
-    label: 'Restless',
-    helper: 'Brain tabs open. Too many.',
-    icon: Cloud,
-    options: ['anxious', 'wired', 'overthinking'],
+    id: 'charged',
+    label: 'Charged',
+    helper: 'Restless, wired, angry, or overfull.',
+    icon: Lightning,
+    options: ['anxious', 'wired', 'angry'],
   },
   {
     id: 'heavy',
     label: 'Heavy',
-    helper: 'Soft, sad, lonely, or tender.',
-    icon: SmileySad,
-    options: ['sad', 'lonely', 'tender'],
-  },
-  {
-    id: 'heated',
-    label: 'Heated',
-    helper: 'Angry, irritated, or fully done.',
-    icon: Lightning,
-    options: ['angry', 'irritated', 'done'],
-  },
-  {
-    id: 'low',
-    label: 'Low',
-    helper: 'Tired, foggy, or battery at 2%.',
+    helper: 'Sad, tired, tender, or low on room.',
     icon: Moon,
-    options: ['tired', 'drained', 'foggy'],
+    options: ['sad', 'tired', 'drained'],
   },
   {
-    id: 'complex',
-    label: 'Complex',
-    helper: 'Mixed, raw, or hard to pin down.',
+    id: 'mixed',
+    label: 'Mixed',
+    helper: 'Hard to name, layered, or in-between.',
     icon: Cloud,
-    options: ['mixed', 'raw', 'numb'],
+    options: ['raw', 'numb'],
   },
 ];
+
+export const MOOD_FAMILIES = MOOD_PICKER_GROUPS;
 
 export const DEFAULT_MOOD_TONE = {
   labelClass: 'text-green',
@@ -206,15 +202,70 @@ export const DEFAULT_MOOD_TONE = {
   fillClass: 'bg-green',
 };
 
-export const getMoodConfig = (mood?: string) =>
-  mood && Object.prototype.hasOwnProperty.call(MOOD_CONFIG, mood)
-    ? MOOD_CONFIG[mood as MoodName]
-    : undefined;
+const SPECIFIC_MOOD_GROUPS: Record<MoodName, MoodGroupId> = {
+  happy: 'light',
+  glad: 'light',
+  sparked: 'light',
+  calm: 'steady',
+  settled: 'steady',
+  spacious: 'steady',
+  anxious: 'charged',
+  wired: 'charged',
+  overthinking: 'charged',
+  sad: 'heavy',
+  lonely: 'heavy',
+  tender: 'heavy',
+  angry: 'charged',
+  irritated: 'charged',
+  done: 'charged',
+  tired: 'heavy',
+  drained: 'heavy',
+  foggy: 'heavy',
+  mixed: 'mixed',
+  raw: 'mixed',
+  numb: 'mixed',
+};
 
-export const getMoodFamilyForMood = (mood?: string) =>
-  mood
-    ? MOOD_FAMILIES.find((family) => (family.options as readonly string[]).includes(mood))
-    : undefined;
+const LEGACY_GROUP_REMAP: Record<string, MoodGroupId> = {
+  restless: 'charged',
+  heated: 'charged',
+  low: 'heavy',
+  complex: 'mixed',
+};
 
-export const getMoodFamilyConfig = (familyId?: string) =>
-  familyId ? MOOD_FAMILIES.find((family) => family.id === familyId) : undefined;
+const isMoodConfigKey = (mood: string): mood is MoodValue =>
+  Object.prototype.hasOwnProperty.call(MOOD_CONFIG, mood);
+
+const isMoodGroupId = (mood: string): mood is MoodGroupId =>
+  (MOOD_GROUP_IDS as readonly string[]).includes(mood);
+
+const getNormalizedMoodValue = (mood?: string): MoodValue | undefined => {
+  if (!mood) return undefined;
+  if (isMoodConfigKey(mood)) return mood;
+  return LEGACY_GROUP_REMAP[mood];
+};
+
+export const getMoodConfig = (mood?: string) => {
+  const moodValue = getNormalizedMoodValue(mood);
+  return moodValue ? MOOD_CONFIG[moodValue] : undefined;
+};
+
+export const getMoodGroupForMood = (mood?: string) => {
+  const moodValue = getNormalizedMoodValue(mood);
+  if (!moodValue) return undefined;
+
+  const groupId = isMoodGroupId(moodValue) ? moodValue : SPECIFIC_MOOD_GROUPS[moodValue];
+  return MOOD_PICKER_GROUPS.find((group) => group.id === groupId);
+};
+
+export const getMoodFamilyForMood = getMoodGroupForMood;
+
+export const getMoodGroupConfig = (groupId?: string) => {
+  const moodValue = getNormalizedMoodValue(groupId);
+  if (!moodValue) return undefined;
+
+  const normalizedGroupId = isMoodGroupId(moodValue) ? moodValue : SPECIFIC_MOOD_GROUPS[moodValue];
+  return MOOD_PICKER_GROUPS.find((group) => group.id === normalizedGroupId);
+};
+
+export const getMoodFamilyConfig = getMoodGroupConfig;

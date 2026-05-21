@@ -47,31 +47,27 @@ import { canNavigateBackInApp } from '../../src/native/androidBack';
 import { NATIVE_PAGE_TOP_PADDING, NATIVE_TOP_CONTROL_OFFSET } from '../../src/native/safeArea';
 import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
 import trailLoadingAnimation from '@/src/lottie/trail-loading.json';
-import { getMoodConfig, getMoodFamilyForMood } from './moodConfig';
+import { getMoodConfig, getMoodGroupForMood } from './moodConfig';
 import { MoodPicker } from './MoodPicker';
 
 const getSurfaceScopeForMood = (mood?: string) => {
-  switch (getMoodFamilyForMood(mood)?.id) {
+  switch (getMoodGroupForMood(mood)?.id) {
     case 'light': return 'surface-scope-sky';
     case 'steady': return 'surface-scope-sage';
-    case 'restless': return 'surface-scope-neutral';
+    case 'charged': return 'surface-scope-clay';
     case 'heavy': return 'surface-scope-sky';
-    case 'heated': return 'surface-scope-clay';
-    case 'low': return 'surface-scope-paper';
-    case 'complex': return 'surface-scope-neutral';
+    case 'mixed': return 'surface-scope-paper';
     default: return 'surface-scope-paper';
   }
 };
 
 const getSurfacePanelForMood = (mood?: string) => {
-  switch (getMoodFamilyForMood(mood)?.id) {
+  switch (getMoodGroupForMood(mood)?.id) {
     case 'light': return 'surface-panel-sky';
     case 'steady': return 'surface-panel-sage';
-    case 'restless': return 'surface-panel-paper';
+    case 'charged': return 'surface-panel-clay';
     case 'heavy': return 'surface-panel-sky';
-    case 'heated': return 'surface-panel-clay';
-    case 'low': return 'surface-panel-paper';
-    case 'complex': return 'surface-panel-paper';
+    case 'mixed': return 'surface-panel-paper';
     default: return 'surface-panel-sage';
   }
 };
@@ -874,7 +870,8 @@ export const CreateNote: React.FC = () => {
       <ModalSheet
         isOpen={isMoodOpen}
         onClose={() => setIsMoodOpen(false)}
-        title="What’s the vibe right now?"
+        title="How does it feel right now?"
+        description="Pick a broad mood. Details are optional."
         size="sm"
         panelClassName="modal-sheet-panel--compact"
         bodyClassName="modal-sheet-body--compact"

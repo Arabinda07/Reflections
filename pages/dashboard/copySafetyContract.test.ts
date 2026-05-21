@@ -28,7 +28,7 @@ describe('voice refresh copy safety', () => {
       read('public/pricing.md'),
     ].join('\n');
 
-    expect(refreshedCopy).toContain('What’s the vibe right now?');
+    expect(refreshedCopy).toContain('How does it feel right now?');
     expect(refreshedCopy).toContain('A reflection, not a verdict');
     expect(refreshedCopy).toContain('More room when life gets loud');
     expect(refreshedCopy).toContain('For the thought that keeps doing laps.');

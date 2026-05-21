@@ -6,7 +6,7 @@ import type {
   WritingRhythm,
 } from '../types';
 import { countBy, topEntries } from './collectionUtils';
-import { getMoodFamilyForMood } from '../pages/dashboard/moodConfig';
+import { getMoodGroupForMood } from '../pages/dashboard/moodConfig';
 
 interface WeeklyRecapInput {
   notes: Note[];
@@ -93,7 +93,7 @@ export function buildWeeklyRecap(input: WeeklyRecapInput): WeeklyRecap {
     countBy(
       moodSource
         .filter(Boolean)
-        .map((name) => getMoodFamilyForMood(name)?.id || name),
+        .map((name) => getMoodGroupForMood(name)?.id || name),
     ),
     8,
   ).map(([name, value]) => ({ name, value }));

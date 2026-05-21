@@ -1,16 +1,19 @@
 import { describe, expect, it } from 'vitest';
-import { MOOD_FAMILIES, MOOD_OPTIONS, getMoodFamilyForMood } from './moodConfig';
+import {
+  MOOD_OPTIONS,
+  MOOD_PICKER_GROUPS,
+  getMoodConfig,
+  getMoodGroupForMood,
+} from './moodConfig';
 
 describe('mood personalization config', () => {
-  it('offers grouped personal moods without optional neutral choices', () => {
-    expect(MOOD_FAMILIES.map((family) => family.id)).toEqual([
+  it('offers a calmer set of broad picker groups without removing legacy specific moods', () => {
+    expect(MOOD_PICKER_GROUPS.map((group) => group.id)).toEqual([
       'light',
       'steady',
-      'restless',
+      'charged',
       'heavy',
-      'heated',
-      'low',
-      'complex',
+      'mixed',
     ]);
 
     expect(MOOD_OPTIONS).toEqual([
@@ -41,10 +44,22 @@ describe('mood personalization config', () => {
     expect(MOOD_OPTIONS).not.toContain('neutral');
   });
 
-  it('maps legacy and expanded moods to recap-safe families', () => {
-    expect(getMoodFamilyForMood('calm')?.id).toBe('steady');
-    expect(getMoodFamilyForMood('settled')?.id).toBe('steady');
-    expect(getMoodFamilyForMood('happy')?.id).toBe('light');
-    expect(getMoodFamilyForMood('unknown')).toBeUndefined();
+  it('maps broad, legacy, and expanded moods to recap-safe groups', () => {
+    expect(getMoodGroupForMood('steady')?.id).toBe('steady');
+    expect(getMoodGroupForMood('calm')?.id).toBe('steady');
+    expect(getMoodGroupForMood('settled')?.id).toBe('steady');
+    expect(getMoodGroupForMood('happy')?.id).toBe('light');
+    expect(getMoodGroupForMood('angry')?.id).toBe('charged');
+    expect(getMoodGroupForMood('restless')?.id).toBe('charged');
+    expect(getMoodGroupForMood('low')?.id).toBe('heavy');
+    expect(getMoodGroupForMood('complex')?.id).toBe('mixed');
+    expect(getMoodGroupForMood('unknown')).toBeUndefined();
+  });
+
+  it('returns display config for broad and specific saved moods', () => {
+    expect(getMoodConfig('light')?.label).toBe('Light');
+    expect(getMoodConfig('charged')?.label).toBe('Charged');
+    expect(getMoodConfig('calm')?.label).toBe('Calm');
+    expect(getMoodConfig('unknown')).toBeUndefined();
   });
 });

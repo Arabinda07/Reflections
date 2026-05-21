@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { CaretLeft } from '@phosphor-icons/react/CaretLeft';
 import { Check } from '@phosphor-icons/react/Check';
 import {
-  MOOD_CONFIG,
-  MOOD_FAMILIES,
-  getMoodFamilyForMood,
-  type MoodFamily,
-  type MoodFamilyId,
+  MOOD_PICKER_GROUPS,
+  getMoodConfig,
+  getMoodGroupForMood,
+  type MoodGroup,
+  type MoodGroupId,
   type MoodName,
+  type MoodValue,
 } from './moodConfig';
 import {
   trackMoodFamilySelectedDeferred,
@@ -19,50 +20,63 @@ type MoodPickerSource = 'note' | 'home' | 'single_note';
 interface MoodPickerProps {
   selectedMood?: string;
   source: MoodPickerSource;
-  onSelect: (mood: MoodName | undefined) => void | Promise<void>;
+  onSelect: (mood: MoodValue | undefined) => void | Promise<void>;
 }
 
-const getInitialFamilyId = (mood?: string) => getMoodFamilyForMood(mood)?.id || null;
+const getInitialGroupId = (mood?: string) => getMoodGroupForMood(mood)?.id || null;
 
 export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, source, onSelect }) => {
-  const [selectedFamilyId, setSelectedFamilyId] = useState<MoodFamilyId | null>(() => getInitialFamilyId(selectedMood));
-  const selectedFamily = MOOD_FAMILIES.find((family) => family.id === selectedFamilyId) || null;
+  const [selectedGroupId, setSelectedGroupId] = useState<MoodGroupId | null>(() => getInitialGroupId(selectedMood));
+  const selectedGroup = MOOD_PICKER_GROUPS.find((group) => group.id === selectedGroupId) || null;
 
-  const handleFamilySelect = (family: MoodFamily) => {
-    setSelectedFamilyId(family.id);
-    trackMoodFamilySelectedDeferred({ source, familyId: family.id });
+  const trackMoodSelection = (mood: MoodValue) => {
+    const group = getMoodGroupForMood(mood);
+    if (!group) return;
+
+    trackMoodSelectedDeferred({ source, mood, familyId: group.id });
+  };
+
+  const handleGroupSelect = (group: MoodGroup) => {
+    setSelectedGroupId(group.id);
+    trackMoodFamilySelectedDeferred({ source, familyId: group.id });
+  };
+
+  const handleKeepGroup = (group: MoodGroup) => {
+    trackMoodSelection(group.id);
+    void onSelect(group.id);
   };
 
   const handleMoodSelect = (mood: MoodName) => {
-    const family = getMoodFamilyForMood(mood);
     const nextMood = selectedMood === mood ? undefined : mood;
 
-    if (nextMood && family) {
-      trackMoodSelectedDeferred({ source, mood: nextMood, familyId: family.id });
+    if (nextMood) {
+      trackMoodSelection(nextMood);
     }
 
     void onSelect(nextMood);
   };
 
-  if (!selectedFamily) {
+  if (!selectedGroup) {
     return (
-      <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
-        {MOOD_FAMILIES.map((family) => {
-          const Icon = family.icon;
-          const firstMoodConfig = MOOD_CONFIG[family.options[0]];
+      <div className="space-y-2.5">
+        {MOOD_PICKER_GROUPS.map((group) => {
+          const Icon = group.icon;
+          const groupConfig = getMoodConfig(group.id);
 
           return (
             <button
-              key={family.id}
+              key={group.id}
               type="button"
-              onClick={() => handleFamilySelect(family)}
-              className={`group min-h-[5.9rem] rounded-[1.1rem] border p-3 text-left transition-[border-color,background-color,box-shadow,transform] duration-300 ease-out-expo hover:scale-[1.01] hover:shadow-lg sm:min-h-[6.7rem] sm:rounded-[1.35rem] sm:p-4 ${firstMoodConfig.option}`}
+              onClick={() => handleGroupSelect(group)}
+              className={`group flex min-h-[4.65rem] w-full items-center gap-3.5 rounded-[1.15rem] border p-3.5 text-left transition-[border-color,background-color,box-shadow,transform] duration-300 ease-out-expo hover:-translate-y-px sm:min-h-[5rem] sm:rounded-[1.25rem] sm:p-4 ${groupConfig?.option || 'control-surface text-gray-text'}`}
             >
-              <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-xl bg-white/40 transition-transform duration-500 group-hover:scale-105 sm:h-10 sm:w-10">
-                <Icon size={21} weight="duotone" className={firstMoodConfig.labelClass} />
-              </div>
-              <span className="block text-sm font-bold leading-tight text-gray-text sm:text-base">{family.label}</span>
-              <span className="mt-1 block text-[11px] font-semibold leading-snug text-gray-nav sm:text-xs">{family.helper}</span>
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/40 transition-transform duration-500 group-hover:scale-105 sm:h-11 sm:w-11">
+                <Icon size={22} weight="duotone" className={groupConfig?.labelClass} />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-sm font-bold leading-tight text-gray-text sm:text-base">{group.label}</span>
+                <span className="mt-1 block text-[11px] font-semibold leading-snug text-gray-nav sm:text-xs">{group.helper}</span>
+              </span>
             </button>
           );
         })}
@@ -70,37 +84,65 @@ export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, source, on
     );
   }
 
+  const selectedGroupConfig = getMoodConfig(selectedGroup.id);
+  const GroupIcon = selectedGroup.icon;
+
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <button
         type="button"
-        onClick={() => setSelectedFamilyId(null)}
-        className="flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-colors hover:bg-green/5 hover:text-green"
+        onClick={() => setSelectedGroupId(null)}
+        className="inline-flex min-h-10 items-center gap-1.5 rounded-[var(--radius-control)] px-1 text-sm font-bold text-gray-nav transition-colors hover:text-green"
       >
         <CaretLeft size={16} weight="bold" />
-        Back to moods
+        Back
       </button>
 
-      <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
-        {selectedFamily.options.map((entry) => {
-          const moodConfig = MOOD_CONFIG[entry];
-          const Icon = moodConfig.icon;
+      <div className="space-y-2">
+        <div className="flex items-start gap-3">
+          <span className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${selectedGroupConfig?.trackClass || 'bg-green/10'}`}>
+            <GroupIcon size={20} weight="duotone" className={selectedGroupConfig?.labelClass || 'text-green'} />
+          </span>
+          <div>
+            <h3 className="font-display text-[18px] font-bold leading-tight text-gray-text">Want a closer word?</h3>
+            <p className="mt-1 text-sm font-medium leading-relaxed text-gray-light">
+              Choose one, or keep it broad.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => handleKeepGroup(selectedGroup)}
+        className={`flex min-h-12 w-full items-center justify-between rounded-[var(--radius-control)] border px-4 py-3 text-left text-sm font-bold transition-[border-color,background-color,color,transform] duration-300 ease-out-expo hover:-translate-y-px ${selectedGroupConfig?.selectedOption || 'border-green/30 bg-green/10 text-green'}`}
+      >
+        <span>Keep {selectedGroup.label}</span>
+        {selectedMood === selectedGroup.id ? (
+          <span className="rounded-full bg-white/70 p-1 text-green">
+            <Check size={12} weight="bold" />
+          </span>
+        ) : null}
+      </button>
+
+      <div className="flex flex-wrap gap-2">
+        {selectedGroup.options.map((entry) => {
+          const moodConfig = getMoodConfig(entry);
+          const Icon = moodConfig?.icon;
           const isSelected = selectedMood === entry;
+
+          if (!moodConfig || !Icon) return null;
 
           return (
             <button
               key={entry}
               type="button"
               onClick={() => handleMoodSelect(entry)}
-              className={`relative flex min-h-20 flex-col items-center justify-center rounded-2xl border-2 p-2.5 text-center transition-colors sm:min-h-24 sm:p-3 ${isSelected ? moodConfig.modal : `${moodConfig.option} dark:bg-white/5`}`}
+              className={`relative inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] border px-3.5 py-2 text-sm font-bold transition-[border-color,background-color,color,transform] duration-300 ease-out-expo hover:-translate-y-px ${isSelected ? moodConfig.modal : `${moodConfig.option} dark:bg-white/5`}`}
             >
-              {isSelected ? (
-                <span className="absolute right-2 top-2 rounded-full bg-white/70 p-1 text-green">
-                  <Check size={12} weight="bold" />
-                </span>
-              ) : null}
-              <Icon size={26} weight={isSelected ? 'fill' : 'regular'} className="mb-1.5" />
-              <span className="text-[12px] font-bold">{moodConfig.label}</span>
+              <Icon size={18} weight={isSelected ? 'fill' : 'regular'} />
+              <span>{moodConfig.label}</span>
+              {isSelected ? <Check size={13} weight="bold" /> : null}
             </button>
           );
         })}
