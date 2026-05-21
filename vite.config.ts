@@ -2,7 +2,6 @@ import path from 'path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
-import { sentryVitePlugin } from '@sentry/vite-plugin';
 
 const lottieLightPlayer = path.resolve(__dirname, 'node_modules/lottie-web/build/player/esm/lottie_light.min.js');
 
@@ -27,7 +26,6 @@ const vendorChunk = (id: string) => {
   if (/[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/.test(id)) return 'vendor-core';
   if (id.includes('react-router')) return 'vendor-routing';
   if (id.includes('@capacitor')) return 'vendor-native';
-  if (id.includes('@vercel')) return 'vendor-observability';
   if (
     id.includes('react-calendar') ||
     id.includes('date-fns') ||
@@ -41,18 +39,12 @@ const vendorChunk = (id: string) => {
   if (id.includes('motion')) return 'vendor-motion';
   if (id.includes('@phosphor-icons')) return undefined;
   if (id.includes('@google/genai') || id.includes('@splinetool/runtime')) return 'vendor-ai';
-  if (id.includes('@sentry')) return 'vendor-sentry';
-  if (id.includes('posthog-js') || id.includes('@posthog') || id.includes('iceberg-js')) return 'vendor-analytics';
   if (id.includes('zustand')) return 'vendor-state';
 
   return 'vendor-react';
 };
 
-export default defineConfig(() => {
-    const hasSentryAuthToken = Boolean(process.env.SENTRY_AUTH_TOKEN);
-    const sentrySourcemap: false | 'hidden' = hasSentryAuthToken ? 'hidden' : false;
-
-    return {
+export default defineConfig({
       root: __dirname,
       server: {
         port: 3000,
@@ -116,8 +108,6 @@ export default defineConfig(() => {
             ],
             globIgnores: [
               '**/vendor-lottie-*.js',
-              '**/vendor-analytics-*.js',
-              '**/vendor-sentry-*.js',
               '**/*.mp4',
               '**/*.webm',
             ],
@@ -211,20 +201,11 @@ export default defineConfig(() => {
             ],
           }
         }),
-        // Source map upload — only runs when SENTRY_AUTH_TOKEN is set (CI/CD)
-        sentryVitePlugin({
-          org: process.env.SENTRY_ORG,
-          project: process.env.SENTRY_PROJECT,
-          authToken: process.env.SENTRY_AUTH_TOKEN,
-          disable: !hasSentryAuthToken,
-        }),
       ],
       build: {
-        sourcemap: sentrySourcemap,
         modulePreload: {
           resolveDependencies: (_filename, deps) => {
             return deps.filter(dep => 
-              !dep.includes('vendor-analytics') && 
               !dep.includes('vendor-supabase') &&
               !dep.includes('vendor-calendar') &&
               !dep.includes('vendor-editor')
@@ -243,5 +224,4 @@ export default defineConfig(() => {
           'lottie-web': lottieLightPlayer,
         }
       }
-    };
 });

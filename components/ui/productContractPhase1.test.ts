@@ -19,7 +19,7 @@ describe('phase 1 product contract and clarity', () => {
     expect(insights).toContain('to={RoutePath.SANCTUARY}');
     expect(insights).not.toContain('onClick={() => navigate(RoutePath.SANCTUARY)}');
     expect(lifeWiki).toContain('getWikiInsightsGate');
-    expect(lifeWiki).toContain('incrementFreeWikiInsights');
+    expect(lifeWiki).toContain("aiRunClient.startLifeWikiRefresh({ trigger: 'manual' })");
     expect(insights).not.toContain('getAiReflectionGate');
     expect(insights).not.toContain('incrementFreeAiReflections');
   });

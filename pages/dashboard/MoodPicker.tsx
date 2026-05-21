@@ -10,48 +10,28 @@ import {
   type MoodName,
   type MoodValue,
 } from './moodConfig';
-import {
-  trackMoodFamilySelectedDeferred,
-  trackMoodSelectedDeferred,
-} from '../../src/analytics/deferredEvents';
-
-type MoodPickerSource = 'note' | 'home' | 'single_note';
 
 interface MoodPickerProps {
   selectedMood?: string;
-  source: MoodPickerSource;
   onSelect: (mood: MoodValue | undefined) => void | Promise<void>;
 }
 
 const getInitialGroupId = (mood?: string) => getMoodGroupForMood(mood)?.id || null;
 
-export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, source, onSelect }) => {
+export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, onSelect }) => {
   const [selectedGroupId, setSelectedGroupId] = useState<MoodGroupId | null>(() => getInitialGroupId(selectedMood));
   const selectedGroup = MOOD_PICKER_GROUPS.find((group) => group.id === selectedGroupId) || null;
 
-  const trackMoodSelection = (mood: MoodValue) => {
-    const group = getMoodGroupForMood(mood);
-    if (!group) return;
-
-    trackMoodSelectedDeferred({ source, mood, familyId: group.id });
-  };
-
   const handleGroupSelect = (group: MoodGroup) => {
     setSelectedGroupId(group.id);
-    trackMoodFamilySelectedDeferred({ source, familyId: group.id });
   };
 
   const handleKeepGroup = (group: MoodGroup) => {
-    trackMoodSelection(group.id);
     void onSelect(group.id);
   };
 
   const handleMoodSelect = (mood: MoodName) => {
     const nextMood = selectedMood === mood ? undefined : mood;
-
-    if (nextMood) {
-      trackMoodSelection(nextMood);
-    }
 
     void onSelect(nextMood);
   };

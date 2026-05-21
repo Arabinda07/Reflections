@@ -55,12 +55,12 @@ const policySections: PolicySection[] = [
     ],
   },
   {
-    title: 'Analytics',
+    title: 'No product analytics',
     icon: 'chart',
     color: 'tone-icon-clay',
     body: [
-      'If analytics are configured, Reflections may record basic product events such as sign-in status, note saves, route groups, plan tier, counts of tags or attachments, and whether an AI refresh was used.',
-      'Analytics should not include the body of your notes, future letters, attachments, moods as private prose, or AI reflection text. These events help find broken flows and understand which parts of the product are used.',
+      'Reflections does not send product analytics, route tracking, session replay, or error-monitoring events to PostHog, Sentry, Vercel Analytics, or Vercel Speed Insights.',
+      'The services that run chosen features can still process the data needed for those features, such as Supabase sign-in and storage, AI requests, payments, email delivery, and ordinary hosting logs.',
     ],
   },
   {
@@ -105,7 +105,7 @@ const policySections: PolicySection[] = [
 export const PrivacyPolicy: React.FC = () => {
   useDocumentMeta({
     title: 'Privacy – How Reflections Handles Your Data',
-    description: 'What Reflections stores, when AI runs, how payments and analytics work, and how to export or delete your writing.',
+    description: 'What Reflections stores, when AI runs, how payments work, and how to export or delete your writing.',
     path: '/privacy',
   });
   const navigate = useNavigate();
@@ -134,7 +134,7 @@ export const PrivacyPolicy: React.FC = () => {
 
         <div className="space-y-4 lg:col-span-4">
           <p className="max-w-[36rem] font-serif text-[18px] leading-relaxed text-gray-light">
-            This page explains what Reflections stores, when AI is used, how payments and analytics work, and how you can remove your writing.
+            This page explains what Reflections stores, when AI is used, how payments work, and how you can remove your writing.
           </p>
           <p className="text-[12px] font-bold uppercase tracking-widest text-gray-nav">Last updated · May 2026</p>
         </div>

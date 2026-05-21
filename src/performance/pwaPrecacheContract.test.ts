@@ -27,19 +27,19 @@ describe('lean PWA precache contract', () => {
     }
   });
 
-  it('does not precache heavy route, analytics, observability, icon, or media payloads', () => {
+  it('does not precache heavy route, icon, media, or removed telemetry payloads', () => {
     const viteConfig = read('vite.config.ts');
 
     for (const excluded of [
       '**/vendor-lottie-*.js',
-      '**/vendor-analytics-*.js',
-      '**/vendor-sentry-*.js',
       '**/*.mp4',
       '**/*.webm',
     ]) {
       expect(viteConfig).toContain(excluded);
     }
 
+    expect(viteConfig).not.toContain('**/vendor-analytics-*.js');
+    expect(viteConfig).not.toContain('**/vendor-sentry-*.js');
     expect(viteConfig).not.toContain("return 'vendor-icons'");
     expect(viteConfig).toContain("if (id.includes('@phosphor-icons')) return undefined;");
     expect(viteConfig).not.toContain('icon-1024.png');

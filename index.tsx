@@ -1,7 +1,6 @@
 import { StrictMode, type ErrorInfo } from "react";
 import { createRoot } from "react-dom/client";
 import { getMissingClientEnvNames } from "./src/bootstrapEnv";
-import { captureReactRootError } from "./src/instrument";
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
@@ -9,8 +8,7 @@ if (!rootElement) {
 }
 
 const handleReactRootError = (error: unknown, errorInfo: ErrorInfo) => {
-  console.error("React root error.", error);
-  void captureReactRootError(error, errorInfo);
+  console.error("React root error.", error, errorInfo);
 };
 
 const root = createRoot(rootElement, {

@@ -878,7 +878,6 @@ export const CreateNote: React.FC = () => {
       >
         <MoodPicker
           selectedMood={mood}
-          source="note"
           onSelect={(nextMood) => {
             setMood(nextMood);
             setIsMoodOpen(false);

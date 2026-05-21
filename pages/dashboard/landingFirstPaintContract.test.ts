@@ -174,6 +174,7 @@ describe('landing first-paint contract', () => {
     expect(indexHtml).not.toContain('https://checkout.razorpay.com/v1/checkout.js');
     expect(indexHtml).not.toContain('@dotlottie/player-component');
     expect(proUpgrade).toContain('const razorpayLoaded = await loadRazorpay();');
-    expect(proUpgrade).toContain("throw new Error('Could not load Razorpay checkout. Please try again.');");
+    expect(proUpgrade).toContain('const RAZORPAY_LOAD_ERROR =');
+    expect(proUpgrade).toContain('throw new Error(RAZORPAY_LOAD_ERROR);');
   });
 });

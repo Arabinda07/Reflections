@@ -479,7 +479,6 @@ export const SingleNote: React.FC = () => {
       >
         <MoodPicker
           selectedMood={note.mood}
-          source="single_note"
           onSelect={async (nextMood) => {
             await persistNote({ mood: nextMood });
             setIsMoodOpen(false);

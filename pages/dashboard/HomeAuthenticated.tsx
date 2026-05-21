@@ -804,7 +804,6 @@ export const HomeAuthenticated: React.FC = () => {
           {!checkInFeedback ? (
             <MoodPicker
               selectedMood={undefined}
-              source="home"
               onSelect={(nextMood) => {
                 if (nextMood) {
                   void handleMoodCheckIn(nextMood);

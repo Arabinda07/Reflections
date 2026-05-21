@@ -31,10 +31,10 @@ describe('launch security regression contract', () => {
     expect(csp).toContain('https://checkout.razorpay.com');
     expect(csp).toContain('https://*.supabase.co');
     expect(csp).toContain('https://api.razorpay.com');
-    expect(csp).toContain('https://api.posthog.com');
-    expect(csp).toContain('https://*.posthog.com');
-    expect(csp).toContain('https://*.ingest.sentry.io');
-    expect(csp).toContain('https://vitals.vercel-insights.com');
+    expect(csp).not.toContain('https://api.posthog.com');
+    expect(csp).not.toContain('https://*.posthog.com');
+    expect(csp).not.toContain('https://*.ingest.sentry.io');
+    expect(csp).not.toContain('https://vitals.vercel-insights.com');
     expect(csp).not.toContain('https://o*.ingest.sentry.io');
     expect(csp).not.toMatch(/https:\/\/[^/\s;]*[A-Za-z0-9-]\*[^/\s;]*/);
     expect(csp).not.toContain("script-src 'self' 'unsafe-inline'");
