@@ -6,16 +6,46 @@ export interface SupabaseReferralInviteRow {
   user_id: string;
   code: string;
   created_at: string;
-  last_shared_at: string | null;
+  last_shared_at?: string | null;
 }
 
-export const mapReferralInvite = (data: SupabaseReferralInviteRow): ReferralInvite => ({
-  id: data.id,
-  userId: data.user_id,
-  code: data.code,
-  createdAt: data.created_at,
-  lastSharedAt: data.last_shared_at || undefined,
-});
+const isReferralInviteRow = (data: unknown): data is SupabaseReferralInviteRow => {
+  if (!data || typeof data !== 'object') return false;
+
+  const row = data as Partial<SupabaseReferralInviteRow>;
+  return (
+    typeof row.id === 'string' &&
+    typeof row.user_id === 'string' &&
+    typeof row.code === 'string' &&
+    typeof row.created_at === 'string' &&
+    (
+      typeof row.last_shared_at === 'string' ||
+      row.last_shared_at === null ||
+      row.last_shared_at === undefined
+    )
+  );
+};
+
+export const mapReferralInvite = (data: unknown): ReferralInvite | null => {
+  if (!isReferralInviteRow(data)) return null;
+
+  return {
+    id: data.id,
+    userId: data.user_id,
+    code: data.code,
+    createdAt: data.created_at,
+    lastSharedAt: data.last_shared_at || undefined,
+  };
+};
+
+const requireReferralInvite = (data: unknown): ReferralInvite => {
+  const invite = mapReferralInvite(data);
+  if (!invite) {
+    throw new Error('Referral invite response was incomplete.');
+  }
+
+  return invite;
+};
 
 export const referralRemoteStore = {
   fetchByUserId: async (userId: string): Promise<ReferralInvite | null> => {
@@ -40,7 +70,7 @@ export const referralRemoteStore = {
       .single();
 
     if (error) throw error;
-    return mapReferralInvite(data);
+    return requireReferralInvite(data);
   },
 
   updateLastSharedAt: async (userId: string, inviteId: string, sharedAt: string): Promise<ReferralInvite> => {
@@ -53,7 +83,7 @@ export const referralRemoteStore = {
       .single();
 
     if (error) throw error;
-    return mapReferralInvite(data);
+    return requireReferralInvite(data);
   },
 
   acceptInvite: async (code: string): Promise<boolean> => {

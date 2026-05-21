@@ -238,6 +238,11 @@ describe('referralService', () => {
     expect(link).not.toMatch(/email|name|user/i);
   });
 
+  it('does not build invite links from missing or invalid backend codes', () => {
+    expect(buildReferralLink(undefined, 'https://reflections.test', '/app/')).toBe('');
+    expect(buildReferralLink('bad code!', 'https://reflections.test', '/app/')).toBe('');
+  });
+
   it('records an accepted referral after profile creation and clears the stored code', async () => {
     const fakeStorage = storage();
     referralService.captureReferralCode('?ref=friend-code', fakeStorage);

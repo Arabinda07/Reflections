@@ -8,6 +8,7 @@ const read = (filePath: string) =>
 describe('lottie surface mapping contract', () => {
   it('keeps each surface on its intended lottie file', () => {
     const createNote = read('pages/dashboard/CreateNote.tsx');
+    const trailLoadingMark = read('components/ui/TrailLoadingMark.tsx');
     const loadingState = read('components/ui/LoadingState.tsx');
     const paperPlaneToast = read('components/ui/PaperPlaneToast.tsx');
     const routeErrorBoundary = read('pages/RouteErrorBoundary.tsx');
@@ -16,7 +17,8 @@ describe('lottie surface mapping contract', () => {
     const myNotes = read('pages/dashboard/MyNotes.tsx');
     const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
 
-    expect(createNote).toContain("from '@/src/lottie/trail-loading.json'");
+    expect(createNote).toContain("import('../../components/ui/TrailLoadingMark')");
+    expect(trailLoadingMark).toContain("from '@/src/lottie/trail-loading.json'");
     expect(createNote).not.toContain("from '@/src/lottie/loading.json'");
 
     expect(loadingState).toContain("from '@/src/lottie/loading.json'");

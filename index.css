@@ -7,14 +7,6 @@
 }
 
 @font-face {
-  font-family: 'Geist Mono';
-  src: url('/assets/fonts/GeistMono[wght].woff2') format('woff2');
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
   font-family: 'Spectral';
   src: url('/assets/fonts/Spectral-Regular.woff2') format('woff2');
   font-weight: 400;
@@ -47,7 +39,7 @@
     --font-sans: 'Manrope', sans-serif;
     --font-serif: 'Spectral', serif;
     --font-display: 'Manrope', sans-serif;
-    --font-mono: 'Geist Mono', monospace;
+    --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', monospace;
     --font-editor: var(--font-serif);
   }
 }
@@ -182,8 +174,8 @@
   --surface-current-control-bg: oklch(from var(--panel-bg) l c h / 0.78);
   --hero-ink: oklch(0.98 0.01 135);
   --hero-shadow:
-    0 10px 30px rgba(20, 24, 19, 0.22),
-    0 24px 60px rgba(20, 24, 19, 0.12);
+    0 8px 22px rgba(20, 24, 19, 0.16),
+    0 18px 42px rgba(20, 24, 19, 0.08);
   --hero-scrim: linear-gradient(180deg,
       oklch(0.28 0.02 135 / 0.12),
       oklch(0.24 0.02 135 / 0.28));
@@ -415,8 +407,8 @@
     0 8px 20px -14px oklch(from var(--bg-color) 0.2 0.01 h / 0.3);
   --hero-ink: oklch(0.95 0.02 135);
   --hero-shadow:
-    0 12px 32px oklch(0.08 0.01 135 / 0.42),
-    0 30px 72px oklch(0.08 0.01 135 / 0.2);
+    0 10px 26px oklch(0.08 0.01 135 / 0.34),
+    0 22px 54px oklch(0.08 0.01 135 / 0.16);
   --hero-scrim: linear-gradient(180deg,
       oklch(0.13 0.02 135 / 0.22),
       oklch(0.1 0.02 135 / 0.48));

@@ -26,7 +26,7 @@ describe('audit fix source contract', () => {
     const insights = read('pages/dashboard/Insights.tsx');
     const css = read('index.css');
 
-    expect(home).not.toContain('bg-black/30');
+    expect(home).not.toContain(['bg', 'black/30'].join('-'));
     expect(home).not.toContain("style={{ color: '#FFFFFF' }}");
     expect(home).not.toContain('dark:bg-white/40');
     expect(home).not.toContain('dark:bg-white/60');

@@ -41,7 +41,7 @@ describe('polish surface contract', () => {
     expect(layout).not.toContain('bg-[rgba(var(--panel-bg-rgb),0.82)]');
     expect(layout).toContain('screen-scrim');
 
-    expect(createNote).not.toContain('bg-black/10');
+    expect(createNote).not.toContain(['bg', 'black/10'].join('-'));
     expect(createNote).not.toContain('bg-[rgba(var(--panel-bg-rgb),0.78)] text-white');
     expect(createNote).toContain('surface-floating');
 

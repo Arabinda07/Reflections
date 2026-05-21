@@ -92,6 +92,10 @@ const ONBOARDING_STEPS = [
 
 const onboardingStepIcons = [NotePencil, Feather, LockKey, Archive] as const;
 
+const prefetchCreateNoteRoute = () => {
+  void import('@/pages/dashboard/CreateNote');
+};
+
 
 
 export const HomeAuthenticated: React.FC = () => {
@@ -119,8 +123,10 @@ export const HomeAuthenticated: React.FC = () => {
   const [newTaskText, setNewTaskText] = useState('');
   const [isCreatingTask, setIsCreatingTask] = useState(false);
   const [isIntentionModalOpen, setIsIntentionModalOpen] = useState(false);
+  const [shouldLoadHeroVideo, setShouldLoadHeroVideo] = useState(false);
   const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);
   const shouldReduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
+  const isCompactViewport = useMediaQuery('(max-width: 639px)');
   const { showToast } = useToast();
   const authStoreDisplayName = user?.name?.trim() || 'Reflector';
 
@@ -206,7 +212,7 @@ export const HomeAuthenticated: React.FC = () => {
 
     let raf: number;
     const start = performance.now();
-    const duration = 2000;
+    const duration = 900;
     const step = (now: number) => {
       const t = Math.min((now - start) / duration, 1);
       // cubic-bezier(0.16, 1, 0.3, 1) approximation
@@ -219,6 +225,23 @@ export const HomeAuthenticated: React.FC = () => {
     return () => cancelAnimationFrame(raf);
   }, [noteCount, shouldReduceMotion]);
 
+  useEffect(() => {
+    const saveData = Boolean(
+      (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData,
+    );
+
+    if (saveData || shouldReduceMotion || isCompactViewport) {
+      setShouldLoadHeroVideo(false);
+      return;
+    }
+
+    const videoDelay = window.setTimeout(() => {
+      setShouldLoadHeroVideo(true);
+    }, 4200);
+
+    return () => window.clearTimeout(videoDelay);
+  }, [isCompactViewport, shouldReduceMotion]);
+
   const handleCloseOnboarding = useCallback(() => {
     localStorage.setItem('hasSeenOnboarding', 'true');
     setOnboardingStep(0);
@@ -228,6 +251,7 @@ export const HomeAuthenticated: React.FC = () => {
   const handleFinishOnboarding = useCallback(() => {
     handleCloseOnboarding();
     // Route directly to the editor with a gentle first-time prompt
+    prefetchCreateNoteRoute();
     navigate(RoutePath.CREATE_NOTE, { state: { initialPrompt: "What's on your mind?" } });
   }, [handleCloseOnboarding, navigate]);
 
@@ -299,6 +323,8 @@ export const HomeAuthenticated: React.FC = () => {
   }, [updateIntentionSummary, user]);
 
   const handleCreateClick = (prompt?: string) => {
+    prefetchCreateNoteRoute();
+
     if (prompt) {
       navigate(RoutePath.CREATE_NOTE, { state: { initialPrompt: prompt } });
       return;
@@ -407,37 +433,37 @@ export const HomeAuthenticated: React.FC = () => {
         className="home-authenticated-mobile-safe surface-scope-sage page-wash relative min-h-full flex flex-col flex-1 bg-body selection:bg-green/10"
         aria-hidden={showOnboarding ? 'true' : undefined}
       >
-        <section className="relative isolate h-[56dvh] min-h-[360px] w-full overflow-hidden bg-body sm:h-[60dvh] sm:min-h-[450px]">
+        <section className="relative isolate h-[44dvh] min-h-[300px] w-full overflow-hidden bg-body sm:h-[48dvh] sm:min-h-[360px]">
           <img
             src="/assets/videos/field.png"
             alt=""
             aria-hidden="true"
             loading="eager"
             decoding="async"
-            className="absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center opacity-100"
+            className="absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center opacity-90"
           />
-          <video
-            src="/assets/videos/field.mp4"
-            poster="/assets/videos/field.png"
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="metadata"
-            onLoadedData={() => setIsHeroVideoReady(true)}
-            className={`absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center bg-transparent transition-opacity duration-700 ease-out-expo ${
-              isHeroVideoReady ? 'opacity-95' : 'opacity-0'
-            }`}
-          >
-          </video>
+          {shouldLoadHeroVideo ? (
+            <video
+              src="/assets/videos/field.mp4"
+              poster="/assets/videos/field.png"
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="metadata"
+              onLoadedData={() => setIsHeroVideoReady(true)}
+              className={`absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center bg-transparent transition-opacity duration-700 ease-out-expo ${
+                isHeroVideoReady ? 'opacity-70' : 'opacity-0'
+              }`}
+            >
+            </video>
+          ) : null}
           <div className="absolute inset-0 z-10 hero-scrim" />
           <div className="absolute inset-0 z-10 screen-scrim opacity-20" />
           <div className="absolute inset-0 bg-gradient-to-t from-body via-transparent to-transparent z-10" />
 
           <div className="relative z-20 h-full flex flex-col items-center justify-start pt-[10vh] text-center px-6">
-            <div
-              className="max-w-4xl animate-fade-in-up"
-            >
+            <div className="max-w-4xl">
               <h1 className="h1-hero hero-ink mb-12 text-balance">
                 <span className="whitespace-nowrap">Welcome back,</span> <br />
                 <span className="font-serif italic hero-ink-accent">
@@ -454,7 +480,7 @@ export const HomeAuthenticated: React.FC = () => {
           className="core-bento-grid"
         >
           <div
-            className="home-primary-reflection-card group relative surface-flat overflow-hidden rounded-[2.5rem] p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full transition-[border-color,box-shadow] duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-green/5 hover:border-green/10 animate-fade-in-up"
+            className="home-primary-reflection-card group relative surface-flat overflow-hidden rounded-[2.5rem] p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full transition-[border-color,box-shadow] duration-300 ease-out-expo hover:shadow-[0_12px_32px_var(--tw-shadow-color)] hover:shadow-green/5 hover:border-green/10"
           >
             <div className="relative z-10">
               <div className="flex items-center justify-between mb-8">
@@ -466,7 +492,7 @@ export const HomeAuthenticated: React.FC = () => {
                 </div>
                 <button
                   onClick={refreshPrompt}
-                  className={`flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] text-gray-nav transition-colors hover:text-green ${
+                  className={`flex h-11 min-w-11 items-center justify-center rounded-[var(--radius-control)] text-gray-nav transition-colors hover:text-green ${
                     isRefreshing ? 'animate-spin' : ''
                   }`}
                   aria-label="Refresh today's reflection prompt"
@@ -486,6 +512,8 @@ export const HomeAuthenticated: React.FC = () => {
                     variant="primary"
 
                     className="h-14 w-full px-8 rounded-xl text-base font-bold bg-green text-white hover:bg-green/90 transition-colors shadow-none sm:w-fit"
+                    onPointerEnter={prefetchCreateNoteRoute}
+                    onFocus={prefetchCreateNoteRoute}
                     onClick={() => handleCreateClick(dailyPrompt)}
                     aria-label="Begin writing with today's prompt"
                   >
@@ -614,7 +642,7 @@ export const HomeAuthenticated: React.FC = () => {
 
           <div className="grid gap-6">
             <div
-              className="group relative surface-flat surface-tone-sky overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-sky/5 animate-fade-in-up anim-delay-1"
+              className="group relative surface-flat surface-tone-sky overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-shadow duration-300 ease-out-expo hover:shadow-[0_12px_32px_var(--tw-shadow-color)] hover:shadow-sky/5"
             >
               <div className="relative z-10">
               <div className="mb-6 flex items-center gap-2 text-gray-nav">
@@ -672,7 +700,7 @@ export const HomeAuthenticated: React.FC = () => {
           </div>
 
             <div
-              className="group relative surface-flat surface-tone-honey overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-honey/5 animate-fade-in-up anim-delay-2"
+              className="group relative surface-flat surface-tone-honey overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-shadow duration-300 ease-out-expo hover:shadow-[0_12px_32px_var(--tw-shadow-color)] hover:shadow-honey/5"
             >
               <div className="relative z-10">
               <div className="mb-8 flex items-center gap-2 text-gray-nav">

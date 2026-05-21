@@ -101,10 +101,10 @@ describe('landing first-paint contract', () => {
     expect(landing).not.toContain('preload="auto"');
     expect(landing).toContain("isHeroVideoReady ? 'opacity-0' : 'opacity-100'");
     expect(landing).toContain('sm:object-[64%_center]');
-    expect(landing).not.toContain("isHeroPosterReady && !isHeroVideoReady ? 'opacity-90' : 'opacity-0'");
+    expect(landing).not.toContain("isHeroPosterReady && !isHeroVideoReady ? 'opacity-72' : 'opacity-0'");
     expect(landing).toContain('onCanPlay={(event) => {');
     expect(landing).toContain('onPlaying={() => setIsHeroVideoReady(true)}');
-    expect(landing).toContain("isHeroVideoReady ? 'opacity-90' : 'opacity-0'");
+    expect(landing).toContain("isHeroVideoReady ? 'opacity-72' : 'opacity-0'");
     expect(landing).not.toContain('poster="/assets/videos/landing_video.png"');
   });
 
@@ -115,7 +115,7 @@ describe('landing first-paint contract', () => {
     expect(landing).toContain('video-mask video-mask--mobile lg:hidden');
     expect(landing).toContain('video-mask video-mask--desktop hidden lg:block');
     expect(landing).not.toContain('landing-media-wash');
-    expect(landing).toContain("isHeroVideoReady ? 'opacity-90' : 'opacity-0'");
+    expect(landing).toContain("isHeroVideoReady ? 'opacity-72' : 'opacity-0'");
     expect(styles).toContain('.video-mask');
     expect(styles).toContain('.video-mask--desktop');
     expect(styles).toContain('.video-mask--mobile');
@@ -158,10 +158,15 @@ describe('landing first-paint contract', () => {
     expect(layout).toContain('min-h-0 w-full flex-1 flex-col overflow-y-auto');
     expect(landing).toContain('relative isolate min-h-[100dvh] w-full overflow-hidden bg-body');
     expect(landing).toContain('h-full min-h-full w-full min-w-full transform-gpu object-cover');
-    expect(homeAuthenticated).toContain('relative isolate h-[56dvh] min-h-[360px] w-full overflow-hidden bg-body sm:h-[60dvh] sm:min-h-[450px]');
+    expect(homeAuthenticated).toContain('relative isolate h-[44dvh] min-h-[300px] w-full overflow-hidden bg-body sm:h-[48dvh] sm:min-h-[360px]');
     expect(homeAuthenticated).toContain('src="/assets/videos/field.png"');
     expect(homeAuthenticated).toContain('h-full min-h-full w-full min-w-full object-cover object-center');
-    expect(homeAuthenticated).toContain('object-cover object-center opacity-100');
+    expect(homeAuthenticated).toContain('object-cover object-center opacity-90');
+    expect(homeAuthenticated).toContain('const [shouldLoadHeroVideo, setShouldLoadHeroVideo] = useState(false);');
+    expect(homeAuthenticated).toContain("const isCompactViewport = useMediaQuery('(max-width: 639px)');");
+    expect(homeAuthenticated).toContain('if (saveData || shouldReduceMotion || isCompactViewport)');
+    expect(homeAuthenticated).toContain('setShouldLoadHeroVideo(false);');
+    expect(homeAuthenticated).toContain('isHeroVideoReady ? \'opacity-70\' : \'opacity-0\'');
     expect(homeAuthenticated).not.toContain('isHeroPosterReady');
     expect(homeAuthenticated).not.toContain("isHeroPosterReady && !isHeroVideoReady ? 'opacity-100' : 'opacity-0'");
     expect(homeAuthenticated).not.toContain("filter: 'blur(10px) brightness(0.8)'");

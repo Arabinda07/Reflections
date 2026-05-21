@@ -18,7 +18,7 @@ export default {
         serif: ['"Spectral"', 'serif'],
         display: ['"Manrope"', 'sans-serif'],
         editor: ['var(--font-editor)'],
-        mono: ['"Geist Mono"', 'monospace'],
+        mono: ['ui-monospace', '"SF Mono"', 'SFMono-Regular', 'Consolas', '"Liberation Mono"', 'monospace'],
       },
       fontSize: {
         /* App UI Fixed Scale (1.25 ratio) */

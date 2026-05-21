@@ -104,7 +104,7 @@ export const Landing: React.FC = () => {
     let cancelVideoLoad: (() => void) | undefined;
     const videoDelay = window.setTimeout(() => {
       cancelVideoLoad = scheduleIdleTask(() => setShouldLoadHeroVideo(true), 3000);
-    }, 6500);
+    }, 9000);
 
     return () => {
       window.clearTimeout(videoDelay);
@@ -174,7 +174,7 @@ export const Landing: React.FC = () => {
             <video
               ref={videoRef}
               aria-hidden="true"
-              className={`absolute inset-0 h-full min-h-full w-full min-w-full transform-gpu object-cover object-[48%_center] bg-transparent transition-opacity duration-700 ease-out-expo motion-reduce:transition-none sm:object-[64%_center] lg:object-center ${isHeroVideoReady ? 'opacity-90' : 'opacity-0'}`}
+              className={`absolute inset-0 h-full min-h-full w-full min-w-full transform-gpu object-cover object-[48%_center] bg-transparent transition-opacity duration-700 ease-out-expo motion-reduce:transition-none sm:object-[64%_center] lg:object-center ${isHeroVideoReady ? 'opacity-72' : 'opacity-0'}`}
               autoPlay
               loop
               muted={isMuted}
@@ -220,7 +220,7 @@ export const Landing: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate(RoutePath.SIGNUP)}
-              className="group relative inline-flex h-14 min-w-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-control)] bg-green px-8 font-sans text-ui-base font-bold text-white shadow-[0_10px_24px_-10px_var(--green-shadow)] transition-[transform,box-shadow,background-color] duration-300 ease-out-expo hover:scale-[1.03] hover:bg-green-hover hover:shadow-[0_14px_32px_-10px_var(--green-shadow)] active:scale-[0.97] motion-reduce:transition-none sm:h-16 sm:px-10 sm:text-btn-lg sm:shadow-[0_12px_28px_-10px_var(--green-shadow)] sm:hover:shadow-[0_16px_36px_-10px_var(--green-shadow)]"
+              className="group relative inline-flex h-14 min-w-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-control)] bg-green px-8 font-sans text-ui-base font-bold text-white shadow-[0_8px_20px_-12px_var(--green-shadow)] transition-[transform,box-shadow,background-color] duration-200 ease-out-expo hover:-translate-y-px hover:bg-green-hover hover:shadow-[0_10px_24px_-12px_var(--green-shadow)] active:translate-y-0 motion-reduce:transition-none sm:h-16 sm:px-10 sm:text-btn-lg sm:shadow-[0_10px_24px_-12px_var(--green-shadow)] sm:hover:shadow-[0_12px_28px_-12px_var(--green-shadow)]"
               aria-label="Begin writing"
             >
               Begin writing
@@ -232,14 +232,14 @@ export const Landing: React.FC = () => {
                 <a
                   href={RoutePath.LOGIN}
                   onClick={(event) => handleAppRouteNavigation(event, RoutePath.LOGIN)}
-                  className="inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap px-1 text-btn-sm font-bold text-gray-nav transition-all duration-300 ease-out-expo hover:-translate-y-px hover:text-green active:translate-y-px"
+                  className="inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap px-1 text-btn-sm font-bold text-gray-nav transition-[color,transform] duration-200 ease-out-expo hover:-translate-y-px hover:text-green active:translate-y-px"
                 >
                   Sign in
                 </a>
 
                 <a
                   href={RoutePath.FAQ}
-                  className="inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap px-1 text-btn-sm font-bold text-gray-nav transition-all duration-300 ease-out-expo hover:-translate-y-px hover:text-green active:translate-y-px"
+                  className="inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap px-1 text-btn-sm font-bold text-gray-nav transition-[color,transform] duration-200 ease-out-expo hover:-translate-y-px hover:text-green active:translate-y-px"
                 >
                   How it works
                 </a>
@@ -248,7 +248,7 @@ export const Landing: React.FC = () => {
               <button
                 type="button"
                 onClick={toggleMute}
-                className="surface-floating surface-floating--media flex h-12 min-h-12 w-12 min-w-12 shrink-0 items-center justify-center rounded-2xl !text-gray-text transition-[color,border-color,transform] duration-300 ease-out-expo hover:scale-[1.03] hover:border-green/40 hover:!text-gray-text active:scale-95 motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-green/40"
+                className="surface-floating surface-floating--media flex h-12 min-h-12 w-12 min-w-12 shrink-0 items-center justify-center rounded-2xl !text-gray-text transition-[color,border-color,transform] duration-200 ease-out-expo hover:-translate-y-px hover:border-green/30 hover:!text-gray-text active:translate-y-0 motion-reduce:transition-none focus-visible:ring-2 focus-visible:ring-green/40"
                 aria-label={isMuted ? 'Unmute video' : 'Mute video'}
               >
                 {isMuted ? (

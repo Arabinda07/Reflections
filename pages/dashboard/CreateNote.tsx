@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { Suspense, lazy, useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import Lottie from 'lottie-react';
-import { motion } from 'motion/react';
 import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
 import { Brain } from '@phosphor-icons/react/Brain';
 import { CalendarBlank } from '@phosphor-icons/react/CalendarBlank';
@@ -23,7 +21,6 @@ import { Target } from '@phosphor-icons/react/Target';
 import { Trash } from '@phosphor-icons/react/Trash';
 import { Wind } from '@phosphor-icons/react/Wind';
 import { X } from '@phosphor-icons/react/X';
-import { Magnetic } from '../../components/ui/Magnetic';
 import { useAmbientAudio, AMBIENT_TRACKS } from '../../hooks/useAmbientAudio';
 import { useHaptics } from '../../hooks/useHaptics';
 import { useSound } from '../../hooks/useSound';
@@ -32,9 +29,7 @@ import { Button } from '../../components/ui/Button';
 import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
 import { Editor, EditorRef } from '../../components/ui/Editor';
 import { RoutePath, Task } from '../../types';
-import { CompanionObservation } from '../../components/ui/CompanionObservation';
 import { ModalSheet } from '../../components/ui/ModalSheet';
-import { PaperPlaneToast } from '../../components/ui/PaperPlaneToast';
 import { InlineLoadingBadge } from '../../components/ui/InlineLoadingBadge';
 import { DEFAULT_WELLNESS_PROMPTS, getCurrentWellnessPrompt, getNextWellnessPromptState } from '../../services/wellnessPrompts';
 import { aiService } from '../../services/aiService';
@@ -46,9 +41,15 @@ import { getOrderedTasks, getTaskDrawerTriggerLabel } from './createNoteTasks';
 import { canNavigateBackInApp } from '../../src/native/androidBack';
 import { NATIVE_PAGE_TOP_PADDING, NATIVE_TOP_CONTROL_OFFSET } from '../../src/native/safeArea';
 import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
-import trailLoadingAnimation from '@/src/lottie/trail-loading.json';
 import { getMoodConfig, getMoodGroupForMood } from './moodConfig';
 import { MoodPicker } from './MoodPicker';
+
+const TrailLoadingMark = lazy(() => import('../../components/ui/TrailLoadingMark')
+  .then((module) => ({ default: module.TrailLoadingMark })));
+const CompanionObservation = lazy(() => import('../../components/ui/CompanionObservation')
+  .then((module) => ({ default: module.CompanionObservation })));
+const PaperPlaneToast = lazy(() => import('../../components/ui/PaperPlaneToast')
+  .then((module) => ({ default: module.PaperPlaneToast })));
 
 const getSurfaceScopeForMood = (mood?: string) => {
   switch (getMoodGroupForMood(mood)?.id) {
@@ -81,17 +82,12 @@ interface TaskRowProps {
 
 const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeTask }) => {
   const [showCompletedText, setShowCompletedText] = useState(task.completed);
-  const [isSwipingToDelete, setIsSwipingToDelete] = useState(false);
-  const [rippleKey, setRippleKey] = useState(0);
-  const haptics = useHaptics();
   const wasCompleted = useRef(task.completed);
   const taskLabel = task.text.trim() || 'untitled task';
 
   useEffect(() => {
     if (task.completed) {
       if (!wasCompleted.current) {
-        setRippleKey((key) => key + 1);
-        // Fire haptic when checking off
         if (window.navigator && window.navigator.vibrate) {
             window.navigator.vibrate(10);
         }
@@ -105,30 +101,9 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
   }, [task.completed]);
 
   return (
-    <div className="relative overflow-hidden rounded-2xl mb-1 group/row">
-      <div className="absolute inset-0 flex items-center justify-end bg-clay/10 px-5 rounded-2xl">
-        <Trash size={18} weight="fill" className={`text-clay transition-transform duration-300 ${isSwipingToDelete ? 'scale-125' : 'group-hover/row:scale-110'}`} />
-      </div>
-      <motion.div
-        drag="x"
-        dragConstraints={{ left: -100, right: 0 }}
-        dragElastic={0.4}
-        onDrag={(e, info) => {
-          if (info.offset.x < -60 && !isSwipingToDelete) {
-             setIsSwipingToDelete(true);
-             haptics.impactMedium();
-          } else if (info.offset.x >= -60 && isSwipingToDelete) {
-             setIsSwipingToDelete(false);
-          }
-        }}
-        onDragEnd={(e, { offset, velocity }) => {
-          setIsSwipingToDelete(false);
-          if (offset.x < -60 || velocity.x < -500) {
-            removeTask(task.id);
-          }
-        }}
-        layout="position"
-        className={`group relative z-10 flex items-center gap-3 rounded-2xl p-3 bg-surface transition-colors duration-300 hover:bg-green/5 dark:hover:bg-white/5 ${task.completed ? 'opacity-60' : ''}`}
+    <div className="relative mb-1 rounded-2xl">
+      <div
+        className={`group relative z-10 flex items-center gap-3 rounded-2xl bg-surface p-3 transition-colors duration-200 hover:bg-green/5 dark:hover:bg-white/5 ${task.completed ? 'opacity-60' : ''}`}
       >
 
 
@@ -173,7 +148,7 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
       >
         <Trash size={16} />
       </button>
-      </motion.div>
+      </div>
     </div>
   );
 };
@@ -409,15 +384,15 @@ export const CreateNote: React.FC = () => {
   if (showEntryExperience) {
     return (
       <div className="relative flex min-h-[100dvh] flex-1 items-center justify-center overflow-hidden bg-body px-6 text-center">
-        <div
-          className="relative z-10 flex max-w-md flex-col items-center animate-fade-in-up"
-        >
-          <div className="mb-8 h-48 w-48 max-w-full" aria-hidden="true">
-            <Lottie animationData={trailLoadingAnimation} autoplay loop />
+        <div className="relative z-10 flex max-w-md flex-col items-center">
+          <div className="mb-6 h-40 w-40 max-w-full opacity-80 sm:h-44 sm:w-44" aria-hidden="true">
+            <Suspense fallback={<div className="h-full w-full rounded-full bg-green/5" />}>
+              <TrailLoadingMark />
+            </Suspense>
           </div>
 
-          <h2 className="h2-section mb-4">Making sense of the swirl.</h2>
-          <p className="body-editorial max-w-sm">Give the page a second to catch up.</p>
+          <h2 className="h2-section mb-4">Opening the page.</h2>
+          <p className="body-editorial max-w-sm">Your writing space is almost ready.</p>
         </div>
       </div>
     );
@@ -459,7 +434,7 @@ export const CreateNote: React.FC = () => {
 
       {/* â”€â”€ Desktop Sidebar â”€â”€ */}
       {!isMobile && (
-        <aside className={`${getSurfacePanelForMood(mood)} flex flex-col min-h-0 z-40 transition-[width,opacity,transform,border] duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] border-r border-green/15 ${isFocusModeActive ? 'w-0 opacity-0 -translate-x-full overflow-hidden border-r-0' : 'w-60 shrink-0 opacity-100 translate-x-0'}`}>
+        <aside className={`${getSurfacePanelForMood(mood)} flex flex-col min-h-0 z-40 transition-[opacity,transform,border-color] duration-300 ease-out-expo border-r border-green/15 ${isFocusModeActive ? 'w-0 pointer-events-none opacity-0 -translate-x-4 overflow-hidden border-r-0' : 'w-60 shrink-0 opacity-100 translate-x-0'}`}>
           <div className="pt-8 px-6 pb-6 flex-1 overflow-y-auto custom-scrollbar space-y-4">
             
             {/* Desktop Back Button */}
@@ -523,14 +498,14 @@ export const CreateNote: React.FC = () => {
       {/* Main Canvas */}
       <section
         aria-labelledby="create-note-heading"
-        className="relative flex-1 w-full pb-40 px-6 sm:px-12 md:px-16 lg:px-24 transition-[padding] duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] pt-[var(--native-page-top-padding)]"
+        className="relative flex-1 w-full pb-40 px-6 sm:px-12 md:px-16 lg:px-24 pt-[var(--native-page-top-padding)]"
       >
         <h1 id="create-note-heading" className="sr-only">New reflection</h1>
-        <div className={`editor-writing-measure transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isFocusModeActive ? 'mx-auto scale-[1.02]' : 'mr-auto lg:ml-12 xl:ml-24 scale-100'}`}>
+        <div className={`editor-writing-measure transition-transform duration-300 ease-out-expo ${isFocusModeActive ? 'mx-auto scale-[1.01]' : 'mr-auto lg:ml-12 xl:ml-24 scale-100'}`}>
           
           {/* Cover Image */}
           {imagePreview && (
-            <div className="surface-flat group relative mb-12 w-full aspect-[21/9] overflow-hidden rounded-[2rem] animate-fade-in-up">
+            <div className="surface-flat group relative mb-12 w-full aspect-[21/9] overflow-hidden rounded-[2rem]">
               <img src={imagePreview} alt="" aria-hidden="true" className="w-full h-full object-cover" />
               <button
                 onClick={() => setImagePreview(null)}
@@ -642,40 +617,35 @@ export const CreateNote: React.FC = () => {
 
         {/* Interchangeable Action FAB (Spark / Save) */}
           {!hasContent ? (
-            <Magnetic key="spark-mag" strength={20}>
-              <button
-                key="spark-fab"
-                onClick={cycleSparkPrompt}
-                className="surface-floating group relative flex h-16 w-16 items-center justify-center rounded-full text-green transition-transform hover:scale-105 active:scale-95"
-                aria-label="Show another writing prompt"
-              >
-                <div className="absolute inset-2 rounded-full bg-green/5 group-hover:bg-green/10 transition-colors" />
-                <Target size={28} weight="fill" />
-              </button>
-            </Magnetic>
+            <button
+              key="spark-fab"
+              onClick={cycleSparkPrompt}
+              className="surface-floating group relative flex h-16 w-16 items-center justify-center rounded-full text-green transition-transform hover:scale-[1.02] active:scale-[0.98]"
+              aria-label="Show another writing prompt"
+            >
+              <div className="absolute inset-2 rounded-full bg-green/5 group-hover:bg-green/10 transition-colors" />
+              <Target size={28} weight="fill" />
+            </button>
           ) : (
-            <Magnetic key="save-mag" strength={20}>
-              <button
-                key="save-fab"
-                onClick={() => {
-                  setReleaseError(null);
-                  setIsSaveChoiceOpen(true);
-                }}
-                disabled={saving || isReleasing}
-                className="group relative h-16 w-16 rounded-full bg-green text-white shadow-2xl shadow-green/40 flex items-center justify-center transition-transform hover:scale-105 active:scale-95 disabled:opacity-90"
-                aria-label="Choose what to do with this reflection"
-              >
-                {/* Breathing Pulse Effect during save */}
-                {(saving || isReleasing) && (
-                  <div
-                    className="absolute inset-0 rounded-full bg-green pointer-events-none animate-ping opacity-40"
-                  />
-                )}
-                
-                <div className="absolute inset-2 rounded-full bg-white/12 group-hover:scale-110 transition-transform duration-500 ease-out" />
-                {saving || isReleasing ? <CircleNotch size={28} className="relative z-10 animate-spin" /> : <FloppyDisk size={26} weight="fill" className="relative z-10" />}
-              </button>
-            </Magnetic>
+            <button
+              key="save-fab"
+              onClick={() => {
+                setReleaseError(null);
+                setIsSaveChoiceOpen(true);
+              }}
+              disabled={saving || isReleasing}
+              className="group relative h-16 w-16 rounded-full bg-green text-white shadow-xl shadow-green/25 flex items-center justify-center transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-90"
+              aria-label="Choose what to do with this reflection"
+            >
+              {(saving || isReleasing) && (
+                <div
+                  className="absolute inset-0 rounded-full bg-green pointer-events-none animate-ping opacity-25"
+                />
+              )}
+              
+              <div className="absolute inset-2 rounded-full bg-white/12 transition-transform duration-300 ease-out group-hover:scale-105" />
+              {saving || isReleasing ? <CircleNotch size={28} className="relative z-10 animate-spin" /> : <FloppyDisk size={26} weight="fill" className="relative z-10" />}
+            </button>
           )}
       </div>
 
@@ -951,8 +921,16 @@ export const CreateNote: React.FC = () => {
         confirmLabel="Leave without saving"
         cancelLabel="Keep writing"
       />
-      <CompanionObservation isVisible={showObservation} text={observationText || ""} onComplete={() => { setShowObservation(false); navigateWithBypass(RoutePath.DASHBOARD, { state: { fromSave: true } }); }} />
-      <PaperPlaneToast isVisible={showPlane} onAnimationComplete={() => {}} />
+      {showObservation ? (
+        <Suspense fallback={null}>
+          <CompanionObservation isVisible text={observationText || ""} onComplete={() => { setShowObservation(false); navigateWithBypass(RoutePath.DASHBOARD, { state: { fromSave: true } }); }} />
+        </Suspense>
+      ) : null}
+      {showPlane ? (
+        <Suspense fallback={null}>
+          <PaperPlaneToast isVisible onAnimationComplete={() => {}} />
+        </Suspense>
+      ) : null}
     </div>
   );
 };

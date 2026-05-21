@@ -145,4 +145,20 @@ describe('signed-in mobile navigation contract', () => {
     expect(lifeWiki).toContain('onClick={() => navigate(RoutePath.INSIGHTS)}');
     expect(lifeWiki).toContain('onClick={() => navigate(RoutePath.SANCTUARY)}');
   });
+
+  it('keeps audited mobile refresh actions labelled and 44px touch-safe', () => {
+    const home = read('pages/dashboard/HomeAuthenticated.tsx');
+    const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
+    const homeRefreshButton = home.slice(
+      home.indexOf('aria-label="Refresh today\'s reflection prompt"') - 260,
+      home.indexOf('aria-label="Refresh today\'s reflection prompt"') + 80,
+    );
+    const lifeWikiRefreshButton = lifeWiki.slice(
+      lifeWiki.indexOf('aria-label="Refresh Life Wiki with AI"') - 260,
+      lifeWiki.indexOf('aria-label="Refresh Life Wiki with AI"') + 80,
+    );
+
+    expect(homeRefreshButton).toContain('h-11 min-w-11');
+    expect(lifeWikiRefreshButton).toContain('min-h-11 min-w-11');
+  });
 });

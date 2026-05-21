@@ -55,7 +55,7 @@ describe('core app typography and layout contract', () => {
 
     expect(audioCss).toContain('@media (max-width: 640px)');
     expect(audioCss).toContain('position: fixed;');
-    expect(audioCss).toContain('bottom: calc(var(--mobile-bottom-nav-height, 5.75rem) + env(safe-area-inset-bottom) + 1.25rem);');
+    expect(audioCss).toContain('bottom: calc(var(--mobile-bottom-nav-height, 5.75rem) + env(safe-area-inset-bottom) + 5.25rem);');
     expect(audioCss).toContain('z-index: 30;');
     expect(audioCss).toContain('.floating-audio-container .audio-hint');
     expect(audioCss).toContain('display: none;');

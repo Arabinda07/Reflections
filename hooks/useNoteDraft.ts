@@ -71,6 +71,8 @@ const EMPTY_DRAFT_INPUT = {
   newAttachments: [] as File[],
 };
 
+const NOTE_DRAFT_READY_DELAY_MS = 450;
+
 /**
  * Hook that owns the full note draft lifecycle:
  * create → edit → snapshot → save → navigate.
@@ -161,26 +163,47 @@ export const useNoteDraft = (): NoteDraftState => {
 
   // Load existing note or check creation limits
   useEffect(() => {
-    const fetchNote = async () => {
+    let blankDraftReadyTimer: number | undefined;
+
+    const openBlankDraftAfterMinimumDelay = () => {
+      blankDraftReadyTimer = window.setTimeout(() => {
+        if (!isUnmountedRef.current) setLoading(false);
+      }, NOTE_DRAFT_READY_DELAY_MS);
+    };
+
+    const loadNewDraftAccess = async () => {
       try {
         const access = await profileService.getWellnessAccess();
         if (!isUnmountedRef.current) {
           setSmartModeEnabled(access.smartModeEnabled);
         }
 
+        const allNotes = await noteService.getAll();
+        const usage = getMonthlyNoteUsage(allNotes, access);
+        if (!isUnmountedRef.current) {
+          setCanCreateNote(usage.canCreateNote);
+        }
+      } catch (error) {
+        console.warn('[useNoteDraft] Could not verify note limits for new draft:', error);
+        if (!isUnmountedRef.current) {
+          setCanCreateNote(true);
+          setSmartModeEnabled(false);
+        }
+      }
+    };
+
+    const fetchNote = async () => {
+      try {
         if (!id) {
           setBaselineSnapshot(buildCreateNoteDraftSnapshot(EMPTY_DRAFT_INPUT));
-          setTimeout(() => {
-            if (!isUnmountedRef.current) setLoading(false);
-          }, 1200);
-
-          // Check note limit for new notes
-          const allNotes = await noteService.getAll();
-          const usage = getMonthlyNoteUsage(allNotes, access);
-          if (!isUnmountedRef.current) {
-            setCanCreateNote(usage.canCreateNote);
-          }
+          openBlankDraftAfterMinimumDelay();
+          await loadNewDraftAccess();
           return;
+        }
+
+        const access = await profileService.getWellnessAccess();
+        if (!isUnmountedRef.current) {
+          setSmartModeEnabled(access.smartModeEnabled);
         }
 
         const note = await noteService.getById(id);
@@ -203,9 +226,9 @@ export const useNoteDraft = (): NoteDraftState => {
           setImagePreview(note.thumbnailUrl || null);
           setExistingAttachments(note.attachments || []);
           setBaselineSnapshot(initialSnapshot);
-          setTimeout(() => {
+          window.setTimeout(() => {
             if (!isUnmountedRef.current) setLoading(false);
-          }, 1200);
+          }, NOTE_DRAFT_READY_DELAY_MS);
         } else {
           navigate(RoutePath.DASHBOARD);
         }
@@ -214,6 +237,12 @@ export const useNoteDraft = (): NoteDraftState => {
       }
     };
     fetchNote();
+
+    return () => {
+      if (blankDraftReadyTimer) {
+        window.clearTimeout(blankDraftReadyTimer);
+      }
+    };
   }, [id, navigate]);
 
   const addFiles = useCallback((files: File[]) => {

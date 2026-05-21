@@ -27,6 +27,7 @@ describe('remaining roadmap contract', () => {
 
   it('keeps intentional loading and feedback surfaces on the current lottie path', () => {
     const createNote = read('pages/dashboard/CreateNote.tsx');
+    const trailLoadingMark = read('components/ui/TrailLoadingMark.tsx');
     const loadingState = read('components/ui/LoadingState.tsx');
     const paperPlaneToast = read('components/ui/PaperPlaneToast.tsx');
     const companionObservation = read('components/ui/CompanionObservation.tsx');
@@ -34,8 +35,9 @@ describe('remaining roadmap contract', () => {
     const myNotes = read('pages/dashboard/MyNotes.tsx');
     const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
 
-    expect(createNote).toContain("import Lottie from 'lottie-react'");
-    expect(createNote).toContain("from '@/src/lottie/trail-loading.json'");
+    expect(createNote).toContain("import('../../components/ui/TrailLoadingMark')");
+    expect(createNote).not.toContain("import Lottie from 'lottie-react'");
+    expect(trailLoadingMark).toContain("from '@/src/lottie/trail-loading.json'");
 
     expect(loadingState).toContain("from './OverlayFeedback'");
     expect(loadingState).toContain('<Lottie');

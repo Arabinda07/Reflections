@@ -77,7 +77,7 @@ describe('impeccable audit follow-up contract', () => {
     expect(landing).not.toContain('secondaryCtaClassName');
     expect(landing).not.toContain('landing-secondary-cta');
     expect(landing).toContain('flex min-w-0 items-center gap-x-8 sm:gap-x-10');
-    expect(landing).toContain('text-gray-nav transition-all duration-300 ease-out-expo hover:-translate-y-px hover:text-green');
+    expect(landing).toContain('text-gray-nav transition-[color,transform] duration-200 ease-out-expo hover:-translate-y-px hover:text-green');
     expect(landing).not.toContain('text-white lg:text-gray-text');
     expect(landing).not.toContain('hover:text-white lg:hover:text-gray-text');
     expect(landing).toContain('surface-floating surface-floating--media');

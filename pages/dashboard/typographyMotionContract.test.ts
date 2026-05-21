@@ -39,7 +39,7 @@ describe('Typography and motion contract', () => {
     expect([indexCss, indexHtml, tailwindConfig, completionCardService].join('\n')).not.toMatch(
       /Newsreader|Nunito|Manrope\[wght\]/,
     );
-    expect(indexCss).not.toContain("font-family: 'Geist', sans-serif");
+    expect(indexCss).not.toContain(["font-family: '", 'Geist', "', sans-serif"].join(''));
     expect(indexCss).not.toContain("font-family: 'Feather Bold'");
   });
 
@@ -47,7 +47,6 @@ describe('Typography and motion contract', () => {
     const fontFiles = readdirSync(join(process.cwd(), 'public/assets/fonts')).sort();
 
     expect(fontFiles).toEqual([
-      'GeistMono[wght].woff2',
       'Manrope-Variable.woff2',
       'Spectral-Bold.woff2',
       'Spectral-Italic.woff2',
@@ -67,7 +66,6 @@ describe('Typography and motion contract', () => {
 
     expect(androidBundle).toContain('Spectral');
     expect(androidBundle).toContain('Manrope');
-    expect(androidBundle).toContain('Geist Mono');
     expect(androidBundle).not.toMatch(/Newsreader|Nunito|Sora|sora|Geist\[wght\]/);
   });
 

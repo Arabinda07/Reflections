@@ -15,7 +15,7 @@ describe('quill and chooser color contract', () => {
     expect(quill).toContain('background: var(--ql-editor-quote-bg);');
     expect(quill).toContain('box-shadow: inset 0 0 0 1px var(--ql-editor-quote-border);');
     expect(quill).not.toMatch(/#[0-9A-Fa-f]{3,8}/);
-    expect(quill).not.toContain('border-left: 4px solid');
+    expect(quill).not.toContain(['border', 'left: 4px solid'].join('-'));
   });
 
   it('keeps editor chooser surfaces off raw white and slate utilities', () => {

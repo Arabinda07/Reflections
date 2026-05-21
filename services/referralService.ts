@@ -9,15 +9,16 @@ interface ReferralStorage {
 }
 
 const REFERRAL_CODE_STORAGE_KEY = 'reflections.referral_code';
+const REFERRAL_CODE_MAX_LENGTH = 80;
 
 const getBrowserStorage = (): ReferralStorage | undefined => {
   if (typeof window === 'undefined') return undefined;
   return window.localStorage;
 };
 
-const normalizeReferralCode = (code: string | null) => {
-  if (!code) return null;
-  const normalized = code.trim().slice(0, 80);
+const normalizeReferralCode = (code: string | null | undefined) => {
+  if (typeof code !== 'string') return null;
+  const normalized = code.trim().slice(0, REFERRAL_CODE_MAX_LENGTH);
   return /^[A-Za-z0-9_-]+$/.test(normalized) ? normalized : null;
 };
 
@@ -27,11 +28,13 @@ const generateReferralCode = (userId: string) => {
 };
 
 export const buildReferralLink = (
-  code: string,
+  code: string | null | undefined,
   origin = typeof window !== 'undefined' ? window.location.origin : '',
   pathname = typeof window !== 'undefined' ? window.location.pathname : '/',
 ) => {
-  const normalizedCode = normalizeReferralCode(code) || code.trim();
+  const normalizedCode = normalizeReferralCode(code);
+  if (!normalizedCode) return '';
+
   const safePath = pathname.endsWith('/') ? pathname : `${pathname}/`;
   return `${origin}${safePath}#/signup?ref=${encodeURIComponent(normalizedCode)}`;
 };

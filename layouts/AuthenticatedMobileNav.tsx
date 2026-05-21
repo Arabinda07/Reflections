@@ -134,6 +134,10 @@ const neutralIconTileClass =
 const signOutIconTileClass =
   'auth-mobile-more-icon-tile auth-mobile-more-icon-tile--danger flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.8rem] bg-clay/10 text-clay';
 
+const prefetchCreateNoteRoute = () => {
+  void import('@/pages/dashboard/CreateNote');
+};
+
 export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
   onBugReport,
   onInvite,
@@ -211,6 +215,8 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
               <Link
                 key={tab.label}
                 to={tab.path ?? RoutePath.DASHBOARD}
+                onPointerEnter={tab.path === RoutePath.CREATE_NOTE ? prefetchCreateNoteRoute : undefined}
+                onFocus={tab.path === RoutePath.CREATE_NOTE ? prefetchCreateNoteRoute : undefined}
                 className={tabClass}
                 data-active={isActive ? 'true' : undefined}
                 aria-current={isActive ? 'page' : undefined}

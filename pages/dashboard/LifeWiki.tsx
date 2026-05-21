@@ -672,7 +672,8 @@ export const LifeWiki: React.FC = () => {
                 type="button"
                 onClick={handleRefreshWiki}
                 disabled={isRefreshingWiki || !gate?.canGenerate}
-                className="flex min-h-11 items-center justify-center gap-2 rounded-full border border-green/20 bg-green/5 px-4 py-2 label-caps text-green transition-colors hover:border-green/40 hover:bg-green/10 disabled:opacity-50"
+                className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full border border-green/20 bg-green/5 px-3 py-2 label-caps text-green transition-colors hover:border-green/40 hover:bg-green/10 disabled:opacity-50 sm:px-4"
+                aria-label="Refresh Life Wiki with AI"
               >
                 <Sparkle size={16} weight="fill" />
                 <span className="hidden sm:inline">Refresh with AI</span>
