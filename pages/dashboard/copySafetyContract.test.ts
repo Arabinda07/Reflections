@@ -9,9 +9,14 @@ describe('voice refresh copy safety', () => {
   it('keeps landing and privacy copy out of the voice refresh', () => {
     const landing = read('pages/dashboard/Landing.tsx');
     const privacy = read('pages/dashboard/PrivacyPolicy.tsx');
+    const publicSeoCopy = read('src/config/publicSeoCopy.js');
 
-    expect(landing).toContain('Your mind beautifully organized');
-    expect(landing).toContain('A private journal. Write what');
+    expect(landing).toContain('HOME_SEO.heroAriaLabel');
+    expect(landing).toContain('HOME_SEO.heroIntro');
+    expect(publicSeoCopy).toContain('Your mind');
+    expect(publicSeoCopy).toContain('beautifully');
+    expect(publicSeoCopy).toContain('organized');
+    expect(publicSeoCopy).toContain('A private journal. Write what');
     expect(privacy).toContain('What Reflections keeps');
     expect(privacy).toContain('AI and Smart Mode');
   });

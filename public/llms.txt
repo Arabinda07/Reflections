@@ -1,17 +1,17 @@
 # Reflections
 
-> A private, writing-first wellness journal. No streaks, no pressure, no automatic AI.
+> Private journal for writing and mood notes. AI stays optional and writing comes first.
 
 ## What it is
-Reflections is a journaling app where users write notes, name their mood, tag patterns, and optionally use AI to receive reflections or refresh their Life Wiki.
+Reflections is a private journal where users write notes, name moods, add tags, and notice patterns over time. AI support runs only when the user chooses it or turns on Smart Mode.
 
 ## Who it's for
-People who want a calm place to think in writing — without gamification, public sharing, or AI that runs without being asked.
+People who want a quiet place to think in writing, without streaks, public sharing, or AI that runs without being asked.
 
 ## Key features
 - Private rich-text journal with mood tracking, tags, tasks, and attachments
-- Life Wiki: AI-generated pages that grow from saved writing when the user asks
-- AI Reflections for moments when users want another lens on a note
+- Life Wiki: AI-supported pages that grow from saved writing when the user asks
+- AI reflections for moments when users want another lens on a note
 - Ambient soundscapes, whisper-to-text, focus mode, breathing exercises
 - Future Letters: write to your future self
 - Available as web app, PWA, and Android APK

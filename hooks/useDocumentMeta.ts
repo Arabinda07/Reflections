@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import { buildPublicCanonicalUrl } from '../src/config/publicSite.js';
+import { PUBLIC_SEO_DEFAULT } from '../src/config/publicSeoCopy.js';
 
-const DEFAULT_TITLE = 'Reflections – A Calm Space to Write and Reflect';
-const DEFAULT_DESCRIPTION =
-  'A private journal for writing notes, naming moods, and noticing patterns. Reflections stays out of the way until you need it.';
+const DEFAULT_TITLE = PUBLIC_SEO_DEFAULT.title;
+const DEFAULT_DESCRIPTION = PUBLIC_SEO_DEFAULT.description;
 
 interface DocumentMeta {
   title: string;

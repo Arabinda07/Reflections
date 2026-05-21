@@ -1,4 +1,6 @@
-# Pricing — Reflections
+# Pricing - Reflections
+
+Reflections is a private journal for writing notes, naming moods, and noticing patterns. AI support stays optional.
 
 ## Free
 

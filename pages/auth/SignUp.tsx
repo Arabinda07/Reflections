@@ -16,6 +16,7 @@ import { Surface } from '@/components/ui/Surface';
 import { RoutePath } from '@/types';
 import { useAuthStore } from '@/hooks/useAuthStore';
 import { useDocumentMeta } from '@/hooks/useDocumentMeta';
+import { PUBLIC_SEO_DEFAULT } from '@/src/config/publicSeoCopy.js';
 import { supabase } from '@/src/supabaseClient';
 import { getPublicHomePath } from '@/src/utils/authHints';
 import {
@@ -36,7 +37,7 @@ import { commitAuthSession } from '@/src/auth/sessionUser';
 
 export const SignUp: React.FC = () => {
   useDocumentMeta({
-    title: 'Reflections – A Calm Space to Write and Reflect',
+    title: PUBLIC_SEO_DEFAULT.title,
     description: 'Create an account to start your private journal and reflection practice.',
     path: RoutePath.SIGNUP,
   });

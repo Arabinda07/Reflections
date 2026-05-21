@@ -75,19 +75,22 @@ describe('SEO crawlability contract', () => {
   it('generates static HTML snapshots for public pages after build', () => {
     const pkg = JSON.parse(read('package.json')) as { scripts: Record<string, string> };
     const generator = read('scripts/generate-public-seo-pages.mjs');
+    const copySource = read('src/config/publicSeoCopy.js');
 
     expect(pkg.scripts.postbuild).toBe('node scripts/generate-public-seo-pages.mjs');
-    expect(generator).toContain("path: '/'");
-    expect(generator).toContain("path: '/faq'");
-    expect(generator).toContain("path: '/privacy'");
-    expect(generator).toContain("path: '/about'");
+    expect(generator).toContain('PUBLIC_SEO_PAGES');
+    expect(copySource).toContain("path: '/'");
+    expect(copySource).toContain("path: '/faq'");
+    expect(copySource).toContain("path: '/privacy'");
+    expect(copySource).toContain("path: '/about'");
     expect(generator).toContain('<meta name="robots" content="index, follow" />');
     expect(generator).toContain('renderStaticLandingShell');
-    expect(generator).toContain('<main id="public-seo-content" data-seo-snapshot="true" class="sr-only"');
-    expect(generator).toContain('Private journal for notes, mood, and reflection');
-    expect(generator).toContain('FAQ about private journaling');
-    expect(generator).toContain('Privacy for your private journal');
-    expect(generator).toContain('About Reflections and Arabinda');
+    expect(generator).toContain('<main id="public-seo-content" data-seo-snapshot="true">');
+    expect(generator).not.toContain('class="sr-only"');
+    expect(copySource).toContain('Reflections - Private Journal for Writing and Mood Notes');
+    expect(copySource).toContain('Reflections FAQ - Journaling, AI, Privacy, and Pricing');
+    expect(copySource).toContain('Reflections Privacy - Notes, AI, Payments, and Deletion');
+    expect(copySource).toContain('About Reflections - A Private Journal by Arabinda');
   });
 
   it('keeps landing-only hero preloads out of non-home SEO snapshots', () => {
@@ -164,6 +167,7 @@ describe('SEO crawlability contract', () => {
 
     expect(llms).toContain('Reflections');
     expect(llms).toContain('journal');
+    expect(llms).toContain('AI stays optional and writing comes first');
     expect(llms).toContain(`${CANONICAL_PUBLIC_ORIGIN}/`);
     expect(llms).not.toContain(FALLBACK_PUBLIC_ORIGIN);
     expect(llms).toContain('Pricing');
@@ -225,14 +229,15 @@ describe('SEO crawlability contract', () => {
 
   it('sets per-page document meta via useDocumentMeta on every public page', () => {
     for (const [file, path] of [
-      ['pages/dashboard/Landing.tsx', '/'],
-      ['pages/dashboard/FAQ.tsx', '/faq'],
-      ['pages/dashboard/PrivacyPolicy.tsx', '/privacy'],
-      ['pages/dashboard/AboutArabinda.tsx', '/about'],
+      ['pages/dashboard/Landing.tsx', 'HOME_SEO.path'],
+      ['pages/dashboard/FAQ.tsx', 'FAQ_SEO.path'],
+      ['pages/dashboard/PrivacyPolicy.tsx', 'PRIVACY_SEO.path'],
+      ['pages/dashboard/AboutArabinda.tsx', 'ABOUT_SEO.path'],
     ] as const) {
       const source = read(file);
       expect(source).toContain('useDocumentMeta');
-      expect(source).toContain(`path: '${path}'`);
+      expect(source).toContain('PUBLIC_SEO_COPY');
+      expect(source).toContain(`path: ${path}`);
     }
   });
 
@@ -265,8 +270,10 @@ describe('SEO crawlability contract', () => {
   it('keeps FAQ guide sections with key product questions for AI extractability', () => {
     const faq = read('pages/dashboard/FAQ.tsx');
     const privacy = read('pages/dashboard/PrivacyPolicy.tsx');
+    const copySource = read('src/config/publicSeoCopy.js');
 
-    expect(faq).toContain('What is Reflections?');
+    expect(faq).toContain('FAQ_SEO.sections[0].title');
+    expect(copySource).toContain('What is Reflections?');
     expect(faq).toContain('Life Wiki');
     expect(faq).toContain('Plans and billing');
     expect(faq).toContain('₹49/week');
@@ -288,17 +295,49 @@ describe('SEO crawlability contract', () => {
   it('places FAQPage schema on /faq snapshot only, not in the global shell', () => {
     const html = read('index.html');
     const generator = read('scripts/generate-public-seo-pages.mjs');
+    const copySource = read('src/config/publicSeoCopy.js');
 
     expect(html).not.toContain('"FAQPage"');
-    expect(generator).toContain('"FAQPage"');
-    expect(generator).toContain('extraSchema');
+    expect(generator).toContain('FAQPage');
+    expect(generator).toContain('buildExtraSchema');
+    expect(copySource).toContain('faqSchema');
   });
 
   it('places Article schema on /about snapshot only', () => {
     const generator = read('scripts/generate-public-seo-pages.mjs');
+    const copySource = read('src/config/publicSeoCopy.js');
 
-    expect(generator).toContain('"Article"');
-    expect(generator).toContain('"Arabinda"');
-    expect(generator).toContain('"datePublished"');
+    expect(generator).toContain('Article');
+    expect(copySource).toContain('Arabinda');
+    expect(generator).toContain('datePublished');
+  });
+
+  it('keeps public SEO surfaces out of stale AI-ish positioning', () => {
+    const publicSeoSurfaces = [
+      read('index.html'),
+      read('metadata.json'),
+      read('public/llms.txt'),
+      read('public/pricing.md'),
+      read('src/config/publicSeoCopy.js'),
+      read('scripts/generate-public-seo-pages.mjs'),
+      read('pages/dashboard/Landing.tsx'),
+      read('pages/dashboard/FAQ.tsx'),
+      read('pages/dashboard/PrivacyPolicy.tsx'),
+      read('pages/dashboard/AboutArabinda.tsx'),
+    ].join('\n').toLowerCase();
+
+    for (const phrase of [
+      'ai-powered',
+      'mental health journaling',
+      'digital sanctuary',
+      'personal growth',
+      'mess before it has words',
+      'people in their 20s',
+      'feelings, but make them less loud',
+      'meta name="keywords"',
+      'class="sr-only"',
+    ]) {
+      expect(publicSeoSurfaces).not.toContain(phrase);
+    }
   });
 });

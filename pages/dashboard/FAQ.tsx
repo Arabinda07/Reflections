@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { PublicPageIcon, type PublicPageIconName } from '../../components/ui/PublicPageIcon';
 import { useDocumentMeta } from '../../hooks/useDocumentMeta';
+import { PUBLIC_SEO_COPY } from '../../src/config/publicSeoCopy.js';
 
 type PublicIconCard = {
   icon: PublicPageIconName;
@@ -9,18 +10,19 @@ type PublicIconCard = {
   label?: string;
 };
 
+const FAQ_SEO = PUBLIC_SEO_COPY.faq;
+
 const guideSections: PublicIconCard[] = [
   {
     icon: 'book',
-    title: 'What is Reflections?',
-    body:
-      'A private place for the mess before it has words. You save notes, name moods, tag patterns, and come back when your brain has cooled down a little.',
+    title: FAQ_SEO.sections[0].title,
+    body: FAQ_SEO.sections[0].body,
   },
   {
     icon: 'heart',
     title: 'Who is Reflections for?',
     body:
-      'For people in their 20s and 30s who need one calm tab for the thing they keep replaying. You set the pace, keep your notes private, and choose when AI gets invited.',
+      'For anyone who wants a private place to write, check in with moods, and return to thoughts without scores, streaks, or public sharing.',
   },
   {
     icon: 'pen',
@@ -53,7 +55,7 @@ const practiceItems: PublicIconCard[] = [
   },
   {
     title: 'Naming the feeling',
-    body: "Check in with your mood. Feelings, but make them less loud.",
+    body: 'Check in with your mood so entries can show simple patterns over time.',
     icon: 'heart',
   },
 ];
@@ -103,9 +105,9 @@ const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
 
 export const FAQ: React.FC = () => {
   useDocumentMeta({
-    title: 'FAQ – How Reflections Works | Private Journaling App',
-    description: 'How Reflections works: the writing practice, mood check-ins, AI that waits for you, Life Wiki, and the design choices behind each feature.',
-    path: '/faq',
+    title: FAQ_SEO.title,
+    description: FAQ_SEO.description,
+    path: FAQ_SEO.path,
   });
 
   useEffect(() => {
@@ -117,16 +119,14 @@ export const FAQ: React.FC = () => {
       <section className="mx-auto grid w-full max-w-[1440px] gap-12 px-6 py-20 sm:px-10 lg:grid-cols-12 lg:items-end lg:px-16 lg:py-28">
         <div className="lg:col-span-8">
           <h1 className="text-mk-display font-display font-extrabold leading-[0.95] tracking-normal text-gray-text text-balance">
-            Untangle your <br />
-            <span className="font-serif italic font-normal text-green">thoughts</span>
+            {FAQ_SEO.h1}
           </h1>
         </div>
 
         <div className="space-y-4 lg:col-span-4">
 
           <p className="max-w-[36rem] font-serif text-[18px] leading-relaxed text-gray-light">
-            Reflections is a calm, private writing space for the thoughts that keep doing laps.
-            This guide explains what the product does, how AI waits, and what stays yours.
+            {FAQ_SEO.intro}
           </p>
           <p className="text-[12px] font-bold uppercase tracking-widest text-gray-nav">Last updated · May 2026</p>
         </div>

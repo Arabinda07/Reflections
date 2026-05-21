@@ -77,13 +77,17 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
 
   it('keeps the landing page in its full-bleed hero form', () => {
     const landing = read('pages/dashboard/Landing.tsx');
+    const publicSeoCopy = read('src/config/publicSeoCopy.js');
     const tailwind = read('tailwind.config.js');
 
     expect(landing).not.toContain('usePWAInstall');
     expect(landing).not.toContain('Install app');
-    expect(landing).toContain('Your mind');
-    expect(landing).toContain('beautifully');
-    expect(landing).toContain('organized');
+    expect(landing).toContain('HOME_SEO.heroLines[0]');
+    expect(landing).toContain('HOME_SEO.heroLines[1]');
+    expect(landing).toContain('HOME_SEO.heroLines[2]');
+    expect(publicSeoCopy).toContain('Your mind');
+    expect(publicSeoCopy).toContain('beautifully');
+    expect(publicSeoCopy).toContain('organized');
     expect(landing).not.toContain('organized.');
     expect(landing).toContain('font-sans text-base font-normal');
     expect(tailwind).toContain("editor: ['var(--font-editor)']");
@@ -111,17 +115,23 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
 
   it('keeps the FAQ in its prior guide and feature-grid structure', () => {
     const faq = read('pages/dashboard/FAQ.tsx');
+    const publicSeoCopy = read('src/config/publicSeoCopy.js');
 
-    expect(faq).toContain('Untangle your');
-    expect(faq).toContain('thoughts</span>');
+    expect(faq).toContain('FAQ_SEO.h1');
+    expect(faq).toContain('FAQ_SEO.intro');
     expect(faq).not.toContain('thoughts.</span>');
     expect(faq).toContain('const guideSections');
     expect(faq).toContain('const practiceItems');
     expect(faq).toContain('const detailItems');
     expect(faq).toContain('const featureGrid');
-    expect(faq).toContain('What is Reflections?');
+    expect(faq).toContain('FAQ_SEO.sections[0].title');
     expect(faq).toContain('Who is Reflections for?');
     expect(faq).toContain('Why writing first?');
+    expect(publicSeoCopy).toContain('What is Reflections?');
+    expect(publicSeoCopy).toContain('Reflections FAQ - Journaling, AI, Privacy, and Pricing');
+    expect(publicSeoCopy).toContain(
+      'Reflections is a private journal for writing notes, naming moods, adding tags, and noticing patterns over time.',
+    );
     expect(faq).toContain('robinsaha434@gmail.com');
     expect(faq).not.toContain('What does Reflections do?');
     expect(faq).not.toContain('No. Reflections is not therapy');
@@ -139,6 +149,7 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
 
     // FAQPage schema now lives in the /faq postbuild snapshot, not the global shell
     const generator = read('scripts/generate-public-seo-pages.mjs');
-    expect(generator).toContain('"FAQPage"');
+    expect(generator).toContain("page.faqSchema");
+    expect(generator).toContain("'@type': 'FAQPage'");
   });
 });

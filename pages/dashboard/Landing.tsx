@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDocumentMeta } from '../../hooks/useDocumentMeta';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { PUBLIC_SEO_COPY } from '../../src/config/publicSeoCopy.js';
 import { RoutePath } from '../../types';
 
 type TinyIconProps = {
@@ -71,11 +72,13 @@ const scheduleIdleTask = (callback: () => void, timeout = 2400) => {
   return () => window.clearTimeout(handle);
 };
 
+const HOME_SEO = PUBLIC_SEO_COPY.home;
+
 export const Landing: React.FC = () => {
   useDocumentMeta({
-    title: 'Reflections - Private Journal for Notes, Mood & Reflection',
-    description: 'A private journal for writing notes, naming moods, and noticing patterns. AI stays on demand unless you turn on Smart Mode. No streaks, no pressure.',
-    path: '/',
+    title: HOME_SEO.title,
+    description: HOME_SEO.description,
+    path: HOME_SEO.path,
   });
   const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -201,18 +204,18 @@ export const Landing: React.FC = () => {
         <div className="relative z-20 flex min-h-[100dvh] flex-col px-6 pb-[calc(env(safe-area-inset-bottom)+1.75rem)] pt-[calc(env(safe-area-inset-top)+var(--header-height)+1.5rem)] sm:px-12 sm:pt-[calc(env(safe-area-inset-top)+var(--header-height)+2rem)] lg:justify-between lg:pt-[28vh] lg:pb-12 lg:px-16 xl:px-24 pointer-events-none">
           <div className="flex flex-col gap-6 lg:w-[60%] lg:gap-8 xl:w-[55%]">
             <h1
-              aria-label="Your mind beautifully organized"
+              aria-label={HOME_SEO.heroAriaLabel}
               className="pointer-events-auto flex max-w-[11ch] flex-col text-mk-display font-display font-extrabold tracking-normal text-gray-text leading-[1.05] sm:leading-[1.0] lg:max-w-5xl lg:leading-[0.96]"
             >
-              <span>Your mind</span>
+              <span>{HOME_SEO.heroLines[0]}</span>
               <span className="font-serif italic font-normal text-green leading-[1.15]">
-                beautifully
+                {HOME_SEO.heroLines[1]}
               </span>
-              <span>organized</span>
+              <span>{HOME_SEO.heroLines[2]}</span>
             </h1>
 
             <p className="pointer-events-auto max-w-[26ch] sm:max-w-[32ch] lg:max-w-[40ch] font-sans text-base font-normal leading-relaxed text-gray-text/85 sm:text-lg">
-              A private journal. Write what's on your mind, notice the patterns, and keep it to yourself
+              {HOME_SEO.heroIntro}
             </p>
           </div>
 
@@ -223,7 +226,7 @@ export const Landing: React.FC = () => {
               className="group relative inline-flex h-14 min-w-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-control)] bg-green px-8 font-sans text-ui-base font-bold text-white shadow-[0_8px_20px_-12px_var(--green-shadow)] transition-[transform,box-shadow,background-color] duration-200 ease-out-expo hover:-translate-y-px hover:bg-green-hover hover:shadow-[0_10px_24px_-12px_var(--green-shadow)] active:translate-y-0 motion-reduce:transition-none sm:h-16 sm:px-10 sm:text-btn-lg sm:shadow-[0_10px_24px_-12px_var(--green-shadow)] sm:hover:shadow-[0_12px_28px_-12px_var(--green-shadow)]"
               aria-label="Begin writing"
             >
-              Begin writing
+              {HOME_SEO.ctaLabel}
               <ArrowRightIcon className="ml-2.5 h-[1.125rem] w-[1.125rem] text-white/80 transition-transform duration-500 ease-out-expo group-hover:translate-x-1.5 sm:ml-3 sm:h-5 sm:w-5" />
             </button>
 

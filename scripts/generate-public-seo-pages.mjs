@@ -6,6 +6,12 @@ import {
   CANONICAL_PUBLIC_ORIGIN,
 } from '../src/config/publicSite.js';
 import {
+  PUBLIC_APP_ROUTE_DESCRIPTION,
+  PUBLIC_APP_ROUTE_SOCIAL_DESCRIPTION,
+  PUBLIC_SEO_COPY,
+  PUBLIC_SEO_PAGES,
+} from '../src/config/publicSeoCopy.js';
+import {
   AUTH_HINT_STALE_STORAGE_KEY,
   AUTH_HINT_STALE_VALUE,
 } from '../src/config/authHintKeys.js';
@@ -14,110 +20,7 @@ const INDEX_FOLLOW_ROBOTS_META = '<meta name="robots" content="index, follow" />
 const NOINDEX_NOFOLLOW_ROBOTS_META = '<meta name="robots" content="noindex, nofollow" />';
 const distDir = new URL('../dist/', import.meta.url);
 
-const publicPages = [
-  {
-    path: '/',
-    title: 'Reflections - Private Journal for Notes, Mood & Reflection',
-    description:
-      'A private journal for writing notes, naming moods, and noticing patterns. AI stays on demand unless you turn on Smart Mode. No streaks, no pressure.',
-    h1: 'Private journal for notes, mood, and reflection',
-    intro:
-      'Write a few lines, name the mood if it helps, and return to patterns at your own pace.',
-    sections: [
-      ['Private writing', 'Your notes belong to your account and stay centered on your own words.'],
-      ['Mood and tags', 'Use moods and tags to notice patterns in ordinary language.'],
-      ['Optional AI support', 'Reflect with AI and Refresh with AI run on demand. Smart Mode can refresh the Life Wiki only if you turn it on.'],
-    ],
-  },
-  {
-    path: '/faq',
-    title: 'FAQ about private journaling | Reflections',
-    description:
-      'How Reflections works: the writing practice, mood check-ins, optional AI, Life Wiki, and the design choices behind each feature.',
-    h1: 'FAQ about private journaling',
-    intro:
-      'How Reflections works, what it stores, and how AI waits around private writing.',
-    sections: [
-      ['What is Reflections?', 'A private writing space for notes, moods, tags, and the thoughts that keep doing laps.'],
-      ['Does AI run automatically?', 'No. AI support runs when you ask for a reflection or Life Wiki refresh, or when you explicitly enable Smart Mode.'],
-      ['Is Reflections therapy?', 'No. Reflections is a personal writing tool, not professional mental health care.'],
-    ],
-    extraSchema: JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "What is Reflections?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Reflections is a journal built around writing. You save notes, name your mood, tag patterns, and can ask AI for a personal reflection when you want help noticing patterns." }
-        },
-        {
-          "@type": "Question",
-          "name": "Does AI run automatically?",
-          "acceptedAnswer": { "@type": "Answer", "text": "AI support runs when you explicitly press Reflect with AI or Refresh Insights, or when you turn on Smart Mode for Life Wiki refreshes after saves." }
-        },
-        {
-          "@type": "Question",
-          "name": "Is Reflections free?",
-          "acceptedAnswer": { "@type": "Answer", "text": "Yes. The free tier includes 30 notes per month, a limited AI reflection sample, and a limited Life Wiki refresh after enough writing. Pro adds weekly or monthly paid plans after a trial." }
-        },
-        {
-          "@type": "Question",
-          "name": "Is Reflections therapy?",
-          "acceptedAnswer": { "@type": "Answer", "text": "No. Reflections is a personal writing tool for noticing thoughts more clearly. It is not professional mental health care." }
-        },
-        {
-          "@type": "Question",
-          "name": "What is the Life Wiki?",
-          "acceptedAnswer": { "@type": "Answer", "text": "The Life Wiki is an AI-maintained personal knowledge base that grows from your writing, tracking mood patterns, recurring themes, and a timeline." }
-        },
-        {
-          "@type": "Question",
-          "name": "How is my data protected?",
-          "acceptedAnswer": { "@type": "Answer", "text": "All data is stored in Supabase with Row Level Security. Every query is scoped to your account. Read our Privacy page for the full picture." }
-        }
-      ]
-    }),
-  },
-  {
-    path: '/privacy',
-    title: 'Privacy for your private journal | Reflections',
-    description:
-      'What Reflections stores, when AI runs, how payments and analytics work, and how to export or delete your writing.',
-    h1: 'Privacy for your private journal',
-    intro:
-      'This page explains what Reflections stores, when AI is used, and how you can export or delete your writing.',
-    sections: [
-      ['What Reflections keeps', 'Account details, notes, moods, tags, attachments, future letters, and Life Wiki pages are tied to your account.'],
-      ['AI and Smart Mode', 'AI features use the relevant writing only when you choose an AI action or enable Smart Mode.'],
-      ['Export and deletion', 'You can export notes, delete individual notes, and remove saved app data from Account.'],
-    ],
-  },
-  {
-    path: '/about',
-    title: 'About Reflections and Arabinda | Private journal app',
-    description:
-      'A note from Arabinda about why Reflections is a personal writing app with mood notes, Life Wiki, and AI that stays out of the way.',
-    h1: 'About Reflections and Arabinda',
-    intro:
-      'Reflections began as a slower place to write, notice feelings, and leave without being pushed to perform.',
-    sections: [
-      ['Private writing', 'The product is built around writing that stays private and ordinary.'],
-      ['No pressure loops', 'Write at your own pace without streaks, scores, or public feeds.'],
-      ['AI should wait', 'AI support appears when invited, or when Smart Mode is explicitly enabled, and never acts like it knows you better than you do.'],
-    ],
-    extraSchema: JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "Article",
-      "headline": "About Reflections and Arabinda",
-      "author": { "@type": "Person", "name": "Arabinda" },
-      "datePublished": "2025-01-01",
-      "dateModified": "2026-05-02",
-      "publisher": { "@type": "Organization", "name": "Reflections", "url": `${CANONICAL_PUBLIC_ORIGIN}/` },
-      "description": "A note from Arabinda about why Reflections is a personal writing app with mood notes, Life Wiki, and AI that stays out of the way."
-    }),
-  },
-];
+const publicPages = PUBLIC_SEO_PAGES;
 
 const appShellRoutes = [
   { path: '/dashboard', title: 'Opening Reflections' },
@@ -169,13 +72,49 @@ const stripLandingHeroPreloads = (html) =>
     .replace(/\n\s*<link rel="preload" href="\/assets\/videos\/landing_video_mobile\.webp"[^>]*\/>/, '')
     .replace(/\n\s*<link rel="preload" href="\/assets\/videos\/landing_video\.webp"[^>]*\/>/, '');
 
+const buildExtraSchema = (page) => {
+  if (page.faqSchema) {
+    return JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: page.faqSchema.map((item) => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: item.answer,
+        },
+      })),
+    });
+  }
+
+  if (page.articleSchema) {
+    return JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: page.articleSchema.headline,
+      author: { '@type': 'Person', name: page.articleSchema.authorName },
+      datePublished: page.articleSchema.datePublished,
+      dateModified: page.articleSchema.dateModified,
+      publisher: {
+        '@type': 'Organization',
+        name: 'Reflections',
+        url: `${CANONICAL_PUBLIC_ORIGIN}/`,
+      },
+      description: page.articleSchema.description,
+    });
+  }
+
+  return null;
+};
+
 const renderSeoContent = (page) => {
   const navLinks = publicPages
     .map((item) => `<a href="${item.path}">${item.path === '/' ? 'Home' : escapeHtml(item.h1)}</a>`)
     .join(' ');
   const sections = page.sections
     .map(
-      ([title, body]) => `
+      ({ title, body }) => `
         <section>
           <h2>${escapeHtml(title)}</h2>
           <p>${escapeHtml(body)}</p>
@@ -184,7 +123,7 @@ const renderSeoContent = (page) => {
     .join('');
 
   return `
-    <main id="public-seo-content" data-seo-snapshot="true" class="sr-only">
+    <main id="public-seo-content" data-seo-snapshot="true">
       <nav aria-label="Public pages">${navLinks}</nav>
       <h1>${escapeHtml(page.h1)}</h1>
       <p>${escapeHtml(page.intro)}</p>
@@ -346,16 +285,16 @@ const renderStaticLandingShell = (page) => `
           </div>
           <div>
             <div>
-              <h1 aria-label="Your mind beautifully organized">
-                <span>Your mind</span>
-                <span>beautifully</span>
-                <span>organized</span>
+              <h1 aria-label="${escapeHtml(PUBLIC_SEO_COPY.home.heroAriaLabel)}">
+                <span>${escapeHtml(PUBLIC_SEO_COPY.home.heroLines[0])}</span>
+                <span>${escapeHtml(PUBLIC_SEO_COPY.home.heroLines[1])}</span>
+                <span>${escapeHtml(PUBLIC_SEO_COPY.home.heroLines[2])}</span>
               </h1>
-              <p>A private journal. Write what's on your mind, notice the patterns, and keep it to yourself</p>
+              <p>${escapeHtml(PUBLIC_SEO_COPY.home.heroIntro)}</p>
             </div>
             <div>
               <a href="/signup" aria-label="Begin writing">
-                Begin writing
+                ${escapeHtml(PUBLIC_SEO_COPY.home.ctaLabel)}
                 ${renderArrowIcon()}
               </a>
               <div>
@@ -407,8 +346,10 @@ const applyPageSeo = (template, page) => {
     html = html.replace('</head>', `${LANDING_AUTH_GATE_STYLE}\n${LANDING_AUTH_GATE_SCRIPT}\n  </head>`);
   }
 
-  if (page.extraSchema) {
-    html = html.replace('</head>', `<script type="application/ld+json">${page.extraSchema}</script>\n  </head>`);
+  const extraSchema = buildExtraSchema(page);
+
+  if (extraSchema) {
+    html = html.replace('</head>', `<script type="application/ld+json">${extraSchema}</script>\n  </head>`);
   }
 
   return html;
@@ -419,14 +360,14 @@ const applyAppShellRoute = (template, route) => {
   let html = stripLandingHeroPreloads(template);
 
   html = html.replace(/<title>[\s\S]*?<\/title>/, `<title>${escapeHtml(route.title)}</title>`);
-  html = setMetaName(html, 'description', 'Open Reflections to continue writing, signing in, or managing your private journal.');
+  html = setMetaName(html, 'description', PUBLIC_APP_ROUTE_DESCRIPTION);
   html = setRobotsMeta(html, NOINDEX_NOFOLLOW_ROBOTS_META);
   html = setCanonical(html, url);
   html = setMetaProperty(html, 'og:url', url);
   html = setMetaProperty(html, 'og:title', route.title);
-  html = setMetaProperty(html, 'og:description', 'Open Reflections to continue writing.');
+  html = setMetaProperty(html, 'og:description', PUBLIC_APP_ROUTE_SOCIAL_DESCRIPTION);
   html = setMetaName(html, 'twitter:title', route.title);
-  html = setMetaName(html, 'twitter:description', 'Open Reflections to continue writing.');
+  html = setMetaName(html, 'twitter:description', PUBLIC_APP_ROUTE_SOCIAL_DESCRIPTION);
   html = html.replace('<div id="root"></div>', `<div id="root">${renderAppShellFallback(route)}</div>`);
 
   return html;

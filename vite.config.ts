@@ -2,6 +2,7 @@ import path from 'path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { PUBLIC_SEO_DEFAULT } from './src/config/publicSeoCopy.js';
 
 const lottieLightPlayer = path.resolve(__dirname, 'node_modules/lottie-web/build/player/esm/lottie_light.min.js');
 
@@ -58,7 +59,7 @@ export default defineConfig({
           manifest: {
             name: 'Reflections',
             short_name: 'Reflections',
-            description: 'A journal for writing, mood tracking, and reflection. AI stays on demand unless you turn on Smart Mode.',
+            description: PUBLIC_SEO_DEFAULT.description,
             theme_color: '#f7f8f6',
             background_color: '#f7f8f6',
             display: 'standalone',

@@ -14,6 +14,7 @@ import { Surface } from '@/components/ui/Surface';
 import { RoutePath } from '@/types';
 import { useAuthStore } from '@/hooks/useAuthStore';
 import { useDocumentMeta } from '@/hooks/useDocumentMeta';
+import { PUBLIC_SEO_DEFAULT } from '@/src/config/publicSeoCopy.js';
 import { supabase } from '@/src/supabaseClient';
 import { getPublicHomePath } from '@/src/utils/authHints';
 import {
@@ -32,7 +33,7 @@ import { commitAuthSession } from '@/src/auth/sessionUser';
 
 export const SignIn: React.FC = () => {
   useDocumentMeta({
-    title: 'Reflections – A Calm Space to Write and Reflect',
+    title: PUBLIC_SEO_DEFAULT.title,
     description: 'Sign in to your private journal to continue writing and reflecting.',
     path: RoutePath.LOGIN,
   });
