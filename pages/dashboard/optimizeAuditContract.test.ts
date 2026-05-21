@@ -27,15 +27,14 @@ describe('optimize audit contract', () => {
     expect(vite).toContain("return 'vendor-core'");
     expect(vite).toContain("return 'vendor-routing'");
     expect(vite).toContain("return 'vendor-native'");
-    expect(vite).toContain("return 'vendor-observability'");
-    expect(vite).toContain("return 'vendor-analytics'");
     expect(vite).toContain("return 'vendor-lottie'");
     expect(vite).toContain("return 'vendor-state'");
     expect(vite).toContain("const lottieLightPlayer = path.resolve(__dirname, 'node_modules/lottie-web/build/player/esm/lottie_light.min.js');");
     expect(vite).toContain("'lottie-web': lottieLightPlayer,");
-    expect(vite).toContain('const hasSentryAuthToken = Boolean(process.env.SENTRY_AUTH_TOKEN);');
-    expect(vite).toContain("const sentrySourcemap: false | 'hidden' = hasSentryAuthToken ? 'hidden' : false;");
-    expect(vite).toContain('sourcemap: sentrySourcemap');
+    expect(vite).not.toContain("return 'vendor-observability'");
+    expect(vite).not.toContain("return 'vendor-analytics'");
+    expect(vite).not.toContain('SENTRY_AUTH_TOKEN');
+    expect(vite).not.toContain('sentrySourcemap');
   });
 
   it('removes perception-slow waits from the authenticated home prompt refresh', () => {

@@ -25,7 +25,6 @@ import {
   isUserVisibleWikiPage,
   type WikiPageType,
 } from '../../services/wikiTypes';
-import { trackLifeWikiRefreshedDeferred } from '../../src/analytics/deferredEvents';
 import {
   SANCTUARY_LEVEL_UP_ANIMATION_ID,
   SANCTUARY_LEVEL_UP_ANIMATION_SRC,
@@ -317,16 +316,6 @@ export const LifeWiki: React.FC = () => {
           variant: 'warning',
           title: 'Nothing could be built yet',
           description: 'The Life Wiki did not find enough usable signal this time. Add a little more detail to your reflections and try again.',
-        });
-      }
-
-      if (refreshResult.pageCount > 0) {
-        trackLifeWikiRefreshedDeferred({
-          planTier: access?.planTier || 'free',
-          entryCount: notes.length,
-          pageCount: refreshResult.pageCount,
-          source: refreshResult.source,
-          usedFreeRefresh: access?.planTier !== 'pro',
         });
       }
 

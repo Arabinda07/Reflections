@@ -4,7 +4,6 @@ import { aiRunClient } from './aiRunClient';
 import { ritualEventService } from './ritualService';
 import { observationService } from './observationService';
 import { extractTasksFromContent, mergeTasks } from '../src/utils/taskParser';
-import { trackNoteSavedDeferred } from '../src/analytics/deferredEvents';
 import { supabase } from '../src/supabaseClient';
 import type { Note, NoteAttachment, Task } from '../types';
 
@@ -37,7 +36,6 @@ export const notePublishingOrchestrator = {
     if (!user) throw new Error('Unauthenticated');
 
     let noteId = input.id;
-    const saveMode = noteId ? 'edit' : 'new';
 
     // Auto-extract tasks from content
     const extractedTasks = extractTasksFromContent(input.content);
@@ -81,13 +79,6 @@ export const notePublishingOrchestrator = {
       tasks: syncedTasks,
       thumbnailUrl: finalThumbnailUrl || undefined,
       attachments: mergedAttachments,
-    });
-
-    trackNoteSavedDeferred({
-      mode: saveMode,
-      attachmentCount: mergedAttachments.length,
-      tagCount: input.tags.length,
-      taskCount: syncedTasks.length,
     });
 
     // Smart mode auto-ingest (fire-and-forget)

@@ -11,17 +11,9 @@ import {
   DEFAULT_PRO_PLAN,
   PRO_PRICING_PLAN_LIST,
   PRO_PRICING_PLANS,
-  PRO_TRIAL_DAYS,
   getTrialChargeDateLabel,
   type BillingPeriod,
 } from '../../src/config/pricingCatalog';
-import {
-  trackCheckoutFailedDeferred,
-  trackModalDismissedDeferred,
-  trackPaywallViewedDeferred,
-  trackPlanSelectedDeferred,
-  trackTrialStartedDeferred,
-} from '../../src/analytics/deferredEvents';
 
 interface ProUpgradeCTAProps {
   onSuccess?: () => void;
@@ -162,18 +154,15 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
 
   const openPaywall = () => {
     setIsModalOpen(true);
-    trackPaywallViewedDeferred({ surface: variant, defaultPlan: DEFAULT_PRO_PLAN });
   };
 
   const closePaywall = () => {
     if (isUnlocked) return;
     setIsModalOpen(false);
-    trackModalDismissedDeferred({ modalId: 'pro_upgrade', surface: variant });
   };
 
   const selectPlan = (billingPeriod: BillingPeriod) => {
     setSelectedPlan(billingPeriod);
-    trackPlanSelectedDeferred({ surface: variant, billingPeriod });
   };
 
   const handleSubscribe = async () => {
@@ -242,7 +231,6 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
               throw new Error(getPaymentErrorMessage(verifyRes, { data: verifyData, error: verifyParseError }, PAYMENT_VERIFY_ERROR));
             }
 
-            trackTrialStartedDeferred({ billingPeriod: selectedPlan, trialDays: PRO_TRIAL_DAYS });
             setIsUnlocked(true);
             await supabase.auth.refreshSession();
             
@@ -253,7 +241,6 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
               }, 4000);
             }
           } catch (err: any) {
-            trackCheckoutFailedDeferred({ billingPeriod: selectedPlan, errorCode: err.message });
             setError(err.message || 'Payment verification failed');
             setIsProcessing(false);
           }
@@ -270,10 +257,6 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
 
       const rzp = new (window as any).Razorpay(options);
       rzp.on('payment.failed', function (response: any) {
-        trackCheckoutFailedDeferred({
-          billingPeriod: selectedPlan,
-          errorCode: response?.error?.code || response?.error?.description,
-        });
         setError(response?.error?.description || 'Payment failed. Please try again.');
         setIsProcessing(false);
       });
@@ -281,7 +264,6 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
       rzp.open();
     } catch (err: any) {
       console.error('Subscription error:', err);
-      trackCheckoutFailedDeferred({ billingPeriod: selectedPlan, errorCode: err.message });
       setError(err.message || 'Please try again later.');
       setIsProcessing(false);
     }

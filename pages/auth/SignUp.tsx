@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Capacitor } from '@capacitor/core';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
@@ -33,7 +32,6 @@ import {
 } from '@/src/auth/credentialManager';
 import { NEWSLETTER_SIGNUP_LABEL, buildNewsletterOptInMetadata } from '@/src/newsletter';
 import { referralService } from '@/services/referralService';
-import { trackGoogleAuthStartedDeferred } from '@/src/analytics/deferredEvents';
 import { commitAuthSession } from '@/src/auth/sessionUser';
 
 export const SignUp: React.FC = () => {
@@ -130,14 +128,8 @@ export const SignUp: React.FC = () => {
   };
 
   const handleGoogleLogin = async () => {
-    const isNative = Capacitor.isNativePlatform();
     setError(null);
     setLoading(true);
-    trackGoogleAuthStartedDeferred({
-      sourcePath: RoutePath.SIGNUP,
-      redirectPath: postLoginPath || RoutePath.DASHBOARD,
-      isNative,
-    });
     const launchError = await startGoogleOAuthFlow({
       sourcePath: RoutePath.SIGNUP,
       redirectPath: postLoginPath || RoutePath.DASHBOARD,

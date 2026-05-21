@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Capacitor } from '@capacitor/core';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
@@ -29,7 +28,6 @@ import {
   isVerifiedEmailAvailable,
   requestVerifiedEmail,
 } from '@/src/auth/credentialManager';
-import { trackGoogleAuthStartedDeferred } from '@/src/analytics/deferredEvents';
 import { commitAuthSession } from '@/src/auth/sessionUser';
 
 export const SignIn: React.FC = () => {
@@ -95,15 +93,9 @@ export const SignIn: React.FC = () => {
   };
 
   const handleGoogleLogin = async () => {
-    const isNative = Capacitor.isNativePlatform();
     setError(null);
     setResetMessage(null);
     setLoading(true);
-    trackGoogleAuthStartedDeferred({
-      sourcePath: RoutePath.LOGIN,
-      redirectPath: postLoginPath || RoutePath.DASHBOARD,
-      isNative,
-    });
     const launchError = await startGoogleOAuthFlow({
       sourcePath: RoutePath.LOGIN,
       redirectPath: postLoginPath || RoutePath.DASHBOARD,

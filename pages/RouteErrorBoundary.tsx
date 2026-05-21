@@ -1,7 +1,6 @@
 import React, { Suspense, lazy, useEffect } from 'react';
 import { isRouteErrorResponse, useNavigate, useRouteError } from 'react-router-dom';
 import { usePublicHomePath } from '../src/utils/authHints';
-import { captureAppError } from '../src/instrument';
 
 const ROUTE_CHUNK_RECOVERY_KEY = 'route_chunk_recovered';
 
@@ -87,8 +86,6 @@ export const RouteErrorBoundary: React.FC = () => {
   const hasAttemptedRecovery = sessionStorage.getItem(ROUTE_CHUNK_RECOVERY_KEY) === 'true';
 
   useEffect(() => {
-    captureAppError(error, { source: 'route_error_boundary' });
-
     if (!isChunkFailure || hasAttemptedRecovery) return;
 
     sessionStorage.setItem(ROUTE_CHUNK_RECOVERY_KEY, 'true');

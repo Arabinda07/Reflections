@@ -59,7 +59,7 @@ describe('profileService.setSmartModeEnabled', () => {
     );
     expect(profileChain.select).toHaveBeenCalledWith('smart_mode_enabled');
     expect(mockFrom).toHaveBeenCalledWith('account_entitlements');
-    expect(mockFrom).toHaveBeenCalledWith('ai_usage_counters');
+    expect(mockFrom).toHaveBeenCalledWith('ai_feature_usage_counters');
     expect(access.smartModeEnabled).toBe(true);
   });
 });
