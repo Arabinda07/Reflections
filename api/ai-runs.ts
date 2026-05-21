@@ -11,15 +11,15 @@ import {
   parseJsonBody,
   requireUser,
   sendJson,
-} from '../server/apiUtils';
+} from '../server/apiUtils.js';
 import {
   runLifeWikiRefresh,
   type LifeWikiRunEventInput,
   type LifeWikiRunStore,
   type LifeWikiRunTrigger,
-} from '../server/lifeWikiRuns';
+} from '../server/lifeWikiRuns.js';
 import type { AiAction } from '../services/aiContracts';
-import { getNoteContentHash } from '../services/aiContext';
+import { getNoteContentHash } from '../services/aiContext.js';
 
 type AiRunRequest = {
   kind?: 'life_wiki_refresh';

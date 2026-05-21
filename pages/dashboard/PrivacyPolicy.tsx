@@ -68,7 +68,7 @@ const policySections: PolicySection[] = [
     icon: 'creditCard',
     color: 'tone-icon-honey',
     body: [
-      'Payments are handled through Razorpay. Reflections stores enough payment and plan information to know whether your account has Pro access, but card and bank details are handled by Razorpay.',
+      'Razorpay handles checkout, subscription billing, and card or bank details. Reflections stores the selected plan, Razorpay subscription ID, payment status, and enough billing metadata to manage Pro access.',
       'If you use an invite link, Reflections stores the invite code and whether someone joined from it. Invites do not create a public social graph, rewards feed, or public list.',
     ],
   },

@@ -175,6 +175,9 @@ describe('SEO crawlability contract', () => {
     expect(pricing).toContain('Free');
     expect(pricing).toContain('Pro');
     expect(pricing).toContain('30 notes');
+    expect(pricing).toContain('₹49/week after a 3-day trial');
+    expect(pricing).toContain('₹149/month after a 3-day trial');
+    expect(pricing).toContain('No payment is due during the trial');
   });
 
   it('excludes llms.txt and pricing.md from the SPA rewrite', () => {
@@ -261,9 +264,14 @@ describe('SEO crawlability contract', () => {
 
   it('keeps FAQ guide sections with key product questions for AI extractability', () => {
     const faq = read('pages/dashboard/FAQ.tsx');
+    const privacy = read('pages/dashboard/PrivacyPolicy.tsx');
 
     expect(faq).toContain('What is Reflections?');
     expect(faq).toContain('Life Wiki');
+    expect(faq).toContain('Plans and billing');
+    expect(faq).toContain('₹49/week');
+    expect(faq).toContain('₹149/month');
+    expect(privacy).toContain('Razorpay handles checkout, subscription billing');
   });
 
   it('sends HSTS header on all routes', () => {

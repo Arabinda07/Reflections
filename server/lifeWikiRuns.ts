@@ -1,14 +1,14 @@
 import type { LifeTheme, Note } from '../types';
 import type { AiAction } from '../services/aiContracts';
-import { buildNotesCorpus, getNoteContentHash } from '../services/aiContext';
+import { buildNotesCorpus, getNoteContentHash } from '../services/aiContext.js';
 import {
   INGEST_MODEL,
   LIFE_WIKI_REFRESH_PROMPT_VERSION,
   WIKI_PAGE_CONFIGS,
   buildIndexPrompt,
   buildWikiPagePrompt,
-} from '../services/aiPromptSpecs';
-import { buildWikiRetryInstruction, validateWikiPageOutput } from '../services/aiOutputValidation';
+} from '../services/aiPromptSpecs.js';
+import { buildWikiRetryInstruction, validateWikiPageOutput } from '../services/aiOutputValidation.js';
 
 export type LifeWikiRunTrigger = 'manual' | 'smart_mode' | 'account_enable';
 export type LifeWikiRunStatus = 'running' | 'succeeded' | 'partial' | 'failed' | 'skipped';

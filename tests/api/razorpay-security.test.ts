@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -35,6 +35,18 @@ describe('Razorpay subscription security contract', () => {
     expect(webhook).toContain('subscription.activated');
     expect(webhook).toContain("from('account_entitlements')");
     expect(webhook).toContain("from('razorpay_subscriptions')");
+    expect(webhook).not.toContain('subscription.expired');
+    expect(webhook).not.toContain('payment.captured');
+    expect(webhook).not.toContain('invoice.');
+    expect(webhook).not.toContain('order.');
+    expect(webhook).not.toContain('settlement.');
+    expect(webhook).not.toContain('qr_code.');
+  });
+
+  it('keeps tests out of the deployed api function directory', () => {
+    const apiFiles = readdirSync(path.resolve(process.cwd(), 'api'));
+
+    expect(apiFiles.some((fileName) => fileName.endsWith('.test.ts'))).toBe(false);
   });
 
   it('keeps Razorpay subscription storage compatible with weekly and monthly plans only', () => {

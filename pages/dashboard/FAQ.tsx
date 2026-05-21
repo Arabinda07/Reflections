@@ -81,6 +81,13 @@ const detailItems: PublicIconCard[] = [
     label: 'On demand only • Private by design',
     icon: 'brain',
   },
+  {
+    title: 'Plans and billing',
+    body:
+      'Pro has weekly and monthly options. The trial lasts 3 days. No payment is due during the trial, and Reflections shows the first charge date before checkout. After that, weekly Pro renews at ₹49/week and monthly Pro renews at ₹149/month until canceled.',
+    label: '3-day trial • No payment today',
+    icon: 'creditCard',
+  },
 ];
 
 const featureGrid: PublicIconCard[] = [

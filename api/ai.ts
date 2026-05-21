@@ -10,20 +10,20 @@ import {
   parseJsonBody,
   requireUser,
   sendJson,
-} from '../server/apiUtils';
+} from '../server/apiUtils.js';
 import {
   validateAiRequest,
   validateIngestDecision,
   type AiAction,
   type AiRequest,
-} from '../services/aiContracts';
+} from '../services/aiContracts.js';
 import {
   GEMINI_MODEL,
   INGEST_MODEL,
   buildIndexPrompt,
   buildPrompt,
   buildWikiPagePrompt,
-} from '../services/aiPromptSpecs';
+} from '../services/aiPromptSpecs.js';
 
 const MAX_BODY_BYTES = 250_000;
 const NOTE_OWNERSHIP_ACTIONS = new Set<AiAction>([

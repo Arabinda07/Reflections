@@ -7,7 +7,7 @@ import {
   parseJsonBody,
   requireUser,
   sendJson,
-} from '../server/apiUtils';
+} from '../server/apiUtils.js';
 import {
   DEFAULT_PRO_PLAN,
   PRO_PRICING_PLANS,
@@ -15,7 +15,7 @@ import {
   getTrialEndsAt,
   isBillingPeriod,
   type BillingPeriod,
-} from '../src/config/pricingCatalog';
+} from '../src/config/pricingCatalog.js';
 
 type CreateSubscriptionRequest = {
   billingPeriod?: BillingPeriod;

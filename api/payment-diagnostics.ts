@@ -1,4 +1,4 @@
-import { sendJson } from '../server/apiUtils';
+import { sendJson } from '../server/apiUtils.js';
 
 const hasValue = (value?: string) => Boolean(value && value.trim());
 

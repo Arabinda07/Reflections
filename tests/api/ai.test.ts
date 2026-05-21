@@ -81,7 +81,7 @@ describe('/api/ai', () => {
   });
 
   it('claims server-side quota before making the provider request', async () => {
-    const { default: handler } = await import('./ai');
+    const { default: handler } = await import('../../api/ai');
     const response = createResponse();
 
     await handler(
@@ -128,7 +128,7 @@ describe('/api/ai', () => {
       data: { allowed: false, reason: 'monthly_quota_exhausted' },
       error: null,
     });
-    const { default: handler } = await import('./ai');
+    const { default: handler } = await import('../../api/ai');
     const response = createResponse();
 
     await handler(
@@ -156,7 +156,7 @@ describe('/api/ai', () => {
     delete process.env.GEMINI_API_KEY;
     delete process.env.GOOGLE_GEMINI_API_KEY;
     process.env.VITE_GEMINI_API_KEY = 'legacy-public-key';
-    const { default: handler } = await import('./ai');
+    const { default: handler } = await import('../../api/ai');
     const response = createResponse();
 
     await handler(
@@ -177,7 +177,7 @@ describe('/api/ai', () => {
   });
 
   it('rejects malformed payloads before quota or provider calls', async () => {
-    const { default: handler } = await import('./ai');
+    const { default: handler } = await import('../../api/ai');
     const response = createResponse();
 
     await handler(
@@ -196,7 +196,7 @@ describe('/api/ai', () => {
 
   it('returns a compact provider error when model JSON is malformed', async () => {
     mockGenerateContent.mockResolvedValueOnce({ text: 'not-json' });
-    const { default: handler } = await import('./ai');
+    const { default: handler } = await import('../../api/ai');
     const response = createResponse();
 
     await handler(

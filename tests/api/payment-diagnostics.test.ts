@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { buildPaymentDiagnostics } from './payment-diagnostics';
+import { buildPaymentDiagnostics } from '../../api/payment-diagnostics';
 
 const PAYMENT_ENV_KEYS = [
   'SUPABASE_URL',

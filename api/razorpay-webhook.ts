@@ -7,7 +7,7 @@ import {
   readRawBody,
   sendJson,
   timingSafeEqualHex,
-} from '../server/apiUtils';
+} from '../server/apiUtils.js';
 
 const RAZORPAY_WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET || '';
 
@@ -38,7 +38,6 @@ const ACTIVE_EVENTS = new Set([
 const INACTIVE_EVENTS = new Set([
   'subscription.cancelled',
   'subscription.completed',
-  'subscription.expired',
   'subscription.halted',
   'subscription.paused',
 ]);

@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { normalizeNewsletterOptIn } from '../src/newsletter';
+import { normalizeNewsletterOptIn } from '../src/newsletter.js';
 import {
   HttpError,
   createSupabaseAdminClient,
@@ -10,7 +10,7 @@ import {
   requireUser,
   sendJson,
   timingSafeEqualHex,
-} from '../server/apiUtils';
+} from '../server/apiUtils.js';
 
 type VerifyPaymentRequest = {
   newsletterOptIn?: unknown;
