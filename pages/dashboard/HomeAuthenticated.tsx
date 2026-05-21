@@ -796,11 +796,12 @@ export const HomeAuthenticated: React.FC = () => {
         icon={<Heart size={20} weight="duotone" />}
         size="sm"
         tone="sage"
-        bodyClassName="pt-2"
+        panelClassName="modal-sheet-panel--compact"
+        bodyClassName="modal-sheet-body--compact"
       >
-        <div className="space-y-5">
-          <p className="text-base font-medium leading-relaxed text-gray-light">
-            Feelings, but make them less loud. Pick the closest word.
+        <div className="space-y-3">
+          <p className="text-sm font-medium leading-relaxed text-gray-light">
+            Pick the closest word.
           </p>
             {!checkInFeedback ? (
               <MoodPicker

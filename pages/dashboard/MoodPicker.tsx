@@ -46,7 +46,7 @@ export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, source, on
 
   if (!selectedFamily) {
     return (
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
         {MOOD_FAMILIES.map((family) => {
           const Icon = family.icon;
           const firstMoodConfig = MOOD_CONFIG[family.options[0]];
@@ -56,13 +56,13 @@ export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, source, on
               key={family.id}
               type="button"
               onClick={() => handleFamilySelect(family)}
-              className={`group min-h-28 rounded-[1.5rem] border p-4 text-left transition-[border-color,background-color,box-shadow,transform] duration-300 ease-out-expo hover:scale-[1.02] hover:shadow-lg ${firstMoodConfig.option}`}
+              className={`group min-h-[5.9rem] rounded-[1.1rem] border p-3 text-left transition-[border-color,background-color,box-shadow,transform] duration-300 ease-out-expo hover:scale-[1.01] hover:shadow-lg sm:min-h-[6.7rem] sm:rounded-[1.35rem] sm:p-4 ${firstMoodConfig.option}`}
             >
-              <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-white/40 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
-                <Icon size={24} weight="duotone" className={firstMoodConfig.labelClass} />
+              <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-xl bg-white/40 transition-transform duration-500 group-hover:scale-105 sm:h-10 sm:w-10">
+                <Icon size={21} weight="duotone" className={firstMoodConfig.labelClass} />
               </div>
-              <span className="block text-base font-bold text-gray-text">{family.label}</span>
-              <span className="mt-1 block text-xs font-semibold leading-relaxed text-gray-nav">{family.helper}</span>
+              <span className="block text-sm font-bold leading-tight text-gray-text sm:text-base">{family.label}</span>
+              <span className="mt-1 block text-[11px] font-semibold leading-snug text-gray-nav sm:text-xs">{family.helper}</span>
             </button>
           );
         })}
@@ -71,7 +71,7 @@ export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, source, on
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <button
         type="button"
         onClick={() => setSelectedFamilyId(null)}
@@ -81,7 +81,7 @@ export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, source, on
         Back to moods
       </button>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
         {selectedFamily.options.map((entry) => {
           const moodConfig = MOOD_CONFIG[entry];
           const Icon = moodConfig.icon;
@@ -92,14 +92,14 @@ export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, source, on
               key={entry}
               type="button"
               onClick={() => handleMoodSelect(entry)}
-              className={`relative flex min-h-28 flex-col items-center justify-center rounded-2xl border-2 p-3 text-center transition-colors ${isSelected ? moodConfig.modal : `${moodConfig.option} dark:bg-white/5`}`}
+              className={`relative flex min-h-20 flex-col items-center justify-center rounded-2xl border-2 p-2.5 text-center transition-colors sm:min-h-24 sm:p-3 ${isSelected ? moodConfig.modal : `${moodConfig.option} dark:bg-white/5`}`}
             >
               {isSelected ? (
                 <span className="absolute right-2 top-2 rounded-full bg-white/70 p-1 text-green">
                   <Check size={12} weight="bold" />
                 </span>
               ) : null}
-              <Icon size={30} weight={isSelected ? 'fill' : 'regular'} className="mb-2" />
+              <Icon size={26} weight={isSelected ? 'fill' : 'regular'} className="mb-1.5" />
               <span className="text-[12px] font-bold">{moodConfig.label}</span>
             </button>
           );

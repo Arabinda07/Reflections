@@ -29,6 +29,78 @@ interface ProUpgradeCTAProps {
   variant?: 'card' | 'fullscreen';
 }
 
+interface PaymentApiResponse<T> {
+  data: T | null;
+  error: string | null;
+}
+
+interface CreateSubscriptionResponse {
+  keyId?: string;
+  subscriptionId?: string;
+}
+
+interface VerifyPaymentResponse {
+  ok?: boolean;
+  message?: string;
+}
+
+const PAYMENT_SETUP_ERROR = 'Payment setup failed. Check the server logs for this request.';
+const PAYMENT_NOT_CONFIGURED_ERROR = 'Payment setup is not configured yet.';
+const PAYMENT_VERIFY_ERROR = 'Payment went through, but we could not verify it yet. Contact support with the payment ID.';
+const SIGN_IN_AGAIN_ERROR = 'Please sign in again before starting payment.';
+const RAZORPAY_LOAD_ERROR = 'Could not load Razorpay. Check your connection and try again.';
+const RESPONSE_PREVIEW_LIMIT = 180;
+
+export const readPaymentApiResponse = async <T,>(
+  response: Response,
+  endpoint: string,
+): Promise<PaymentApiResponse<T>> => {
+  const text = await response.text();
+  const preview = text.slice(0, RESPONSE_PREVIEW_LIMIT);
+
+  if (!text.trim()) {
+    if (!response.ok) {
+      console.error('[payments] Empty API response', {
+        endpoint,
+        status: response.status,
+      });
+    }
+
+    return { data: null, error: null };
+  }
+
+  try {
+    return { data: JSON.parse(text) as T, error: null };
+  } catch (error) {
+    console.error('[payments] Non-JSON API response', {
+      endpoint,
+      status: response.status,
+      preview,
+      error,
+    });
+
+    return { data: null, error: PAYMENT_SETUP_ERROR };
+  }
+};
+
+const getPaymentErrorMessage = (
+  response: Response,
+  parsed: PaymentApiResponse<{ error?: string | null }>,
+  fallback: string,
+) => {
+  const serverError = parsed.data?.error || parsed.error;
+
+  if (serverError === 'Razorpay plan is not configured' || serverError === 'Razorpay keys are missing in environment variables') {
+    return PAYMENT_NOT_CONFIGURED_ERROR;
+  }
+
+  if (response.status === 401) {
+    return SIGN_IN_AGAIN_ERROR;
+  }
+
+  return serverError || fallback;
+};
+
 const getRazorpayThemeColor = () => {
   if (typeof document === 'undefined' || !document.body) {
     return 'var(--honey)';
@@ -110,6 +182,9 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error(SIGN_IN_AGAIN_ERROR);
+      }
       
       const res = await fetch('/api/create-razorpay-subscription', {
         method: 'POST',
@@ -120,8 +195,17 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
         body: JSON.stringify({ billingPeriod: selectedPlan })
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to initialize subscription');
+      const { data, error: parseError } = await readPaymentApiResponse<CreateSubscriptionResponse & { error?: string }>(
+        res,
+        '/api/create-razorpay-subscription',
+      );
+      if (!res.ok || parseError) {
+        throw new Error(getPaymentErrorMessage(res, { data, error: parseError }, 'Failed to initialize subscription'));
+      }
+
+      if (!data?.subscriptionId) {
+        throw new Error(PAYMENT_NOT_CONFIGURED_ERROR);
+      }
 
       const options = {
         key: data.keyId || import.meta.env.VITE_RAZORPAY_KEY_ID,
@@ -132,6 +216,9 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
           try {
             setIsProcessing(true);
             const { data: { session } } = await supabase.auth.getSession();
+            if (!session?.access_token) {
+              throw new Error(SIGN_IN_AGAIN_ERROR);
+            }
             
             const verifyRes = await fetch('/api/verify-razorpay-payment', {
               method: 'POST',
@@ -147,8 +234,13 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
               })
             });
 
-            const verifyData = await verifyRes.json();
-            if (!verifyRes.ok) throw new Error(verifyData.error || 'Verification failed');
+            const { data: verifyData, error: verifyParseError } = await readPaymentApiResponse<VerifyPaymentResponse & { error?: string }>(
+              verifyRes,
+              '/api/verify-razorpay-payment',
+            );
+            if (!verifyRes.ok || verifyParseError) {
+              throw new Error(getPaymentErrorMessage(verifyRes, { data: verifyData, error: verifyParseError }, PAYMENT_VERIFY_ERROR));
+            }
 
             trackTrialStartedDeferred({ billingPeriod: selectedPlan, trialDays: PRO_TRIAL_DAYS });
             setIsUnlocked(true);
@@ -173,7 +265,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
 
       const razorpayLoaded = await loadRazorpay();
       if (!razorpayLoaded) {
-        throw new Error('Could not load Razorpay checkout. Please try again.');
+        throw new Error(RAZORPAY_LOAD_ERROR);
       }
 
       const rzp = new (window as any).Razorpay(options);
@@ -182,7 +274,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
           billingPeriod: selectedPlan,
           errorCode: response?.error?.code || response?.error?.description,
         });
-        setError(response.error.description);
+        setError(response?.error?.description || 'Payment failed. Please try again.');
         setIsProcessing(false);
       });
       
@@ -196,9 +288,9 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
   };
 
   const features = [
-    'Unlimited writing after the free room fills',
-    'On-demand AI reflections when your brain is doing laps',
-    'More Life Wiki refreshes for messy weeks',
+    'Unlimited notes',
+    'More AI reflections',
+    'More Life Wiki refreshes',
   ];
 
   const renderSubscriptionModal = () => (
@@ -209,32 +301,33 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
       icon={<Crown size={20} weight="duotone" />}
       size="md"
       tone="honey"
-      bodyClassName="px-6 pb-6 pt-2 sm:px-8"
+      panelClassName="modal-sheet-panel--compact"
+      bodyClassName="modal-sheet-body--compact"
     >
-      <div className="space-y-6">
+      <div className="space-y-4">
         {!isUnlocked ? (
           <>
-            <div className="space-y-2">
-              <p className="text-base font-medium leading-relaxed text-gray-light">
-                Try Pro free. We’ll tell you before billing starts.
+            <div className="space-y-1.5">
+              <p className="text-sm font-medium leading-relaxed text-gray-light">
+                Try Pro free. We’ll remind you before billing starts.
               </p>
-              <p className="text-sm font-semibold leading-relaxed text-gray-nav">
+              <p className="text-xs font-semibold leading-relaxed text-gray-nav sm:text-sm">
                 No payment today. First charge {trialChargeDateLabel}: {selectedPlanDetails.displayPrice}/{selectedPlanDetails.intervalLabel}.
               </p>
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               {PRO_PRICING_PLAN_LIST.map((plan) => (
                 <button
                   key={plan.code}
                   type="button"
                   onClick={() => selectPlan(plan.code)}
-                  className={`flex min-h-32 flex-col items-start justify-between rounded-[var(--radius-control)] border p-4 text-left transition-colors duration-300 ease-out-expo ${
+                  className={`flex min-h-[6.2rem] flex-col items-start justify-between rounded-[var(--radius-control)] border p-3 text-left transition-colors duration-300 ease-out-expo sm:min-h-28 sm:p-4 ${
                     selectedPlan === plan.code ? 'border-honey bg-honey/5' : 'control-surface hover:border-honey/30'
                   }`}
                 >
                   <span className={`label-caps ${selectedPlan === plan.code ? 'text-honey' : 'text-gray-nav'}`}>{plan.shortName}</span>
-                  <span className="mt-3 text-2xl font-serif italic text-gray-text">
+                  <span className="mt-2 text-xl font-serif italic text-gray-text sm:text-2xl">
                     {plan.displayPrice}
                     <span className="text-sm not-italic text-gray-light">/{plan.intervalLabel}</span>
                   </span>
@@ -243,7 +336,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
               ))}
             </div>
 
-            <ul className="space-y-2 border-y border-border/50 py-4">
+            <ul className="space-y-2 border-y border-border/50 py-3">
               {features.map((feature) => (
                 <li key={feature} className="flex items-center gap-3 text-sm font-semibold text-gray-text">
                   <CheckCircle size={16} weight="fill" className="text-honey" />
@@ -271,15 +364,15 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
               </label>
             </div>
 
-            <div className="rounded-[var(--radius-control)] border border-honey/20 bg-honey/5 p-3 text-xs font-semibold leading-relaxed text-gray-light">
-              No surprise charges. No guilt trip. Cancel anytime. Free keeps your saved writing, mood history, and monthly note room.
-            </div>
+            <p className="text-xs font-semibold leading-relaxed text-gray-light">
+              No surprise charges. No guilt trip. Cancel anytime.
+            </p>
 
-            {error && <p className="text-clay text-sm font-bold">{error}</p>}
+            {error && <p className="text-clay text-xs font-bold leading-relaxed sm:text-sm">{error}</p>}
 
             <Button
               variant="primary"
-              className="w-full h-14 text-base rounded-[var(--radius-control)] !bg-honey !text-white border-none hover:opacity-90 whitespace-nowrap"
+              className="w-full h-12 text-sm rounded-[var(--radius-control)] !bg-honey !text-white border-none hover:opacity-90 whitespace-nowrap sm:h-14 sm:text-base"
               isLoading={isProcessing}
               onClick={handleSubscribe}
             >

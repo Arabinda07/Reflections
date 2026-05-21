@@ -473,6 +473,8 @@ export const SingleNote: React.FC = () => {
         onClose={() => setIsMoodOpen(false)}
         title="What’s the vibe right now?"
         size="sm"
+        panelClassName="modal-sheet-panel--compact"
+        bodyClassName="modal-sheet-body--compact"
       >
         <MoodPicker
           selectedMood={note.mood}

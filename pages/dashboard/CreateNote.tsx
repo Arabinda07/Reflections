@@ -876,7 +876,8 @@ export const CreateNote: React.FC = () => {
         onClose={() => setIsMoodOpen(false)}
         title="What’s the vibe right now?"
         size="sm"
-        bodyClassName="pt-2"
+        panelClassName="modal-sheet-panel--compact"
+        bodyClassName="modal-sheet-body--compact"
       >
         <MoodPicker
           selectedMood={mood}

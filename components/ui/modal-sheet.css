@@ -179,6 +179,51 @@
     padding: 1.25rem;
   }
 
+  .modal-sheet-panel--compact {
+    max-height: min(94vh, 720px);
+  }
+
+  .modal-sheet-panel--compact .modal-sheet-header {
+    gap: 0.75rem;
+    padding: 1rem 1rem 0;
+  }
+
+  .modal-sheet-panel--compact .modal-sheet-heading {
+    gap: 0.75rem;
+  }
+
+  .modal-sheet-panel--compact .modal-sheet-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.9rem;
+  }
+
+  .modal-sheet-panel--compact .modal-sheet-title {
+    font-size: 1.18rem;
+    line-height: 1.12;
+  }
+
+  .modal-sheet-panel--compact .modal-sheet-close {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.9rem;
+  }
+
+  .modal-sheet-body--compact {
+    overflow-y: visible;
+    padding: 0.9rem 1rem 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .modal-sheet-panel--compact .modal-sheet-header {
+      padding: 1.1rem 1.25rem 0;
+    }
+
+    .modal-sheet-body--compact {
+      padding: 1rem 1.25rem 1.25rem;
+    }
+  }
+
   .modal-sheet-footer {
     border-top: 1px solid var(--border-color);
     padding: 1rem 1.25rem 1.25rem;
