@@ -30,7 +30,7 @@ The app's center is writing. AI exists as a support layer, not the product's mai
 
 ### What is the public promise?
 
-Reflections is for quiet personal writing. The product avoids streaks, leaderboards, public feeds, shame nudges, and inflated wellness claims. It doesn't claim to be therapy, diagnosis, crisis care, or a replacement for professional support.
+Reflections is for quiet personal writing. The product avoids streaks, leaderboards, public feeds, shame nudges, and inflated wellness claims. It does not claim to be therapy, diagnosis, crisis care, or a replacement for professional support.
 
 The plain promise is this: write privately, keep ownership of the notes, and use AI only when it helps the writing feel more understandable.
 
@@ -42,16 +42,16 @@ The interface is designed for private moments: before bed, after work, during a 
 
 ### What is it not?
 
-Reflections isn't:
+Reflections is not:
 
-- A habit game
-- A therapy service
-- A diagnosis tool
-- A social network
-- An AI chatbot with a journal attached
-- A productivity dashboard for optimizing mood
-- A public sharing platform
-- A dark-pattern subscription app
+- a habit game
+- a therapy service
+- a diagnosis tool
+- a social network
+- an AI chatbot with a journal attached
+- a productivity dashboard for optimizing mood
+- a public sharing platform
+- a dark-pattern subscription app
 
 The app should never imply that care, clarity, or self-understanding requires payment.
 
@@ -73,11 +73,11 @@ The fallback Vercel origin is defined in `src/config/publicSite.js`.
 Reflections follows a few hard product rules:
 
 - Writing comes first. Every surface should protect the user's ability to write.
-- AI is invited. It shouldn't feel like a watcher sitting over the user's shoulder.
+- AI is invited. It should not feel like a watcher sitting over the user's shoulder.
 - Calm is behavior, not decoration. Copy, motion, hierarchy, and feature timing should lower pressure.
 - Privacy should be concrete. Say what is stored, what leaves the app, and what can be deleted.
 - Patterns emerge slowly. Insights should be observant, tentative, and grounded.
-- Premium is additive. Free users shouldn't feel punished for needing a private writing space.
+- Premium is additive. Free users should not feel punished for needing a private writing space.
 
 ### What voice should the app use?
 
@@ -99,18 +99,18 @@ Avoid copy like:
 
 ### What should the user feel while using Reflections?
 
-The user should feel unhurried. A note can be short, messy, repeated, unfinished, or emotionally plain. The app shouldn't grade that. It should give the user enough structure to return to writing without making them feel watched or evaluated.
+The user should feel unhurried. A note can be short, messy, repeated, unfinished, or emotionally plain. The app should not grade that. It should give the user enough structure to return to writing without making them feel watched or evaluated.
 
 ### What user actions matter most?
 
 The most important actions are:
 
-- Write a note
-- Save it reliably
-- Come back to it later
-- Understand what is private
-- Ask for AI only when wanted
-- Delete personal data when needed
+- write a note
+- save it reliably
+- come back to it later
+- understand what is private
+- ask for AI only when wanted
+- delete personal data when needed
 
 Everything else is secondary.
 
@@ -120,14 +120,14 @@ Everything else is secondary.
 
 Users can create, edit, read, and delete notes. Notes support:
 
-- Rich text through Quill
-- Mood labels
-- Tags
-- Cover images
-- File attachments
-- Inline tasks
-- Local offline cache
-- Remote sync through Supabase
+- rich text through Quill
+- mood labels
+- tags
+- cover images
+- file attachments
+- inline tasks
+- local offline cache
+- remote sync through Supabase
 
 The app treats the note as the main object. Mood, tags, and tasks support the note instead of replacing it.
 
@@ -135,22 +135,22 @@ The app treats the note as the main object. Mood, tags, and tasks support the no
 
 The writing surface includes:
 
-- A rich-text editor
+- a rich-text editor
 - Focus Mode, which reduces surrounding UI while the user types
 - Whisper input through browser speech APIs where available
-- Contextual prompts
-- Suggested tags
-- Mood selection
-- Task extraction and completion state
-- Save feedback
-- Optional AI reflection
+- contextual prompts
+- suggested tags
+- mood selection
+- task extraction and completion state
+- save feedback
+- optional AI reflection
 - Smart Mode controls when Life Wiki automation is enabled
 
 ### What are moods?
 
 Mood labels help users mark how an entry felt at the time. Moods are used by note views, weekly recap, calendar surfaces, and insight summaries. The mood system should stay descriptive rather than clinical.
 
-The app shouldn't infer diagnosis from mood data.
+The app should not infer diagnosis from mood data.
 
 ### What are tags?
 
@@ -172,7 +172,7 @@ The calendar view shows writing activity by date and mood. It helps a user retur
 
 Release Mode is a contained writing ritual for letting something go. Completing it records a ritual event, which can contribute to weekly rhythm and completion cards.
 
-It should feel private and grounded. It shouldn't pressure the user to perform emotional closure.
+It should feel private and grounded. It should not pressure the user to perform emotional closure.
 
 ### What are Future Letters?
 
@@ -184,13 +184,13 @@ Future Letters are stored per user and protected by the same authentication and 
 
 The weekly recap summarizes activity for the current local week. It can include:
 
-- Writing days
-- Notes saved
-- Mood check-ins
-- Release moments
-- Letters scheduled
-- Letters opened
-- Recurring tags
+- writing days
+- notes saved
+- mood check-ins
+- release moments
+- letters scheduled
+- letters opened
+- recurring tags
 
 The recap should describe activity without judging it. "You returned 2 days this week" is better than "You only wrote twice."
 
@@ -198,7 +198,7 @@ The recap should describe activity without judging it. "You returned 2 days this
 
 Completion cards are shareable visual cards generated in the browser for certain moments, such as a weekly recap, a completed release ritual, or a scheduled letter. They use canvas rendering and the app's brand typography.
 
-The user decides whether to share. The app shouldn't push public performance.
+The user decides whether to share. The app should not push public performance.
 
 ### What are referrals?
 
@@ -226,7 +226,7 @@ Yes. The project includes Capacitor Android support. Android integration covers 
 
 Life Wiki is Reflections' personal knowledge layer. It turns saved notes into a small set of structured, readable pages about patterns in the user's writing.
 
-The Life Wiki isn't a transcript of every note. It's a synthesis layer. It should capture recurring ideas, relationships, decisions, eras, and patterns without overstating certainty.
+The Life Wiki is not a transcript of every note. It is a synthesis layer. It should capture recurring ideas, relationships, decisions, eras, and patterns without overstating certainty.
 
 ### What is Sanctuary?
 
@@ -280,7 +280,7 @@ The note save should never depend on AI success.
 
 A manual refresh builds a notes corpus, asks Gemini to produce the structured wiki pages, validates source markers, retries once when needed, writes pages through `wikiService.upsertWikiPage`, and rebuilds the index if at least one page succeeds.
 
-The refresh result reports page count and source. If there's no usable note corpus, the result is `source: 'none'`.
+The refresh result reports page count and source. If there is no usable note corpus, the result is `source: 'none'`.
 
 ### Why use a compiled wiki instead of vector search?
 
@@ -288,11 +288,11 @@ The wiki approach keeps the user's history small and readable. Rather than stori
 
 That means:
 
-- Lower storage pressure
-- Less repeated AI work
-- User-visible summaries
-- Easier citation and validation
-- A calmer mental model for the product
+- lower storage pressure
+- less repeated AI work
+- user-visible summaries
+- easier citation and validation
+- a calmer mental model for the product
 
 Vector search may become useful later, but the current product bet is that compiled context is enough for the core experience.
 
@@ -304,7 +304,7 @@ If validation fails, the app builds a retry instruction and asks for a corrected
 
 ### What happens when Life Wiki AI fails?
 
-The app logs the error and keeps the saved notes intact. Wiki generation can partially succeed: one page can fail while another succeeds. The user shouldn't lose writing because an AI request failed.
+The app logs the error and keeps the saved notes intact. Wiki generation can partially succeed: one page can fail while another succeeds. The user should not lose writing because an AI request failed.
 
 ## AI FAQ
 
@@ -314,9 +314,9 @@ Reflections uses Google's Gemini API through `@google/genai`.
 
 Current prompt configuration lives in `services/aiPromptSpecs.ts`:
 
-- Default generation model: `gemini-3-flash-preview`
-- Ingest and Life Wiki refresh model: `gemini-2.5-flash`
-- Prompt version: `2026-05-19`
+- default generation model: `gemini-3-flash-preview`
+- ingest and Life Wiki refresh model: `gemini-2.5-flash`
+- prompt version: `2026-05-19`
 
 ### Does the browser call Gemini directly?
 
@@ -324,7 +324,7 @@ No. The current architecture routes AI requests through `/api/ai`.
 
 The browser calls `services/aiClient.ts`, which sends the user's Supabase access token to `/api/ai`. The API route verifies the user, validates the request shape, checks note ownership for note-bound actions, claims usage or quota, and then calls Gemini server-side.
 
-This replaced the older browser-exposed provider-key approach. AI provider keys must stay server-side.
+This replaced the older client-side AI-key approach. AI provider keys must stay server-side.
 
 ### What AI actions exist?
 
@@ -359,34 +359,34 @@ Suggested tags generate a short list of possible tags for a note. The user can i
 
 There are two layers:
 
-- Local in-memory rate limits inside `/api/ai`
+- local in-memory rate limits inside `/api/ai`
 - Supabase-backed usage and feature counters through RPC functions
 
-The API also hashes IPs before using them for rate-limit buckets or logs. Raw IPs shouldn't be written into application logs.
+The API also hashes IPs before using them for rate-limit buckets or logs. Raw IPs should not be written into application logs.
 
 ### What is the free AI policy?
 
 The free policy is defined in `services/wellnessPolicy.ts`:
 
-- Free users can create 30 notes per month
-- Free users need at least 3 notes before the AI reflection sample is available
-- Free users get 1 AI reflection sample
-- Free users need at least 3 entries before a Life Wiki generation is useful
-- Free users get 1 Life Wiki generation
+- free users can create 30 notes per month
+- free users need at least 3 notes before the AI reflection sample is available
+- free users get 1 AI reflection sample
+- free users need at least 3 entries before a Life Wiki generation is useful
+- free users get 1 Life Wiki generation
 - Pro users have access beyond those free feature gates
 
 ### Does AI train on user notes?
 
-The app shouldn't claim more than the provider and deployment settings support. The product copy should say that notes are sent to the AI provider only when the user invokes an AI feature or enables Smart Mode behavior that performs AI work. It shouldn't promise things that aren't enforced in code.
+The app should not claim more than the provider and deployment settings support. The product copy should say that notes are sent to the AI provider only when the user invokes an AI feature or enables Smart Mode behavior that performs AI work. It should not promise things that are not enforced in code.
 
 ### Can AI see all notes?
 
 AI receives the bounded content needed for the specific action:
 
-- Reflections receive the note and wiki context
+- reflections receive the note and wiki context
 - Life Wiki refresh receives a notes corpus
-- Tag suggestions receive note content
-- Prompts receive recent-note context where applicable
+- tag suggestions receive note content
+- prompts receive recent-note context where applicable
 
 The system should avoid sending more data than the feature needs.
 
@@ -408,12 +408,12 @@ Private app data should be protected through Supabase Auth, Row Level Security, 
 
 The app uses Supabase Auth. Supported flows include:
 
-- Email and password signup
-- Email and password login
-- Password reset
+- email and password signup
+- email and password login
+- password reset
 - Google OAuth
-- Auth callback handling
-- Session persistence through Supabase's browser client
+- auth callback handling
+- session persistence through Supabase's browser client
 
 Protected routes use an authenticated app shell and route guard.
 
@@ -439,16 +439,16 @@ Account deletion should be treated as destructive and irreversible in user-facin
 
 Configuration is split by category:
 
-- Public Supabase browser configuration
-- Server Supabase configuration
+- public Supabase browser configuration
+- server Supabase configuration
 - Supabase service-role configuration for trusted API routes
 - Gemini server-side API configuration
 - Razorpay checkout, subscription, and webhook configuration
-- Email provider configuration
+- email provider configuration
 - Supabase function secrets
-- Public site origin configuration
+- public site origin configuration
 
-Variable names may appear in code and documentation when useful, but README examples mustn't include real values, token-shaped placeholders, or copy-pasteable secret blocks.
+Variable names may appear in code and documentation when useful, but README examples must not include real values, token-shaped placeholders, or copy-pasteable secret blocks.
 
 ### Which variable names are important?
 
@@ -472,7 +472,7 @@ Common configuration names in this project include:
 - `NEWSLETTER_TOKEN_SECRET`
 - `PUBLIC_SITE_URL`
 
-This list is for orientation only. Don't paste values into the README.
+This list is for orientation only. Do not paste values into the README.
 
 ### What should never be committed?
 
@@ -485,20 +485,20 @@ Never commit:
 - Resend credentials
 - Supabase function secrets
 - Android signing keys or keystore credentials
-- Private user exports
-- Production database dumps
-- Raw logs containing personal writing
-- Screenshots that show private notes
+- private user exports
+- production database dumps
+- raw logs containing personal writing
+- screenshots that show private notes
 
 ### Are public keys safe?
 
-Some browser-facing keys are designed to be public, such as the Supabase anon key and Razorpay public key. They still need correct backend and RLS enforcement. Public key doesn't mean unrestricted access.
+Some browser-facing keys are designed to be public, such as the Supabase anon key and Razorpay public key. They still need correct backend and RLS enforcement. Public key does not mean unrestricted access.
 
 Secrets such as service-role keys, provider API keys, payment secrets, webhook secrets, and email provider credentials must never be exposed to the browser bundle.
 
 ### Is Reflections safe for crisis use?
 
-No. Reflections isn't a crisis service. User-facing copy should make this clear in privacy, support, and wellness-related surfaces where the context calls for it.
+No. Reflections is not a crisis service. User-facing copy should make this clear in privacy, support, and wellness-related surfaces where the context calls for it.
 
 ## Pricing and Access FAQ
 
@@ -507,12 +507,12 @@ No. Reflections isn't a crisis service. User-facing copy should make this clear 
 The free tier includes:
 
 - 30 notes per calendar month
-- Private journaling
-- Mood tracking
-- Tags and tasks
-- One AI reflection sample after enough writing
-- One Life Wiki generation after enough writing
-- Core privacy protections
+- private journaling
+- mood tracking
+- tags and tasks
+- one AI reflection sample after enough writing
+- one Life Wiki generation after enough writing
+- core privacy protections
 
 The 30-note monthly limit is enforced server-side for free users.
 
@@ -529,7 +529,7 @@ The default Pro plan is weekly. Both plans are trial-eligible in the current cat
 
 Payments use Razorpay. Subscription creation happens through `/api/create-razorpay-subscription`, payment verification through `/api/verify-razorpay-payment`, and subscription state is confirmed through the Razorpay webhook route.
 
-The UI shouldn't promise Pro activation until the trusted payment flow confirms it.
+The UI should not promise Pro activation until the trusted payment flow confirms it.
 
 ### How is entitlement stored?
 
@@ -573,15 +573,15 @@ Profile rows are created when a user signs up.
 
 `notes` stores journal entries. A note can contain:
 
-- Title
-- Rich HTML content
-- Mood
-- Tags
-- Cover image path
-- Attachments
-- Tasks
-- Timestamps
-- User ownership
+- title
+- rich HTML content
+- mood
+- tags
+- cover image path
+- attachments
+- tasks
+- timestamps
+- user ownership
 
 The app maps database rows into the frontend `Note` type in the note remote store and service layer.
 
@@ -597,7 +597,7 @@ The table supports active, archived, and resolved states. Structured pages are u
 
 ### What is `wiki_absorb_log`?
 
-`wiki_absorb_log` records which notes have already been absorbed into the wiki. Smart Mode uses it to avoid repeating work when a saved note hasn't changed in a meaningful way.
+`wiki_absorb_log` records which notes have already been absorbed into the wiki. Smart Mode uses it to avoid repeating work when a saved note has not changed in a meaningful way.
 
 ### What are AI run tables?
 
@@ -743,7 +743,7 @@ Android-specific tests check signing assumptions, shell behavior, native OAuth b
 
 ### How should a maintainer work with the project locally?
 
-This README assumes the maintainer is already working inside the repository workspace. It doesn't include repository acquisition instructions.
+This README assumes the maintainer is already working inside the repository workspace. It does not include repository acquisition instructions.
 
 Common commands:
 
@@ -841,16 +841,16 @@ Avoid adding new state systems unless the feature clearly needs one. The app alr
 
 Match test scope to risk:
 
-- Service logic: unit tests beside the service
+- service logic: unit tests beside the service
 - AI contracts: payload and validation tests
-- Schema/security: contract tests against SQL text
-- Public pages: SEO and crawlability contract tests
-- Mobile behavior: Android/native contract tests
-- Visual/layout changes: targeted route/component contract tests
+- schema/security: contract tests against SQL text
+- public pages: SEO and crawlability contract tests
+- mobile behavior: Android/native contract tests
+- visual/layout changes: targeted route/component contract tests
 
 ### How should deployment configuration be treated?
 
-Deployment should keep secrets in the platform environment, not in files. Public origins, SEO metadata, PWA config, and public asset paths can live in source. Provider keys, payment secrets, webhook secrets, and function secrets can't.
+Deployment should keep secrets in the platform environment, not in files. Public origins, SEO metadata, PWA config, and public asset paths can live in source. Provider keys, payment secrets, webhook secrets, and function secrets cannot.
 
 ## Troubleshooting FAQ
 
@@ -860,7 +860,7 @@ The browser-facing Supabase configuration is missing or empty. The app checks re
 
 ### AI reflection says it is not configured. What does that mean?
 
-The server-side Gemini configuration is missing in that environment. The fallback message comes from `aiService` when `/api/ai` can't call Gemini.
+The server-side Gemini configuration is missing in that environment. The fallback message comes from `aiService` when `/api/ai` cannot call Gemini.
 
 ### AI returns a rate-limit error. What happened?
 
@@ -870,11 +870,11 @@ The action may have exceeded local API rate limits or Supabase-backed usage limi
 
 Common reasons:
 
-- The user has too few notes
-- The note corpus is empty
-- Generated output failed source-marker validation
-- The AI route failed
-- All page generations failed and were logged
+- the user has too few notes
+- the note corpus is empty
+- generated output failed source-marker validation
+- the AI route failed
+- all page generations failed and were logged
 
 The user's notes should still be safe.
 
@@ -882,11 +882,11 @@ The user's notes should still be safe.
 
 Check:
 
-- Server Razorpay configuration presence
-- Public and server key mode alignment
-- Weekly and monthly plan configuration
-- Webhook secret configuration
-- Webhook delivery logs
+- server Razorpay configuration presence
+- public and server key mode alignment
+- weekly and monthly plan configuration
+- webhook secret configuration
+- webhook delivery logs
 - `api/payment-diagnostics.ts`
 - Razorpay-related tests under `tests/api`
 
@@ -896,23 +896,23 @@ Diagnostics should never print secret values.
 
 Check:
 
-- The file exists in `app-files`
-- The path is under the user's folder
+- the file exists in `app-files`
+- the path is under the user's folder
 - Storage RLS policies are installed
-- Signed URL generation is working
-- The component is using `StorageImage` or the storage service
+- signed URL generation is working
+- the component is using `StorageImage` or the storage service
 
 ### Offline notes are not syncing. What should be checked?
 
 Check:
 
-- Local Dexie records
-- Sync status flags
+- local Dexie records
+- sync status flags
 - Supabase session state
-- Network state
+- network state
 - `syncEngine`
 - `offlineStorage`
-- Note ownership and RLS errors
+- note ownership and RLS errors
 
 ### Public SEO output looks stale. What should be checked?
 
@@ -921,7 +921,7 @@ Check:
 - `src/config/publicSeoCopy.js`
 - `src/config/publicSite.js`
 - `scripts/generate-public-seo-pages.mjs`
-- Generated files under `public/`
+- generated files under `public/`
 - SEO contract tests
 
 ## Roadmap FAQ
@@ -930,44 +930,44 @@ Check:
 
 Current code already includes the major product systems:
 
-- Writing and note management
-- Mood and weekly recap
+- writing and note management
+- mood and weekly recap
 - Life Wiki and Sanctuary
 - Smart Mode
 - AI reflection, prompts, tags, wiki pages, and writing notes
-- Offline cache and sync
+- offline cache and sync
 - PWA support
 - Android shell support
 - Razorpay Pro pricing and subscriptions
 - Future Letters
 - Release Mode
-- Completion cards
-- Referrals
-- Newsletter and email infrastructure
+- completion cards
+- referrals
+- newsletter and email infrastructure
 
 ### What future work still fits the product?
 
 Future work should stay close to writing, privacy, and gentle pattern recognition. Good candidates include:
 
-- Better export flows
-- Clearer account deletion UX
-- Stronger offline conflict handling
-- Richer Life Wiki source review
-- Better user control over Smart Mode
-- Privacy copy that tracks implementation exactly
-- Improved Android release readiness
+- better export flows
+- clearer account deletion UX
+- stronger offline conflict handling
+- richer Life Wiki source review
+- better user control over Smart Mode
+- privacy copy that tracks implementation exactly
+- improved Android release readiness
 
 ### What should not be added?
 
 Avoid:
 
-- Streak mechanics
-- Social feeds
-- Public note sharing by default
-- Diagnosis-like AI
-- Manipulative subscription copy
-- Hidden AI processing
-- Growth loops that pressure private writing
+- streak mechanics
+- social feeds
+- public note sharing by default
+- diagnosis-like AI
+- manipulative subscription copy
+- hidden AI processing
+- growth loops that pressure private writing
 
 ## Author and License
 
