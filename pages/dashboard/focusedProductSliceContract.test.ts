@@ -128,7 +128,7 @@ describe('focused product slice source contract', () => {
     expect(read('pages/dashboard/moodConfig.ts')).toContain("'charged'");
     expect(homeAuthenticated.toLowerCase()).not.toContain('score');
 
-    expect(createNote).toContain('title="How does it feel right now?"');
+    expect(createNote).toContain("title={moodPickerStage === 'group' ? 'How does it feel right now?' : undefined}");
     expect(createNote).not.toContain('Reflection mood');
   });
 

@@ -24,11 +24,13 @@ describe('surgical route and landing contract', () => {
     }
   });
 
-  it('keeps CreateNote entry feedback tied to real loading only', () => {
+  it('keeps CreateNote entry feedback tied to loading and the one-shot entry animation', () => {
     const createNote = read('pages/dashboard/CreateNote.tsx');
     const trailLoadingMark = read('components/ui/TrailLoadingMark.tsx');
 
-    expect(createNote).toContain('const showEntryExperience = loading;');
+    expect(createNote).toContain('const showEntryExperience = loading || !entryAnimationComplete;');
+    expect(createNote).toContain('CREATE_NOTE_ENTRY_ANIMATION_FALLBACK_MS = 3600');
+    expect(createNote).toContain('<TrailLoadingMark loop={false} onComplete={() => setEntryAnimationComplete(true)} />');
     expect(createNote).toContain('if (showEntryExperience) {');
     expect(createNote).not.toContain('const [isBreathing');
     expect(createNote).not.toContain('setIsBreathing');

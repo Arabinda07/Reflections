@@ -10,6 +10,7 @@ interface ModalSheetProps {
   onClose: () => void;
   title?: string;
   description?: string;
+  ariaLabel?: string;
   icon?: React.ReactNode;
   children?: React.ReactNode;
   footer?: React.ReactNode;
@@ -43,6 +44,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
   onClose,
   title,
   description,
+  ariaLabel,
   icon,
   children,
   footer,
@@ -179,6 +181,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
               role="dialog"
               aria-modal="true"
               aria-labelledby={title ? titleId : undefined}
+              aria-label={!title && ariaLabel ? ariaLabel : undefined}
               aria-describedby={description ? descriptionId : undefined}
             >
               <div className="modal-sheet-handle" />

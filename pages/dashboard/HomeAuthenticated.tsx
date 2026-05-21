@@ -37,7 +37,7 @@ import {
   type HomeIntentionSummary,
 } from './homeIntentions';
 import { getMoodConfig } from './moodConfig';
-import { MoodPicker } from './MoodPicker';
+import { MoodPicker, type MoodPickerStage } from './MoodPicker';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 
@@ -112,6 +112,7 @@ export const HomeAuthenticated: React.FC = () => {
   const [dailyPrompt, setDailyPrompt] = useState(DEFAULT_WELLNESS_PROMPTS[0]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
+  const [moodPickerStage, setMoodPickerStage] = useState<MoodPickerStage>('group');
   const [isSavingCheckIn, setIsSavingCheckIn] = useState(false);
   const [checkInFeedback, setCheckInFeedback] = useState<string | null>(null);
   const [intentionFeedback, setIntentionFeedback] = useState<string | null>(null);
@@ -347,6 +348,7 @@ export const HomeAuthenticated: React.FC = () => {
       });
       setCheckInFeedback(mood);
       setTimeout(() => {
+        setMoodPickerStage('group');
         setIsCheckInOpen(false);
         setTimeout(() => setCheckInFeedback(null), 300);
       }, 1500);
@@ -817,12 +819,14 @@ export const HomeAuthenticated: React.FC = () => {
       <ModalSheet
         isOpen={isCheckInOpen}
         onClose={() => {
+          setMoodPickerStage('group');
           setIsCheckInOpen(false);
           setCheckInFeedback(null);
         }}
-        title="How does it feel right now?"
-        description="Pick a broad mood. Details are optional."
-        icon={<Heart size={20} weight="duotone" />}
+        title={moodPickerStage === 'group' ? 'How does it feel right now?' : undefined}
+        description={moodPickerStage === 'group' ? 'Pick a broad mood. Details are optional.' : undefined}
+        ariaLabel="Choose a mood for this reflection"
+        icon={moodPickerStage === 'group' ? <Heart size={20} weight="duotone" /> : undefined}
         size="sm"
         tone="sage"
         panelClassName="modal-sheet-panel--compact"
@@ -832,8 +836,10 @@ export const HomeAuthenticated: React.FC = () => {
           {!checkInFeedback ? (
             <MoodPicker
               selectedMood={undefined}
+              onStageChange={setMoodPickerStage}
               onSelect={(nextMood) => {
                 if (nextMood) {
+                  setMoodPickerStage('group');
                   void handleMoodCheckIn(nextMood);
                 }
               }}

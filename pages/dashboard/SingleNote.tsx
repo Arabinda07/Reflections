@@ -31,7 +31,7 @@ import { Note, RoutePath, Task } from '../../types';
 import { sanitizeNoteHtml } from './noteContent';
 import { downloadNoteExport } from './noteExport';
 import { getMoodConfig } from './moodConfig';
-import { MoodPicker } from './MoodPicker';
+import { MoodPicker, type MoodPickerStage } from './MoodPicker';
 
 export const SingleNote: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -42,6 +42,7 @@ export const SingleNote: React.FC = () => {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isMoodOpen, setIsMoodOpen] = useState(false);
+  const [moodPickerStage, setMoodPickerStage] = useState<MoodPickerStage>('group');
   const [isTagsOpen, setIsTagsOpen] = useState(false);
   const [isTasksOpen, setIsTasksOpen] = useState(false);
   const [tagDraft, setTagDraft] = useState('');
@@ -470,17 +471,23 @@ export const SingleNote: React.FC = () => {
 
       <ModalSheet
         isOpen={isMoodOpen}
-        onClose={() => setIsMoodOpen(false)}
-        title="How does it feel right now?"
-        description="Pick a broad mood. Details are optional."
+        onClose={() => {
+          setMoodPickerStage('group');
+          setIsMoodOpen(false);
+        }}
+        title={moodPickerStage === 'group' ? 'How does it feel right now?' : undefined}
+        description={moodPickerStage === 'group' ? 'Pick a broad mood. Details are optional.' : undefined}
+        ariaLabel="Choose a mood for this reflection"
         size="sm"
         panelClassName="modal-sheet-panel--compact"
         bodyClassName="modal-sheet-body--compact"
       >
         <MoodPicker
           selectedMood={note.mood}
+          onStageChange={setMoodPickerStage}
           onSelect={async (nextMood) => {
             await persistNote({ mood: nextMood });
+            setMoodPickerStage('group');
             setIsMoodOpen(false);
           }}
         />

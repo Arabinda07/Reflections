@@ -42,7 +42,7 @@ import { canNavigateBackInApp } from '../../src/native/androidBack';
 import { NATIVE_PAGE_TOP_PADDING, NATIVE_TOP_CONTROL_OFFSET } from '../../src/native/safeArea';
 import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
 import { getMoodConfig, getMoodGroupForMood } from './moodConfig';
-import { MoodPicker } from './MoodPicker';
+import { MoodPicker, type MoodPickerStage } from './MoodPicker';
 
 const TrailLoadingMark = lazy(() => import('../../components/ui/TrailLoadingMark')
   .then((module) => ({ default: module.TrailLoadingMark })));
@@ -50,6 +50,8 @@ const CompanionObservation = lazy(() => import('../../components/ui/CompanionObs
   .then((module) => ({ default: module.CompanionObservation })));
 const PaperPlaneToast = lazy(() => import('../../components/ui/PaperPlaneToast')
   .then((module) => ({ default: module.PaperPlaneToast })));
+
+const CREATE_NOTE_ENTRY_ANIMATION_FALLBACK_MS = 3600;
 
 const getSurfaceScopeForMood = (mood?: string) => {
   switch (getMoodGroupForMood(mood)?.id) {
@@ -187,7 +189,9 @@ export const CreateNote: React.FC = () => {
   const [isReflecting, setIsReflecting] = useState(false);
   const [aiReflection, setAiReflection] = useState<string | null>(null);
   const [isMobileOptionsOpen, setIsMobileOptionsOpen] = useState(false);
+  const [entryAnimationComplete, setEntryAnimationComplete] = useState(false);
   const [isMoodOpen, setIsMoodOpen] = useState(false);
+  const [moodPickerStage, setMoodPickerStage] = useState<MoodPickerStage>('group');
   const [isTagsOpen, setIsTagsOpen] = useState(false);
   const [isMusicOpen, setIsMusicOpen] = useState(false);
   const [isTasksOpen, setIsTasksOpen] = useState(false);
@@ -212,6 +216,12 @@ export const CreateNote: React.FC = () => {
     isUnmounted.current = false;
     return () => { isUnmounted.current = true; };
   }, []);
+
+  useEffect(() => {
+    if (entryAnimationComplete) return;
+    const timer = window.setTimeout(() => setEntryAnimationComplete(true), CREATE_NOTE_ENTRY_ANIMATION_FALLBACK_MS);
+    return () => window.clearTimeout(timer);
+  }, [entryAnimationComplete]);
 
   useEffect(() => {
     return () => {
@@ -361,7 +371,7 @@ export const CreateNote: React.FC = () => {
   const interimTranscript = whisper.interimTranscript;
   const whisperFeedback = whisper.feedback;
   const toggleWhisper = whisper.toggle;
-  const showEntryExperience = loading;
+  const showEntryExperience = loading || !entryAnimationComplete;
 
   const handleStayOnDraft = () => {
     setShowLeaveDialog(false);
@@ -387,7 +397,7 @@ export const CreateNote: React.FC = () => {
         <div className="relative z-10 flex max-w-md flex-col items-center">
           <div className="mb-6 h-40 w-40 max-w-full opacity-80 sm:h-44 sm:w-44" aria-hidden="true">
             <Suspense fallback={<div className="h-full w-full rounded-full bg-green/5" />}>
-              <TrailLoadingMark />
+              <TrailLoadingMark loop={false} onComplete={() => setEntryAnimationComplete(true)} />
             </Suspense>
           </div>
 
@@ -839,17 +849,23 @@ export const CreateNote: React.FC = () => {
 
       <ModalSheet
         isOpen={isMoodOpen}
-        onClose={() => setIsMoodOpen(false)}
-        title="How does it feel right now?"
-        description="Pick a broad mood. Details are optional."
+        onClose={() => {
+          setMoodPickerStage('group');
+          setIsMoodOpen(false);
+        }}
+        title={moodPickerStage === 'group' ? 'How does it feel right now?' : undefined}
+        description={moodPickerStage === 'group' ? 'Pick a broad mood. Details are optional.' : undefined}
+        ariaLabel="Choose a mood for this reflection"
         size="sm"
         panelClassName="modal-sheet-panel--compact"
         bodyClassName="modal-sheet-body--compact"
       >
         <MoodPicker
           selectedMood={mood}
+          onStageChange={setMoodPickerStage}
           onSelect={(nextMood) => {
             setMood(nextMood);
+            setMoodPickerStage('group');
             setIsMoodOpen(false);
           }}
         />

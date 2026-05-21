@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CaretLeft } from '@phosphor-icons/react/CaretLeft';
 import { Check } from '@phosphor-icons/react/Check';
 import {
@@ -11,16 +11,24 @@ import {
   type MoodValue,
 } from './moodConfig';
 
+export type MoodPickerStage = 'group' | 'detail';
+
 interface MoodPickerProps {
   selectedMood?: string;
   onSelect: (mood: MoodValue | undefined) => void | Promise<void>;
+  onStageChange?: (stage: MoodPickerStage) => void;
 }
 
 const getInitialGroupId = (mood?: string) => getMoodGroupForMood(mood)?.id || null;
 
-export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, onSelect }) => {
+export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, onSelect, onStageChange }) => {
   const [selectedGroupId, setSelectedGroupId] = useState<MoodGroupId | null>(() => getInitialGroupId(selectedMood));
   const selectedGroup = MOOD_PICKER_GROUPS.find((group) => group.id === selectedGroupId) || null;
+
+  useEffect(() => {
+    if (!onStageChange) return;
+    onStageChange(selectedGroup ? 'detail' : 'group');
+  }, [onStageChange, selectedGroup]);
 
   const handleGroupSelect = (group: MoodGroup) => {
     setSelectedGroupId(group.id);
