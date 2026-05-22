@@ -14,7 +14,7 @@ import { Plus } from '@phosphor-icons/react/Plus';
 import { Sparkle } from '@phosphor-icons/react/Sparkle';
 import { Target } from '@phosphor-icons/react/Target';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { isSameDay } from 'date-fns';
 
@@ -97,6 +97,22 @@ const prefetchCreateNoteRoute = () => {
   void import('@/pages/dashboard/CreateNote');
 };
 
+const HOME_HERO_COLLAPSED_SESSION_KEY = 'home_hero_collapsed';
+const HOME_HERO_DRAG_THRESHOLD = 48;
+const HOME_HERO_SCROLL_THRESHOLD = 32;
+
+const getInitialHomeHeroCollapsed = () => {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  try {
+    return window.sessionStorage.getItem(HOME_HERO_COLLAPSED_SESSION_KEY) === 'true';
+  } catch {
+    return false;
+  }
+};
+
 
 
 export const HomeAuthenticated: React.FC = () => {
@@ -127,6 +143,11 @@ export const HomeAuthenticated: React.FC = () => {
   const [isIntentionModalOpen, setIsIntentionModalOpen] = useState(false);
   const [shouldLoadHeroVideo, setShouldLoadHeroVideo] = useState(false);
   const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);
+  const [isHeroCollapsed, setIsHeroCollapsed] = useState(getInitialHomeHeroCollapsed);
+  const [isHeroDragging, setIsHeroDragging] = useState(false);
+  const heroDragStartYRef = useRef<number | null>(null);
+  const heroDragCurrentYRef = useRef<number | null>(null);
+  const heroDragMovedRef = useRef(false);
   const shouldReduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const isCompactViewport = useMediaQuery('(max-width: 639px)');
   const { showToast } = useToast();
@@ -136,6 +157,80 @@ export const HomeAuthenticated: React.FC = () => {
   const currentOnboardingStep = ONBOARDING_STEPS[onboardingStep];
   const isLastOnboardingStep = onboardingStep === ONBOARDING_STEPS.length - 1;
   const CurrentOnboardingIcon = onboardingStepIcons[onboardingStep];
+
+  const collapseHero = useCallback(() => {
+    setIsHeroCollapsed(true);
+    if (typeof window !== 'undefined') {
+      try {
+        window.sessionStorage.setItem(HOME_HERO_COLLAPSED_SESSION_KEY, 'true');
+      } catch {
+        // The hero still collapses if session storage is unavailable.
+      }
+    }
+  }, []);
+
+  const expandHero = useCallback(() => {
+    setIsHeroCollapsed(false);
+    if (typeof window !== 'undefined') {
+      try {
+        window.sessionStorage.setItem(HOME_HERO_COLLAPSED_SESSION_KEY, 'false');
+      } catch {
+        // The hero still expands if session storage is unavailable.
+      }
+    }
+  }, []);
+
+  const handleHeroPointerDown = useCallback((event: React.PointerEvent<HTMLButtonElement>) => {
+    heroDragStartYRef.current = event.clientY;
+    heroDragCurrentYRef.current = event.clientY;
+    heroDragMovedRef.current = false;
+    setIsHeroDragging(true);
+    event.currentTarget.setPointerCapture(event.pointerId);
+  }, []);
+
+  const handleHeroPointerMove = useCallback((event: React.PointerEvent<HTMLButtonElement>) => {
+    const startY = heroDragStartYRef.current;
+    if (startY === null) return;
+
+    heroDragCurrentYRef.current = event.clientY;
+    if (Math.abs(event.clientY - startY) > 8) {
+      heroDragMovedRef.current = true;
+    }
+  }, []);
+
+  const handleHeroPointerEnd = useCallback(() => {
+    const startY = heroDragStartYRef.current;
+    const currentY = heroDragCurrentYRef.current;
+
+    heroDragStartYRef.current = null;
+    heroDragCurrentYRef.current = null;
+    setIsHeroDragging(false);
+
+    if (startY === null || currentY === null) return;
+
+    const dragDistance = currentY - startY;
+    if (!isHeroCollapsed && dragDistance <= -HOME_HERO_DRAG_THRESHOLD) {
+      collapseHero();
+    }
+
+    if (isHeroCollapsed && dragDistance >= HOME_HERO_DRAG_THRESHOLD) {
+      expandHero();
+    }
+  }, [collapseHero, expandHero, isHeroCollapsed]);
+
+  const handleHeroHandleClick = useCallback(() => {
+    if (heroDragMovedRef.current) {
+      heroDragMovedRef.current = false;
+      return;
+    }
+
+    if (isHeroCollapsed) {
+      expandHero();
+      return;
+    }
+
+    collapseHero();
+  }, [collapseHero, expandHero, isHeroCollapsed]);
 
   useEffect(() => {
     setDailyPrompt(
@@ -243,6 +338,19 @@ export const HomeAuthenticated: React.FC = () => {
 
     return () => window.clearTimeout(videoDelay);
   }, [isCompactViewport, shouldReduceMotion]);
+
+  useEffect(() => {
+    if (isHeroCollapsed || showOnboarding) return;
+
+    const handleScroll = () => {
+      if (window.scrollY > HOME_HERO_SCROLL_THRESHOLD) {
+        collapseHero();
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [collapseHero, isHeroCollapsed, showOnboarding]);
 
   const handleCloseOnboarding = useCallback(() => {
     localStorage.setItem('hasSeenOnboarding', 'true');
@@ -444,39 +552,47 @@ export const HomeAuthenticated: React.FC = () => {
         className="home-authenticated-mobile-safe surface-scope-sage page-wash relative min-h-full flex flex-col flex-1 bg-body selection:bg-green/10"
         aria-hidden={showOnboarding ? 'true' : undefined}
       >
-        <section className="relative isolate h-[44dvh] min-h-[300px] w-full overflow-hidden bg-body sm:h-[48dvh] sm:min-h-[360px]">
-          <img
-            src="/assets/videos/field.png"
-            alt=""
-            aria-hidden="true"
-            loading="eager"
-            decoding="async"
-            className="absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center opacity-90"
-          />
-          {shouldLoadHeroVideo ? (
-            <video
-              src="/assets/videos/field.mp4"
-              poster="/assets/videos/field.png"
-              autoPlay
-              loop
-              muted
-              playsInline
-              preload="metadata"
-              onLoadedData={() => setIsHeroVideoReady(true)}
-              className={`absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center bg-transparent transition-opacity duration-700 ease-out-expo ${
-                isHeroVideoReady ? 'opacity-70' : 'opacity-0'
-              }`}
-            >
-            </video>
-          ) : null}
-          <div className="absolute inset-0 z-10 hero-scrim" />
-          <div className="absolute inset-0 z-10 screen-scrim opacity-20" />
-          <div className="absolute inset-0 bg-gradient-to-t from-body via-transparent to-transparent z-10" />
+        <section
+          className={`home-hero-shell relative isolate w-full overflow-hidden bg-body ${
+            isHeroDragging ? 'home-hero-shell--dragging' : ''
+          } ${shouldReduceMotion ? 'home-hero-shell--reduced-motion' : ''}`}
+          data-collapsed={isHeroCollapsed ? 'true' : 'false'}
+        >
+          <div className="home-hero-media" aria-hidden="true">
+            <img
+              src="/assets/videos/field.png"
+              alt=""
+              aria-hidden="true"
+              loading="eager"
+              decoding="async"
+              className="absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center opacity-90"
+            />
+            {shouldLoadHeroVideo ? (
+              <video
+                src="/assets/videos/field.mp4"
+                poster="/assets/videos/field.png"
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="metadata"
+                onLoadedData={() => setIsHeroVideoReady(true)}
+                className={`absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center bg-transparent transition-opacity duration-700 ease-out-expo ${
+                  isHeroVideoReady ? 'opacity-70' : 'opacity-0'
+                }`}
+              >
+              </video>
+            ) : null}
+            <div className="absolute inset-0 z-10 hero-scrim" />
+            <div className="absolute inset-0 z-10 screen-scrim opacity-20" />
+            <div className="absolute inset-0 bg-gradient-to-t from-body via-transparent to-transparent z-10" />
+          </div>
 
-          <div className="relative z-20 h-full flex flex-col items-center justify-start pt-[10vh] text-center px-6">
+          <div className="home-hero-copy relative z-20 flex h-full flex-col items-center justify-start text-center px-6">
             <div className="max-w-4xl">
               <h1 className="h1-hero hero-ink mb-12 text-balance">
-                <span className="whitespace-nowrap">Welcome back,</span> <br />
+                <span className="whitespace-nowrap">Welcome back,</span>{' '}
+                <br className="home-hero-break" />
                 <span className="font-serif italic hero-ink-accent">
                   {authStoreDisplayName}
                 </span>
@@ -484,10 +600,27 @@ export const HomeAuthenticated: React.FC = () => {
             </div>
           </div>
 
-
+          <button
+            type="button"
+            className="home-hero-handle"
+            onClick={handleHeroHandleClick}
+            onPointerDown={handleHeroPointerDown}
+            onPointerMove={handleHeroPointerMove}
+            onPointerUp={handleHeroPointerEnd}
+            onPointerCancel={handleHeroPointerEnd}
+            aria-expanded={!isHeroCollapsed}
+            aria-controls="home-dashboard-grid"
+            aria-label={isHeroCollapsed ? 'Show greeting' : 'Show dashboard'}
+          >
+            <span className="home-hero-handle-grip" aria-hidden="true" />
+            <span className="home-hero-handle-label">
+              {isHeroCollapsed ? 'Show greeting' : 'Show dashboard'}
+            </span>
+          </button>
         </section>
 
         <section
+          id="home-dashboard-grid"
           className="core-bento-grid"
         >
           <div

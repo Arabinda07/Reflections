@@ -105,6 +105,24 @@ describe('focused product slice source contract', () => {
     expect(homeAuthenticated).toContain('dashboard-prompt-text typographic-measure');
   });
 
+  it('lets the authenticated greeting yield to the dashboard through explicit and inferred actions', () => {
+    const homeAuthenticated = read('pages/dashboard/HomeAuthenticated.tsx');
+
+    expect(homeAuthenticated).toContain('HOME_HERO_COLLAPSED_SESSION_KEY');
+    expect(homeAuthenticated).toContain('HOME_HERO_DRAG_THRESHOLD');
+    expect(homeAuthenticated).toContain('HOME_HERO_SCROLL_THRESHOLD');
+    expect(homeAuthenticated).toContain('collapseHero');
+    expect(homeAuthenticated).toContain('expandHero');
+    expect(homeAuthenticated).toContain('handleHeroPointerDown');
+    expect(homeAuthenticated).toContain('handleHeroPointerMove');
+    expect(homeAuthenticated).toContain('handleHeroPointerEnd');
+    expect(homeAuthenticated).toContain('setPointerCapture');
+    expect(homeAuthenticated).toContain('window.addEventListener(\'scroll\'');
+    expect(homeAuthenticated).toContain('shouldReduceMotion');
+    expect(homeAuthenticated).toContain('Show dashboard');
+    expect(homeAuthenticated).toContain('Show greeting');
+  });
+
   it('removes quietly from live app and AI copy', () => {
     const liveCopyFiles = [
       'pages/dashboard/AboutArabinda.tsx',

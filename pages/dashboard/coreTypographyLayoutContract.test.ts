@@ -72,4 +72,24 @@ describe('core app typography and layout contract', () => {
     expect(cardsPosition).toBeGreaterThan(-1);
     expect(audioPosition).toBeGreaterThan(cardsPosition);
   });
+
+  it('makes the authenticated home greeting compress into a dashboard shelf', () => {
+    const css = read('index.css');
+    const home = read('pages/dashboard/HomeAuthenticated.tsx');
+
+    expect(home).toContain('home-hero-shell');
+    expect(home).toContain("data-collapsed={isHeroCollapsed ? 'true' : 'false'}");
+    expect(home).toContain('home-hero-handle');
+    expect(home).toContain('aria-expanded={!isHeroCollapsed}');
+    expect(home).toContain('aria-controls="home-dashboard-grid"');
+    expect(home).toContain('id="home-dashboard-grid"');
+    expect(home).toContain('sessionStorage');
+    expect(home).not.toContain("localStorage.getItem('home_hero_collapsed')");
+
+    expect(css).toContain('.home-hero-shell[data-collapsed="false"]');
+    expect(css).toContain('.home-hero-shell[data-collapsed="true"]');
+    expect(css).toContain('.home-hero-handle');
+    expect(css).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(css).toContain('.home-hero-shell');
+  });
 });
