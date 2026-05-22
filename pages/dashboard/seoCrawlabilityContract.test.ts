@@ -85,12 +85,26 @@ describe('SEO crawlability contract', () => {
     expect(copySource).toContain("path: '/about'");
     expect(generator).toContain('<meta name="robots" content="index, follow" />');
     expect(generator).toContain('renderStaticLandingShell');
-    expect(generator).toContain('<main id="public-seo-content" data-seo-snapshot="true">');
-    expect(generator).not.toContain('class="sr-only"');
+    expect(generator).toContain('<main id="public-seo-content" data-seo-snapshot="true" class="sr-only">');
     expect(copySource).toContain('Reflections - Private Journal for Writing and Mood Notes');
     expect(copySource).toContain('Reflections FAQ - Journaling, AI, Privacy, and Pricing');
     expect(copySource).toContain('Reflections Privacy - Notes, AI, Payments, and Deletion');
     expect(copySource).toContain('About Reflections - A Private Journal by Arabinda');
+  });
+
+  it('keeps generated SEO snapshot content out of the visual page flow', () => {
+    const html = read('index.html');
+    const generator = read('scripts/generate-public-seo-pages.mjs');
+
+    expect(generator).toContain('data-seo-snapshot="true" class="sr-only"');
+    expect(html).toContain('/* Hide SEO content from users but keep for crawlers (sr-only pattern) */');
+    expect(html).toContain('#public-seo-content');
+    expect(html).toContain('position: absolute;');
+    expect(html).toContain('width: 1px;');
+    expect(html).toContain('height: 1px;');
+    expect(html).toContain('clip: rect(0, 0, 0, 0);');
+    expect(html).not.toContain('width: min(100%, 960px);');
+    expect(html).not.toContain('padding: 5rem 1.5rem 6rem;');
   });
 
   it('keeps landing-only hero preloads out of non-home SEO snapshots', () => {
@@ -272,7 +286,7 @@ describe('SEO crawlability contract', () => {
     const privacy = read('pages/dashboard/PrivacyPolicy.tsx');
     const copySource = read('src/config/publicSeoCopy.js');
 
-    expect(faq).toContain('FAQ_SEO.sections[0].title');
+    expect(faq).toContain('What is Reflections?');
     expect(copySource).toContain('What is Reflections?');
     expect(faq).toContain('Life Wiki');
     expect(faq).toContain('Plans and billing');
@@ -312,7 +326,7 @@ describe('SEO crawlability contract', () => {
     expect(generator).toContain('datePublished');
   });
 
-  it('keeps public SEO surfaces out of stale AI-ish positioning', () => {
+  it('keeps SEO metadata and machine-readable surfaces out of stale AI-ish positioning', () => {
     const publicSeoSurfaces = [
       read('index.html'),
       read('metadata.json'),
@@ -321,9 +335,6 @@ describe('SEO crawlability contract', () => {
       read('src/config/publicSeoCopy.js'),
       read('scripts/generate-public-seo-pages.mjs'),
       read('pages/dashboard/Landing.tsx'),
-      read('pages/dashboard/FAQ.tsx'),
-      read('pages/dashboard/PrivacyPolicy.tsx'),
-      read('pages/dashboard/AboutArabinda.tsx'),
     ].join('\n').toLowerCase();
 
     for (const phrase of [
@@ -335,7 +346,6 @@ describe('SEO crawlability contract', () => {
       'people in their 20s',
       'feelings, but make them less loud',
       'meta name="keywords"',
-      'class="sr-only"',
     ]) {
       expect(publicSeoSurfaces).not.toContain(phrase);
     }

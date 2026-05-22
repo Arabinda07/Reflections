@@ -123,7 +123,7 @@ const renderSeoContent = (page) => {
     .join('');
 
   return `
-    <main id="public-seo-content" data-seo-snapshot="true">
+    <main id="public-seo-content" data-seo-snapshot="true" class="sr-only">
       <nav aria-label="Public pages">${navLinks}</nav>
       <h1>${escapeHtml(page.h1)}</h1>
       <p>${escapeHtml(page.intro)}</p>

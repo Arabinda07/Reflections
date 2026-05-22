@@ -130,13 +130,13 @@ export const PrivacyPolicy: React.FC = () => {
             Back
           </button>
           <h1 className="text-mk-display font-display font-extrabold leading-[0.95] tracking-normal text-gray-text text-balance">
-            {PRIVACY_SEO.h1}
+            Privacy
           </h1>
         </div>
 
         <div className="space-y-4 lg:col-span-4">
           <p className="max-w-[36rem] font-serif text-[18px] leading-relaxed text-gray-light">
-            {PRIVACY_SEO.intro}
+            This page explains what Reflections stores, when AI is used, how payments work, and how you can remove your writing.
           </p>
           <p className="text-[12px] font-bold uppercase tracking-widest text-gray-nav">Last updated · May 2026</p>
         </div>

@@ -117,14 +117,14 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
     const faq = read('pages/dashboard/FAQ.tsx');
     const publicSeoCopy = read('src/config/publicSeoCopy.js');
 
-    expect(faq).toContain('FAQ_SEO.h1');
-    expect(faq).toContain('FAQ_SEO.intro');
+    expect(faq).toContain('Untangle your');
+    expect(faq).toContain('thoughts</span>');
     expect(faq).not.toContain('thoughts.</span>');
     expect(faq).toContain('const guideSections');
     expect(faq).toContain('const practiceItems');
     expect(faq).toContain('const detailItems');
     expect(faq).toContain('const featureGrid');
-    expect(faq).toContain('FAQ_SEO.sections[0].title');
+    expect(faq).toContain('What is Reflections?');
     expect(faq).toContain('Who is Reflections for?');
     expect(faq).toContain('Why writing first?');
     expect(publicSeoCopy).toContain('What is Reflections?');

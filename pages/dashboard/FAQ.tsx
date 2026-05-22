@@ -15,14 +15,15 @@ const FAQ_SEO = PUBLIC_SEO_COPY.faq;
 const guideSections: PublicIconCard[] = [
   {
     icon: 'book',
-    title: FAQ_SEO.sections[0].title,
-    body: FAQ_SEO.sections[0].body,
+    title: 'What is Reflections?',
+    body:
+      'A private place for the mess before it has words. You save notes, name moods, tag patterns, and come back when your brain has cooled down a little.',
   },
   {
     icon: 'heart',
     title: 'Who is Reflections for?',
     body:
-      'For anyone who wants a private place to write, check in with moods, and return to thoughts without scores, streaks, or public sharing.',
+      'For people in their 20s and 30s who need one calm tab for the thing they keep replaying. You set the pace, keep your notes private, and choose when AI gets invited.',
   },
   {
     icon: 'pen',
@@ -55,7 +56,7 @@ const practiceItems: PublicIconCard[] = [
   },
   {
     title: 'Naming the feeling',
-    body: 'Check in with your mood so entries can show simple patterns over time.',
+    body: "Check in with your mood. Feelings, but make them less loud.",
     icon: 'heart',
   },
 ];
@@ -119,14 +120,16 @@ export const FAQ: React.FC = () => {
       <section className="mx-auto grid w-full max-w-[1440px] gap-12 px-6 py-20 sm:px-10 lg:grid-cols-12 lg:items-end lg:px-16 lg:py-28">
         <div className="lg:col-span-8">
           <h1 className="text-mk-display font-display font-extrabold leading-[0.95] tracking-normal text-gray-text text-balance">
-            {FAQ_SEO.h1}
+            Untangle your <br />
+            <span className="font-serif italic font-normal text-green">thoughts</span>
           </h1>
         </div>
 
         <div className="space-y-4 lg:col-span-4">
 
           <p className="max-w-[36rem] font-serif text-[18px] leading-relaxed text-gray-light">
-            {FAQ_SEO.intro}
+            Reflections is a calm, private writing space for the thoughts that keep doing laps.
+            This guide explains what the product does, how AI waits, and what stays yours.
           </p>
           <p className="text-[12px] font-bold uppercase tracking-widest text-gray-nav">Last updated · May 2026</p>
         </div>
