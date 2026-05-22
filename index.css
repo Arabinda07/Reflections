@@ -837,6 +837,13 @@ details:focus-visible,
   }
 
   .home-dashboard-intro-frame #home-dashboard-grid {
+    transform: none;
+    transition: none;
+    will-change: auto;
+  }
+
+  .home-dashboard-intro-frame[data-intro-state="visible"] #home-dashboard-grid,
+  .home-dashboard-intro-frame[data-intro-state="exiting"] #home-dashboard-grid {
     transform: translate3d(0, var(--home-dashboard-grid-y), 0);
     transition: transform 650ms var(--ease-out-expo);
     will-change: transform;
@@ -865,7 +872,9 @@ details:focus-visible,
   }
 
   .home-dashboard-intro-frame[data-intro-state="gone"] #home-dashboard-grid {
+    transform: none;
     transition-duration: 0ms;
+    will-change: auto;
   }
 
   .core-bento-grid {

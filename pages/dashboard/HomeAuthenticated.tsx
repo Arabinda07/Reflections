@@ -97,7 +97,6 @@ const prefetchCreateNoteRoute = () => {
 };
 
 type HomeHeroIntroState = 'visible' | 'exiting' | 'gone';
-type HomeHeroCollapseReason = 'button' | 'drag' | 'scroll' | 'timer';
 
 const HOME_HERO_INTRO_DWELL_MS = 3000;
 const HOME_HERO_EXIT_MS = 650;
@@ -171,10 +170,11 @@ export const HomeAuthenticated: React.FC = () => {
   const shouldAllowHeroVideoViewport = useMediaQuery('(min-width: 768px)');
   const { showToast } = useToast();
   const homeRootRef = useRef<HTMLDivElement>(null);
+  const heroIntroRef = useRef<HTMLElement>(null);
+  const dashboardGridRef = useRef<HTMLElement>(null);
   const isHeroInteractionActiveRef = useRef(false);
   const heroDismissPointerStartYRef = useRef<number | null>(null);
   const heroDismissPointerIdRef = useRef<number | null>(null);
-  const lastHeroCollapseReasonRef = useRef<HomeHeroCollapseReason | null>(null);
   const authStoreDisplayName = user?.name?.trim() || 'Reflector';
   const shouldRenderHeroIntro = heroIntroState !== 'gone';
 
@@ -183,10 +183,20 @@ export const HomeAuthenticated: React.FC = () => {
   const isLastOnboardingStep = onboardingStep === ONBOARDING_STEPS.length - 1;
   const CurrentOnboardingIcon = onboardingStepIcons[onboardingStep];
 
+  const moveFocusFromHeroIntro = useCallback(() => {
+    if (typeof document === 'undefined') return;
+
+    const activeElement = document.activeElement;
+    if (!(activeElement instanceof Node)) return;
+    if (!heroIntroRef.current?.contains(activeElement)) return;
+
+    dashboardGridRef.current?.focus({ preventScroll: true });
+  }, []);
+
   const collapseHeroIntro = useCallback(
-    (reason: HomeHeroCollapseReason) => {
-      lastHeroCollapseReasonRef.current = reason;
+    () => {
       rememberHomeHeroIntroSeen();
+      moveFocusFromHeroIntro();
       setShouldLoadHeroVideo(false);
       setIsHeroVideoReady(false);
       setHeroIntroState((current) => {
@@ -194,7 +204,7 @@ export const HomeAuthenticated: React.FC = () => {
         return shouldReduceMotion ? 'gone' : 'exiting';
       });
     },
-    [shouldReduceMotion],
+    [moveFocusFromHeroIntro, shouldReduceMotion],
   );
 
   const resetHeroDismissPointer = useCallback(() => {
@@ -249,7 +259,7 @@ export const HomeAuthenticated: React.FC = () => {
         event.currentTarget.releasePointerCapture(pointerId);
       }
       resetHeroDismissPointer();
-      collapseHeroIntro('drag');
+      collapseHeroIntro();
     },
     [collapseHeroIntro, resetHeroDismissPointer],
   );
@@ -361,7 +371,7 @@ export const HomeAuthenticated: React.FC = () => {
         dwellTimer = window.setTimeout(tryTimerDismiss, 1000);
         return;
       }
-      collapseHeroIntro('timer');
+      collapseHeroIntro();
     };
 
     dwellTimer = window.setTimeout(() => {
@@ -390,7 +400,7 @@ export const HomeAuthenticated: React.FC = () => {
     const startScrollTop = scrollContainer.scrollTop;
     const handleHeroScroll = () => {
       if (scrollContainer.scrollTop > startScrollTop + HOME_HERO_SCROLL_DISMISS_THRESHOLD) {
-        collapseHeroIntro('scroll');
+        collapseHeroIntro();
       }
     };
 
@@ -608,6 +618,7 @@ export const HomeAuthenticated: React.FC = () => {
         >
           {shouldRenderHeroIntro ? (
             <section
+              ref={heroIntroRef}
               className={`home-hero-shell relative isolate w-full overflow-hidden bg-body ${
                 shouldReduceMotion ? 'home-hero-shell--reduced-motion' : ''
               }`}
@@ -677,7 +688,9 @@ export const HomeAuthenticated: React.FC = () => {
                 className="home-hero-dismiss-control"
                 aria-label="Show dashboard"
                 aria-controls="home-dashboard-grid"
-                onClick={() => collapseHeroIntro('button')}
+                disabled={heroIntroState !== 'visible'}
+                tabIndex={heroIntroState === 'visible' ? 0 : -1}
+                onClick={() => collapseHeroIntro()}
                 onPointerDown={handleHeroDismissPointerDown}
                 onPointerMove={handleHeroDismissPointerMove}
                 onPointerUp={handleHeroDismissPointerEnd}
@@ -691,6 +704,9 @@ export const HomeAuthenticated: React.FC = () => {
 
           <section
             id="home-dashboard-grid"
+            ref={dashboardGridRef}
+            tabIndex={-1}
+            aria-label="Dashboard"
             className="core-bento-grid"
           >
             <div
