@@ -519,26 +519,29 @@ export const HomeAuthenticated: React.FC = () => {
                   {dailyPrompt}
                 </p>
                 <div className="home-primary-action-cluster flex max-w-xl flex-col gap-3">
-                  <Button
-                    variant="primary"
-
-                    className="h-14 w-full px-8 rounded-xl text-base font-bold bg-green text-white hover:bg-green/90 transition-colors shadow-none sm:w-fit"
-                    onPointerEnter={prefetchCreateNoteRoute}
-                    onFocus={prefetchCreateNoteRoute}
-                    onClick={() => handleCreateClick(dailyPrompt)}
-                    aria-label="Begin writing with today's prompt"
-                  >
-                    Begin Writing
-                    <Plus size={18} weight="regular" className="ml-2" />
-                  </Button>
-                  <WhisperComposerControl
-                    onFinalTranscript={handleVoiceDraft}
-                    label="Speak a note"
-                    stopOnFinalTranscript
-                    className="w-full sm:w-fit"
-                    buttonClassName="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-green/20 bg-green/5 px-6 text-base font-bold text-green transition-colors hover:bg-green/10 sm:w-fit"
-                  />
-                  <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="home-primary-action-row flex w-full flex-col gap-3 sm:flex-row sm:items-stretch">
+                    <Button
+                      variant="primary"
+                      className="h-14 w-full rounded-xl bg-green px-8 text-base font-bold text-white shadow-none transition-colors hover:bg-green/90 sm:flex-[1.05]"
+                      onPointerEnter={prefetchCreateNoteRoute}
+                      onFocus={prefetchCreateNoteRoute}
+                      onClick={() => handleCreateClick(dailyPrompt)}
+                      aria-label="Begin writing with today's prompt"
+                    >
+                      Begin Writing
+                      <Plus size={18} weight="regular" className="ml-2" />
+                    </Button>
+                    <WhisperComposerControl
+                      onFinalTranscript={handleVoiceDraft}
+                      label="Speak a note"
+                      stopOnFinalTranscript
+                      className="w-full sm:flex-1"
+                      buttonClassName="inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl border px-6 text-base font-bold transition-colors"
+                      idleButtonClassName="control-surface text-gray-text hover:border-green/20 hover:bg-green/5 hover:text-green"
+                      activeButtonClassName="border-green/25 bg-green/10 text-green"
+                    />
+                  </div>
+                  <div className="home-secondary-action-row grid w-full gap-3 sm:grid-cols-2">
                     <Button
                       variant="secondary"
 

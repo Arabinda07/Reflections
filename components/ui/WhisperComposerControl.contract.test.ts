@@ -29,4 +29,17 @@ describe('WhisperComposerControl contract', () => {
     expect(home).toContain('WhisperComposerControl');
     expect(home).toContain('stopOnFinalTranscript');
   });
+
+  it('keeps Create Note whisper as a sidebar action instead of a duplicate editor mode', () => {
+    const createNote = read('pages/dashboard/CreateNote.tsx');
+    const whisperIndex = createNote.indexOf('label="Whisper"');
+    const tasksIndex = createNote.indexOf('<button onClick={() => setIsTasksOpen(true)}', whisperIndex);
+    const sidebarWhisper = createNote.slice(whisperIndex, tasksIndex);
+
+    expect(createNote).not.toContain('label="Voice capture"');
+    expect(sidebarWhisper).toContain('gap-3');
+    expect(sidebarWhisper).toContain('text-[13px] font-bold');
+    expect(sidebarWhisper).not.toContain('justify-between');
+    expect(sidebarWhisper).not.toContain('CaretRight');
+  });
 });

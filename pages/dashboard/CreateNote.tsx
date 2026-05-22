@@ -475,7 +475,7 @@ export const CreateNote: React.FC = () => {
               onFinalTranscript={appendWhisperTranscript}
               label="Whisper"
               className="w-full"
-              buttonClassName="w-full flex items-center justify-between p-4 min-h-14 rounded-[20px] transition-colors border border-border/40"
+              buttonClassName="w-full flex min-h-14 items-center gap-3 rounded-[20px] border border-border/40 p-4 text-[13px] font-bold transition-colors"
             />
 
             <button onClick={() => setIsTasksOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-[20px] transition-colors border border-border/40 ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>
@@ -555,13 +555,6 @@ export const CreateNote: React.FC = () => {
               </button>
             )}
           </div>
-
-          <WhisperComposerControl
-            onFinalTranscript={appendWhisperTranscript}
-            label="Voice capture"
-            className="mb-6 max-w-sm"
-            buttonClassName="inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2 label-caps transition-colors"
-          />
 
           {/* Reflection title field */}
           <input
