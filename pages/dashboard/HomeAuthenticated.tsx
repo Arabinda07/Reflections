@@ -97,19 +97,36 @@ const prefetchCreateNoteRoute = () => {
   void import('@/pages/dashboard/CreateNote');
 };
 
-const HOME_HERO_COLLAPSED_SESSION_KEY = 'home_hero_collapsed';
-const HOME_HERO_DRAG_THRESHOLD = 48;
-const HOME_HERO_SCROLL_THRESHOLD = 32;
+type HomeHeroIntroState = 'visible' | 'exiting' | 'gone';
 
-const getInitialHomeHeroCollapsed = () => {
+const HOME_HERO_INTRO_DWELL_MS = 3000;
+const HOME_HERO_EXIT_MS = 650;
+const HOME_HERO_SEEN_SESSION_KEY = 'home_hero_intro_seen';
+const HOME_HERO_SCROLL_RESET_THRESHOLD = 240;
+
+const getInitialHomeHeroIntroState = (): HomeHeroIntroState => {
   if (typeof window === 'undefined') {
-    return false;
+    return 'visible';
   }
 
   try {
-    return window.sessionStorage.getItem(HOME_HERO_COLLAPSED_SESSION_KEY) === 'true';
+    return window.sessionStorage.getItem(HOME_HERO_SEEN_SESSION_KEY) === 'true'
+      ? 'gone'
+      : 'visible';
   } catch {
-    return false;
+    return 'visible';
+  }
+};
+
+const rememberHomeHeroIntroSeen = () => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.sessionStorage.setItem(HOME_HERO_SEEN_SESSION_KEY, 'true');
+  } catch {
+    // The dashboard still opens if session storage is unavailable.
   }
 };
 
@@ -143,94 +160,20 @@ export const HomeAuthenticated: React.FC = () => {
   const [isIntentionModalOpen, setIsIntentionModalOpen] = useState(false);
   const [shouldLoadHeroVideo, setShouldLoadHeroVideo] = useState(false);
   const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);
-  const [isHeroCollapsed, setIsHeroCollapsed] = useState(getInitialHomeHeroCollapsed);
-  const [isHeroDragging, setIsHeroDragging] = useState(false);
-  const heroDragStartYRef = useRef<number | null>(null);
-  const heroDragCurrentYRef = useRef<number | null>(null);
-  const heroDragMovedRef = useRef(false);
+  const [hasHeroVideoFailed, setHasHeroVideoFailed] = useState(false);
+  const [heroIntroState, setHeroIntroState] = useState<HomeHeroIntroState>(
+    getInitialHomeHeroIntroState,
+  );
   const shouldReduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
-  const isCompactViewport = useMediaQuery('(max-width: 639px)');
   const { showToast } = useToast();
+  const homeRootRef = useRef<HTMLDivElement>(null);
   const authStoreDisplayName = user?.name?.trim() || 'Reflector';
+  const shouldRenderHeroIntro = heroIntroState !== 'gone';
 
 
   const currentOnboardingStep = ONBOARDING_STEPS[onboardingStep];
   const isLastOnboardingStep = onboardingStep === ONBOARDING_STEPS.length - 1;
   const CurrentOnboardingIcon = onboardingStepIcons[onboardingStep];
-
-  const collapseHero = useCallback(() => {
-    setIsHeroCollapsed(true);
-    if (typeof window !== 'undefined') {
-      try {
-        window.sessionStorage.setItem(HOME_HERO_COLLAPSED_SESSION_KEY, 'true');
-      } catch {
-        // The hero still collapses if session storage is unavailable.
-      }
-    }
-  }, []);
-
-  const expandHero = useCallback(() => {
-    setIsHeroCollapsed(false);
-    if (typeof window !== 'undefined') {
-      try {
-        window.sessionStorage.setItem(HOME_HERO_COLLAPSED_SESSION_KEY, 'false');
-      } catch {
-        // The hero still expands if session storage is unavailable.
-      }
-    }
-  }, []);
-
-  const handleHeroPointerDown = useCallback((event: React.PointerEvent<HTMLButtonElement>) => {
-    heroDragStartYRef.current = event.clientY;
-    heroDragCurrentYRef.current = event.clientY;
-    heroDragMovedRef.current = false;
-    setIsHeroDragging(true);
-    event.currentTarget.setPointerCapture(event.pointerId);
-  }, []);
-
-  const handleHeroPointerMove = useCallback((event: React.PointerEvent<HTMLButtonElement>) => {
-    const startY = heroDragStartYRef.current;
-    if (startY === null) return;
-
-    heroDragCurrentYRef.current = event.clientY;
-    if (Math.abs(event.clientY - startY) > 8) {
-      heroDragMovedRef.current = true;
-    }
-  }, []);
-
-  const handleHeroPointerEnd = useCallback(() => {
-    const startY = heroDragStartYRef.current;
-    const currentY = heroDragCurrentYRef.current;
-
-    heroDragStartYRef.current = null;
-    heroDragCurrentYRef.current = null;
-    setIsHeroDragging(false);
-
-    if (startY === null || currentY === null) return;
-
-    const dragDistance = currentY - startY;
-    if (!isHeroCollapsed && dragDistance <= -HOME_HERO_DRAG_THRESHOLD) {
-      collapseHero();
-    }
-
-    if (isHeroCollapsed && dragDistance >= HOME_HERO_DRAG_THRESHOLD) {
-      expandHero();
-    }
-  }, [collapseHero, expandHero, isHeroCollapsed]);
-
-  const handleHeroHandleClick = useCallback(() => {
-    if (heroDragMovedRef.current) {
-      heroDragMovedRef.current = false;
-      return;
-    }
-
-    if (isHeroCollapsed) {
-      expandHero();
-      return;
-    }
-
-    collapseHero();
-  }, [collapseHero, expandHero, isHeroCollapsed]);
 
   useEffect(() => {
     setDailyPrompt(
@@ -327,30 +270,55 @@ export const HomeAuthenticated: React.FC = () => {
       (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData,
     );
 
-    if (saveData || shouldReduceMotion || isCompactViewport) {
+    if (saveData || shouldReduceMotion) {
       setShouldLoadHeroVideo(false);
+      setIsHeroVideoReady(false);
       return;
     }
 
-    const videoDelay = window.setTimeout(() => {
-      setShouldLoadHeroVideo(true);
-    }, 4200);
-
-    return () => window.clearTimeout(videoDelay);
-  }, [isCompactViewport, shouldReduceMotion]);
+    setHasHeroVideoFailed(false);
+    setShouldLoadHeroVideo(true);
+  }, [shouldReduceMotion]);
 
   useEffect(() => {
-    if (isHeroCollapsed || showOnboarding) return;
+    if (heroIntroState === 'gone' || showOnboarding) return;
 
-    const handleScroll = () => {
-      if (window.scrollY > HOME_HERO_SCROLL_THRESHOLD) {
-        collapseHero();
-      }
-    };
+    if (shouldReduceMotion) {
+      rememberHomeHeroIntroSeen();
+      setHeroIntroState('gone');
+      return;
+    }
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [collapseHero, isHeroCollapsed, showOnboarding]);
+    if (heroIntroState !== 'visible') return;
+
+    const dwellTimer = window.setTimeout(() => {
+      rememberHomeHeroIntroSeen();
+      setHeroIntroState('exiting');
+    }, HOME_HERO_INTRO_DWELL_MS);
+
+    return () => window.clearTimeout(dwellTimer);
+  }, [heroIntroState, shouldReduceMotion, showOnboarding]);
+
+  useEffect(() => {
+    if (heroIntroState !== 'exiting') return;
+
+    const exitTimer = window.setTimeout(() => {
+      setHeroIntroState('gone');
+    }, HOME_HERO_EXIT_MS);
+
+    return () => window.clearTimeout(exitTimer);
+  }, [heroIntroState]);
+
+  useEffect(() => {
+    if (heroIntroState !== 'gone') return;
+
+    const scrollContainer = homeRootRef.current?.closest('main');
+    if (!(scrollContainer instanceof HTMLElement)) return;
+
+    if (scrollContainer.scrollTop <= HOME_HERO_SCROLL_RESET_THRESHOLD) {
+      scrollContainer.scrollTop = 0;
+    }
+  }, [heroIntroState]);
 
   const handleCloseOnboarding = useCallback(() => {
     localStorage.setItem('hasSeenOnboarding', 'true');
@@ -549,155 +517,157 @@ export const HomeAuthenticated: React.FC = () => {
   return (
     <>
       <div
+        ref={homeRootRef}
         className="home-authenticated-mobile-safe surface-scope-sage page-wash relative min-h-full flex flex-col flex-1 bg-body selection:bg-green/10"
         aria-hidden={showOnboarding ? 'true' : undefined}
       >
-        <section
-          className={`home-hero-shell relative isolate w-full overflow-hidden bg-body ${
-            isHeroDragging ? 'home-hero-shell--dragging' : ''
-          } ${shouldReduceMotion ? 'home-hero-shell--reduced-motion' : ''}`}
-          data-collapsed={isHeroCollapsed ? 'true' : 'false'}
+        <div
+          className="home-dashboard-intro-frame"
+          data-intro-state={heroIntroState}
         >
-          <div className="home-hero-media" aria-hidden="true">
-            <img
-              src="/assets/videos/field.png"
-              alt=""
-              aria-hidden="true"
-              loading="eager"
-              decoding="async"
-              className="absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center opacity-90"
-            />
-            {shouldLoadHeroVideo ? (
-              <video
-                src="/assets/videos/field.mp4"
-                poster="/assets/videos/field.png"
-                autoPlay
-                loop
-                muted
-                playsInline
-                preload="metadata"
-                onLoadedData={() => setIsHeroVideoReady(true)}
-                className={`absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center bg-transparent transition-opacity duration-700 ease-out-expo ${
-                  isHeroVideoReady ? 'opacity-70' : 'opacity-0'
-                }`}
-              >
-              </video>
-            ) : null}
-            <div className="absolute inset-0 z-10 hero-scrim" />
-            <div className="absolute inset-0 z-10 screen-scrim opacity-20" />
-            <div className="absolute inset-0 bg-gradient-to-t from-body via-transparent to-transparent z-10" />
-          </div>
-
-          <div className="home-hero-copy relative z-20 flex h-full flex-col items-center justify-start text-center px-6">
-            <div className="max-w-4xl">
-              <h1 className="h1-hero hero-ink mb-12 text-balance">
-                <span className="whitespace-nowrap">Welcome back,</span>{' '}
-                <br className="home-hero-break" />
-                <span className="font-serif italic hero-ink-accent">
-                  {authStoreDisplayName}
-                </span>
-              </h1>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            className="home-hero-handle"
-            onClick={handleHeroHandleClick}
-            onPointerDown={handleHeroPointerDown}
-            onPointerMove={handleHeroPointerMove}
-            onPointerUp={handleHeroPointerEnd}
-            onPointerCancel={handleHeroPointerEnd}
-            aria-expanded={!isHeroCollapsed}
-            aria-controls="home-dashboard-grid"
-            aria-label={isHeroCollapsed ? 'Show greeting' : 'Show dashboard'}
-          >
-            <span className="home-hero-handle-grip" aria-hidden="true" />
-            <span className="home-hero-handle-label">
-              {isHeroCollapsed ? 'Show greeting' : 'Show dashboard'}
-            </span>
-          </button>
-        </section>
-
-        <section
-          id="home-dashboard-grid"
-          className="core-bento-grid"
-        >
-          <div
-            className="home-primary-reflection-card group relative surface-flat overflow-hidden rounded-[2.5rem] p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full transition-[border-color,box-shadow] duration-300 ease-out-expo hover:shadow-[0_12px_32px_var(--tw-shadow-color)] hover:shadow-green/5 hover:border-green/10"
-          >
-            <div className="relative z-10">
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-2 text-gray-nav">
-                  <Target size={18} weight="duotone" className="text-green" />
-                  <span className="label-caps">
-                    Today's Reflection
-                  </span>
-                </div>
-                <button
-                  onClick={refreshPrompt}
-                  className={`flex h-11 min-w-11 items-center justify-center rounded-[var(--radius-control)] text-gray-nav transition-colors hover:text-green ${
-                    isRefreshing ? 'animate-spin' : ''
-                  }`}
-                  aria-label="Refresh today's reflection prompt"
-                >
-                  <ArrowsClockwise size={20} weight="regular" />
-                </button>
+          {shouldRenderHeroIntro ? (
+            <section
+              className={`home-hero-shell relative isolate w-full overflow-hidden bg-body ${
+                shouldReduceMotion ? 'home-hero-shell--reduced-motion' : ''
+              }`}
+              data-intro-state={heroIntroState}
+              aria-hidden={heroIntroState === 'exiting' ? 'true' : undefined}
+            >
+              <div className="home-hero-media" aria-hidden="true">
+                <img
+                  src="/assets/videos/field.png"
+                  alt=""
+                  aria-hidden="true"
+                  loading="eager"
+                  decoding="async"
+                  className="absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center opacity-90"
+                />
+                {shouldLoadHeroVideo && !hasHeroVideoFailed ? (
+                  <video
+                    src="/assets/videos/field.mp4"
+                    poster="/assets/videos/field.png"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    preload="metadata"
+                    onCanPlay={(event) => {
+                      void event.currentTarget.play().catch(() => {
+                        setHasHeroVideoFailed(true);
+                        setShouldLoadHeroVideo(false);
+                        setIsHeroVideoReady(false);
+                      });
+                    }}
+                    onPlaying={() => setIsHeroVideoReady(true)}
+                    onError={() => {
+                      setHasHeroVideoFailed(true);
+                      setShouldLoadHeroVideo(false);
+                      setIsHeroVideoReady(false);
+                    }}
+                    className={`absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center bg-transparent transition-opacity duration-700 ease-out-expo ${
+                      isHeroVideoReady ? 'opacity-70' : 'opacity-0'
+                    }`}
+                  >
+                  </video>
+                ) : null}
+                <div className="absolute inset-0 z-10 hero-scrim" />
+                <div className="absolute inset-0 z-10 screen-scrim opacity-20" />
+                <div className="absolute inset-0 bg-gradient-to-t from-body via-transparent to-transparent z-10" />
               </div>
 
-              <div className="mb-12 space-y-8">
-                <p
-                  className={`dashboard-prompt-text typographic-measure transition-opacity duration-[400ms] ease-out ${isRefreshing ? 'opacity-0' : 'opacity-100'}`}
-                >
-                  {dailyPrompt}
-                </p>
-                <div className="home-primary-action-cluster flex max-w-xl flex-col gap-3">
-                  <div className="home-primary-action-row flex w-full flex-col gap-3 sm:flex-row sm:items-stretch">
-                    <Button
-                      variant="primary"
-                      className="h-14 w-full rounded-xl bg-green px-8 text-base font-bold text-white shadow-none transition-colors hover:bg-green/90 sm:flex-[1.05]"
-                      onPointerEnter={prefetchCreateNoteRoute}
-                      onFocus={prefetchCreateNoteRoute}
-                      onClick={() => handleCreateClick(dailyPrompt)}
-                      aria-label="Begin writing with today's prompt"
-                    >
-                      Begin Writing
-                      <Plus size={18} weight="regular" className="ml-2" />
-                    </Button>
-                    <WhisperComposerControl
-                      onFinalTranscript={handleVoiceDraft}
-                      label="Speak a note"
-                      stopOnFinalTranscript
-                      className="w-full sm:flex-1"
-                      buttonClassName="inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl border px-6 text-base font-bold transition-colors"
-                      idleButtonClassName="control-surface text-gray-text hover:border-green/20 hover:bg-green/5 hover:text-green"
-                      activeButtonClassName="border-green/25 bg-green/10 text-green"
-                    />
-                  </div>
-                  <div className="home-secondary-action-row grid w-full gap-3 sm:grid-cols-2">
-                    <Button
-                      variant="secondary"
-
-                      className="h-12 w-full rounded-xl px-6 text-base font-bold"
-                      onClick={() => setIsCheckInOpen(true)}
-                      aria-label="Save a quick mood check-in"
-                    >
-                      Quick check-in
-                      <Heart size={18} weight="duotone" className="ml-2" />
-                    </Button>
-                    <Button
-                      variant="outline"
-
-                      className="h-12 w-full justify-center rounded-xl border-sky/25 bg-sky/5 px-6 text-sky hover:bg-sky/10"
-                      onClick={() => navigate(RoutePath.FUTURE_LETTERS)}
-                      aria-label="Write a future letter"
-                    >
-                      Future letter
-                      <EnvelopeSimple size={18} weight="duotone" className="ml-2" />
-                    </Button>
-                  </div>
+              <div className="home-hero-copy relative z-20 flex h-full flex-col items-center justify-start text-center px-6">
+                <div className="max-w-4xl">
+                  <h1 className="h1-hero hero-ink mb-12 text-balance">
+                    <span className="whitespace-nowrap">Welcome back,</span>{' '}
+                    <br className="home-hero-break" />
+                    <span className="font-serif italic hero-ink-accent">
+                      {authStoreDisplayName}
+                    </span>
+                  </h1>
                 </div>
               </div>
+            </section>
+          ) : null}
+
+          <section
+            id="home-dashboard-grid"
+            className="core-bento-grid"
+          >
+            <div
+              className="home-primary-reflection-card group relative surface-flat overflow-hidden rounded-[2.5rem] p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full transition-[border-color,box-shadow] duration-300 ease-out-expo hover:shadow-[0_12px_32px_var(--tw-shadow-color)] hover:shadow-green/5 hover:border-green/10"
+            >
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-2 text-gray-nav">
+                    <Target size={18} weight="duotone" className="text-green" />
+                    <span className="label-caps">
+                      Today's Reflection
+                    </span>
+                  </div>
+                  <button
+                    onClick={refreshPrompt}
+                    className={`flex h-11 min-w-11 items-center justify-center rounded-[var(--radius-control)] text-gray-nav transition-colors hover:text-green ${
+                      isRefreshing ? 'animate-spin' : ''
+                    }`}
+                    aria-label="Refresh today's reflection prompt"
+                  >
+                    <ArrowsClockwise size={20} weight="regular" />
+                  </button>
+                </div>
+
+                <div className="mb-12 space-y-8">
+                  <p
+                    className={`dashboard-prompt-text typographic-measure transition-opacity duration-[400ms] ease-out ${isRefreshing ? 'opacity-0' : 'opacity-100'}`}
+                  >
+                    {dailyPrompt}
+                  </p>
+                  <div className="home-primary-action-cluster flex max-w-xl flex-col gap-3">
+                    <div className="home-primary-action-row flex w-full flex-col gap-3 sm:flex-row sm:items-stretch">
+                      <Button
+                        variant="primary"
+                        className="h-14 w-full rounded-xl bg-green px-8 text-base font-bold text-white shadow-none transition-colors hover:bg-green/90 sm:flex-[1.05]"
+                        onPointerEnter={prefetchCreateNoteRoute}
+                        onFocus={prefetchCreateNoteRoute}
+                        onClick={() => handleCreateClick(dailyPrompt)}
+                        aria-label="Begin writing with today's prompt"
+                      >
+                        Begin Writing
+                        <Plus size={18} weight="regular" className="ml-2" />
+                      </Button>
+                      <WhisperComposerControl
+                        onFinalTranscript={handleVoiceDraft}
+                        label="Speak a note"
+                        stopOnFinalTranscript
+                        className="w-full sm:flex-1"
+                        buttonClassName="inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl border px-6 text-base font-bold transition-colors"
+                        idleButtonClassName="control-surface text-gray-text hover:border-green/20 hover:bg-green/5 hover:text-green"
+                        activeButtonClassName="border-green/25 bg-green/10 text-green"
+                      />
+                    </div>
+                    <div className="home-secondary-action-row grid w-full gap-3 sm:grid-cols-2">
+                      <Button
+                        variant="secondary"
+
+                        className="h-12 w-full rounded-xl px-6 text-base font-bold"
+                        onClick={() => setIsCheckInOpen(true)}
+                        aria-label="Save a quick mood check-in"
+                      >
+                        Quick check-in
+                        <Heart size={18} weight="duotone" className="ml-2" />
+                      </Button>
+                      <Button
+                        variant="outline"
+
+                        className="h-12 w-full justify-center rounded-xl border-sky/25 bg-sky/5 px-6 text-sky hover:bg-sky/10"
+                        onClick={() => navigate(RoutePath.FUTURE_LETTERS)}
+                        aria-label="Write a future letter"
+                      >
+                        Future letter
+                        <EnvelopeSimple size={18} weight="duotone" className="ml-2" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
             </div>
 
             <div className="border-t border-border/60 pt-8 text-left">
@@ -887,6 +857,7 @@ export const HomeAuthenticated: React.FC = () => {
             </div>
           </div>
         </section>
+        </div>
       </div>
 
       <ModalSheet

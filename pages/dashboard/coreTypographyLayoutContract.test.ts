@@ -73,22 +73,31 @@ describe('core app typography and layout contract', () => {
     expect(audioPosition).toBeGreaterThan(cardsPosition);
   });
 
-  it('makes the authenticated home greeting compress into a dashboard shelf', () => {
+  it('makes the authenticated home greeting auto-dismiss into the dashboard', () => {
     const css = read('index.css');
     const home = read('pages/dashboard/HomeAuthenticated.tsx');
 
     expect(home).toContain('home-hero-shell');
-    expect(home).toContain("data-collapsed={isHeroCollapsed ? 'true' : 'false'}");
-    expect(home).toContain('home-hero-handle');
-    expect(home).toContain('aria-expanded={!isHeroCollapsed}');
-    expect(home).toContain('aria-controls="home-dashboard-grid"');
+    expect(home).toContain("data-intro-state={heroIntroState}");
+    expect(home).toContain("const HOME_HERO_INTRO_DWELL_MS = 3000;");
+    expect(home).toContain("const HOME_HERO_EXIT_MS = 650;");
+    expect(home).toContain("const HOME_HERO_SEEN_SESSION_KEY = 'home_hero_intro_seen';");
+    expect(home).toContain("type HomeHeroIntroState = 'visible' | 'exiting' | 'gone';");
     expect(home).toContain('id="home-dashboard-grid"');
     expect(home).toContain('sessionStorage');
+    expect(home).not.toContain('home-hero-handle');
+    expect(home).not.toContain('aria-expanded={!isHeroCollapsed}');
+    expect(home).not.toContain('handleHeroPointerDown');
+    expect(home).not.toContain('handleHeroHandleClick');
+    expect(home).not.toContain('HOME_HERO_COLLAPSED_SESSION_KEY');
     expect(home).not.toContain("localStorage.getItem('home_hero_collapsed')");
 
-    expect(css).toContain('.home-hero-shell[data-collapsed="false"]');
-    expect(css).toContain('.home-hero-shell[data-collapsed="true"]');
-    expect(css).toContain('.home-hero-handle');
+    expect(css).toContain('.home-dashboard-intro-frame[data-intro-state="visible"]');
+    expect(css).toContain('.home-dashboard-intro-frame[data-intro-state="exiting"]');
+    expect(css).toContain('.home-dashboard-intro-frame[data-intro-state="gone"]');
+    expect(css).not.toContain('.home-hero-shell[data-collapsed="false"]');
+    expect(css).not.toContain('.home-hero-shell[data-collapsed="true"]');
+    expect(css).not.toContain('.home-hero-handle');
     expect(css).toContain('@media (prefers-reduced-motion: reduce)');
     expect(css).toContain('.home-hero-shell');
   });

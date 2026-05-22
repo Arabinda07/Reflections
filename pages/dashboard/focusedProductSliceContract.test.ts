@@ -105,22 +105,26 @@ describe('focused product slice source contract', () => {
     expect(homeAuthenticated).toContain('dashboard-prompt-text typographic-measure');
   });
 
-  it('lets the authenticated greeting yield to the dashboard through explicit and inferred actions', () => {
+  it('lets the authenticated greeting auto-dismiss into the dashboard', () => {
     const homeAuthenticated = read('pages/dashboard/HomeAuthenticated.tsx');
 
-    expect(homeAuthenticated).toContain('HOME_HERO_COLLAPSED_SESSION_KEY');
-    expect(homeAuthenticated).toContain('HOME_HERO_DRAG_THRESHOLD');
-    expect(homeAuthenticated).toContain('HOME_HERO_SCROLL_THRESHOLD');
-    expect(homeAuthenticated).toContain('collapseHero');
-    expect(homeAuthenticated).toContain('expandHero');
-    expect(homeAuthenticated).toContain('handleHeroPointerDown');
-    expect(homeAuthenticated).toContain('handleHeroPointerMove');
-    expect(homeAuthenticated).toContain('handleHeroPointerEnd');
-    expect(homeAuthenticated).toContain('setPointerCapture');
-    expect(homeAuthenticated).toContain('window.addEventListener(\'scroll\'');
+    expect(homeAuthenticated).toContain('HOME_HERO_INTRO_DWELL_MS');
+    expect(homeAuthenticated).toContain('HOME_HERO_EXIT_MS');
+    expect(homeAuthenticated).toContain('HOME_HERO_SEEN_SESSION_KEY');
+    expect(homeAuthenticated).toContain("type HomeHeroIntroState = 'visible' | 'exiting' | 'gone';");
+    expect(homeAuthenticated).toContain('heroIntroState');
+    expect(homeAuthenticated).toContain('setHeroIntroState(\'exiting\')');
+    expect(homeAuthenticated).toContain('setHeroIntroState(\'gone\')');
+    expect(homeAuthenticated).toContain('rememberHomeHeroIntroSeen');
+    expect(homeAuthenticated).toContain('shouldRenderHeroIntro');
     expect(homeAuthenticated).toContain('shouldReduceMotion');
-    expect(homeAuthenticated).toContain('Show dashboard');
-    expect(homeAuthenticated).toContain('Show greeting');
+    expect(homeAuthenticated).not.toContain('HOME_HERO_COLLAPSED_SESSION_KEY');
+    expect(homeAuthenticated).not.toContain('HOME_HERO_DRAG_THRESHOLD');
+    expect(homeAuthenticated).not.toContain('HOME_HERO_SCROLL_THRESHOLD');
+    expect(homeAuthenticated).not.toContain('handleHeroPointerDown');
+    expect(homeAuthenticated).not.toContain('setPointerCapture');
+    expect(homeAuthenticated).not.toContain('Show dashboard');
+    expect(homeAuthenticated).not.toContain('Show greeting');
   });
 
   it('removes quietly from live app and AI copy', () => {
