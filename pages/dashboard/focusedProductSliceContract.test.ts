@@ -113,18 +113,25 @@ describe('focused product slice source contract', () => {
     expect(homeAuthenticated).toContain('HOME_HERO_SEEN_SESSION_KEY');
     expect(homeAuthenticated).toContain("type HomeHeroIntroState = 'visible' | 'exiting' | 'gone';");
     expect(homeAuthenticated).toContain('heroIntroState');
-    expect(homeAuthenticated).toContain('setHeroIntroState(\'exiting\')');
+    expect(homeAuthenticated).toContain('collapseHeroIntro');
+    expect(homeAuthenticated).toContain("return shouldReduceMotion ? 'gone' : 'exiting';");
     expect(homeAuthenticated).toContain('setHeroIntroState(\'gone\')');
     expect(homeAuthenticated).toContain('rememberHomeHeroIntroSeen');
     expect(homeAuthenticated).toContain('shouldRenderHeroIntro');
     expect(homeAuthenticated).toContain('shouldReduceMotion');
+    expect(homeAuthenticated).toContain('HOME_HERO_DRAG_DISMISS_THRESHOLD = 48');
+    expect(homeAuthenticated).toContain('HOME_HERO_SCROLL_DISMISS_THRESHOLD = 32');
+    expect(homeAuthenticated).toContain('Show dashboard');
+    expect(homeAuthenticated).toContain('aria-controls="home-dashboard-grid"');
+    expect(homeAuthenticated).toContain("collapseHeroIntro('scroll')");
+    expect(homeAuthenticated).toContain("collapseHeroIntro('drag')");
+    expect(homeAuthenticated).toContain("collapseHeroIntro('timer')");
+    expect(homeAuthenticated).toContain('setPointerCapture');
     expect(homeAuthenticated).not.toContain('HOME_HERO_COLLAPSED_SESSION_KEY');
-    expect(homeAuthenticated).not.toContain('HOME_HERO_DRAG_THRESHOLD');
-    expect(homeAuthenticated).not.toContain('HOME_HERO_SCROLL_THRESHOLD');
-    expect(homeAuthenticated).not.toContain('handleHeroPointerDown');
-    expect(homeAuthenticated).not.toContain('setPointerCapture');
-    expect(homeAuthenticated).not.toContain('Show dashboard');
+    expect(homeAuthenticated).not.toContain('expandHero');
     expect(homeAuthenticated).not.toContain('Show greeting');
+    expect(homeAuthenticated).not.toContain('generateWritingNotes');
+    expect(homeAuthenticated).not.toContain('dynamic_writing_notes');
   });
 
   it('removes quietly from live app and AI copy', () => {

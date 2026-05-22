@@ -25,7 +25,6 @@ import { useToast } from '../../components/ui/Toast';
 import { WhisperComposerControl } from '../../components/ui/WhisperComposerControl';
 import { useAuthStore } from '../../hooks/useAuthStore';
 import { useHaptics } from '../../hooks/useHaptics';
-import { aiService } from '../../services/aiService';
 import { moodCheckinService } from '../../services/moodService';
 import { noteService } from '../../services/noteService';
 import { DEFAULT_WELLNESS_PROMPTS } from '../../services/wellnessPrompts';
@@ -98,11 +97,14 @@ const prefetchCreateNoteRoute = () => {
 };
 
 type HomeHeroIntroState = 'visible' | 'exiting' | 'gone';
+type HomeHeroCollapseReason = 'button' | 'drag' | 'scroll' | 'timer';
 
 const HOME_HERO_INTRO_DWELL_MS = 3000;
 const HOME_HERO_EXIT_MS = 650;
+const HOME_HERO_DRAG_DISMISS_THRESHOLD = 48;
+const HOME_HERO_SCROLL_DISMISS_THRESHOLD = 32;
+const HOME_HERO_VIDEO_LOAD_DELAY_MS = 1200;
 const HOME_HERO_SEEN_SESSION_KEY = 'home_hero_intro_seen';
-const HOME_HERO_SCROLL_RESET_THRESHOLD = 240;
 
 const getInitialHomeHeroIntroState = (): HomeHeroIntroState => {
   if (typeof window === 'undefined') {
@@ -130,7 +132,8 @@ const rememberHomeHeroIntroSeen = () => {
   }
 };
 
-
+const getRandomWritingNote = () =>
+  WRITING_NOTES[Math.floor(Math.random() * WRITING_NOTES.length)];
 
 export const HomeAuthenticated: React.FC = () => {
   const navigate = useNavigate();
@@ -150,7 +153,7 @@ export const HomeAuthenticated: React.FC = () => {
   const [isSavingCheckIn, setIsSavingCheckIn] = useState(false);
   const [checkInFeedback, setCheckInFeedback] = useState<string | null>(null);
   const [intentionFeedback, setIntentionFeedback] = useState<string | null>(null);
-  const [quote, setQuote] = useState({ text: '', author: '' });
+  const [quote] = useState(getRandomWritingNote);
   const [taskNotes, setTaskNotes] = useState<Note[]>([]);
   const [intentionSummary, setIntentionSummary] = useState<HomeIntentionSummary>(() =>
     buildHomeIntentionSummary([]),
@@ -165,8 +168,13 @@ export const HomeAuthenticated: React.FC = () => {
     getInitialHomeHeroIntroState,
   );
   const shouldReduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
+  const shouldAllowHeroVideoViewport = useMediaQuery('(min-width: 768px)');
   const { showToast } = useToast();
   const homeRootRef = useRef<HTMLDivElement>(null);
+  const isHeroInteractionActiveRef = useRef(false);
+  const heroDismissPointerStartYRef = useRef<number | null>(null);
+  const heroDismissPointerIdRef = useRef<number | null>(null);
+  const lastHeroCollapseReasonRef = useRef<HomeHeroCollapseReason | null>(null);
   const authStoreDisplayName = user?.name?.trim() || 'Reflector';
   const shouldRenderHeroIntro = heroIntroState !== 'gone';
 
@@ -175,46 +183,92 @@ export const HomeAuthenticated: React.FC = () => {
   const isLastOnboardingStep = onboardingStep === ONBOARDING_STEPS.length - 1;
   const CurrentOnboardingIcon = onboardingStepIcons[onboardingStep];
 
+  const collapseHeroIntro = useCallback(
+    (reason: HomeHeroCollapseReason) => {
+      lastHeroCollapseReasonRef.current = reason;
+      rememberHomeHeroIntroSeen();
+      setShouldLoadHeroVideo(false);
+      setIsHeroVideoReady(false);
+      setHeroIntroState((current) => {
+        if (current === 'gone') return current;
+        return shouldReduceMotion ? 'gone' : 'exiting';
+      });
+    },
+    [shouldReduceMotion],
+  );
+
+  const resetHeroDismissPointer = useCallback(() => {
+    heroDismissPointerStartYRef.current = null;
+    heroDismissPointerIdRef.current = null;
+    isHeroInteractionActiveRef.current = false;
+  }, []);
+
+  const handleHeroFocusCapture = useCallback(() => {
+    isHeroInteractionActiveRef.current = true;
+  }, []);
+
+  const handleHeroBlurCapture = useCallback((event: React.FocusEvent<HTMLElement>) => {
+    const nextTarget = event.relatedTarget;
+    if (!(nextTarget instanceof Node) || !event.currentTarget.contains(nextTarget)) {
+      isHeroInteractionActiveRef.current = false;
+    }
+  }, []);
+
+  const handleHeroShellPointerDownCapture = useCallback(() => {
+    isHeroInteractionActiveRef.current = true;
+  }, []);
+
+  const handleHeroShellPointerEndCapture = useCallback(() => {
+    if (heroDismissPointerStartYRef.current === null) {
+      isHeroInteractionActiveRef.current = false;
+    }
+  }, []);
+
+  const handleHeroDismissPointerDown = useCallback(
+    (event: React.PointerEvent<HTMLButtonElement>) => {
+      if (event.pointerType === 'mouse' && event.button !== 0) return;
+
+      heroDismissPointerStartYRef.current = event.clientY;
+      heroDismissPointerIdRef.current = event.pointerId;
+      isHeroInteractionActiveRef.current = true;
+      event.currentTarget.setPointerCapture(event.pointerId);
+    },
+    [],
+  );
+
+  const handleHeroDismissPointerMove = useCallback(
+    (event: React.PointerEvent<HTMLButtonElement>) => {
+      const startY = heroDismissPointerStartYRef.current;
+      if (startY === null) return;
+
+      const upwardDistance = startY - event.clientY;
+      if (upwardDistance < HOME_HERO_DRAG_DISMISS_THRESHOLD) return;
+
+      const pointerId = heroDismissPointerIdRef.current;
+      if (pointerId !== null && event.currentTarget.hasPointerCapture(pointerId)) {
+        event.currentTarget.releasePointerCapture(pointerId);
+      }
+      resetHeroDismissPointer();
+      collapseHeroIntro('drag');
+    },
+    [collapseHeroIntro, resetHeroDismissPointer],
+  );
+
+  const handleHeroDismissPointerEnd = useCallback(
+    (event: React.PointerEvent<HTMLButtonElement>) => {
+      const pointerId = heroDismissPointerIdRef.current;
+      if (pointerId !== null && event.currentTarget.hasPointerCapture(pointerId)) {
+        event.currentTarget.releasePointerCapture(pointerId);
+      }
+      resetHeroDismissPointer();
+    },
+    [resetHeroDismissPointer],
+  );
+
   useEffect(() => {
     setDailyPrompt(
       DEFAULT_WELLNESS_PROMPTS[Math.floor(Math.random() * DEFAULT_WELLNESS_PROMPTS.length)],
     );
-
-    const loadQuotes = async () => {
-      const cached = localStorage.getItem('dynamic_writing_notes');
-      const lastFetch = localStorage.getItem('dynamic_writing_notes_time');
-      const now = Date.now();
-      const ONE_DAY = 24 * 60 * 60 * 1000;
-
-      let quotesPool = WRITING_NOTES;
-
-      if (cached && lastFetch && now - Number(lastFetch) < ONE_DAY) {
-        try {
-          const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            quotesPool = [...WRITING_NOTES, ...parsed];
-          }
-        } catch (e) {
-          // Silently discard corrupted cache — user will get default quotes
-        }
-      } else {
-        // Fetch new quotes from AI
-        try {
-          const freshQuotes = await aiService.generateWritingNotes();
-          if (freshQuotes.length > 0) {
-            localStorage.setItem('dynamic_writing_notes', JSON.stringify(freshQuotes));
-            localStorage.setItem('dynamic_writing_notes_time', now.toString());
-            quotesPool = [...WRITING_NOTES, ...freshQuotes];
-          }
-        } catch (e) {
-          // Could not fetch; fall back to the static quotes pool.
-        }
-      }
-
-      setQuote(quotesPool[Math.floor(Math.random() * quotesPool.length)]);
-    };
-
-    loadQuotes();
 
     const hasSeen = localStorage.getItem('hasSeenOnboarding');
     if (!hasSeen) setShowOnboarding(true);
@@ -270,34 +324,52 @@ export const HomeAuthenticated: React.FC = () => {
       (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData,
     );
 
-    if (saveData || shouldReduceMotion) {
+    if (
+      heroIntroState !== 'visible' ||
+      showOnboarding ||
+      saveData ||
+      shouldReduceMotion ||
+      !shouldAllowHeroVideoViewport ||
+      hasHeroVideoFailed
+    ) {
       setShouldLoadHeroVideo(false);
       setIsHeroVideoReady(false);
       return;
     }
 
-    setHasHeroVideoFailed(false);
-    setShouldLoadHeroVideo(true);
-  }, [shouldReduceMotion]);
+    const videoLoadTimer = window.setTimeout(() => {
+      setShouldLoadHeroVideo(true);
+    }, HOME_HERO_VIDEO_LOAD_DELAY_MS);
+
+    return () => window.clearTimeout(videoLoadTimer);
+  }, [
+    hasHeroVideoFailed,
+    heroIntroState,
+    shouldAllowHeroVideoViewport,
+    shouldReduceMotion,
+    showOnboarding,
+  ]);
 
   useEffect(() => {
     if (heroIntroState === 'gone' || showOnboarding) return;
 
-    if (shouldReduceMotion) {
-      rememberHomeHeroIntroSeen();
-      setHeroIntroState('gone');
-      return;
-    }
-
     if (heroIntroState !== 'visible') return;
 
-    const dwellTimer = window.setTimeout(() => {
-      rememberHomeHeroIntroSeen();
-      setHeroIntroState('exiting');
+    let dwellTimer: number;
+    const tryTimerDismiss = () => {
+      if (isHeroInteractionActiveRef.current) {
+        dwellTimer = window.setTimeout(tryTimerDismiss, 1000);
+        return;
+      }
+      collapseHeroIntro('timer');
+    };
+
+    dwellTimer = window.setTimeout(() => {
+      tryTimerDismiss();
     }, HOME_HERO_INTRO_DWELL_MS);
 
     return () => window.clearTimeout(dwellTimer);
-  }, [heroIntroState, shouldReduceMotion, showOnboarding]);
+  }, [collapseHeroIntro, heroIntroState, showOnboarding]);
 
   useEffect(() => {
     if (heroIntroState !== 'exiting') return;
@@ -310,15 +382,24 @@ export const HomeAuthenticated: React.FC = () => {
   }, [heroIntroState]);
 
   useEffect(() => {
-    if (heroIntroState !== 'gone') return;
+    if (heroIntroState !== 'visible' || showOnboarding) return;
 
     const scrollContainer = homeRootRef.current?.closest('main');
     if (!(scrollContainer instanceof HTMLElement)) return;
 
-    if (scrollContainer.scrollTop <= HOME_HERO_SCROLL_RESET_THRESHOLD) {
-      scrollContainer.scrollTop = 0;
-    }
-  }, [heroIntroState]);
+    const startScrollTop = scrollContainer.scrollTop;
+    const handleHeroScroll = () => {
+      if (scrollContainer.scrollTop > startScrollTop + HOME_HERO_SCROLL_DISMISS_THRESHOLD) {
+        collapseHeroIntro('scroll');
+      }
+    };
+
+    scrollContainer.addEventListener('scroll', handleHeroScroll, { passive: true });
+
+    return () => {
+      scrollContainer.removeEventListener('scroll', handleHeroScroll);
+    };
+  }, [collapseHeroIntro, heroIntroState, showOnboarding]);
 
   const handleCloseOnboarding = useCallback(() => {
     localStorage.setItem('hasSeenOnboarding', 'true');
@@ -532,6 +613,11 @@ export const HomeAuthenticated: React.FC = () => {
               }`}
               data-intro-state={heroIntroState}
               aria-hidden={heroIntroState === 'exiting' ? 'true' : undefined}
+              onFocusCapture={handleHeroFocusCapture}
+              onBlurCapture={handleHeroBlurCapture}
+              onPointerDownCapture={handleHeroShellPointerDownCapture}
+              onPointerUpCapture={handleHeroShellPointerEndCapture}
+              onPointerCancelCapture={handleHeroShellPointerEndCapture}
             >
               <div className="home-hero-media" aria-hidden="true">
                 <img
@@ -542,7 +628,7 @@ export const HomeAuthenticated: React.FC = () => {
                   decoding="async"
                   className="absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center opacity-90"
                 />
-                {shouldLoadHeroVideo && !hasHeroVideoFailed ? (
+                {shouldLoadHeroVideo && !hasHeroVideoFailed && heroIntroState === 'visible' ? (
                   <video
                     src="/assets/videos/field.mp4"
                     poster="/assets/videos/field.png"
@@ -586,6 +672,20 @@ export const HomeAuthenticated: React.FC = () => {
                   </h1>
                 </div>
               </div>
+              <button
+                type="button"
+                className="home-hero-dismiss-control"
+                aria-label="Show dashboard"
+                aria-controls="home-dashboard-grid"
+                onClick={() => collapseHeroIntro('button')}
+                onPointerDown={handleHeroDismissPointerDown}
+                onPointerMove={handleHeroDismissPointerMove}
+                onPointerUp={handleHeroDismissPointerEnd}
+                onPointerCancel={handleHeroDismissPointerEnd}
+              >
+                <span className="home-hero-dismiss-grip" aria-hidden="true" />
+                <span>Show dashboard</span>
+              </button>
             </section>
           ) : null}
 

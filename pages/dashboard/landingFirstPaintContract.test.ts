@@ -163,10 +163,11 @@ describe('landing first-paint contract', () => {
     expect(homeAuthenticated).toContain('h-full min-h-full w-full min-w-full object-cover object-center');
     expect(homeAuthenticated).toContain('object-cover object-center opacity-90');
     expect(homeAuthenticated).toContain('const [shouldLoadHeroVideo, setShouldLoadHeroVideo] = useState(false);');
-    expect(homeAuthenticated).not.toContain("const isCompactViewport = useMediaQuery('(max-width: 639px)');");
+    expect(homeAuthenticated).toContain("const shouldAllowHeroVideoViewport = useMediaQuery('(min-width: 768px)');");
     expect(homeAuthenticated).toContain('const [hasHeroVideoFailed, setHasHeroVideoFailed] = useState(false);');
-    expect(homeAuthenticated).toContain('if (saveData || shouldReduceMotion)');
-    expect(homeAuthenticated).not.toContain('if (saveData || shouldReduceMotion || isCompactViewport)');
+    expect(homeAuthenticated).toContain("heroIntroState !== 'visible'");
+    expect(homeAuthenticated).toContain('!shouldAllowHeroVideoViewport');
+    expect(homeAuthenticated).toContain('HOME_HERO_VIDEO_LOAD_DELAY_MS = 1200');
     expect(homeAuthenticated).toContain('setShouldLoadHeroVideo(false);');
     expect(homeAuthenticated).toContain('setShouldLoadHeroVideo(true);');
     expect(homeAuthenticated).toContain('onCanPlay={(event) => {');

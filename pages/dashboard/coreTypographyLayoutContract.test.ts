@@ -81,16 +81,24 @@ describe('core app typography and layout contract', () => {
     expect(home).toContain("data-intro-state={heroIntroState}");
     expect(home).toContain("const HOME_HERO_INTRO_DWELL_MS = 3000;");
     expect(home).toContain("const HOME_HERO_EXIT_MS = 650;");
+    expect(home).toContain('const HOME_HERO_DRAG_DISMISS_THRESHOLD = 48;');
+    expect(home).toContain('const HOME_HERO_SCROLL_DISMISS_THRESHOLD = 32;');
     expect(home).toContain("const HOME_HERO_SEEN_SESSION_KEY = 'home_hero_intro_seen';");
     expect(home).toContain("type HomeHeroIntroState = 'visible' | 'exiting' | 'gone';");
+    expect(home).toContain('collapseHeroIntro');
+    expect(home).toContain('Show dashboard');
+    expect(home).toContain('aria-controls="home-dashboard-grid"');
     expect(home).toContain('id="home-dashboard-grid"');
     expect(home).toContain('sessionStorage');
+    expect(home).not.toContain('Show greeting');
+    expect(home).not.toContain('expandHero');
     expect(home).not.toContain('home-hero-handle');
     expect(home).not.toContain('aria-expanded={!isHeroCollapsed}');
-    expect(home).not.toContain('handleHeroPointerDown');
     expect(home).not.toContain('handleHeroHandleClick');
     expect(home).not.toContain('HOME_HERO_COLLAPSED_SESSION_KEY');
     expect(home).not.toContain("localStorage.getItem('home_hero_collapsed')");
+    expect(home).not.toContain('generateWritingNotes');
+    expect(home).not.toContain('dynamic_writing_notes');
 
     expect(css).toContain('.home-dashboard-intro-frame[data-intro-state="visible"]');
     expect(css).toContain('.home-dashboard-intro-frame[data-intro-state="exiting"]');
@@ -98,6 +106,7 @@ describe('core app typography and layout contract', () => {
     expect(css).not.toContain('.home-hero-shell[data-collapsed="false"]');
     expect(css).not.toContain('.home-hero-shell[data-collapsed="true"]');
     expect(css).not.toContain('.home-hero-handle');
+    expect(css).toContain('.home-hero-dismiss-control');
     expect(css).toContain('@media (prefers-reduced-motion: reduce)');
     expect(css).toContain('.home-hero-shell');
   });

@@ -790,6 +790,52 @@ details:focus-visible,
     will-change: opacity, transform;
   }
 
+  .home-hero-dismiss-control {
+    position: absolute;
+    left: 50%;
+    bottom: clamp(1rem, 4vh, 2rem);
+    z-index: 30;
+    display: inline-flex;
+    min-height: 3rem;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    transform: translate3d(-50%, 0, 0);
+    border: 1px solid oklch(from var(--hero-ink) l c h / 0.24);
+    border-radius: 999px;
+    background: oklch(from var(--bg-color) l c h / 0.68);
+    color: var(--hero-ink);
+    padding: 0.75rem 1rem;
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    line-height: 1;
+    text-transform: uppercase;
+    box-shadow: var(--hero-shadow);
+    touch-action: none;
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    transition:
+      border-color 180ms ease,
+      background-color 180ms ease,
+      opacity 420ms var(--ease-out-expo),
+      transform 420ms var(--ease-out-expo);
+  }
+
+  .home-hero-dismiss-control:hover {
+    border-color: oklch(from var(--green) l c h / 0.48);
+    background: oklch(from var(--green) l c h / 0.18);
+  }
+
+  .home-hero-dismiss-grip {
+    width: 2rem;
+    height: 0.25rem;
+    border-radius: 999px;
+    background: currentColor;
+    opacity: 0.64;
+  }
+
   .home-dashboard-intro-frame #home-dashboard-grid {
     transform: translate3d(0, var(--home-dashboard-grid-y), 0);
     transition: transform 650ms var(--ease-out-expo);
@@ -810,6 +856,12 @@ details:focus-visible,
   .home-dashboard-intro-frame[data-intro-state="exiting"] .home-hero-copy {
     opacity: 0;
     transform: translate3d(0, -30%, 0);
+  }
+
+  .home-dashboard-intro-frame[data-intro-state="exiting"] .home-hero-dismiss-control {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(-50%, -1.5rem, 0);
   }
 
   .home-dashboard-intro-frame[data-intro-state="gone"] #home-dashboard-grid {
@@ -855,6 +907,7 @@ details:focus-visible,
     .home-hero-shell,
     .home-hero-media,
     .home-hero-copy,
+    .home-hero-dismiss-control,
     .home-dashboard-intro-frame #home-dashboard-grid {
       transition-duration: 0.01ms !important;
     }
