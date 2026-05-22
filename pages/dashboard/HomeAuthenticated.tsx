@@ -22,6 +22,7 @@ import { AmbientMusicButton } from '../../components/ui/AmbientMusicButton';
 import { Button } from '../../components/ui/Button';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { useToast } from '../../components/ui/Toast';
+import { WhisperComposerControl } from '../../components/ui/WhisperComposerControl';
 import { useAuthStore } from '../../hooks/useAuthStore';
 import { useHaptics } from '../../hooks/useHaptics';
 import { aiService } from '../../services/aiService';
@@ -334,6 +335,14 @@ export const HomeAuthenticated: React.FC = () => {
     navigate(RoutePath.CREATE_NOTE);
   };
 
+  const handleVoiceDraft = useCallback((text: string) => {
+    const cleanText = text.trim();
+    if (!cleanText) return;
+
+    prefetchCreateNoteRoute();
+    navigate(RoutePath.CREATE_NOTE, { state: { initialContent: cleanText } });
+  }, [navigate]);
+
 
   const handleMoodCheckIn = async (mood: string) => {
     if (isSavingCheckIn) return;
@@ -522,6 +531,13 @@ export const HomeAuthenticated: React.FC = () => {
                     Begin Writing
                     <Plus size={18} weight="regular" className="ml-2" />
                   </Button>
+                  <WhisperComposerControl
+                    onFinalTranscript={handleVoiceDraft}
+                    label="Speak a note"
+                    stopOnFinalTranscript
+                    className="w-full sm:w-fit"
+                    buttonClassName="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-green/20 bg-green/5 px-6 text-base font-bold text-green transition-colors hover:bg-green/10 sm:w-fit"
+                  />
                   <div className="grid gap-3 sm:grid-cols-2">
                     <Button
                       variant="secondary"

@@ -1855,6 +1855,19 @@ details:focus-visible,
     transform: translateZ(0);
   }
 
+  .mobile-sidebar-shell--dragging {
+    transition: none;
+  }
+
+  .mobile-sidebar-drag-zone {
+    position: absolute;
+    inset-block: 0;
+    left: 0;
+    z-index: 2;
+    width: 1rem;
+    touch-action: none;
+  }
+
   .mobile-sidebar-user-header {
     display: flex;
     align-items: center;

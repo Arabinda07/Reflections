@@ -9,6 +9,7 @@ import {
   buildWikiPagePrompt,
 } from '../services/aiPromptSpecs.js';
 import { buildWikiRetryInstruction, validateWikiPageOutput } from '../services/aiOutputValidation.js';
+import type { LifeWikiReviewInput, LifeWikiReviewResult } from '../services/aiOutputReview.js';
 
 export type LifeWikiRunTrigger = 'manual' | 'smart_mode' | 'account_enable';
 export type LifeWikiRunStatus = 'running' | 'succeeded' | 'partial' | 'failed' | 'skipped';
@@ -55,6 +56,7 @@ export interface LifeWikiRunResult {
 interface RunLifeWikiRefreshInput {
   store: LifeWikiRunStore;
   generateText(prompt: string, model: string, action: AiAction): Promise<string>;
+  reviewWikiPageDraft?(input: LifeWikiReviewInput): Promise<LifeWikiReviewResult>;
   claimFeatureUsage(feature: 'life_wiki_refresh'): Promise<void>;
   claimProviderUsage(action: AiAction): Promise<void>;
   userId: string;
@@ -79,6 +81,7 @@ const generateWikiPage = async (
     runId: string;
     store: LifeWikiRunStore;
     generateText(prompt: string, model: string, action: AiAction): Promise<string>;
+    reviewWikiPageDraft?: (input: LifeWikiReviewInput) => Promise<LifeWikiReviewResult>;
     claimProviderUsage(action: AiAction): Promise<void>;
   },
 ) => {
@@ -96,7 +99,63 @@ const generateWikiPage = async (
     allowedSourceIds: input.sourceNoteIds,
   });
 
-  if (firstValidation.ok === true) return firstValidation.content;
+  const reviewValidatedContent = async (content: string) => {
+    if (!input.reviewWikiPageDraft) return content;
+
+    const review = await input.reviewWikiPageDraft({
+      pageType: input.config.pageType,
+      title: input.config.title,
+      content,
+      allowedSourceIds: input.sourceNoteIds,
+    });
+    const reasons = review.reasons || [];
+
+    if (review.status === 'approve') {
+      await input.store.recordEvent(input.runId, {
+        eventType: 'review_approved',
+        pageType: input.config.pageType,
+        status: 'succeeded',
+        metadata: { reasons },
+      });
+      return content;
+    }
+
+    if (review.status === 'revise' && review.revisedContent) {
+      const revisedValidation = validateWikiPageOutput(review.revisedContent, {
+        allowedSourceIds: input.sourceNoteIds,
+      });
+
+      if (revisedValidation.ok === true) {
+        await input.store.recordEvent(input.runId, {
+          eventType: 'review_revised',
+          pageType: input.config.pageType,
+          status: 'succeeded',
+          metadata: { reasons },
+        });
+        return revisedValidation.content;
+      }
+
+      await input.store.recordEvent(input.runId, {
+        eventType: 'review_rejected',
+        pageType: input.config.pageType,
+        status: 'failed',
+        message: revisedValidation.reason,
+        metadata: { reasons },
+      });
+      return null;
+    }
+
+    await input.store.recordEvent(input.runId, {
+      eventType: 'review_rejected',
+      pageType: input.config.pageType,
+      status: 'failed',
+      message: reasons[0] || 'review_rejected',
+      metadata: { reasons },
+    });
+    return null;
+  };
+
+  if (firstValidation.ok === true) return reviewValidatedContent(firstValidation.content);
 
   await input.store.recordEvent(input.runId, {
     eventType: 'wiki_page_validation_failed',
@@ -115,7 +174,7 @@ const generateWikiPage = async (
     allowedSourceIds: input.sourceNoteIds,
   });
 
-  if (retryValidation.ok === true) return retryValidation.content;
+  if (retryValidation.ok === true) return reviewValidatedContent(retryValidation.content);
 
   await input.store.recordEvent(input.runId, {
     eventType: 'wiki_page_failed',
@@ -129,6 +188,7 @@ const generateWikiPage = async (
 export const runLifeWikiRefresh = async ({
   store,
   generateText,
+  reviewWikiPageDraft,
   claimFeatureUsage,
   claimProviderUsage,
   userId,
@@ -180,6 +240,7 @@ export const runLifeWikiRefresh = async ({
         runId,
         store,
         generateText,
+        reviewWikiPageDraft,
         claimProviderUsage,
       });
 

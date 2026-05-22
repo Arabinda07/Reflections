@@ -20,6 +20,8 @@ import {
 } from '../server/lifeWikiRuns.js';
 import type { AiAction } from '../services/aiContracts';
 import { getNoteContentHash } from '../services/aiContext.js';
+import { buildWikiReviewPrompt, parseLifeWikiReviewResult } from '../services/aiOutputReview.js';
+import { INGEST_MODEL } from '../services/aiPromptSpecs.js';
 
 type AiRunRequest = {
   kind?: 'life_wiki_refresh';
@@ -298,9 +300,31 @@ const getRunIdFromRequest = (req: any) => {
   return url.searchParams.get('id') || '';
 };
 
+const getRunListLimitFromRequest = (req: any) => {
+  const rawLimit =
+    typeof req.query?.limit === 'string'
+      ? req.query.limit
+      : new URL(req.url || '/', 'https://reflections.local').searchParams.get('limit');
+  const parsedLimit = Number.parseInt(rawLimit || '10', 10);
+  if (!Number.isFinite(parsedLimit)) return 10;
+  return Math.max(1, Math.min(parsedLimit, 25));
+};
+
 const handleGet = async (req: any, res: any, userId: string, supabaseAdmin: ReturnType<typeof createSupabaseAdminClient>) => {
   const runId = getRunIdFromRequest(req);
-  if (!runId) return sendJson(res, 400, { error: 'Missing AI run id' });
+  if (!runId) {
+    const limit = getRunListLimitFromRequest(req);
+    const { data, error } = await supabaseAdmin
+      .from('ai_runs')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('kind', 'life_wiki_refresh')
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+    return sendJson(res, 200, { ok: true, data: { runs: data || [] } });
+  }
 
   const [runResult, eventsResult] = await Promise.all([
     supabaseAdmin
@@ -355,6 +379,13 @@ export default async function handler(req: any, res: any) {
           contents: prompt,
         });
         return response.text?.trim() || '';
+      },
+      reviewWikiPageDraft: async (input) => {
+        const response = await ai.models.generateContent({
+          model: INGEST_MODEL,
+          contents: buildWikiReviewPrompt(input),
+        });
+        return parseLifeWikiReviewResult(response.text?.trim() || '');
       },
       claimFeatureUsage: (feature) => claimFeatureUsage(supabaseAdmin, user.id, feature),
       claimProviderUsage: (action) => claimProviderUsage(supabaseAdmin, user.id, action, ipHash),

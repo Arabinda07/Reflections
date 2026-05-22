@@ -64,12 +64,18 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
+  const dragStartYRef = useRef<number | null>(null);
+  const onCloseRef = useRef(onClose);
+  const [dragOffsetY, setDragOffsetY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Keep DOM mounted during exit animation
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
+      setDragOffsetY(0);
+      setIsDragging(false);
       setMounted(true);
       return;
     }
@@ -79,7 +85,29 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
     return () => window.clearTimeout(timer);
   }, [isOpen]);
 
-  const onCloseRef = useRef(onClose);
+  const handleDragStart = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (mobilePlacement !== 'bottom' || event.pointerType === 'mouse') return;
+    dragStartYRef.current = event.clientY;
+    setIsDragging(true);
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const handleDragMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (dragStartYRef.current === null) return;
+    setDragOffsetY(Math.max(0, event.clientY - dragStartYRef.current));
+  };
+
+  const handleDragEnd = () => {
+    if (dragStartYRef.current === null) return;
+    const shouldClose = dragOffsetY > 96;
+    dragStartYRef.current = null;
+    setIsDragging(false);
+    setDragOffsetY(0);
+    if (shouldClose) {
+      onCloseRef.current();
+    }
+  };
+
   useEffect(() => {
     onCloseRef.current = onClose;
   }, [onClose]);
@@ -177,14 +205,23 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
             <div
               ref={panelRef}
               id={panelId}
-              className={`surface-bezel-inner modal-sheet-panel ${panelClassName}`.trim()}
+              className={`surface-bezel-inner modal-sheet-panel ${
+                isDragging ? 'modal-sheet-panel--dragging' : ''
+              } ${panelClassName}`.trim()}
+              style={dragOffsetY > 0 ? { transform: `translateY(${dragOffsetY}px)` } : undefined}
               role="dialog"
               aria-modal="true"
               aria-labelledby={title ? titleId : undefined}
               aria-label={!title && ariaLabel ? ariaLabel : undefined}
               aria-describedby={description ? descriptionId : undefined}
             >
-              <div className="modal-sheet-handle" />
+              <div
+                className="modal-sheet-handle"
+                onPointerDown={handleDragStart}
+                onPointerMove={handleDragMove}
+                onPointerUp={handleDragEnd}
+                onPointerCancel={handleDragEnd}
+              />
 
               {(icon || title || description || !hideClose) && (
                 <div className="modal-sheet-header">

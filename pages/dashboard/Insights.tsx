@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
 import { Book } from '@phosphor-icons/react/Book';
@@ -33,6 +33,7 @@ import {
 } from '../../src/lottie/sanctuaryAnimation';
 import { DEFAULT_MOOD_TONE, getMoodConfig, getMoodGroupConfig } from './moodConfig';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { useViewTransitionNavigation } from '../../hooks/useViewTransitionNavigation';
 
 const TAG_TONE_CLASSES = ['text-green', 'text-green/80', 'text-green/70', 'text-green/60'];
 
@@ -53,7 +54,7 @@ const getWeekSignalSince = () => {
 };
 
 export const Insights: React.FC = () => {
-  const navigate = useNavigate();
+  const navigate = useViewTransitionNavigation();
 
   const [notes, setNotes] = useState<Note[]>([]);
   const [themes, setThemes] = useState<LifeTheme[]>([]);

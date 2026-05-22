@@ -11,8 +11,6 @@ import { FloppyDisk } from '@phosphor-icons/react/FloppyDisk';
 import { Headphones } from '@phosphor-icons/react/Headphones';
 import { Image as ImageIcon } from '@phosphor-icons/react/Image';
 import { ListChecks } from '@phosphor-icons/react/ListChecks';
-import { Microphone } from '@phosphor-icons/react/Microphone';
-import { MicrophoneSlash } from '@phosphor-icons/react/MicrophoneSlash';
 import { Paperclip } from '@phosphor-icons/react/Paperclip';
 import { Plus } from '@phosphor-icons/react/Plus';
 import { Smiley } from '@phosphor-icons/react/Smiley';
@@ -24,19 +22,18 @@ import { X } from '@phosphor-icons/react/X';
 import { useAmbientAudio, AMBIENT_TRACKS } from '../../hooks/useAmbientAudio';
 import { useHaptics } from '../../hooks/useHaptics';
 import { useSound } from '../../hooks/useSound';
-import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
 import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
 import { Editor, EditorRef } from '../../components/ui/Editor';
 import { RoutePath, Task } from '../../types';
 import { ModalSheet } from '../../components/ui/ModalSheet';
+import { WhisperComposerControl, appendTranscriptToHtml } from '../../components/ui/WhisperComposerControl';
 import { InlineLoadingBadge } from '../../components/ui/InlineLoadingBadge';
 import { DEFAULT_WELLNESS_PROMPTS, getCurrentWellnessPrompt, getNextWellnessPromptState } from '../../services/wellnessPrompts';
 import { aiService } from '../../services/aiService';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useNoteDraft } from '../../hooks/useNoteDraft';
 import { useFocusMode } from '../../hooks/useFocusMode';
-import { useWhisperInput } from '../../hooks/useWhisperInput';
 import { getOrderedTasks, getTaskDrawerTriggerLabel } from './createNoteTasks';
 import { canNavigateBackInApp } from '../../src/native/androidBack';
 import { NATIVE_PAGE_TOP_PADDING, NATIVE_TOP_CONTROL_OFFSET } from '../../src/native/safeArea';
@@ -159,25 +156,21 @@ export const CreateNote: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const initialPrompt = location.state?.initialPrompt;
+  const initialContent =
+    typeof location.state?.initialContent === 'string' ? location.state.initialContent : '';
 
   // â”€â”€ Core draft lifecycle (state, save, release, navigation blocking) â”€â”€
   const draft = useNoteDraft();
+  const hasAppliedInitialContentRef = useRef(false);
 
   // â”€â”€ Focus/flow mode â”€â”€
   const [isFocused, setIsFocused] = useState(false);
   const [isTitleFocused, setIsTitleFocused] = useState(false);
   const focusMode = useFocusMode({ isEditorFocused: isFocused, isTitleFocused });
 
-  // â”€â”€ Whisper (speech-to-text) â”€â”€
-  const whisper = useWhisperInput(
-    useCallback((text: string) => {
-      draft.setContent((prev: string) => {
-        const clean = prev === '<p><br></p>' ? '' : prev;
-        if (!clean) return `<p>${text}</p>`;
-        return clean.endsWith('</p>') ? clean.slice(0, -4) + ' ' + text + '</p>' : clean + ' ' + text;
-      });
-    }, [draft.setContent]),
-  );
+  const appendWhisperTranscript = useCallback((text: string) => {
+    draft.setContent((prev: string) => appendTranscriptToHtml(prev, text));
+  }, [draft.setContent]);
 
   // â”€â”€ UI-local state (modals, editor chrome) â”€â”€
   const isMobile = useMediaQuery('(max-width: 1023px)');
@@ -228,6 +221,12 @@ export const CreateNote: React.FC = () => {
       stopMusic();
     };
   }, [stopMusic]);
+
+  useEffect(() => {
+    if (hasAppliedInitialContentRef.current || !initialContent.trim()) return;
+    hasAppliedInitialContentRef.current = true;
+    draft.setContent((previous: string) => appendTranscriptToHtml(previous, initialContent));
+  }, [draft.setContent, initialContent]);
 
   // Aliases from draft hook for template readability
   const { title, setTitle, content, setContent, mood, setMood, tags, setTags, tasks, setTasks } = draft;
@@ -367,10 +366,6 @@ export const CreateNote: React.FC = () => {
   const canReflect = wordCount >= 100;
   const isFocusModeActive = focusMode.isActive;
   const isFocusModeEnabled = focusMode.isEnabled;
-  const isWhispering = whisper.isWhispering;
-  const interimTranscript = whisper.interimTranscript;
-  const whisperFeedback = whisper.feedback;
-  const toggleWhisper = whisper.toggle;
   const showEntryExperience = loading || !entryAnimationComplete;
 
   const handleStayOnDraft = () => {
@@ -476,9 +471,12 @@ export const CreateNote: React.FC = () => {
               <CaretRight size={14} className="opacity-40" />
             </button>
 
-            <button onClick={toggleWhisper} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-[20px] transition-colors border border-border/40 ${isWhispering ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>
-              <div className="flex items-center gap-3">{isWhispering ? <Microphone size={20} weight="fill" /> : <MicrophoneSlash size={20} weight="regular" />}<span className="text-[13px] font-bold">Whisper</span></div>
-            </button>
+            <WhisperComposerControl
+              onFinalTranscript={appendWhisperTranscript}
+              label="Whisper"
+              className="w-full"
+              buttonClassName="w-full flex items-center justify-between p-4 min-h-14 rounded-[20px] transition-colors border border-border/40"
+            />
 
             <button onClick={() => setIsTasksOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-[20px] transition-colors border border-border/40 ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>
               <div className="flex items-center gap-3"><ListChecks size={20} weight={tasks.some(t => !t.completed) ? "fill" : "regular"} /><span className="text-[13px] font-bold">{getTaskDrawerTriggerLabel(tasks).label}</span></div>
@@ -558,16 +556,12 @@ export const CreateNote: React.FC = () => {
             )}
           </div>
 
-          {whisperFeedback ? (
-            <div className="mb-6">
-              <Alert
-                variant="info"
-                title="Whisper needs a supported browser"
-                description={whisperFeedback}
-                icon={<MicrophoneSlash size={18} weight="fill" />}
-              />
-            </div>
-          ) : null}
+          <WhisperComposerControl
+            onFinalTranscript={appendWhisperTranscript}
+            label="Voice capture"
+            className="mb-6 max-w-sm"
+            buttonClassName="inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2 label-caps transition-colors"
+          />
 
           {/* Reflection title field */}
           <input
@@ -580,12 +574,6 @@ export const CreateNote: React.FC = () => {
             onBlur={() => { setIsFocused(false); setIsTitleFocused(false); }}
             className="editor-title-input min-h-11"
           />
-
-            {isWhispering && interimTranscript && (
-              <div className="mb-8 p-4 rounded-[2rem] bg-green/5 border border-green/10 text-green font-serif italic text-[18px] animate-fade-in-up">
-                {interimTranscript}...
-              </div>
-            )}
 
           <Editor 
             ref={editorInstanceRef} 
@@ -672,7 +660,11 @@ export const CreateNote: React.FC = () => {
           <button onClick={() => { setIsMobileOptionsOpen(false); setIsTagsOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><TagIcon size={24} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-[14px] font-bold">Tags</span></button>
           <button onClick={() => { setIsMobileOptionsOpen(false); setIsMusicOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${musicPlaying ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><Headphones size={24} weight={musicPlaying ? "fill" : "regular"} /><span className="text-[14px] font-bold">Sounds</span></button>
           <button onClick={() => { setIsMobileOptionsOpen(false); setIsTasksOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><ListChecks size={24} weight={tasks.some(t => !t.completed) ? "fill" : "regular"} /><span className="text-[14px] font-bold">Tasks</span></button>
-          <button onClick={toggleWhisper} className={`flex items-center gap-3 rounded-2xl border p-4 ${isWhispering ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>{isWhispering ? <Microphone size={24} weight="fill" /> : <MicrophoneSlash size={24} weight="regular" />}<span className="text-[14px] font-bold">Whisper</span></button>
+          <WhisperComposerControl
+            onFinalTranscript={appendWhisperTranscript}
+            label="Whisper"
+            buttonClassName="flex w-full items-center gap-3 rounded-2xl border p-4 text-[14px] font-bold transition-colors"
+          />
 
           <label className="control-surface flex cursor-pointer items-center gap-3 rounded-2xl p-4 text-gray-text transition-colors hover:border-green/20 hover:bg-green/5">
             <Paperclip size={24} weight="regular" /><span className="text-[14px] font-bold">Files</span>

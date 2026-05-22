@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { LifeTheme, Note } from '../types';
+import type { AiAction } from '../services/aiContracts';
 import { getNoteContentHash } from '../services/aiContext';
+import { WIKI_PAGE_CONFIGS } from '../services/aiPromptSpecs';
 import { runLifeWikiRefresh, type LifeWikiRunStore } from './lifeWikiRuns';
 
 const note = (overrides: Partial<Note> = {}): Note => ({
@@ -113,5 +115,76 @@ describe('runLifeWikiRefresh', () => {
       pageCount: 0,
     });
     expect(generateText).not.toHaveBeenCalled();
+  });
+
+  it('records review revisions before saving wiki pages', async () => {
+    const store = createStore();
+    const reviewWikiPageDraft = vi.fn(async () => ({
+      status: 'revise',
+      reasons: ['source tone drift'],
+      revisedContent: 'Revised page with quieter wording. [Source: note-1]',
+    }));
+    const generateText = vi.fn(async (prompt: string) =>
+      prompt.includes('index page') ? 'Index body' : 'Draft with a source. [Source: note-1]',
+    );
+
+    const result = await runLifeWikiRefresh({
+      store,
+      generateText,
+      reviewWikiPageDraft,
+      claimFeatureUsage: vi.fn(async () => undefined),
+      claimProviderUsage: vi.fn(async () => undefined),
+      userId: 'user-1',
+      trigger: 'manual',
+    } as any);
+
+    expect(result.status).toBe('succeeded');
+    expect(reviewWikiPageDraft).toHaveBeenCalledWith(expect.objectContaining({
+      pageType: 'people',
+      title: 'People',
+      content: 'Draft with a source. [Source: note-1]',
+    }));
+    expect(store.recordEvent).toHaveBeenCalledWith(
+      'run-1',
+      expect.objectContaining({
+        eventType: 'review_revised',
+        pageType: 'people',
+        status: 'succeeded',
+        metadata: expect.objectContaining({ reasons: ['source tone drift'] }),
+      }),
+    );
+    expect(store.upsertWikiPage).toHaveBeenCalledWith(
+      'people',
+      'People',
+      'Revised page with quieter wording. [Source: note-1]',
+    );
+  });
+
+  it('does not charge an extra wikiPage provider claim for review-only calls', async () => {
+    const store = createStore();
+    const claimProviderUsage = vi.fn(async (_action: AiAction) => undefined);
+    const reviewWikiPageDraft = vi.fn(async () => ({
+      status: 'approve' as const,
+      reasons: [],
+    }));
+    const generateText = vi.fn(async (prompt: string) =>
+      prompt.includes('index page') ? 'Index body' : 'Grounded page. [Source: note-1]',
+    );
+
+    await runLifeWikiRefresh({
+      store,
+      generateText,
+      reviewWikiPageDraft,
+      claimFeatureUsage: vi.fn(async () => undefined),
+      claimProviderUsage,
+      userId: 'user-1',
+      trigger: 'manual',
+    });
+
+    expect(claimProviderUsage).toHaveBeenCalledTimes(WIKI_PAGE_CONFIGS.length + 1);
+    expect(claimProviderUsage.mock.calls.filter(([action]) => action === 'wikiPage')).toHaveLength(
+      WIKI_PAGE_CONFIGS.length,
+    );
+    expect(claimProviderUsage.mock.calls.filter(([action]) => action === 'index')).toHaveLength(1);
   });
 });

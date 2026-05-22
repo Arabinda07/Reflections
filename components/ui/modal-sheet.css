@@ -88,6 +88,11 @@
     -webkit-backdrop-filter: none;
   }
 
+  .modal-sheet-panel--dragging {
+    transition: none;
+    touch-action: none;
+  }
+
   .dark .modal-sheet-panel {
     background:
       linear-gradient(145deg, oklch(from var(--surface-current-accent) 0.26 0.032 h / 0.5), transparent 52%),
@@ -100,6 +105,8 @@
     border-radius: 999px;
     background: var(--border-color);
     margin: 0.9rem auto 0;
+    touch-action: none;
+    cursor: grab;
   }
 
   @media (min-width: 640px) {

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
 import { Calendar } from '@phosphor-icons/react/Calendar';
 import { Check } from '@phosphor-icons/react/Check';
@@ -27,6 +27,7 @@ import { StorageImage } from '../../components/ui/StorageImage';
 import { Surface } from '../../components/ui/Surface';
 import { noteService } from '../../services/noteService';
 import { storageService } from '../../services/storageService';
+import { useViewTransitionNavigation } from '../../hooks/useViewTransitionNavigation';
 import { Note, RoutePath, Task } from '../../types';
 import { sanitizeNoteHtml } from './noteContent';
 import { downloadNoteExport } from './noteExport';
@@ -35,7 +36,7 @@ import { MoodPicker, type MoodPickerStage } from './MoodPicker';
 
 export const SingleNote: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+  const navigate = useViewTransitionNavigation();
   const [note, setNote] = useState<Note | null>(null);
   const [loading, setLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
