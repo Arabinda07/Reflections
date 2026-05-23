@@ -39,6 +39,7 @@ const MyNotesCalendar = lazy(() =>
 
 const NOTE_SWIPE_OPEN_THRESHOLD = 72;
 const NOTE_SWIPE_CLOSE_THRESHOLD = 48;
+const NOTE_SWIPE_AXIS_INTENT_RATIO = 1.25;
 
 export const MyNotes: React.FC = () => {
   const navigate = useViewTransitionNavigation();
@@ -56,6 +57,7 @@ export const MyNotes: React.FC = () => {
   const [swipedNoteId, setSwipedNoteId] = useState<string | null>(null);
   const notesViewScopeRef = useRef<HTMLDivElement | null>(null);
   const swipeStartXRef = useRef<number | null>(null);
+  const swipeStartYRef = useRef<number | null>(null);
   const swipeNoteIdRef = useRef<string | null>(null);
 
   const queryParams = new URLSearchParams(location.search);
@@ -120,21 +122,30 @@ export const MyNotes: React.FC = () => {
   const handleNotePointerDown = (event: React.PointerEvent, noteId: string) => {
     if (event.pointerType === 'mouse') return;
     swipeStartXRef.current = event.clientX;
+    swipeStartYRef.current = event.clientY;
     swipeNoteIdRef.current = noteId;
   };
 
   const handleNotePointerEnd = (event: React.PointerEvent, noteId: string) => {
-    if (swipeNoteIdRef.current !== noteId || swipeStartXRef.current === null) return;
+    if (
+      swipeNoteIdRef.current !== noteId ||
+      swipeStartXRef.current === null ||
+      swipeStartYRef.current === null
+    ) return;
 
     const deltaX = event.clientX - swipeStartXRef.current;
-    if (deltaX < -NOTE_SWIPE_OPEN_THRESHOLD) {
+    const deltaY = event.clientY - swipeStartYRef.current;
+    const hasHorizontalIntent = Math.abs(deltaX) > Math.abs(deltaY) * NOTE_SWIPE_AXIS_INTENT_RATIO;
+
+    if (hasHorizontalIntent && deltaX < -NOTE_SWIPE_OPEN_THRESHOLD) {
       void haptics.light();
       setSwipedNoteId(noteId);
-    } else if (deltaX > NOTE_SWIPE_CLOSE_THRESHOLD) {
+    } else if (hasHorizontalIntent && deltaX > NOTE_SWIPE_CLOSE_THRESHOLD) {
       setSwipedNoteId((current) => (current === noteId ? null : current));
     }
 
     swipeStartXRef.current = null;
+    swipeStartYRef.current = null;
     swipeNoteIdRef.current = null;
   };
 
@@ -251,6 +262,7 @@ export const MyNotes: React.FC = () => {
           onPointerUp={(event) => handleNotePointerEnd(event, note.id)}
           onPointerCancel={() => {
             swipeStartXRef.current = null;
+            swipeStartYRef.current = null;
             swipeNoteIdRef.current = null;
           }}
           style={{ '--note-card-delay': `${index * 50}ms` } as React.CSSProperties}

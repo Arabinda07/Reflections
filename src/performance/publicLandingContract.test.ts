@@ -182,6 +182,8 @@ describe('public landing performance contract', () => {
     expect(indexCss).toMatch(/(^|\n)\s*\.no-scroll\s*{/);
     expect(indexCss).toMatch(/(^|\n)\s*\.no-scroll\s+\.app-shell--fixed-scroll\s+#main-content\s*{/);
     expect(indexCss).not.toMatch(/(^|\n)\s*\.no-scroll\s+#main-content\s*{/);
+    expect(indexCss).not.toMatch(/html,\s*body\s*{\s*overflow-x:\s*hidden;/);
+    expect(indexCss).toContain('body {\n    max-width: 100%;');
     expect(read('layouts/DashboardLayout.tsx')).toContain('app-shell--fixed-scroll');
 
     expect(modalCss).not.toContain('.no-scroll');

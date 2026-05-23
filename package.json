@@ -53,6 +53,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^8.3.1",
+    "@playwright/test": "^1.60.0",
     "@react-email/ui": "^6.0.5",
     "@tailwindcss/container-queries": "^0.1.1",
     "@types/howler": "^2.2.12",
