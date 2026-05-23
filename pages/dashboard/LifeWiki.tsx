@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import ReactMarkdown from 'react-markdown';
@@ -30,6 +30,7 @@ import {
   SANCTUARY_LEVEL_UP_ANIMATION_SRC,
 } from '../../src/lottie/sanctuaryAnimation';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { runScopedTransition } from '../../hooks/viewTransitionUtils';
 import { getLifeWikiReviewSummary } from './lifeWikiReviewSummary';
 
 type RefreshFeedback = {
@@ -248,6 +249,7 @@ export const LifeWiki: React.FC = () => {
   const cameFromInsights = Boolean(location.state?.fromInsights);
   const shouldPlayEntryAnimation =
     !shouldReduceMotion && (location.pathname === RoutePath.WIKI || location.pathname === RoutePath.SANCTUARY);
+  const lifeWikiScopeRef = useRef<HTMLDivElement | null>(null);
   const [notes, setNotes] = useState<Note[]>([]);
   const [themes, setThemes] = useState<LifeTheme[]>([]);
   const [access, setAccess] = useState<WellnessAccess | null>(null);
@@ -280,9 +282,11 @@ export const LifeWiki: React.FC = () => {
         profileService.getWellnessAccess(),
       ]);
 
-      setNotes(allNotes);
-      setThemes(allThemes);
-      setAccess(accessData);
+      runScopedTransition(lifeWikiScopeRef.current, () => {
+        setNotes(allNotes);
+        setThemes(allThemes);
+        setAccess(accessData);
+      });
     } catch (error) {
       console.error('[LifeWiki] Failed to load data:', error);
     } finally {
@@ -585,7 +589,8 @@ export const LifeWiki: React.FC = () => {
           <div className="sanctuary-page-fade absolute inset-0 opacity-50" />
         </div>
         <PageContainer size="narrow" className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10 relative z-10">
-          <div 
+          <div
+            ref={lifeWikiScopeRef}
             className={`core-page-stack transition-[opacity,transform] duration-500 ease-out-expo ${isEnteringWiki ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}
           >
             <button
@@ -798,7 +803,8 @@ export const LifeWiki: React.FC = () => {
       </div>
 
       <PageContainer className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10 relative z-10">
-        <div 
+        <div
+          ref={lifeWikiScopeRef}
           className={`core-page-stack transition-[opacity,transform] duration-500 ease-out-expo ${isEnteringWiki ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}
         >
           <div className="flex items-center justify-between gap-4">

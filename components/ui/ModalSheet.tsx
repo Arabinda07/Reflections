@@ -2,6 +2,7 @@ import React, { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from '@phosphor-icons/react/X';
 import { registerAndroidBackAction } from '../../src/native/androidBack';
+import { useHaptics } from '../../hooks/useHaptics';
 import { SURFACE_TONE_CLASS, type SurfaceTone } from './surfaceTone';
 import './modal-sheet.css';
 
@@ -39,6 +40,9 @@ const EXIT_DURATION_MS = 220;
 /** Brief delay (ms) before auto-focusing the first element, giving children time to mount. */
 const AUTOFOCUS_DELAY_MS = 40;
 
+const SHEET_DRAG_CLOSE_THRESHOLD = 112;
+const SHEET_DRAG_MINIMUM_MOVEMENT = 12;
+
 export const ModalSheet: React.FC<ModalSheetProps> = ({
   isOpen,
   onClose,
@@ -59,6 +63,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
   mobilePlacement = 'bottom',
   tone = 'paper',
 }) => {
+  const haptics = useHaptics();
   const titleId = useId();
   const descriptionId = useId();
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -94,16 +99,22 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
 
   const handleDragMove = (event: React.PointerEvent<HTMLDivElement>) => {
     if (dragStartYRef.current === null) return;
-    setDragOffsetY(Math.max(0, event.clientY - dragStartYRef.current));
+    const nextOffset = Math.max(0, event.clientY - dragStartYRef.current);
+    if (nextOffset < SHEET_DRAG_MINIMUM_MOVEMENT) {
+      setDragOffsetY(0);
+      return;
+    }
+    setDragOffsetY(nextOffset);
   };
 
   const handleDragEnd = () => {
     if (dragStartYRef.current === null) return;
-    const shouldClose = dragOffsetY > 96;
+    const shouldClose = dragOffsetY > SHEET_DRAG_CLOSE_THRESHOLD;
     dragStartYRef.current = null;
     setIsDragging(false);
     setDragOffsetY(0);
     if (shouldClose) {
+      void haptics.light();
       onCloseRef.current();
     }
   };

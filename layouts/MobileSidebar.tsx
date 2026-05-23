@@ -11,6 +11,7 @@ import { SignOut } from '@phosphor-icons/react/SignOut';
 import { X } from '@phosphor-icons/react/X';
 import { StorageImage } from '../components/ui/StorageImage';
 import { useAuthStore } from '../hooks/useAuthStore';
+import { useHaptics } from '../hooks/useHaptics';
 import { usePWAInstall } from '../context/PWAInstallContext';
 import { registerAndroidBackAction } from '../src/native/androidBack';
 import { NATIVE_PAGE_TOP_PADDING, NATIVE_TOP_CONTROL_OFFSET } from '../src/native/safeArea';
@@ -30,6 +31,9 @@ interface MobileSidebarProps {
   onInvite: () => void;
 }
 
+const SIDEBAR_DRAG_CLOSE_THRESHOLD = 112;
+const SIDEBAR_DRAG_MINIMUM_MOVEMENT = 12;
+
 /**
  * Full-screen mobile navigation sidebar.
  * Owns focus-trap, scroll-lock, Android back-button registration, and all nav rendering.
@@ -42,6 +46,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
   onInvite,
 }) => {
   const navigate = useNavigate();
+  const haptics = useHaptics();
   const location = useLocation();
   const { isAuthenticated, user, logout } = useAuthStore();
   const { canInstall, isInstalled, triggerInstall } = usePWAInstall();
@@ -76,18 +81,24 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
   const handleSidebarPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
     if (dragStartXRef.current === null) return;
     const nextOffset = Math.max(0, event.clientX - dragStartXRef.current);
+    if (nextOffset < SIDEBAR_DRAG_MINIMUM_MOVEMENT) {
+      dragOffsetXRef.current = 0;
+      setDragOffsetX(0);
+      return;
+    }
     dragOffsetXRef.current = nextOffset;
     setDragOffsetX(nextOffset);
   };
 
   const handleSidebarPointerEnd = () => {
     if (dragStartXRef.current === null) return;
-    const shouldClose = dragOffsetXRef.current > 96;
+    const shouldClose = dragOffsetXRef.current > SIDEBAR_DRAG_CLOSE_THRESHOLD;
     dragStartXRef.current = null;
     dragOffsetXRef.current = 0;
     setIsDragging(false);
     setDragOffsetX(0);
     if (shouldClose) {
+      void haptics.light();
       onClose();
     }
   };

@@ -34,6 +34,7 @@ import {
 import { DEFAULT_MOOD_TONE, getMoodConfig, getMoodGroupConfig } from './moodConfig';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useViewTransitionNavigation } from '../../hooks/useViewTransitionNavigation';
+import { runScopedTransition } from '../../hooks/viewTransitionUtils';
 
 const TAG_TONE_CLASSES = ['text-green', 'text-green/80', 'text-green/70', 'text-green/60'];
 
@@ -55,6 +56,7 @@ const getWeekSignalSince = () => {
 
 export const Insights: React.FC = () => {
   const navigate = useViewTransitionNavigation();
+  const insightsScopeRef = useRef<HTMLDivElement | null>(null);
 
   const [notes, setNotes] = useState<Note[]>([]);
   const [themes, setThemes] = useState<LifeTheme[]>([]);
@@ -71,6 +73,10 @@ export const Insights: React.FC = () => {
   const isOpeningSanctuaryRef = useRef(false);
   const openingTimerRef = useRef<number | null>(null);
   const shouldReduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
+
+  const toggleInsightPanel = (update: () => void) => {
+    runScopedTransition(insightsScopeRef.current, update);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -265,7 +271,7 @@ export const Insights: React.FC = () => {
             className="insights-section-header"
           />
 
-          <div aria-live="polite" aria-busy={loading} className="w-full">
+          <div ref={insightsScopeRef} aria-live="polite" aria-busy={loading} className="w-full">
             {loading ? (
             <Surface variant="flat" tone="sky" className="p-8 md:p-10">
               <WeeklyRecapLoadingSkeleton />
@@ -317,7 +323,7 @@ export const Insights: React.FC = () => {
               {/* Mood Frequency Accordion */}
                 <button
                   type="button"
-                  onClick={() => setIsMoodOpen((prev) => !prev)}
+                  onClick={() => toggleInsightPanel(() => setIsMoodOpen((prev) => !prev))}
                   aria-expanded={isMoodOpen}
                   aria-controls="insights-mood-panel"
                   className="group/acc flex w-full items-center justify-between gap-4 py-6 text-left"
@@ -386,7 +392,7 @@ export const Insights: React.FC = () => {
               <div>
                 <button
                   type="button"
-                  onClick={() => setIsTagsOpen((prev) => !prev)}
+                  onClick={() => toggleInsightPanel(() => setIsTagsOpen((prev) => !prev))}
                   aria-expanded={isTagsOpen}
                   aria-controls="insights-tags-panel"
                   className="group/acc flex w-full items-center justify-between gap-4 py-6 text-left"
@@ -444,7 +450,7 @@ export const Insights: React.FC = () => {
           <Surface variant="bezel" tone="sage" className="group relative overflow-hidden rounded-[2.5rem] transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-green/5">
             <button
               type="button"
-              onClick={() => setIsOverviewOpen((current) => !current)}
+              onClick={() => toggleInsightPanel(() => setIsOverviewOpen((current) => !current))}
               aria-expanded={isOverviewOpen}
               aria-controls="insights-overview-panel"
               className="flex w-full items-center justify-between gap-4 p-6 text-left md:p-8"
@@ -492,7 +498,7 @@ export const Insights: React.FC = () => {
           <Surface variant="flat" tone="honey" className="group relative overflow-hidden rounded-[2.5rem] transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-honey/5">
             <button
               type="button"
-              onClick={() => setIsCompletionOpen((prev) => !prev)}
+              onClick={() => toggleInsightPanel(() => setIsCompletionOpen((prev) => !prev))}
               aria-expanded={isCompletionOpen}
               aria-controls="insights-completion-panel"
               className="flex w-full items-center justify-between gap-4 p-6 text-left md:p-8"

@@ -24,7 +24,9 @@ import { SectionHeader } from '../../components/ui/SectionHeader';
 import { StorageImage } from '../../components/ui/StorageImage';
 import { Surface } from '../../components/ui/Surface';
 import { useAuthStore } from '../../hooks/useAuthStore';
+import { useHaptics } from '../../hooks/useHaptics';
 import { useViewTransitionNavigation } from '../../hooks/useViewTransitionNavigation';
+import { runScopedTransition } from '../../hooks/viewTransitionUtils';
 import { noteService } from '../../services/noteService';
 import { Note, RoutePath } from '../../types';
 import { buildNotePreviewText } from './noteContent';
@@ -35,8 +37,12 @@ const MyNotesCalendar = lazy(() =>
   import('./MyNotesCalendar').then((module) => ({ default: module.MyNotesCalendar })),
 );
 
+const NOTE_SWIPE_OPEN_THRESHOLD = 72;
+const NOTE_SWIPE_CLOSE_THRESHOLD = 48;
+
 export const MyNotes: React.FC = () => {
   const navigate = useViewTransitionNavigation();
+  const haptics = useHaptics();
   const location = useLocation();
   const { user } = useAuthStore();
   const [notes, setNotes] = useState<Note[]>([]);
@@ -47,6 +53,7 @@ export const MyNotes: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'calendar'>('grid');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [swipedNoteId, setSwipedNoteId] = useState<string | null>(null);
+  const notesViewScopeRef = useRef<HTMLDivElement | null>(null);
   const swipeStartXRef = useRef<number | null>(null);
   const swipeNoteIdRef = useRef<string | null>(null);
 
@@ -97,6 +104,20 @@ export const MyNotes: React.FC = () => {
     setIsConfirmOpen(true);
   };
 
+  const handleViewModeChange = (nextViewMode: 'grid' | 'calendar') => {
+    runScopedTransition(notesViewScopeRef.current, () => {
+      setViewMode(nextViewMode);
+      setSwipedNoteId(null);
+    });
+  };
+
+  const handleTagFilterChange = (path: string) => {
+    runScopedTransition(notesViewScopeRef.current, () => {
+      setSwipedNoteId(null);
+      navigate(path);
+    });
+  };
+
   const handleNotePointerDown = (event: React.PointerEvent, noteId: string) => {
     if (event.pointerType === 'mouse') return;
     swipeStartXRef.current = event.clientX;
@@ -107,9 +128,10 @@ export const MyNotes: React.FC = () => {
     if (swipeNoteIdRef.current !== noteId || swipeStartXRef.current === null) return;
 
     const deltaX = event.clientX - swipeStartXRef.current;
-    if (deltaX < -64) {
+    if (deltaX < -NOTE_SWIPE_OPEN_THRESHOLD) {
+      void haptics.light();
       setSwipedNoteId(noteId);
-    } else if (deltaX > 48) {
+    } else if (deltaX > NOTE_SWIPE_CLOSE_THRESHOLD) {
       setSwipedNoteId((current) => (current === noteId ? null : current));
     }
 
@@ -373,7 +395,7 @@ export const MyNotes: React.FC = () => {
                       active={viewMode === 'grid'}
                       aria-pressed={viewMode === 'grid'}
                       icon={<SquaresFour size={16} weight="regular" />}
-                      onClick={() => setViewMode('grid')}
+                      onClick={() => handleViewModeChange('grid')}
                       title="Grid view"
                     >
                       Grid
@@ -382,7 +404,7 @@ export const MyNotes: React.FC = () => {
                       active={viewMode === 'calendar'}
                       aria-pressed={viewMode === 'calendar'}
                       icon={<CalendarIcon size={16} weight="regular" />}
-                      onClick={() => setViewMode('calendar')}
+                      onClick={() => handleViewModeChange('calendar')}
                       title="Calendar view"
                     >
                       Calendar
@@ -424,7 +446,7 @@ export const MyNotes: React.FC = () => {
                       <span className="metadata-pill metadata-pill--sage">
                         {selectedTagSummary?.count || 0} {(selectedTagSummary?.count || 0) === 1 ? 'reflection' : 'reflections'}
                       </span>
-                      <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.NOTES)} className="text-clay">
+                      <Button variant="ghost" size="sm" onClick={() => handleTagFilterChange(RoutePath.NOTES)} className="text-clay">
                         <X size={12} weight="regular" className="mr-1" />
                         Clear filter
                       </Button>
@@ -435,7 +457,7 @@ export const MyNotes: React.FC = () => {
                         <Chip
                           key={tag.name}
                           icon={<Tag size={12} weight="regular" />}
-                          onClick={() => navigate(`${RoutePath.NOTES}?tag=${encodeURIComponent(tag.name)}`)}
+                          onClick={() => handleTagFilterChange(`${RoutePath.NOTES}?tag=${encodeURIComponent(tag.name)}`)}
                           aria-label={`Show ${tag.name} reflections`}
                         >
                           <span>{tag.name}</span>
@@ -448,6 +470,7 @@ export const MyNotes: React.FC = () => {
               </Surface>
             ) : null}
 
+            <div ref={notesViewScopeRef}>
             {viewMode === 'calendar' ? (
               <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
                 <div className="lg:col-span-7 xl:col-span-8">
@@ -514,7 +537,7 @@ export const MyNotes: React.FC = () => {
                 }
                 action={
                   tagFilter ? (
-                    <Button onClick={() => navigate(RoutePath.NOTES)} variant="secondary">
+                    <Button onClick={() => handleTagFilterChange(RoutePath.NOTES)} variant="secondary">
                       Clear filter
                     </Button>
                   ) : (
@@ -525,6 +548,7 @@ export const MyNotes: React.FC = () => {
                 }
               />
             )}
+            </div>
           </div>
         </PageContainer>
       ) : null}

@@ -1,18 +1,14 @@
 import { useCallback } from 'react';
 import { type NavigateOptions, type To, useNavigate } from 'react-router-dom';
+import { supportsViewTransitions } from './viewTransitionUtils';
 
 type ViewTransitionDocument = Document & {
   startViewTransition?: (callback: () => void) => { finished?: Promise<void> };
 };
 
-const shouldReduceMotion = () =>
-  typeof window !== 'undefined' &&
-  window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true;
-
 export const canStartViewTransition = () =>
-  typeof document !== 'undefined' &&
-  typeof (document as ViewTransitionDocument).startViewTransition === 'function' &&
-  !shouldReduceMotion();
+  // supportsViewTransitions includes the prefers-reduced-motion guard.
+  supportsViewTransitions();
 
 export const useViewTransitionNavigation = () => {
   const navigate = useNavigate();

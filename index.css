@@ -624,6 +624,46 @@ details:focus-visible,
   }
 }
 
+@supports (color: light-dark(white, black)) {
+  :root {
+    color-scheme: light dark;
+    --system-ink-color: light-dark(var(--gray-text), var(--gray-text));
+  }
+}
+
+@supports (color: contrast-color(white)) {
+  .metadata-pill,
+  .chip-filter--active {
+    --auto-contrast-ink: contrast-color(var(--surface-current-soft-bg));
+  }
+}
+
+@supports (corner-shape: bevel) {
+  .surface-bezel-inner.modal-sheet-panel,
+  .control-surface {
+    corner-shape: squircle;
+  }
+}
+
+@supports (animation-trigger: --reflections-scroll-reveal) {
+  .section-header {
+    trigger-scope: --reflections-scroll-reveal;
+  }
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 240ms;
+  animation-timing-function: var(--ease-out-expo);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.01ms !important;
+  }
+}
+
 @layer components {
 
   .touch-target-44 {
