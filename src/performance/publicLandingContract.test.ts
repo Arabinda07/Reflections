@@ -180,7 +180,9 @@ describe('public landing performance contract', () => {
     expect(indexCss).not.toContain('.audio-popup');
     expect(indexCss).not.toContain('.ql-toolbar.ql-snow');
     expect(indexCss).toMatch(/(^|\n)\s*\.no-scroll\s*{/);
-    expect(indexCss).toMatch(/(^|\n)\s*\.no-scroll\s+#main-content\s*{/);
+    expect(indexCss).toMatch(/(^|\n)\s*\.no-scroll\s+\.app-shell--fixed-scroll\s+#main-content\s*{/);
+    expect(indexCss).not.toMatch(/(^|\n)\s*\.no-scroll\s+#main-content\s*{/);
+    expect(read('layouts/DashboardLayout.tsx')).toContain('app-shell--fixed-scroll');
 
     expect(modalCss).not.toContain('.no-scroll');
     expect(modalCss).toContain('.modal-sheet-root');

@@ -70,6 +70,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
   const panelRef = useRef<HTMLDivElement | null>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const dragStartYRef = useRef<number | null>(null);
+  const dragOffsetYRef = useRef(0);
   const onCloseRef = useRef(onClose);
   const [dragOffsetY, setDragOffsetY] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -79,6 +80,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
 
   useEffect(() => {
     if (isOpen) {
+      dragOffsetYRef.current = 0;
       setDragOffsetY(0);
       setIsDragging(false);
       setMounted(true);
@@ -93,6 +95,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
   const handleDragStart = (event: React.PointerEvent<HTMLDivElement>) => {
     if (mobilePlacement !== 'bottom' || event.pointerType === 'mouse') return;
     dragStartYRef.current = event.clientY;
+    dragOffsetYRef.current = 0;
     setIsDragging(true);
     event.currentTarget.setPointerCapture(event.pointerId);
   };
@@ -101,16 +104,19 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
     if (dragStartYRef.current === null) return;
     const nextOffset = Math.max(0, event.clientY - dragStartYRef.current);
     if (nextOffset < SHEET_DRAG_MINIMUM_MOVEMENT) {
+      dragOffsetYRef.current = 0;
       setDragOffsetY(0);
       return;
     }
+    dragOffsetYRef.current = nextOffset;
     setDragOffsetY(nextOffset);
   };
 
   const handleDragEnd = () => {
     if (dragStartYRef.current === null) return;
-    const shouldClose = dragOffsetY > SHEET_DRAG_CLOSE_THRESHOLD;
+    const shouldClose = dragOffsetYRef.current > SHEET_DRAG_CLOSE_THRESHOLD;
     dragStartYRef.current = null;
+    dragOffsetYRef.current = 0;
     setIsDragging(false);
     setDragOffsetY(0);
     if (shouldClose) {

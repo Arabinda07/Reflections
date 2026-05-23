@@ -12,6 +12,7 @@ describe('mood modal stage contract', () => {
     expect(moodPicker).toContain("export type MoodPickerStage = 'group' | 'detail';");
     expect(moodPicker).toContain('onStageChange?: (stage: MoodPickerStage) => void;');
     expect(moodPicker).toContain("onStageChange(selectedGroup ? 'detail' : 'group');");
+    expect(moodPicker).toContain('mood-picker-detail');
     expect(moodPicker).toContain('Want a closer word?');
     expect(moodPicker).toContain('Choose one, or keep it broad.');
     expect(moodPicker).not.toContain('How does it feel right now?');
@@ -31,8 +32,14 @@ describe('mood modal stage contract', () => {
       expect(source).toContain("useState<MoodPickerStage>('group')");
       expect(source).toContain("title={moodPickerStage === 'group' ? 'How does it feel right now?' : undefined}");
       expect(source).toContain("description={moodPickerStage === 'group' ? 'Pick a broad mood. Details are optional.' : undefined}");
+      expect(source).toContain("moodPickerStage === 'detail' ? 'modal-sheet-panel--mood-detail' : ''");
+      expect(source).toContain("moodPickerStage === 'detail' ? 'modal-sheet-body--mood-detail' : ''");
       expect(source).toContain('ariaLabel="Choose a mood for this reflection"');
       expect(source).toContain('onStageChange={setMoodPickerStage}');
     });
+
+    const modalCss = read('components/ui/modal-sheet.css');
+    expect(modalCss).toContain('.modal-sheet-panel--mood-detail');
+    expect(modalCss).toContain('.modal-sheet-body--mood-detail');
   });
 });

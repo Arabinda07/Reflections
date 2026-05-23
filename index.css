@@ -627,14 +627,18 @@ details:focus-visible,
 @supports (color: light-dark(white, black)) {
   :root {
     color-scheme: light dark;
-    --system-ink-color: light-dark(var(--gray-text), var(--gray-text));
+    --native-control-accent: light-dark(var(--green), var(--green-hover));
+  }
+
+  :where(input, select, textarea) {
+    accent-color: var(--native-control-accent);
   }
 }
 
 @supports (color: contrast-color(white)) {
-  .metadata-pill,
-  .chip-filter--active {
+  .tag-filter-count {
     --auto-contrast-ink: contrast-color(var(--surface-current-soft-bg));
+    color: var(--auto-contrast-ink);
   }
 }
 
@@ -642,12 +646,6 @@ details:focus-visible,
   .surface-bezel-inner.modal-sheet-panel,
   .control-surface {
     corner-shape: squircle;
-  }
-}
-
-@supports (animation-trigger: --reflections-scroll-reveal) {
-  .section-header {
-    trigger-scope: --reflections-scroll-reveal;
   }
 }
 
@@ -2928,7 +2926,7 @@ details:focus-visible,
     overflow: hidden !important;
   }
 
-  .no-scroll #main-content {
+  .no-scroll .app-shell--fixed-scroll #main-content {
     overflow: hidden !important;
   }
 

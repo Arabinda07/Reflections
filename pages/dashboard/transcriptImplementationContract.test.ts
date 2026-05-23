@@ -18,6 +18,7 @@ describe('transcript-inspired implementation contracts', () => {
     expect(transitionUtils).toContain('export const runScopedTransition');
     expect(transitionUtils).toContain('Element & {');
     expect(transitionUtils).toContain('startViewTransition?:');
+    expect(transitionUtils).toContain('prefers-reduced-motion: reduce');
     expect(hook).toContain("from './viewTransitionUtils'");
   });
 
@@ -28,7 +29,9 @@ describe('transcript-inspired implementation contracts', () => {
     const insights = read('pages/dashboard/Insights.tsx');
 
     expect(hook).toContain('startViewTransition');
-    expect(hook).toContain('prefers-reduced-motion');
+    expect(hook).toContain('supportsViewTransitions');
+    expect(hook).toContain('try');
+    expect(hook).toContain('catch');
     expect(myNotes).toContain('useViewTransitionNavigation');
     expect(singleNote).toContain('useViewTransitionNavigation');
     expect(insights).toContain('useViewTransitionNavigation');
@@ -71,8 +74,10 @@ describe('transcript-inspired implementation contracts', () => {
     expect(myNotes).toContain('notesViewScopeRef');
     expect(myNotes).toContain('handleViewModeChange');
     expect(myNotes).toContain('handleTagFilterChange');
+    expect(myNotes).toContain('const rawNavigate = useNavigate();');
     expect(myNotes).toContain('NOTE_SWIPE_OPEN_THRESHOLD');
     expect(myNotes).toContain('haptics.light()');
+    expect(modalSheet).toContain('dragOffsetYRef');
     expect(insights).toContain('runScopedTransition');
     expect(insights).toContain('insightsScopeRef');
     expect(insights).toContain('toggleInsightPanel');
@@ -91,9 +96,11 @@ describe('transcript-inspired implementation contracts', () => {
     const modalCss = read('components/ui/modal-sheet.css');
 
     expect(css).toContain('@supports (color: light-dark(white, black))');
+    expect(css).toContain('--native-control-accent');
     expect(css).toContain('@supports (color: contrast-color(white))');
+    expect(css).toContain('color: var(--auto-contrast-ink)');
     expect(css).toContain('@supports (corner-shape: bevel)');
-    expect(css).toContain('@supports (animation-trigger: --reflections-scroll-reveal)');
+    expect(css).not.toContain('@supports (animation-trigger: --reflections-scroll-reveal)');
     expect(css).toContain('::view-transition-old(root)');
     expect(css).toContain('::view-transition-new(root)');
     expect(css).toContain('@media (prefers-reduced-motion: reduce)');

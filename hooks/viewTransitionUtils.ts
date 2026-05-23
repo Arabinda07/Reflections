@@ -1,9 +1,9 @@
 type ViewTransitionDocument = Document & {
-  startViewTransition?: (callback: () => void) => { finished?: Promise<void> };
+  startViewTransition?: (callback: () => void) => ViewTransition;
 };
 
 type ScopedViewTransitionElement = Element & {
-  startViewTransition?: (callback: () => void) => { finished?: Promise<void> };
+  startViewTransition?: (callback: () => void) => ViewTransition;
 };
 
 export const prefersReducedMotion = () =>
@@ -28,5 +28,9 @@ export const runScopedTransition = (element: Element | null, update: () => void)
     return;
   }
 
-  (element as ScopedViewTransitionElement).startViewTransition?.(update);
+  try {
+    (element as ScopedViewTransitionElement).startViewTransition?.(update);
+  } catch {
+    update();
+  }
 };

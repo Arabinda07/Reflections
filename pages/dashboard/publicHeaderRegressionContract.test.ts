@@ -124,6 +124,7 @@ describe('public header regression fixes', () => {
     expect(header).toContain('handleMobileMenuKeyDown');
     expect(header).toContain("document.body.classList.add('no-scroll')");
     expect(header).toContain("document.body.classList.remove('no-scroll')");
+    expect(header).toContain('}, [location.pathname]);');
     expect(header).not.toContain('public-mobile-menu-scrim');
     expect(header).not.toContain('mobile-sidebar-link');
   });

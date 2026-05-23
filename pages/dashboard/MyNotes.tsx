@@ -1,5 +1,5 @@
 import React, { Suspense, lazy, useEffect, useRef, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import { ArrowUpRight } from '@phosphor-icons/react/ArrowUpRight';
 import { Calendar as CalendarIcon } from '@phosphor-icons/react/Calendar';
@@ -42,6 +42,7 @@ const NOTE_SWIPE_CLOSE_THRESHOLD = 48;
 
 export const MyNotes: React.FC = () => {
   const navigate = useViewTransitionNavigation();
+  const rawNavigate = useNavigate();
   const haptics = useHaptics();
   const location = useLocation();
   const { user } = useAuthStore();
@@ -112,10 +113,8 @@ export const MyNotes: React.FC = () => {
   };
 
   const handleTagFilterChange = (path: string) => {
-    runScopedTransition(notesViewScopeRef.current, () => {
-      setSwipedNoteId(null);
-      navigate(path);
-    });
+    setSwipedNoteId(null);
+    rawNavigate(path);
   };
 
   const handleNotePointerDown = (event: React.PointerEvent, noteId: string) => {

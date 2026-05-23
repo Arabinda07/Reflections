@@ -842,8 +842,8 @@ export const CreateNote: React.FC = () => {
         description={moodPickerStage === 'group' ? 'Pick a broad mood. Details are optional.' : undefined}
         ariaLabel="Choose a mood for this reflection"
         size="sm"
-        panelClassName="modal-sheet-panel--compact"
-        bodyClassName="modal-sheet-body--compact"
+        panelClassName={`modal-sheet-panel--compact ${moodPickerStage === 'detail' ? 'modal-sheet-panel--mood-detail' : ''}`.trim()}
+        bodyClassName={`modal-sheet-body--compact ${moodPickerStage === 'detail' ? 'modal-sheet-body--mood-detail' : ''}`.trim()}
       >
         <MoodPicker
           selectedMood={mood}

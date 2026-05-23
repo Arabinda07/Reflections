@@ -1068,8 +1068,8 @@ export const HomeAuthenticated: React.FC = () => {
         icon={moodPickerStage === 'group' ? <Heart size={20} weight="duotone" /> : undefined}
         size="sm"
         tone="sage"
-        panelClassName="modal-sheet-panel--compact"
-        bodyClassName="modal-sheet-body--compact"
+        panelClassName={`modal-sheet-panel--compact ${moodPickerStage === 'detail' ? 'modal-sheet-panel--mood-detail' : ''}`.trim()}
+        bodyClassName={`modal-sheet-body--compact ${moodPickerStage === 'detail' ? 'modal-sheet-body--mood-detail' : ''}`.trim()}
       >
         <div className="space-y-3">
           {!checkInFeedback ? (

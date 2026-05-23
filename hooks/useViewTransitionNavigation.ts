@@ -3,11 +3,10 @@ import { type NavigateOptions, type To, useNavigate } from 'react-router-dom';
 import { supportsViewTransitions } from './viewTransitionUtils';
 
 type ViewTransitionDocument = Document & {
-  startViewTransition?: (callback: () => void) => { finished?: Promise<void> };
+  startViewTransition?: (callback: () => void) => ViewTransition;
 };
 
 export const canStartViewTransition = () =>
-  // supportsViewTransitions includes the prefers-reduced-motion guard.
   supportsViewTransitions();
 
 export const useViewTransitionNavigation = () => {
@@ -24,8 +23,12 @@ export const useViewTransitionNavigation = () => {
       return;
     }
 
-    (document as ViewTransitionDocument).startViewTransition?.(() => {
+    try {
+      (document as ViewTransitionDocument).startViewTransition?.(() => {
+        navigate(to, options);
+      });
+    } catch {
       navigate(to, options);
-    });
+    }
   }, [navigate]);
 };

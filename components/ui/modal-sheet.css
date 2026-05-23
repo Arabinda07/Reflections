@@ -191,6 +191,10 @@
     max-height: min(94vh, 720px);
   }
 
+  .modal-sheet-panel--mood-detail {
+    max-height: min(78vh, 430px);
+  }
+
   .modal-sheet-panel--compact .modal-sheet-header {
     gap: 0.75rem;
     padding: 1rem 1rem 0;
@@ -222,6 +226,10 @@
     padding: 0.9rem 1rem 1rem;
   }
 
+  .modal-sheet-body--mood-detail {
+    padding: 0.65rem 1rem 0.9rem;
+  }
+
   @media (min-width: 640px) {
     .modal-sheet-panel--compact .modal-sheet-header {
       padding: 1.1rem 1.25rem 0;
@@ -229,6 +237,10 @@
 
     .modal-sheet-body--compact {
       padding: 1rem 1.25rem 1.25rem;
+    }
+
+    .modal-sheet-body--mood-detail {
+      padding: 0.75rem 1.25rem 1rem;
     }
   }
 
