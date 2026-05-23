@@ -76,7 +76,7 @@ export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, onSelect, 
   const GroupIcon = selectedGroup.icon;
 
   return (
-    <div className="space-y-4">
+    <div className="mood-picker-detail space-y-3">
       <button
         type="button"
         onClick={() => setSelectedGroupId(null)}

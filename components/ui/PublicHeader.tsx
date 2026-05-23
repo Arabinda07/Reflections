@@ -234,7 +234,12 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
+    document.body.classList.remove('no-scroll');
   }, [location.pathname]);
+
+  useEffect(() => () => {
+    document.body.classList.remove('no-scroll');
+  }, []);
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDarkMode);

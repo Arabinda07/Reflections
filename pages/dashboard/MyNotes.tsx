@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect, useState } from 'react';
+import React, { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import { ArrowUpRight } from '@phosphor-icons/react/ArrowUpRight';
@@ -24,6 +24,9 @@ import { SectionHeader } from '../../components/ui/SectionHeader';
 import { StorageImage } from '../../components/ui/StorageImage';
 import { Surface } from '../../components/ui/Surface';
 import { useAuthStore } from '../../hooks/useAuthStore';
+import { useHaptics } from '../../hooks/useHaptics';
+import { useViewTransitionNavigation } from '../../hooks/useViewTransitionNavigation';
+import { runScopedTransition } from '../../hooks/viewTransitionUtils';
 import { noteService } from '../../services/noteService';
 import { Note, RoutePath } from '../../types';
 import { buildNotePreviewText } from './noteContent';
@@ -34,8 +37,14 @@ const MyNotesCalendar = lazy(() =>
   import('./MyNotesCalendar').then((module) => ({ default: module.MyNotesCalendar })),
 );
 
+const NOTE_SWIPE_OPEN_THRESHOLD = 72;
+const NOTE_SWIPE_CLOSE_THRESHOLD = 48;
+const NOTE_SWIPE_AXIS_INTENT_RATIO = 1.25;
+
 export const MyNotes: React.FC = () => {
-  const navigate = useNavigate();
+  const navigate = useViewTransitionNavigation();
+  const rawNavigate = useNavigate();
+  const haptics = useHaptics();
   const location = useLocation();
   const { user } = useAuthStore();
   const [notes, setNotes] = useState<Note[]>([]);
@@ -45,6 +54,11 @@ export const MyNotes: React.FC = () => {
   const [noteIdToDelete, setNoteIdToDelete] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'calendar'>('grid');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [swipedNoteId, setSwipedNoteId] = useState<string | null>(null);
+  const notesViewScopeRef = useRef<HTMLDivElement | null>(null);
+  const swipeStartXRef = useRef<number | null>(null);
+  const swipeStartYRef = useRef<number | null>(null);
+  const swipeNoteIdRef = useRef<string | null>(null);
 
   const queryParams = new URLSearchParams(location.search);
   const tagFilter = queryParams.get('tag');
@@ -91,6 +105,48 @@ export const MyNotes: React.FC = () => {
     event.stopPropagation();
     setNoteIdToDelete(id);
     setIsConfirmOpen(true);
+  };
+
+  const handleViewModeChange = (nextViewMode: 'grid' | 'calendar') => {
+    runScopedTransition(notesViewScopeRef.current, () => {
+      setViewMode(nextViewMode);
+      setSwipedNoteId(null);
+    });
+  };
+
+  const handleTagFilterChange = (path: string) => {
+    setSwipedNoteId(null);
+    rawNavigate(path);
+  };
+
+  const handleNotePointerDown = (event: React.PointerEvent, noteId: string) => {
+    if (event.pointerType === 'mouse') return;
+    swipeStartXRef.current = event.clientX;
+    swipeStartYRef.current = event.clientY;
+    swipeNoteIdRef.current = noteId;
+  };
+
+  const handleNotePointerEnd = (event: React.PointerEvent, noteId: string) => {
+    if (
+      swipeNoteIdRef.current !== noteId ||
+      swipeStartXRef.current === null ||
+      swipeStartYRef.current === null
+    ) return;
+
+    const deltaX = event.clientX - swipeStartXRef.current;
+    const deltaY = event.clientY - swipeStartYRef.current;
+    const hasHorizontalIntent = Math.abs(deltaX) > Math.abs(deltaY) * NOTE_SWIPE_AXIS_INTENT_RATIO;
+
+    if (hasHorizontalIntent && deltaX < -NOTE_SWIPE_OPEN_THRESHOLD) {
+      void haptics.light();
+      setSwipedNoteId(noteId);
+    } else if (hasHorizontalIntent && deltaX > NOTE_SWIPE_CLOSE_THRESHOLD) {
+      setSwipedNoteId((current) => (current === noteId ? null : current));
+    }
+
+    swipeStartXRef.current = null;
+    swipeStartYRef.current = null;
+    swipeNoteIdRef.current = null;
   };
 
   const performDelete = async () => {
@@ -152,6 +208,11 @@ export const MyNotes: React.FC = () => {
   const renderNoteCard = (note: Note, index: number) => {
     const noteDetailPath = RoutePath.NOTE_DETAIL.replace(':id', note.id);
     const moodConfig = getMoodConfig(note.mood);
+    const isSwipedOpen = swipedNoteId === note.id;
+    const openNote = (event: React.MouseEvent) => {
+      event.preventDefault();
+      navigate(noteDetailPath);
+    };
 
     return (
       <Surface
@@ -159,13 +220,57 @@ export const MyNotes: React.FC = () => {
         variant="flat"
         className="group relative overflow-hidden rounded-[2.5rem] border border-border/40 transition-[transform,border-color,box-shadow] duration-500 hover:-translate-y-1 hover:border-green/20 hover:shadow-xl"
       >
+        <div
+          data-swipe-action-rail
+          className="absolute inset-y-0 right-0 z-0 flex w-28 flex-col justify-center gap-2 bg-green/5 px-3"
+          aria-hidden={!isSwipedOpen}
+        >
+          <button
+            type="button"
+            tabIndex={isSwipedOpen ? 0 : -1}
+            disabled={!isSwipedOpen}
+            onClick={(event) => {
+              event.stopPropagation();
+              if (!isSwipedOpen) return;
+              downloadNoteExport(note, 'md');
+              setSwipedNoteId(null);
+            }}
+            className="flex h-11 w-11 items-center justify-center self-end rounded-2xl bg-green text-white"
+            aria-label={`Export ${note.title}`}
+          >
+            <Download size={15} weight="bold" />
+          </button>
+          <button
+            type="button"
+            tabIndex={isSwipedOpen ? 0 : -1}
+            disabled={!isSwipedOpen}
+            onClick={(event) => {
+              if (!isSwipedOpen) return;
+              initiateDelete(event, note.id);
+            }}
+            className="flex h-11 w-11 items-center justify-center self-end rounded-2xl bg-clay/10 text-clay"
+            aria-label={`Delete ${note.title}`}
+          >
+            <Trash size={15} weight="bold" />
+          </button>
+        </div>
         <article
-          className="flex h-full flex-col [animation-delay:var(--note-card-delay)] animation-fill-mode-both"
+          className={`relative z-10 flex h-full flex-col bg-surface transition-transform duration-300 ease-out [animation-delay:var(--note-card-delay)] animation-fill-mode-both ${
+            isSwipedOpen ? '-translate-x-28' : 'translate-x-0'
+          }`}
+          onPointerDown={(event) => handleNotePointerDown(event, note.id)}
+          onPointerUp={(event) => handleNotePointerEnd(event, note.id)}
+          onPointerCancel={() => {
+            swipeStartXRef.current = null;
+            swipeStartYRef.current = null;
+            swipeNoteIdRef.current = null;
+          }}
           style={{ '--note-card-delay': `${index * 50}ms` } as React.CSSProperties}
         >
           <div className="relative h-44 w-full overflow-hidden border-b border-border/40">
             <Link
               to={noteDetailPath}
+              onClick={openNote}
               className="block h-full w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
               aria-label={`Open ${note.title}`}
             >
@@ -221,6 +326,7 @@ export const MyNotes: React.FC = () => {
 
             <Link
               to={noteDetailPath}
+              onClick={openNote}
               className="group/title rounded-[var(--radius-control)] focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
               aria-label={`Open ${note.title}`}
             >
@@ -259,6 +365,7 @@ export const MyNotes: React.FC = () => {
 
                 <Link
                   to={noteDetailPath}
+                  onClick={openNote}
                   className="inline-flex min-h-11 items-center rounded-2xl bg-green px-4 label-caps text-white shadow-lg shadow-green/10 transition-[background-color,transform] duration-300 hover:bg-green/90 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
                   aria-label={`Open ${note.title}`}
                 >
@@ -299,7 +406,7 @@ export const MyNotes: React.FC = () => {
                       active={viewMode === 'grid'}
                       aria-pressed={viewMode === 'grid'}
                       icon={<SquaresFour size={16} weight="regular" />}
-                      onClick={() => setViewMode('grid')}
+                      onClick={() => handleViewModeChange('grid')}
                       title="Grid view"
                     >
                       Grid
@@ -308,7 +415,7 @@ export const MyNotes: React.FC = () => {
                       active={viewMode === 'calendar'}
                       aria-pressed={viewMode === 'calendar'}
                       icon={<CalendarIcon size={16} weight="regular" />}
-                      onClick={() => setViewMode('calendar')}
+                      onClick={() => handleViewModeChange('calendar')}
                       title="Calendar view"
                     >
                       Calendar
@@ -350,7 +457,7 @@ export const MyNotes: React.FC = () => {
                       <span className="metadata-pill metadata-pill--sage">
                         {selectedTagSummary?.count || 0} {(selectedTagSummary?.count || 0) === 1 ? 'reflection' : 'reflections'}
                       </span>
-                      <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.NOTES)} className="text-clay">
+                      <Button variant="ghost" size="sm" onClick={() => handleTagFilterChange(RoutePath.NOTES)} className="text-clay">
                         <X size={12} weight="regular" className="mr-1" />
                         Clear filter
                       </Button>
@@ -361,7 +468,7 @@ export const MyNotes: React.FC = () => {
                         <Chip
                           key={tag.name}
                           icon={<Tag size={12} weight="regular" />}
-                          onClick={() => navigate(`${RoutePath.NOTES}?tag=${encodeURIComponent(tag.name)}`)}
+                          onClick={() => handleTagFilterChange(`${RoutePath.NOTES}?tag=${encodeURIComponent(tag.name)}`)}
                           aria-label={`Show ${tag.name} reflections`}
                         >
                           <span>{tag.name}</span>
@@ -374,6 +481,7 @@ export const MyNotes: React.FC = () => {
               </Surface>
             ) : null}
 
+            <div ref={notesViewScopeRef}>
             {viewMode === 'calendar' ? (
               <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
                 <div className="lg:col-span-7 xl:col-span-8">
@@ -440,7 +548,7 @@ export const MyNotes: React.FC = () => {
                 }
                 action={
                   tagFilter ? (
-                    <Button onClick={() => navigate(RoutePath.NOTES)} variant="secondary">
+                    <Button onClick={() => handleTagFilterChange(RoutePath.NOTES)} variant="secondary">
                       Clear filter
                     </Button>
                   ) : (
@@ -451,6 +559,7 @@ export const MyNotes: React.FC = () => {
                 }
               />
             )}
+            </div>
           </div>
         </PageContainer>
       ) : null}

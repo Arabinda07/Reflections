@@ -72,4 +72,50 @@ describe('core app typography and layout contract', () => {
     expect(cardsPosition).toBeGreaterThan(-1);
     expect(audioPosition).toBeGreaterThan(cardsPosition);
   });
+
+  it('makes the authenticated home greeting auto-dismiss into the dashboard', () => {
+    const css = read('index.css');
+    const home = read('pages/dashboard/HomeAuthenticated.tsx');
+
+    expect(home).toContain('home-hero-shell');
+    expect(home).toContain("data-intro-state={heroIntroState}");
+    expect(home).toContain("const HOME_HERO_INTRO_DWELL_MS = 3000;");
+    expect(home).toContain("const HOME_HERO_EXIT_MS = 650;");
+    expect(home).toContain('const HOME_HERO_DRAG_DISMISS_THRESHOLD = 48;');
+    expect(home).toContain('const HOME_HERO_SCROLL_DISMISS_THRESHOLD = 32;');
+    expect(home).toContain("const HOME_HERO_SEEN_SESSION_KEY = 'home_hero_intro_seen';");
+    expect(home).toContain("type HomeHeroIntroState = 'visible' | 'exiting' | 'gone';");
+    expect(home).toContain('collapseHeroIntro');
+    expect(home).toContain('Show dashboard');
+    expect(home).toContain('aria-controls="home-dashboard-grid"');
+    expect(home).toContain("disabled={heroIntroState !== 'visible'}");
+    expect(home).toContain("tabIndex={heroIntroState === 'visible' ? 0 : -1}");
+    expect(home).toContain('dashboardGridRef.current?.focus({ preventScroll: true });');
+    expect(home).toContain('id="home-dashboard-grid"');
+    expect(home).toContain('tabIndex={-1}');
+    expect(home).toContain('sessionStorage');
+    expect(home).not.toContain('Show greeting');
+    expect(home).not.toContain('expandHero');
+    expect(home).not.toContain('HomeHeroCollapseReason');
+    expect(home).not.toContain('lastHeroCollapseReasonRef');
+    expect(home).not.toContain('home-hero-handle');
+    expect(home).not.toContain('aria-expanded={!isHeroCollapsed}');
+    expect(home).not.toContain('handleHeroHandleClick');
+    expect(home).not.toContain('HOME_HERO_COLLAPSED_SESSION_KEY');
+    expect(home).not.toContain("localStorage.getItem('home_hero_collapsed')");
+    expect(home).not.toContain('generateWritingNotes');
+    expect(home).not.toContain('dynamic_writing_notes');
+
+    expect(css).toContain('.home-dashboard-intro-frame[data-intro-state="visible"]');
+    expect(css).toContain('.home-dashboard-intro-frame[data-intro-state="exiting"]');
+    expect(css).toContain('.home-dashboard-intro-frame[data-intro-state="gone"]');
+    expect(css).toContain('.home-dashboard-intro-frame[data-intro-state="gone"] #home-dashboard-grid');
+    expect(css).toContain('will-change: auto;');
+    expect(css).not.toContain('.home-hero-shell[data-collapsed="false"]');
+    expect(css).not.toContain('.home-hero-shell[data-collapsed="true"]');
+    expect(css).not.toContain('.home-hero-handle');
+    expect(css).toContain('.home-hero-dismiss-control');
+    expect(css).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(css).toContain('.home-hero-shell');
+  });
 });

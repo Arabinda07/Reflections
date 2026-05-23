@@ -1,4 +1,8 @@
 import type { CompletionCardPayload } from './completionCardPayload';
+import {
+  canRenderCompletionCardWithHtmlInCanvas,
+  renderCompletionCardHtmlPng,
+} from './completionCardHtmlRenderer';
 
 export { buildCompletionCardPayload } from './completionCardPayload';
 export type { CompletionCardKind, CompletionCardPayload } from './completionCardPayload';
@@ -212,6 +216,14 @@ export async function renderCompletionCardPng(
   const context = canvas.getContext('2d');
   if (!context) {
     throw new Error('COMPLETION_CARD_CANVAS_UNAVAILABLE');
+  }
+
+  if (canRenderCompletionCardWithHtmlInCanvas(context)) {
+    try {
+      return await renderCompletionCardHtmlPng(payload, () => canvas);
+    } catch {
+      // The experimental HTML-in-Canvas path is optional; keep the manual renderer reliable.
+    }
   }
 
   drawCompletionCard(context, payload);

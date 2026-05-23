@@ -455,9 +455,12 @@ html {
     scrollbar-gutter: auto;
   }
 
-  html,
+  html {
+    max-width: 100%;
+  }
+
   body {
-    overflow-x: hidden;
+    max-width: 100%;
   }
 
   .custom-scrollbar {
@@ -624,6 +627,44 @@ details:focus-visible,
   }
 }
 
+@supports (color: light-dark(white, black)) {
+  :root {
+    color-scheme: light dark;
+    --native-control-accent: light-dark(var(--green), var(--green-hover));
+  }
+
+  :where(input, select, textarea) {
+    accent-color: var(--native-control-accent);
+  }
+}
+
+@supports (color: contrast-color(white)) {
+  .tag-filter-count {
+    --auto-contrast-ink: contrast-color(var(--surface-current-soft-bg));
+    color: var(--auto-contrast-ink);
+  }
+}
+
+@supports (corner-shape: bevel) {
+  .surface-bezel-inner.modal-sheet-panel,
+  .control-surface {
+    corner-shape: squircle;
+  }
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 240ms;
+  animation-timing-function: var(--ease-out-expo);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.01ms !important;
+  }
+}
+
 @layer components {
 
   .touch-target-44 {
@@ -739,6 +780,144 @@ details:focus-visible,
     gap: var(--space-cluster);
   }
 
+  .home-dashboard-intro-frame {
+    --home-hero-intro-height: max(300px, 44dvh);
+    --home-dashboard-grid-y: 0;
+    position: relative;
+    overflow-x: clip;
+    overflow-anchor: none;
+  }
+
+  .home-dashboard-intro-frame[data-intro-state="visible"] {
+    --home-dashboard-grid-y: 0;
+  }
+
+  .home-dashboard-intro-frame[data-intro-state="exiting"] {
+    --home-dashboard-grid-y: calc(-1 * var(--home-hero-intro-height));
+  }
+
+  .home-dashboard-intro-frame[data-intro-state="gone"] {
+    --home-dashboard-grid-y: 0;
+  }
+
+  .home-hero-shell {
+    height: var(--home-hero-intro-height);
+    min-height: 300px;
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    transition:
+      opacity 420ms var(--ease-out-expo),
+      transform 650ms var(--ease-out-expo);
+    will-change: opacity, transform;
+  }
+
+  .home-hero-media {
+    position: absolute;
+    inset: 0;
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    transition:
+      opacity 420ms var(--ease-out-expo),
+      transform 650ms var(--ease-out-expo);
+    will-change: opacity, transform;
+  }
+
+  .home-hero-copy {
+    padding-top: 10vh;
+    transition:
+      opacity 420ms var(--ease-out-expo),
+      transform 650ms var(--ease-out-expo);
+    transform: translate3d(0, 0, 0);
+    will-change: opacity, transform;
+  }
+
+  .home-hero-dismiss-control {
+    position: absolute;
+    left: 50%;
+    bottom: clamp(1rem, 4vh, 2rem);
+    z-index: 30;
+    display: inline-flex;
+    min-height: 3rem;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    transform: translate3d(-50%, 0, 0);
+    border: 1px solid oklch(from var(--hero-ink) l c h / 0.24);
+    border-radius: 999px;
+    background: oklch(from var(--bg-color) l c h / 0.68);
+    color: var(--hero-ink);
+    padding: 0.75rem 1rem;
+    font-family: var(--font-sans);
+    font-size: var(--text-xs);
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    line-height: 1;
+    text-transform: uppercase;
+    box-shadow: var(--hero-shadow);
+    touch-action: none;
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    transition:
+      border-color 180ms ease,
+      background-color 180ms ease,
+      opacity 420ms var(--ease-out-expo),
+      transform 420ms var(--ease-out-expo);
+  }
+
+  .home-hero-dismiss-control:hover {
+    border-color: oklch(from var(--green) l c h / 0.48);
+    background: oklch(from var(--green) l c h / 0.18);
+  }
+
+  .home-hero-dismiss-grip {
+    width: 2rem;
+    height: 0.25rem;
+    border-radius: 999px;
+    background: currentColor;
+    opacity: 0.64;
+  }
+
+  .home-dashboard-intro-frame #home-dashboard-grid {
+    transform: none;
+    transition: none;
+    will-change: auto;
+  }
+
+  .home-dashboard-intro-frame[data-intro-state="visible"] #home-dashboard-grid,
+  .home-dashboard-intro-frame[data-intro-state="exiting"] #home-dashboard-grid {
+    transform: translate3d(0, var(--home-dashboard-grid-y), 0);
+    transition: transform 650ms var(--ease-out-expo);
+    will-change: transform;
+  }
+
+  .home-dashboard-intro-frame[data-intro-state="exiting"] .home-hero-shell {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(0, -100%, 0);
+  }
+
+  .home-dashboard-intro-frame[data-intro-state="exiting"] .home-hero-media {
+    opacity: 0.78;
+    transform: translate3d(0, -8%, 0) scale(1.035);
+  }
+
+  .home-dashboard-intro-frame[data-intro-state="exiting"] .home-hero-copy {
+    opacity: 0;
+    transform: translate3d(0, -30%, 0);
+  }
+
+  .home-dashboard-intro-frame[data-intro-state="exiting"] .home-hero-dismiss-control {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(-50%, -1.5rem, 0);
+  }
+
+  .home-dashboard-intro-frame[data-intro-state="gone"] #home-dashboard-grid {
+    transform: none;
+    transition-duration: 0ms;
+    will-change: auto;
+  }
+
   .core-bento-grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -765,8 +944,26 @@ details:focus-visible,
   }
 
   @media (min-width: 768px) {
+    .home-dashboard-intro-frame {
+      --home-hero-intro-height: max(360px, 48dvh);
+    }
+
     .core-bento-grid {
       padding: var(--space-10);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .home-hero-shell,
+    .home-hero-media,
+    .home-hero-copy,
+    .home-hero-dismiss-control,
+    .home-dashboard-intro-frame #home-dashboard-grid {
+      transition-duration: 0.01ms !important;
+    }
+
+    .home-dashboard-intro-frame[data-intro-state="exiting"] #home-dashboard-grid {
+      transform: translate3d(0, 0, 0);
     }
   }
 
@@ -1855,6 +2052,19 @@ details:focus-visible,
     transform: translateZ(0);
   }
 
+  .mobile-sidebar-shell--dragging {
+    transition: none;
+  }
+
+  .mobile-sidebar-drag-zone {
+    position: absolute;
+    inset-block: 0;
+    left: 0;
+    z-index: 2;
+    width: 1rem;
+    touch-action: none;
+  }
+
   .mobile-sidebar-user-header {
     display: flex;
     align-items: center;
@@ -2719,7 +2929,7 @@ details:focus-visible,
     overflow: hidden !important;
   }
 
-  .no-scroll #main-content {
+  .no-scroll .app-shell--fixed-scroll #main-content {
     overflow: hidden !important;
   }
 

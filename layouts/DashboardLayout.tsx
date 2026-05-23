@@ -99,7 +99,7 @@ export const DashboardLayout: React.FC = () => {
 
   return (
     <div
-      className={`${routeSurfaceScopeClass} page-wash relative flex h-[100dvh] min-h-[100dvh] flex-col overflow-hidden bg-body font-sans selection:bg-green/30 selection:text-green`}
+      className={`${routeSurfaceScopeClass} app-shell--fixed-scroll page-wash relative flex h-[100dvh] min-h-[100dvh] flex-col overflow-hidden bg-body font-sans selection:bg-green/30 selection:text-green`}
     >
       <a href="#main-content" className="skip-link">
         Skip to content

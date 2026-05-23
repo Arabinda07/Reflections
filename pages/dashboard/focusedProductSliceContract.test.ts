@@ -86,11 +86,15 @@ describe('focused product slice source contract', () => {
 
     expect(homeAuthenticated).toContain("Today's Reflection");
     expect(homeAuthenticated).toContain('Begin Writing');
+    expect(homeAuthenticated).toContain('Speak a note');
     expect(homeAuthenticated).toContain('Quick check-in');
     expect(homeAuthenticated).toContain('Future letter');
     expect(homeAuthenticated).toContain('Your Rhythm');
     expect(homeAuthenticated).toContain('Before you write');
     expect(homeAuthenticated).toContain('core-bento-grid');
+    expect(homeAuthenticated).toContain('home-primary-action-row');
+    expect(homeAuthenticated).toContain('home-secondary-action-row');
+    expect(homeAuthenticated).toContain('stopOnFinalTranscript');
     expect(homeAuthenticated).not.toContain('Daily Focus');
     expect(homeAuthenticated).not.toContain('Start Reflection');
     expect(homeAuthenticated).not.toContain('Reflections Overview');
@@ -99,6 +103,38 @@ describe('focused product slice source contract', () => {
     
     // Check for the specific combination of classes that was removed from the prompt
     expect(homeAuthenticated).toContain('dashboard-prompt-text typographic-measure');
+  });
+
+  it('lets the authenticated greeting auto-dismiss into the dashboard', () => {
+    const homeAuthenticated = read('pages/dashboard/HomeAuthenticated.tsx');
+
+    expect(homeAuthenticated).toContain('HOME_HERO_INTRO_DWELL_MS');
+    expect(homeAuthenticated).toContain('HOME_HERO_EXIT_MS');
+    expect(homeAuthenticated).toContain('HOME_HERO_SEEN_SESSION_KEY');
+    expect(homeAuthenticated).toContain("type HomeHeroIntroState = 'visible' | 'exiting' | 'gone';");
+    expect(homeAuthenticated).toContain('heroIntroState');
+    expect(homeAuthenticated).toContain('collapseHeroIntro');
+    expect(homeAuthenticated).toContain("return shouldReduceMotion ? 'gone' : 'exiting';");
+    expect(homeAuthenticated).toContain('setHeroIntroState(\'gone\')');
+    expect(homeAuthenticated).toContain('rememberHomeHeroIntroSeen');
+    expect(homeAuthenticated).toContain('shouldRenderHeroIntro');
+    expect(homeAuthenticated).toContain('shouldReduceMotion');
+    expect(homeAuthenticated).toContain('HOME_HERO_DRAG_DISMISS_THRESHOLD = 48');
+    expect(homeAuthenticated).toContain('HOME_HERO_SCROLL_DISMISS_THRESHOLD = 32');
+    expect(homeAuthenticated).toContain('Show dashboard');
+    expect(homeAuthenticated).toContain('aria-controls="home-dashboard-grid"');
+    expect(homeAuthenticated).toContain("disabled={heroIntroState !== 'visible'}");
+    expect(homeAuthenticated).toContain("tabIndex={heroIntroState === 'visible' ? 0 : -1}");
+    expect(homeAuthenticated).toContain('dashboardGridRef.current?.focus({ preventScroll: true });');
+    expect(homeAuthenticated).toContain('collapseHeroIntro();');
+    expect(homeAuthenticated).toContain('setPointerCapture');
+    expect(homeAuthenticated).not.toContain('HOME_HERO_COLLAPSED_SESSION_KEY');
+    expect(homeAuthenticated).not.toContain('expandHero');
+    expect(homeAuthenticated).not.toContain('Show greeting');
+    expect(homeAuthenticated).not.toContain('HomeHeroCollapseReason');
+    expect(homeAuthenticated).not.toContain('lastHeroCollapseReasonRef');
+    expect(homeAuthenticated).not.toContain('generateWritingNotes');
+    expect(homeAuthenticated).not.toContain('dynamic_writing_notes');
   });
 
   it('removes quietly from live app and AI copy', () => {

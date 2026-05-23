@@ -3,6 +3,40 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 const UNSUPPORTED_MESSAGE =
   "Whisper isn't available in this browser yet. You can keep writing normally or try Chrome on Android.";
 
+type BrowserSpeechRecognitionAlternative = {
+  transcript: string;
+};
+
+type BrowserSpeechRecognitionResult = {
+  isFinal: boolean;
+  0: BrowserSpeechRecognitionAlternative;
+};
+
+type BrowserSpeechRecognitionEvent = {
+  resultIndex: number;
+  results: {
+    length: number;
+    [index: number]: BrowserSpeechRecognitionResult;
+  };
+};
+
+type BrowserSpeechRecognition = {
+  continuous: boolean;
+  interimResults: boolean;
+  onresult: ((event: BrowserSpeechRecognitionEvent) => void) | null;
+  onerror: ((event: Event) => void) | null;
+  start: () => void;
+  stop: () => void;
+  abort?: () => void;
+};
+
+type BrowserSpeechRecognitionConstructor = new () => BrowserSpeechRecognition;
+
+type SpeechRecognitionWindow = Window & {
+  SpeechRecognition?: BrowserSpeechRecognitionConstructor;
+  webkitSpeechRecognition?: BrowserSpeechRecognitionConstructor;
+};
+
 interface WhisperInputState {
   /** Whether speech recognition is currently active */
   isWhispering: boolean;
@@ -12,6 +46,8 @@ interface WhisperInputState {
   feedback: string | null;
   /** Toggle speech recognition on/off */
   toggle: () => void;
+  /** Stop speech recognition immediately */
+  stop: () => void;
 }
 
 /**
@@ -28,14 +64,43 @@ export const useWhisperInput = (
   const [interimTranscript, setInterimTranscript] = useState('');
   const [feedback, setFeedback] = useState<string | null>(null);
 
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
   const isWhisperingRef = useRef(false);
   const onFinalTranscriptRef = useRef(onFinalTranscript);
+  const isMountedRef = useRef(true);
 
   // Keep callback ref in sync
   useEffect(() => {
     onFinalTranscriptRef.current = onFinalTranscript;
   }, [onFinalTranscript]);
+
+  const stopRecognition = useCallback((updateState = true) => {
+    const recognition = recognitionRef.current;
+    recognitionRef.current = null;
+    isWhisperingRef.current = false;
+
+    if (recognition) {
+      recognition.onresult = null;
+      recognition.onerror = null;
+      try {
+        recognition.stop();
+      } catch {
+        recognition.abort?.();
+      }
+    }
+
+    if (updateState && isMountedRef.current) {
+      setIsWhispering(false);
+      setInterimTranscript('');
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+      stopRecognition(false);
+    };
+  }, [stopRecognition]);
 
   // Auto-clear feedback after 5 seconds
   useEffect(() => {
@@ -50,7 +115,8 @@ export const useWhisperInput = (
 
   const toggle = useCallback(() => {
     const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      (window as SpeechRecognitionWindow).SpeechRecognition ||
+      (window as SpeechRecognitionWindow).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
       setFeedback(UNSUPPORTED_MESSAGE);
@@ -60,13 +126,8 @@ export const useWhisperInput = (
     setFeedback(null);
 
     if (isWhisperingRef.current) {
-      // Stop
-      setIsWhispering(false);
-      isWhisperingRef.current = false;
-      recognitionRef.current?.stop();
-      setInterimTranscript('');
+      stopRecognition();
     } else {
-      // Start
       setIsWhispering(true);
       isWhisperingRef.current = true;
 
@@ -74,7 +135,10 @@ export const useWhisperInput = (
         recognitionRef.current = new SpeechRecognition();
         recognitionRef.current.continuous = true;
         recognitionRef.current.interimResults = true;
-        recognitionRef.current.onresult = (event: any) => {
+        recognitionRef.current.onerror = () => {
+          stopRecognition();
+        };
+        recognitionRef.current.onresult = (event: BrowserSpeechRecognitionEvent) => {
           let finalText = '';
           let currentInterim = '';
           for (let i = event.resultIndex; i < event.results.length; ++i) {
@@ -91,14 +155,20 @@ export const useWhisperInput = (
         };
       }
 
-      recognitionRef.current.start();
+      try {
+        recognitionRef.current.start();
+      } catch {
+        stopRecognition();
+        setFeedback('Voice capture stopped unexpectedly. You can start it again when ready.');
+      }
     }
-  }, []);
+  }, [stopRecognition]);
 
   return {
     isWhispering,
     interimTranscript,
     feedback,
     toggle,
+    stop: stopRecognition,
   };
 };

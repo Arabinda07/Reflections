@@ -14,7 +14,7 @@ import { Plus } from '@phosphor-icons/react/Plus';
 import { Sparkle } from '@phosphor-icons/react/Sparkle';
 import { Target } from '@phosphor-icons/react/Target';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { isSameDay } from 'date-fns';
 
@@ -22,9 +22,9 @@ import { AmbientMusicButton } from '../../components/ui/AmbientMusicButton';
 import { Button } from '../../components/ui/Button';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { useToast } from '../../components/ui/Toast';
+import { WhisperComposerControl } from '../../components/ui/WhisperComposerControl';
 import { useAuthStore } from '../../hooks/useAuthStore';
 import { useHaptics } from '../../hooks/useHaptics';
-import { aiService } from '../../services/aiService';
 import { moodCheckinService } from '../../services/moodService';
 import { noteService } from '../../services/noteService';
 import { DEFAULT_WELLNESS_PROMPTS } from '../../services/wellnessPrompts';
@@ -96,7 +96,43 @@ const prefetchCreateNoteRoute = () => {
   void import('@/pages/dashboard/CreateNote');
 };
 
+type HomeHeroIntroState = 'visible' | 'exiting' | 'gone';
 
+const HOME_HERO_INTRO_DWELL_MS = 3000;
+const HOME_HERO_EXIT_MS = 650;
+const HOME_HERO_DRAG_DISMISS_THRESHOLD = 48;
+const HOME_HERO_SCROLL_DISMISS_THRESHOLD = 32;
+const HOME_HERO_VIDEO_LOAD_DELAY_MS = 1200;
+const HOME_HERO_SEEN_SESSION_KEY = 'home_hero_intro_seen';
+
+const getInitialHomeHeroIntroState = (): HomeHeroIntroState => {
+  if (typeof window === 'undefined') {
+    return 'visible';
+  }
+
+  try {
+    return window.sessionStorage.getItem(HOME_HERO_SEEN_SESSION_KEY) === 'true'
+      ? 'gone'
+      : 'visible';
+  } catch {
+    return 'visible';
+  }
+};
+
+const rememberHomeHeroIntroSeen = () => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  try {
+    window.sessionStorage.setItem(HOME_HERO_SEEN_SESSION_KEY, 'true');
+  } catch {
+    // The dashboard still opens if session storage is unavailable.
+  }
+};
+
+const getRandomWritingNote = () =>
+  WRITING_NOTES[Math.floor(Math.random() * WRITING_NOTES.length)];
 
 export const HomeAuthenticated: React.FC = () => {
   const navigate = useNavigate();
@@ -116,7 +152,7 @@ export const HomeAuthenticated: React.FC = () => {
   const [isSavingCheckIn, setIsSavingCheckIn] = useState(false);
   const [checkInFeedback, setCheckInFeedback] = useState<string | null>(null);
   const [intentionFeedback, setIntentionFeedback] = useState<string | null>(null);
-  const [quote, setQuote] = useState({ text: '', author: '' });
+  const [quote] = useState(getRandomWritingNote);
   const [taskNotes, setTaskNotes] = useState<Note[]>([]);
   const [intentionSummary, setIntentionSummary] = useState<HomeIntentionSummary>(() =>
     buildHomeIntentionSummary([]),
@@ -126,56 +162,123 @@ export const HomeAuthenticated: React.FC = () => {
   const [isIntentionModalOpen, setIsIntentionModalOpen] = useState(false);
   const [shouldLoadHeroVideo, setShouldLoadHeroVideo] = useState(false);
   const [isHeroVideoReady, setIsHeroVideoReady] = useState(false);
+  const [hasHeroVideoFailed, setHasHeroVideoFailed] = useState(false);
+  const [heroIntroState, setHeroIntroState] = useState<HomeHeroIntroState>(
+    getInitialHomeHeroIntroState,
+  );
   const shouldReduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
-  const isCompactViewport = useMediaQuery('(max-width: 639px)');
+  const shouldAllowHeroVideoViewport = useMediaQuery('(min-width: 768px)');
   const { showToast } = useToast();
+  const homeRootRef = useRef<HTMLDivElement>(null);
+  const heroIntroRef = useRef<HTMLElement>(null);
+  const dashboardGridRef = useRef<HTMLElement>(null);
+  const isHeroInteractionActiveRef = useRef(false);
+  const heroDismissPointerStartYRef = useRef<number | null>(null);
+  const heroDismissPointerIdRef = useRef<number | null>(null);
   const authStoreDisplayName = user?.name?.trim() || 'Reflector';
+  const shouldRenderHeroIntro = heroIntroState !== 'gone';
 
 
   const currentOnboardingStep = ONBOARDING_STEPS[onboardingStep];
   const isLastOnboardingStep = onboardingStep === ONBOARDING_STEPS.length - 1;
   const CurrentOnboardingIcon = onboardingStepIcons[onboardingStep];
 
+  const moveFocusFromHeroIntro = useCallback(() => {
+    if (typeof document === 'undefined') return;
+
+    const activeElement = document.activeElement;
+    if (!(activeElement instanceof Node)) return;
+    if (!heroIntroRef.current?.contains(activeElement)) return;
+
+    dashboardGridRef.current?.focus({ preventScroll: true });
+  }, []);
+
+  const collapseHeroIntro = useCallback(
+    () => {
+      rememberHomeHeroIntroSeen();
+      moveFocusFromHeroIntro();
+      setShouldLoadHeroVideo(false);
+      setIsHeroVideoReady(false);
+      setHeroIntroState((current) => {
+        if (current === 'gone') return current;
+        return shouldReduceMotion ? 'gone' : 'exiting';
+      });
+    },
+    [moveFocusFromHeroIntro, shouldReduceMotion],
+  );
+
+  const resetHeroDismissPointer = useCallback(() => {
+    heroDismissPointerStartYRef.current = null;
+    heroDismissPointerIdRef.current = null;
+    isHeroInteractionActiveRef.current = false;
+  }, []);
+
+  const handleHeroFocusCapture = useCallback(() => {
+    isHeroInteractionActiveRef.current = true;
+  }, []);
+
+  const handleHeroBlurCapture = useCallback((event: React.FocusEvent<HTMLElement>) => {
+    const nextTarget = event.relatedTarget;
+    if (!(nextTarget instanceof Node) || !event.currentTarget.contains(nextTarget)) {
+      isHeroInteractionActiveRef.current = false;
+    }
+  }, []);
+
+  const handleHeroShellPointerDownCapture = useCallback(() => {
+    isHeroInteractionActiveRef.current = true;
+  }, []);
+
+  const handleHeroShellPointerEndCapture = useCallback(() => {
+    if (heroDismissPointerStartYRef.current === null) {
+      isHeroInteractionActiveRef.current = false;
+    }
+  }, []);
+
+  const handleHeroDismissPointerDown = useCallback(
+    (event: React.PointerEvent<HTMLButtonElement>) => {
+      if (event.pointerType === 'mouse' && event.button !== 0) return;
+
+      heroDismissPointerStartYRef.current = event.clientY;
+      heroDismissPointerIdRef.current = event.pointerId;
+      isHeroInteractionActiveRef.current = true;
+      event.currentTarget.setPointerCapture(event.pointerId);
+    },
+    [],
+  );
+
+  const handleHeroDismissPointerMove = useCallback(
+    (event: React.PointerEvent<HTMLButtonElement>) => {
+      const startY = heroDismissPointerStartYRef.current;
+      if (startY === null) return;
+
+      const upwardDistance = startY - event.clientY;
+      if (upwardDistance < HOME_HERO_DRAG_DISMISS_THRESHOLD) return;
+
+      const pointerId = heroDismissPointerIdRef.current;
+      if (pointerId !== null && event.currentTarget.hasPointerCapture(pointerId)) {
+        event.currentTarget.releasePointerCapture(pointerId);
+      }
+      resetHeroDismissPointer();
+      collapseHeroIntro();
+    },
+    [collapseHeroIntro, resetHeroDismissPointer],
+  );
+
+  const handleHeroDismissPointerEnd = useCallback(
+    (event: React.PointerEvent<HTMLButtonElement>) => {
+      const pointerId = heroDismissPointerIdRef.current;
+      if (pointerId !== null && event.currentTarget.hasPointerCapture(pointerId)) {
+        event.currentTarget.releasePointerCapture(pointerId);
+      }
+      resetHeroDismissPointer();
+    },
+    [resetHeroDismissPointer],
+  );
+
   useEffect(() => {
     setDailyPrompt(
       DEFAULT_WELLNESS_PROMPTS[Math.floor(Math.random() * DEFAULT_WELLNESS_PROMPTS.length)],
     );
-
-    const loadQuotes = async () => {
-      const cached = localStorage.getItem('dynamic_writing_notes');
-      const lastFetch = localStorage.getItem('dynamic_writing_notes_time');
-      const now = Date.now();
-      const ONE_DAY = 24 * 60 * 60 * 1000;
-
-      let quotesPool = WRITING_NOTES;
-
-      if (cached && lastFetch && now - Number(lastFetch) < ONE_DAY) {
-        try {
-          const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            quotesPool = [...WRITING_NOTES, ...parsed];
-          }
-        } catch (e) {
-          // Silently discard corrupted cache — user will get default quotes
-        }
-      } else {
-        // Fetch new quotes from AI
-        try {
-          const freshQuotes = await aiService.generateWritingNotes();
-          if (freshQuotes.length > 0) {
-            localStorage.setItem('dynamic_writing_notes', JSON.stringify(freshQuotes));
-            localStorage.setItem('dynamic_writing_notes_time', now.toString());
-            quotesPool = [...WRITING_NOTES, ...freshQuotes];
-          }
-        } catch (e) {
-          // Could not fetch; fall back to the static quotes pool.
-        }
-      }
-
-      setQuote(quotesPool[Math.floor(Math.random() * quotesPool.length)]);
-    };
-
-    loadQuotes();
 
     const hasSeen = localStorage.getItem('hasSeenOnboarding');
     if (!hasSeen) setShowOnboarding(true);
@@ -231,17 +334,82 @@ export const HomeAuthenticated: React.FC = () => {
       (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData,
     );
 
-    if (saveData || shouldReduceMotion || isCompactViewport) {
+    if (
+      heroIntroState !== 'visible' ||
+      showOnboarding ||
+      saveData ||
+      shouldReduceMotion ||
+      !shouldAllowHeroVideoViewport ||
+      hasHeroVideoFailed
+    ) {
       setShouldLoadHeroVideo(false);
+      setIsHeroVideoReady(false);
       return;
     }
 
-    const videoDelay = window.setTimeout(() => {
+    const videoLoadTimer = window.setTimeout(() => {
       setShouldLoadHeroVideo(true);
-    }, 4200);
+    }, HOME_HERO_VIDEO_LOAD_DELAY_MS);
 
-    return () => window.clearTimeout(videoDelay);
-  }, [isCompactViewport, shouldReduceMotion]);
+    return () => window.clearTimeout(videoLoadTimer);
+  }, [
+    hasHeroVideoFailed,
+    heroIntroState,
+    shouldAllowHeroVideoViewport,
+    shouldReduceMotion,
+    showOnboarding,
+  ]);
+
+  useEffect(() => {
+    if (heroIntroState === 'gone' || showOnboarding) return;
+
+    if (heroIntroState !== 'visible') return;
+
+    let dwellTimer: number;
+    const tryTimerDismiss = () => {
+      if (isHeroInteractionActiveRef.current) {
+        dwellTimer = window.setTimeout(tryTimerDismiss, 1000);
+        return;
+      }
+      collapseHeroIntro();
+    };
+
+    dwellTimer = window.setTimeout(() => {
+      tryTimerDismiss();
+    }, HOME_HERO_INTRO_DWELL_MS);
+
+    return () => window.clearTimeout(dwellTimer);
+  }, [collapseHeroIntro, heroIntroState, showOnboarding]);
+
+  useEffect(() => {
+    if (heroIntroState !== 'exiting') return;
+
+    const exitTimer = window.setTimeout(() => {
+      setHeroIntroState('gone');
+    }, HOME_HERO_EXIT_MS);
+
+    return () => window.clearTimeout(exitTimer);
+  }, [heroIntroState]);
+
+  useEffect(() => {
+    if (heroIntroState !== 'visible' || showOnboarding) return;
+
+    const scrollContainer = homeRootRef.current?.closest('main');
+    if (!(scrollContainer instanceof HTMLElement)) return;
+
+    const startScrollTop = scrollContainer.scrollTop;
+    const handleHeroScroll = () => {
+      if (scrollContainer.scrollTop > startScrollTop + HOME_HERO_SCROLL_DISMISS_THRESHOLD) {
+        collapseHeroIntro();
+      }
+    };
+
+    scrollContainer.addEventListener('scroll', handleHeroScroll, { passive: true });
+
+    return () => {
+      scrollContainer.removeEventListener('scroll', handleHeroScroll);
+    };
+  }, [collapseHeroIntro, heroIntroState, showOnboarding]);
 
   const handleCloseOnboarding = useCallback(() => {
     localStorage.setItem('hasSeenOnboarding', 'true');
@@ -333,6 +501,14 @@ export const HomeAuthenticated: React.FC = () => {
 
     navigate(RoutePath.CREATE_NOTE);
   };
+
+  const handleVoiceDraft = useCallback((text: string) => {
+    const cleanText = text.trim();
+    if (!cleanText) return;
+
+    prefetchCreateNoteRoute();
+    navigate(RoutePath.CREATE_NOTE, { state: { initialContent: cleanText } });
+  }, [navigate]);
 
 
   const handleMoodCheckIn = async (mood: string) => {
@@ -432,120 +608,182 @@ export const HomeAuthenticated: React.FC = () => {
   return (
     <>
       <div
+        ref={homeRootRef}
         className="home-authenticated-mobile-safe surface-scope-sage page-wash relative min-h-full flex flex-col flex-1 bg-body selection:bg-green/10"
         aria-hidden={showOnboarding ? 'true' : undefined}
       >
-        <section className="relative isolate h-[44dvh] min-h-[300px] w-full overflow-hidden bg-body sm:h-[48dvh] sm:min-h-[360px]">
-          <img
-            src="/assets/videos/field.png"
-            alt=""
-            aria-hidden="true"
-            loading="eager"
-            decoding="async"
-            className="absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center opacity-90"
-          />
-          {shouldLoadHeroVideo ? (
-            <video
-              src="/assets/videos/field.mp4"
-              poster="/assets/videos/field.png"
-              autoPlay
-              loop
-              muted
-              playsInline
-              preload="metadata"
-              onLoadedData={() => setIsHeroVideoReady(true)}
-              className={`absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center bg-transparent transition-opacity duration-700 ease-out-expo ${
-                isHeroVideoReady ? 'opacity-70' : 'opacity-0'
-              }`}
-            >
-            </video>
-          ) : null}
-          <div className="absolute inset-0 z-10 hero-scrim" />
-          <div className="absolute inset-0 z-10 screen-scrim opacity-20" />
-          <div className="absolute inset-0 bg-gradient-to-t from-body via-transparent to-transparent z-10" />
-
-          <div className="relative z-20 h-full flex flex-col items-center justify-start pt-[10vh] text-center px-6">
-            <div className="max-w-4xl">
-              <h1 className="h1-hero hero-ink mb-12 text-balance">
-                <span className="whitespace-nowrap">Welcome back,</span> <br />
-                <span className="font-serif italic hero-ink-accent">
-                  {authStoreDisplayName}
-                </span>
-              </h1>
-            </div>
-          </div>
-
-
-        </section>
-
-        <section
-          className="core-bento-grid"
+        <div
+          className="home-dashboard-intro-frame"
+          data-intro-state={heroIntroState}
         >
-          <div
-            className="home-primary-reflection-card group relative surface-flat overflow-hidden rounded-[2.5rem] p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full transition-[border-color,box-shadow] duration-300 ease-out-expo hover:shadow-[0_12px_32px_var(--tw-shadow-color)] hover:shadow-green/5 hover:border-green/10"
-          >
-            <div className="relative z-10">
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-2 text-gray-nav">
-                  <Target size={18} weight="duotone" className="text-green" />
-                  <span className="label-caps">
-                    Today's Reflection
-                  </span>
-                </div>
-                <button
-                  onClick={refreshPrompt}
-                  className={`flex h-11 min-w-11 items-center justify-center rounded-[var(--radius-control)] text-gray-nav transition-colors hover:text-green ${
-                    isRefreshing ? 'animate-spin' : ''
-                  }`}
-                  aria-label="Refresh today's reflection prompt"
-                >
-                  <ArrowsClockwise size={20} weight="regular" />
-                </button>
+          {shouldRenderHeroIntro ? (
+            <section
+              ref={heroIntroRef}
+              className={`home-hero-shell relative isolate w-full overflow-hidden bg-body ${
+                shouldReduceMotion ? 'home-hero-shell--reduced-motion' : ''
+              }`}
+              data-intro-state={heroIntroState}
+              aria-hidden={heroIntroState === 'exiting' ? 'true' : undefined}
+              onFocusCapture={handleHeroFocusCapture}
+              onBlurCapture={handleHeroBlurCapture}
+              onPointerDownCapture={handleHeroShellPointerDownCapture}
+              onPointerUpCapture={handleHeroShellPointerEndCapture}
+              onPointerCancelCapture={handleHeroShellPointerEndCapture}
+            >
+              <div className="home-hero-media" aria-hidden="true">
+                <img
+                  src="/assets/videos/field.png"
+                  alt=""
+                  aria-hidden="true"
+                  loading="eager"
+                  decoding="async"
+                  className="absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center opacity-90"
+                />
+                {shouldLoadHeroVideo && !hasHeroVideoFailed && heroIntroState === 'visible' ? (
+                  <video
+                    src="/assets/videos/field.mp4"
+                    poster="/assets/videos/field.png"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    preload="metadata"
+                    onCanPlay={(event) => {
+                      void event.currentTarget.play().catch(() => {
+                        setHasHeroVideoFailed(true);
+                        setShouldLoadHeroVideo(false);
+                        setIsHeroVideoReady(false);
+                      });
+                    }}
+                    onPlaying={() => setIsHeroVideoReady(true)}
+                    onError={() => {
+                      setHasHeroVideoFailed(true);
+                      setShouldLoadHeroVideo(false);
+                      setIsHeroVideoReady(false);
+                    }}
+                    className={`absolute inset-0 z-0 h-full min-h-full w-full min-w-full object-cover object-center bg-transparent transition-opacity duration-700 ease-out-expo ${
+                      isHeroVideoReady ? 'opacity-70' : 'opacity-0'
+                    }`}
+                  >
+                  </video>
+                ) : null}
+                <div className="absolute inset-0 z-10 hero-scrim" />
+                <div className="absolute inset-0 z-10 screen-scrim opacity-20" />
+                <div className="absolute inset-0 bg-gradient-to-t from-body via-transparent to-transparent z-10" />
               </div>
 
-              <div className="mb-12 space-y-8">
-                <p
-                  className={`dashboard-prompt-text typographic-measure transition-opacity duration-[400ms] ease-out ${isRefreshing ? 'opacity-0' : 'opacity-100'}`}
-                >
-                  {dailyPrompt}
-                </p>
-                <div className="home-primary-action-cluster flex max-w-xl flex-col gap-3">
-                  <Button
-                    variant="primary"
+              <div className="home-hero-copy relative z-20 flex h-full flex-col items-center justify-start text-center px-6">
+                <div className="max-w-4xl">
+                  <h1 className="h1-hero hero-ink mb-12 text-balance">
+                    <span className="whitespace-nowrap">Welcome back,</span>{' '}
+                    <br className="home-hero-break" />
+                    <span className="font-serif italic hero-ink-accent">
+                      {authStoreDisplayName}
+                    </span>
+                  </h1>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="home-hero-dismiss-control"
+                aria-label="Show dashboard"
+                aria-controls="home-dashboard-grid"
+                disabled={heroIntroState !== 'visible'}
+                tabIndex={heroIntroState === 'visible' ? 0 : -1}
+                onClick={() => collapseHeroIntro()}
+                onPointerDown={handleHeroDismissPointerDown}
+                onPointerMove={handleHeroDismissPointerMove}
+                onPointerUp={handleHeroDismissPointerEnd}
+                onPointerCancel={handleHeroDismissPointerEnd}
+              >
+                <span className="home-hero-dismiss-grip" aria-hidden="true" />
+                <span>Show dashboard</span>
+              </button>
+            </section>
+          ) : null}
 
-                    className="h-14 w-full px-8 rounded-xl text-base font-bold bg-green text-white hover:bg-green/90 transition-colors shadow-none sm:w-fit"
-                    onPointerEnter={prefetchCreateNoteRoute}
-                    onFocus={prefetchCreateNoteRoute}
-                    onClick={() => handleCreateClick(dailyPrompt)}
-                    aria-label="Begin writing with today's prompt"
+          <section
+            id="home-dashboard-grid"
+            ref={dashboardGridRef}
+            tabIndex={-1}
+            aria-label="Dashboard"
+            className="core-bento-grid"
+          >
+            <div
+              className="home-primary-reflection-card group relative surface-flat overflow-hidden rounded-[2.5rem] p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full transition-[border-color,box-shadow] duration-300 ease-out-expo hover:shadow-[0_12px_32px_var(--tw-shadow-color)] hover:shadow-green/5 hover:border-green/10"
+            >
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-2 text-gray-nav">
+                    <Target size={18} weight="duotone" className="text-green" />
+                    <span className="label-caps">
+                      Today's Reflection
+                    </span>
+                  </div>
+                  <button
+                    onClick={refreshPrompt}
+                    className={`flex h-11 min-w-11 items-center justify-center rounded-[var(--radius-control)] text-gray-nav transition-colors hover:text-green ${
+                      isRefreshing ? 'animate-spin' : ''
+                    }`}
+                    aria-label="Refresh today's reflection prompt"
                   >
-                    Begin Writing
-                    <Plus size={18} weight="regular" className="ml-2" />
-                  </Button>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <Button
-                      variant="secondary"
+                    <ArrowsClockwise size={20} weight="regular" />
+                  </button>
+                </div>
 
-                      className="h-12 w-full rounded-xl px-6 text-base font-bold"
-                      onClick={() => setIsCheckInOpen(true)}
-                      aria-label="Save a quick mood check-in"
-                    >
-                      Quick check-in
-                      <Heart size={18} weight="duotone" className="ml-2" />
-                    </Button>
-                    <Button
-                      variant="outline"
+                <div className="mb-12 space-y-8">
+                  <p
+                    className={`dashboard-prompt-text typographic-measure transition-opacity duration-[400ms] ease-out ${isRefreshing ? 'opacity-0' : 'opacity-100'}`}
+                  >
+                    {dailyPrompt}
+                  </p>
+                  <div className="home-primary-action-cluster flex max-w-xl flex-col gap-3">
+                    <div className="home-primary-action-row flex w-full flex-col gap-3 sm:flex-row sm:items-stretch">
+                      <Button
+                        variant="primary"
+                        className="h-14 w-full rounded-xl bg-green px-8 text-base font-bold text-white shadow-none transition-colors hover:bg-green/90 sm:flex-[1.05]"
+                        onPointerEnter={prefetchCreateNoteRoute}
+                        onFocus={prefetchCreateNoteRoute}
+                        onClick={() => handleCreateClick(dailyPrompt)}
+                        aria-label="Begin writing with today's prompt"
+                      >
+                        Begin Writing
+                        <Plus size={18} weight="regular" className="ml-2" />
+                      </Button>
+                      <WhisperComposerControl
+                        onFinalTranscript={handleVoiceDraft}
+                        label="Speak a note"
+                        stopOnFinalTranscript
+                        className="w-full sm:flex-1"
+                        buttonClassName="inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl border px-6 text-base font-bold transition-colors"
+                        idleButtonClassName="control-surface text-gray-text hover:border-green/20 hover:bg-green/5 hover:text-green"
+                        activeButtonClassName="border-green/25 bg-green/10 text-green"
+                      />
+                    </div>
+                    <div className="home-secondary-action-row grid w-full gap-3 sm:grid-cols-2">
+                      <Button
+                        variant="secondary"
 
-                      className="h-12 w-full justify-center rounded-xl border-sky/25 bg-sky/5 px-6 text-sky hover:bg-sky/10"
-                      onClick={() => navigate(RoutePath.FUTURE_LETTERS)}
-                      aria-label="Write a future letter"
-                    >
-                      Future letter
-                      <EnvelopeSimple size={18} weight="duotone" className="ml-2" />
-                    </Button>
+                        className="h-12 w-full rounded-xl px-6 text-base font-bold"
+                        onClick={() => setIsCheckInOpen(true)}
+                        aria-label="Save a quick mood check-in"
+                      >
+                        Quick check-in
+                        <Heart size={18} weight="duotone" className="ml-2" />
+                      </Button>
+                      <Button
+                        variant="outline"
+
+                        className="h-12 w-full justify-center rounded-xl border-sky/25 bg-sky/5 px-6 text-sky hover:bg-sky/10"
+                        onClick={() => navigate(RoutePath.FUTURE_LETTERS)}
+                        aria-label="Write a future letter"
+                      >
+                        Future letter
+                        <EnvelopeSimple size={18} weight="duotone" className="ml-2" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
             </div>
 
             <div className="border-t border-border/60 pt-8 text-left">
@@ -735,6 +973,7 @@ export const HomeAuthenticated: React.FC = () => {
             </div>
           </div>
         </section>
+        </div>
       </div>
 
       <ModalSheet
@@ -829,8 +1068,8 @@ export const HomeAuthenticated: React.FC = () => {
         icon={moodPickerStage === 'group' ? <Heart size={20} weight="duotone" /> : undefined}
         size="sm"
         tone="sage"
-        panelClassName="modal-sheet-panel--compact"
-        bodyClassName="modal-sheet-body--compact"
+        panelClassName={`modal-sheet-panel--compact ${moodPickerStage === 'detail' ? 'modal-sheet-panel--mood-detail' : ''}`.trim()}
+        bodyClassName={`modal-sheet-body--compact ${moodPickerStage === 'detail' ? 'modal-sheet-body--mood-detail' : ''}`.trim()}
       >
         <div className="space-y-3">
           {!checkInFeedback ? (

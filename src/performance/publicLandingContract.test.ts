@@ -118,7 +118,7 @@ describe('public landing performance contract', () => {
     expect(landing).not.toContain('window.requestAnimationFrame(() => {\n      setShouldLoadHeroVideo(true);');
     expect(landing).toContain('const videoDelay = window.setTimeout(() => {');
     expect(landing).toContain('cancelVideoLoad = scheduleIdleTask(() => setShouldLoadHeroVideo(true), 3000);');
-    expect(landing).toContain('}, 6500);');
+    expect(landing).toContain('}, 9000);');
     expect(landing).toContain('cancelVideoLoad?.();');
   });
 
@@ -180,7 +180,11 @@ describe('public landing performance contract', () => {
     expect(indexCss).not.toContain('.audio-popup');
     expect(indexCss).not.toContain('.ql-toolbar.ql-snow');
     expect(indexCss).toMatch(/(^|\n)\s*\.no-scroll\s*{/);
-    expect(indexCss).toMatch(/(^|\n)\s*\.no-scroll\s+#main-content\s*{/);
+    expect(indexCss).toMatch(/(^|\n)\s*\.no-scroll\s+\.app-shell--fixed-scroll\s+#main-content\s*{/);
+    expect(indexCss).not.toMatch(/(^|\n)\s*\.no-scroll\s+#main-content\s*{/);
+    expect(indexCss).not.toMatch(/html,\s*body\s*{\s*overflow-x:\s*hidden;/);
+    expect(indexCss).toContain('body {\n    max-width: 100%;');
+    expect(read('layouts/DashboardLayout.tsx')).toContain('app-shell--fixed-scroll');
 
     expect(modalCss).not.toContain('.no-scroll');
     expect(modalCss).toContain('.modal-sheet-root');

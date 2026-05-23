@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import ReactMarkdown from 'react-markdown';
@@ -16,7 +16,7 @@ import { Surface } from '../../components/ui/Surface';
 import { LifeTheme, Note, RoutePath, WellnessAccess } from '../../types';
 import { noteService } from '../../services/noteService';
 import { wikiService } from '../../services/wikiService';
-import { aiRunClient } from '../../services/aiRunClient';
+import { aiRunClient, type LifeWikiRunDetail, type LifeWikiRunRecord } from '../../services/aiRunClient';
 import { profileService } from '../../services/profileService';
 import { FREE_WIKI_MINIMUM_ENTRIES, getWikiInsightsGate } from '../../services/wellnessPolicy';
 import {
@@ -30,6 +30,8 @@ import {
   SANCTUARY_LEVEL_UP_ANIMATION_SRC,
 } from '../../src/lottie/sanctuaryAnimation';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { runScopedTransition } from '../../hooks/viewTransitionUtils';
+import { getLifeWikiReviewSummary } from './lifeWikiReviewSummary';
 
 type RefreshFeedback = {
   variant: 'warning' | 'error';
@@ -211,6 +213,34 @@ const getPageMap = (pages: LifeTheme[]) =>
       .map((page) => [page.pageType, page]),
   );
 
+const ACTIVE_RUN_STATUSES = new Set(['running']);
+
+const formatRunStatus = (status: string) => {
+  switch (status) {
+    case 'succeeded':
+      return 'Completed';
+    case 'partial':
+      return 'Partly updated';
+    case 'failed':
+      return 'Failed';
+    case 'skipped':
+      return 'Skipped';
+    default:
+      return 'Running';
+  }
+};
+
+const formatRunTrigger = (trigger: string) => {
+  switch (trigger) {
+    case 'smart_mode':
+      return 'Smart Mode';
+    case 'account_enable':
+      return 'Account setup';
+    default:
+      return 'Manual';
+  }
+};
+
 export const LifeWiki: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -219,6 +249,7 @@ export const LifeWiki: React.FC = () => {
   const cameFromInsights = Boolean(location.state?.fromInsights);
   const shouldPlayEntryAnimation =
     !shouldReduceMotion && (location.pathname === RoutePath.WIKI || location.pathname === RoutePath.SANCTUARY);
+  const lifeWikiScopeRef = useRef<HTMLDivElement | null>(null);
   const [notes, setNotes] = useState<Note[]>([]);
   const [themes, setThemes] = useState<LifeTheme[]>([]);
   const [access, setAccess] = useState<WellnessAccess | null>(null);
@@ -226,6 +257,22 @@ export const LifeWiki: React.FC = () => {
   const [isEnteringWiki, setIsEnteringWiki] = useState(shouldPlayEntryAnimation && !cameFromInsights);
   const [hasLoadedLibrary, setHasLoadedLibrary] = useState(false);
   const [refreshFeedback, setRefreshFeedback] = useState<RefreshFeedback | null>(null);
+  const [recentRuns, setRecentRuns] = useState<LifeWikiRunRecord[]>([]);
+  const [runDetail, setRunDetail] = useState<LifeWikiRunDetail | null>(null);
+
+  const loadRunActivity = async (preferredRunId?: string) => {
+    try {
+      const list = await aiRunClient.listLifeWikiRuns(8);
+      setRecentRuns(list.runs);
+      const runId = preferredRunId || runDetail?.run.id || list.runs[0]?.id;
+      if (runId) {
+        const detail = await aiRunClient.getLifeWikiRun(runId);
+        setRunDetail(detail);
+      }
+    } catch (error) {
+      console.error('[LifeWiki] Failed to load AI run activity:', error);
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -235,9 +282,11 @@ export const LifeWiki: React.FC = () => {
         profileService.getWellnessAccess(),
       ]);
 
-      setNotes(allNotes);
-      setThemes(allThemes);
-      setAccess(accessData);
+      runScopedTransition(lifeWikiScopeRef.current, () => {
+        setNotes(allNotes);
+        setThemes(allThemes);
+        setAccess(accessData);
+      });
     } catch (error) {
       console.error('[LifeWiki] Failed to load data:', error);
     } finally {
@@ -247,7 +296,18 @@ export const LifeWiki: React.FC = () => {
 
   useEffect(() => {
     void loadData();
+    void loadRunActivity();
   }, []);
+
+  useEffect(() => {
+    if (!runDetail || !ACTIVE_RUN_STATUSES.has(runDetail.run.status)) return;
+
+    const timer = window.setInterval(() => {
+      void loadRunActivity(runDetail.run.id);
+    }, 3000);
+
+    return () => window.clearInterval(timer);
+  }, [runDetail?.run.id, runDetail?.run.status]);
 
   useEffect(() => {
     // If we came from Insights, the transition animation already played there.
@@ -300,6 +360,9 @@ export const LifeWiki: React.FC = () => {
     (meta) => meta.pageType === articlePageType,
   );
   const sourceIds = articlePage ? extractSourceIds(articlePage.content) : [];
+  const reviewSummary = articlePageType
+    ? getLifeWikiReviewSummary(runDetail?.events || [], articlePageType, sourceIds.length)
+    : null;
   const sourceNoteMap = useMemo(() => new Map(notes.map((note) => [note.id, note])), [notes]);
 
   const handleRefreshWiki = async () => {
@@ -320,6 +383,7 @@ export const LifeWiki: React.FC = () => {
       }
 
       await loadData();
+      await loadRunActivity(refreshResult.runId);
     } catch (error) {
       const newAccess = await profileService.getWellnessAccess().catch(() => access);
       setAccess(newAccess || null);
@@ -408,6 +472,74 @@ export const LifeWiki: React.FC = () => {
     );
   };
 
+  const renderRunActivity = () => (
+    <Surface variant="flat" tone="paper" className="rounded-[2rem] border-border/50 p-5 sm:p-6">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+        <div className="max-w-md space-y-2">
+          <p className="label-caps text-green">Smart Mode activity</p>
+          <h2 className="text-2xl font-display font-bold text-gray-text">Recent Life Wiki runs</h2>
+          <p className="text-sm font-medium leading-relaxed text-gray-light">
+            Reflections keeps a short, private trail of what the Life Wiki refresh touched.
+          </p>
+        </div>
+
+        <div className="grid flex-1 gap-3 md:grid-cols-2">
+          {recentRuns.length > 0 ? recentRuns.slice(0, 4).map((run) => (
+            <button
+              key={run.id}
+              type="button"
+              onClick={() => {
+                void loadRunActivity(run.id);
+              }}
+              className={`rounded-[1.25rem] border p-4 text-left transition-colors hover:border-green/25 hover:bg-green/5 ${
+                runDetail?.run.id === run.id ? 'border-green/30 bg-green/5' : 'border-border/60 bg-panel/40'
+              }`}
+            >
+              <span className="flex items-center justify-between gap-3">
+                <span className="label-caps text-gray-nav">{formatRunTrigger(run.trigger)}</span>
+                <span className="text-[11px] font-black uppercase tracking-[0.16em] text-green">
+                  {formatRunStatus(run.status)}
+                </span>
+              </span>
+              <span className="mt-3 block text-sm font-bold text-gray-text">
+                {run.page_count || 0} room{run.page_count === 1 ? '' : 's'} touched
+              </span>
+              <span className="mt-1 block text-xs font-semibold text-gray-nav">
+                {new Date(run.started_at || run.created_at).toLocaleString()}
+              </span>
+              {run.error ? <span className="mt-2 block text-xs font-bold text-clay">{run.error}</span> : null}
+            </button>
+          )) : (
+            <div className="rounded-[1.25rem] border border-border/60 bg-panel/40 p-4 text-sm font-semibold text-gray-light">
+              No Life Wiki runs have been recorded yet.
+            </div>
+          )}
+        </div>
+      </div>
+
+      {runDetail ? (
+        <div className="mt-5 border-t border-border/60 pt-5">
+          <p className="label-caps text-gray-nav">Timeline</p>
+          <div className="mt-3 grid gap-2">
+            {runDetail.events.length > 0 ? runDetail.events.map((event) => (
+              <div key={event.id} className="flex flex-col gap-1 rounded-[1rem] bg-green/5 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                <span className="text-sm font-bold text-gray-text">
+                  {event.event_type.replace(/_/g, ' ')}
+                  {event.page_type ? <span className="text-gray-nav"> · {event.page_type}</span> : null}
+                </span>
+                <span className="text-xs font-semibold text-gray-nav">
+                  {new Date(event.created_at).toLocaleTimeString()}
+                </span>
+              </div>
+            )) : (
+              <p className="text-sm font-semibold text-gray-light">This run has not recorded timeline events yet.</p>
+            )}
+          </div>
+        </div>
+      ) : null}
+    </Surface>
+  );
+
   const renderEntrance = () => (
       (isRefreshingWiki || isEnteringWiki) ? (
         <div
@@ -457,7 +589,8 @@ export const LifeWiki: React.FC = () => {
           <div className="sanctuary-page-fade absolute inset-0 opacity-50" />
         </div>
         <PageContainer size="narrow" className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10 relative z-10">
-          <div 
+          <div
+            ref={lifeWikiScopeRef}
             className={`core-page-stack transition-[opacity,transform] duration-500 ease-out-expo ${isEnteringWiki ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}
           >
             <button
@@ -601,6 +734,22 @@ export const LifeWiki: React.FC = () => {
                   </div>
                 </Surface>
 
+                <Surface variant="flat" tone="paper" className="p-5 md:p-6">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="label-caps text-green">Review summary</p>
+                      <p className="mt-2 text-sm font-semibold leading-relaxed text-gray-light">
+                        {reviewSummary?.reviewedAtLabel
+                          ? `${reviewSummary.label} ${reviewSummary.reviewedAtLabel}. ${reviewSummary.sourceLabel}.`
+                          : `${reviewSummary?.label || 'No review event loaded'}. ${reviewSummary?.sourceLabel || '0 sources visible'}.`}
+                      </p>
+                    </div>
+                    <MetadataPill tone={reviewSummary?.tone || 'neutral'}>
+                      {reviewSummary?.label || 'No review event loaded'}
+                    </MetadataPill>
+                  </div>
+                </Surface>
+
                 <Surface variant="flat" tone="sky" className="p-6">
                   <div className="mb-4 flex items-center gap-2">
                     <Book size={18} weight="duotone" className="text-green" />
@@ -654,7 +803,8 @@ export const LifeWiki: React.FC = () => {
       </div>
 
       <PageContainer className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10 relative z-10">
-        <div 
+        <div
+          ref={lifeWikiScopeRef}
           className={`core-page-stack transition-[opacity,transform] duration-500 ease-out-expo ${isEnteringWiki ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}
         >
           <div className="flex items-center justify-between gap-4">
@@ -712,6 +862,8 @@ export const LifeWiki: React.FC = () => {
               description={refreshFeedback.description}
             />
           ) : null}
+
+          {renderRunActivity()}
 
           <section className="border-y border-border/60 py-5">
             <div className="grid gap-0 divide-y divide-border/60 md:grid-cols-4 md:divide-x md:divide-y-0">

@@ -2,6 +2,7 @@ import React, { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from '@phosphor-icons/react/X';
 import { registerAndroidBackAction } from '../../src/native/androidBack';
+import { useHaptics } from '../../hooks/useHaptics';
 import { SURFACE_TONE_CLASS, type SurfaceTone } from './surfaceTone';
 import './modal-sheet.css';
 
@@ -39,6 +40,9 @@ const EXIT_DURATION_MS = 220;
 /** Brief delay (ms) before auto-focusing the first element, giving children time to mount. */
 const AUTOFOCUS_DELAY_MS = 40;
 
+const SHEET_DRAG_CLOSE_THRESHOLD = 112;
+const SHEET_DRAG_MINIMUM_MOVEMENT = 12;
+
 export const ModalSheet: React.FC<ModalSheetProps> = ({
   isOpen,
   onClose,
@@ -59,17 +63,26 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
   mobilePlacement = 'bottom',
   tone = 'paper',
 }) => {
+  const haptics = useHaptics();
   const titleId = useId();
   const descriptionId = useId();
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
+  const dragStartYRef = useRef<number | null>(null);
+  const dragOffsetYRef = useRef(0);
+  const onCloseRef = useRef(onClose);
+  const [dragOffsetY, setDragOffsetY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Keep DOM mounted during exit animation
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
+      dragOffsetYRef.current = 0;
+      setDragOffsetY(0);
+      setIsDragging(false);
       setMounted(true);
       return;
     }
@@ -79,7 +92,39 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
     return () => window.clearTimeout(timer);
   }, [isOpen]);
 
-  const onCloseRef = useRef(onClose);
+  const handleDragStart = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (mobilePlacement !== 'bottom' || event.pointerType === 'mouse') return;
+    dragStartYRef.current = event.clientY;
+    dragOffsetYRef.current = 0;
+    setIsDragging(true);
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const handleDragMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (dragStartYRef.current === null) return;
+    const nextOffset = Math.max(0, event.clientY - dragStartYRef.current);
+    if (nextOffset < SHEET_DRAG_MINIMUM_MOVEMENT) {
+      dragOffsetYRef.current = 0;
+      setDragOffsetY(0);
+      return;
+    }
+    dragOffsetYRef.current = nextOffset;
+    setDragOffsetY(nextOffset);
+  };
+
+  const handleDragEnd = () => {
+    if (dragStartYRef.current === null) return;
+    const shouldClose = dragOffsetYRef.current > SHEET_DRAG_CLOSE_THRESHOLD;
+    dragStartYRef.current = null;
+    dragOffsetYRef.current = 0;
+    setIsDragging(false);
+    setDragOffsetY(0);
+    if (shouldClose) {
+      void haptics.light();
+      onCloseRef.current();
+    }
+  };
+
   useEffect(() => {
     onCloseRef.current = onClose;
   }, [onClose]);
@@ -177,14 +222,23 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
             <div
               ref={panelRef}
               id={panelId}
-              className={`surface-bezel-inner modal-sheet-panel ${panelClassName}`.trim()}
+              className={`surface-bezel-inner modal-sheet-panel ${
+                isDragging ? 'modal-sheet-panel--dragging' : ''
+              } ${panelClassName}`.trim()}
+              style={dragOffsetY > 0 ? { transform: `translateY(${dragOffsetY}px)` } : undefined}
               role="dialog"
               aria-modal="true"
               aria-labelledby={title ? titleId : undefined}
               aria-label={!title && ariaLabel ? ariaLabel : undefined}
               aria-describedby={description ? descriptionId : undefined}
             >
-              <div className="modal-sheet-handle" />
+              <div
+                className="modal-sheet-handle"
+                onPointerDown={handleDragStart}
+                onPointerMove={handleDragMove}
+                onPointerUp={handleDragEnd}
+                onPointerCancel={handleDragEnd}
+              />
 
               {(icon || title || description || !hideClose) && (
                 <div className="modal-sheet-header">

@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useRef } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'motion/react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -11,6 +11,7 @@ import { SignOut } from '@phosphor-icons/react/SignOut';
 import { X } from '@phosphor-icons/react/X';
 import { StorageImage } from '../components/ui/StorageImage';
 import { useAuthStore } from '../hooks/useAuthStore';
+import { useHaptics } from '../hooks/useHaptics';
 import { usePWAInstall } from '../context/PWAInstallContext';
 import { registerAndroidBackAction } from '../src/native/androidBack';
 import { NATIVE_PAGE_TOP_PADDING, NATIVE_TOP_CONTROL_OFFSET } from '../src/native/safeArea';
@@ -30,6 +31,9 @@ interface MobileSidebarProps {
   onInvite: () => void;
 }
 
+const SIDEBAR_DRAG_CLOSE_THRESHOLD = 112;
+const SIDEBAR_DRAG_MINIMUM_MOVEMENT = 12;
+
 /**
  * Full-screen mobile navigation sidebar.
  * Owns focus-trap, scroll-lock, Android back-button registration, and all nav rendering.
@@ -42,6 +46,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
   onInvite,
 }) => {
   const navigate = useNavigate();
+  const haptics = useHaptics();
   const location = useLocation();
   const { isAuthenticated, user, logout } = useAuthStore();
   const { canInstall, isInstalled, triggerInstall } = usePWAInstall();
@@ -52,6 +57,10 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
   const closeRef = useRef<HTMLButtonElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
+  const dragStartXRef = useRef<number | null>(null);
+  const dragOffsetXRef = useRef(0);
+  const [dragOffsetX, setDragOffsetX] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
 
   const primaryItems = navItems.filter((item) => item.path !== '/account');
   const accountItem = navItems.find((item) => item.path === '/account');
@@ -59,6 +68,39 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
   const handleNavigation = (path: string) => {
     navigate(path);
     onClose();
+  };
+
+  const handleSidebarPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === 'mouse') return;
+    dragStartXRef.current = event.clientX;
+    dragOffsetXRef.current = 0;
+    setIsDragging(true);
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const handleSidebarPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (dragStartXRef.current === null) return;
+    const nextOffset = Math.max(0, event.clientX - dragStartXRef.current);
+    if (nextOffset < SIDEBAR_DRAG_MINIMUM_MOVEMENT) {
+      dragOffsetXRef.current = 0;
+      setDragOffsetX(0);
+      return;
+    }
+    dragOffsetXRef.current = nextOffset;
+    setDragOffsetX(nextOffset);
+  };
+
+  const handleSidebarPointerEnd = () => {
+    if (dragStartXRef.current === null) return;
+    const shouldClose = dragOffsetXRef.current > SIDEBAR_DRAG_CLOSE_THRESHOLD;
+    dragStartXRef.current = null;
+    dragOffsetXRef.current = 0;
+    setIsDragging(false);
+    setDragOffsetX(0);
+    if (shouldClose) {
+      void haptics.light();
+      onClose();
+    }
   };
 
   // Focus trap + Escape key handling
@@ -154,8 +196,20 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: 36, opacity: 0 }}
         transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
-        className="mobile-sidebar-shell fixed right-0 top-0 bottom-0 z-[110] h-[100dvh] pt-[var(--native-page-top-padding)] w-[min(86vw,352px)]"
+        style={{ x: dragOffsetX }}
+        className={`mobile-sidebar-shell ${
+          isDragging ? 'mobile-sidebar-shell--dragging' : ''
+        } fixed right-0 top-0 bottom-0 z-[110] h-[100dvh] pt-[var(--native-page-top-padding)] w-[min(86vw,352px)]`.trim()}
       >
+        <div
+          data-sidebar-drag-zone
+          className="mobile-sidebar-drag-zone"
+          aria-hidden="true"
+          onPointerDown={handleSidebarPointerDown}
+          onPointerMove={handleSidebarPointerMove}
+          onPointerUp={handleSidebarPointerEnd}
+          onPointerCancel={handleSidebarPointerEnd}
+        />
         <div className="flex h-full min-h-0 flex-col">
           <h2 id={mobileMenuTitleId} className="sr-only">
             Navigation menu
