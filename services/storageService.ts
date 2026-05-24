@@ -1,4 +1,6 @@
 import { supabase } from '../src/supabaseClient';
+import { cryptoService, isEncryptedEnvelope } from './cryptoService';
+import { requireCurrentCryptoSession } from './cryptoSessionStore';
 
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 const IMAGE_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
@@ -53,6 +55,35 @@ const assertCurrentUserOwnsPath = async (path: string) => {
   }
 };
 
+const storageAad = (path: string) => {
+  const userId = path.split('/')[0] || '';
+  return {
+    table: 'storage.objects',
+    rowId: path,
+    userId,
+  };
+};
+
+const isEncryptedNoteFilePath = (path: string) => path.includes('/notes/');
+
+const encryptedFile = async (file: File, path: string) => {
+  const encryptedPayload = await cryptoService.encryptBytes(
+    requireCurrentCryptoSession(),
+    storageAad(path),
+    new Uint8Array(await file.arrayBuffer()),
+  );
+  return new Blob([JSON.stringify(encryptedPayload)], { type: 'application/json' });
+};
+
+const decryptFileUrl = async (signedUrl: string, path: string) => {
+  const response = await fetch(signedUrl);
+  if (!response.ok) throw new Error('Encrypted file could not be downloaded');
+  const envelope = await response.json();
+  if (!isEncryptedEnvelope(envelope)) throw new Error('Stored file is not encrypted');
+  const bytes = await cryptoService.decryptBytes(requireCurrentCryptoSession(), storageAad(path), envelope);
+  return URL.createObjectURL(new Blob([bytes]));
+};
+
 export const storageService = {
   // Since bucket is private, we must use signed URLs
   async getSignedUrl(path: string): Promise<string> {
@@ -68,6 +99,10 @@ export const storageService = {
       console.error('Supabase Storage Error (getSignedUrl):', error.message, error);
       return '';
     }
+    if (isEncryptedNoteFilePath(path)) {
+      return decryptFileUrl(data.signedUrl, path);
+    }
+
     return data.signedUrl;
   },
 
@@ -79,13 +114,16 @@ export const storageService = {
 
     const extension = getExtension(file);
     const uuid = crypto.randomUUID();
-    const path = `${userId}/${featureName}/${itemId}/${uuid}.${extension}`;
+    const path = featureName === 'notes'
+      ? `${userId}/${featureName}/${itemId}/${uuid}.enc`
+      : `${userId}/${featureName}/${itemId}/${uuid}.${extension}`;
+    const uploadBody = featureName === 'notes' ? await encryptedFile(file, path) : file;
     
     const { error } = await supabase.storage
       .from('app-files')
-      .upload(path, file, { 
+      .upload(path, uploadBody, { 
         cacheControl: '3600',
-        contentType: file.type,
+        contentType: featureName === 'notes' ? 'application/json' : file.type,
         upsert: false
       });
 
@@ -124,5 +162,36 @@ export const storageService = {
       console.error('Error deleting files:', error);
       throw error;
     }
-  }
+  },
+
+  async deleteUserPrefix(userId: string): Promise<void> {
+    assertSafePathSegment(userId, 'userId');
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user || user.id !== userId) {
+      throw new Error('Storage prefix does not belong to the authenticated user');
+    }
+
+    const pathsToDelete: string[] = [];
+    const walkPrefix = async (prefix: string): Promise<void> => {
+      const { data, error } = await supabase.storage
+        .from('app-files')
+        .list(prefix, { limit: 1000 });
+
+      if (error) throw error;
+
+      for (const item of data || []) {
+        const itemPath = `${prefix}/${item.name}`;
+        if (item.id) {
+          pathsToDelete.push(itemPath);
+        } else {
+          await walkPrefix(itemPath);
+        }
+      }
+    };
+
+    await walkPrefix(userId);
+    if (pathsToDelete.length > 0) {
+      await storageService.deleteFiles(pathsToDelete);
+    }
+  },
 };

@@ -34,6 +34,7 @@ import { useAuthStore } from '../../hooks/useAuthStore';
 import { profileService } from '../../services/profileService';
 import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
 import { aiRunClient, type LifeWikiRunResult } from '../../services/aiRunClient';
+import { getStrictPrivateModeDisabledMessage, isPrivateAiDisabled } from '../../services/privateMode';
 
 const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
 
@@ -129,6 +130,10 @@ export const Account: React.FC = () => {
   }, [isSaved]);
 
   const membershipCopy = useMemo(() => {
+    if (isPrivateAiDisabled()) {
+      return 'Zero-knowledge mode is active. Your writing stays encrypted, and AI features that require server reading are disabled.';
+    }
+
     if (access?.smartModeEnabled) {
       return 'Smart Mode is on. Reflections can refresh your Life Wiki after saves while keeping manual Refresh with AI available.';
     }
@@ -230,7 +235,7 @@ export const Account: React.FC = () => {
       setPasswordResetFeedback({
         variant: 'info',
         title: 'Password reset email sent.',
-        description: 'Check your inbox for a secure recovery link.',
+        description: 'This restores sign-in only. Your writing still needs the encryption passphrase or recovery key.',
       });
     } catch (err) {
       console.error(err);
@@ -246,6 +251,14 @@ export const Account: React.FC = () => {
 
   const handleSmartModeToggle = async () => {
     if (!access || isSmartModeChanging) return;
+    if (isPrivateAiDisabled()) {
+      setFeedback({
+        variant: 'info',
+        title: 'Smart Mode is disabled.',
+        description: getStrictPrivateModeDisabledMessage(),
+      });
+      return;
+    }
 
     const nextEnabled = !access.smartModeEnabled;
     setIsSmartModeChanging(true);
@@ -317,20 +330,7 @@ export const Account: React.FC = () => {
     setFeedback(null);
 
     try {
-      const notes = await noteService.getAll();
-      const storedPaths = Array.from(
-        new Set(
-          [
-            avatarPath,
-            ...notes.flatMap((note) => [
-              note.thumbnailUrl,
-              ...(note.attachments || []).map((attachment) => attachment.path),
-            ]),
-          ].filter((path): path is string => Boolean(path && !path.startsWith('blob:'))),
-        ),
-      );
-
-      await storageService.deleteFiles(storedPaths);
+      await storageService.deleteUserPrefix(userId);
 
       const { error } = await supabase.rpc('delete_user_data');
       if (error) throw error;
@@ -623,7 +623,7 @@ export const Account: React.FC = () => {
                     </summary>
                     <div className="border-t border-border/50 p-5 pt-4 space-y-4">
                       <p className="text-[14px] font-medium leading-relaxed text-gray-light">
-                        Keep AI on demand by default, or let Smart Mode refresh the Life Wiki after saves. Your writing screen stays quiet either way.
+                        Smart Mode is unavailable in zero-knowledge mode because the server cannot read your private writing.
                       </p>
 
                       {smartModeRun ? (
@@ -642,10 +642,12 @@ export const Account: React.FC = () => {
                       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pt-2">
                         <div className="space-y-1">
                           <MetadataPill tone={access?.smartModeEnabled ? 'green' : undefined}>
-                            {access?.smartModeEnabled ? 'Enabled' : 'Off'}
+                            {isPrivateAiDisabled() ? 'Disabled' : access?.smartModeEnabled ? 'Enabled' : 'Off'}
                           </MetadataPill>
                           <p className="text-[12px] font-medium text-gray-light" id="smart-mode-state">
-                            {isSmartModeChanging
+                            {isPrivateAiDisabled()
+                              ? 'AI and Smart Mode stay off while strict privacy is enabled.'
+                              : isSmartModeChanging
                               ? 'Updating Smart Mode...'
                               : access?.smartModeEnabled
                                 ? 'Future saves can refresh the Life Wiki while Smart Mode is on.'
@@ -656,10 +658,10 @@ export const Account: React.FC = () => {
                           type="button"
                           role="switch"
                           aria-checked={Boolean(access?.smartModeEnabled)}
-                          aria-label={access?.smartModeEnabled ? 'Turn off Smart Mode' : 'Enable Smart Mode'}
+                          aria-label={isPrivateAiDisabled() ? 'Smart Mode disabled in zero-knowledge mode' : access?.smartModeEnabled ? 'Turn off Smart Mode' : 'Enable Smart Mode'}
                           aria-describedby="smart-mode-state"
                           onClick={handleSmartModeToggle}
-                          disabled={!access || isSmartModeChanging}
+                          disabled={!access || isSmartModeChanging || isPrivateAiDisabled()}
                           className={`relative flex h-11 w-[156px] shrink-0 items-center rounded-[var(--radius-control)] border px-1.5 transition-[border-color,background-color,opacity] duration-500 ease-out-expo focus:outline-none focus-visible:ring-4 focus-visible:ring-green/15 disabled:pointer-events-none disabled:opacity-50 ${
                             access?.smartModeEnabled
                               ? 'border-green/30 bg-green/10 text-green'

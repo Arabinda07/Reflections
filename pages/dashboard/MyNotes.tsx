@@ -468,7 +468,10 @@ export const MyNotes: React.FC = () => {
                         <Chip
                           key={tag.name}
                           icon={<Tag size={12} weight="regular" />}
-                          onClick={() => handleTagFilterChange(`${RoutePath.NOTES}?tag=${encodeURIComponent(tag.name)}`)}
+                          onClick={() => {
+                            setSwipedNoteId(null);
+                            navigate(`${RoutePath.NOTES}?tag=${encodeURIComponent(tag.name)}`);
+                          }}
                           aria-label={`Show ${tag.name} reflections`}
                         >
                           <span>{tag.name}</span>

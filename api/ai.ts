@@ -26,6 +26,9 @@ import {
 } from '../services/aiPromptSpecs.js';
 
 const MAX_BODY_BYTES = 250_000;
+const STRICT_PRIVATE_MODE_DISABLED_MESSAGE =
+  'AI and Smart Mode are disabled in zero-knowledge mode because the backend cannot read private writing.';
+const isStrictPrivateModeEnabled = () => true;
 const NOTE_OWNERSHIP_ACTIONS = new Set<AiAction>([
   'reflection',
   'ingestDecision',
@@ -397,6 +400,13 @@ export default async function handler(req: any, res: any) {
 
   try {
     const user = await requireUser(supabaseAuth, req.headers?.authorization);
+    if (isStrictPrivateModeEnabled()) {
+      return sendJson(res, 403, {
+        error: 'strict_private_mode_ai_disabled',
+        message: STRICT_PRIVATE_MODE_DISABLED_MESSAGE,
+      });
+    }
+
     const body = await parseJsonBody<AiRequest>(req, MAX_BODY_BYTES);
     const validation = validateAiRequest(body);
 

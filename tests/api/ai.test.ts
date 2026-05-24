@@ -57,7 +57,7 @@ const createResponse = () => {
   return response;
 };
 
-describe('/api/ai', () => {
+describe('/api/ai strict private mode', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.resetModules();
@@ -66,8 +66,6 @@ describe('/api/ai', () => {
     process.env.SUPABASE_ANON_KEY = 'anon-key';
     process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role-key';
     process.env.GEMINI_API_KEY = 'server-gemini-key';
-    delete process.env.GOOGLE_GEMINI_API_KEY;
-    delete process.env.VITE_GEMINI_API_KEY;
 
     mockGetUser.mockResolvedValue({
       data: { user: { id: 'user-1' } },
@@ -80,54 +78,7 @@ describe('/api/ai', () => {
     mockGenerateContent.mockResolvedValue({ text: 'A thoughtful reflection.' });
   });
 
-  it('claims server-side quota before making the provider request', async () => {
-    const { default: handler } = await import('../../api/ai');
-    const response = createResponse();
-
-    await handler(
-      createRequest({
-        action: 'reflection',
-        payload: {
-          note: {
-            title: 'Today',
-            content: '<p>I slowed down.</p>',
-            mood: 'calm',
-          },
-          wikiPages: [],
-          indexPage: null,
-          recentNotes: [],
-        },
-      }),
-      response,
-    );
-
-    expect(mockRpc).toHaveBeenCalledWith(
-      'claim_ai_feature_usage',
-      expect.objectContaining({
-        p_feature: 'reflection',
-        p_user_id: 'user-1',
-      }),
-    );
-    expect(mockRpc).toHaveBeenCalledWith(
-      'claim_ai_usage',
-      expect.objectContaining({
-        p_action: 'reflection',
-        p_user_id: 'user-1',
-      }),
-    );
-    expect(mockGoogleGenAI).toHaveBeenCalledWith({ apiKey: 'server-gemini-key' });
-    expect(response.statusCode).toBe(200);
-    expect(JSON.parse(response.body)).toEqual({
-      ok: true,
-      data: 'A thoughtful reflection.',
-    });
-  });
-
-  it('stops before the provider when quota is exhausted', async () => {
-    mockRpc.mockResolvedValueOnce({
-      data: { allowed: false, reason: 'monthly_quota_exhausted' },
-      error: null,
-    });
+  it('authenticates then rejects private writing AI without quota or provider calls', async () => {
     const { default: handler } = await import('../../api/ai');
     const response = createResponse();
 
@@ -145,69 +96,33 @@ describe('/api/ai', () => {
       response,
     );
 
-    expect(response.statusCode).toBe(429);
+    expect(response.statusCode).toBe(403);
     expect(JSON.parse(response.body)).toEqual({
-      error: 'monthly_quota_exhausted',
+      error: 'strict_private_mode_ai_disabled',
+      message: expect.stringContaining('zero-knowledge'),
     });
-    expect(mockGenerateContent).not.toHaveBeenCalled();
-  });
-
-  it('does not accept public VITE-prefixed AI provider keys on the server', async () => {
-    delete process.env.GEMINI_API_KEY;
-    delete process.env.GOOGLE_GEMINI_API_KEY;
-    process.env.VITE_GEMINI_API_KEY = 'legacy-public-key';
-    const { default: handler } = await import('../../api/ai');
-    const response = createResponse();
-
-    await handler(
-      createRequest({
-        action: 'reflection',
-        payload: {
-          note: {
-            title: 'Today',
-            content: '<p>I slowed down.</p>',
-          },
-        },
-      }),
-      response,
-    );
-
-    expect(response.statusCode).toBe(500);
-    expect(mockGoogleGenAI).not.toHaveBeenCalledWith({ apiKey: 'legacy-public-key' });
-  });
-
-  it('rejects malformed payloads before quota or provider calls', async () => {
-    const { default: handler } = await import('../../api/ai');
-    const response = createResponse();
-
-    await handler(
-      createRequest({
-        action: 'wikiPage',
-        payload: { title: 'People' },
-      }),
-      response,
-    );
-
-    expect(response.statusCode).toBe(400);
-    expect(JSON.parse(response.body)).toEqual({ error: 'Invalid wikiPage payload' });
+    expect(mockGetUser).toHaveBeenCalled();
     expect(mockRpc).not.toHaveBeenCalled();
     expect(mockGenerateContent).not.toHaveBeenCalled();
+    expect(mockGoogleGenAI).not.toHaveBeenCalled();
   });
 
-  it('returns a compact provider error when model JSON is malformed', async () => {
-    mockGenerateContent.mockResolvedValueOnce({ text: 'not-json' });
+  it('keeps method and auth failures outside the private payload path', async () => {
     const { default: handler } = await import('../../api/ai');
-    const response = createResponse();
+    const methodResponse = createResponse();
+    await handler({ ...createRequest({}), method: 'GET' }, methodResponse);
 
-    await handler(
-      createRequest({
-        action: 'tags',
-        payload: { content: 'A quiet entry.' },
-      }),
-      response,
-    );
+    expect(methodResponse.statusCode).toBe(405);
 
-    expect(response.statusCode).toBe(502);
-    expect(JSON.parse(response.body)).toEqual({ error: 'Malformed AI JSON' });
+    mockGetUser.mockResolvedValueOnce({
+      data: { user: null },
+      error: new Error('bad token'),
+    });
+    const authResponse = createResponse();
+    await handler(createRequest({ action: 'tags', payload: { content: 'private' } }), authResponse);
+
+    expect(authResponse.statusCode).toBe(401);
+    expect(mockRpc).not.toHaveBeenCalled();
+    expect(mockGenerateContent).not.toHaveBeenCalled();
   });
 });

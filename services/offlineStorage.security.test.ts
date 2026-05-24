@@ -13,8 +13,18 @@ describe('offline storage isolation contract', () => {
 
     expect(offlineStorage).toContain('getNoteById(id: string, userId: string)');
     expect(offlineStorage).toContain('getPendingOperations(userId: string)');
-    expect(syncHook).toContain('getPendingOperations(session.user.id)');
+    expect(syncHook).toContain('syncEngine.flush(session.user.id)');
     expect(syncHook).not.toContain('getPendingOperations()');
     expect(db).toContain('[userId+syncStatus]');
+  });
+
+  it('stores cached notes as encrypted payloads instead of plaintext fields', () => {
+    const db = read('services/db.ts');
+    const offlineStorage = read('services/offlineStorage.ts');
+
+    expect(db).toContain('encryptedPayload');
+    expect(db).not.toContain('interface LocalNote extends Note');
+    expect(offlineStorage).toContain('saveEncryptedNote');
+    expect(offlineStorage).not.toContain('db.notes.put(note)');
   });
 });
