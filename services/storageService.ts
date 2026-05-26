@@ -172,20 +172,31 @@ export const storageService = {
     }
 
     const pathsToDelete: string[] = [];
+    const pageSize = 1000;
     const walkPrefix = async (prefix: string): Promise<void> => {
-      const { data, error } = await supabase.storage
-        .from('app-files')
-        .list(prefix, { limit: 1000 });
+      let offset = 0;
 
-      if (error) throw error;
+      for (;;) {
+        const { data, error } = await supabase.storage
+          .from('app-files')
+          .list(prefix, { limit: pageSize, offset });
 
-      for (const item of data || []) {
-        const itemPath = `${prefix}/${item.name}`;
-        if (item.id) {
-          pathsToDelete.push(itemPath);
-        } else {
-          await walkPrefix(itemPath);
+        if (error) throw error;
+
+        for (const item of data || []) {
+          const itemPath = `${prefix}/${item.name}`;
+          if (item.id) {
+            pathsToDelete.push(itemPath);
+          } else {
+            await walkPrefix(itemPath);
+          }
         }
+
+        if (!data || data.length < pageSize) {
+          return;
+        }
+
+        offset += pageSize;
       }
     };
 

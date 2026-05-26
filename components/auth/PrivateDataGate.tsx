@@ -7,11 +7,13 @@ const panelClassName =
 const cardClassName =
   'w-full max-w-lg rounded-sm border border-border bg-surface/95 p-6 shadow-card';
 const inputClassName =
-  'w-full rounded-sm border border-border bg-white px-3 py-3 text-sm text-primary outline-none focus:border-primary';
+  'input-surface w-full rounded-sm px-3 py-3 text-sm text-primary outline-none focus:border-primary';
 const buttonClassName =
   'inline-flex min-h-12 w-full items-center justify-center rounded-sm border border-green bg-green px-4 py-3 text-sm font-semibold text-on-accent transition hover:bg-green-hover disabled:cursor-not-allowed disabled:border-border disabled:bg-surface-muted disabled:text-gray-nav disabled:opacity-100';
 const secondaryButtonClassName =
   'inline-flex min-h-12 w-full items-center justify-center rounded-sm border border-border px-4 py-3 text-sm font-semibold text-primary transition hover:bg-surface-muted disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-gray-nav disabled:opacity-100';
+const labelClassName = 'block text-xs font-semibold uppercase tracking-[0.08em] text-gray-nav';
+const errorClassName = 'text-sm text-clay';
 const validationClassName = 'text-xs leading-5 text-gray-text';
 const successValidationClassName = 'text-xs leading-5 text-green';
 
@@ -61,19 +63,26 @@ const UnlockPanel: React.FC = () => {
       description="Your account is signed in, but your notes, moods, letters, attachments, and Life Wiki stay encrypted until you unlock them on this device."
     >
       <div className="space-y-4">
-        <input
-          className={inputClassName}
-          type="password"
-          autoComplete="current-password"
-          placeholder="Encryption passphrase"
-          value={passphrase}
-          onChange={(event) => setPassphrase(event.target.value)}
-        />
+        <div className="space-y-2">
+          <label className={labelClassName} htmlFor="private-unlock-passphrase">Encryption passphrase</label>
+          <input
+            id="private-unlock-passphrase"
+            className={inputClassName}
+            type="password"
+            autoComplete="current-password"
+            placeholder="Encryption passphrase"
+            aria-describedby={error ? 'private-unlock-error' : undefined}
+            value={passphrase}
+            onChange={(event) => setPassphrase(event.target.value)}
+          />
+        </div>
         <button className={buttonClassName} disabled={isSubmitting || !canUnlockWithPassphrase} onClick={() => submit('passphrase')}>
           Unlock
         </button>
         <div className="border-t border-border pt-4">
+          <label className={labelClassName} htmlFor="private-unlock-recovery">Recovery key</label>
           <input
+            id="private-unlock-recovery"
             className={inputClassName}
             type="text"
             autoComplete="off"
@@ -81,6 +90,7 @@ const UnlockPanel: React.FC = () => {
             autoCorrect="off"
             spellCheck={false}
             placeholder="Recovery key"
+            aria-describedby={error ? 'private-unlock-error' : undefined}
             value={recoveryKey}
             onChange={(event) => setRecoveryKey(event.target.value)}
           />
@@ -88,7 +98,7 @@ const UnlockPanel: React.FC = () => {
             Unlock with recovery key
           </button>
         </div>
-        {error && <p className="text-sm text-red-700">{error}</p>}
+        {error && <p id="private-unlock-error" className={errorClassName} role="alert">{error}</p>}
       </div>
     </CryptoShell>
   );
@@ -139,7 +149,9 @@ const SetupPanel: React.FC = () => {
       >
         <div className="space-y-4">
           <code className="block rounded-sm border border-border bg-surface-muted p-3 text-sm break-all">{recoveryKey}</code>
+          <label className={labelClassName} htmlFor="private-recovery-confirm">Confirm recovery key</label>
           <input
+            id="private-recovery-confirm"
             className={inputClassName}
             type="text"
             autoComplete="off"
@@ -147,16 +159,17 @@ const SetupPanel: React.FC = () => {
             autoCorrect="off"
             spellCheck={false}
             placeholder="Type the recovery key to confirm"
+            aria-describedby={`private-recovery-confirm-help${error ? ' private-setup-error' : ''}`}
             value={typedRecoveryKey}
             onChange={(event) => setTypedRecoveryKey(event.target.value)}
           />
-          <p className={isRecoveryKeyConfirmed ? successValidationClassName : validationClassName}>
+          <p id="private-recovery-confirm-help" className={isRecoveryKeyConfirmed ? successValidationClassName : validationClassName}>
             {isRecoveryKeyConfirmed ? 'Recovery key matches.' : 'Type the recovery key exactly to continue.'}
           </p>
           <button className={buttonClassName} disabled={isSubmitting || !isRecoveryKeyConfirmed} onClick={confirm}>
             Confirm and unlock
           </button>
-          {error && <p className="text-sm text-red-700">{error}</p>}
+          {error && <p id="private-setup-error" className={errorClassName} role="alert">{error}</p>}
         </div>
       </CryptoShell>
     );
@@ -168,32 +181,38 @@ const SetupPanel: React.FC = () => {
       description="Create a separate encryption passphrase. It is not your login password and never leaves this device as plaintext."
     >
       <div className="space-y-4">
+        <label className={labelClassName} htmlFor="private-setup-passphrase">Encryption passphrase</label>
         <input
+          id="private-setup-passphrase"
           className={inputClassName}
           type="password"
           autoComplete="new-password"
           placeholder="Encryption passphrase"
+          aria-describedby={`private-passphrase-help${error ? ' private-setup-error' : ''}`}
           value={passphrase}
           onChange={(event) => setPassphrase(event.target.value)}
         />
-        <p className={isPassphraseLongEnough ? successValidationClassName : validationClassName}>
+        <p id="private-passphrase-help" className={isPassphraseLongEnough ? successValidationClassName : validationClassName}>
           {isPassphraseLongEnough ? 'Passphrase has at least 12 characters.' : 'Use at least 12 characters.'}
         </p>
+        <label className={labelClassName} htmlFor="private-setup-confirmation">Confirm passphrase</label>
         <input
+          id="private-setup-confirmation"
           className={inputClassName}
           type="password"
           autoComplete="new-password"
           placeholder="Confirm passphrase"
+          aria-describedby={`private-confirmation-help${error ? ' private-setup-error' : ''}`}
           value={confirmation}
           onChange={(event) => setConfirmation(event.target.value)}
         />
-        <p className={doPassphrasesMatch ? successValidationClassName : validationClassName}>
+        <p id="private-confirmation-help" className={doPassphrasesMatch ? successValidationClassName : validationClassName}>
           {doPassphrasesMatch ? 'Passphrases match.' : 'Confirm the same passphrase.'}
         </p>
         <button className={buttonClassName} disabled={isSubmitting || !isPassphraseReady} onClick={createBundle}>
           Create encryption key
         </button>
-        {error && <p className="text-sm text-red-700">{error}</p>}
+        {error && <p id="private-setup-error" className={errorClassName} role="alert">{error}</p>}
       </div>
     </CryptoShell>
   );

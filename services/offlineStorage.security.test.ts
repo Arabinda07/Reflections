@@ -27,4 +27,15 @@ describe('offline storage isolation contract', () => {
     expect(offlineStorage).toContain('saveEncryptedNote');
     expect(offlineStorage).not.toContain('db.notes.put(note)');
   });
+
+  it('migrates legacy plaintext cached notes after unlock without dropping pending edits', () => {
+    const offlineStorage = read('services/offlineStorage.ts');
+
+    expect(offlineStorage).toContain('isLegacyPlaintextNote');
+    expect(offlineStorage).toContain('normalizeLegacyLocalNote');
+    expect(offlineStorage).toContain('db.notes.put(await encryptLocalNote(legacyNote, session))');
+    expect(offlineStorage).toContain("throw new Error('Pending cached note cannot be migrated safely.')");
+    expect(offlineStorage).toContain("note.syncStatus === 'pending_insert' || note.syncStatus === 'pending_update'");
+    expect(offlineStorage).not.toContain("throw new Error('Cached note is not encrypted.')");
+  });
 });

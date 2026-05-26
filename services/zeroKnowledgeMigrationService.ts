@@ -50,8 +50,12 @@ const fetchMigrationBatch = async <Row>(
   };
 };
 
-const isPlaintextCleared = (row: { encrypted_payload?: EncryptedEnvelope | null; encryption_migration_state?: string }) =>
-  isEncryptedEnvelope(row.encrypted_payload) && row.encryption_migration_state === 'plaintext_cleared';
+const isEncryptedMigrationComplete = (row: {
+  encrypted_payload?: EncryptedEnvelope | null;
+  encryption_migration_state?: string;
+}) =>
+  isEncryptedEnvelope(row.encrypted_payload) &&
+  (row.encryption_migration_state === 'verified' || row.encryption_migration_state === 'plaintext_cleared');
 
 const reportProgress = (
   table: MigrationTable,
@@ -140,7 +144,7 @@ const migrateNotes = async (session: CryptoSession, onProgress?: MigrationProgre
     session,
     onProgress,
     migrateRow: async (row) => {
-      if (isPlaintextCleared(row)) return;
+      if (isEncryptedMigrationComplete(row)) return;
 
       const note = mapToNote(row);
       const payload = {
@@ -190,7 +194,7 @@ const migrateMoods = async (session: CryptoSession, onProgress?: MigrationProgre
     session,
     onProgress,
     migrateRow: async (row) => {
-      if (isPlaintextCleared(row)) return;
+      if (isEncryptedMigrationComplete(row)) return;
 
       const payload = {
         mood: row.mood,
@@ -232,7 +236,7 @@ const migrateFutureLetters = async (session: CryptoSession, onProgress?: Migrati
     session,
     onProgress,
     migrateRow: async (row) => {
-      if (isPlaintextCleared(row)) return;
+      if (isEncryptedMigrationComplete(row)) return;
 
       const payload = {
         title: row.title || '',
@@ -273,7 +277,7 @@ const migrateLifeThemes = async (session: CryptoSession, onProgress?: MigrationP
     session,
     onProgress,
     migrateRow: async (row) => {
-      if (isPlaintextCleared(row)) return;
+      if (isEncryptedMigrationComplete(row)) return;
 
       const payload = {
         title: row.title || '',

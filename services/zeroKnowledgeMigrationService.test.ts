@@ -123,4 +123,32 @@ describe('zeroKnowledgeMigrationService', () => {
     expect(updates.some((update) => update.rowId === 'note-cleared')).toBe(false);
     expect(updates.some((update) => update.rowId === 'note-pending' && update.payload.encryption_migration_state === 'plaintext_cleared')).toBe(true);
   });
+
+  it('skips already-verified encrypted rows instead of comparing against cleared plaintext fields', async () => {
+    tableRows.notes = [
+      {
+        id: 'note-verified',
+        title: null,
+        content: null,
+        encrypted_payload: {
+          v: 1,
+          alg: 'AES-GCM-256',
+          kid: 'key-1',
+          iv: 'iv',
+          ciphertext: JSON.stringify({ title: 'Real encrypted title', content: 'Real encrypted content' }),
+        },
+        encryption_migration_state: 'verified',
+        user_id: session.userId,
+      },
+    ];
+
+    await zeroKnowledgeMigrationService.migrateUserPrivateData(session);
+
+    expect(updates.some((update) => update.rowId === 'note-verified')).toBe(false);
+    expect(cryptoMocks.decryptJson).not.toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      tableRows.notes[0].encrypted_payload,
+    );
+  });
 });
