@@ -44,6 +44,7 @@ export const SingleNote: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isMoodOpen, setIsMoodOpen] = useState(false);
   const [moodPickerStage, setMoodPickerStage] = useState<MoodPickerStage>('group');
+  const [isExportSheetOpen, setIsExportSheetOpen] = useState(false);
   const [isTagsOpen, setIsTagsOpen] = useState(false);
   const [isTasksOpen, setIsTasksOpen] = useState(false);
   const [tagDraft, setTagDraft] = useState('');
@@ -77,6 +78,7 @@ export const SingleNote: React.FC = () => {
     [note?.tasks],
   );
   const sanitizedContent = useMemo(() => sanitizeNoteHtml(note?.content ?? ''), [note?.content]);
+  const hasAttachments = Boolean(note?.attachments?.length);
 
   const persistNote = async (updates: Partial<Note>) => {
     if (!note || !id) return;
@@ -116,6 +118,24 @@ export const SingleNote: React.FC = () => {
     if (id) {
       navigate(RoutePath.EDIT_NOTE.replace(':id', id));
     }
+  };
+
+  const downloadMarkdown = () => {
+    if (!note) return;
+
+    downloadNoteExport(note, 'md');
+    setIsExportSheetOpen(false);
+  };
+
+  const handleExportClick = () => {
+    if (!note) return;
+
+    if (hasAttachments) {
+      setIsExportSheetOpen(true);
+      return;
+    }
+
+    downloadMarkdown();
   };
 
   const toggleTask = async (taskId: string) => {
@@ -276,6 +296,7 @@ export const SingleNote: React.FC = () => {
 
   if (!note) return null;
   const noteMoodConfig = getMoodConfig(note.mood);
+  const noteAttachments = note.attachments || [];
 
   return (
     <>
@@ -297,7 +318,7 @@ export const SingleNote: React.FC = () => {
               <Button
                 variant="secondary"
                 size="md"
-                onClick={() => downloadNoteExport(note, 'md')}
+                onClick={handleExportClick}
                 disabled={isDeleting}
                 className="shadow-sm hover:border-green/20 hover:bg-green/5 !px-3 sm:!px-4"
                 aria-label="Export this reflection"
@@ -469,6 +490,60 @@ export const SingleNote: React.FC = () => {
           </div>
         </div>
       </PageContainer>
+
+      <ModalSheet
+        isOpen={isExportSheetOpen}
+        onClose={() => setIsExportSheetOpen(false)}
+        title="Export this reflection"
+        description="Download the Markdown note, or choose an attachment to download separately."
+        ariaLabel="Choose what to export from this reflection"
+        size="md"
+      >
+        <div className="space-y-5">
+          <button
+            type="button"
+            onClick={downloadMarkdown}
+            className="surface-inline-panel flex w-full items-center gap-3 px-4 py-4 text-left transition-colors hover:border-green/20 hover:bg-green/5"
+          >
+            <span className="tone-icon tone-icon-green flex h-10 w-10 shrink-0 rounded-xl">
+              <Download size={20} weight="bold" />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-sm font-extrabold text-gray-text">Download Markdown</span>
+              <span className="block text-xs font-bold text-gray-nav">Save the written note as a .md file.</span>
+            </span>
+          </button>
+
+          <div className="space-y-3">
+            <p className="label-caps text-gray-nav">Choose an attachment to download</p>
+            {noteAttachments.map((attachment) => (
+              <button
+                key={attachment.id || attachment.path}
+                type="button"
+                onClick={() => {
+                  void downloadAttachment(attachment.path);
+                  setIsExportSheetOpen(false);
+                }}
+                className="surface-inline-panel flex w-full items-center justify-between gap-3 px-4 py-4 text-left transition-colors hover:border-green/20 hover:bg-green/5"
+                aria-label={`Download attachment: ${attachment.name}`}
+              >
+                <span className="flex min-w-0 items-center gap-3">
+                  <span className="tone-icon tone-icon-sky flex h-10 w-10 shrink-0 rounded-xl text-gray-nav">
+                    <FileText size={20} weight="duotone" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-extrabold text-gray-text">{attachment.name}</span>
+                    <span className="block text-xs font-bold text-gray-nav">
+                      {(attachment.size / 1024).toFixed(1)} KB
+                    </span>
+                  </span>
+                </span>
+                <Download size={16} weight="bold" className="shrink-0 text-green" />
+              </button>
+            ))}
+          </div>
+        </div>
+      </ModalSheet>
 
       <ModalSheet
         isOpen={isMoodOpen}

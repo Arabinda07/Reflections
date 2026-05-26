@@ -77,8 +77,24 @@ describe('focused product slice source contract', () => {
     expect(singleNote).toContain("import { downloadNoteExport } from './noteExport';");
     expect(singleNote).not.toContain('<NoteExportDialog');
     expect(singleNote).not.toContain('setIsExportOpen(true)');
-    expect(singleNote).toContain("onClick={() => downloadNoteExport(note, 'md')}");
+    expect(singleNote).toContain('handleExportClick');
     expect(singleNote).toContain('aria-label="Export this reflection"');
+  });
+
+  it('offers attachment downloads from the single-note export sheet without adding download-all', () => {
+    const singleNote = read('pages/dashboard/SingleNote.tsx');
+
+    expect(singleNote).toContain('isExportSheetOpen');
+    expect(singleNote).toContain('setIsExportSheetOpen');
+    expect(singleNote).toContain('hasAttachments');
+    expect(singleNote).toContain("downloadNoteExport(note, 'md')");
+    expect(singleNote).toContain('Download Markdown');
+    expect(singleNote).toContain('Choose an attachment to download');
+    expect(singleNote).toContain('noteAttachments.map');
+    expect(singleNote).toContain('downloadAttachment(attachment.path)');
+    expect(singleNote).toContain('aria-label={`Download attachment: ${attachment.name}`}');
+    expect(singleNote).not.toContain('Download all');
+    expect(singleNote).not.toContain('downloadAllAttachments');
   });
 
   it('keeps the home dashboard organized around the primary writing action', () => {

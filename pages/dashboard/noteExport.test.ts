@@ -30,4 +30,58 @@ describe('noteExport', () => {
   it('uses a safe filename for downloaded note exports', () => {
     expect(getNoteExportFilename(note, 'md')).toBe('a-quiet-tuesday-draft-2026-04-21.md');
   });
+
+  it('builds a portable markdown export with frontmatter and preserved structure', () => {
+    const structuredNote: Note = {
+      ...note,
+      content: [
+        '<h2>Morning notes</h2>',
+        '<p>Hello <strong>there</strong>, <em>reader</em>.</p>',
+        '<p><u>Underlined</u> and <s>removed</s>.</p>',
+        '<p><a href="https://example.com">Example link</a></p>',
+        '<blockquote><p>A useful line.</p></blockquote>',
+        '<ul><li>First item</li><li>Second item</li></ul>',
+        '<ol><li>Number one</li><li>Number two</li></ol>',
+        '<pre><code>const value = 1;</code></pre>',
+        '<script>alert("no")</script>',
+      ].join(''),
+      attachments: [
+        {
+          id: 'attachment-1',
+          name: 'photo.png',
+          path: 'user-1/notes/note-1/photo.png.enc',
+          size: 2048,
+          type: 'image/png',
+        },
+      ],
+    };
+
+    const markdown = buildNoteExportText(structuredNote, 'md');
+
+    expect(markdown).toContain('---\n');
+    expect(markdown).toContain('id: note-1');
+    expect(markdown).toContain('title: "A quiet Tuesday / draft"');
+    expect(markdown).toContain('created_at: 2026-04-20T10:00:00.000Z');
+    expect(markdown).toContain('updated_at: 2026-04-21T11:30:00.000Z');
+    expect(markdown).toContain('mood: calm');
+    expect(markdown).toContain('tags:\n  - work\n  - rest');
+    expect(markdown).toContain('## Morning notes');
+    expect(markdown).toContain('Hello **there**, *reader*.');
+    expect(markdown).toContain('<u>Underlined</u> and ~~removed~~.');
+    expect(markdown).toContain('[Example link](https://example.com)');
+    expect(markdown).toContain('> A useful line.');
+    expect(markdown).toContain('- First item\n- Second item');
+    expect(markdown).toContain('1. Number one\n2. Number two');
+    expect(markdown).toContain('```\nconst value = 1;\n```');
+    expect(markdown).toContain('- [ ] Reply to Mira');
+    expect(markdown).toContain('- [x] Pack notes');
+    expect(markdown).not.toContain('## Attachments');
+    expect(markdown).not.toContain('user-1/notes/note-1/photo.png.enc');
+    expect(markdown).not.toContain('<script>');
+    expect(markdown).not.toContain('alert("no")');
+  });
+
+  it('keeps markdown exports readable when a note has no written text', () => {
+    expect(buildNoteExportText({ ...note, content: '' }, 'md')).toContain('No written text.');
+  });
 });
