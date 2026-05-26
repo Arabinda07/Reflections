@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { zeroKnowledgeMigrationService, type MigrationProgress } from './zeroKnowledgeMigrationService';
 
 const cryptoMocks = vi.hoisted(() => ({
@@ -32,6 +34,10 @@ const tableRows: Record<string, any[]> = {
 
 const updates: Array<{ table: string; payload: any; rowId?: string }> = [];
 const ranges: Array<{ table: string; from: number; to: number }> = [];
+const events: string[] = [];
+
+const read = (filePath: string) =>
+  readFileSync(path.resolve(process.cwd(), filePath), 'utf8');
 
 const createSelectQuery = (table: string) => {
   const query = {
@@ -52,6 +58,9 @@ const createSelectQuery = (table: string) => {
 const createUpdateQuery = (table: string, payload: any) => {
   const update = { table, payload, rowId: undefined as string | undefined };
   updates.push(update);
+  if (payload.encryption_migration_state) {
+    events.push(`${table}:${payload.encryption_migration_state}`);
+  }
   const query = {
     eq: vi.fn((column: string, value: string) => {
       if (column === 'id') update.rowId = value;
@@ -82,8 +91,13 @@ describe('zeroKnowledgeMigrationService', () => {
     for (const table of Object.keys(tableRows)) tableRows[table] = [];
     updates.length = 0;
     ranges.length = 0;
+    events.length = 0;
     cryptoMocks.encryptJson.mockClear();
     cryptoMocks.decryptJson.mockClear();
+    cryptoMocks.decryptJson.mockImplementation(async (_session, _aad, envelope) => {
+      events.push('verify');
+      return JSON.parse(envelope.ciphertext);
+    });
   });
 
   it('reports table progress while processing private rows in batches', async () => {
@@ -150,5 +164,58 @@ describe('zeroKnowledgeMigrationService', () => {
       expect.anything(),
       tableRows.notes[0].encrypted_payload,
     );
+  });
+
+  it('does not mark a pending encrypted row terminal when verification fails', async () => {
+    tableRows.notes = [
+      {
+        id: 'note-bad-payload',
+        title: 'Original title',
+        content: 'Original content',
+        tags: [],
+        attachments: [],
+        tasks: [],
+        encrypted_payload: {
+          v: 1,
+          alg: 'AES-GCM-256',
+          kid: 'key-1',
+          iv: 'iv',
+          ciphertext: JSON.stringify({ title: 'Different title', content: 'Original content' }),
+        },
+        encryption_migration_state: 'pending',
+        user_id: session.userId,
+      },
+    ];
+
+    await expect(zeroKnowledgeMigrationService.migrateUserPrivateData(session))
+      .rejects
+      .toThrow('Zero-knowledge migration verification failed for notes:note-bad-payload');
+
+    expect(updates.filter((update) => update.rowId === 'note-bad-payload')).toHaveLength(0);
+  });
+
+  it('verifies before marking a row verified during successful migration', async () => {
+    tableRows.notes = [
+      { id: 'note-ordered', title: 'One', content: 'First', tags: [], attachments: [], tasks: [], user_id: session.userId },
+    ];
+
+    await zeroKnowledgeMigrationService.migrateUserPrivateData(session);
+
+    expect(events.indexOf('verify')).toBeGreaterThanOrEqual(0);
+    expect(events.indexOf('notes:verified')).toBeGreaterThanOrEqual(0);
+    expect(events.indexOf('verify')).toBeLessThan(events.indexOf('notes:verified'));
+  });
+
+  it('keeps every migration path verifying before the verified-state write', () => {
+    const source = read('services/zeroKnowledgeMigrationService.ts');
+
+    for (const table of ['notes', 'mood_checkins', 'future_letters', 'life_themes']) {
+      const verifyIndex = source.indexOf(`await verifyEnvelope(session, '${table}'`);
+      const markIndex = source.indexOf(`await markEncryptionVerified('${table}'`);
+
+      expect(verifyIndex).toBeGreaterThanOrEqual(0);
+      expect(markIndex).toBeGreaterThanOrEqual(0);
+      expect(verifyIndex).toBeLessThan(markIndex);
+    }
   });
 });

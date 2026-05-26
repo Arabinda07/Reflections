@@ -160,8 +160,8 @@ const migrateNotes = async (session: CryptoSession, onProgress?: MigrationProgre
         ? row.encrypted_payload
         : await cryptoService.encryptJson(session, aad('notes', session.userId, row.id), payload);
 
-      await markEncryptionVerified('notes', row.id, session.userId, encryptedPayload);
       await verifyEnvelope(session, 'notes', session.userId, row.id, encryptedPayload, payload);
+      await markEncryptionVerified('notes', row.id, session.userId, encryptedPayload);
 
       const { error: clearError } = await supabase
         .from('notes')
@@ -205,8 +205,8 @@ const migrateMoods = async (session: CryptoSession, onProgress?: MigrationProgre
         ? row.encrypted_payload
         : await cryptoService.encryptJson(session, aad('mood_checkins', session.userId, row.id), payload);
 
-      await markEncryptionVerified('mood_checkins', row.id, session.userId, encryptedPayload);
       await verifyEnvelope(session, 'mood_checkins', session.userId, row.id, encryptedPayload, payload);
+      await markEncryptionVerified('mood_checkins', row.id, session.userId, encryptedPayload);
 
       const { error: clearError } = await supabase
         .from('mood_checkins')
@@ -246,8 +246,8 @@ const migrateFutureLetters = async (session: CryptoSession, onProgress?: Migrati
         ? row.encrypted_payload
         : await cryptoService.encryptJson(session, aad('future_letters', session.userId, row.id), payload);
 
-      await markEncryptionVerified('future_letters', row.id, session.userId, encryptedPayload);
       await verifyEnvelope(session, 'future_letters', session.userId, row.id, encryptedPayload, payload);
+      await markEncryptionVerified('future_letters', row.id, session.userId, encryptedPayload);
 
       const { error: clearError } = await supabase
         .from('future_letters')
@@ -287,8 +287,8 @@ const migrateLifeThemes = async (session: CryptoSession, onProgress?: MigrationP
         ? row.encrypted_payload
         : await cryptoService.encryptJson(session, aad('life_themes', session.userId, row.id), payload);
 
-      await markEncryptionVerified('life_themes', row.id, session.userId, encryptedPayload);
       await verifyEnvelope(session, 'life_themes', session.userId, row.id, encryptedPayload, payload);
+      await markEncryptionVerified('life_themes', row.id, session.userId, encryptedPayload);
 
       const { error: clearError } = await supabase
         .from('life_themes')
