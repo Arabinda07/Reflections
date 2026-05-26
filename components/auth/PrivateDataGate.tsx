@@ -9,9 +9,11 @@ const cardClassName =
 const inputClassName =
   'w-full rounded-sm border border-border bg-white px-3 py-3 text-sm text-primary outline-none focus:border-primary';
 const buttonClassName =
-  'rounded-sm bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50';
+  'inline-flex min-h-12 w-full items-center justify-center rounded-sm border border-green bg-green px-4 py-3 text-sm font-semibold text-on-accent transition hover:bg-green-hover disabled:cursor-not-allowed disabled:border-border disabled:bg-surface-muted disabled:text-gray-nav disabled:opacity-100';
 const secondaryButtonClassName =
-  'rounded-sm border border-border px-4 py-3 text-sm font-semibold text-primary transition hover:bg-surface-muted disabled:cursor-not-allowed disabled:opacity-50';
+  'inline-flex min-h-12 w-full items-center justify-center rounded-sm border border-border px-4 py-3 text-sm font-semibold text-primary transition hover:bg-surface-muted disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-gray-nav disabled:opacity-100';
+const validationClassName = 'text-xs leading-5 text-gray-text';
+const successValidationClassName = 'text-xs leading-5 text-green';
 
 const CryptoShell: React.FC<{ children: React.ReactNode; title: string; description: string }> = ({
   children,
@@ -34,6 +36,8 @@ const UnlockPanel: React.FC = () => {
   const [recoveryKey, setRecoveryKey] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const canUnlockWithPassphrase = passphrase.trim().length > 0;
+  const canUnlockWithRecoveryKey = recoveryKey.trim().length > 0;
 
   const submit = async (mode: 'passphrase' | 'recovery') => {
     setIsSubmitting(true);
@@ -65,19 +69,22 @@ const UnlockPanel: React.FC = () => {
           value={passphrase}
           onChange={(event) => setPassphrase(event.target.value)}
         />
-        <button className={buttonClassName} disabled={isSubmitting || !passphrase} onClick={() => submit('passphrase')}>
+        <button className={buttonClassName} disabled={isSubmitting || !canUnlockWithPassphrase} onClick={() => submit('passphrase')}>
           Unlock
         </button>
         <div className="border-t border-border pt-4">
           <input
             className={inputClassName}
-            type="password"
+            type="text"
             autoComplete="off"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
             placeholder="Recovery key"
             value={recoveryKey}
             onChange={(event) => setRecoveryKey(event.target.value)}
           />
-          <button className={`${secondaryButtonClassName} mt-3`} disabled={isSubmitting || !recoveryKey} onClick={() => submit('recovery')}>
+          <button className={`${secondaryButtonClassName} mt-3`} disabled={isSubmitting || !canUnlockWithRecoveryKey} onClick={() => submit('recovery')}>
             Unlock with recovery key
           </button>
         </div>
@@ -94,6 +101,10 @@ const SetupPanel: React.FC = () => {
   const [typedRecoveryKey, setTypedRecoveryKey] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isPassphraseLongEnough = passphrase.trim().length >= 12;
+  const doPassphrasesMatch = confirmation.length > 0 && passphrase === confirmation;
+  const isPassphraseReady = isPassphraseLongEnough && doPassphrasesMatch;
+  const isRecoveryKeyConfirmed = recoveryKey !== null && typedRecoveryKey.trim() === recoveryKey;
 
   const createBundle = async () => {
     setIsSubmitting(true);
@@ -130,12 +141,19 @@ const SetupPanel: React.FC = () => {
           <code className="block rounded-sm border border-border bg-surface-muted p-3 text-sm break-all">{recoveryKey}</code>
           <input
             className={inputClassName}
+            type="text"
             autoComplete="off"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
             placeholder="Type the recovery key to confirm"
             value={typedRecoveryKey}
             onChange={(event) => setTypedRecoveryKey(event.target.value)}
           />
-          <button className={buttonClassName} disabled={isSubmitting || !typedRecoveryKey} onClick={confirm}>
+          <p className={isRecoveryKeyConfirmed ? successValidationClassName : validationClassName}>
+            {isRecoveryKeyConfirmed ? 'Recovery key matches.' : 'Type the recovery key exactly to continue.'}
+          </p>
+          <button className={buttonClassName} disabled={isSubmitting || !isRecoveryKeyConfirmed} onClick={confirm}>
             Confirm and unlock
           </button>
           {error && <p className="text-sm text-red-700">{error}</p>}
@@ -158,6 +176,9 @@ const SetupPanel: React.FC = () => {
           value={passphrase}
           onChange={(event) => setPassphrase(event.target.value)}
         />
+        <p className={isPassphraseLongEnough ? successValidationClassName : validationClassName}>
+          {isPassphraseLongEnough ? 'Passphrase has at least 12 characters.' : 'Use at least 12 characters.'}
+        </p>
         <input
           className={inputClassName}
           type="password"
@@ -166,7 +187,10 @@ const SetupPanel: React.FC = () => {
           value={confirmation}
           onChange={(event) => setConfirmation(event.target.value)}
         />
-        <button className={buttonClassName} disabled={isSubmitting || !passphrase || !confirmation} onClick={createBundle}>
+        <p className={doPassphrasesMatch ? successValidationClassName : validationClassName}>
+          {doPassphrasesMatch ? 'Passphrases match.' : 'Confirm the same passphrase.'}
+        </p>
+        <button className={buttonClassName} disabled={isSubmitting || !isPassphraseReady} onClick={createBundle}>
           Create encryption key
         </button>
         {error && <p className="text-sm text-red-700">{error}</p>}
@@ -175,10 +199,38 @@ const SetupPanel: React.FC = () => {
   );
 };
 
+const MigrationPanel: React.FC = () => {
+  const { migrationProgress } = useCrypto();
+  const label = migrationProgress?.label || 'private writing';
+  const countText = typeof migrationProgress?.total === 'number'
+    ? `${migrationProgress.processed} of ${migrationProgress.total}`
+    : `${migrationProgress?.processed || 0}`;
+
+  return (
+    <CryptoShell
+      title="Encrypting your existing writing"
+      description="Your private data is being moved into zero-knowledge encrypted payloads on this device."
+    >
+      <div className="space-y-4">
+        <div className="h-2 w-full overflow-hidden rounded-full bg-surface-muted">
+          <div className="h-full w-1/2 animate-pulse rounded-full bg-green motion-reduce:animate-none" aria-hidden="true" />
+        </div>
+        <p className="text-sm leading-6 text-gray-text">
+          Working through {label}: {countText} rows checked.
+        </p>
+        <p className="text-sm leading-6 text-gray-text">
+          Larger accounts can take a little longer. If this is interrupted, refresh and the migration can resume safely.
+        </p>
+      </div>
+    </CryptoShell>
+  );
+};
+
 export const PrivateDataGate: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { status, error } = useCrypto();
 
-  if (status === 'loading' || status === 'migrating') return <RouteLoadingFrame className="surface-scope-paper page-wash min-h-[100dvh] bg-body" />;
+  if (status === 'loading') return <RouteLoadingFrame className="surface-scope-paper page-wash min-h-[100dvh] bg-body" />;
+  if (status === 'migrating') return <MigrationPanel />;
   if (status === 'setupRequired') return <SetupPanel />;
   if (status === 'locked') return <UnlockPanel />;
   if (status === 'error') {

@@ -8,13 +8,17 @@ import {
 } from '../services/cryptoService';
 import { setCurrentCryptoSession } from '../services/cryptoSessionStore';
 import { useAuthStore } from '../hooks/useAuthStore';
-import { zeroKnowledgeMigrationService } from '../services/zeroKnowledgeMigrationService';
+import {
+  zeroKnowledgeMigrationService,
+  type MigrationProgress,
+} from '../services/zeroKnowledgeMigrationService';
 
 type CryptoStatus = 'loading' | 'setupRequired' | 'locked' | 'migrating' | 'unlocked' | 'error';
 
 interface CryptoContextValue {
   status: CryptoStatus;
   session: CryptoSession | null;
+  migrationProgress: MigrationProgress | null;
   recoveryKey: string | null;
   error: string | null;
   setupEncryption: (passphrase: string) => Promise<void>;
@@ -44,6 +48,7 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const user = useAuthStore((state) => state.user);
   const [status, setStatus] = useState<CryptoStatus>('loading');
   const [session, setSession] = useState<CryptoSession | null>(null);
+  const [migrationProgress, setMigrationProgress] = useState<MigrationProgress | null>(null);
   const [bundle, setBundle] = useState<PersistedUserEncryptionKeyBundle | null>(null);
   const [pendingBundle, setPendingBundle] = useState<UserEncryptionKeyBundle | null>(null);
   const [recoveryKey, setRecoveryKey] = useState<string | null>(null);
@@ -53,14 +58,24 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setCurrentCryptoSession(nextSession);
     setSession(nextSession);
     setStatus('migrating');
-    await zeroKnowledgeMigrationService.migrateUserPrivateData(nextSession);
-    setStatus('unlocked');
-    setError(null);
+    setMigrationProgress(null);
+
+    try {
+      await zeroKnowledgeMigrationService.migrateUserPrivateData(nextSession, setMigrationProgress);
+      setStatus('unlocked');
+      setError(null);
+      setMigrationProgress(null);
+    } catch (migrationError) {
+      const detail = migrationError instanceof Error ? migrationError.message : 'Unknown migration error.';
+      setError(`Private writing could not finish encrypting existing data. Refresh to resume safely. ${detail}`);
+      setStatus('error');
+    }
   }, []);
 
   const lock = useCallback(() => {
     setCurrentCryptoSession(null);
     setSession(null);
+    setMigrationProgress(null);
     setStatus((current) => (current === 'setupRequired' ? current : 'locked'));
   }, []);
 
@@ -73,6 +88,7 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setBundle(null);
       setPendingBundle(null);
       setRecoveryKey(null);
+      setMigrationProgress(null);
 
       if (!user?.id) {
         setStatus('loading');
@@ -178,6 +194,7 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const value = useMemo<CryptoContextValue>(() => ({
     status,
     session,
+    migrationProgress,
     recoveryKey,
     error,
     setupEncryption,
@@ -189,6 +206,7 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     confirmRecoveryKey,
     error,
     lock,
+    migrationProgress,
     recoveryKey,
     session,
     setupEncryption,

@@ -26,18 +26,32 @@ const BLOCK_TAGS = new Set(['blockquote', 'div', 'h1', 'h2', 'h3', 'li', 'ol', '
 const VOID_TAGS = new Set(['br', 'hr', 'img', 'input', 'meta']);
 const UNSAFE_TAG_BLOCK_PATTERN = /<(script|style|iframe|object|form|svg|math)\b[^>]*>[\s\S]*?<\/\1>/gi;
 const TAG_PATTERN = /<\/?[^>]+>|[^<]+/g;
+const MARKDOWN_WRAP_WIDTH = 88;
+const MONTH_NAMES = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
 
 const formatExportDate = (value: string) => {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return 'Unknown date';
 
-  return date.toLocaleString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  const hours = date.getHours();
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const period = hours >= 12 ? 'PM' : 'AM';
+  const hour12 = hours % 12 || 12;
+
+  return `${MONTH_NAMES[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}, ${hour12}:${minutes} ${period}`;
 };
 
 const getExportDateStamp = (value: string) => {
@@ -250,18 +264,83 @@ const htmlToMarkdown = (html: string) => {
   return markdown || 'No written text.';
 };
 
-const escapeYamlString = (value: string) => `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
-
-const getFrontmatter = (note: Note) => [
-  '---',
-  `id: ${note.id}`,
-  `title: ${escapeYamlString(getNoteTitle(note))}`,
-  `created_at: ${note.createdAt}`,
-  `updated_at: ${note.updatedAt}`,
-  ...(note.mood ? [`mood: ${note.mood}`] : []),
-  ...(note.tags?.length ? ['tags:', ...note.tags.map((tag) => `  - ${tag}`)] : ['tags: []']),
-  '---',
+const getMarkdownHeaderLines = (note: Note) => [
+  `# ${getNoteTitle(note)}`,
+  '',
+  `Created: ${formatExportDate(note.createdAt)}`,
+  `Updated: ${formatExportDate(note.updatedAt)}`,
+  ...(note.mood ? [`Mood: ${note.mood}`] : []),
+  ...(note.tags?.length ? [`Tags: ${note.tags.join(', ')}`] : []),
 ];
+
+const shouldSkipMarkdownWrap = (line: string, isInCodeBlock: boolean) =>
+  isInCodeBlock ||
+  /^#{1,6}\s/.test(line) ||
+  /^\|/.test(line) ||
+  /^```/.test(line) ||
+  /<\/?u>/.test(line);
+
+const wrapTextLine = (line: string, width: number, continuationIndent = '') => {
+  const words = line.trim().split(/\s+/);
+  const wrapped: string[] = [];
+  let current = '';
+
+  for (const word of words) {
+    const next = current ? `${current} ${word}` : word;
+
+    if (next.length > width && current) {
+      wrapped.push(current);
+      current = `${continuationIndent}${word}`;
+    } else {
+      current = next;
+    }
+  }
+
+  if (current) wrapped.push(current);
+
+  return wrapped.join('\n');
+};
+
+const wrapMarkdownLine = (line: string, width: number) => {
+  const taskMatch = line.match(/^(\s*[-*+]\s+\[[ xX]\]\s+)(.+)$/);
+  if (taskMatch) {
+    return `${taskMatch[1]}${wrapTextLine(taskMatch[2], width - taskMatch[1].length, ' '.repeat(taskMatch[1].length))}`;
+  }
+
+  const listMatch = line.match(/^(\s*(?:[-*+]|\d+\.)\s+)(.+)$/);
+  if (listMatch) {
+    return `${listMatch[1]}${wrapTextLine(listMatch[2], width - listMatch[1].length, ' '.repeat(listMatch[1].length))}`;
+  }
+
+  const blockquoteMatch = line.match(/^(>\s?)(.+)$/);
+  if (blockquoteMatch) {
+    return `${blockquoteMatch[1]}${wrapTextLine(blockquoteMatch[2], width - blockquoteMatch[1].length, blockquoteMatch[1])}`;
+  }
+
+  return wrapTextLine(line, width);
+};
+
+const wrapMarkdownBody = (markdown: string, width = MARKDOWN_WRAP_WIDTH) => {
+  const wrappedLines: string[] = [];
+  let isInCodeBlock = false;
+
+  for (const line of markdown.split('\n')) {
+    if (line.startsWith('```')) {
+      wrappedLines.push(line);
+      isInCodeBlock = !isInCodeBlock;
+      continue;
+    }
+
+    if (!line.trim() || shouldSkipMarkdownWrap(line, isInCodeBlock)) {
+      wrappedLines.push(line);
+      continue;
+    }
+
+    wrappedLines.push(wrapMarkdownLine(line, width));
+  }
+
+  return wrappedLines.join('\n');
+};
 
 export const buildNoteExportText = (note: Note, format: NoteExportFormat) => {
   const title = getNoteTitle(note);
@@ -269,9 +348,9 @@ export const buildNoteExportText = (note: Note, format: NoteExportFormat) => {
 
   if (format === 'md') {
     return [
-      ...getFrontmatter(note),
+      ...getMarkdownHeaderLines(note),
       '',
-      htmlToMarkdown(note.content),
+      wrapMarkdownBody(htmlToMarkdown(note.content)),
       ...(taskLines.length ? ['', '## Tasks', '', ...taskLines.map((line) => `- ${line}`)] : []),
       '',
     ].join('\n');

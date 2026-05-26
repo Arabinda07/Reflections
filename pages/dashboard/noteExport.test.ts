@@ -31,7 +31,7 @@ describe('noteExport', () => {
     expect(getNoteExportFilename(note, 'md')).toBe('a-quiet-tuesday-draft-2026-04-21.md');
   });
 
-  it('builds a portable markdown export with frontmatter and preserved structure', () => {
+  it('builds a human-readable markdown export with preserved structure', () => {
     const structuredNote: Note = {
       ...note,
       content: [
@@ -58,13 +58,16 @@ describe('noteExport', () => {
 
     const markdown = buildNoteExportText(structuredNote, 'md');
 
-    expect(markdown).toContain('---\n');
-    expect(markdown).toContain('id: note-1');
-    expect(markdown).toContain('title: "A quiet Tuesday / draft"');
-    expect(markdown).toContain('created_at: 2026-04-20T10:00:00.000Z');
-    expect(markdown).toContain('updated_at: 2026-04-21T11:30:00.000Z');
-    expect(markdown).toContain('mood: calm');
-    expect(markdown).toContain('tags:\n  - work\n  - rest');
+    expect(markdown).toMatch(/^# A quiet Tuesday \/ draft\n\n/);
+    expect(markdown).toContain('Created: April 20, 2026, 3:30 PM');
+    expect(markdown).toContain('Updated: April 21, 2026, 5:00 PM');
+    expect(markdown).toContain('Mood: calm');
+    expect(markdown).toContain('Tags: work, rest');
+    expect(markdown).not.toContain('---');
+    expect(markdown).not.toContain('id: note-1');
+    expect(markdown).not.toContain('created_at:');
+    expect(markdown).not.toContain('updated_at:');
+    expect(markdown).not.toContain('tags: []');
     expect(markdown).toContain('## Morning notes');
     expect(markdown).toContain('Hello **there**, *reader*.');
     expect(markdown).toContain('<u>Underlined</u> and ~~removed~~.');
@@ -79,6 +82,42 @@ describe('noteExport', () => {
     expect(markdown).not.toContain('user-1/notes/note-1/photo.png.enc');
     expect(markdown).not.toContain('<script>');
     expect(markdown).not.toContain('alert("no")');
+  });
+
+  it('omits empty optional metadata from markdown exports', () => {
+    const markdown = buildNoteExportText({ ...note, mood: undefined, tags: [] }, 'md');
+
+    expect(markdown).not.toContain('Mood:');
+    expect(markdown).not.toContain('Tags:');
+    expect(markdown).not.toContain('tags: []');
+  });
+
+  it('wraps long markdown paragraphs without wrapping code blocks', () => {
+    const longText =
+      'This is a long paragraph that should be wrapped into readable lines instead of continuing forever across the screen when someone opens the exported markdown file.';
+    const longCode = 'const message = "This code line should remain as one long line because code blocks must not be wrapped by the markdown exporter.";';
+    const markdown = buildNoteExportText(
+      {
+        ...note,
+        content: `<p>${longText}</p><pre><code>${longCode}</code></pre>`,
+        tasks: [],
+      },
+      'md',
+    );
+
+    expect(markdown).toContain(
+      [
+        'This is a long paragraph that should be wrapped into readable lines instead of',
+        'continuing forever across the screen when someone opens the exported markdown file.',
+      ].join('\n'),
+    );
+    expect(
+      markdown
+        .split('\n')
+        .filter((line) => line.startsWith('This is') || line.startsWith('continuing'))
+        .every((line) => line.length <= 88),
+    ).toBe(true);
+    expect(markdown).toContain(`\`\`\`\n${longCode}\n\`\`\``);
   });
 
   it('keeps markdown exports readable when a note has no written text', () => {
