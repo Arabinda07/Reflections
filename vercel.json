@@ -1,5 +1,18 @@
 {
   "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "destination": "https://www.reflections-sanctuary.space/$1",
+      "statusCode": 301,
+      "has": [
+        {
+          "type": "host",
+          "value": "reflections-sanctuary.space"
+        }
+      ]
+    }
+  ],
   "headers": [
     {
       "source": "/sw.js",

@@ -15,6 +15,8 @@ const sitemapLocations = () => {
   return Array.from(sitemap.matchAll(/<loc>(.*?)<\/loc>/g), ([, loc]) => loc);
 };
 
+const BARE_PUBLIC_HOST = 'reflections-sanctuary.space';
+
 describe('SEO crawlability contract', () => {
   it('publishes only public canonical routes in the static sitemap', () => {
     const sitemap = read('public/sitemap.xml');
@@ -146,6 +148,34 @@ describe('SEO crawlability contract', () => {
     expect(rewriteSources).not.toContain('/privacy');
     expect(rewriteSources).not.toContain('/about');
     expect(rewriteSources).not.toContain('/(.*)');
+  });
+
+  it('permanently redirects the bare production host to the canonical www host', () => {
+    const vercel = JSON.parse(read('vercel.json')) as {
+      redirects?: Array<{
+        source: string;
+        destination: string;
+        statusCode?: number;
+        has?: Array<{ type: string; value: string }>;
+      }>;
+      rewrites: Array<{ source: string; destination: string }>;
+    };
+    const topLevelKeys = Object.keys(vercel);
+    const bareHostRedirect = vercel.redirects?.[0];
+
+    expect(topLevelKeys.indexOf('redirects')).toBeLessThan(topLevelKeys.indexOf('rewrites'));
+    expect(bareHostRedirect).toEqual({
+      source: '/(.*)',
+      destination: `${CANONICAL_PUBLIC_ORIGIN}/$1`,
+      statusCode: 301,
+      has: [
+        {
+          type: 'host',
+          value: BARE_PUBLIC_HOST,
+        },
+      ],
+    });
+    expect(vercel.rewrites.map((rewrite) => rewrite.source)).not.toContain('/(.*)');
   });
 
   it('generates noindex app-shell fallbacks for cold app route requests', () => {
