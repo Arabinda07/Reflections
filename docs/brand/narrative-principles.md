@@ -2,6 +2,8 @@
 
 This document defines what Reflections is, what it believes, what it refuses to become, and how all product decisions should be framed.
 
+For surface-level execution rules, use `docs/brand/brand-in-practice.md`. This narrative document defines the belief system; Brand In Practice defines how that belief system appears on the website, in product UI, in AI copy, in privacy explanations, in Pro prompts, and in lifecycle surfaces.
+
 ## Core Narrative
 
 Reflections is a private writing sanctuary for people who want to understand themselves more clearly.
@@ -390,4 +392,3 @@ Can build:
 - pattern views with clear data limits
 - accessibility improvements
 - privacy and control surfaces
-

@@ -8,6 +8,8 @@ Reflections sounds calm, clear, intimate, grounded, and lightly reflective.
 
 It should feel like a thoughtful human sitting beside the user, not like a brand performing warmth or an AI trying to be profound.
 
+Abstract brand lines are allowed on public surfaces when they are immediately grounded in real product behavior. For example, "Your mind beautifully organized" can work as a hero line because the supporting sentence explains that Reflections is a private journal for writing, noticing patterns, and reflecting when the user is ready. Do not use abstract language by itself in product UI, privacy copy, billing copy, or AI states.
+
 ## The Five Voice Qualities
 
 ### 1. Calm
@@ -304,4 +306,3 @@ Avoid:
 - "Upgrade to continue healing."
 - "Your journey is locked."
 - "Don't miss out on deeper self-awareness."
-

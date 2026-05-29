@@ -6,14 +6,14 @@ export const PUBLIC_SEO_COPY = {
     path: '/',
     title: 'Reflections - Private Journal for Writing and Mood Notes',
     description:
-      'Write privately, name moods, and notice patterns at your own pace. Reflections keeps AI optional and writing first.',
+      'A private journal for writing what is on your mind, naming moods, and noticing patterns. Reflections keeps AI optional and writing first.',
     h1: 'Private journal for writing and mood notes',
     intro:
       'Write a few lines, name the mood if it helps, and return to patterns at your own pace.',
     heroAriaLabel: 'Your mind beautifully organized',
     heroLines: ['Your mind', 'beautifully', 'organized'],
     heroIntro:
-      "A private journal. Write what's on your mind, notice the patterns, and keep it to yourself",
+      "A private journal for writing what's on your mind, noticing patterns, and reflecting only when you're ready.",
     ctaLabel: 'Begin writing',
     sections: [
       {
@@ -22,7 +22,7 @@ export const PUBLIC_SEO_COPY = {
       },
       {
         title: 'Mood notes and tags',
-        body: 'Name moods, add tags, and notice ordinary patterns without scores or streaks.',
+        body: 'Name moods, add tags, and notice ordinary patterns without scores or pressure loops.',
       },
       {
         title: 'Optional AI support',
@@ -31,7 +31,7 @@ export const PUBLIC_SEO_COPY = {
       },
     ],
     softwareDescription:
-      'Reflections is a private journal for writing notes, naming moods, and noticing patterns. AI support runs only when you choose it or turn on Smart Mode.',
+      'Reflections is a private journal for writing notes, naming moods, and noticing patterns. AI support runs only when you choose it or explicitly turn on Smart Mode.',
     serviceDescription:
       'Reflections helps people write private notes, name moods, organize tags, and ask for AI-supported reflection when they choose.',
   },
@@ -40,7 +40,7 @@ export const PUBLIC_SEO_COPY = {
     path: '/faq',
     title: 'Reflections FAQ - Journaling, AI, Privacy, and Pricing',
     description:
-      'Answers about Reflections, private journaling, optional AI, Life Wiki, privacy, and Pro pricing.',
+      'Short answers about Reflections, private journaling, optional AI, Life Wiki, privacy, and Pro pricing.',
     h1: 'Reflections FAQ',
     intro:
       'Clear answers about what Reflections does, what it stores, when AI runs, and how pricing works.',
@@ -58,7 +58,7 @@ export const PUBLIC_SEO_COPY = {
       {
         title: 'Is Reflections therapy?',
         body:
-          'No. Reflections is a personal writing tool. It is not therapy, diagnosis, crisis support, or professional mental health care.',
+          'No. Reflections is a personal writing tool. It is not therapy, crisis support, or professional mental health care.',
       },
       {
         title: 'What does Pro include?',
@@ -85,7 +85,7 @@ export const PUBLIC_SEO_COPY = {
       {
         question: 'Is Reflections therapy?',
         answer:
-          'No. Reflections is a personal writing tool for noticing thoughts more clearly. It is not therapy, diagnosis, crisis support, or professional mental health care.',
+          'No. Reflections is a personal writing tool for noticing thoughts more clearly. It is not therapy, crisis support, or professional mental health care.',
       },
       {
         question: 'What is the Life Wiki?',
@@ -104,7 +104,7 @@ export const PUBLIC_SEO_COPY = {
     path: '/privacy',
     title: 'Reflections Privacy - Notes, AI, Payments, and Deletion',
     description:
-      'What Reflections stores, when AI receives writing, how payments work, and how to export or delete your notes.',
+      'A concrete guide to what Reflections stores, when AI receives writing, how payments work, and how to export or delete your notes.',
     h1: 'Reflections privacy',
     intro:
       'This page explains what Reflections stores, when AI is used, and how you can export or delete your writing.',
@@ -131,7 +131,7 @@ export const PUBLIC_SEO_COPY = {
     path: '/about',
     title: 'About Reflections - A Private Journal by Arabinda',
     description:
-      'A note from Arabinda about building Reflections as a private journal with mood notes, Life Wiki, and optional AI.',
+      'A note from Arabinda about building Reflections as a private journal where writing comes first and AI waits until invited.',
     h1: 'About Reflections',
     intro:
       'Reflections began as a slower place to write, notice feelings, and leave without being pushed to perform.',
@@ -142,7 +142,7 @@ export const PUBLIC_SEO_COPY = {
       },
       {
         title: 'No pressure loops',
-        body: 'Write at your own pace without streaks, scores, or public feeds.',
+        body: 'Write at your own pace without pressure loops, scores, or public feeds.',
       },
       {
         title: 'AI should wait',
@@ -156,7 +156,7 @@ export const PUBLIC_SEO_COPY = {
       datePublished: '2025-01-01',
       dateModified: PUBLIC_SEO_LAST_MODIFIED,
       description:
-        'A note from Arabinda about building Reflections as a private journal with mood notes, Life Wiki, and optional AI.',
+        'A note from Arabinda about building Reflections as a private journal where writing comes first and AI waits until invited.',
     },
   },
 };

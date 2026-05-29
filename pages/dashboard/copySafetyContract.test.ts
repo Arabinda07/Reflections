@@ -6,19 +6,37 @@ const read = (filePath: string) =>
   readFileSync(path.resolve(process.cwd(), filePath), 'utf8');
 
 describe('voice refresh copy safety', () => {
-  it('keeps landing and privacy copy out of the voice refresh', () => {
+  it('keeps the poetic landing hero grounded in concrete product behavior', () => {
     const landing = read('pages/dashboard/Landing.tsx');
     const privacy = read('pages/dashboard/PrivacyPolicy.tsx');
     const publicSeoCopy = read('src/config/publicSeoCopy.js');
 
     expect(landing).toContain('HOME_SEO.heroAriaLabel');
     expect(landing).toContain('HOME_SEO.heroIntro');
-    expect(publicSeoCopy).toContain('Your mind');
-    expect(publicSeoCopy).toContain('beautifully');
-    expect(publicSeoCopy).toContain('organized');
-    expect(publicSeoCopy).toContain('A private journal. Write what');
+    expect(publicSeoCopy).toContain("heroAriaLabel: 'Your mind beautifully organized'");
+    expect(publicSeoCopy).toContain("heroLines: ['Your mind', 'beautifully', 'organized']");
+    expect(publicSeoCopy).toContain(
+      "A private journal for writing what's on your mind, noticing patterns, and reflecting only when you're ready.",
+    );
     expect(privacy).toContain('What Reflections keeps');
     expect(privacy).toContain('AI and Smart Mode');
+  });
+
+  it('keeps public copy away from overclaiming AI, therapy, or pressure language', () => {
+    const publicCopy = [
+      read('src/config/publicSeoCopy.js'),
+      read('pages/dashboard/Landing.tsx'),
+      read('pages/dashboard/FAQ.tsx'),
+      read('pages/dashboard/PrivacyPolicy.tsx'),
+      read('pages/dashboard/AboutArabinda.tsx'),
+    ].join('\n').toLowerCase();
+
+    expect(publicCopy).not.toContain('transform your life');
+    expect(publicCopy).not.toContain('ai therapist');
+    expect(publicCopy).not.toContain('unlock your healing');
+    expect(publicCopy).not.toContain('mental health score');
+    expect(publicCopy).not.toMatch(/\bstreaks?\b/);
+    expect(publicCopy).not.toMatch(/\bdiagnos(?:e|is|tic)\b/);
   });
 
   it('uses original pop-confessional language without direct lyric or dark-pattern copy', () => {
