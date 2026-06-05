@@ -14,6 +14,7 @@ const PrivateDataGate = lazy(() => import('./components/auth/PrivateDataGate').t
 const SignIn = lazy(() => import('@/pages/auth/SignIn').then((m) => ({ default: m.SignIn })));
 const SignUp = lazy(() => import('@/pages/auth/SignUp').then((m) => ({ default: m.SignUp })));
 const ResetPassword = lazy(() => import('@/pages/auth/ResetPassword').then((m) => ({ default: m.ResetPassword })));
+const RecoverPrivateWriting = lazy(() => import('@/features/private-writing-recovery').then((m) => ({ default: m.RecoverPrivateWriting })));
 const MyNotes = lazy(() => import('@/pages/dashboard/MyNotes').then((m) => ({ default: m.MyNotes })));
 const CreateNote = lazy(() => import('@/pages/dashboard/CreateNote').then((m) => ({ default: m.CreateNote })));
 const SingleNote = lazy(() => import('@/pages/dashboard/SingleNote').then((m) => ({ default: m.SingleNote })));
@@ -104,6 +105,7 @@ const router = createBrowserRouter(
         <Route path={RoutePath.RELEASE} element={withPrivateRoute(withRouteFallback(<ReleaseMode />))} />
         <Route path={RoutePath.FUTURE_LETTERS} element={withPrivateRoute(withRouteFallback(<FutureLetters />))} />
         <Route path={RoutePath.ACCOUNT} element={withProtectedRoute(withRouteFallback(<Account />))} />
+        <Route path={RoutePath.RECOVER_PRIVATE_WRITING} element={withProtectedRoute(withRouteFallback(<RecoverPrivateWriting />))} />
         <Route path={RoutePath.INSIGHTS} element={withPrivateRoute(withRouteFallback(<Insights />))} />
         <Route path={RoutePath.WIKI} element={withPrivateRoute(withRouteFallback(<LifeWiki />))} />
         <Route path={RoutePath.SANCTUARY} element={withPrivateRoute(withRouteFallback(<LifeWiki />))} />

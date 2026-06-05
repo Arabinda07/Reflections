@@ -55,6 +55,7 @@ export interface User {
   name: string;
   email: string;
   avatarUrl?: string;
+  authProvider?: string;
 }
 
 export type PlanTier = 'free' | 'pro';
@@ -188,6 +189,7 @@ export enum RoutePath {
   LOGIN = '/login',
   SIGNUP = '/signup',
   RESET_PASSWORD = '/reset-password',
+  RECOVER_PRIVATE_WRITING = '/recover-private-writing',
   INSIGHTS = '/insights',
   RELEASE = '/release',
   FUTURE_LETTERS = '/letters',

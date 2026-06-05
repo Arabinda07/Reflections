@@ -40,6 +40,22 @@ describe('auth route session handoff contract', () => {
     expect(signUp).toContain('commitAuthSession(authResult.data.session);');
   });
 
+  it('hands off account passwords only after immediate email-password sessions', () => {
+    const signIn = read('pages/auth/SignIn.tsx');
+    const signUp = read('pages/auth/SignUp.tsx');
+    const authStore = read('hooks/useAuthStore.ts');
+
+    expect(signIn).toContain('storePendingAccountPassword(password, data.session.user.id);');
+    expect(signIn).toContain('if (data.session) {');
+    expect(signIn).toContain('commitAuthSession(data.session);');
+    expect(signUp).toContain('storePendingAccountPassword(password, data.session.user.id);');
+    expect(signUp).toContain('} else if (data.session) {');
+    expect(signUp).toContain('commitAuthSession(data.session);');
+    expect(authStore).toContain('clearAllVolatileAuthSecrets');
+    expect(authStore).not.toContain('clearPendingAccountPassword');
+    expect(authStore).not.toContain('clearPendingResetAccountPassword');
+  });
+
   it('keeps Supabase callback redirects specific to recovery and signup confirmations', () => {
     const callback = read('pages/auth/AuthCallback.tsx');
     const signIn = read('pages/auth/SignIn.tsx');
@@ -50,8 +66,8 @@ describe('auth route session handoff contract', () => {
     expect(callback).toContain("const errorDescription = params.get('error_description');");
     expect(callback).toContain("const nextPath = params.get('next');");
     expect(callback).toContain('const pendingSourcePath = getPendingGoogleAuthPath();');
-    expect(callback).toContain('const safeNextPath = resolveSafeNextPath(nextPath);');
-    expect(callback).toContain('return RoutePath.RESET_PASSWORD;');
+    expect(callback).toContain('const safeNextPath = resolveSafeCallbackNextPath(nextPath);');
+    expect(read('src/auth/authRedirectConfig.ts')).toContain('return RoutePath.RESET_PASSWORD;');
     expect(callback).toContain('navigate(safeNextPath, { replace: true });');
     expect(callback).toContain('consumePendingGoogleAuthRedirectPath(pendingSourcePath)');
     expect(callback).toContain('navigate(RoutePath.DASHBOARD, {');

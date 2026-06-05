@@ -32,6 +32,9 @@ export const mapSessionToUser = (session: Session): User => ({
   email: session.user.email || '',
   name: getSessionDisplayName(session),
   avatarUrl: getSessionAvatarUrl(session) || undefined,
+  authProvider: typeof session.user.app_metadata?.provider === 'string'
+    ? session.user.app_metadata.provider
+    : undefined,
 });
 
 export const commitAuthSession = (session: Session) => {

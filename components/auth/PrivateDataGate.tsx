@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useCrypto } from '../../context/CryptoContext';
 import { RouteLoadingFrame } from '../ui/RouteLoadingFrame';
+import { RoutePath } from '../../types';
 
 const panelClassName =
   'surface-scope-paper page-wash flex min-h-[100dvh] items-center justify-center bg-body px-4 py-10 text-primary';
@@ -14,8 +16,6 @@ const secondaryButtonClassName =
   'inline-flex min-h-12 w-full items-center justify-center rounded-sm border border-border px-4 py-3 text-sm font-semibold text-primary transition hover:bg-surface-muted disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-gray-nav disabled:opacity-100';
 const labelClassName = 'block text-xs font-semibold uppercase tracking-[0.08em] text-gray-nav';
 const errorClassName = 'text-sm text-clay';
-const validationClassName = 'text-xs leading-5 text-gray-text';
-const successValidationClassName = 'text-xs leading-5 text-green';
 
 const CryptoShell: React.FC<{ children: React.ReactNode; title: string; description: string }> = ({
   children,
@@ -33,13 +33,19 @@ const CryptoShell: React.FC<{ children: React.ReactNode; title: string; descript
 );
 
 const UnlockPanel: React.FC = () => {
-  const { unlockWithPassphrase, unlockWithRecoveryKey } = useCrypto();
+  const { unlockMethod, unlockWithPassphrase, unlockWithRecoveryKey } = useCrypto();
   const [passphrase, setPassphrase] = useState('');
   const [recoveryKey, setRecoveryKey] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const canUnlockWithPassphrase = passphrase.trim().length > 0;
   const canUnlockWithRecoveryKey = recoveryKey.trim().length > 0;
+  const primarySecretLabel =
+    unlockMethod === 'account_password' ? 'Account password' : 'Private-writing password';
+  const primarySecretHelp =
+    unlockMethod === 'account_password'
+      ? 'Use the account password that was active when private writing was last connected.'
+      : 'Use the private-writing password you created during setup.';
 
   const submit = async (mode: 'passphrase' | 'recovery') => {
     setIsSubmitting(true);
@@ -64,23 +70,24 @@ const UnlockPanel: React.FC = () => {
     >
       <div className="space-y-4">
         <div className="space-y-2">
-          <label className={labelClassName} htmlFor="private-unlock-passphrase">Encryption passphrase</label>
+          <label className={labelClassName} htmlFor="private-unlock-passphrase">{primarySecretLabel}</label>
           <input
             id="private-unlock-passphrase"
             className={inputClassName}
             type="password"
             autoComplete="current-password"
-            placeholder="Encryption passphrase"
+            placeholder={primarySecretLabel}
             aria-describedby={error ? 'private-unlock-error' : undefined}
             value={passphrase}
             onChange={(event) => setPassphrase(event.target.value)}
           />
+          <p className="text-xs font-medium leading-5 text-gray-nav">{primarySecretHelp}</p>
         </div>
         <button className={buttonClassName} disabled={isSubmitting || !canUnlockWithPassphrase} onClick={() => submit('passphrase')}>
-          Unlock
+          Unlock with {primarySecretLabel.toLowerCase()}
         </button>
         <div className="border-t border-border pt-4">
-          <label className={labelClassName} htmlFor="private-unlock-recovery">Recovery key</label>
+          <label className={labelClassName} htmlFor="private-unlock-recovery">Recovery phrase</label>
           <input
             id="private-unlock-recovery"
             className={inputClassName}
@@ -89,130 +96,16 @@ const UnlockPanel: React.FC = () => {
             autoCapitalize="none"
             autoCorrect="off"
             spellCheck={false}
-            placeholder="Recovery key"
+            placeholder="Recovery phrase"
             aria-describedby={error ? 'private-unlock-error' : undefined}
             value={recoveryKey}
             onChange={(event) => setRecoveryKey(event.target.value)}
           />
           <button className={`${secondaryButtonClassName} mt-3`} disabled={isSubmitting || !canUnlockWithRecoveryKey} onClick={() => submit('recovery')}>
-            Unlock with recovery key
+            Unlock with recovery phrase
           </button>
         </div>
         {error && <p id="private-unlock-error" className={errorClassName} role="alert">{error}</p>}
-      </div>
-    </CryptoShell>
-  );
-};
-
-const SetupPanel: React.FC = () => {
-  const { setupEncryption, confirmRecoveryKey, recoveryKey } = useCrypto();
-  const [passphrase, setPassphrase] = useState('');
-  const [confirmation, setConfirmation] = useState('');
-  const [typedRecoveryKey, setTypedRecoveryKey] = useState('');
-  const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const isPassphraseLongEnough = passphrase.trim().length >= 12;
-  const doPassphrasesMatch = confirmation.length > 0 && passphrase === confirmation;
-  const isPassphraseReady = isPassphraseLongEnough && doPassphrasesMatch;
-  const isRecoveryKeyConfirmed = recoveryKey !== null && typedRecoveryKey.trim() === recoveryKey;
-
-  const createBundle = async () => {
-    setIsSubmitting(true);
-    setError('');
-    try {
-      if (passphrase !== confirmation) throw new Error('Passphrases do not match.');
-      await setupEncryption(passphrase);
-    } catch (setupError) {
-      setError(setupError instanceof Error ? setupError.message : 'Unable to set up encryption.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const confirm = async () => {
-    setIsSubmitting(true);
-    setError('');
-    try {
-      await confirmRecoveryKey(typedRecoveryKey);
-    } catch (confirmError) {
-      setError(confirmError instanceof Error ? confirmError.message : 'Unable to confirm recovery key.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  if (recoveryKey) {
-    return (
-      <CryptoShell
-        title="Save your recovery key"
-        description="This key is shown once. It can unlock your writing if the passphrase is lost; support cannot recover it."
-      >
-        <div className="space-y-4">
-          <code className="block rounded-sm border border-border bg-surface-muted p-3 text-sm break-all">{recoveryKey}</code>
-          <label className={labelClassName} htmlFor="private-recovery-confirm">Confirm recovery key</label>
-          <input
-            id="private-recovery-confirm"
-            className={inputClassName}
-            type="text"
-            autoComplete="off"
-            autoCapitalize="none"
-            autoCorrect="off"
-            spellCheck={false}
-            placeholder="Type the recovery key to confirm"
-            aria-describedby={`private-recovery-confirm-help${error ? ' private-setup-error' : ''}`}
-            value={typedRecoveryKey}
-            onChange={(event) => setTypedRecoveryKey(event.target.value)}
-          />
-          <p id="private-recovery-confirm-help" className={isRecoveryKeyConfirmed ? successValidationClassName : validationClassName}>
-            {isRecoveryKeyConfirmed ? 'Recovery key matches.' : 'Type the recovery key exactly to continue.'}
-          </p>
-          <button className={buttonClassName} disabled={isSubmitting || !isRecoveryKeyConfirmed} onClick={confirm}>
-            Confirm and unlock
-          </button>
-          {error && <p id="private-setup-error" className={errorClassName} role="alert">{error}</p>}
-        </div>
-      </CryptoShell>
-    );
-  }
-
-  return (
-    <CryptoShell
-      title="Set up private writing encryption"
-      description="Create a separate encryption passphrase. It is not your login password and never leaves this device as plaintext."
-    >
-      <div className="space-y-4">
-        <label className={labelClassName} htmlFor="private-setup-passphrase">Encryption passphrase</label>
-        <input
-          id="private-setup-passphrase"
-          className={inputClassName}
-          type="password"
-          autoComplete="new-password"
-          placeholder="Encryption passphrase"
-          aria-describedby={`private-passphrase-help${error ? ' private-setup-error' : ''}`}
-          value={passphrase}
-          onChange={(event) => setPassphrase(event.target.value)}
-        />
-        <p id="private-passphrase-help" className={isPassphraseLongEnough ? successValidationClassName : validationClassName}>
-          {isPassphraseLongEnough ? 'Passphrase has at least 12 characters.' : 'Use at least 12 characters.'}
-        </p>
-        <label className={labelClassName} htmlFor="private-setup-confirmation">Confirm passphrase</label>
-        <input
-          id="private-setup-confirmation"
-          className={inputClassName}
-          type="password"
-          autoComplete="new-password"
-          placeholder="Confirm passphrase"
-          aria-describedby={`private-confirmation-help${error ? ' private-setup-error' : ''}`}
-          value={confirmation}
-          onChange={(event) => setConfirmation(event.target.value)}
-        />
-        <p id="private-confirmation-help" className={doPassphrasesMatch ? successValidationClassName : validationClassName}>
-          {doPassphrasesMatch ? 'Passphrases match.' : 'Confirm the same passphrase.'}
-        </p>
-        <button className={buttonClassName} disabled={isSubmitting || !isPassphraseReady} onClick={createBundle}>
-          Create encryption key
-        </button>
-        {error && <p id="private-setup-error" className={errorClassName} role="alert">{error}</p>}
       </div>
     </CryptoShell>
   );
@@ -247,10 +140,16 @@ const MigrationPanel: React.FC = () => {
 
 export const PrivateDataGate: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { status, error } = useCrypto();
+  const location = useLocation();
 
   if (status === 'loading') return <RouteLoadingFrame className="surface-scope-paper page-wash min-h-[100dvh] bg-body" />;
   if (status === 'migrating') return <MigrationPanel />;
-  if (status === 'setupRequired') return <SetupPanel />;
+  if (status === 'setupRequired') {
+    if (location.pathname !== RoutePath.DASHBOARD) {
+      return <Navigate to={RoutePath.DASHBOARD} replace state={{ from: location }} />;
+    }
+    return <>{children}</>;
+  }
   if (status === 'locked') return <UnlockPanel />;
   if (status === 'error') {
     return (

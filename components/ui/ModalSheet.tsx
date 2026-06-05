@@ -22,6 +22,7 @@ interface ModalSheetProps {
   panelClassName?: string;
   panelId?: string;
   hideClose?: boolean;
+  disableDismiss?: boolean;
   closeLabel?: string;
   mobilePlacement?: 'bottom' | 'center';
   tone?: SurfaceTone;
@@ -59,6 +60,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
   panelClassName = '',
   panelId,
   hideClose = false,
+  disableDismiss = false,
   closeLabel = 'Close dialog',
   mobilePlacement = 'bottom',
   tone = 'paper',
@@ -121,6 +123,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
     setDragOffsetY(0);
     if (shouldClose) {
       void haptics.light();
+      if (disableDismiss) return;
       onCloseRef.current();
     }
   };
@@ -133,10 +136,11 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
     if (!isOpen) return;
 
     return registerAndroidBackAction(() => {
+      if (disableDismiss) return true;
       onCloseRef.current();
       return true;
     });
-  }, [isOpen]);
+  }, [disableDismiss, isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -146,6 +150,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        if (disableDismiss) return;
         onCloseRef.current();
         return;
       }
@@ -199,7 +204,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
       window.clearTimeout(focusTimer);
       previousFocusRef.current?.focus();
     };
-  }, [isOpen]);
+  }, [disableDismiss, isOpen]);
 
   if (typeof document === 'undefined' || !mounted) return null;
 
@@ -211,7 +216,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
     >
       <div
         className={`modal-sheet-backdrop ${backdropClassName}`.trim()}
-        onClick={onClose}
+        onClick={disableDismiss ? undefined : onClose}
       />
 
       <div className="modal-sheet-shell">
@@ -240,7 +245,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
                 onPointerCancel={handleDragEnd}
               />
 
-              {(icon || title || description || !hideClose) && (
+              {(icon || title || description || (!hideClose && !disableDismiss)) && (
                 <div className="modal-sheet-header">
                   <div className="modal-sheet-heading">
                     {icon ? <div className="modal-sheet-icon">{icon}</div> : null}
@@ -258,7 +263,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
                     </div>
                   </div>
 
-                  {!hideClose ? (
+                  {!hideClose && !disableDismiss ? (
                     <button
                       ref={closeButtonRef}
                       type="button"

@@ -1,13 +1,15 @@
 import { Capacitor } from '@capacitor/core';
 import { RoutePath } from '../../types';
+import {
+  getOAuthRedirectTo,
+  resolveSafePostAuthRedirectPath,
+} from './authRedirectConfig';
 import { supabase } from '../supabaseClient';
 
 const PENDING_GOOGLE_AUTH_PATH_KEY = 'reflections.pending-google-auth-path';
 const PENDING_GOOGLE_AUTH_REDIRECT_PATH_KEY = 'reflections.pending-google-auth-redirect-path';
 const GOOGLE_AUTH_ERROR_KEY = 'reflections.google-auth-error';
 export const LAST_HANDLED_NATIVE_URL_KEY = 'reflections.last-handled-native-url';
-// Native apps should return through an app link, not back into the public web origin.
-const NATIVE_GOOGLE_AUTH_REDIRECT_URL = 'com.arabinda.reflections://auth/callback';
 
 let isLaunchingOAuth = false;
 
@@ -46,44 +48,10 @@ const parseAuthParams = (urlString: string) => {
 };
 
 export const getGoogleOAuthRedirectTo = () => {
-  if (!hasWindow()) {
-    return NATIVE_GOOGLE_AUTH_REDIRECT_URL;
-  }
-
-  return Capacitor.isNativePlatform()
-    ? NATIVE_GOOGLE_AUTH_REDIRECT_URL
-    : `${window.location.origin}${RoutePath.AUTH_CALLBACK}`;
+  return getOAuthRedirectTo();
 };
 
-export const resolvePostAuthRedirectPath = (value?: unknown) => {
-  if (typeof value !== 'object' || value === null) {
-    return RoutePath.DASHBOARD;
-  }
-
-  const candidate = value as {
-    pathname?: unknown;
-    search?: unknown;
-    hash?: unknown;
-  };
-
-  const pathname =
-    typeof candidate.pathname === 'string' && candidate.pathname.startsWith('/')
-      ? candidate.pathname
-      : RoutePath.DASHBOARD;
-
-  if (
-    pathname === RoutePath.LOGIN ||
-    pathname === RoutePath.SIGNUP ||
-    pathname === RoutePath.AUTH_CALLBACK
-  ) {
-    return RoutePath.DASHBOARD;
-  }
-
-  const search = typeof candidate.search === 'string' ? candidate.search : '';
-  const hash = typeof candidate.hash === 'string' ? candidate.hash : '';
-
-  return `${pathname}${search}${hash}`;
-};
+export const resolvePostAuthRedirectPath = resolveSafePostAuthRedirectPath;
 
 export const rememberPendingGoogleAuth = ({
   sourcePath,
@@ -100,7 +68,7 @@ export const rememberPendingGoogleAuth = ({
   window.sessionStorage.setItem(
     PENDING_GOOGLE_AUTH_REDIRECT_PATH_KEY,
     redirectPath.startsWith('/')
-      ? resolvePostAuthRedirectPath(new URL(redirectPath, window.location.origin))
+      ? resolveSafePostAuthRedirectPath(new URL(redirectPath, window.location.origin))
       : RoutePath.HOME,
   );
   window.sessionStorage.removeItem(GOOGLE_AUTH_ERROR_KEY);

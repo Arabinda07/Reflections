@@ -16,6 +16,7 @@ const ROUTE_SURFACE_SCOPE_CLASS: Partial<Record<RoutePath, string>> = {
   [RoutePath.LOGIN]: 'surface-scope-paper',
   [RoutePath.SIGNUP]: 'surface-scope-paper',
   [RoutePath.RESET_PASSWORD]: 'surface-scope-paper',
+  [RoutePath.RECOVER_PRIVATE_WRITING]: 'surface-scope-paper',
   [RoutePath.AUTH_CALLBACK]: 'surface-scope-paper',
   [RoutePath.WIKI]: 'surface-scope-sage',
   [RoutePath.SANCTUARY]: 'surface-scope-sage',

@@ -35,6 +35,7 @@ import { profileService } from '../../services/profileService';
 import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
 import { aiRunClient, type LifeWikiRunResult } from '../../services/aiRunClient';
 import { getStrictPrivateModeDisabledMessage, isPrivateAiDisabled } from '../../services/privateMode';
+import { getPasswordResetRedirectTo } from '../../src/auth/authRedirectConfig';
 
 const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
 
@@ -53,7 +54,7 @@ type FeedbackState =
 
 export const Account: React.FC = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated, logout } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [isSaved, setIsSaved] = useState(false);
@@ -214,7 +215,7 @@ export const Account: React.FC = () => {
   };
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    await logout();
     navigate(RoutePath.LOGIN);
   };
 
@@ -227,7 +228,7 @@ export const Account: React.FC = () => {
 
     try {
       const response = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}${RoutePath.AUTH_CALLBACK}?next=${RoutePath.RESET_PASSWORD}`,
+        redirectTo: getPasswordResetRedirectTo(),
       });
 
       if (response.error) throw response.error;
@@ -235,7 +236,7 @@ export const Account: React.FC = () => {
       setPasswordResetFeedback({
         variant: 'info',
         title: 'Password reset email sent.',
-        description: 'This restores sign-in only. Your writing still needs the encryption passphrase or recovery key.',
+        description: 'This restores sign-in first. If your private writing uses your account password, recovery will reconnect it after reset.',
       });
     } catch (err) {
       console.error(err);
@@ -338,7 +339,7 @@ export const Account: React.FC = () => {
       await offlineStorage.clearUserData(userId);
       setShowDeleteConfirm(false);
 
-      await supabase.auth.signOut();
+      await logout();
       navigate(RoutePath.LOGIN, {
         replace: true,
         state: {

@@ -1,11 +1,12 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { supabase } from '../src/supabaseClient';
+import { type CryptoSession } from '../services/cryptoService';
 import {
-  cryptoService,
-  type CryptoSession,
+  keyWrapperPolicy,
   type PersistedUserEncryptionKeyBundle,
+  type UnlockMethod,
   type UserEncryptionKeyBundle,
-} from '../services/cryptoService';
+} from '../services/keyWrapperPolicy';
 import { setCurrentCryptoSession } from '../services/cryptoSessionStore';
 import { useAuthStore } from '../hooks/useAuthStore';
 import {
@@ -20,29 +21,18 @@ interface CryptoContextValue {
   session: CryptoSession | null;
   migrationProgress: MigrationProgress | null;
   recoveryKey: string | null;
+  unlockMethod: UnlockMethod | null;
   error: string | null;
-  setupEncryption: (passphrase: string) => Promise<void>;
+  setupEncryption: (secret: string, unlockMethod?: UnlockMethod) => Promise<void>;
   confirmRecoveryKey: (typedRecoveryKey: string) => Promise<void>;
   unlockWithPassphrase: (passphrase: string) => Promise<void>;
   unlockWithRecoveryKey: (recoveryKey: string) => Promise<void>;
+  recoverAccountPasswordWithRecoveryKey: (recoveryKey: string, newAccountPassword: string) => Promise<void>;
+  recoverAccountPasswordWithPreviousPassword: (previousAccountPassword: string, newAccountPassword: string) => Promise<void>;
   lock: () => void;
 }
 
 const CryptoContext = createContext<CryptoContextValue | null>(null);
-
-const toPersistedBundle = (bundle: UserEncryptionKeyBundle): PersistedUserEncryptionKeyBundle => ({
-  userId: bundle.userId,
-  keyId: bundle.keyId,
-  passphraseWrapper: bundle.passphraseWrapper,
-  recoveryWrapper: bundle.recoveryWrapper,
-});
-
-const mapKeyBundleRow = (row: any): PersistedUserEncryptionKeyBundle => ({
-  userId: row.user_id,
-  keyId: row.key_id,
-  passphraseWrapper: row.passphrase_wrapper,
-  recoveryWrapper: row.recovery_wrapper,
-});
 
 export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const user = useAuthStore((state) => state.user);
@@ -115,7 +105,7 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         return;
       }
 
-      setBundle(mapKeyBundleRow(data));
+      setBundle(keyWrapperPolicy.mapPersistedBundleRow(data));
       setStatus('locked');
     };
 
@@ -125,49 +115,45 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     };
   }, [user?.id]);
 
-  const setupEncryption = useCallback(async (passphrase: string) => {
+  const setupEncryption = useCallback(async (passphrase: string, unlockMethod: UnlockMethod = 'private_writing_password') => {
     if (!user?.id) throw new Error('Sign in before setting up encryption.');
-    if (passphrase.trim().length < 12) {
-      throw new Error('Use at least 12 characters for your encryption passphrase.');
+    const minimumLength = unlockMethod === 'account_password' ? 8 : 12;
+    if (passphrase.trim().length < minimumLength) {
+      throw new Error(
+        unlockMethod === 'account_password'
+          ? 'Enter your account password to continue.'
+          : 'Use at least 12 characters for your private-writing password.',
+      );
     }
 
-    const createdBundle = await cryptoService.createKeyBundle({
+    const createdBundle = await keyWrapperPolicy.createBundle({
       userId: user.id,
-      passphrase,
+      secret: passphrase,
+      unlockMethod,
     });
     setPendingBundle(createdBundle);
-    setRecoveryKey(createdBundle.recoveryKey);
+    setRecoveryKey(createdBundle.recoveryPhrase);
     setError(null);
   }, [user?.id]);
 
   const confirmRecoveryKey = useCallback(async (typedRecoveryKey: string) => {
     if (!pendingBundle) throw new Error('Create an encryption bundle before confirming recovery.');
-    if (typedRecoveryKey.trim() !== pendingBundle.recoveryKey) {
+    if (typedRecoveryKey.trim() !== pendingBundle.recoveryPhrase) {
       throw new Error('Recovery key confirmation did not match.');
     }
 
-    const persistedBundle = toPersistedBundle(pendingBundle);
     const { error: insertError } = await supabase
       .from('user_encryption_keys')
-      .insert({
-        user_id: persistedBundle.userId,
-        key_id: persistedBundle.keyId,
-        passphrase_wrapper: persistedBundle.passphraseWrapper,
-        recovery_wrapper: persistedBundle.recoveryWrapper,
-        kdf_calibration: {
-          targetMs: 500,
-          source: 'web_crypto_pbkdf2',
-        },
-      });
+      .insert(keyWrapperPolicy.toSetupInsertPayload(pendingBundle));
 
     if (insertError) throw insertError;
 
-    const nextSession = await cryptoService.unlockWithRecoveryKey({
-      userId: persistedBundle.userId,
-      recoveryKey: pendingBundle.recoveryKey,
-      bundle: persistedBundle,
+    const nextSession = await keyWrapperPolicy.unlockWithRecoveryPhrase({
+      userId: pendingBundle.userId,
+      recoveryPhrase: pendingBundle.recoveryPhrase,
+      bundle: pendingBundle,
     });
-    setBundle(persistedBundle);
+    setBundle(pendingBundle);
     setPendingBundle(null);
     setRecoveryKey(null);
     await setUnlockedSession(nextSession);
@@ -175,38 +161,108 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const unlockWithPassphrase = useCallback(async (passphrase: string) => {
     if (!user?.id || !bundle) throw new Error('Encryption is not set up for this account.');
-    await setUnlockedSession(await cryptoService.unlockWithPassphrase({
+    await setUnlockedSession(await keyWrapperPolicy.unlockWithPrimarySecret({
       userId: user.id,
-      passphrase,
+      secret: passphrase,
       bundle,
     }));
   }, [bundle, setUnlockedSession, user?.id]);
 
   const unlockWithRecoveryKey = useCallback(async (typedRecoveryKey: string) => {
     if (!user?.id || !bundle) throw new Error('Encryption is not set up for this account.');
-    await setUnlockedSession(await cryptoService.unlockWithRecoveryKey({
+    await setUnlockedSession(await keyWrapperPolicy.unlockWithRecoveryPhrase({
       userId: user.id,
-      recoveryKey: typedRecoveryKey,
+      recoveryPhrase: typedRecoveryKey,
       bundle,
     }));
   }, [bundle, setUnlockedSession, user?.id]);
+
+  const persistAccountPasswordRewrap = useCallback(async (input: {
+    accountPasswordWrapper: NonNullable<PersistedUserEncryptionKeyBundle['accountPasswordWrapper']>;
+    updatePayload: ReturnType<typeof keyWrapperPolicy.toAccountPasswordRewrapPayload>;
+  }) => {
+    if (!user?.id || !bundle) {
+      throw new Error('Encryption is not set up for this account.');
+    }
+
+    const { error: updateError } = await supabase
+      .from('user_encryption_keys')
+      .update(input.updatePayload)
+      .eq('user_id', user.id)
+      .eq('key_id', bundle.keyId);
+
+    if (updateError) throw updateError;
+
+    const nextBundle = {
+      ...bundle,
+      accountPasswordWrapper: input.accountPasswordWrapper,
+      passphraseWrapper: input.accountPasswordWrapper,
+    };
+    setBundle(nextBundle);
+    return nextBundle;
+  }, [bundle, user?.id]);
+
+  const recoverAccountPasswordWithRecoveryKey = useCallback(async (
+    typedRecoveryKey: string,
+    newAccountPassword: string,
+  ) => {
+    if (!user?.id || !bundle) throw new Error('Encryption is not set up for this account.');
+    if (bundle.unlockMethod !== 'account_password') {
+      throw new Error('This account uses a separate private-writing password.');
+    }
+
+    const result = await keyWrapperPolicy.rewrapAccountPasswordWithRecoveryPhrase({
+      userId: user.id,
+      recoveryPhrase: typedRecoveryKey,
+      newAccountPassword,
+      bundle,
+    });
+    await persistAccountPasswordRewrap(result);
+    await setUnlockedSession(result.session);
+  }, [bundle, persistAccountPasswordRewrap, setUnlockedSession, user?.id]);
+
+  const recoverAccountPasswordWithPreviousPassword = useCallback(async (
+    previousAccountPassword: string,
+    newAccountPassword: string,
+  ) => {
+    if (!user?.id || !bundle) throw new Error('Encryption is not set up for this account.');
+    if (bundle.unlockMethod !== 'account_password') {
+      throw new Error('This account uses a separate private-writing password.');
+    }
+
+    const result = await keyWrapperPolicy.rewrapAccountPasswordWithPreviousPassword({
+      userId: user.id,
+      previousAccountPassword,
+      newAccountPassword,
+      bundle,
+    });
+    await persistAccountPasswordRewrap(result);
+    await setUnlockedSession(result.session);
+  }, [bundle, persistAccountPasswordRewrap, setUnlockedSession, user?.id]);
 
   const value = useMemo<CryptoContextValue>(() => ({
     status,
     session,
     migrationProgress,
     recoveryKey,
+    unlockMethod: bundle?.unlockMethod ?? pendingBundle?.unlockMethod ?? null,
     error,
     setupEncryption,
     confirmRecoveryKey,
     unlockWithPassphrase,
     unlockWithRecoveryKey,
+    recoverAccountPasswordWithRecoveryKey,
+    recoverAccountPasswordWithPreviousPassword,
     lock,
   }), [
     confirmRecoveryKey,
     error,
     lock,
     migrationProgress,
+    bundle?.unlockMethod,
+    pendingBundle?.unlockMethod,
+    recoverAccountPasswordWithPreviousPassword,
+    recoverAccountPasswordWithRecoveryKey,
     recoveryKey,
     session,
     setupEncryption,

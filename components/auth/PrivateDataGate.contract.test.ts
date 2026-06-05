@@ -7,19 +7,17 @@ const read = (filePath: string) =>
 
 const APP_UI_HARD_COLOR_PATTERN = /#[0-9A-Fa-f]{3,8}|rgba?\(|hsla?\(|\bbg-white\b|\btext-white\b|\bborder-white\b|\btext-red-\d{2,3}\b|\bbg-gray-\d{2,3}\b|\btext-gray-\d{2,3}\b|\bborder-gray-\d{2,3}\b/;
 
-describe('PrivateDataGate setup contract', () => {
-  it('keeps private-writing setup actions visible and validates before enabling them', () => {
+describe('PrivateDataGate contract', () => {
+  it('keeps first-time setup out of the gate and delegates it to home onboarding', () => {
     const source = read('components/auth/PrivateDataGate.tsx');
 
-    expect(source).toContain('bg-green');
-    expect(source).toContain('text-on-accent');
-    expect(source).toContain('min-h-12 w-full');
-    expect(source).toContain('isPassphraseReady');
-    expect(source).toContain('isRecoveryKeyConfirmed');
-    expect(source).toContain('Type the recovery key exactly to continue.');
-    expect(source).toContain('spellCheck={false}');
-    expect(source).toContain('autoCapitalize="none"');
-    expect(source).toContain('autoCorrect="off"');
+    expect(source).not.toContain('const SetupPanel');
+    expect(source).not.toContain('setupEncryption');
+    expect(source).not.toContain('confirmRecoveryKey');
+    expect(source).not.toContain('private-setup-passphrase');
+    expect(source).toContain("if (status === 'setupRequired')");
+    expect(source).toContain('location.pathname !== RoutePath.DASHBOARD');
+    expect(source).toContain('return <>{children}</>');
   });
 
   it('shows a dedicated migration panel instead of the generic route loader', () => {
@@ -32,17 +30,17 @@ describe('PrivateDataGate setup contract', () => {
     expect(source).not.toContain("status === 'loading' || status === 'migrating'");
   });
 
-  it('labels private encryption inputs and announces validation errors accessibly', () => {
+  it('labels private unlock inputs and announces validation errors accessibly', () => {
     const source = read('components/auth/PrivateDataGate.tsx');
 
+    expect(source).toContain('unlockMethod');
+    expect(source).toContain("unlockMethod === 'account_password'");
+    expect(source).toContain('Account password');
+    expect(source).toContain('Private-writing password');
     expect(source).toContain('htmlFor="private-unlock-passphrase"');
     expect(source).toContain('id="private-unlock-passphrase"');
     expect(source).toContain('htmlFor="private-unlock-recovery"');
     expect(source).toContain('id="private-unlock-recovery"');
-    expect(source).toContain('htmlFor="private-setup-passphrase"');
-    expect(source).toContain('id="private-setup-passphrase"');
-    expect(source).toContain('htmlFor="private-setup-confirmation"');
-    expect(source).toContain('id="private-setup-confirmation"');
     expect(source).toContain('aria-describedby');
     expect(source).toContain('role="alert"');
   });

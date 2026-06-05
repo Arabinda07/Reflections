@@ -34,6 +34,8 @@ import {
 import { NEWSLETTER_SIGNUP_LABEL, buildNewsletterOptInMetadata } from '@/src/newsletter';
 import { referralService } from '@/services/referralService';
 import { commitAuthSession } from '@/src/auth/sessionUser';
+import { storePendingAccountPassword } from '@/src/auth/accountPasswordHandoff';
+import { getSignupEmailRedirectTo } from '@/src/auth/authRedirectConfig';
 
 export const SignUp: React.FC = () => {
   useDocumentMeta({
@@ -98,7 +100,7 @@ export const SignUp: React.FC = () => {
         options: {
           // Supabase hosted auth must allow-list this exact production callback URL
           // in Authentication -> URL Configuration, or signup confirmation links will fail.
-          emailRedirectTo: `${window.location.origin}${RoutePath.AUTH_CALLBACK}`,
+          emailRedirectTo: getSignupEmailRedirectTo(),
           data: {
             full_name: name,
             ...buildNewsletterOptInMetadata(newsletterOptIn),
@@ -117,6 +119,7 @@ export const SignUp: React.FC = () => {
         });
       } else if (data.session) {
         commitAuthSession(data.session);
+        storePendingAccountPassword(password, data.session.user.id);
         await recordAcceptedReferral();
         navigate(postLoginPath, { replace: true, state: { justLoggedIn: true } });
       }

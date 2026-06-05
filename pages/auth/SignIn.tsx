@@ -30,6 +30,8 @@ import {
   requestVerifiedEmail,
 } from '@/src/auth/credentialManager';
 import { commitAuthSession } from '@/src/auth/sessionUser';
+import { storePendingAccountPassword } from '@/src/auth/accountPasswordHandoff';
+import { getPasswordResetRedirectTo } from '@/src/auth/authRedirectConfig';
 
 export const SignIn: React.FC = () => {
   useDocumentMeta({
@@ -82,6 +84,7 @@ export const SignIn: React.FC = () => {
       } else {
         if (data.session) {
           commitAuthSession(data.session);
+          storePendingAccountPassword(password, data.session.user.id);
         }
         navigate(postLoginPath, { replace: true, state: { justLoggedIn: true } });
       }
@@ -151,7 +154,7 @@ export const SignIn: React.FC = () => {
 
     try {
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}${RoutePath.AUTH_CALLBACK}?next=${RoutePath.RESET_PASSWORD}`,
+        redirectTo: getPasswordResetRedirectTo(),
       });
 
       if (resetError) throw resetError;

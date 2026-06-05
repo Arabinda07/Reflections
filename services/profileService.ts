@@ -4,6 +4,8 @@ import { getAuthenticatedUser } from './authUtils';
 
 export interface SupabaseProfileRow {
   smart_mode_enabled: boolean | null;
+  onboarding_completed_at?: string | null;
+  onboarding_version_seen?: number | null;
 }
 
 interface SupabaseEntitlementRow {
@@ -92,6 +94,45 @@ const getWellnessAccessForUser = async (
 };
 
 export const profileService = {
+  getOnboardingState: async (): Promise<{
+    completedAt: string | null;
+    versionSeen: number | null;
+  }> => {
+    const user = await getAuthenticatedUser();
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('onboarding_completed_at, onboarding_version_seen')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error('[profileService] Error fetching onboarding state:', error);
+    }
+
+    return {
+      completedAt: data?.onboarding_completed_at || null,
+      versionSeen: data?.onboarding_version_seen || null,
+    };
+  },
+
+  completeOnboarding: async (versionSeen: number): Promise<void> => {
+    const user = await getAuthenticatedUser();
+
+    const { error } = await supabase
+      .from('profiles')
+      .upsert(
+        {
+          id: user.id,
+          onboarding_completed_at: new Date().toISOString(),
+          onboarding_version_seen: versionSeen,
+        },
+        { onConflict: 'id' },
+      );
+
+    if (error) throw error;
+  },
+
   getWellnessAccess: async (): Promise<WellnessAccess> => {
     const user = await getAuthenticatedUser();
 

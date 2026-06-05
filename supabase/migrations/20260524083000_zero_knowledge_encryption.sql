@@ -3,14 +3,34 @@ begin;
 create table if not exists public.user_encryption_keys (
   user_id uuid primary key references auth.users(id) on delete cascade,
   key_id uuid not null,
+  unlock_method text not null default 'private_writing_password'
+    check (unlock_method in ('account_password', 'private_writing_password')),
+  account_password_wrapper jsonb,
   passphrase_wrapper jsonb not null,
   recovery_wrapper jsonb not null,
+  wrapper_version integer not null default 1,
   kdf_calibration jsonb not null default '{}'::jsonb,
   migration_state text not null default 'pending'
     check (migration_state in ('pending', 'migrating', 'verified', 'plaintext_cleared', 'reset')),
+  recovery_verified_at timestamptz,
+  encryption_setup_completed_at timestamptz,
+  last_rewrapped_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.user_encryption_keys
+  add column if not exists unlock_method text not null default 'private_writing_password'
+    check (unlock_method in ('account_password', 'private_writing_password')),
+  add column if not exists account_password_wrapper jsonb,
+  add column if not exists wrapper_version integer not null default 1,
+  add column if not exists recovery_verified_at timestamptz,
+  add column if not exists encryption_setup_completed_at timestamptz,
+  add column if not exists last_rewrapped_at timestamptz;
+
+alter table public.profiles
+  add column if not exists onboarding_completed_at timestamptz,
+  add column if not exists onboarding_version_seen integer;
 
 alter table public.user_encryption_keys enable row level security;
 

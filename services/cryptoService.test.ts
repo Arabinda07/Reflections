@@ -7,17 +7,34 @@ const aad = {
   userId: 'user-1',
 };
 
-describe('cryptoService', () => {
+const createSession = async () => ({
+  userId: aad.userId,
+  keyId: 'key-1',
+  dataKey: await cryptoService.importRawDataKey(cryptoService.generateRawDataKey()),
+});
+
+describe('cryptoService primitives', () => {
+  it('wraps and unwraps raw data keys without exposing plaintext wrappers', async () => {
+    const rawDataKey = cryptoService.generateRawDataKey();
+    const wrapper = await cryptoService.wrapRawDataKey(rawDataKey, 'correct secret', 1_000);
+    const unwrappedDataKey = await cryptoService.unwrapRawDataKey(wrapper, 'correct secret');
+
+    expect(wrapper.ciphertext).not.toContain('correct secret');
+    expect(Array.from(unwrappedDataKey)).toEqual(Array.from(rawDataKey));
+  });
+
+  it('rejects the wrong wrapper secret', async () => {
+    const wrapper = await cryptoService.wrapRawDataKey(
+      cryptoService.generateRawDataKey(),
+      'correct secret',
+      1_000,
+    );
+
+    await expect(cryptoService.unwrapRawDataKey(wrapper, 'wrong secret')).rejects.toThrow(/unlock/i);
+  });
+
   it('round-trips JSON without storing plaintext in the envelope', async () => {
-    const bundle = await cryptoService.createKeyBundle({
-      userId: aad.userId,
-      passphrase: 'a long private passphrase',
-    });
-    const session = await cryptoService.unlockWithPassphrase({
-      userId: aad.userId,
-      passphrase: 'a long private passphrase',
-      bundle,
-    });
+    const session = await createSession();
 
     const envelope = await cryptoService.encryptJson(
       session,
@@ -34,35 +51,8 @@ describe('cryptoService', () => {
     });
   });
 
-  it('rejects wrong passphrases and recovery keys', async () => {
-    const bundle = await cryptoService.createKeyBundle({
-      userId: aad.userId,
-      passphrase: 'correct private passphrase',
-    });
-
-    await expect(cryptoService.unlockWithPassphrase({
-      userId: aad.userId,
-      passphrase: 'wrong private passphrase',
-      bundle,
-    })).rejects.toThrow(/unlock/i);
-
-    await expect(cryptoService.unlockWithRecoveryKey({
-      userId: aad.userId,
-      recoveryKey: 'bad recovery key',
-      bundle,
-    })).rejects.toThrow(/unlock/i);
-  });
-
   it('uses random IVs and binds ciphertext to row identity with AAD', async () => {
-    const bundle = await cryptoService.createKeyBundle({
-      userId: aad.userId,
-      passphrase: 'another long private passphrase',
-    });
-    const session = await cryptoService.unlockWithRecoveryKey({
-      userId: aad.userId,
-      recoveryKey: bundle.recoveryKey,
-      bundle,
-    });
+    const session = await createSession();
 
     const firstEnvelope = await cryptoService.encryptJson(session, aad, { mood: 'calm' });
     const secondEnvelope = await cryptoService.encryptJson(session, aad, { mood: 'calm' });
@@ -77,15 +67,7 @@ describe('cryptoService', () => {
   });
 
   it('round-trips attachment bytes with the same envelope format', async () => {
-    const bundle = await cryptoService.createKeyBundle({
-      userId: aad.userId,
-      passphrase: 'file private passphrase',
-    });
-    const session = await cryptoService.unlockWithPassphrase({
-      userId: aad.userId,
-      passphrase: 'file private passphrase',
-      bundle,
-    });
+    const session = await createSession();
     const bytes = new TextEncoder().encode('secret attachment bytes');
 
     const encrypted = await cryptoService.encryptBytes(session, aad, bytes);

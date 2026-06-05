@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { storageService } from './storageService';
 import { supabase } from '../src/supabaseClient';
-import { cryptoService } from './cryptoService';
+import { keyWrapperPolicy } from './keyWrapperPolicy';
 import { setCurrentCryptoSession } from './cryptoSessionStore';
 
 vi.mock('../src/supabaseClient', () => ({
@@ -40,14 +40,14 @@ describe('storageService upload hardening', () => {
   it('encrypts note attachments before upload with overwrite disabled', async () => {
     const upload = vi.fn().mockResolvedValue({ data: { path: 'ok' }, error: null });
     mockFrom.mockReturnValue({ upload } as any);
-    const bundle = await cryptoService.createKeyBundle({
+    const bundle = await keyWrapperPolicy.createBundle({
       userId: 'user-1',
-      passphrase: 'attachment passphrase',
+      secret: 'attachment passphrase',
       iterations: 1_000,
     });
-    setCurrentCryptoSession(await cryptoService.unlockWithPassphrase({
+    setCurrentCryptoSession(await keyWrapperPolicy.unlockWithPrimarySecret({
       userId: 'user-1',
-      passphrase: 'attachment passphrase',
+      secret: 'attachment passphrase',
       bundle,
     }));
 

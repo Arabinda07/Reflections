@@ -28,6 +28,7 @@ const ANDROID_TOP_LEVEL_ROUTES = new Set<string>([
   RoutePath.LOGIN,
   RoutePath.SIGNUP,
   RoutePath.RESET_PASSWORD,
+  RoutePath.RECOVER_PRIVATE_WRITING,
   RoutePath.FAQ,
   RoutePath.ABOUT,
   RoutePath.PRIVACY,

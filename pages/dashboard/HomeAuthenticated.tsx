@@ -1,15 +1,11 @@
-import { Archive } from '@phosphor-icons/react/Archive';
 import { ArrowsClockwise } from '@phosphor-icons/react/ArrowsClockwise';
 import { Brain } from '@phosphor-icons/react/Brain';
 import { CaretRight } from '@phosphor-icons/react/CaretRight';
 import { CheckCircle as CheckCircleIcon } from '@phosphor-icons/react/CheckCircle';
 import { EnvelopeSimple } from '@phosphor-icons/react/EnvelopeSimple';
-import { Feather } from '@phosphor-icons/react/Feather';
 import { FolderOpen } from '@phosphor-icons/react/FolderOpen';
 import { Heart } from '@phosphor-icons/react/Heart';
 import { ListChecks } from '@phosphor-icons/react/ListChecks';
-import { LockKey } from '@phosphor-icons/react/LockKey';
-import { NotePencil } from '@phosphor-icons/react/NotePencil';
 import { Plus } from '@phosphor-icons/react/Plus';
 import { Sparkle } from '@phosphor-icons/react/Sparkle';
 import { Target } from '@phosphor-icons/react/Target';
@@ -23,11 +19,17 @@ import { Button } from '../../components/ui/Button';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { useToast } from '../../components/ui/Toast';
 import { WhisperComposerControl } from '../../components/ui/WhisperComposerControl';
+import { useCrypto } from '../../context/CryptoContext';
+import {
+  PrivateWritingOnboardingFlow,
+  usePrivateWritingOnboarding,
+} from '../../features/private-writing-onboarding';
 import { useAuthStore } from '../../hooks/useAuthStore';
 import { useHaptics } from '../../hooks/useHaptics';
 import { moodCheckinService } from '../../services/moodService';
 import { noteService } from '../../services/noteService';
 import { DEFAULT_WELLNESS_PROMPTS } from '../../services/wellnessPrompts';
+import { hasPendingAccountPassword } from '../../src/auth/accountPasswordHandoff';
 import { supabase } from '../../src/supabaseClient';
 import { Note, RoutePath } from '../../types';
 import {
@@ -58,39 +60,6 @@ const WRITING_NOTES = [
   { text: 'Notice the thing you keep circling. It may be asking for a name.', author: 'Julia Cameron' },
   { text: 'You do not have to be certain before you start writing.', author: 'Reflections' },
 ];
-
-const ONBOARDING_STEPS = [
-  {
-    label: 'Intro',
-    title: 'A private space for notes',
-    body:
-      'This is a private journal for your writing. Use it to get thoughts down and come back to them later.',
-    note: 'One honest line is already enough to begin.',
-  },
-  {
-    label: 'Focus',
-    title: 'Focus on the writing',
-    body:
-      'Start with one sentence. Write what you need to say and let the page hold the rest.',
-    note: 'The page can hold the unfinished part too.',
-  },
-  {
-    label: 'Privacy',
-    title: 'Private and secure',
-    body:
-      'Your notes stay with you. AI only runs if you specifically ask it to help you find a pattern.',
-    note: 'Support appears only when you invite it in.',
-  },
-  {
-    label: 'Ready',
-    title: 'Ready to start',
-    body:
-      'Start with a blank note or use a daily focus prompt. Your archived reflections are always available.',
-    note: 'When you are ready, begin with the smallest true thing.',
-  },
-];
-
-const onboardingStepIcons = [NotePencil, Feather, LockKey, Archive] as const;
 
 const prefetchCreateNoteRoute = () => {
   void import('@/pages/dashboard/CreateNote');
@@ -140,11 +109,10 @@ export const HomeAuthenticated: React.FC = () => {
   const haptics = useHaptics();
   const isFromSave = location.state?.fromSave;
   const { user } = useAuthStore();
+  const cryptoContext = useCrypto();
   const [noteCount, setNoteCount] = useState<number | null>(null);
   const [displayCount, setDisplayCount] = useState<number | string>('...');
   const [isCountLoading, setIsCountLoading] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
-  const [onboardingStep, setOnboardingStep] = useState(0);
   const [dailyPrompt, setDailyPrompt] = useState(DEFAULT_WELLNESS_PROMPTS[0]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
@@ -177,11 +145,14 @@ export const HomeAuthenticated: React.FC = () => {
   const heroDismissPointerIdRef = useRef<number | null>(null);
   const authStoreDisplayName = user?.name?.trim() || 'Reflector';
   const shouldRenderHeroIntro = heroIntroState !== 'gone';
-
-
-  const currentOnboardingStep = ONBOARDING_STEPS[onboardingStep];
-  const isLastOnboardingStep = onboardingStep === ONBOARDING_STEPS.length - 1;
-  const CurrentOnboardingIcon = onboardingStepIcons[onboardingStep];
+  const isPrivateWritingSetupRequired = cryptoContext.status === 'setupRequired';
+  const isPrivateWritingReady = cryptoContext.status === 'unlocked';
+  const onboarding = usePrivateWritingOnboarding({
+    hasUser: Boolean(user),
+    isSetupRequired: isPrivateWritingSetupRequired,
+  });
+  const showOnboarding = onboarding.shouldShowOnboarding;
+  const isGoogleLikeAuth = user?.authProvider === 'google';
 
   const moveFocusFromHeroIntro = useCallback(() => {
     if (typeof document === 'undefined') return;
@@ -279,9 +250,6 @@ export const HomeAuthenticated: React.FC = () => {
     setDailyPrompt(
       DEFAULT_WELLNESS_PROMPTS[Math.floor(Math.random() * DEFAULT_WELLNESS_PROMPTS.length)],
     );
-
-    const hasSeen = localStorage.getItem('hasSeenOnboarding');
-    if (!hasSeen) setShowOnboarding(true);
   }, []);
 
   const refreshPrompt = useCallback(
@@ -411,40 +379,14 @@ export const HomeAuthenticated: React.FC = () => {
     };
   }, [collapseHeroIntro, heroIntroState, showOnboarding]);
 
-  const handleCloseOnboarding = useCallback(() => {
-    localStorage.setItem('hasSeenOnboarding', 'true');
-    setOnboardingStep(0);
-    setShowOnboarding(false);
-  }, []);
-
-  const handleFinishOnboarding = useCallback(() => {
-    handleCloseOnboarding();
-    // Route directly to the editor with a gentle first-time prompt
+  const handleBeginWritingFromOnboarding = useCallback(() => {
     prefetchCreateNoteRoute();
     navigate(RoutePath.CREATE_NOTE, { state: { initialPrompt: "What's on your mind?" } });
-  }, [handleCloseOnboarding, navigate]);
-
-  const handleSkipOnboarding = useCallback(() => {
-    handleCloseOnboarding();
-    navigate(RoutePath.DASHBOARD, { replace: true });
-  }, [handleCloseOnboarding, navigate]);
+  }, [navigate]);
 
   const updateIntentionSummary = useCallback((notes: Note[]) => {
     setTaskNotes(notes);
     setIntentionSummary(buildHomeIntentionSummary(notes));
-  }, []);
-
-  const handleNextOnboardingStep = useCallback(() => {
-    if (isLastOnboardingStep) {
-      handleFinishOnboarding();
-      return;
-    }
-
-    setOnboardingStep((current) => Math.min(current + 1, ONBOARDING_STEPS.length - 1));
-  }, [handleFinishOnboarding, isLastOnboardingStep]);
-
-  const handlePreviousOnboardingStep = useCallback(() => {
-    setOnboardingStep((current) => Math.max(current - 1, 0));
   }, []);
 
   useEffect(() => {
@@ -457,7 +399,7 @@ export const HomeAuthenticated: React.FC = () => {
 
   useEffect(() => {
     const fetchCount = async () => {
-      if (!user) return;
+      if (!user || !isPrivateWritingReady) return;
 
       setIsCountLoading(true);
       try {
@@ -477,6 +419,8 @@ export const HomeAuthenticated: React.FC = () => {
 
     fetchCount();
 
+    if (!isPrivateWritingReady) return;
+
     const channel = supabase
       .channel('note-count-updates')
       .on(
@@ -489,7 +433,7 @@ export const HomeAuthenticated: React.FC = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [updateIntentionSummary, user]);
+  }, [isPrivateWritingReady, updateIntentionSummary, user]);
 
   const handleCreateClick = (prompt?: string) => {
     prefetchCreateNoteRoute();
@@ -568,7 +512,7 @@ export const HomeAuthenticated: React.FC = () => {
       let targetNote = taskNotes[0];
       
       const newTask = {
-        id: crypto.randomUUID(),
+        id: globalThis.crypto.randomUUID(),
         text: newTaskText.trim(),
         completed: false,
       };
@@ -976,84 +920,20 @@ export const HomeAuthenticated: React.FC = () => {
         </div>
       </div>
 
-      <ModalSheet
+      <PrivateWritingOnboardingFlow
         isOpen={showOnboarding}
-        onClose={handleCloseOnboarding}
-        title={currentOnboardingStep.title}
-        size="lg"
-        mobilePlacement="center"
-        closeLabel="Skip onboarding"
-        panelClassName="onboarding-modal-panel"
-        bodyClassName="onboarding-modal-body"
-        footer={
-          <div className="onboarding-footer-actions flex flex-col gap-3 sm:gap-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleSkipOnboarding}
-              aria-label="Skip onboarding"
-              className="self-center px-3 text-gray-nav/75 hover:text-green"
-            >
-              Skip onboarding
-            </Button>
-            <div className="flex items-center justify-between gap-3 sm:justify-between">
-              <Button
-                variant="secondary"
-                onClick={handlePreviousOnboardingStep}
-                disabled={onboardingStep === 0}
-                className="min-w-[6.75rem] flex-1 sm:flex-none"
-              >
-                Back
-              </Button>
-              <Button
-                variant="primary"
-                onClick={handleNextOnboardingStep}
-                className="min-w-[8.75rem] flex-1 sm:flex-none"
-              >
-                {isLastOnboardingStep ? 'Begin writing' : 'Next'}
-              </Button>
-            </div>
-          </div>
-        }
-      >
-          <div
-            key={currentOnboardingStep.title}
-            className="onboarding-step-copy flex min-h-[18rem] flex-col justify-between gap-6 pb-1 sm:min-h-[19rem] animate-fade-in-up"
-          >
-            <div className="space-y-4">
-              <p className="label-caps text-green" aria-live="polite">
-                Step {onboardingStep + 1} of {ONBOARDING_STEPS.length}
-              </p>
-
-              <div className="onboarding-progress-rail grid grid-cols-4 gap-2" aria-hidden="true">
-                {ONBOARDING_STEPS.map((step, index) => (
-                  <span
-                    key={step.label}
-                    className={`h-1.5 rounded-full bg-green transition-opacity duration-300 ease-out-expo ${
-                      index <= onboardingStep ? 'opacity-100' : 'opacity-20'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div className="onboarding-step-stage">
-              <div className="relative flex flex-col gap-6 sm:flex-row sm:items-start">
-                <div className="onboarding-step-icon" aria-hidden="true">
-                  <CurrentOnboardingIcon size={28} weight="duotone" />
-                </div>
-                <div className="space-y-4">
-                  <p className="max-w-[65ch] text-base font-semibold leading-relaxed text-gray-text sm:text-lg">
-                    {currentOnboardingStep.body}
-                  </p>
-                  <p className="onboarding-step-note font-serif italic">
-                    {currentOnboardingStep.note}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-      </ModalSheet>
+        onClose={onboarding.dismiss}
+        onBeginWriting={handleBeginWritingFromOnboarding}
+        isSetupRequired={onboarding.isSetupRequired}
+        canOfferAccountPassword={!isGoogleLikeAuth}
+        hasFreshAccountPassword={Boolean(user?.id && hasPendingAccountPassword(user.id))}
+        userId={user?.id || ''}
+        email={user?.email}
+        setupEncryption={cryptoContext.setupEncryption}
+        confirmRecoveryKey={cryptoContext.confirmRecoveryKey}
+        recoveryKey={cryptoContext.recoveryKey}
+        completeOnboarding={onboarding.complete}
+      />
 
       <ModalSheet
         isOpen={isCheckInOpen}

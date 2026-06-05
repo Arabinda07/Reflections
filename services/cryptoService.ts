@@ -20,21 +20,6 @@ export interface KeyWrapper {
   ciphertext: string;
 }
 
-export interface UserEncryptionKeyBundle {
-  userId: string;
-  keyId: string;
-  passphraseWrapper: KeyWrapper;
-  recoveryWrapper: KeyWrapper;
-  recoveryKey: string;
-}
-
-export interface PersistedUserEncryptionKeyBundle {
-  userId: string;
-  keyId: string;
-  passphraseWrapper: KeyWrapper;
-  recoveryWrapper: KeyWrapper;
-}
-
 export interface CryptoSession {
   userId: string;
   keyId: string;
@@ -137,7 +122,7 @@ const wrapDataKey = async (rawDataKey: Uint8Array, secret: string, iterations: n
   };
 };
 
-const unwrapDataKey = async (wrapper: KeyWrapper, secret: string) => {
+const unwrapDataKeyRaw = async (wrapper: KeyWrapper, secret: string) => {
   if (wrapper.alg !== WRAPPER_ALG) {
     throw new Error(`Unsupported key wrapper: ${wrapper.alg}`);
   }
@@ -149,11 +134,17 @@ const unwrapDataKey = async (wrapper: KeyWrapper, secret: string) => {
       wrappingKey,
       fromBase64(wrapper.ciphertext),
     );
-    return importRawAesKey(new Uint8Array(rawDataKey));
+    return new Uint8Array(rawDataKey);
   } catch {
     throw new Error('Unable to unlock encryption key.');
   }
 };
+
+const unwrapDataKey = async (wrapper: KeyWrapper, secret: string) =>
+  importRawAesKey(await unwrapDataKeyRaw(wrapper, secret));
+
+const exportRawDataKey = async (dataKey: CryptoKey) =>
+  new Uint8Array(await getCrypto().subtle.exportKey('raw', dataKey));
 
 const encryptBytesWithKey = async (
   session: CryptoSession,
@@ -218,6 +209,14 @@ export const isEncryptedEnvelope = (value: unknown): value is EncryptedEnvelope 
 };
 
 export const cryptoService = {
+  generateRawDataKey() {
+    return randomBytes(32);
+  },
+
+  generateRecoveryPhrase() {
+    return toBase64Url(randomBytes(RECOVERY_KEY_BYTE_LENGTH));
+  },
+
   async calibratePbkdf2Iterations(targetMs = 500): Promise<number> {
     const start = performance.now();
     await deriveWrappingKey('calibration', randomBytes(SALT_BYTE_LENGTH), CALIBRATION_SAMPLE_ITERATIONS);
@@ -226,47 +225,24 @@ export const cryptoService = {
     return Math.max(DEFAULT_PBKDF2_ITERATIONS, estimatedIterations);
   },
 
-  async createKeyBundle(input: {
-    userId: string;
-    passphrase: string;
-    iterations?: number;
-  }): Promise<UserEncryptionKeyBundle> {
-    const keyId = crypto.randomUUID();
-    const rawDataKey = randomBytes(32);
-    const recoveryKey = toBase64Url(randomBytes(RECOVERY_KEY_BYTE_LENGTH));
-    const iterations = input.iterations ?? DEFAULT_PBKDF2_ITERATIONS;
-
-    return {
-      userId: input.userId,
-      keyId,
-      passphraseWrapper: await wrapDataKey(rawDataKey, input.passphrase, iterations),
-      recoveryWrapper: await wrapDataKey(rawDataKey, recoveryKey, iterations),
-      recoveryKey,
-    };
+  wrapRawDataKey(rawDataKey: Uint8Array, secret: string, iterations = DEFAULT_PBKDF2_ITERATIONS) {
+    return wrapDataKey(rawDataKey, secret, iterations);
   },
 
-  async unlockWithPassphrase(input: {
-    userId: string;
-    passphrase: string;
-    bundle: PersistedUserEncryptionKeyBundle;
-  }): Promise<CryptoSession> {
-    return {
-      userId: input.userId,
-      keyId: input.bundle.keyId,
-      dataKey: await unwrapDataKey(input.bundle.passphraseWrapper, input.passphrase),
-    };
+  unwrapRawDataKey(wrapper: KeyWrapper, secret: string) {
+    return unwrapDataKeyRaw(wrapper, secret);
   },
 
-  async unlockWithRecoveryKey(input: {
-    userId: string;
-    recoveryKey: string;
-    bundle: PersistedUserEncryptionKeyBundle;
-  }): Promise<CryptoSession> {
-    return {
-      userId: input.userId,
-      keyId: input.bundle.keyId,
-      dataKey: await unwrapDataKey(input.bundle.recoveryWrapper, input.recoveryKey),
-    };
+  unwrapRawDataKeyToCryptoKey(wrapper: KeyWrapper, secret: string) {
+    return unwrapDataKey(wrapper, secret);
+  },
+
+  importRawDataKey(rawDataKey: Uint8Array) {
+    return importRawAesKey(rawDataKey);
+  },
+
+  exportRawDataKey(dataKey: CryptoKey) {
+    return exportRawDataKey(dataKey);
   },
 
   encryptJson: async <T>(session: CryptoSession, aad: EncryptionAad, payload: T) =>

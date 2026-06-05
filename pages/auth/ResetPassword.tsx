@@ -10,6 +10,7 @@ import { SectionHeader } from '../../components/ui/SectionHeader';
 import { Surface } from '../../components/ui/Surface';
 import { RoutePath } from '../../types';
 import { supabase } from '../../src/supabaseClient';
+import { storePendingResetAccountPassword } from '../../features/private-writing-recovery/resetPasswordRecoveryHandoff';
 
 export const ResetPassword: React.FC = () => {
   const navigate = useNavigate();
@@ -61,6 +62,26 @@ export const ResetPassword: React.FC = () => {
     try {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user?.id) {
+        const { data: encryptionRow, error: encryptionError } = await supabase
+          .from('user_encryption_keys')
+          .select('unlock_method')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (encryptionError) throw encryptionError;
+
+        if (encryptionRow?.unlock_method === 'account_password') {
+          storePendingResetAccountPassword(password, user.id);
+          navigate(RoutePath.RECOVER_PRIVATE_WRITING, { replace: true });
+          return;
+        }
+      }
 
       setFeedback({
         variant: 'success',

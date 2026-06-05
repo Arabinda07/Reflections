@@ -40,6 +40,8 @@ export const useAuthStore = create<AuthState>()(
       setInitialCheckDone: (isInitialCheckDone) => set({ isInitialCheckDone }),
       logout: async () => {
         const { getAuthAdapter } = await import('../src/auth/AuthRuntime');
+        const { clearAllVolatileAuthSecrets } = await import('../src/auth/volatileSecretHandoff');
+        clearAllVolatileAuthSecrets();
         await getAuthAdapter().signOut();
         set({ user: null, isAuthenticated: false });
       },

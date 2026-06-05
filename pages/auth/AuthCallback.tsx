@@ -7,6 +7,7 @@ import {
   consumePendingGoogleAuthRedirectPath,
   getPendingGoogleAuthPath,
 } from '../../src/auth/googleOAuth';
+import { resolveSafeCallbackNextPath } from '../../src/auth/authRedirectConfig';
 import { commitAuthSession } from '../../src/auth/sessionUser';
 
 type AuthCallbackFeedback = {
@@ -16,21 +17,6 @@ type AuthCallbackFeedback = {
 
 const SIGNUP_CONFIRMATION_SUCCESS = 'Your email has been confirmed. Welcome to Reflections.';
 const LOGIN_CONFIRMATION_SUCCESS = 'Your email has been confirmed. Please sign in to continue.';
-
-const resolveSafeNextPath = (nextPath: string | null) => {
-  if (!nextPath) return null;
-
-  try {
-    const url = new URL(nextPath, window.location.origin);
-    if (url.origin !== window.location.origin) return null;
-    if (url.pathname === RoutePath.RESET_PASSWORD && !url.search && !url.hash) {
-      return RoutePath.RESET_PASSWORD;
-    }
-    return `${url.pathname}${url.search}${url.hash}`;
-  } catch {
-    return null;
-  }
-};
 
 const navigateWithFeedback = (
   navigate: ReturnType<typeof useNavigate>,
@@ -65,7 +51,7 @@ export const AuthCallback: React.FC = () => {
 
       const pendingSourcePath = getPendingGoogleAuthPath();
       const sourcePath = pendingSourcePath || RoutePath.LOGIN;
-      const safeNextPath = resolveSafeNextPath(nextPath);
+      const safeNextPath = resolveSafeCallbackNextPath(nextPath);
 
       if (error || errorDescription) {
         const message = errorDescription || error || 'Authentication failed.';

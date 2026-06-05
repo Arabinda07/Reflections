@@ -11,6 +11,7 @@ import {
   resolvePostAuthRedirectPath,
   startGoogleOAuthFlow,
 } from './googleOAuth';
+import { getOAuthRedirectTo } from './authRedirectConfig';
 import { supabase } from '../supabaseClient';
 
 vi.mock('@capacitor/core', () => ({
@@ -115,6 +116,15 @@ describe('googleOAuth', () => {
         redirectTo: 'https://www.reflections-sanctuary.space/auth/callback',
       },
     });
+  });
+
+  it('delegates OAuth redirect construction to auth redirect config', () => {
+    (globalThis as any).window = createWindow(
+      'https://reflections-git-feature-team.vercel.app/login',
+      'https://reflections-git-feature-team.vercel.app',
+    );
+
+    expect(getGoogleOAuthRedirectTo()).toBe(getOAuthRedirectTo());
   });
 
   it('builds the browser OAuth callback from the current custom-domain origin', () => {

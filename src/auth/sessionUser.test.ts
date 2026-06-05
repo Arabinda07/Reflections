@@ -9,6 +9,7 @@ const createSession = (userMetadata: Record<string, unknown>, email = 'journaler
       id: 'user-1',
       email,
       user_metadata: userMetadata,
+      app_metadata: {},
     },
   }) as Session;
 
@@ -58,5 +59,12 @@ describe('mapSessionToUser', () => {
         ),
       ).name,
     ).toBe('reflector');
+  });
+
+  it('carries the Supabase auth provider for onboarding decisions', () => {
+    const session = createSession({ full_name: 'OAuth User' });
+    session.user.app_metadata = { provider: 'google' };
+
+    expect(mapSessionToUser(session).authProvider).toBe('google');
   });
 });
