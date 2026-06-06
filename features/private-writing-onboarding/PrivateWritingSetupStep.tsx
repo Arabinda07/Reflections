@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '../../components/ui/Button';
+import { recordOnboardingFunnelEvent } from '../../services/onboardingFunnelService';
 import type { UnlockMethod } from '../../services/keyWrapperPolicy';
 import { consumePendingAccountPassword } from '../../src/auth/accountPasswordHandoff';
 import { supabase } from '../../src/supabaseClient';
@@ -30,18 +31,28 @@ export const PrivateWritingSetupStep: React.FC<{
   const [unlockMethod, setUnlockMethod] = useState<UnlockMethod>(
     canOfferAccountPassword ? 'account_password' : 'private_writing_password',
   );
+  const recordedUnlockMethodRef = useRef<UnlockMethod | null>(null);
   const [requiresAccountPassword, setRequiresAccountPassword] = useState(!hasFreshAccountPassword);
   const [accountPassword, setAccountPassword] = useState('');
   const [privatePassword, setPrivatePassword] = useState('');
   const [privatePasswordConfirmation, setPrivatePasswordConfirmation] = useState('');
   const [typedRecoveryKey, setTypedRecoveryKey] = useState('');
   const [hasSavedRecoveryKey, setHasSavedRecoveryKey] = useState(false);
+  const [hasCopiedRecoveryKey, setHasCopiedRecoveryKey] = useState(false);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isPrivatePasswordReady =
     privatePassword.trim().length >= 12 && privatePassword === privatePasswordConfirmation;
   const isRecoveryConfirmed =
     Boolean(recoveryKey) && hasSavedRecoveryKey && typedRecoveryKey.trim() === recoveryKey;
+
+  useEffect(() => {
+    recordOnboardingFunnelEvent('private_writing_setup_started', {});
+    recordOnboardingFunnelEvent('private_writing_unlock_method_selected', {
+      method: unlockMethod,
+    });
+    recordedUnlockMethodRef.current = unlockMethod;
+  }, []);
 
   const createBundle = async () => {
     setIsSubmitting(true);
@@ -71,6 +82,7 @@ export const PrivateWritingSetupStep: React.FC<{
         }
         await setupEncryption(privatePassword, 'private_writing_password');
       }
+      recordOnboardingFunnelEvent('private_writing_key_created', { method: unlockMethod });
     } catch (setupError) {
       setError(setupError instanceof Error ? setupError.message : 'Unable to set up private writing.');
     } finally {
@@ -84,6 +96,7 @@ export const PrivateWritingSetupStep: React.FC<{
 
     try {
       await confirmRecoveryKey(typedRecoveryKey);
+      recordOnboardingFunnelEvent('recovery_phrase_confirmed', {});
       await onSetupComplete();
     } catch (confirmError) {
       setError(confirmError instanceof Error ? confirmError.message : 'Unable to confirm recovery phrase.');
@@ -92,25 +105,54 @@ export const PrivateWritingSetupStep: React.FC<{
     }
   };
 
+  const selectUnlockMethod = (nextUnlockMethod: UnlockMethod) => {
+    setUnlockMethod(nextUnlockMethod);
+    if (recordedUnlockMethodRef.current === nextUnlockMethod) return;
+
+    recordOnboardingFunnelEvent('private_writing_unlock_method_selected', {
+      method: nextUnlockMethod,
+    });
+    recordedUnlockMethodRef.current = nextUnlockMethod;
+  };
+
+  const copyRecoveryKey = async () => {
+    if (!recoveryKey) return;
+
+    try {
+      await navigator.clipboard.writeText(recoveryKey);
+      setHasCopiedRecoveryKey(true);
+    } catch {
+      setError('Copy did not work in this browser. Select the phrase and save it somewhere safe.');
+    }
+  };
+
   if (recoveryKey) {
     return (
       <div className="space-y-5">
         <div className="space-y-2">
+          <p className="label-caps text-green">Private writing setup: 2 of 2</p>
           <p className="label-caps text-green">Recovery phrase</p>
           <p className="text-base font-semibold leading-relaxed text-gray-text">
-            Save this backup for private writing. Reflections cannot see it or restore it for you.
+            Save this backup for private writing. Reflections cannot see it, reset it, or restore it for you if it is lost.
           </p>
         </div>
         <code className="block rounded-sm border border-border bg-surface-muted p-3 text-sm break-all">
           {recoveryKey}
         </code>
+        <Button
+          variant="secondary"
+          onClick={copyRecoveryKey}
+          className="w-full min-h-11"
+        >
+          {hasCopiedRecoveryKey ? 'Recovery phrase copied' : 'Copy recovery phrase'}
+        </Button>
         <label className="flex min-h-11 items-center gap-3 text-sm font-semibold text-gray-text">
           <input
             type="checkbox"
             checked={hasSavedRecoveryKey}
             onChange={(event) => setHasSavedRecoveryKey(event.target.checked)}
           />
-          I saved this recovery phrase somewhere safe.
+          I understand this is the only backup if I lose access.
         </label>
         <div className="space-y-2">
           <label className={setupLabelClassName} htmlFor="onboarding-recovery-confirm">
@@ -145,6 +187,7 @@ export const PrivateWritingSetupStep: React.FC<{
   return (
     <div className="space-y-5">
       <div className="space-y-2">
+        <p className="label-caps text-green">Private writing setup: 1 of 2</p>
         <p className="label-caps text-green">Private writing</p>
         <p className="text-base font-semibold leading-relaxed text-gray-text">
           Choose how Reflections should unlock your private writing on this account.
@@ -155,7 +198,7 @@ export const PrivateWritingSetupStep: React.FC<{
         <div className="grid gap-3 sm:grid-cols-2">
           <button
             type="button"
-            onClick={() => setUnlockMethod('account_password')}
+            onClick={() => selectUnlockMethod('account_password')}
             className={`rounded-sm border p-4 text-left transition ${
               unlockMethod === 'account_password'
                 ? 'border-green bg-green/5 text-primary'
@@ -172,7 +215,7 @@ export const PrivateWritingSetupStep: React.FC<{
           </button>
           <button
             type="button"
-            onClick={() => setUnlockMethod('private_writing_password')}
+            onClick={() => selectUnlockMethod('private_writing_password')}
             className={`rounded-sm border p-4 text-left transition ${
               unlockMethod === 'private_writing_password'
                 ? 'border-green bg-green/5 text-primary'

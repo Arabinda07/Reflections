@@ -1,16 +1,22 @@
 import React, { useCallback, useState } from 'react';
 import { Button } from '../../components/ui/Button';
 import { ModalSheet } from '../../components/ui/ModalSheet';
+import { recordOnboardingFunnelEvent } from '../../services/onboardingFunnelService';
 import type { UnlockMethod } from '../../services/keyWrapperPolicy';
 import {
   PRIVATE_WRITING_ONBOARDING_STEPS,
   privateWritingOnboardingStepIcons,
 } from './onboardingContent';
+import {
+  getPrivateWritingOnboardingView,
+  shouldCompleteOnboardingForAction,
+} from './onboardingFlowState';
 import { PrivateWritingSetupStep } from './PrivateWritingSetupStep';
 
 export const PrivateWritingOnboardingFlow: React.FC<{
   isOpen: boolean;
   onClose: () => Promise<void> | void;
+  onExitToWriting: () => Promise<void> | void;
   onBeginWriting?: () => Promise<void> | void;
   isSetupRequired: boolean;
   canOfferAccountPassword: boolean;
@@ -24,6 +30,7 @@ export const PrivateWritingOnboardingFlow: React.FC<{
 }> = ({
   isOpen,
   onClose,
+  onExitToWriting,
   onBeginWriting,
   isSetupRequired,
   canOfferAccountPassword,
@@ -36,35 +43,70 @@ export const PrivateWritingOnboardingFlow: React.FC<{
   completeOnboarding,
 }) => {
   const [onboardingStep, setOnboardingStep] = useState(0);
+  const [isOptionalGuidanceOpen, setIsOptionalGuidanceOpen] = useState(!isSetupRequired);
   const currentOnboardingStep = PRIVATE_WRITING_ONBOARDING_STEPS[onboardingStep];
   const isLastOnboardingStep = onboardingStep === PRIVATE_WRITING_ONBOARDING_STEPS.length - 1;
   const CurrentOnboardingIcon = privateWritingOnboardingStepIcons[onboardingStep];
   const [hasCompletedPrivateWritingSetup, setHasCompletedPrivateWritingSetup] = useState(false);
-  const shouldShowPrivateWritingSetup =
-    isSetupRequired && !hasCompletedPrivateWritingSetup && onboardingStep >= 1;
-  const canDismissOnboarding = !isSetupRequired;
+  const currentView = getPrivateWritingOnboardingView({
+    isSetupRequired,
+    hasCompletedPrivateWritingSetup,
+    isOptionalGuidanceOpen,
+  });
+  const shouldShowPrivateWritingSetup = currentView === 'setup';
+  const shouldShowSetupReady = currentView === 'ready';
+  const shouldShowOptionalGuidance = currentView === 'optional_guidance';
+  const canDismissOnboarding = !shouldShowPrivateWritingSetup;
 
   const closeAndReset = useCallback(async () => {
-    if (isSetupRequired) return;
+    if (shouldShowPrivateWritingSetup) return;
     await onClose();
     setOnboardingStep(0);
-  }, [isSetupRequired, onClose]);
+    setIsOptionalGuidanceOpen(!isSetupRequired);
+  }, [isSetupRequired, onClose, shouldShowPrivateWritingSetup]);
 
-  const handleSkipOnboarding = useCallback(() => {
-    void closeAndReset();
-  }, [closeAndReset]);
+  const exitToWritingAndReset = useCallback(async () => {
+    await onExitToWriting();
+    setOnboardingStep(0);
+    setIsOptionalGuidanceOpen(!isSetupRequired);
+  }, [isSetupRequired, onExitToWriting]);
+
+  const handleSkipOnboarding = useCallback(async (source: 'optional_guidance' | 'ready_screen' = 'optional_guidance') => {
+    recordOnboardingFunnelEvent('onboarding_skipped', { source });
+    if (shouldCompleteOnboardingForAction('skip')) {
+      await completeOnboarding();
+    }
+    await closeAndReset();
+  }, [closeAndReset, completeOnboarding]);
 
   const handleFinishOnboarding = useCallback(async () => {
-    await completeOnboarding();
+    recordOnboardingFunnelEvent('onboarding_completed', { source: 'optional_guidance' });
+    if (shouldCompleteOnboardingForAction('finish_optional_guidance')) {
+      await completeOnboarding();
+    }
     await closeAndReset();
     await onBeginWriting?.();
   }, [closeAndReset, completeOnboarding, onBeginWriting]);
 
   const handlePrivateWritingSetupComplete = useCallback(async () => {
     setHasCompletedPrivateWritingSetup(true);
-    setOnboardingStep((current) =>
-      Math.min(Math.max(current + 1, 2), PRIVATE_WRITING_ONBOARDING_STEPS.length - 1),
-    );
+    setOnboardingStep(0);
+    setIsOptionalGuidanceOpen(false);
+  }, []);
+
+  const handleWriteFirstReflection = useCallback(async () => {
+    recordOnboardingFunnelEvent('setup_ready_cta_clicked', { cta: 'write_first_reflection' });
+    if (shouldCompleteOnboardingForAction('write_first_reflection')) {
+      await completeOnboarding();
+    }
+    await exitToWritingAndReset();
+    await onBeginWriting?.();
+  }, [completeOnboarding, exitToWritingAndReset, onBeginWriting]);
+
+  const handleShowMeAround = useCallback(() => {
+    recordOnboardingFunnelEvent('setup_ready_cta_clicked', { cta: 'show_me_around' });
+    setOnboardingStep(0);
+    setIsOptionalGuidanceOpen(true);
   }, []);
 
   const handleNextOnboardingStep = useCallback(() => {
@@ -91,7 +133,13 @@ export const PrivateWritingOnboardingFlow: React.FC<{
     <ModalSheet
       isOpen={isOpen}
       onClose={() => void closeAndReset()}
-      title={shouldShowPrivateWritingSetup ? 'Set up private writing' : currentOnboardingStep.title}
+      title={
+        shouldShowPrivateWritingSetup
+          ? 'Set up private writing'
+          : shouldShowSetupReady
+            ? 'Your private space is ready'
+            : currentOnboardingStep.title
+      }
       size="lg"
       mobilePlacement="center"
       disableDismiss={!canDismissOnboarding}
@@ -99,13 +147,13 @@ export const PrivateWritingOnboardingFlow: React.FC<{
       closeLabel="Skip onboarding"
       panelClassName="onboarding-modal-panel"
       bodyClassName="onboarding-modal-body"
-      footer={shouldShowPrivateWritingSetup ? undefined : (
+      footer={shouldShowPrivateWritingSetup || shouldShowSetupReady ? undefined : (
         <div className="onboarding-footer-actions flex flex-col gap-3 sm:gap-4">
           {canDismissOnboarding ? (
             <Button
               variant="ghost"
               size="sm"
-              onClick={handleSkipOnboarding}
+              onClick={() => void handleSkipOnboarding('optional_guidance')}
               aria-label="Skip onboarding"
               className="self-center px-3 text-gray-nav/75 hover:text-green"
             >
@@ -144,7 +192,44 @@ export const PrivateWritingOnboardingFlow: React.FC<{
           recoveryKey={recoveryKey}
           onSetupComplete={handlePrivateWritingSetupComplete}
         />
-      ) : (
+      ) : shouldShowSetupReady ? (
+        <div className="flex min-h-[18rem] flex-col justify-between gap-6 pb-1 sm:min-h-[19rem] animate-fade-in-up">
+          <div className="space-y-4">
+            <p className="label-caps text-green">Private writing setup complete</p>
+            <div className="rounded-sm border border-green/20 bg-green/5 p-5 sm:p-6">
+              <p className="text-base font-semibold leading-relaxed text-gray-text">
+                Your private writing key is connected and your recovery phrase is confirmed.
+              </p>
+              <p className="mt-3 font-serif italic text-gray-nav">
+                Start with one true sentence. The rest can arrive after.
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+            <Button
+              variant="ghost"
+              onClick={() => void handleSkipOnboarding('ready_screen')}
+              className="min-h-12 sm:order-first"
+            >
+              Skip for now
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={handleShowMeAround}
+              className="min-h-12"
+            >
+              Show me around
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => void handleWriteFirstReflection()}
+              className="min-h-12"
+            >
+              Write first reflection
+            </Button>
+          </div>
+        </div>
+      ) : shouldShowOptionalGuidance ? (
         <div
           key={currentOnboardingStep.title}
           className="onboarding-step-copy flex min-h-[18rem] flex-col justify-between gap-6 pb-1 sm:min-h-[19rem] animate-fade-in-up"
@@ -180,7 +265,7 @@ export const PrivateWritingOnboardingFlow: React.FC<{
             </div>
           </div>
         </div>
-      )}
+      ) : null}
     </ModalSheet>
   );
 };

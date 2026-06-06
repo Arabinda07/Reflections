@@ -27,8 +27,9 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
 
     expect(home).toContain('PrivateWritingOnboardingFlow');
     expect(home).toContain('usePrivateWritingOnboarding');
-    expect(home).toContain('setupEncryption={crypto.setupEncryption}');
-    expect(home).toContain('confirmRecoveryKey={crypto.confirmRecoveryKey}');
+    expect(home).toContain('onExitToWriting={onboarding.exitToWriting}');
+    expect(home).toContain('setupEncryption={cryptoContext.setupEncryption}');
+    expect(home).toContain('confirmRecoveryKey={cryptoContext.confirmRecoveryKey}');
     expect(home).not.toContain('profileService.getOnboardingState');
     expect(home).not.toContain('profileService.completeOnboarding');
     expect(home).not.toContain('PrivateWritingOnboardingSetup');
@@ -36,6 +37,9 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
     expect(content).toContain('PRIVATE_WRITING_ONBOARDING_STEPS');
     expect(flow).toContain('onboardingStep');
     expect(flow).toContain('Step {onboardingStep + 1} of {PRIVATE_WRITING_ONBOARDING_STEPS.length}');
+    expect(flow).toContain('shouldShowSetupReady');
+    expect(flow).toContain('Write first reflection');
+    expect(flow).toContain('Show me around');
     expect(flow).toContain('onboarding-step-copy');
     expect(flow).toContain('Skip onboarding');
     expect(flow).toContain('disableDismiss={!canDismissOnboarding}');
@@ -60,7 +64,9 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
     const modalCss = read('components/ui/modal-sheet.css');
 
     expect(flow).toContain('mobilePlacement="center"');
-    expect(flow).toContain("title={shouldShowPrivateWritingSetup ? 'Set up private writing' : currentOnboardingStep.title}");
+    expect(flow).toContain("shouldShowPrivateWritingSetup");
+    expect(flow).toContain("'Set up private writing'");
+    expect(flow).toContain("'Your private space is ready'");
     expect(flow).not.toContain('description={currentOnboardingStep.body}');
     expect(flow).toContain('onboarding-footer-actions');
     expect(flow).toContain('sm:justify-between');

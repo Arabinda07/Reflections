@@ -381,7 +381,7 @@ export const HomeAuthenticated: React.FC = () => {
 
   const handleBeginWritingFromOnboarding = useCallback(() => {
     prefetchCreateNoteRoute();
-    navigate(RoutePath.CREATE_NOTE, { state: { initialPrompt: "What's on your mind?" } });
+    navigate(RoutePath.CREATE_NOTE, { state: { initialPrompt: 'Start with one true sentence.' } });
   }, [navigate]);
 
   const updateIntentionSummary = useCallback((notes: Note[]) => {
@@ -923,6 +923,7 @@ export const HomeAuthenticated: React.FC = () => {
       <PrivateWritingOnboardingFlow
         isOpen={showOnboarding}
         onClose={onboarding.dismiss}
+        onExitToWriting={onboarding.exitToWriting}
         onBeginWriting={handleBeginWritingFromOnboarding}
         isSetupRequired={onboarding.isSetupRequired}
         canOfferAccountPassword={!isGoogleLikeAuth}

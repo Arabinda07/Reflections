@@ -63,12 +63,64 @@ describe('private writing onboarding module contract', () => {
     const flow = read('features/private-writing-onboarding/PrivateWritingOnboardingFlow.tsx');
     const setupStep = read('features/private-writing-onboarding/PrivateWritingSetupStep.tsx');
 
-    expect(flow).toContain('const canDismissOnboarding = !isSetupRequired');
+    expect(flow).toContain('const canDismissOnboarding = !shouldShowPrivateWritingSetup');
     expect(flow).toContain('disableDismiss={!canDismissOnboarding}');
     expect(flow).toContain('hideClose={!canDismissOnboarding}');
+    expect(setupStep).toContain('Private writing setup: 1 of 2');
+    expect(setupStep).toContain('Private writing setup: 2 of 2');
+    expect(setupStep).toContain('Copy recovery phrase');
+    expect(setupStep).toContain('Reflections cannot see it, reset it, or restore it for you if it is lost.');
     expect(setupStep).toContain('hasSavedRecoveryKey');
     expect(setupStep).toContain('typedRecoveryKey.trim() === recoveryKey');
     expect(setupStep).toContain('disabled={isSubmitting || !isRecoveryConfirmed}');
+  });
+
+  it('routes successful setup into a ready screen before optional guidance', () => {
+    const flow = read('features/private-writing-onboarding/PrivateWritingOnboardingFlow.tsx');
+    const home = read('pages/dashboard/HomeAuthenticated.tsx');
+    const state = read('features/private-writing-onboarding/onboardingFlowState.ts');
+
+    expect(flow).toContain('shouldShowSetupReady');
+    expect(flow).toContain('getPrivateWritingOnboardingView');
+    expect(state).toContain("return 'ready';");
+    expect(flow).toContain('Your private space is ready');
+    expect(flow).toContain('Write first reflection');
+    expect(flow).toContain('Show me around');
+    expect(flow).toContain("recordOnboardingFunnelEvent('setup_ready_cta_clicked'");
+    expect(home).toContain("initialPrompt: 'Start with one true sentence.'");
+  });
+
+  it('keeps write-first-reflection from completing optional onboarding before save', () => {
+    const flow = read('features/private-writing-onboarding/PrivateWritingOnboardingFlow.tsx');
+    const home = read('pages/dashboard/HomeAuthenticated.tsx');
+    const hook = read('features/private-writing-onboarding/usePrivateWritingOnboarding.ts');
+    const state = read('features/private-writing-onboarding/onboardingFlowState.ts');
+
+    expect(flow).toContain('onExitToWriting');
+    expect(home).toContain('onExitToWriting={onboarding.exitToWriting}');
+    expect(hook).toContain('const exitToWriting = useCallback(() => {');
+    expect(hook).toContain('setShouldShowOnboarding(false);');
+    expect(state).toContain("action !== 'write_first_reflection'");
+    expect(flow).toContain("shouldCompleteOnboardingForAction('write_first_reflection')");
+    expect(flow).toContain('await exitToWritingAndReset();');
+  });
+
+  it('keeps onboarding funnel events internal and free of secrets', () => {
+    const funnel = read('services/onboardingFunnelService.ts');
+    const setupStep = read('features/private-writing-onboarding/PrivateWritingSetupStep.tsx');
+    const draftHook = read('hooks/useNoteDraft.ts');
+
+    expect(funnel).toContain("ONBOARDING_FUNNEL_BROWSER_EVENT = 'reflections:onboarding-funnel'");
+    expect(funnel).toContain('window.dispatchEvent');
+    expect(funnel).toContain('CustomEvent');
+    expect(funnel).not.toContain('fetch(');
+    expect(funnel).not.toContain('supabase');
+    expect(funnel).not.toContain('localStorage');
+    expect(funnel).not.toContain('secret');
+    expect(funnel).not.toContain('password');
+    expect(setupStep).toContain("recordOnboardingFunnelEvent('private_writing_setup_started'");
+    expect(setupStep).toContain("recordOnboardingFunnelEvent('private_writing_key_created', { method: unlockMethod })");
+    expect(draftHook).toContain("recordOnboardingFunnelEvent('first_private_reflection_saved'");
   });
 
   it('keeps Supabase profile state as the onboarding source of truth', () => {

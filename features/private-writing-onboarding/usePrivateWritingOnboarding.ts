@@ -55,6 +55,7 @@ export const usePrivateWritingOnboarding = ({
   const complete = useCallback(async () => {
     await profileService.completeOnboarding(PRIVATE_WRITING_ONBOARDING_VERSION);
     setHasCompletedOnboarding(true);
+    setShouldShowOnboarding(false);
   }, []);
 
   const dismiss = useCallback(async () => {
@@ -62,6 +63,10 @@ export const usePrivateWritingOnboarding = ({
     await complete();
     setShouldShowOnboarding(false);
   }, [complete, isSetupRequired]);
+
+  const exitToWriting = useCallback(() => {
+    setShouldShowOnboarding(false);
+  }, []);
 
   const canDismissOnboarding = !isSetupRequired && hasCompletedOnboarding === true;
 
@@ -72,5 +77,6 @@ export const usePrivateWritingOnboarding = ({
     isSetupRequired,
     complete,
     dismiss,
+    exitToWriting,
   };
 };
