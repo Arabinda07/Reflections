@@ -22,6 +22,10 @@ import type { AiAction } from '../services/aiContracts';
 import { getNoteContentHash } from '../services/aiContext.js';
 import { buildWikiReviewPrompt, parseLifeWikiReviewResult } from '../services/aiOutputReview.js';
 import { INGEST_MODEL } from '../services/aiPromptSpecs.js';
+import {
+  STRICT_PRIVATE_MODE_DISABLED_MESSAGE,
+  isStrictPrivateModeEnabled,
+} from '../services/privateMode.js';
 
 type AiRunRequest = {
   kind?: 'life_wiki_refresh';
@@ -364,6 +368,13 @@ export default async function handler(req: any, res: any) {
 
     if (req.method === 'GET') {
       return handleGet(req, res, user.id, supabaseAdmin);
+    }
+
+    if (isStrictPrivateModeEnabled()) {
+      return sendJson(res, 403, {
+        error: 'strict_private_mode_ai_disabled',
+        message: STRICT_PRIVATE_MODE_DISABLED_MESSAGE,
+      });
     }
 
     const body = await parseJsonBody<AiRunRequest>(req, MAX_BODY_BYTES);

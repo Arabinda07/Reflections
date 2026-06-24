@@ -45,7 +45,10 @@ describe('RelationshipOS routing and UI contracts', () => {
 describe('RelationshipOS security migration contract', () => {
   it('creates encrypted RLS tables and clears them during account deletion', () => {
     const migration = read('supabase/migrations/20260623090000_relationship_os.sql');
+    const privacyMigration = read('supabase/migrations/20260624120000_remove_relationship_import_fingerprint.sql');
     const service = read('services/relationshipService.ts');
+    const store = read('services/relationshipStore.ts');
+    const db = read('services/db.ts');
 
     ['relationships', 'relationship_import_inbox', 'relationship_import_runs'].forEach((table) => {
       expect(migration).toContain(`public.${table}`);
@@ -57,6 +60,10 @@ describe('RelationshipOS security migration contract', () => {
     expect(migration).toContain('zero_knowledge_is_forced()');
     expect(migration).toContain('source_fingerprint text');
     expect(migration).toContain('relationship_import_inbox_source_fingerprint_uidx');
+    expect(privacyMigration).toContain('drop index if exists public.relationship_import_inbox_source_fingerprint_uidx');
+    expect(privacyMigration).toContain('drop column if exists source_fingerprint');
+    expect(store).not.toContain('source_fingerprint');
+    expect(db).not.toContain('sourceFingerprint?: string');
     expect(migration).not.toContain('display_name');
     expect(migration).not.toContain('relationship_hooks');
     expect(migration).not.toContain('relationship_connections');

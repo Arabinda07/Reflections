@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { Check, GoogleLogo, X } from '@phosphor-icons/react';
+import { Check } from '@phosphor-icons/react/Check';
+import { GoogleLogo } from '@phosphor-icons/react/GoogleLogo';
+import { X } from '@phosphor-icons/react/X';
 
 import { Button } from '../../components/ui/Button';
 import { Surface } from '../../components/ui/Surface';
 import { useToast } from '../../components/ui/Toast';
-import { relationshipService } from '../../services/relationshipService';
+import { relationshipImportService } from '../../services/relationshipImportService';
+import { googleContactsImportService } from '../../services/googleContactsImportService';
 import type { RelationshipHook, RelationshipImportInboxItem, RelationshipRecord, RelationshipStage, RelationshipTag } from '../../types';
 import { relationshipStageLabels } from './RelationshipProfile';
 
@@ -59,7 +62,7 @@ export const RelationshipImportInbox: React.FC<Props> = ({ relationships, pendin
   const [drafts, setDrafts] = useState<Record<string, TriageDraft>>({});
   const [isImporting, setIsImporting] = useState(false);
   const [needsReconnect, setNeedsReconnect] = useState(false);
-  const canImport = relationshipService.canImportGoogleContacts();
+  const canImport = googleContactsImportService.canImportGoogleContacts();
 
   const draftFor = (id: string) => drafts[id] || defaultDraft();
   const updateDraft = (id: string, updates: Partial<TriageDraft>) => {
@@ -80,7 +83,7 @@ export const RelationshipImportInbox: React.FC<Props> = ({ relationships, pendin
     setIsImporting(true);
     setNeedsReconnect(false);
     try {
-      const result = await relationshipService.importGoogleContacts();
+      const result = await googleContactsImportService.importGoogleContacts();
       if (result.unavailableOnDevice) return;
       if (result.needsReconnect) {
         setNeedsReconnect(true);
@@ -106,7 +109,7 @@ export const RelationshipImportInbox: React.FC<Props> = ({ relationships, pendin
         </div>
         {canImport ? (
           <div className="flex flex-wrap gap-2">
-            {needsReconnect && <Button variant="secondary" onClick={() => void relationshipService.startGoogleContactsOAuth()}>Reconnect Google<GoogleLogo size={16} weight="bold" className="ml-2" /></Button>}
+            {needsReconnect && <Button variant="secondary" onClick={() => void googleContactsImportService.startGoogleContactsOAuth()}>Reconnect Google<GoogleLogo size={16} weight="bold" className="ml-2" /></Button>}
             <Button variant="primary" onClick={importGoogle} isLoading={isImporting}>Google import<GoogleLogo size={16} weight="bold" className="ml-2" /></Button>
           </div>
         ) : (
@@ -122,7 +125,7 @@ export const RelationshipImportInbox: React.FC<Props> = ({ relationships, pendin
             <form key={item.id} onSubmit={(event) => {
               event.preventDefault();
               const additions = additionsFor(draft);
-              void run(() => relationshipService.acceptImportItem(item.id, {
+              void run(() => relationshipImportService.acceptImportItem(item.id, {
                 name: item.name,
                 stage: draft.stage,
                 closeness: draft.closeness,
@@ -162,9 +165,9 @@ export const RelationshipImportInbox: React.FC<Props> = ({ relationships, pendin
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  {mergeTarget && <Button type="button" variant="secondary" onClick={() => void run(() => relationshipService.mergeImportItem(item.id, mergeTarget.id, additionsFor(draft)), `${item.name} merged into ${mergeTarget.name}.`)}>Merge into {mergeTarget.name}</Button>}
+                  {mergeTarget && <Button type="button" variant="secondary" onClick={() => void run(() => relationshipImportService.mergeImportItem(item.id, mergeTarget.id, additionsFor(draft)), `${item.name} merged into ${mergeTarget.name}.`)}>Merge into {mergeTarget.name}</Button>}
                   <Button type="submit" variant="primary"><Check size={16} weight="bold" className="mr-2" />{mergeTarget ? 'Keep separate' : 'Add relationship'}</Button>
-                  <Button type="button" variant="ghost" onClick={() => void run(() => relationshipService.archiveImportItem(item.id), `${item.name} archived.`)}><X size={16} weight="bold" className="mr-2" />Archive</Button>
+                  <Button type="button" variant="ghost" onClick={() => void run(() => relationshipImportService.archiveImportItem(item.id), `${item.name} archived.`)}><X size={16} weight="bold" className="mr-2" />Archive</Button>
                 </div>
               </fieldset>
             </form>

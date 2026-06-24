@@ -5,6 +5,7 @@ import { Sparkle } from '@phosphor-icons/react/Sparkle';
 
 import { Surface } from '../../components/ui/Surface';
 import { relationshipService } from '../../services/relationshipService';
+import { relationshipImportService } from '../../services/relationshipImportService';
 import type { WeeklyRelationshipSuggestion } from '../../types';
 import { RoutePath } from '../../types';
 
@@ -21,7 +22,7 @@ export const RelationshipHomeModule: React.FC = () => {
       try {
         const [relationships, inbox] = await Promise.all([
           relationshipService.getAll(),
-          relationshipService.getImportInbox(),
+          relationshipImportService.getImportInbox(),
         ]);
         if (!isMounted) return;
         setSuggestions(relationshipService.buildWeeklySuggestions(relationships).slice(0, 2));

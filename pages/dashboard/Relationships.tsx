@@ -1,6 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { AddressBook, CirclesThreePlus, ClockCounterClockwise, Plus, Tray } from '@phosphor-icons/react';
+import { AddressBook } from '@phosphor-icons/react/AddressBook';
+import { CirclesThreePlus } from '@phosphor-icons/react/CirclesThreePlus';
+import { ClockCounterClockwise } from '@phosphor-icons/react/ClockCounterClockwise';
+import { Plus } from '@phosphor-icons/react/Plus';
+import { Tray } from '@phosphor-icons/react/Tray';
 
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
@@ -10,6 +14,7 @@ import { PageContainer } from '../../components/ui/PageContainer';
 import { Surface } from '../../components/ui/Surface';
 import { useToast } from '../../components/ui/Toast';
 import { relationshipService } from '../../services/relationshipService';
+import { relationshipImportService } from '../../services/relationshipImportService';
 import type { RelationshipHook, RelationshipImportInboxItem, RelationshipRecord, RelationshipTag } from '../../types';
 import { RoutePath } from '../../types';
 import { RelationshipImportInbox } from './RelationshipImportInbox';
@@ -66,7 +71,7 @@ export const Relationships: React.FC = () => {
     try {
       const [nextRelationships, nextInbox] = await Promise.all([
         relationshipService.getAll(),
-        relationshipService.getImportInbox(),
+        relationshipImportService.getImportInbox(),
       ]);
       setRelationships(nextRelationships);
       setInbox(nextInbox);

@@ -6,6 +6,7 @@ import { observationService } from './observationService';
 import { extractTasksFromContent, mergeTasks } from '../src/utils/taskParser';
 import { supabase } from '../src/supabaseClient';
 import type { Note, NoteAttachment, Task } from '../types';
+import { isPrivateAiDisabled } from './privateMode';
 
 export interface NotePublishInput {
   id?: string;
@@ -82,7 +83,7 @@ export const notePublishingOrchestrator = {
     });
 
     // Smart mode auto-ingest (fire-and-forget)
-    if (input.smartModeEnabled) {
+    if (input.smartModeEnabled && !isPrivateAiDisabled()) {
       aiRunClient
         .startLifeWikiRefresh({ trigger: 'smart_mode', noteId: savedNote.id })
         .catch((error) => {

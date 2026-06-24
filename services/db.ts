@@ -40,7 +40,6 @@ export interface LocalEncryptedRelationshipImportInboxItem {
   userId: string;
   source: RelationshipImportInboxItem['source'];
   status: RelationshipImportInboxItem['status'];
-  sourceFingerprint?: string;
   createdAt: string;
   updatedAt: string;
   syncStatus: LocalSyncStatus;

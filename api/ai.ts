@@ -24,11 +24,12 @@ import {
   buildPrompt,
   buildWikiPagePrompt,
 } from '../services/aiPromptSpecs.js';
+import {
+  STRICT_PRIVATE_MODE_DISABLED_MESSAGE,
+  isStrictPrivateModeEnabled,
+} from '../services/privateMode.js';
 
 const MAX_BODY_BYTES = 250_000;
-const STRICT_PRIVATE_MODE_DISABLED_MESSAGE =
-  'AI and Smart Mode are disabled in zero-knowledge mode because the backend cannot read private writing.';
-const isStrictPrivateModeEnabled = () => true;
 const NOTE_OWNERSHIP_ACTIONS = new Set<AiAction>([
   'reflection',
   'ingestDecision',
