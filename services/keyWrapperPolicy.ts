@@ -53,11 +53,18 @@ export const keyWrapperPolicy = {
     unlockMethod?: UnlockMethod;
     iterations?: number;
   }): Promise<UserEncryptionKeyBundle> {
+    const unlockMethod = input.unlockMethod ?? 'private_writing_password';
+    if (unlockMethod === 'account_password' && input.secret.length === 0) {
+      throw new Error('Enter your account password to continue.');
+    }
+    if (unlockMethod === 'private_writing_password' && input.secret.trim().length < 12) {
+      throw new Error('Use at least 12 characters for your private-writing password.');
+    }
+
     const keyId = crypto.randomUUID();
     const rawDataKey = cryptoService.generateRawDataKey();
     const recoveryPhrase = cryptoService.generateRecoveryPhrase();
     const iterations = input.iterations ?? DEFAULT_PRIMARY_WRAPPER_ITERATIONS;
-    const unlockMethod = input.unlockMethod ?? 'private_writing_password';
     const primaryWrapper = await cryptoService.wrapRawDataKey(rawDataKey, input.secret, iterations);
 
     return {

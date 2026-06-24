@@ -57,10 +57,12 @@ export const PrivateWritingSetupStep: React.FC<{
   const createBundle = async () => {
     setIsSubmitting(true);
     setError('');
+    let usedPendingPassword = false;
 
     try {
       if (unlockMethod === 'account_password') {
         const pendingPassword = consumePendingAccountPassword(userId);
+        usedPendingPassword = Boolean(pendingPassword);
         const password = pendingPassword || accountPassword;
         if (!password) {
           setRequiresAccountPassword(true);
@@ -84,6 +86,7 @@ export const PrivateWritingSetupStep: React.FC<{
       }
       recordOnboardingFunnelEvent('private_writing_key_created', { method: unlockMethod });
     } catch (setupError) {
+      if (usedPendingPassword) setRequiresAccountPassword(true);
       setError(setupError instanceof Error ? setupError.message : 'Unable to set up private writing.');
     } finally {
       setIsSubmitting(false);
@@ -107,6 +110,7 @@ export const PrivateWritingSetupStep: React.FC<{
 
   const selectUnlockMethod = (nextUnlockMethod: UnlockMethod) => {
     setUnlockMethod(nextUnlockMethod);
+    setError('');
     if (recordedUnlockMethodRef.current === nextUnlockMethod) return;
 
     recordOnboardingFunnelEvent('private_writing_unlock_method_selected', {
@@ -185,7 +189,10 @@ export const PrivateWritingSetupStep: React.FC<{
   }
 
   return (
-    <div className="space-y-5">
+    <form className="space-y-5" onSubmit={(event) => {
+      event.preventDefault();
+      void createBundle();
+    }}>
       <div className="space-y-2">
         <p className="label-caps text-green">Private writing setup: 1 of 2</p>
         <p className="label-caps text-green">Private writing</p>
@@ -230,7 +237,8 @@ export const PrivateWritingSetupStep: React.FC<{
         </div>
       ) : (
         <p className="rounded-sm border border-border bg-surface-muted p-3 text-sm leading-6 text-gray-text">
-          Google signs you in. A private-writing password unlocks your writing inside Reflections.
+          You signed in with Google, so there is no Reflections account password to reuse. Create a separate
+          private-writing password to unlock your writing inside Reflections.
         </p>
       )}
 
@@ -248,10 +256,15 @@ export const PrivateWritingSetupStep: React.FC<{
               id="onboarding-account-password"
               className={setupInputClassName}
               type="password"
+              name="account-password"
               autoComplete="current-password"
+              required
               placeholder="Enter your account password"
               value={accountPassword}
-              onChange={(event) => setAccountPassword(event.target.value)}
+              onChange={(event) => {
+                setAccountPassword(event.target.value);
+                setError('');
+              }}
             />
           </div>
         )
@@ -265,10 +278,16 @@ export const PrivateWritingSetupStep: React.FC<{
               id="onboarding-private-password"
               className={setupInputClassName}
               type="password"
+              name="private-writing-password"
               autoComplete="new-password"
+              required
+              minLength={12}
               placeholder="At least 12 characters"
               value={privatePassword}
-              onChange={(event) => setPrivatePassword(event.target.value)}
+              onChange={(event) => {
+                setPrivatePassword(event.target.value);
+                setError('');
+              }}
             />
           </div>
           <div className="space-y-2">
@@ -279,10 +298,16 @@ export const PrivateWritingSetupStep: React.FC<{
               id="onboarding-private-password-confirm"
               className={setupInputClassName}
               type="password"
+              name="private-writing-password-confirmation"
               autoComplete="new-password"
+              required
+              minLength={12}
               placeholder="Confirm private-writing password"
               value={privatePasswordConfirmation}
-              onChange={(event) => setPrivatePasswordConfirmation(event.target.value)}
+              onChange={(event) => {
+                setPrivatePasswordConfirmation(event.target.value);
+                setError('');
+              }}
             />
           </div>
         </div>
@@ -290,8 +315,9 @@ export const PrivateWritingSetupStep: React.FC<{
 
       {error ? <p className="text-sm text-clay" role="alert">{error}</p> : null}
       <Button
+        type="submit"
         variant="primary"
-        onClick={createBundle}
+        isLoading={isSubmitting}
         disabled={
           isSubmitting ||
           (unlockMethod === 'account_password' && requiresAccountPassword && !accountPassword) ||
@@ -299,8 +325,8 @@ export const PrivateWritingSetupStep: React.FC<{
         }
         className="w-full min-h-12"
       >
-        Create private-writing key
+        {isSubmitting ? 'Creating private-writing key' : 'Create private-writing key'}
       </Button>
-    </div>
+    </form>
   );
 };

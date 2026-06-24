@@ -56,7 +56,21 @@ describe('private writing onboarding module contract', () => {
     expect(setupStep).toContain("canOfferAccountPassword ? 'account_password' : 'private_writing_password'");
     expect(setupStep).toContain('Use my account password');
     expect(setupStep).toContain('Recommended');
-    expect(setupStep).toContain('Google signs you in. A private-writing password unlocks your writing inside Reflections.');
+    expect(setupStep).toContain('You signed in with Google, so there is no Reflections account password to reuse.');
+  });
+
+  it('keeps setup submission semantic, retryable, and visibly busy', () => {
+    const setupStep = read('features/private-writing-onboarding/PrivateWritingSetupStep.tsx');
+
+    expect(setupStep).toContain('<form className="space-y-5" onSubmit=');
+    expect(setupStep).toContain('type="submit"');
+    expect(setupStep).toContain('name="account-password"');
+    expect(setupStep).toContain('autoComplete="current-password"');
+    expect(setupStep).toContain('required');
+    expect(setupStep).toContain('usedPendingPassword');
+    expect(setupStep).toContain('if (usedPendingPassword) setRequiresAccountPassword(true);');
+    expect(setupStep).toContain('isLoading={isSubmitting}');
+    expect(setupStep).toContain("isSubmitting ? 'Creating private-writing key'");
   });
 
   it('keeps required encryption setup non-dismissible and recovery-confirmed', () => {

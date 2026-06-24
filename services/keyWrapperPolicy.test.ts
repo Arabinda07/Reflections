@@ -4,6 +4,37 @@ import { keyWrapperPolicy } from './keyWrapperPolicy';
 const userId = 'user-1';
 
 describe('keyWrapperPolicy', () => {
+  it('accepts a verified account password shorter than eight characters', async () => {
+    const bundle = await keyWrapperPolicy.createBundle({
+      userId,
+      secret: 'six123',
+      unlockMethod: 'account_password',
+      iterations: 1_000,
+    });
+
+    await expect(keyWrapperPolicy.unlockWithPrimarySecret({
+      userId,
+      secret: 'six123',
+      bundle,
+    })).resolves.toMatchObject({ userId, keyId: bundle.keyId });
+  });
+
+  it('rejects empty account passwords and short private-writing passwords', async () => {
+    await expect(keyWrapperPolicy.createBundle({
+      userId,
+      secret: '',
+      unlockMethod: 'account_password',
+      iterations: 1_000,
+    })).rejects.toThrow('Enter your account password to continue.');
+
+    await expect(keyWrapperPolicy.createBundle({
+      userId,
+      secret: 'too short',
+      unlockMethod: 'private_writing_password',
+      iterations: 1_000,
+    })).rejects.toThrow('Use at least 12 characters for your private-writing password.');
+  });
+
   it('unlocks account-password users through the account password wrapper', async () => {
     const bundle = await keyWrapperPolicy.createBundle({
       userId,

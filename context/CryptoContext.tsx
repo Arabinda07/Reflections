@@ -117,14 +117,6 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const setupEncryption = useCallback(async (passphrase: string, unlockMethod: UnlockMethod = 'private_writing_password') => {
     if (!user?.id) throw new Error('Sign in before setting up encryption.');
-    const minimumLength = unlockMethod === 'account_password' ? 8 : 12;
-    if (passphrase.trim().length < minimumLength) {
-      throw new Error(
-        unlockMethod === 'account_password'
-          ? 'Enter your account password to continue.'
-          : 'Use at least 12 characters for your private-writing password.',
-      );
-    }
 
     const createdBundle = await keyWrapperPolicy.createBundle({
       userId: user.id,
