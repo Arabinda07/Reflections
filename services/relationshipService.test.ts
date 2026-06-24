@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { deriveRelationshipImportFingerprint, mergeRemoteWithPending, relationshipService } from './relationshipService';
-import { buildNonDestructiveMerge, fetchAllGoogleConnections, findRelationshipMergeSuggestion } from './relationshipImportPlanning';
+import { relationshipService } from './relationshipService';
+import { buildNonDestructiveMerge, deriveRelationshipImportFingerprint, fetchAllGoogleConnections, findRelationshipMergeSuggestion } from './relationshipImportPlanning';
+import { mergeRemoteWithPending } from './relationshipStore';
 import type { RelationshipRecord } from '../types';
 import type { LocalSyncStatus } from './db';
 

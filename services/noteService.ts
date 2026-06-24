@@ -1,7 +1,7 @@
 import type { Note } from '../types';
 import { offlineStorage } from './offlineStorage';
 import { getAuthenticatedUserId } from './authUtils';
-import { noteRemoteStore, mapToNote, mapToDbNote } from './noteRemoteStore';
+import { noteRemoteStore, mapToNote } from './noteRemoteStore';
 import type { LocalNote } from './db';
 import { syncEngine } from './syncEngine';
 

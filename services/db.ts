@@ -59,9 +59,6 @@ export class AppDatabase extends Dexie {
     this.version(2).stores({
       notes: 'id, userId, syncStatus, [userId+syncStatus], updatedAt'
     });
-    this.version(3).stores({
-      notes: 'id, userId, syncStatus, [userId+syncStatus], updatedAt'
-    });
     this.version(4).stores({
       notes: 'id, userId, syncStatus, [userId+syncStatus], updatedAt',
       relationships: 'id, userId, syncStatus, [userId+syncStatus], updatedAt',

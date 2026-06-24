@@ -21,7 +21,7 @@ describe('RelationshipOS routing and UI contracts', () => {
   });
 
   it('keeps Google Contacts import one-time, read-only, and inbox-gated', () => {
-    const service = read('services/relationshipService.ts');
+    const service = read('services/googleContactsImportService.ts');
     const page = read('pages/dashboard/RelationshipImportInbox.tsx');
     const importPlanning = read('services/relationshipImportPlanning.ts');
 
@@ -39,6 +39,7 @@ describe('RelationshipOS routing and UI contracts', () => {
     expect(importPlanning).not.toContain('people:updateContact');
     expect(page).toContain('Review one by one');
     expect(page).toContain('Google import');
+    expect(read('services/relationshipService.ts')).not.toContain('startGoogleContactsOAuth');
   });
 });
 
