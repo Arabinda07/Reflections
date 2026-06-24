@@ -3,6 +3,7 @@ import { supabase } from '../src/supabaseClient';
 import { type CryptoSession } from '../services/cryptoService';
 import {
   keyWrapperPolicy,
+  type EncryptionMigrationState,
   type PersistedUserEncryptionKeyBundle,
   type UnlockMethod,
   type UserEncryptionKeyBundle,
@@ -43,15 +44,30 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [pendingBundle, setPendingBundle] = useState<UserEncryptionKeyBundle | null>(null);
   const [recoveryKey, setRecoveryKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const setUnlockedSession = useCallback(async (nextSession: CryptoSession) => {
+  const setUnlockedSession = useCallback(async (
+    nextSession: CryptoSession,
+    migrationState: EncryptionMigrationState,
+  ) => {
     setCurrentCryptoSession(nextSession);
     setSession(nextSession);
+    if (migrationState === 'plaintext_cleared') {
+      setStatus('unlocked');
+      setError(null);
+      setMigrationProgress(null);
+      return;
+    }
     setStatus('migrating');
     setMigrationProgress(null);
 
     try {
       await zeroKnowledgeMigrationService.migrateUserPrivateData(nextSession, setMigrationProgress);
+      const { error: migrationStateError } = await supabase
+        .from('user_encryption_keys')
+        .update({ migration_state: 'plaintext_cleared' })
+        .eq('user_id', nextSession.userId)
+        .eq('key_id', nextSession.keyId);
+      if (migrationStateError) throw migrationStateError;
+      setBundle((current) => current ? { ...current, migrationState: 'plaintext_cleared' } : current);
       setStatus('unlocked');
       setError(null);
       setMigrationProgress(null);
@@ -150,7 +166,7 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setBundle(pendingBundle);
     setPendingBundle(null);
     setRecoveryKey(null);
-    await setUnlockedSession(nextSession);
+    await setUnlockedSession(nextSession, pendingBundle.migrationState);
   }, [pendingBundle, setUnlockedSession]);
 
   const unlockWithPassphrase = useCallback(async (passphrase: string) => {
@@ -159,7 +175,7 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       userId: user.id,
       secret: passphrase,
       bundle,
-    }));
+    }), bundle.migrationState);
   }, [bundle, setUnlockedSession, user?.id]);
 
   const unlockWithRecoveryKey = useCallback(async (typedRecoveryKey: string) => {
@@ -168,7 +184,7 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       userId: user.id,
       recoveryPhrase: typedRecoveryKey,
       bundle,
-    }));
+    }), bundle.migrationState);
   }, [bundle, setUnlockedSession, user?.id]);
 
   const persistAccountPasswordRewrap = useCallback(async (input: {
@@ -212,7 +228,7 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       bundle,
     });
     await persistAccountPasswordRewrap(result);
-    await setUnlockedSession(result.session);
+    await setUnlockedSession(result.session, bundle.migrationState);
   }, [bundle, persistAccountPasswordRewrap, setUnlockedSession, user?.id]);
 
   const recoverAccountPasswordWithPreviousPassword = useCallback(async (
@@ -231,7 +247,7 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       bundle,
     });
     await persistAccountPasswordRewrap(result);
-    await setUnlockedSession(result.session);
+    await setUnlockedSession(result.session, bundle.migrationState);
   }, [bundle, persistAccountPasswordRewrap, setUnlockedSession, user?.id]);
 
   const value = useMemo<CryptoContextValue>(() => ({

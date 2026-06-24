@@ -1,6 +1,7 @@
 import { cryptoService, type CryptoSession, type KeyWrapper } from './cryptoService';
 
 export type UnlockMethod = 'account_password' | 'private_writing_password';
+export type EncryptionMigrationState = 'pending' | 'migrating' | 'verified' | 'plaintext_cleared' | 'reset';
 
 export interface UserEncryptionKeyBundle {
   userId: string;
@@ -10,6 +11,7 @@ export interface UserEncryptionKeyBundle {
   passphraseWrapper: KeyWrapper;
   recoveryWrapper: KeyWrapper;
   recoveryPhrase: string;
+  migrationState: EncryptionMigrationState;
 }
 
 export interface PersistedUserEncryptionKeyBundle {
@@ -19,6 +21,7 @@ export interface PersistedUserEncryptionKeyBundle {
   accountPasswordWrapper?: KeyWrapper | null;
   passphraseWrapper: KeyWrapper;
   recoveryWrapper: KeyWrapper;
+  migrationState: EncryptionMigrationState;
 }
 
 export interface SupabaseEncryptionKeyRow {
@@ -28,6 +31,7 @@ export interface SupabaseEncryptionKeyRow {
   account_password_wrapper?: KeyWrapper | null;
   passphrase_wrapper: KeyWrapper;
   recovery_wrapper: KeyWrapper;
+  migration_state?: EncryptionMigrationState | null;
 }
 
 export interface AccountPasswordRewrapPayload {
@@ -75,6 +79,7 @@ export const keyWrapperPolicy = {
       passphraseWrapper: primaryWrapper,
       recoveryWrapper: await cryptoService.wrapRawDataKey(rawDataKey, recoveryPhrase, iterations),
       recoveryPhrase,
+      migrationState: 'pending',
     };
   },
 
@@ -86,6 +91,7 @@ export const keyWrapperPolicy = {
       accountPasswordWrapper: row.account_password_wrapper ?? null,
       passphraseWrapper: row.passphrase_wrapper,
       recoveryWrapper: row.recovery_wrapper,
+      migrationState: row.migration_state || 'pending',
     };
   },
 
@@ -97,6 +103,7 @@ export const keyWrapperPolicy = {
       account_password_wrapper: bundle.accountPasswordWrapper,
       passphrase_wrapper: bundle.passphraseWrapper,
       recovery_wrapper: bundle.recoveryWrapper,
+      migration_state: bundle.migrationState,
       recovery_verified_at: new Date().toISOString(),
       encryption_setup_completed_at: new Date().toISOString(),
       kdf_calibration: {

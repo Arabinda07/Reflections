@@ -123,16 +123,18 @@ describe('keyWrapperPolicy', () => {
       account_password_wrapper: bundle.accountPasswordWrapper,
       passphrase_wrapper: bundle.passphraseWrapper,
       recovery_wrapper: bundle.recoveryWrapper,
+      migration_state: 'plaintext_cleared',
     });
     const payload = keyWrapperPolicy.toSetupInsertPayload(mapped);
 
-    expect(mapped).toMatchObject({ userId, keyId: bundle.keyId });
+    expect(mapped).toMatchObject({ userId, keyId: bundle.keyId, migrationState: 'plaintext_cleared' });
     expect(payload).toMatchObject({
       user_id: userId,
       key_id: bundle.keyId,
       unlock_method: 'private_writing_password',
       passphrase_wrapper: bundle.passphraseWrapper,
       recovery_wrapper: bundle.recoveryWrapper,
+      migration_state: 'plaintext_cleared',
     });
     expect(payload.recovery_verified_at).toEqual(expect.any(String));
     expect(payload.encryption_setup_completed_at).toEqual(expect.any(String));
