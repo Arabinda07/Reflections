@@ -91,7 +91,8 @@ describe('focused product slice source contract', () => {
     expect(singleNote).toContain('Download Markdown');
     expect(singleNote).toContain('Choose an attachment to download');
     expect(singleNote).toContain('noteAttachments.map');
-    expect(singleNote).toContain('downloadAttachment(attachment.path)');
+    expect(singleNote).toContain('downloadAttachment(attachment)');
+    expect(singleNote).toContain('link.download = attachment.name');
     expect(singleNote).toContain('aria-label={`Download attachment: ${attachment.name}`}');
     expect(singleNote).not.toContain('Download all');
     expect(singleNote).not.toContain('downloadAllAttachments');
