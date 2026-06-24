@@ -56,6 +56,8 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setError(null);
       setMigrationProgress(null);
     } catch (migrationError) {
+      setCurrentCryptoSession(null);
+      setSession(null);
       const detail = migrationError instanceof Error ? migrationError.message : 'Unknown migration error.';
       setError(`Private writing could not finish encrypting existing data. Refresh to resume safely. ${detail}`);
       setStatus('error');

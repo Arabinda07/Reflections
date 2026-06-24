@@ -138,7 +138,7 @@ describe('zeroKnowledgeMigrationService', () => {
     expect(updates.some((update) => update.rowId === 'note-pending' && update.payload.encryption_migration_state === 'plaintext_cleared')).toBe(true);
   });
 
-  it('skips already-verified encrypted rows instead of comparing against cleared plaintext fields', async () => {
+  it('promotes verified rows whose plaintext is already cleared', async () => {
     tableRows.notes = [
       {
         id: 'note-verified',
@@ -158,7 +158,14 @@ describe('zeroKnowledgeMigrationService', () => {
 
     await zeroKnowledgeMigrationService.migrateUserPrivateData(session);
 
-    expect(updates.some((update) => update.rowId === 'note-verified')).toBe(false);
+    expect(updates).toContainEqual(expect.objectContaining({
+      rowId: 'note-verified',
+      payload: expect.objectContaining({
+        title: null,
+        content: null,
+        encryption_migration_state: 'plaintext_cleared',
+      }),
+    }));
     expect(cryptoMocks.decryptJson).not.toHaveBeenCalledWith(
       expect.anything(),
       expect.anything(),
@@ -194,7 +201,7 @@ describe('zeroKnowledgeMigrationService', () => {
     expect(updates.filter((update) => update.rowId === 'note-bad-payload')).toHaveLength(0);
   });
 
-  it('verifies before marking a row verified during successful migration', async () => {
+  it('verifies before atomically clearing plaintext during successful migration', async () => {
     tableRows.notes = [
       { id: 'note-ordered', title: 'One', content: 'First', tags: [], attachments: [], tasks: [], user_id: session.userId },
     ];
@@ -202,16 +209,16 @@ describe('zeroKnowledgeMigrationService', () => {
     await zeroKnowledgeMigrationService.migrateUserPrivateData(session);
 
     expect(events.indexOf('verify')).toBeGreaterThanOrEqual(0);
-    expect(events.indexOf('notes:verified')).toBeGreaterThanOrEqual(0);
-    expect(events.indexOf('verify')).toBeLessThan(events.indexOf('notes:verified'));
+    expect(events.indexOf('notes:plaintext_cleared')).toBeGreaterThanOrEqual(0);
+    expect(events.indexOf('verify')).toBeLessThan(events.indexOf('notes:plaintext_cleared'));
   });
 
-  it('keeps every migration path verifying before the verified-state write', () => {
+  it('keeps every migration path verifying before the atomic clear write', () => {
     const source = read('services/zeroKnowledgeMigrationService.ts');
 
     for (const table of ['notes', 'mood_checkins', 'future_letters', 'life_themes']) {
       const verifyIndex = source.indexOf(`await verifyEnvelope(session, '${table}'`);
-      const markIndex = source.indexOf(`await markEncryptionVerified('${table}'`);
+      const markIndex = source.indexOf(`await finalizeEncryptedRow('${table}'`);
 
       expect(verifyIndex).toBeGreaterThanOrEqual(0);
       expect(markIndex).toBeGreaterThanOrEqual(0);

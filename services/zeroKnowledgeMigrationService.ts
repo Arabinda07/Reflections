@@ -55,7 +55,7 @@ const isEncryptedMigrationComplete = (row: {
   encryption_migration_state?: string;
 }) =>
   isEncryptedEnvelope(row.encrypted_payload) &&
-  (row.encryption_migration_state === 'verified' || row.encryption_migration_state === 'plaintext_cleared');
+  row.encryption_migration_state === 'plaintext_cleared';
 
 const reportProgress = (
   table: MigrationTable,
@@ -119,18 +119,20 @@ const verifyEnvelope = async <T>(
   }
 };
 
-const markEncryptionVerified = async (
+const finalizeEncryptedRow = async (
   table: MigrationTable,
   rowId: string,
   userId: string,
   encryptedPayload: EncryptedEnvelope,
+  clearedPlaintext: Record<string, unknown>,
 ) => {
   const { error } = await supabase
     .from(table)
     .update({
       encrypted_payload: encryptedPayload,
       encrypted_payload_version: 1,
-      encryption_migration_state: 'verified',
+      ...clearedPlaintext,
+      encryption_migration_state: 'plaintext_cleared',
     })
     .eq('id', rowId)
     .eq('user_id', userId);
@@ -160,12 +162,13 @@ const migrateNotes = async (session: CryptoSession, onProgress?: MigrationProgre
         ? row.encrypted_payload
         : await cryptoService.encryptJson(session, aad('notes', session.userId, row.id), payload);
 
-      await verifyEnvelope(session, 'notes', session.userId, row.id, encryptedPayload, payload);
-      await markEncryptionVerified('notes', row.id, session.userId, encryptedPayload);
-
-      const { error: clearError } = await supabase
-        .from('notes')
-        .update({
+      const plaintextAlreadyCleared = row.title == null && row.content == null && row.thumbnail_url == null
+        && (row.tags?.length ?? 0) === 0 && (row.attachments?.length ?? 0) === 0
+        && (row.tasks?.length ?? 0) === 0 && row.mood == null;
+      if (!plaintextAlreadyCleared) {
+        await verifyEnvelope(session, 'notes', session.userId, row.id, encryptedPayload, payload);
+      }
+      await finalizeEncryptedRow('notes', row.id, session.userId, encryptedPayload, {
           title: null,
           content: null,
           thumbnail_url: null,
@@ -173,12 +176,7 @@ const migrateNotes = async (session: CryptoSession, onProgress?: MigrationProgre
           attachments: [],
           tasks: [],
           mood: null,
-          encryption_migration_state: 'plaintext_cleared',
-        })
-        .eq('id', row.id)
-        .eq('user_id', session.userId);
-
-      if (clearError) throw clearError;
+      });
     },
   });
 };
@@ -205,21 +203,15 @@ const migrateMoods = async (session: CryptoSession, onProgress?: MigrationProgre
         ? row.encrypted_payload
         : await cryptoService.encryptJson(session, aad('mood_checkins', session.userId, row.id), payload);
 
-      await verifyEnvelope(session, 'mood_checkins', session.userId, row.id, encryptedPayload, payload);
-      await markEncryptionVerified('mood_checkins', row.id, session.userId, encryptedPayload);
-
-      const { error: clearError } = await supabase
-        .from('mood_checkins')
-        .update({
+      const plaintextAlreadyCleared = row.mood == null && row.label == null && row.source == null;
+      if (!plaintextAlreadyCleared) {
+        await verifyEnvelope(session, 'mood_checkins', session.userId, row.id, encryptedPayload, payload);
+      }
+      await finalizeEncryptedRow('mood_checkins', row.id, session.userId, encryptedPayload, {
           mood: null,
           label: null,
           source: null,
-          encryption_migration_state: 'plaintext_cleared',
-        })
-        .eq('id', row.id)
-        .eq('user_id', session.userId);
-
-      if (clearError) throw clearError;
+      });
     },
   });
 };
@@ -246,20 +238,14 @@ const migrateFutureLetters = async (session: CryptoSession, onProgress?: Migrati
         ? row.encrypted_payload
         : await cryptoService.encryptJson(session, aad('future_letters', session.userId, row.id), payload);
 
-      await verifyEnvelope(session, 'future_letters', session.userId, row.id, encryptedPayload, payload);
-      await markEncryptionVerified('future_letters', row.id, session.userId, encryptedPayload);
-
-      const { error: clearError } = await supabase
-        .from('future_letters')
-        .update({
+      const plaintextAlreadyCleared = row.title == null && row.content == null;
+      if (!plaintextAlreadyCleared) {
+        await verifyEnvelope(session, 'future_letters', session.userId, row.id, encryptedPayload, payload);
+      }
+      await finalizeEncryptedRow('future_letters', row.id, session.userId, encryptedPayload, {
           title: null,
           content: null,
-          encryption_migration_state: 'plaintext_cleared',
-        })
-        .eq('id', row.id)
-        .eq('user_id', session.userId);
-
-      if (clearError) throw clearError;
+      });
     },
   });
 };
@@ -287,20 +273,15 @@ const migrateLifeThemes = async (session: CryptoSession, onProgress?: MigrationP
         ? row.encrypted_payload
         : await cryptoService.encryptJson(session, aad('life_themes', session.userId, row.id), payload);
 
-      await verifyEnvelope(session, 'life_themes', session.userId, row.id, encryptedPayload, payload);
-      await markEncryptionVerified('life_themes', row.id, session.userId, encryptedPayload);
-
-      const { error: clearError } = await supabase
-        .from('life_themes')
-        .update({
-          title: row.page_type === 'theme' ? 'Encrypted theme' : 'Encrypted wiki page',
+      const clearedTitle = row.page_type === 'theme' ? 'Encrypted theme' : 'Encrypted wiki page';
+      const plaintextAlreadyCleared = row.title === clearedTitle && row.content === '';
+      if (!plaintextAlreadyCleared) {
+        await verifyEnvelope(session, 'life_themes', session.userId, row.id, encryptedPayload, payload);
+      }
+      await finalizeEncryptedRow('life_themes', row.id, session.userId, encryptedPayload, {
+          title: clearedTitle,
           content: '',
-          encryption_migration_state: 'plaintext_cleared',
-        })
-        .eq('id', row.id)
-        .eq('user_id', session.userId);
-
-      if (clearError) throw clearError;
+      });
     },
   });
 };
