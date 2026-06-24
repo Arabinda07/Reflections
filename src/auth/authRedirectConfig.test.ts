@@ -76,13 +76,16 @@ describe('auth redirect config', () => {
     expect(getOAuthRedirectTo()).toBe('com.arabinda.reflections://auth/callback');
   });
 
-  it('rejects unsafe callback next paths and only allows reset password', () => {
+  it('rejects unsafe callback next paths and only allows explicit safe destinations', () => {
     const origin = 'https://www.reflections-sanctuary.space';
 
     expect(resolveSafeCallbackNextPath('/reset-password', origin)).toBe(RoutePath.RESET_PASSWORD);
     expect(resolveSafeCallbackNextPath(`${origin}/reset-password`, origin)).toBe(RoutePath.RESET_PASSWORD);
+    expect(resolveSafeCallbackNextPath('/relationships', origin)).toBe(RoutePath.RELATIONSHIPS);
+    expect(resolveSafeCallbackNextPath('/relationships?tab=import', origin)).toBe(`${RoutePath.RELATIONSHIPS}?tab=import`);
     expect(resolveSafeCallbackNextPath('https://evil.example/reset-password', origin)).toBeNull();
     expect(resolveSafeCallbackNextPath('/reset-password?x=1', origin)).toBeNull();
+    expect(resolveSafeCallbackNextPath('/relationships?tab=people', origin)).toBeNull();
     expect(resolveSafeCallbackNextPath('/notes', origin)).toBeNull();
   });
 

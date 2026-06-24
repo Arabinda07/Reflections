@@ -41,6 +41,7 @@ import {
 import { getMoodConfig } from './moodConfig';
 import { MoodPicker, type MoodPickerStage } from './MoodPicker';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { RelationshipHomeModule } from './RelationshipHomeModule';
 
 
 const WRITING_NOTES = [
@@ -825,6 +826,8 @@ export const HomeAuthenticated: React.FC = () => {
           </div>
 
           <div className="grid gap-6">
+            <RelationshipHomeModule />
+
             <div
               className="group relative surface-flat surface-tone-sky overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-shadow duration-300 ease-out-expo hover:shadow-[0_12px_32px_var(--tw-shadow-color)] hover:shadow-sky/5"
             >

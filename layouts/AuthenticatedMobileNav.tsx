@@ -7,6 +7,7 @@ import { DotsThreeCircle } from '@phosphor-icons/react/DotsThreeCircle';
 import { DownloadSimple } from '@phosphor-icons/react/DownloadSimple';
 import { EnvelopeSimple } from '@phosphor-icons/react/EnvelopeSimple';
 import { House } from '@phosphor-icons/react/House';
+import { Heart } from '@phosphor-icons/react/Heart';
 import { Notebook } from '@phosphor-icons/react/Notebook';
 import { PaperPlaneTilt } from '@phosphor-icons/react/PaperPlaneTilt';
 import { PencilSimpleLine } from '@phosphor-icons/react/PencilSimpleLine';
@@ -56,6 +57,8 @@ const isNoteRoute = (pathname: string) =>
 const isMoreRoute = (pathname: string) =>
   pathname === RoutePath.INSIGHTS ||
   pathname === RoutePath.FUTURE_LETTERS ||
+  pathname === RoutePath.RELATIONSHIPS ||
+  pathname.startsWith(`${RoutePath.RELATIONSHIPS}/`) ||
   pathname === RoutePath.ACCOUNT ||
   pathname === RoutePath.FAQ ||
   pathname === RoutePath.WIKI ||
@@ -94,6 +97,7 @@ export const MORE_NAV_GROUPS: MoreNavGroup[] = [
     label: 'Reflect',
     items: [
       { label: 'Insights', path: RoutePath.INSIGHTS, icon: Sparkle },
+      { label: 'Relationships', path: RoutePath.RELATIONSHIPS, icon: Heart },
       { label: 'Future Letters', path: RoutePath.FUTURE_LETTERS, icon: EnvelopeSimple },
       {
         label: 'Life Wiki',

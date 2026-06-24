@@ -62,8 +62,8 @@ export const SyncBanner: React.FC = () => {
             
             <span className="font-sans text-[12px] font-bold tracking-wide">
               {bannerMode === 'offline' 
-                ? 'Offline. Notes saved securely to this device. Connect to sync.'
-                : 'Online. Notes synced to sanctuary.'
+                ? 'Offline. Changes are saved securely to this device.'
+                : 'Online. Secure sync is available again.'
               }
             </span>
           </div>

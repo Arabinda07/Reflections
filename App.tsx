@@ -23,6 +23,7 @@ const FutureLetters = lazy(() => import('@/pages/dashboard/FutureLetters').then(
 const Account = lazy(() => import('@/pages/dashboard/Account').then((m) => ({ default: m.Account })));
 const Insights = lazy(() => import('@/pages/dashboard/Insights').then((m) => ({ default: m.Insights })));
 const LifeWiki = lazy(() => import('@/pages/dashboard/LifeWiki').then((m) => ({ default: m.LifeWiki })));
+const Relationships = lazy(() => import('@/pages/dashboard/Relationships').then((m) => ({ default: m.Relationships })));
 const FAQ = lazy(() => import('@/pages/dashboard/FAQ').then((m) => ({ default: m.FAQ })));
 const AboutArabinda = lazy(() => import('@/pages/dashboard/AboutArabinda').then((m) => ({ default: m.AboutArabinda })));
 const PrivacyPolicy = lazy(() => import('@/pages/dashboard/PrivacyPolicy').then((m) => ({ default: m.PrivacyPolicy })));
@@ -110,6 +111,8 @@ const router = createBrowserRouter(
         <Route path={RoutePath.WIKI} element={withPrivateRoute(withRouteFallback(<LifeWiki />))} />
         <Route path={RoutePath.SANCTUARY} element={withPrivateRoute(withRouteFallback(<LifeWiki />))} />
         <Route path={RoutePath.SANCTUARY_ARTICLE} element={withPrivateRoute(withRouteFallback(<LifeWiki />))} />
+        <Route path={RoutePath.RELATIONSHIPS} element={withPrivateRoute(withRouteFallback(<Relationships />))} />
+        <Route path={RoutePath.RELATIONSHIP_DETAIL} element={withPrivateRoute(withRouteFallback(<Relationships />))} />
 
         <Route path="*" element={withRouteFallback(<NotFound />)} />
       </Route>

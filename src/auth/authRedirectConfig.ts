@@ -75,6 +75,13 @@ export const resolveSafeCallbackNextPath = (
     if (url.pathname === RoutePath.RESET_PASSWORD && !url.search && !url.hash) {
       return RoutePath.RESET_PASSWORD;
     }
+    if (
+      url.pathname === RoutePath.RELATIONSHIPS &&
+      (url.search === '' || url.search === '?tab=import') &&
+      !url.hash
+    ) {
+      return `${RoutePath.RELATIONSHIPS}${url.search}`;
+    }
 
     return null;
   } catch {
