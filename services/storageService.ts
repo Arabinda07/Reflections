@@ -1,5 +1,5 @@
 import { supabase } from '../src/supabaseClient';
-import { cryptoService, isEncryptedEnvelope } from './cryptoService';
+import { cryptoService, isEncryptedEnvelope, type EncryptedEnvelope } from './cryptoService';
 import { requireCurrentCryptoSession } from './cryptoSessionStore';
 
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
@@ -55,33 +55,66 @@ const assertCurrentUserOwnsPath = async (path: string) => {
   }
 };
 
-const storageAad = (path: string) => {
+const storageAad = (path: string, part?: 'metadata' | 'content') => {
   const userId = path.split('/')[0] || '';
   return {
     table: 'storage.objects',
-    rowId: path,
+    rowId: part ? `${path}:${part}` : path,
     userId,
   };
 };
 
 const isEncryptedNoteFilePath = (path: string) => path.includes('/notes/');
 
+interface StoredEncryptedFile {
+  v: 1;
+  metadata: EncryptedEnvelope;
+  content: EncryptedEnvelope;
+}
+
+const isStoredEncryptedFile = (value: unknown): value is StoredEncryptedFile => {
+  if (!value || typeof value !== 'object') return false;
+  const file = value as Partial<StoredEncryptedFile>;
+  return file.v === 1 && isEncryptedEnvelope(file.metadata) && isEncryptedEnvelope(file.content);
+};
+
 const encryptedFile = async (file: File, path: string) => {
-  const encryptedPayload = await cryptoService.encryptBytes(
-    requireCurrentCryptoSession(),
-    storageAad(path),
-    new Uint8Array(await file.arrayBuffer()),
-  );
-  return new Blob([JSON.stringify(encryptedPayload)], { type: 'application/json' });
+  const session = requireCurrentCryptoSession();
+  const payload: StoredEncryptedFile = {
+    v: 1,
+    metadata: await cryptoService.encryptJson(session, storageAad(path, 'metadata'), {
+      name: file.name,
+      type: file.type,
+    }),
+    content: await cryptoService.encryptBytes(
+      session,
+      storageAad(path, 'content'),
+      new Uint8Array(await file.arrayBuffer()),
+    ),
+  };
+  return new Blob([JSON.stringify(payload)], { type: 'application/json' });
 };
 
 const decryptFileUrl = async (signedUrl: string, path: string) => {
   const response = await fetch(signedUrl);
   if (!response.ok) throw new Error('Encrypted file could not be downloaded');
-  const envelope = await response.json();
-  if (!isEncryptedEnvelope(envelope)) throw new Error('Stored file is not encrypted');
-  const bytes = await cryptoService.decryptBytes(requireCurrentCryptoSession(), storageAad(path), envelope);
-  return URL.createObjectURL(new Blob([bytes]));
+  const stored = await response.json();
+  const session = requireCurrentCryptoSession();
+
+  if (isEncryptedEnvelope(stored)) {
+    const bytes = await cryptoService.decryptBytes(session, storageAad(path), stored);
+    return URL.createObjectURL(new Blob([bytes], { type: 'application/octet-stream' }));
+  }
+  if (!isStoredEncryptedFile(stored)) throw new Error('Stored file is not encrypted');
+
+  const metadata = await cryptoService.decryptJson<{ name: string; type: string }>(
+    session,
+    storageAad(path, 'metadata'),
+    stored.metadata,
+  );
+  const bytes = await cryptoService.decryptBytes(session, storageAad(path, 'content'), stored.content);
+  const type = NOTE_ATTACHMENT_MIME_TYPES.has(metadata.type) ? metadata.type : 'application/octet-stream';
+  return URL.createObjectURL(new Blob([bytes], { type }));
 };
 
 export const storageService = {

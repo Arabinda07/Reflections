@@ -3,6 +3,7 @@ import { storageService } from './storageService';
 import { supabase } from '../src/supabaseClient';
 import { keyWrapperPolicy } from './keyWrapperPolicy';
 import { setCurrentCryptoSession } from './cryptoSessionStore';
+import { cryptoService } from './cryptoService';
 
 vi.mock('../src/supabaseClient', () => ({
   supabase: {
@@ -45,11 +46,12 @@ describe('storageService upload hardening', () => {
       secret: 'attachment passphrase',
       iterations: 1_000,
     });
-    setCurrentCryptoSession(await keyWrapperPolicy.unlockWithPrimarySecret({
+    const session = await keyWrapperPolicy.unlockWithPrimarySecret({
       userId: 'user-1',
       secret: 'attachment passphrase',
       bundle,
-    }));
+    });
+    setCurrentCryptoSession(session);
 
     const file = new File(['hello'], 'voice.webm', { type: 'audio/webm' });
     const path = await storageService.uploadFile(file, 'user-1', 'notes', 'note-1');
@@ -64,6 +66,67 @@ describe('storageService upload hardening', () => {
         upsert: false,
       }),
     );
+    const body = upload.mock.calls[0][1] as Blob;
+    const stored = JSON.parse(await body.text());
+    expect(stored).toMatchObject({
+      v: 1,
+      metadata: expect.objectContaining({ alg: 'AES-GCM-256' }),
+      content: expect.objectContaining({ alg: 'AES-GCM-256' }),
+    });
+    expect(await cryptoService.decryptJson(
+      session,
+      { table: 'storage.objects', rowId: `${path}:metadata`, userId: 'user-1' },
+      stored.metadata,
+    )).toEqual({ name: 'voice.webm', type: 'audio/webm' });
+    expect(JSON.stringify(stored)).not.toContain('voice.webm');
+  });
+
+  it('restores MIME types and still reads legacy attachment envelopes', async () => {
+    const bundle = await keyWrapperPolicy.createBundle({
+      userId: 'user-1',
+      secret: 'attachment passphrase',
+      iterations: 1_000,
+    });
+    const session = await keyWrapperPolicy.unlockWithPrimarySecret({
+      userId: 'user-1',
+      secret: 'attachment passphrase',
+      bundle,
+    });
+    setCurrentCryptoSession(session);
+    const path = 'user-1/notes/note-1/file.enc';
+    const content = new TextEncoder().encode('private audio');
+    const stored = {
+      v: 1,
+      metadata: await cryptoService.encryptJson(
+        session,
+        { table: 'storage.objects', rowId: `${path}:metadata`, userId: 'user-1' },
+        { name: 'voice.webm', type: 'audio/webm' },
+      ),
+      content: await cryptoService.encryptBytes(
+        session,
+        { table: 'storage.objects', rowId: `${path}:content`, userId: 'user-1' },
+        content,
+      ),
+    };
+    const createSignedUrl = vi.fn().mockResolvedValue({ data: { signedUrl: 'https://signed' }, error: null });
+    mockFrom.mockReturnValue({ createSignedUrl } as any);
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify(stored)));
+    const createObjectUrl = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:decrypted');
+
+    await expect(storageService.getSignedUrl(path)).resolves.toBe('blob:decrypted');
+    expect((createObjectUrl.mock.calls[0][0] as Blob).type).toBe('audio/webm');
+
+    const legacy = await cryptoService.encryptBytes(
+      session,
+      { table: 'storage.objects', rowId: path, userId: 'user-1' },
+      content,
+    );
+    fetchSpy.mockResolvedValueOnce(new Response(JSON.stringify(legacy)));
+    await storageService.getSignedUrl(path);
+    expect((createObjectUrl.mock.calls[1][0] as Blob).type).toBe('application/octet-stream');
+
+    fetchSpy.mockRestore();
+    createObjectUrl.mockRestore();
   });
 
   it('paginates user-prefix deletion beyond the first 1000 storage objects', async () => {

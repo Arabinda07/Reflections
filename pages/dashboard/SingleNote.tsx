@@ -28,7 +28,7 @@ import { Surface } from '../../components/ui/Surface';
 import { noteService } from '../../services/noteService';
 import { storageService } from '../../services/storageService';
 import { useViewTransitionNavigation } from '../../hooks/useViewTransitionNavigation';
-import { Note, RoutePath, Task } from '../../types';
+import { type Note, type NoteAttachment, RoutePath, type Task } from '../../types';
 import { sanitizeNoteHtml } from './noteContent';
 import { downloadNoteExport } from './noteExport';
 import { getMoodConfig } from './moodConfig';
@@ -212,26 +212,23 @@ export const SingleNote: React.FC = () => {
     return <Icon size={16} weight="fill" className={moodConfig.labelClass} />;
   };
 
-  const downloadAttachment = async (path: string) => {
+  const downloadAttachment = async (attachment: NoteAttachment) => {
     setError(null);
-    const popup = window.open('', '_blank', 'noopener,noreferrer');
 
     try {
-      const url = await storageService.getSignedUrl(path);
+      const url = await storageService.getSignedUrl(attachment.path);
 
       if (!url) {
         throw new Error('Missing attachment URL');
       }
 
-      if (popup) {
-        popup.opener = null;
-        popup.location.href = url;
-        return;
-      }
-
-      window.location.assign(url);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = attachment.name;
+      link.rel = 'noopener';
+      link.click();
+      if (url.startsWith('blob:')) window.setTimeout(() => URL.revokeObjectURL(url), 0);
     } catch (err) {
-      popup?.close();
       console.error('Failed to open attachment', err);
       setError('This attachment could not be opened right now. Please try again.');
     }
@@ -471,7 +468,7 @@ export const SingleNote: React.FC = () => {
                               </div>
                               <button
                                 type="button"
-                                onClick={() => downloadAttachment(attachment.path)}
+                                onClick={() => downloadAttachment(attachment)}
                                 className="rounded-[var(--radius-control)] border border-transparent p-2 text-gray-nav transition-colors hover:border-green/20 hover:bg-green/10 hover:text-green"
                                 title="Download attachment"
                                 aria-label={`Download ${attachment.name}`}
@@ -521,7 +518,7 @@ export const SingleNote: React.FC = () => {
                 key={attachment.id || attachment.path}
                 type="button"
                 onClick={() => {
-                  void downloadAttachment(attachment.path);
+                  void downloadAttachment(attachment);
                   setIsExportSheetOpen(false);
                 }}
                 className="surface-inline-panel flex w-full items-center justify-between gap-3 px-4 py-4 text-left transition-colors hover:border-green/20 hover:bg-green/5"

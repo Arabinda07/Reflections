@@ -1,9 +1,27 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { keyWrapperPolicy } from './keyWrapperPolicy';
+import { cryptoService } from './cryptoService';
 
 const userId = 'user-1';
 
 describe('keyWrapperPolicy', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it('calibrates wrappers when setup does not provide an iteration count', async () => {
+    const calibrate = vi.spyOn(cryptoService, 'calibratePbkdf2Iterations').mockResolvedValue(1_234);
+    const bundle = await keyWrapperPolicy.createBundle({
+      userId,
+      secret: 'private writing password',
+    });
+
+    expect(calibrate).toHaveBeenCalledOnce();
+    expect(bundle.passphraseWrapper.iterations).toBe(1_234);
+    expect(keyWrapperPolicy.toSetupInsertPayload(bundle).kdf_calibration).toEqual({
+      targetMs: 500,
+      source: 'web_crypto_pbkdf2',
+      iterations: 1_234,
+    });
+  });
   it('accepts a verified account password shorter than eight characters', async () => {
     const bundle = await keyWrapperPolicy.createBundle({
       userId,

@@ -64,7 +64,7 @@ export const keyWrapperPolicy = {
     const keyId = crypto.randomUUID();
     const rawDataKey = cryptoService.generateRawDataKey();
     const recoveryPhrase = cryptoService.generateRecoveryPhrase();
-    const iterations = input.iterations ?? DEFAULT_PRIMARY_WRAPPER_ITERATIONS;
+    const iterations = input.iterations ?? await cryptoService.calibratePbkdf2Iterations();
     const primaryWrapper = await cryptoService.wrapRawDataKey(rawDataKey, input.secret, iterations);
 
     return {
@@ -102,6 +102,7 @@ export const keyWrapperPolicy = {
       kdf_calibration: {
         targetMs: 500,
         source: 'web_crypto_pbkdf2',
+        iterations: bundle.passphraseWrapper.iterations,
       },
     };
   },
