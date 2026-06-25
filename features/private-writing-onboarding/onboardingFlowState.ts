@@ -1,10 +1,5 @@
 export type PrivateWritingOnboardingView = 'setup' | 'ready' | 'optional_guidance';
 
-export type PrivateWritingOnboardingAction =
-  | 'write_first_reflection'
-  | 'skip'
-  | 'finish_optional_guidance';
-
 export const getPrivateWritingOnboardingView = ({
   isSetupRequired,
   hasCompletedPrivateWritingSetup,
@@ -24,7 +19,3 @@ export const getPrivateWritingOnboardingView = ({
 
   return 'optional_guidance';
 };
-
-export const shouldCompleteOnboardingForAction = (
-  action: PrivateWritingOnboardingAction,
-) => action !== 'write_first_reflection';

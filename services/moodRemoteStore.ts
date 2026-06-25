@@ -1,7 +1,7 @@
 import { supabase } from '../src/supabaseClient';
 import type { MoodCheckin } from '../types';
-import { cryptoService, type EncryptedEnvelope, isEncryptedEnvelope } from './cryptoService';
-import { requireCurrentCryptoSession } from './cryptoSessionStore';
+import type { EncryptedEnvelope } from './cryptoService';
+import { decryptEnvelope, encryptedColumns, rowAad } from './encryptedPayload';
 
 export interface SupabaseMoodCheckinRow {
   id: string;
@@ -13,11 +13,7 @@ export interface SupabaseMoodCheckinRow {
   encrypted_payload?: EncryptedEnvelope | null;
 }
 
-const moodAad = (userId: string, id: string) => ({
-  table: 'mood_checkins',
-  rowId: id,
-  userId,
-});
+const moodAad = rowAad('mood_checkins');
 
 export const mapMoodCheckin = (data: SupabaseMoodCheckinRow): MoodCheckin => ({
   id: data.id,
@@ -29,12 +25,11 @@ export const mapMoodCheckin = (data: SupabaseMoodCheckinRow): MoodCheckin => ({
 });
 
 const mapEncryptedMoodCheckin = async (data: SupabaseMoodCheckinRow): Promise<MoodCheckin> => {
-  if (!isEncryptedEnvelope(data.encrypted_payload)) return mapMoodCheckin(data);
-  const payload = await cryptoService.decryptJson<Pick<MoodCheckin, 'mood' | 'label' | 'source'>>(
-    requireCurrentCryptoSession(),
-    moodAad(data.user_id, data.id),
+  const payload = await decryptEnvelope<Pick<MoodCheckin, 'mood' | 'label' | 'source'>>(
     data.encrypted_payload,
+    moodAad(data.user_id, data.id),
   );
+  if (!payload) return mapMoodCheckin(data);
   return {
     id: data.id,
     userId: data.user_id,
@@ -48,11 +43,6 @@ const mapEncryptedMoodCheckin = async (data: SupabaseMoodCheckinRow): Promise<Mo
 export const moodRemoteStore = {
   insert: async (userId: string, mood: string, label?: string, source?: string): Promise<MoodCheckin> => {
     const id = crypto.randomUUID();
-    const encryptedPayload = await cryptoService.encryptJson(
-      requireCurrentCryptoSession(),
-      moodAad(userId, id),
-      { mood, label, source },
-    );
     const { data, error } = await supabase
       .from('mood_checkins')
       .insert({
@@ -61,9 +51,7 @@ export const moodRemoteStore = {
         mood: null,
         label: null,
         source: null,
-        encrypted_payload: encryptedPayload,
-        encrypted_payload_version: 1,
-        encryption_migration_state: 'verified',
+        ...(await encryptedColumns({ mood, label, source }, moodAad(userId, id))),
       })
       .select()
       .single();

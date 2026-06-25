@@ -7,10 +7,7 @@ import {
   PRIVATE_WRITING_ONBOARDING_STEPS,
   privateWritingOnboardingStepIcons,
 } from './onboardingContent';
-import {
-  getPrivateWritingOnboardingView,
-  shouldCompleteOnboardingForAction,
-} from './onboardingFlowState';
+import { getPrivateWritingOnboardingView } from './onboardingFlowState';
 import { PrivateWritingSetupStep } from './PrivateWritingSetupStep';
 
 export const PrivateWritingOnboardingFlow: React.FC<{
@@ -27,6 +24,8 @@ export const PrivateWritingOnboardingFlow: React.FC<{
   confirmRecoveryKey: (recoveryKey: string) => Promise<void>;
   recoveryKey: string | null;
   completeOnboarding: () => Promise<void> | void;
+  justCompletedSetup: boolean;
+  clearJustCompletedSetup: () => void;
 }> = ({
   isOpen,
   onClose,
@@ -41,13 +40,18 @@ export const PrivateWritingOnboardingFlow: React.FC<{
   confirmRecoveryKey,
   recoveryKey,
   completeOnboarding,
+  justCompletedSetup,
+  clearJustCompletedSetup,
 }) => {
   const [onboardingStep, setOnboardingStep] = useState(0);
-  const [isOptionalGuidanceOpen, setIsOptionalGuidanceOpen] = useState(!isSetupRequired);
+  const [isOptionalGuidanceOpen, setIsOptionalGuidanceOpen] = useState(false);
   const currentOnboardingStep = PRIVATE_WRITING_ONBOARDING_STEPS[onboardingStep];
   const isLastOnboardingStep = onboardingStep === PRIVATE_WRITING_ONBOARDING_STEPS.length - 1;
   const CurrentOnboardingIcon = privateWritingOnboardingStepIcons[onboardingStep];
-  const [hasCompletedPrivateWritingSetup, setHasCompletedPrivateWritingSetup] = useState(false);
+  // Local flag covers the in-session case; justCompletedSetup survives the
+  // PrivateDataGate remount (migrating -> unlocked) that wipes local state.
+  const [localSetupComplete, setHasCompletedPrivateWritingSetup] = useState(false);
+  const hasCompletedPrivateWritingSetup = localSetupComplete || justCompletedSetup;
   const currentView = getPrivateWritingOnboardingView({
     isSetupRequired,
     hasCompletedPrivateWritingSetup,
@@ -62,28 +66,25 @@ export const PrivateWritingOnboardingFlow: React.FC<{
     if (shouldShowPrivateWritingSetup) return;
     await onClose();
     setOnboardingStep(0);
-    setIsOptionalGuidanceOpen(!isSetupRequired);
-  }, [isSetupRequired, onClose, shouldShowPrivateWritingSetup]);
+    setIsOptionalGuidanceOpen(false);
+  }, [onClose, shouldShowPrivateWritingSetup]);
 
   const exitToWritingAndReset = useCallback(async () => {
     await onExitToWriting();
     setOnboardingStep(0);
-    setIsOptionalGuidanceOpen(!isSetupRequired);
-  }, [isSetupRequired, onExitToWriting]);
+    setIsOptionalGuidanceOpen(false);
+  }, [onExitToWriting]);
 
   const handleSkipOnboarding = useCallback(async (source: 'optional_guidance' | 'ready_screen' = 'optional_guidance') => {
     recordOnboardingFunnelEvent('onboarding_skipped', { source });
-    if (shouldCompleteOnboardingForAction('skip')) {
-      await completeOnboarding();
-    }
+    clearJustCompletedSetup();
+    await completeOnboarding();
     await closeAndReset();
-  }, [closeAndReset, completeOnboarding]);
+  }, [clearJustCompletedSetup, closeAndReset, completeOnboarding]);
 
   const handleFinishOnboarding = useCallback(async () => {
     recordOnboardingFunnelEvent('onboarding_completed', { source: 'optional_guidance' });
-    if (shouldCompleteOnboardingForAction('finish_optional_guidance')) {
-      await completeOnboarding();
-    }
+    await completeOnboarding();
     await closeAndReset();
     await onBeginWriting?.();
   }, [closeAndReset, completeOnboarding, onBeginWriting]);
@@ -96,18 +97,20 @@ export const PrivateWritingOnboardingFlow: React.FC<{
 
   const handleWriteFirstReflection = useCallback(async () => {
     recordOnboardingFunnelEvent('setup_ready_cta_clicked', { cta: 'write_first_reflection' });
-    if (shouldCompleteOnboardingForAction('write_first_reflection')) {
-      await completeOnboarding();
-    }
+    clearJustCompletedSetup();
+    // Persist completion now so onboarding never re-opens on later visits; the
+    // first-reflection-saved trigger stays as a harmless backup.
+    await completeOnboarding();
     await exitToWritingAndReset();
     await onBeginWriting?.();
-  }, [completeOnboarding, exitToWritingAndReset, onBeginWriting]);
+  }, [clearJustCompletedSetup, completeOnboarding, exitToWritingAndReset, onBeginWriting]);
 
   const handleShowMeAround = useCallback(() => {
     recordOnboardingFunnelEvent('setup_ready_cta_clicked', { cta: 'show_me_around' });
+    clearJustCompletedSetup();
     setOnboardingStep(0);
     setIsOptionalGuidanceOpen(true);
-  }, []);
+  }, [clearJustCompletedSetup]);
 
   const handleNextOnboardingStep = useCallback(() => {
     if (isSetupRequired && onboardingStep === 0) {
@@ -155,7 +158,7 @@ export const PrivateWritingOnboardingFlow: React.FC<{
               size="sm"
               onClick={() => void handleSkipOnboarding('optional_guidance')}
               aria-label="Skip onboarding"
-              className="self-center px-3 text-gray-nav/75 hover:text-green"
+              className="self-center px-3 text-gray-nav hover:text-green"
             >
               Skip onboarding
             </Button>
@@ -200,7 +203,7 @@ export const PrivateWritingOnboardingFlow: React.FC<{
               <p className="text-base font-semibold leading-relaxed text-gray-text">
                 Your private writing key is connected and your recovery phrase is confirmed.
               </p>
-              <p className="mt-3 font-serif italic text-gray-nav">
+              <p className="mt-3 text-sm text-gray-nav">
                 Start with one true sentence. The rest can arrive after.
               </p>
             </div>
@@ -225,7 +228,7 @@ export const PrivateWritingOnboardingFlow: React.FC<{
               onClick={() => void handleWriteFirstReflection()}
               className="min-h-12"
             >
-              Write first reflection
+              Begin writing
             </Button>
           </div>
         </div>
@@ -259,7 +262,7 @@ export const PrivateWritingOnboardingFlow: React.FC<{
               <p className="text-base font-semibold leading-relaxed text-gray-text">
                 {currentOnboardingStep.body}
               </p>
-              <p className="onboarding-step-note font-serif italic text-gray-nav">
+              <p className="onboarding-step-note text-sm text-gray-nav">
                 {currentOnboardingStep.note}
               </p>
             </div>

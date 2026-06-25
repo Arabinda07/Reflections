@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, Check } from '@phosphor-icons/react';
+import { Link } from 'react-router-dom';
+import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
+import { Check } from '@phosphor-icons/react/Check';
 
 import { Button } from '../../components/ui/Button';
 import { MetadataPill } from '../../components/ui/MetadataPill';
@@ -7,6 +9,8 @@ import { PageContainer } from '../../components/ui/PageContainer';
 import { Surface } from '../../components/ui/Surface';
 import { useToast } from '../../components/ui/Toast';
 import { relationshipService } from '../../services/relationshipService';
+import { findWikiMentions } from '../../services/relationshipWikiLink';
+import { wikiService } from '../../services/wikiService';
 import type {
   RelationshipHook,
   RelationshipInteraction,
@@ -16,6 +20,7 @@ import type {
   RelationshipTier,
   RelationshipValueEntry,
 } from '../../types';
+import { RoutePath } from '../../types';
 
 export const relationshipStageLabels: Record<RelationshipStage, string> = {
   discover: 'Discover',
@@ -28,7 +33,9 @@ export const relationshipStageLabels: Record<RelationshipStage, string> = {
 
 const stages = Object.keys(relationshipStageLabels) as RelationshipStage[];
 const tiers: RelationshipTier[] = ['none', 't1', 't2', 't3'];
-const fieldClass = 'mt-2 min-h-12 w-full rounded-xl border border-border bg-panel px-3 py-3 text-base font-bold text-gray-text outline-none focus-visible:ring-2 focus-visible:ring-green/30';
+// input-surface carries the themed background/border/focus ring; bg-panel was an
+// unregistered utility that left fields with the native (dark-mode) control bg.
+const fieldClass = 'input-surface mt-2 min-h-12 w-full px-3 py-3 text-base font-medium';
 
 type Props = {
   relationship: RelationshipRecord;
@@ -55,6 +62,15 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
   const [valueEntry, setValueEntry] = useState({ direction: 'given', category: 'support', description: '' });
   const [connection, setConnection] = useState({ relatedRelationshipId: '', label: '' });
   const [isSavingContext, setIsSavingContext] = useState(false);
+  const [wikiMentions, setWikiMentions] = useState<string[]>([]);
+
+  useEffect(() => {
+    let active = true;
+    void wikiService.getWikiPage('people')
+      .then((page) => { if (active) setWikiMentions(findWikiMentions(page?.content || '', relationship.name)); })
+      .catch(() => { if (active) setWikiMentions([]); });
+    return () => { active = false; };
+  }, [relationship.id, relationship.name]);
 
   useEffect(() => {
     setContext({
@@ -105,6 +121,17 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
       used: false,
     }];
     if (await update({ hooks })) setHook('');
+  };
+
+  const saveSnippetAsHook = async (snippet: string) => {
+    const hooks: RelationshipHook[] = [...relationship.hooks, {
+      id: crypto.randomUUID(),
+      description: snippet,
+      source: 'life wiki',
+      createdAt: new Date().toISOString(),
+      used: false,
+    }];
+    await update({ hooks }, 'Saved as a reason to reconnect.');
   };
 
   const addInteraction = async (event: React.FormEvent) => {
@@ -168,7 +195,7 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
           <div className="space-y-4">
             <MetadataPill tone="green">{relationshipStageLabels[relationship.stage]}</MetadataPill>
             <h1 className="text-4xl font-display font-extrabold text-gray-text sm:text-5xl md:text-6xl">{relationship.name}</h1>
-            <p className="font-serif text-xl italic leading-relaxed text-gray-text/75">
+            <p className="text-lg leading-relaxed text-gray-light">
               {relationship.caresAbout || relationship.howWeMet || 'Relationship context will gather here.'}
             </p>
           </div>
@@ -232,12 +259,31 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
           </Surface>
         </form>
 
+        <Surface variant="flat" tone="paper" className="p-6 md:p-8">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="label-caps text-green">From your Life Wiki</h2>
+            <Link to={RoutePath.SANCTUARY_ARTICLE.replace(':pageType', 'people')} className="text-sm font-bold text-green hover:underline">Open People room</Link>
+          </div>
+          {wikiMentions.length ? (
+            <div className="mt-5 space-y-3">
+              {wikiMentions.map((snippet, index) => (
+                <div key={index} className="rounded-2xl border border-green/20 bg-green/5 p-4">
+                  <p className="text-sm font-medium leading-relaxed text-gray-text">{snippet}</p>
+                  <Button type="button" size="sm" variant="secondary" className="mt-3" onClick={() => void saveSnippetAsHook(snippet)}>Save as a reason to reconnect</Button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-4 text-sm font-medium leading-relaxed text-gray-light">Nothing about {relationship.name} in your People room yet. As you write and refresh the Life Wiki, mentions show up here.</p>
+          )}
+        </Surface>
+
         <section className="grid gap-5 lg:grid-cols-3">
-          <Surface variant="flat" tone="honey" className="p-6">
-            <h2 className="label-caps text-honey">Hooks</h2>
+          <Surface variant="flat" tone="paper" className="p-6">
+            <h2 className="label-caps text-green">Hooks</h2>
             <div className="mt-4 space-y-3">
               {relationship.hooks.map((item) => (
-                <button key={item.id} type="button" disabled={item.used} onClick={() => void update({ hooks: relationship.hooks.map((candidate) => candidate.id === item.id ? { ...candidate, used: true } : candidate) })} className="min-h-12 w-full rounded-2xl border border-honey/20 p-4 text-left focus-visible:ring-2 focus-visible:ring-honey/40 disabled:opacity-50 hover:bg-honey/5">
+                <button key={item.id} type="button" disabled={item.used} onClick={() => void update({ hooks: relationship.hooks.map((candidate) => candidate.id === item.id ? { ...candidate, used: true } : candidate) })} className="min-h-12 w-full rounded-2xl border border-green/20 p-4 text-left focus-visible:ring-2 focus-visible:ring-green/40 disabled:opacity-50 hover:bg-green/5">
                   <span className="block text-sm font-bold text-gray-text">{item.description}</span>
                   <span className="mt-1 block text-xs font-bold uppercase tracking-[0.14em] text-gray-nav">{item.used ? 'Used' : 'Mark used'} - {item.source}</span>
                 </button>
@@ -252,10 +298,10 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
             </div>
           </Surface>
 
-          <Surface variant="flat" tone="sky" className="p-6">
-            <h2 className="label-caps text-sky">Timeline</h2>
+          <Surface variant="flat" tone="paper" className="p-6">
+            <h2 className="label-caps text-green">Timeline</h2>
             <div className="mt-4 space-y-3">
-              {relationship.interactions.map((item) => <div key={item.id} className="rounded-2xl border border-sky/20 p-4"><p className="text-sm font-bold text-gray-text">{item.channel}</p><p className="mt-1 text-sm font-medium text-gray-light">{item.notes}</p></div>)}
+              {relationship.interactions.map((item) => <div key={item.id} className="rounded-2xl border border-green/20 p-4"><p className="text-sm font-bold text-gray-text">{item.channel}</p><p className="mt-1 text-sm font-medium text-gray-light">{item.notes}</p></div>)}
               {!relationship.interactions.length && <p className="text-sm font-medium text-gray-light">No touchpoints yet.</p>}
               <form onSubmit={addInteraction} className="space-y-2">
                 <label className="block text-sm font-bold text-gray-nav">Channel
@@ -297,10 +343,10 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
             </div>
           </Surface>
 
-          <Surface variant="flat" tone="sky" className="p-6">
-            <h2 className="label-caps text-sky">Connections</h2>
+          <Surface variant="flat" tone="paper" className="p-6">
+            <h2 className="label-caps text-green">Connections</h2>
             <div className="mt-4 space-y-3">
-              {relationship.connections.map((item) => <div key={item.id} className="rounded-2xl border border-sky/20 p-4"><p className="text-sm font-bold text-gray-text">{relationships.find((candidate) => candidate.id === item.relatedRelationshipId)?.name || 'Unknown person'}</p><p className="mt-1 text-sm font-medium text-gray-light">{item.label}</p></div>)}
+              {relationship.connections.map((item) => <div key={item.id} className="rounded-2xl border border-green/20 p-4"><p className="text-sm font-bold text-gray-text">{relationships.find((candidate) => candidate.id === item.relatedRelationshipId)?.name || 'Unknown person'}</p><p className="mt-1 text-sm font-medium text-gray-light">{item.label}</p></div>)}
               {!relationship.connections.length && <p className="text-sm font-medium text-gray-light">No person-to-person connections yet.</p>}
               <form onSubmit={addConnection} className="space-y-2">
                 <label className="block text-sm font-bold text-gray-nav">Person

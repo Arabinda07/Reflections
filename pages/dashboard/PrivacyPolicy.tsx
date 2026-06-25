@@ -24,7 +24,17 @@ const policySections: PolicySection[] = [
     color: 'tone-icon-sky',
     body: [
       'Reflections stores the account information needed to sign you in, including your email address and profile details you choose to save, such as your name, display name, timezone, and avatar.',
-      'The app stores the writing you create here: notes, moods, tags, tasks, attachments, note covers, future letters, mood check-ins, Life Wiki pages, referral invite status, and the small usage counters needed for Free and Pro access.',
+      'The app stores the writing you create here: notes, moods, tags, tasks, attachments, note covers, future letters, mood check-ins, Life Wiki pages, relationships, referral invite status, and the small usage counters needed for Free and Pro access. Your private writing is encrypted on your device before it reaches the server.',
+    ],
+  },
+  {
+    title: 'Device-side encryption',
+    icon: 'shield',
+    color: 'tone-icon-sage',
+    body: [
+      'Your private writing — notes, moods, tags, tasks, attachments, future letters, Life Wiki pages, and relationships — is encrypted on your device before it is saved. The key is derived from your password and never sent to the server, so what Reflections stores is data it cannot read.',
+      'Because the key stays on your device, you unlock your writing once on each device you use. On a device you trust, you can choose "Keep me unlocked on this device" to skip that step; signing out clears it.',
+      'When you turn on private writing you save a recovery phrase. If you forget your password, that phrase is the only other way to unlock your writing. Reflections cannot reset it for you, so keep it somewhere safe. AI features that need the server to read your writing, including Smart Mode, stay off while this protection is on.',
     ],
   },
   {
@@ -98,7 +108,7 @@ const policySections: PolicySection[] = [
     icon: 'shield',
     color: 'tone-icon-honey',
     body: [
-      'Reflections uses Supabase account security, private storage, Row Level Security, and encrypted connections to protect saved writing. No online service can promise perfect security.',
+      'Private writing is encrypted on your device before it is saved, as described in Device-side encryption. On top of that, Reflections uses Supabase account security, private storage, Row Level Security, and encrypted connections. No online service can promise perfect security.',
       'Some features require an internet connection. AI features, sync, payments, and exports can fail if a provider is unavailable. Features and Free or Pro limits may change as the product changes, but the app should explain limits plainly where they matter.',
     ],
   },
@@ -138,7 +148,7 @@ export const PrivacyPolicy: React.FC = () => {
           <p className="max-w-[36rem] font-serif text-[18px] leading-relaxed text-gray-light">
             This page explains what Reflections stores, when AI is used, how payments work, and how you can remove your writing.
           </p>
-          <p className="text-[12px] font-bold uppercase tracking-widest text-gray-nav">Last updated · May 2026</p>
+          <p className="text-[12px] font-bold uppercase tracking-widest text-gray-nav">Last updated · June 2026</p>
         </div>
       </section>
 

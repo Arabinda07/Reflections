@@ -152,7 +152,9 @@ export const HomeAuthenticated: React.FC = () => {
     hasUser: Boolean(user),
     isSetupRequired: isPrivateWritingSetupRequired,
   });
-  const showOnboarding = onboarding.shouldShowOnboarding;
+  // shouldShowOnboarding only covers mandatory setup; justCompletedSetup keeps the
+  // post-setup "ready" screen visible for this session (it resets on reload).
+  const showOnboarding = onboarding.shouldShowOnboarding || cryptoContext.justCompletedSetup;
   const isGoogleLikeAuth = user?.authProvider === 'google';
 
   const moveFocusFromHeroIntro = useCallback(() => {
@@ -937,6 +939,8 @@ export const HomeAuthenticated: React.FC = () => {
         confirmRecoveryKey={cryptoContext.confirmRecoveryKey}
         recoveryKey={cryptoContext.recoveryKey}
         completeOnboarding={onboarding.complete}
+        justCompletedSetup={cryptoContext.justCompletedSetup}
+        clearJustCompletedSetup={cryptoContext.clearJustCompletedSetup}
       />
 
       <ModalSheet

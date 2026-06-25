@@ -38,7 +38,6 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
     expect(flow).toContain('onboardingStep');
     expect(flow).toContain('Step {onboardingStep + 1} of {PRIVATE_WRITING_ONBOARDING_STEPS.length}');
     expect(flow).toContain('shouldShowSetupReady');
-    expect(flow).toContain('Write first reflection');
     expect(flow).toContain('Show me around');
     expect(flow).toContain('onboarding-step-copy');
     expect(flow).toContain('Skip onboarding');
@@ -88,7 +87,9 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
     expect(flow).toContain('CurrentOnboardingIcon');
     expect(flow).toContain('onboarding-step-stage');
     expect(flow).toContain('onboarding-step-note');
-    expect(flow).toContain('font-serif italic');
+    // Editorial treatment now lives in the serif modal title (modalCss below); the
+    // step-note italic-serif subhead was dropped as a design tell.
+    expect(flow).not.toContain('font-serif italic');
     expect(home).not.toContain('currentOnboardingStep.signal');
     expect(home).not.toContain('onboarding-step-index');
     expect(home).not.toContain('onboarding-step-folio');

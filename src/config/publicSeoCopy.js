@@ -1,4 +1,4 @@
-export const PUBLIC_SEO_LAST_MODIFIED = '2026-05-21';
+export const PUBLIC_SEO_LAST_MODIFIED = '2026-06-25';
 
 export const PUBLIC_SEO_COPY = {
   home: {
@@ -6,7 +6,7 @@ export const PUBLIC_SEO_COPY = {
     path: '/',
     title: 'Reflections - Private Journal for Writing and Mood Notes',
     description:
-      'A private journal for writing what is on your mind, naming moods, and noticing patterns. Reflections keeps AI optional and writing first.',
+      'A private journal for writing what is on your mind, naming moods, and noticing patterns. Your writing is encrypted on your device, and AI stays optional.',
     h1: 'Private journal for writing and mood notes',
     intro:
       'Write a few lines, name the mood if it helps, and return to patterns at your own pace.',
@@ -18,7 +18,7 @@ export const PUBLIC_SEO_COPY = {
     sections: [
       {
         title: 'Private writing',
-        body: 'Your notes stay tied to your account and centered on your own words.',
+        body: 'Your notes, moods, letters, and Life Wiki are encrypted on your device with a key only you hold.',
       },
       {
         title: 'Mood notes and tags',
@@ -31,16 +31,16 @@ export const PUBLIC_SEO_COPY = {
       },
     ],
     softwareDescription:
-      'Reflections is a private journal for writing notes, naming moods, and noticing patterns. AI support runs only when you choose it or explicitly turn on Smart Mode.',
+      'Reflections is a private journal for writing notes, naming moods, and noticing patterns. Your private writing is encrypted on your device, and AI support runs only when you choose it or explicitly turn on Smart Mode.',
     serviceDescription:
-      'Reflections helps people write private notes, name moods, organize tags, and ask for AI-supported reflection when they choose.',
+      'Reflections helps people write private notes, name moods, organize tags, tend relationships, and ask for AI-supported reflection when they choose. Private writing is encrypted on the device.',
   },
   faq: {
     key: 'faq',
     path: '/faq',
     title: 'Reflections FAQ - Journaling, AI, Privacy, and Pricing',
     description:
-      'Short answers about Reflections, private journaling, optional AI, Life Wiki, privacy, and Pro pricing.',
+      'Short answers about Reflections: private journaling, device-side encryption, optional AI, Life Wiki, relationships, privacy, and Pro pricing.',
     h1: 'Reflections FAQ',
     intro:
       'Clear answers about what Reflections does, what it stores, when AI runs, and how pricing works.',
@@ -51,9 +51,19 @@ export const PUBLIC_SEO_COPY = {
           'Reflections is a private journal for writing notes, naming moods, adding tags, and noticing patterns over time.',
       },
       {
+        title: 'Is my writing encrypted?',
+        body:
+          'Yes. Your notes, moods, letters, attachments, Life Wiki, and relationships are encrypted on your device before they are saved, using a key from your password the server never sees.',
+      },
+      {
         title: 'Does AI run automatically?',
         body:
           'No. AI support runs when you ask for a reflection or Life Wiki refresh, or when you explicitly turn on Smart Mode.',
+      },
+      {
+        title: 'What is the Relationships feature?',
+        body:
+          'A quiet place to keep track of the people you want to stay close to, with a few weekly suggestions for who to reach out to and why.',
       },
       {
         title: 'Is Reflections therapy?',
@@ -95,7 +105,17 @@ export const PUBLIC_SEO_COPY = {
       {
         question: 'How is my data protected?',
         answer:
-          'Reflections uses account-scoped database rules and private storage. The Privacy page explains what is stored, what leaves the app, and how deletion works.',
+          'Your private writing is encrypted on your device before it is saved, using a key derived from your password, so the server stores data it cannot read. Account-scoped database rules and private storage add another layer. The Privacy page explains what is stored and how deletion works.',
+      },
+      {
+        question: 'What happens if I forget my password?',
+        answer:
+          'You set a recovery phrase when you turn on private writing. If you forget your password, that phrase is the only other way to unlock your writing. Reflections cannot reset it for you, so keep it somewhere safe.',
+      },
+      {
+        question: 'What is the Relationships feature?',
+        answer:
+          'Relationships is a quiet place to keep track of the people you want to stay close to. Each week it suggests a few people to reach out to, with a reason and a small next step, and it is encrypted like the rest of your writing.',
       },
     ],
   },
@@ -104,7 +124,7 @@ export const PUBLIC_SEO_COPY = {
     path: '/privacy',
     title: 'Reflections Privacy - Notes, AI, Payments, and Deletion',
     description:
-      'A concrete guide to what Reflections stores, when AI receives writing, how payments work, and how to export or delete your notes.',
+      'A concrete guide to what Reflections stores, how your writing is encrypted on your device, when AI receives writing, how payments work, and how to export or delete your notes.',
     h1: 'Reflections privacy',
     intro:
       'This page explains what Reflections stores, when AI is used, and how you can export or delete your writing.',
@@ -112,7 +132,12 @@ export const PUBLIC_SEO_COPY = {
       {
         title: 'What Reflections keeps',
         body:
-          'Account details, notes, moods, tags, attachments, future letters, and Life Wiki pages are tied to your account.',
+          'Account details plus your notes, moods, tags, attachments, future letters, Life Wiki pages, and relationships. Your private writing is encrypted on your device before it is saved.',
+      },
+      {
+        title: 'Device-side encryption',
+        body:
+          'Private writing is encrypted with a key derived from your password, so the server stores data it cannot read. A recovery phrase is the only other way in if you forget your password.',
       },
       {
         title: 'AI and Smart Mode',

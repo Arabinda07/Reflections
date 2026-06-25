@@ -85,6 +85,18 @@ const detailItems: PublicIconCard[] = [
     icon: 'brain',
   },
   {
+    title: 'Encrypted on your device',
+    body: 'Your notes, moods, letters, attachments, Life Wiki, and relationships are encrypted on your device before they are saved. The key comes from your password, so the server stores writing it cannot read.',
+    label: 'Zero-knowledge • The key stays with you',
+    icon: 'shield',
+  },
+  {
+    title: 'Your password and recovery phrase',
+    body: 'You unlock your writing once on each device. If you forget your password, the recovery phrase you saved during setup is the only other way in, so keep it somewhere safe. On a device you trust, you can choose to stay unlocked.',
+    label: 'Keep your recovery phrase safe',
+    icon: 'shield',
+  },
+  {
     title: 'Plans and billing',
     body:
       'Pro has weekly and monthly options. The trial lasts 3 days. No payment is due during the trial, and Reflections shows the first charge date before checkout. After that, weekly Pro renews at ₹49/week and monthly Pro renews at ₹149/month until canceled.',
@@ -100,6 +112,7 @@ const featureGrid: PublicIconCard[] = [
   { title: 'Visual covers', body: 'Add atmospheric imagery to set the mood for your entries.', icon: 'image' },
   { title: 'Embedded tasks', body: 'Keep track of follow-ups and intentions right inside your prose.', icon: 'checklist' },
   { title: 'Life Wiki', body: 'A high-level summary of your world, updated only when you choose.', icon: 'brain' },
+  { title: 'Relationships', body: 'Keep track of the people you want to tend, with a few gentle nudges each week.', icon: 'heart' },
 ];
 
 const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
@@ -131,7 +144,7 @@ export const FAQ: React.FC = () => {
             Reflections is a calm, private writing space for the thoughts that keep doing laps.
             This guide explains what the product does, how AI waits, and what stays yours.
           </p>
-          <p className="text-[12px] font-bold uppercase tracking-widest text-gray-nav">Last updated · May 2026</p>
+          <p className="text-[12px] font-bold uppercase tracking-widest text-gray-nav">Last updated · June 2026</p>
         </div>
       </section>
 

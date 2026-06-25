@@ -9,6 +9,7 @@ import {
   type UserEncryptionKeyBundle,
 } from '../services/keyWrapperPolicy';
 import { setCurrentCryptoSession } from '../services/cryptoSessionStore';
+import { cryptoKeyCache } from '../services/cryptoKeyCache';
 import { useAuthStore } from '../hooks/useAuthStore';
 import {
   zeroKnowledgeMigrationService,
@@ -24,10 +25,12 @@ interface CryptoContextValue {
   recoveryKey: string | null;
   unlockMethod: UnlockMethod | null;
   error: string | null;
+  justCompletedSetup: boolean;
+  clearJustCompletedSetup: () => void;
   setupEncryption: (secret: string, unlockMethod?: UnlockMethod) => Promise<void>;
   confirmRecoveryKey: (typedRecoveryKey: string) => Promise<void>;
-  unlockWithPassphrase: (passphrase: string) => Promise<void>;
-  unlockWithRecoveryKey: (recoveryKey: string) => Promise<void>;
+  unlockWithPassphrase: (passphrase: string, remember?: boolean) => Promise<void>;
+  unlockWithRecoveryKey: (recoveryKey: string, remember?: boolean) => Promise<void>;
   recoverAccountPasswordWithRecoveryKey: (recoveryKey: string, newAccountPassword: string) => Promise<void>;
   recoverAccountPasswordWithPreviousPassword: (previousAccountPassword: string, newAccountPassword: string) => Promise<void>;
   lock: () => void;
@@ -44,6 +47,10 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [pendingBundle, setPendingBundle] = useState<UserEncryptionKeyBundle | null>(null);
   const [recoveryKey, setRecoveryKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Durable across the PrivateDataGate remount that the migrating -> unlocked
+  // transition triggers, so onboarding can show the "ready" screen once.
+  const [justCompletedSetup, setJustCompletedSetup] = useState(false);
+  const clearJustCompletedSetup = useCallback(() => setJustCompletedSetup(false), []);
   const setUnlockedSession = useCallback(async (
     nextSession: CryptoSession,
     migrationState: EncryptionMigrationState,
@@ -81,6 +88,7 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, []);
 
   const lock = useCallback(() => {
+    void cryptoKeyCache.clear();
     setCurrentCryptoSession(null);
     setSession(null);
     setMigrationProgress(null);
@@ -99,6 +107,10 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setMigrationProgress(null);
 
       if (!user?.id) {
+        // No signed-in user (initial load or just-logged-out): drop any cached
+        // "keep me unlocked" key so it never outlives the session.
+        await cryptoKeyCache.clear();
+        if (!isActive) return;
         setStatus('loading');
         return;
       }
@@ -123,7 +135,22 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         return;
       }
 
-      setBundle(keyWrapperPolicy.mapPersistedBundleRow(data));
+      const mappedBundle = keyWrapperPolicy.mapPersistedBundleRow(data);
+      setBundle(mappedBundle);
+
+      // If the user opted to stay unlocked on this device, restore the cached
+      // data key and skip the gate. Only safe once migration has finished.
+      if (mappedBundle.migrationState === 'plaintext_cleared') {
+        const cachedSession = await cryptoKeyCache.load(user.id);
+        if (!isActive) return;
+        if (cachedSession && cachedSession.keyId === mappedBundle.keyId) {
+          setCurrentCryptoSession(cachedSession);
+          setSession(cachedSession);
+          setStatus('unlocked');
+          return;
+        }
+      }
+
       setStatus('locked');
     };
 
@@ -166,25 +193,30 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setBundle(pendingBundle);
     setPendingBundle(null);
     setRecoveryKey(null);
+    setJustCompletedSetup(true);
     await setUnlockedSession(nextSession, pendingBundle.migrationState);
   }, [pendingBundle, setUnlockedSession]);
 
-  const unlockWithPassphrase = useCallback(async (passphrase: string) => {
+  const unlockWithPassphrase = useCallback(async (passphrase: string, remember = false) => {
     if (!user?.id || !bundle) throw new Error('Encryption is not set up for this account.');
-    await setUnlockedSession(await keyWrapperPolicy.unlockWithPrimarySecret({
+    const nextSession = await keyWrapperPolicy.unlockWithPrimarySecret({
       userId: user.id,
       secret: passphrase,
       bundle,
-    }), bundle.migrationState);
+    });
+    await setUnlockedSession(nextSession, bundle.migrationState);
+    if (remember) await cryptoKeyCache.persist(nextSession);
   }, [bundle, setUnlockedSession, user?.id]);
 
-  const unlockWithRecoveryKey = useCallback(async (typedRecoveryKey: string) => {
+  const unlockWithRecoveryKey = useCallback(async (typedRecoveryKey: string, remember = false) => {
     if (!user?.id || !bundle) throw new Error('Encryption is not set up for this account.');
-    await setUnlockedSession(await keyWrapperPolicy.unlockWithRecoveryPhrase({
+    const nextSession = await keyWrapperPolicy.unlockWithRecoveryPhrase({
       userId: user.id,
       recoveryPhrase: typedRecoveryKey,
       bundle,
-    }), bundle.migrationState);
+    });
+    await setUnlockedSession(nextSession, bundle.migrationState);
+    if (remember) await cryptoKeyCache.persist(nextSession);
   }, [bundle, setUnlockedSession, user?.id]);
 
   const persistAccountPasswordRewrap = useCallback(async (input: {
@@ -257,6 +289,8 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     recoveryKey,
     unlockMethod: bundle?.unlockMethod ?? pendingBundle?.unlockMethod ?? null,
     error,
+    justCompletedSetup,
+    clearJustCompletedSetup,
     setupEncryption,
     confirmRecoveryKey,
     unlockWithPassphrase,
@@ -267,6 +301,8 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }), [
     confirmRecoveryKey,
     error,
+    justCompletedSetup,
+    clearJustCompletedSetup,
     lock,
     migrationProgress,
     bundle?.unlockMethod,

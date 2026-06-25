@@ -42,6 +42,8 @@ export const RecoverPrivateWriting: React.FC = () => {
     const hasUnlockSecret = mode === 'recovery_phrase'
       ? recoveryPhrase.trim().length > 0
       : previousPassword.length > 0;
+    // ponytail: 8 is the account-password floor (matches ResetPassword), not the
+    // 12-char floor used for a standalone private-writing password - different secret.
     return hasUnlockSecret && (!needsNewPassword || newAccountPassword.length >= 8);
   }, [mode, needsNewPassword, newAccountPassword, previousPassword, recoveryPhrase]);
 
@@ -144,7 +146,7 @@ export const RecoverPrivateWriting: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setMode('recovery_phrase')}
-                  className={`rounded-sm border p-4 text-left transition ${
+                  className={`rounded-xl border p-4 text-left transition ${
                     mode === 'recovery_phrase'
                       ? 'border-green bg-green/5 text-primary'
                       : 'border-border bg-surface text-gray-text hover:border-green/30'
@@ -158,7 +160,7 @@ export const RecoverPrivateWriting: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setMode('previous_password')}
-                  className={`rounded-sm border p-4 text-left transition ${
+                  className={`rounded-xl border p-4 text-left transition ${
                     mode === 'previous_password'
                       ? 'border-green bg-green/5 text-primary'
                       : 'border-border bg-surface text-gray-text hover:border-green/30'
@@ -204,7 +206,7 @@ export const RecoverPrivateWriting: React.FC = () => {
                   placeholder="Enter your new account password"
                 />
               ) : (
-                <p className="rounded-sm border border-green/20 bg-green/5 p-3 text-sm font-semibold text-gray-text">
+                <p className="rounded-xl border border-green/20 bg-green/5 p-3 text-sm font-semibold text-gray-text">
                   We can use the new account password you just created. It will not be stored.
                 </p>
               )}

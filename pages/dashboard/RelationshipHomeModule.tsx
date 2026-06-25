@@ -73,7 +73,7 @@ export const RelationshipHomeModule: React.FC = () => {
       ) : (
         <div className="rounded-2xl border border-dashed border-honey/30 p-5">
           <p className="font-serif text-base italic text-gray-text">
-            Seed a few relationships to begin the weekly care ritual.
+            Add a few people to start getting weekly reminders to reach out.
           </p>
         </div>
       )}

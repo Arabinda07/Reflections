@@ -3,8 +3,8 @@ import type { LifeTheme, ThemeCitation, Note } from '../types';
 import { WikiPageType, STRUCTURED_WIKI_PAGES } from './wikiTypes';
 import { mapToNote, type SupabaseNoteRow } from './noteService';
 import { getAuthenticatedUserId } from './authUtils';
-import { cryptoService, type EncryptedEnvelope, isEncryptedEnvelope } from './cryptoService';
-import { requireCurrentCryptoSession } from './cryptoSessionStore';
+import type { EncryptedEnvelope } from './cryptoService';
+import { decryptEnvelope, encryptedColumns, rowAad } from './encryptedPayload';
 
 const VALID_THEME_STATES = new Set<LifeTheme['state']>(['active', 'archived', 'resolved']);
 const parseThemeState = (raw: string): LifeTheme['state'] =>
@@ -33,11 +33,7 @@ export interface SupabaseThemeCitationRow {
 // ─────────────────────────────────────────────
 // Mappers
 // ─────────────────────────────────────────────
-const wikiAad = (userId: string, id: string) => ({
-  table: 'life_themes',
-  rowId: id,
-  userId,
-});
+const wikiAad = rowAad('life_themes');
 
 const mapToLifeTheme = (data: SupabaseLifeThemeRow): LifeTheme => ({
   id: data.id,
@@ -51,12 +47,11 @@ const mapToLifeTheme = (data: SupabaseLifeThemeRow): LifeTheme => ({
 });
 
 const mapEncryptedLifeTheme = async (data: SupabaseLifeThemeRow): Promise<LifeTheme> => {
-  if (!isEncryptedEnvelope(data.encrypted_payload)) return mapToLifeTheme(data);
-  const payload = await cryptoService.decryptJson<Pick<LifeTheme, 'title' | 'content'>>(
-    requireCurrentCryptoSession(),
-    wikiAad(data.user_id, data.id),
+  const payload = await decryptEnvelope<Pick<LifeTheme, 'title' | 'content'>>(
     data.encrypted_payload,
+    wikiAad(data.user_id, data.id),
   );
+  if (!payload) return mapToLifeTheme(data);
 
   return {
     ...mapToLifeTheme(data),
@@ -139,12 +134,6 @@ export const wikiService = {
   createTheme: async (title: string, content: string): Promise<LifeTheme> => {
     const userId = await getAuthenticatedUserId();
     const id = crypto.randomUUID();
-    const encryptedPayload = await cryptoService.encryptJson(
-      requireCurrentCryptoSession(),
-      wikiAad(userId, id),
-      { title, content },
-    );
-
     const { data, error } = await supabase
       .from('life_themes')
       .insert({
@@ -154,9 +143,7 @@ export const wikiService = {
         content: '',
         state: 'active',
         page_type: 'theme',
-        encrypted_payload: encryptedPayload,
-        encrypted_payload_version: 1,
-        encryption_migration_state: 'verified',
+        ...(await encryptedColumns({ title, content }, wikiAad(userId, id))),
       })
       .select()
       .single();
@@ -172,19 +159,11 @@ export const wikiService = {
     const userId = await getAuthenticatedUserId();
     const existingTheme = await wikiService.getThemeById(themeId);
     if (!existingTheme) throw new Error('Theme not found.');
-    const encryptedPayload = await cryptoService.encryptJson(
-      requireCurrentCryptoSession(),
-      wikiAad(userId, themeId),
-      { title: existingTheme.title, content: newContent },
-    );
-
     const { data, error } = await supabase
       .from('life_themes')
       .update({
         content: '',
-        encrypted_payload: encryptedPayload,
-        encrypted_payload_version: 1,
-        encryption_migration_state: 'verified',
+        ...(await encryptedColumns({ title: existingTheme.title, content: newContent }, wikiAad(userId, themeId))),
         updated_at: new Date().toISOString(),
       })
       .eq('id', themeId)
@@ -246,12 +225,6 @@ export const wikiService = {
     const userId = await getAuthenticatedUserId();
     const existing = await wikiService.getWikiPage(pageType);
     const id = existing?.id || crypto.randomUUID();
-    const encryptedPayload = await cryptoService.encryptJson(
-      requireCurrentCryptoSession(),
-      wikiAad(userId, id),
-      { title, content },
-    );
-
     const { data, error } = await supabase
       .from('life_themes')
       .upsert(
@@ -262,9 +235,7 @@ export const wikiService = {
           title: 'Encrypted wiki page',
           content: '',
           state: 'active',
-          encrypted_payload: encryptedPayload,
-          encrypted_payload_version: 1,
-          encryption_migration_state: 'verified',
+          ...(await encryptedColumns({ title, content }, wikiAad(userId, id))),
           updated_at: new Date().toISOString(),
         },
         { onConflict: 'user_id,page_type' }

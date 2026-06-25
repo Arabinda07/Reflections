@@ -34,7 +34,9 @@ const defaultDraft = (): TriageDraft => ({
 });
 
 const stages = Object.keys(relationshipStageLabels) as RelationshipStage[];
-const fieldClass = 'min-h-12 w-full rounded-xl border border-border bg-panel px-3 py-3 text-base font-bold text-gray-text outline-none focus-visible:ring-2 focus-visible:ring-sky/30';
+// input-surface carries the themed background/border/focus ring; bg-panel was an
+// unregistered utility that left fields with the native (dark-mode) control bg.
+const fieldClass = 'input-surface min-h-12 w-full px-3 py-3 text-base font-medium';
 
 const additionsFor = (draft: TriageDraft) => {
   const tags: RelationshipTag[] = [];

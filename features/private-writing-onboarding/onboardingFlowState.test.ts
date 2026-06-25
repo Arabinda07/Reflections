@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  getPrivateWritingOnboardingView,
-  shouldCompleteOnboardingForAction,
-} from './onboardingFlowState';
+import { getPrivateWritingOnboardingView } from './onboardingFlowState';
 
 describe('private writing onboarding flow state', () => {
   it('keeps the ready screen visible after setup-required flips false', () => {
@@ -23,11 +20,5 @@ describe('private writing onboarding flow state', () => {
         isOptionalGuidanceOpen: false,
       }),
     ).toBe('setup');
-  });
-
-  it('only completes onboarding for explicit skip or optional guidance finish', () => {
-    expect(shouldCompleteOnboardingForAction('write_first_reflection')).toBe(false);
-    expect(shouldCompleteOnboardingForAction('skip')).toBe(true);
-    expect(shouldCompleteOnboardingForAction('finish_optional_guidance')).toBe(true);
   });
 });

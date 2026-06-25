@@ -5,15 +5,11 @@ import { getAuthenticatedUserId } from './authUtils';
 import { db, type LocalSyncStatus } from './db';
 import { buildWeeklyRelationshipSuggestions } from './relationshipSuggestions';
 import {
-  type SupabaseRelationshipRow,
   defaultRelationshipPayload,
-  mapRemoteRelationship,
   decryptLocalRelationship,
   toRemoteRelationshipRow,
   saveRelationshipLocal,
-  getLocalRelationships,
-  mergeRemoteWithPending,
-  flushPendingRelationships,
+  loadRelationships,
 } from './relationshipStore';
 
 export const relationshipService = {
@@ -29,27 +25,7 @@ export const relationshipService = {
 
   async getAll(): Promise<RelationshipRecord[]> {
     const userId = await getAuthenticatedUserId();
-    try {
-      await flushPendingRelationships(userId);
-      const { data, error } = await supabase
-        .from('relationships')
-        .select('*')
-        .eq('user_id', userId)
-        .order('updated_at', { ascending: false });
-      if (error) throw error;
-      const relationships = await Promise.all(((data || []) as SupabaseRelationshipRow[]).map((row) => mapRemoteRelationship(row, requireCurrentCryptoSession())));
-      for (const relationship of relationships) {
-        const local = await db.relationships.get(relationship.id);
-        if (!local || local.syncStatus === 'synced') {
-          await saveRelationshipLocal(userId, relationship, 'synced');
-        }
-      }
-      return mergeRemoteWithPending(relationships, await getLocalRelationships(userId));
-    } catch {
-      return (await getLocalRelationships(userId))
-        .filter((relationship) => relationship.syncStatus !== 'pending_delete')
-        .sort((left, right) => Date.parse(right.updatedAt) - Date.parse(left.updatedAt));
-    }
+    return loadRelationships(userId);
   },
 
   async getById(id: string): Promise<RelationshipRecord | undefined> {

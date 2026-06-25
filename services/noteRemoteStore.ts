@@ -1,7 +1,8 @@
 import { supabase } from '../src/supabaseClient';
 import type { Note, NoteAttachment, Task, MoodValue } from '../types';
-import { cryptoService, type CryptoSession, type EncryptedEnvelope, isEncryptedEnvelope } from './cryptoService';
+import type { CryptoSession, EncryptedEnvelope } from './cryptoService';
 import { requireCurrentCryptoSession } from './cryptoSessionStore';
+import { decryptEnvelope, encryptedColumns, rowAad } from './encryptedPayload';
 
 export interface SupabaseNoteRow {
   id: string;
@@ -50,11 +51,7 @@ export const mapToDbNote = (note: Note, userId: string) => ({
   updated_at: note.updatedAt,
 });
 
-const noteAad = (userId: string, noteId: string) => ({
-  table: 'notes',
-  rowId: noteId,
-  userId,
-});
+const noteAad = rowAad('notes');
 
 const encryptedNotePayload = (note: Note) => ({
   title: note.title,
@@ -71,15 +68,15 @@ const mapEncryptedPayloadToNote = async (
   userId: string,
   session: CryptoSession,
 ): Promise<Note> => {
-  if (!isEncryptedEnvelope(data.encrypted_payload)) {
+  const payload = await decryptEnvelope<ReturnType<typeof encryptedNotePayload>>(
+    data.encrypted_payload,
+    noteAad(userId, data.id),
+    session,
+  );
+
+  if (!payload) {
     return mapToNote(data);
   }
-
-  const payload = await cryptoService.decryptJson<ReturnType<typeof encryptedNotePayload>>(
-    session,
-    noteAad(userId, data.id),
-    data.encrypted_payload,
-  );
 
   return {
     id: data.id,
@@ -109,9 +106,7 @@ export const mapToEncryptedDbNote = async (
   attachments: [],
   tasks: [],
   mood: null,
-  encrypted_payload: await cryptoService.encryptJson(session, noteAad(userId, note.id), encryptedNotePayload(note)),
-  encrypted_payload_version: 1,
-  encryption_migration_state: 'verified',
+  ...(await encryptedColumns(encryptedNotePayload(note), noteAad(userId, note.id), session)),
   created_at: note.createdAt,
   updated_at: note.updatedAt,
 });

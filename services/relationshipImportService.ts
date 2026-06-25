@@ -1,19 +1,8 @@
-import { supabase } from '../src/supabaseClient';
 import type { RelationshipImportInboxItem, RelationshipRecord } from '../types';
 import { getAuthenticatedUserId } from './authUtils';
-import { requireCurrentCryptoSession } from './cryptoSessionStore';
-import { db } from './db';
 import { buildNonDestructiveMerge } from './relationshipImportPlanning';
 import { relationshipService } from './relationshipService';
-import {
-  type SupabaseImportInboxRow,
-  flushPendingImports,
-  getLocalImports,
-  mapRemoteImportItem,
-  markImportStatus,
-  mergeRemoteWithPending,
-  saveImportLocal,
-} from './relationshipStore';
+import { loadImports, markImportStatus } from './relationshipStore';
 
 /**
  * Import-inbox slice of RelationshipOS: list/accept/merge/archive of imported people.
@@ -22,27 +11,7 @@ import {
 export const relationshipImportService = {
   async getImportInbox(): Promise<RelationshipImportInboxItem[]> {
     const userId = await getAuthenticatedUserId();
-    try {
-      await flushPendingImports(userId);
-      const { data, error } = await supabase
-        .from('relationship_import_inbox')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      const items = await Promise.all(((data || []) as SupabaseImportInboxRow[]).map((row) => mapRemoteImportItem(row, requireCurrentCryptoSession())));
-      for (const item of items) {
-        const local = await db.relationshipImportInbox.get(item.id);
-        if (!local || local.syncStatus === 'synced') {
-          await saveImportLocal(userId, item, 'synced');
-        }
-      }
-      return mergeRemoteWithPending(items, await getLocalImports(userId));
-    } catch {
-      return (await getLocalImports(userId))
-        .filter((item) => item.syncStatus !== 'pending_delete')
-        .sort((left, right) => Date.parse(right.updatedAt) - Date.parse(left.updatedAt));
-    }
+    return loadImports(userId);
   },
 
   async archiveImportItem(id: string): Promise<void> {

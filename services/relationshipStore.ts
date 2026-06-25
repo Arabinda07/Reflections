@@ -1,3 +1,4 @@
+import type { Table } from 'dexie';
 import { supabase } from '../src/supabaseClient';
 import type { RelationshipImportInboxItem, RelationshipRecord } from '../types';
 import { cryptoService, type CryptoSession, type EncryptedEnvelope } from './cryptoService';
@@ -202,10 +203,10 @@ const encryptLocalImport = async (
   session: CryptoSession,
 ) => ({
   id: item.id,
-    userId: item.userId,
-    source: item.source,
-    status: item.status,
-    createdAt: item.createdAt,
+  userId: item.userId,
+  source: item.source,
+  status: item.status,
+  createdAt: item.createdAt,
   updatedAt: item.updatedAt,
   syncStatus: item.syncStatus,
   encryptedPayload: await cryptoService.encryptJson(session, localImportAad(item), {
@@ -322,22 +323,6 @@ export const markImportStatus = async (
   if (!error) await db.relationshipImportInbox.update(item.id, { syncStatus: 'synced' });
 };
 
-export const getLocalRelationships = async (userId: string) => {
-  const cached = await db.relationships.where('userId').equals(userId).toArray();
-  const decrypted = await Promise.all(
-    cached.map((relationship) => decryptLocalRelationship(relationship, requireCurrentCryptoSession())),
-  );
-  return decrypted.filter((relationship): relationship is LocalRelationship => Boolean(relationship));
-};
-
-export const getLocalImports = async (userId: string) => {
-  const cached = await db.relationshipImportInbox.where('userId').equals(userId).toArray();
-  const decrypted = await Promise.all(
-    cached.map((item) => decryptLocalImport(item, requireCurrentCryptoSession())),
-  );
-  return decrypted.filter((item): item is LocalRelationshipImportInboxItem => Boolean(item));
-};
-
 export const mergeRemoteWithPending = <T extends { id: string; syncStatus?: LocalSyncStatus }>(
   remote: T[],
   local: T[],
@@ -350,68 +335,113 @@ export const mergeRemoteWithPending = <T extends { id: string; syncStatus?: Loca
   ];
 };
 
-export const flushPendingRelationships = async (userId: string) => {
-  const pending = await db.relationships
-    .where('[userId+syncStatus]')
-    .anyOf([
-      [userId, 'pending_insert'],
-      [userId, 'pending_update'],
-      [userId, 'pending_delete'],
-    ])
-    .toArray();
+// ── Generic local-mirror + sync, parametrized per entity ───────────────────
+// Relationships and the import inbox share the same Dexie-mirror + pending-flush
+// machinery; only the table, ordering, and field-mappers differ. One mirror
+// config captures those, so the cache read, flush loop, and local read live once.
+const PENDING_STATUSES: LocalSyncStatus[] = ['pending_insert', 'pending_update', 'pending_delete'];
 
-  for (const cached of pending) {
-    const relationship = await decryptLocalRelationship(cached, requireCurrentCryptoSession());
-    if (!relationship) continue;
+type MirrorRow = { id: string; userId: string; syncStatus: LocalSyncStatus };
+type MirrorModel = { id: string; userId: string; updatedAt: string; syncStatus?: LocalSyncStatus };
 
-    if (relationship.syncStatus === 'pending_delete') {
-      const { error } = await supabase
-        .from('relationships')
-        .delete()
-        .eq('id', relationship.id)
-        .eq('user_id', userId);
-      if (error) throw error;
-      await db.relationships.delete(relationship.id);
-      continue;
-    }
+interface EntityMirror<TRemote extends { id: string; user_id: string }, TModel extends MirrorModel> {
+  dexieTable: Table<MirrorRow>;
+  remoteTable: string;
+  orderColumn: string;
+  decryptLocal: (row: MirrorRow | undefined, session: CryptoSession) => Promise<TModel | undefined>;
+  mapRemoteRow: (row: TRemote, session: CryptoSession) => Promise<TModel>;
+  toRemoteRow: (item: TModel, userId: string) => Promise<Record<string, unknown>>;
+  saveLocal: (userId: string, item: TModel, syncStatus: LocalSyncStatus) => Promise<void>;
+}
 
-    const { error } = await supabase
-      .from('relationships')
-      .upsert(await toRemoteRelationshipRow(relationship, userId));
-    if (error) throw error;
-    await db.relationships.update(relationship.id, { syncStatus: 'synced' });
-  }
+const getLocalEntity = async <TRemote extends { id: string; user_id: string }, TModel extends MirrorModel>(
+  mirror: EntityMirror<TRemote, TModel>,
+  userId: string,
+): Promise<TModel[]> => {
+  const cached = await mirror.dexieTable.where('userId').equals(userId).toArray();
+  const decrypted = await Promise.all(cached.map((row) => mirror.decryptLocal(row, requireCurrentCryptoSession())));
+  return decrypted.filter((item) => Boolean(item)) as TModel[];
 };
 
-export const flushPendingImports = async (userId: string) => {
-  const pending = await db.relationshipImportInbox
+const flushPendingEntity = async <TRemote extends { id: string; user_id: string }, TModel extends MirrorModel>(
+  mirror: EntityMirror<TRemote, TModel>,
+  userId: string,
+): Promise<void> => {
+  const pending = await mirror.dexieTable
     .where('[userId+syncStatus]')
-    .anyOf([
-      [userId, 'pending_insert'],
-      [userId, 'pending_update'],
-      [userId, 'pending_delete'],
-    ])
+    .anyOf(PENDING_STATUSES.map((status) => [userId, status]))
     .toArray();
 
   for (const cached of pending) {
-    const item = await decryptLocalImport(cached, requireCurrentCryptoSession());
+    const item = await mirror.decryptLocal(cached, requireCurrentCryptoSession());
     if (!item) continue;
 
     if (item.syncStatus === 'pending_delete') {
-      const { error } = await supabase
-        .from('relationship_import_inbox')
-        .delete()
-        .eq('id', item.id)
-        .eq('user_id', userId);
+      const { error } = await supabase.from(mirror.remoteTable).delete().eq('id', item.id).eq('user_id', userId);
       if (error) throw error;
-      await db.relationshipImportInbox.delete(item.id);
+      await mirror.dexieTable.delete(item.id);
       continue;
     }
 
-    const { error } = await supabase
-      .from('relationship_import_inbox')
-      .upsert(await toRemoteImportRow(item, userId));
+    const { error } = await supabase.from(mirror.remoteTable).upsert(await mirror.toRemoteRow(item, userId));
     if (error) throw error;
-    await db.relationshipImportInbox.update(item.id, { syncStatus: 'synced' });
+    await mirror.dexieTable.update(item.id, { syncStatus: 'synced' });
   }
 };
+
+// flush -> fetch remote -> map -> refresh local cache for synced rows -> merge
+// with pending local edits; on any failure fall back to the local cache.
+const loadCachedEntities = async <TRemote extends { id: string; user_id: string }, TModel extends MirrorModel>(
+  mirror: EntityMirror<TRemote, TModel>,
+  userId: string,
+): Promise<TModel[]> => {
+  try {
+    await flushPendingEntity(mirror, userId);
+    const { data, error } = await supabase
+      .from(mirror.remoteTable)
+      .select('*')
+      .eq('user_id', userId)
+      .order(mirror.orderColumn, { ascending: false });
+    if (error) throw error;
+    const items = await Promise.all(((data || []) as TRemote[]).map((row) => mirror.mapRemoteRow(row, requireCurrentCryptoSession())));
+    for (const item of items) {
+      const local = await mirror.dexieTable.get(item.id);
+      if (!local || local.syncStatus === 'synced') {
+        await mirror.saveLocal(userId, item, 'synced');
+      }
+    }
+    return mergeRemoteWithPending(items, await getLocalEntity(mirror, userId));
+  } catch {
+    return (await getLocalEntity(mirror, userId))
+      .filter((item) => item.syncStatus !== 'pending_delete')
+      .sort((left, right) => Date.parse(right.updatedAt) - Date.parse(left.updatedAt));
+  }
+};
+
+const relationshipMirror: EntityMirror<SupabaseRelationshipRow, RelationshipRecord> = {
+  dexieTable: db.relationships as unknown as Table<MirrorRow>,
+  remoteTable: 'relationships',
+  orderColumn: 'updated_at',
+  decryptLocal: decryptLocalRelationship as EntityMirror<SupabaseRelationshipRow, RelationshipRecord>['decryptLocal'],
+  mapRemoteRow: mapRemoteRelationship,
+  toRemoteRow: toRemoteRelationshipRow,
+  saveLocal: saveRelationshipLocal,
+};
+
+const importMirror: EntityMirror<SupabaseImportInboxRow, RelationshipImportInboxItem> = {
+  dexieTable: db.relationshipImportInbox as unknown as Table<MirrorRow>,
+  remoteTable: 'relationship_import_inbox',
+  orderColumn: 'created_at',
+  decryptLocal: decryptLocalImport as EntityMirror<SupabaseImportInboxRow, RelationshipImportInboxItem>['decryptLocal'],
+  mapRemoteRow: mapRemoteImportItem,
+  toRemoteRow: toRemoteImportRow,
+  saveLocal: saveImportLocal,
+};
+
+// Thin per-entity wrappers keep the public surface stable for existing imports.
+export const getLocalRelationships = (userId: string) => getLocalEntity(relationshipMirror, userId);
+export const getLocalImports = (userId: string) => getLocalEntity(importMirror, userId);
+export const flushPendingRelationships = (userId: string) => flushPendingEntity(relationshipMirror, userId);
+export const flushPendingImports = (userId: string) => flushPendingEntity(importMirror, userId);
+export const loadRelationships = (userId: string) => loadCachedEntities(relationshipMirror, userId);
+export const loadImports = (userId: string) => loadCachedEntities(importMirror, userId);

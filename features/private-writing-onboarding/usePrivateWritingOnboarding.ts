@@ -26,11 +26,14 @@ export const usePrivateWritingOnboarding = ({
           state.completedAt && (state.versionSeen || 0) >= PRIVATE_WRITING_ONBOARDING_VERSION,
         );
         setHasCompletedOnboarding(completed);
-        setShouldShowOnboarding(!completed || isSetupRequired);
+        // Only the mandatory encryption-setup step auto-opens. The optional tour
+        // must never nag returning users, so it is not gated on the (best-effort)
+        // DB completion flag - the post-setup session shows it via justCompletedSetup.
+        setShouldShowOnboarding(isSetupRequired);
       } catch {
         if (!isActive) return;
         setHasCompletedOnboarding(false);
-        setShouldShowOnboarding(true);
+        setShouldShowOnboarding(isSetupRequired);
       } finally {
         if (isActive) setIsLoading(false);
       }
@@ -53,7 +56,13 @@ export const usePrivateWritingOnboarding = ({
   }, [hasUser, isSetupRequired]);
 
   const complete = useCallback(async () => {
-    await profileService.completeOnboarding(PRIVATE_WRITING_ONBOARDING_VERSION);
+    // Best-effort persistence: a failed profile write must never trap the user
+    // inside the modal. Dismiss regardless; it re-syncs on the next session.
+    try {
+      await profileService.completeOnboarding(PRIVATE_WRITING_ONBOARDING_VERSION);
+    } catch (error) {
+      console.error('[onboarding] completion not persisted; dismissing anyway', error);
+    }
     setHasCompletedOnboarding(true);
     setShouldShowOnboarding(false);
   }, []);
