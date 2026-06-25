@@ -97,7 +97,7 @@ describe('Typography and motion contract', () => {
     expect(app).not.toContain('<MotionConfig reducedMotion="user">');
     expect(indexCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(indexCss).toContain('animation-duration: 0.01ms !important');
-    expect(home).toContain('if (shouldReduceMotion)');
+    expect(home).toContain("shouldReduceMotion ? 'gone' : 'exiting'");
   });
 
   it('keeps dashboard motion off broad and layout-property animations', () => {

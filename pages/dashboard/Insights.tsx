@@ -271,7 +271,7 @@ export const Insights: React.FC = () => {
             className="insights-section-header"
           />
 
-          <div ref={insightsScopeRef} aria-live="polite" aria-busy={loading} className="w-full">
+          <div ref={insightsScopeRef} aria-live="polite" aria-busy={loading} className="w-full core-section-stack">
             {loading ? (
             <Surface variant="flat" tone="sky" className="p-8 md:p-10">
               <WeeklyRecapLoadingSkeleton />
@@ -289,9 +289,9 @@ export const Insights: React.FC = () => {
               }
             />
           ) : (<>
-          <Surface variant="flat" tone="sky" className="group relative overflow-hidden rounded-[2.5rem] p-8 md:p-10 transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-sky/5">
+          <Surface variant="flat" tone="sky" className="group relative overflow-hidden rounded-[2rem] p-8 md:p-10 transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-sky/5">
             <div className="relative z-10">
-            <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+            <div className="space-y-8">
               <div className="space-y-5">
                 <div className="flex items-center gap-3 text-green">
                   <CalendarCheck size={18} weight="duotone" />
@@ -302,7 +302,7 @@ export const Insights: React.FC = () => {
                 </h2>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
                 {[
                   ['Reflections', weeklyRecap.reflectionsSaved],
                   ['Check-ins', weeklyRecap.moodCheckins],
@@ -326,7 +326,7 @@ export const Insights: React.FC = () => {
                   onClick={() => toggleInsightPanel(() => setIsMoodOpen((prev) => !prev))}
                   aria-expanded={isMoodOpen}
                   aria-controls="insights-mood-panel"
-                  className="group/acc flex w-full items-center justify-between gap-4 py-6 text-left"
+                  className="group/acc flex w-full items-center justify-between gap-4 py-5 text-left"
                 >
                   <div className="flex items-center gap-3">
                     <div className="tone-icon tone-icon-sky h-12 w-12 rounded-2xl transition-transform duration-500 ease-out-expo group-hover/acc:scale-110 group-hover/acc:rotate-6">
@@ -395,7 +395,7 @@ export const Insights: React.FC = () => {
                   onClick={() => toggleInsightPanel(() => setIsTagsOpen((prev) => !prev))}
                   aria-expanded={isTagsOpen}
                   aria-controls="insights-tags-panel"
-                  className="group/acc flex w-full items-center justify-between gap-4 py-6 text-left"
+                  className="group/acc flex w-full items-center justify-between gap-4 py-5 text-left"
                 >
                   <div className="flex items-center gap-3">
                     <div className="tone-icon tone-icon-honey h-12 w-12 rounded-2xl transition-transform duration-500 ease-out-expo group-hover/acc:scale-110 group-hover/acc:-rotate-6">
@@ -447,7 +447,7 @@ export const Insights: React.FC = () => {
 
           </Surface>
 
-          <Surface variant="bezel" tone="sage" className="group relative overflow-hidden rounded-[2.5rem] transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-green/5">
+          <Surface variant="bezel" tone="sage" className="group relative overflow-hidden rounded-[2rem] transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-green/5">
             <button
               type="button"
               onClick={() => toggleInsightPanel(() => setIsOverviewOpen((current) => !current))}
@@ -495,7 +495,7 @@ export const Insights: React.FC = () => {
                 </div>
           </Surface>
 
-          <Surface variant="flat" tone="honey" className="group relative overflow-hidden rounded-[2.5rem] transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-honey/5">
+          <Surface variant="flat" tone="honey" className="group relative overflow-hidden rounded-[2rem] transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-honey/5">
             <button
               type="button"
               onClick={() => toggleInsightPanel(() => setIsCompletionOpen((prev) => !prev))}
@@ -550,7 +550,7 @@ export const Insights: React.FC = () => {
           <Surface
             variant="flat"
             tone="sage"
-            className="group relative overflow-hidden rounded-[2.5rem] border border-transparent transition-[border-color,box-shadow] duration-500 ease-out-expo hover:border-green/20 hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-green/5"
+            className="group relative overflow-hidden rounded-[2rem] border border-transparent transition-[border-color,box-shadow] duration-500 ease-out-expo hover:border-green/20 hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-green/5"
           >
             <Link
               to={RoutePath.SANCTUARY}

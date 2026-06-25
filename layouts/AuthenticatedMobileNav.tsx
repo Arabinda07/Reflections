@@ -248,7 +248,10 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
         <div className="auth-mobile-more-sheet-content space-y-3">
           <nav aria-label="More navigation" className="space-y-3">
             {MORE_NAV_GROUPS.map((group, groupIndex) => (
-              <section key={group.label} className="space-y-1.5">
+              <section
+                key={group.label}
+                className={`space-y-1.5 ${groupIndex > 0 ? 'border-t border-border/60 pt-3' : ''}`.trim()}
+              >
                 <h3 className="px-1 text-[10px] font-black uppercase tracking-[0.16em] text-gray-nav">
                   {group.label}
                 </h3>

@@ -606,16 +606,16 @@ export const CreateNote: React.FC = () => {
           </button>
         )}
 
-        {/* Interchangeable Action FAB (Spark / Save) */}
+        {/* Interchangeable Action FAB: cycles prompts while empty, becomes Save once you write */}
           {!hasContent ? (
             <button
               key="spark-fab"
               onClick={cycleSparkPrompt}
-              className="surface-floating group relative flex h-16 w-16 items-center justify-center rounded-full text-green transition-transform hover:scale-[1.02] active:scale-[0.98]"
+              className="surface-floating group relative flex h-16 items-center gap-2.5 rounded-full px-6 text-green transition-transform hover:scale-[1.02] active:scale-[0.98]"
               aria-label="Show another writing prompt"
             >
-              <div className="absolute inset-2 rounded-full bg-green/5 group-hover:bg-green/10 transition-colors" />
-              <Target size={28} weight="fill" />
+              <Target size={24} weight="fill" className="shrink-0" />
+              <span className="text-[14px] font-bold">New prompt</span>
             </button>
           ) : (
             <button
@@ -625,17 +625,17 @@ export const CreateNote: React.FC = () => {
                 setIsSaveChoiceOpen(true);
               }}
               disabled={saving || isReleasing}
-              className="group relative h-16 w-16 rounded-full bg-green text-white shadow-xl shadow-green/25 flex items-center justify-center transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-90"
-              aria-label="Choose what to do with this reflection"
+              className="group relative flex h-16 items-center gap-2.5 rounded-full bg-green px-7 text-white shadow-xl shadow-green/25 transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-90"
+              aria-label="Save or release this reflection"
             >
-              {(saving || isReleasing) && (
-                <div
-                  className="absolute inset-0 rounded-full bg-green pointer-events-none animate-ping opacity-25"
-                />
+              {saving || isReleasing ? (
+                <CircleNotch size={24} className="relative z-10 animate-spin shrink-0" />
+              ) : (
+                <FloppyDisk size={24} weight="fill" className="relative z-10 shrink-0" />
               )}
-              
-              <div className="absolute inset-2 rounded-full bg-white/12 transition-transform duration-300 ease-out group-hover:scale-105" />
-              {saving || isReleasing ? <CircleNotch size={28} className="relative z-10 animate-spin" /> : <FloppyDisk size={26} weight="fill" className="relative z-10" />}
+              <span className="relative z-10 text-[15px] font-bold">
+                {saving ? 'Saving' : isReleasing ? 'Releasing' : 'Save'}
+              </span>
             </button>
           )}
       </div>

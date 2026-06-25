@@ -450,6 +450,16 @@ html {
   scrollbar-gutter: stable;
 }
 
+.custom-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 @media (max-width: 767px) {
   html {
     scrollbar-gutter: auto;
@@ -461,16 +471,6 @@ html {
 
   body {
     max-width: 100%;
-  }
-
-  .custom-scrollbar {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar {
-    display: none;
   }
 }
 
@@ -970,6 +970,7 @@ details:focus-visible,
   @media (min-width: 1024px) {
     .core-bento-grid {
       grid-template-columns: minmax(0, 2fr) minmax(20rem, 0.95fr);
+      align-items: start;
     }
   }
 

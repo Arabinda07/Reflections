@@ -7,6 +7,7 @@ import { Notebook } from '@phosphor-icons/react/Notebook';
 import { PaperPlaneTilt } from '@phosphor-icons/react/PaperPlaneTilt';
 import { PencilSimpleLine } from '@phosphor-icons/react/PencilSimpleLine';
 import { Question } from '@phosphor-icons/react/Question';
+import { Sparkle } from '@phosphor-icons/react/Sparkle';
 import { Heart } from '@phosphor-icons/react/Heart';
 import { SignIn } from '@phosphor-icons/react/SignIn';
 import { UserCircle } from '@phosphor-icons/react/UserCircle';
@@ -36,6 +37,7 @@ const GUEST_NAV_ITEMS: SidebarNavItem[] = [
 const AUTH_NAV_ITEMS: SidebarNavItem[] = [
   { label: 'My notes', path: RoutePath.NOTES, icon: Notebook, description: 'Return to your saved reflections.' },
   { label: 'Create note', path: RoutePath.CREATE_NOTE, icon: PencilSimpleLine, description: 'Open a fresh writing surface.' },
+  { label: 'Insights', path: RoutePath.INSIGHTS, icon: Sparkle, description: 'See patterns drawn from your writing.' },
   { label: 'Relationships', path: RoutePath.RELATIONSHIPS, icon: Heart, description: 'Tend people, hooks, and weekly care.' },
   { label: 'Account', path: RoutePath.ACCOUNT, icon: UserCircle, description: 'Manage your profile and plan.' },
   { label: 'FAQ', path: RoutePath.FAQ, icon: Question, description: 'Read how Reflections works.' },

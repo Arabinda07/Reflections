@@ -107,7 +107,6 @@ describe('focused product slice source contract', () => {
     expect(homeAuthenticated).toContain('Quick check-in');
     expect(homeAuthenticated).toContain('Future letter');
     expect(homeAuthenticated).toContain('Your Rhythm');
-    expect(homeAuthenticated).toContain('Before you write');
     expect(homeAuthenticated).toContain('core-bento-grid');
     expect(homeAuthenticated).toContain('home-primary-action-row');
     expect(homeAuthenticated).toContain('home-secondary-action-row');

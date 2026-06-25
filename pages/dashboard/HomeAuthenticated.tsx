@@ -7,7 +7,6 @@ import { FolderOpen } from '@phosphor-icons/react/FolderOpen';
 import { Heart } from '@phosphor-icons/react/Heart';
 import { ListChecks } from '@phosphor-icons/react/ListChecks';
 import { Plus } from '@phosphor-icons/react/Plus';
-import { Sparkle } from '@phosphor-icons/react/Sparkle';
 import { Target } from '@phosphor-icons/react/Target';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -43,24 +42,6 @@ import { MoodPicker, type MoodPickerStage } from './MoodPicker';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { RelationshipHomeModule } from './RelationshipHomeModule';
 
-
-const WRITING_NOTES = [
-  {
-    text: 'Start with the sentence that keeps trying to get your attention.',
-    author: 'Julia Cameron',
-  },
-  {
-    text: 'You do not need to explain the whole day. One true detail is enough.',
-    author: 'Natalie Goldberg',
-  },
-  {
-    text: 'Write what happened. Then write what stayed with you.',
-    author: 'Joan Didion',
-  },
-  { text: 'If the thought feels messy, put it down messy.', author: 'Natalie Goldberg' },
-  { text: 'Notice the thing you keep circling. It may be asking for a name.', author: 'Julia Cameron' },
-  { text: 'You do not have to be certain before you start writing.', author: 'Reflections' },
-];
 
 const prefetchCreateNoteRoute = () => {
   void import('@/pages/dashboard/CreateNote');
@@ -101,19 +82,12 @@ const rememberHomeHeroIntroSeen = () => {
   }
 };
 
-const getRandomWritingNote = () =>
-  WRITING_NOTES[Math.floor(Math.random() * WRITING_NOTES.length)];
-
 export const HomeAuthenticated: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const haptics = useHaptics();
-  const isFromSave = location.state?.fromSave;
   const { user } = useAuthStore();
   const cryptoContext = useCrypto();
-  const [noteCount, setNoteCount] = useState<number | null>(null);
-  const [displayCount, setDisplayCount] = useState<number | string>('...');
-  const [isCountLoading, setIsCountLoading] = useState(false);
   const [dailyPrompt, setDailyPrompt] = useState(DEFAULT_WELLNESS_PROMPTS[0]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
@@ -121,7 +95,6 @@ export const HomeAuthenticated: React.FC = () => {
   const [isSavingCheckIn, setIsSavingCheckIn] = useState(false);
   const [checkInFeedback, setCheckInFeedback] = useState<string | null>(null);
   const [intentionFeedback, setIntentionFeedback] = useState<string | null>(null);
-  const [quote] = useState(getRandomWritingNote);
   const [taskNotes, setTaskNotes] = useState<Note[]>([]);
   const [intentionSummary, setIntentionSummary] = useState<HomeIntentionSummary>(() =>
     buildHomeIntentionSummary([]),
@@ -278,29 +251,6 @@ export const HomeAuthenticated: React.FC = () => {
   );
 
   useEffect(() => {
-    if (noteCount === null) return;
-
-    if (shouldReduceMotion) {
-      setDisplayCount(noteCount);
-      return;
-    }
-
-    let raf: number;
-    const start = performance.now();
-    const duration = 900;
-    const step = (now: number) => {
-      const t = Math.min((now - start) / duration, 1);
-      // cubic-bezier(0.16, 1, 0.3, 1) approximation
-      const eased = 1 - Math.pow(1 - t, 3);
-      setDisplayCount(Math.round(eased * noteCount));
-      if (t < 1) raf = requestAnimationFrame(step);
-    };
-    raf = requestAnimationFrame(step);
-
-    return () => cancelAnimationFrame(raf);
-  }, [noteCount, shouldReduceMotion]);
-
-  useEffect(() => {
     const saveData = Boolean(
       (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData,
     );
@@ -404,19 +354,11 @@ export const HomeAuthenticated: React.FC = () => {
     const fetchCount = async () => {
       if (!user || !isPrivateWritingReady) return;
 
-      setIsCountLoading(true);
       try {
-        const [count, notes] = await Promise.all([
-          noteService.getCount(),
-          noteService.getAll()
-        ]);
-        setNoteCount(count);
+        const notes = await noteService.getAll();
         updateIntentionSummary(notes);
       } catch {
-        setNoteCount(0);
         updateIntentionSummary([]);
-      } finally {
-        setIsCountLoading(false);
       }
     };
 
@@ -656,8 +598,9 @@ export const HomeAuthenticated: React.FC = () => {
             aria-label="Dashboard"
             className="core-bento-grid"
           >
+            <div className="flex flex-col gap-6">
             <div
-              className="home-primary-reflection-card group relative surface-flat overflow-hidden rounded-[2.5rem] p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full transition-[border-color,box-shadow] duration-300 ease-out-expo hover:shadow-[0_12px_32px_var(--tw-shadow-color)] hover:shadow-green/5 hover:border-green/10"
+              className="home-primary-reflection-card group relative surface-flat overflow-hidden rounded-[2rem] p-8 sm:p-10 lg:p-12 flex flex-col transition-[border-color,box-shadow] duration-300 ease-out-expo hover:shadow-[0_12px_32px_var(--tw-shadow-color)] hover:shadow-green/5 hover:border-green/10"
             >
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-8">
@@ -678,13 +621,13 @@ export const HomeAuthenticated: React.FC = () => {
                   </button>
                 </div>
 
-                <div className="mb-12 space-y-8">
+                <div className="space-y-8">
                   <p
                     className={`dashboard-prompt-text typographic-measure transition-opacity duration-[400ms] ease-out ${isRefreshing ? 'opacity-0' : 'opacity-100'}`}
                   >
                     {dailyPrompt}
                   </p>
-                  <div className="home-primary-action-cluster flex max-w-xl flex-col gap-3">
+                  <div className="home-primary-action-cluster flex flex-col gap-3">
                     <div className="home-primary-action-row flex w-full flex-col gap-3 sm:flex-row sm:items-stretch">
                       <Button
                         variant="primary"
@@ -719,9 +662,8 @@ export const HomeAuthenticated: React.FC = () => {
                         <Heart size={18} weight="duotone" className="ml-2" />
                       </Button>
                       <Button
-                        variant="outline"
-
-                        className="h-12 w-full justify-center rounded-xl border-sky/25 bg-sky/5 px-6 text-sky hover:bg-sky/10"
+                        variant="secondary"
+                        className="h-12 w-full rounded-xl px-6 text-base font-bold"
                         onClick={() => navigate(RoutePath.FUTURE_LETTERS)}
                         aria-label="Write a future letter"
                       >
@@ -732,8 +674,11 @@ export const HomeAuthenticated: React.FC = () => {
                   </div>
                 </div>
             </div>
+              {/* Subtle background glow effect on hover */}
+              <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-green/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+            </div>
 
-            <div className="border-t border-border/60 pt-8 text-left">
+            <div className="home-intentions-card surface-flat overflow-hidden rounded-[2rem] p-8 sm:p-10 lg:p-12 text-left">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-gray-nav">
                   <ListChecks size={16} weight="duotone" className="text-honey" />
@@ -742,7 +687,7 @@ export const HomeAuthenticated: React.FC = () => {
                   </span>
                 </div>
                 {intentionSummary.openCount > 0 && (
-                  <span className="text-xs font-bold text-gray-nav/60">
+                  <span className="text-xs font-bold text-gray-nav">
                     {intentionSummary.openCount} open
                   </span>
                 )}
@@ -795,14 +740,14 @@ export const HomeAuthenticated: React.FC = () => {
                   >
                     <Plus size={24} weight="bold" />
                     <span className="text-base font-bold">Set your first intention</span>
-                    <span className="text-sm font-medium text-gray-nav/60">What matters most today?</span>
+                    <span className="text-sm font-medium text-gray-nav">What matters most today?</span>
                   </button>
                 )}
 
                 {(intentionSummary.hiddenCount > 0 || intentionSummary.items.length > 3) && (
                   <button 
                     onClick={() => navigate(RoutePath.NOTES)}
-                    className="w-full text-center label-caps text-gray-nav/40 hover:text-honey transition-colors pt-4"
+                    className="w-full text-center label-caps text-gray-nav hover:text-honey transition-colors pt-4"
                   >
                     + {intentionSummary.hiddenCount + Math.max(0, intentionSummary.items.length - 3)} more
                   </button>
@@ -814,7 +759,7 @@ export const HomeAuthenticated: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setIsIntentionModalOpen(true)}
-                      className="w-full flex items-center justify-center gap-2 rounded-xl py-2 text-sm font-bold text-honey/60 hover:text-honey transition-colors"
+                      className="w-full flex items-center justify-center gap-2 rounded-xl py-2 text-sm font-bold text-honey hover:text-honey/80 transition-colors"
                     >
                       <Plus size={14} weight="bold" />
                       Add intention
@@ -823,15 +768,13 @@ export const HomeAuthenticated: React.FC = () => {
                 )}
               </div>
             </div>
-            {/* Subtle background glow effect on hover */}
-            <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-green/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
           </div>
 
           <div className="grid gap-6">
             <RelationshipHomeModule />
 
             <div
-              className="group relative surface-flat surface-tone-sky overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-shadow duration-300 ease-out-expo hover:shadow-[0_12px_32px_var(--tw-shadow-color)] hover:shadow-sky/5"
+              className="group relative surface-flat surface-tone-sky overflow-hidden rounded-[2rem] p-6 sm:p-8 transition-shadow duration-300 ease-out-expo hover:shadow-[0_12px_32px_var(--tw-shadow-color)] hover:shadow-sky/5"
             >
               <div className="relative z-10">
               <div className="mb-6 flex items-center gap-2 text-gray-nav">
@@ -839,17 +782,6 @@ export const HomeAuthenticated: React.FC = () => {
                 <p className="label-caps">
                   Your Rhythm
                 </p>
-              </div>
-
-              <div className="mb-6">
-                <p className="dashboard-stat-value flex items-center overflow-hidden h-[1.2em]">
-                    <span
-                      className="inline-block"
-                    >
-                      {isCountLoading ? '...' : displayCount}
-                    </span>
-                </p>
-                <p className="mt-1 text-sm font-semibold text-gray-nav">reflections saved</p>
               </div>
 
               <div className="space-y-3">
@@ -884,42 +816,8 @@ export const HomeAuthenticated: React.FC = () => {
                 </button>
               </div>
             </div>
-            {/* Subtle background glow effect on hover */}
-
           </div>
 
-            <div
-              className="group relative surface-flat surface-tone-honey overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-shadow duration-300 ease-out-expo hover:shadow-[0_12px_32px_var(--tw-shadow-color)] hover:shadow-honey/5"
-            >
-              <div className="relative z-10">
-              <div className="mb-8 flex items-center gap-2 text-gray-nav">
-                <Sparkle size={18} weight="duotone" className="text-honey" />
-                <span className="label-caps">
-                  Before you write
-                </span>
-              </div>
-
-              <div className="space-y-5">
-                {isFromSave ? (
-                  <p className="text-sm font-bold text-green">Reflection saved.</p>
-                ) : null}
-                <p className="dashboard-prose typographic-measure-compact relative italic">
-                  <span className="absolute -left-4 -top-5 font-serif text-5xl text-honey/10 pointer-events-none">
-                    "
-                  </span>
-                  {quote.text}
-                </p>
-                <div className="flex items-center gap-4">
-                  <div className="h-px w-8 bg-honey/20" />
-                  <p className="dashboard-caption text-gray-nav">
-                    {quote.author}
-                  </p>
-                </div>
-                </div>
-              </div>
-              {/* Subtle sweep effect on hover */}
-              <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-honey/0 via-honey/5 to-honey/0 translate-x-[-100%] transition-transform duration-1000 group-hover:translate-x-[100%]" />
-            </div>
           </div>
         </section>
         </div>
@@ -1056,7 +954,7 @@ export const HomeAuthenticated: React.FC = () => {
               )}
             </form>
           ) : (
-            <p className="text-sm font-medium text-gray-nav/60 text-center py-2">
+            <p className="text-sm font-medium text-gray-nav text-center py-2">
               Cross off an existing intention to add a new one.
             </p>
           )}

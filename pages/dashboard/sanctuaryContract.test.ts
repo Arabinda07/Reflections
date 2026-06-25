@@ -53,7 +53,8 @@ describe('Sanctuary Life Wiki contract', () => {
     expect(lifeWiki).toContain('const canShowSanctuaryRooms = hasEnoughEntriesForWiki || primaryPages.length > 0;');
     expect(lifeWiki).toContain('Room awaiting signal');
     expect(lifeWiki).toContain('This Life Wiki room is ready, but it has not been written yet.');
-    expect(lifeWiki).toContain('SANCTUARY_META.map((meta) => renderPageCard(meta, pageMap.get(meta.pageType)))');
+    expect(lifeWiki).toContain('SANCTUARY_META.map((meta) =>');
+    expect(lifeWiki).toContain('!hasEnoughEntriesForWiki && !pageMap.get(meta.pageType)');
     expect(lifeWiki).toContain('font-serif');
     expect(lifeWiki).toContain('italic');
   });

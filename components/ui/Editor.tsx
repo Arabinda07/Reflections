@@ -72,7 +72,7 @@ export interface EditorRef {
 }
 
 export const Editor = forwardRef<EditorRef, EditorProps>(({ value, onChange, onFocusChange, placeholder, ariaLabel = 'Reflection body', className = '', hideToolbar = false }, ref) => {
-  const editorRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const quillInstance = useRef<InstanceType<typeof Quill> | null>(null);
 
   /** Stable refs for callbacks — prevents stale closures in the Quill event handlers. */
@@ -88,50 +88,62 @@ export const Editor = forwardRef<EditorRef, EditorProps>(({ value, onChange, onF
   }));
 
   useEffect(() => {
-    if (editorRef.current && !quillInstance.current) {
-      if (typeof Quill === 'undefined') {
-        console.error("Quill is not loaded. Please check your internet connection or CDN.");
-        return;
-      }
-      // Initialize Quill
-      quillInstance.current = new Quill(editorRef.current, {
-        theme: 'snow',
-        placeholder: placeholder || 'Start typing...',
-        modules: {
-          toolbar: hideToolbar ? false : [
-            [{ 'header': [1, 2, 3, false] }],
-            ['bold', 'italic', 'underline', 'strike'],
-            [{ 'color': [] }, { 'background': [] }],
-            [{ 'align': [] }],
-            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-            ['link', 'blockquote', 'code-block'],
-            ['clean']
-          ]
-        }
-      });
-      applyToolbarAccessibility(editorRef.current.parentElement?.querySelector<HTMLElement>('.ql-toolbar') ?? null);
-
-      const handleTextChange = () => {
-        const html = quillInstance.current!.root.innerHTML;
-        onChangeRef.current(html === '<p><br></p>' ? '' : html);
-      };
-      const handleSelectionChange = (range: unknown) => {
-        onFocusChangeRef.current?.(Boolean(range));
-      };
-
-      quillInstance.current.on('text-change', handleTextChange);
-      quillInstance.current.on('selection-change', handleSelectionChange);
-      
-      // Initial value
-      if (value) {
-         quillInstance.current.root.innerHTML = value;
-      }
-
-      return () => {
-        quillInstance.current?.off('text-change', handleTextChange);
-        quillInstance.current?.off('selection-change', handleSelectionChange);
-      };
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+    if (typeof Quill === 'undefined') {
+      console.error("Quill is not loaded. Please check your internet connection or CDN.");
+      return;
     }
+
+    // Mount Quill on a fresh node each time so it re-initialises cleanly under
+    // React StrictMode's mount→unmount→mount cycle. Reusing the same instance
+    // detaches the text-change listener (cleanup ran) without re-attaching it,
+    // which silently stops onChange from firing.
+    const editorEl = document.createElement('div');
+    editorEl.className = 'border-none';
+    wrapper.appendChild(editorEl);
+
+    const quill = new Quill(editorEl, {
+      theme: 'snow',
+      placeholder: placeholder || 'Start typing...',
+      modules: {
+        toolbar: hideToolbar ? false : [
+          [{ 'header': [1, 2, 3, false] }],
+          ['bold', 'italic', 'underline', 'strike'],
+          [{ 'color': [] }, { 'background': [] }],
+          [{ 'align': [] }],
+          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+          ['link', 'blockquote', 'code-block'],
+          ['clean']
+        ]
+      }
+    });
+    quillInstance.current = quill;
+    applyToolbarAccessibility(wrapper.querySelector<HTMLElement>('.ql-toolbar'));
+
+    const handleTextChange = () => {
+      const html = quill.root.innerHTML;
+      onChangeRef.current(html === '<p><br></p>' ? '' : html);
+    };
+    const handleSelectionChange = (range: unknown) => {
+      onFocusChangeRef.current?.(Boolean(range));
+    };
+
+    quill.on('text-change', handleTextChange);
+    quill.on('selection-change', handleSelectionChange);
+
+    // Initial value
+    if (value) {
+      quill.root.innerHTML = value;
+    }
+
+    return () => {
+      quill.off('text-change', handleTextChange);
+      quill.off('selection-change', handleSelectionChange);
+      quillInstance.current = null;
+      // Drop Quill's injected toolbar + editor so the next mount starts clean.
+      wrapper.innerHTML = '';
+    };
   }, []);
 
   useEffect(() => {
@@ -166,8 +178,6 @@ export const Editor = forwardRef<EditorRef, EditorProps>(({ value, onChange, onF
   }, [ariaLabel]);
 
   return (
-    <div className={`prose prose-zinc max-w-none ${className} note-editor`}>
-      <div ref={editorRef} className="border-none" />
-    </div>
+    <div ref={wrapperRef} className={`prose prose-zinc max-w-none ${className} note-editor`} />
   );
 });
