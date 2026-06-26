@@ -56,7 +56,7 @@ const getWellnessAccessForUser = async (
         .from('profiles')
         .select('smart_mode_enabled')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
 
   const [profileResult, entitlementResult, usageResult] = await Promise.all([
     profilePromise,
