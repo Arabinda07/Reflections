@@ -10,6 +10,10 @@ import {
 } from '../services/keyWrapperPolicy';
 import { setCurrentCryptoSession } from '../services/cryptoSessionStore';
 import { cryptoKeyCache } from '../services/cryptoKeyCache';
+import {
+  consumePendingAccountPassword,
+  hasPendingAccountPassword,
+} from '../src/auth/accountPasswordHandoff';
 import { useAuthStore } from '../hooks/useAuthStore';
 import {
   zeroKnowledgeMigrationService,
@@ -148,6 +152,30 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           setSession(cachedSession);
           setStatus('unlocked');
           return;
+        }
+
+        // Account-password users just typed the exact password that derives the
+        // key at login (held briefly in the volatile handoff). Reuse it to skip
+        // the redundant unlock prompt instead of asking again.
+        if (mappedBundle.unlockMethod === 'account_password' && hasPendingAccountPassword(user.id)) {
+          const pending = consumePendingAccountPassword(user.id);
+          if (pending) {
+            try {
+              const nextSession = await keyWrapperPolicy.unlockWithPrimarySecret({
+                userId: user.id,
+                secret: pending,
+                bundle: mappedBundle,
+              });
+              if (!isActive) return;
+              setCurrentCryptoSession(nextSession);
+              setSession(nextSession);
+              setStatus('unlocked');
+              return;
+            } catch {
+              // Stale stash (e.g. account password changed after setup) — fall
+              // through to the gate so the user can unlock or recover.
+            }
+          }
         }
       }
 
