@@ -21,18 +21,18 @@ const startOfCurrentWeek = () => {
 const suggestedCare = (relationship: RelationshipRecord, hook?: RelationshipHook) => {
   const openCare = relationship.nextCare.find((care) => care.status === 'open');
   if (openCare) return openCare.label;
-  if (hook) return `Reach out around: ${hook.description}`;
-  if (relationship.stage === 'dormant') return 'Send a warm check-in';
-  return 'Notice one useful thing you can offer';
+  if (hook) return 'Message them about it.';
+  if (relationship.stage === 'dormant') return 'Send a no-pressure hello.';
+  return 'Share something they’d appreciate.';
 };
 
 const reason = (relationship: RelationshipRecord, last?: RelationshipInteraction, hook?: RelationshipHook) => {
-  if (relationship.stage === 'dormant') return 'Dormant relationship with enough context to revive gently.';
-  if (hook) return 'Unused hook gives this outreach a human reason.';
-  if (!last) return 'Seed relationship still needs first meaningful touchpoint.';
+  if (relationship.stage === 'dormant') return 'It’s been a while — easy to pick back up.';
+  if (hook) return 'You’ve got a real reason to reach out.';
+  if (!last) return 'You haven’t talked yet — a good time to start.';
   const gap = daysSince(last.date);
-  if (gap > 90) return `Quiet for ${gap} days; worth a small act of care.`;
-  return 'Strong signal for this week based on closeness, energy, and opportunity.';
+  if (gap > 90) return `Quiet for ${gap} days — worth a hello.`;
+  return 'Worth keeping close this week.';
 };
 
 export const buildWeeklyRelationshipSuggestions = (

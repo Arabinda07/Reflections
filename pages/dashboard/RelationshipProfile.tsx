@@ -1,8 +1,16 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
+import { Bell } from '@phosphor-icons/react/Bell';
+import { ChatCircleText } from '@phosphor-icons/react/ChatCircleText';
 import { Check } from '@phosphor-icons/react/Check';
+import { ClockCounterClockwise } from '@phosphor-icons/react/ClockCounterClockwise';
 import { DotsThreeCircle } from '@phosphor-icons/react/DotsThreeCircle';
+import { HandHeart } from '@phosphor-icons/react/HandHeart';
+import { IdentificationCard } from '@phosphor-icons/react/IdentificationCard';
+import { Plus } from '@phosphor-icons/react/Plus';
+import { Sparkle } from '@phosphor-icons/react/Sparkle';
+import { UsersThree } from '@phosphor-icons/react/UsersThree';
 
 import { Button } from '../../components/ui/Button';
 import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
@@ -59,6 +67,54 @@ export const OverflowMenu: React.FC<{ items: OverflowMenuItem[] }> = ({ items })
     </details>
   );
 };
+
+// Shared section header: tinted icon + title + one muted subline, with an optional right-side action.
+const CardHeader: React.FC<{
+  icon: React.ComponentType<{ size?: number; weight?: 'duotone' | 'fill' | 'bold' }>;
+  title: string;
+  subtitle?: string;
+  action?: React.ReactNode;
+}> = ({ icon: Icon, title, subtitle, action }) => (
+  <div className="flex items-start justify-between gap-3">
+    <div className="flex items-center gap-3">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green/10 text-green">
+        <Icon size={18} weight="duotone" />
+      </span>
+      <div>
+        <h2 className="text-base font-bold text-gray-text">{title}</h2>
+        {subtitle && <p className="text-xs font-medium text-gray-nav">{subtitle}</p>}
+      </div>
+    </div>
+    {action}
+  </div>
+);
+
+// Single-field quick-add: one rounded field with the submit button inside it (Enter or click).
+const QuickAdd: React.FC<{
+  placeholder: string;
+  value: string;
+  ariaLabel: string;
+  onChange: (value: string) => void;
+  onSubmit: (event: React.FormEvent) => void;
+}> = ({ placeholder, value, ariaLabel, onChange, onSubmit }) => (
+  <form onSubmit={onSubmit} className="relative">
+    <input
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+      placeholder={placeholder}
+      aria-label={ariaLabel}
+      className="input-surface w-full rounded-xl py-3 pl-3.5 pr-14 text-base font-medium"
+    />
+    <button
+      type="submit"
+      aria-label={ariaLabel}
+      disabled={!value.trim()}
+      className="absolute right-1.5 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg bg-green text-on-accent transition duration-200 ease-out hover:bg-green-hover disabled:opacity-40 disabled:hover:bg-green"
+    >
+      <Plus size={18} weight="bold" />
+    </button>
+  </form>
+);
 
 type Props = {
   relationship: RelationshipRecord;
@@ -335,55 +391,54 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
         </Surface>
 
         {/* Reasons to reconnect */}
-        <Surface variant="flat" tone="paper" className="p-6 md:p-8">
-          <h2 className="label-caps text-green">Reasons to reconnect</h2>
-          <p className="mt-1 text-sm font-medium text-gray-light">Talking points for when you reach out.</p>
-          <div className="mt-4 space-y-3">
+        <Surface variant="flat" tone="paper" className="p-5 md:p-6">
+          <CardHeader icon={ChatCircleText} title="Reasons to reconnect" subtitle="Talking points for when you reach out." />
+          <div className="mt-4 space-y-1.5">
             {openHooks.map((item) => (
-              <button key={item.id} type="button" onClick={() => void update({ hooks: relationship.hooks.map((candidate) => candidate.id === item.id ? { ...candidate, used: true } : candidate) })} className="min-h-12 w-full rounded-2xl border border-green/20 p-4 text-left focus-visible:ring-2 focus-visible:ring-green/40 hover:bg-green/5">
-                <span className="block text-sm font-bold text-gray-text">{item.description}</span>
-                <span className="mt-1 block text-xs font-bold uppercase tracking-[0.14em] text-gray-nav">Mark done</span>
+              <button key={item.id} type="button" onClick={() => void update({ hooks: relationship.hooks.map((candidate) => candidate.id === item.id ? { ...candidate, used: true } : candidate) })} className="group flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition duration-200 ease-out hover:bg-green/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40">
+                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-green/60" />
+                <span className="flex-1 text-sm font-medium text-gray-text">{item.description}</span>
+                <span className="text-xs font-bold text-gray-nav opacity-0 transition group-hover:opacity-100">Done</span>
               </button>
             ))}
-            {!openHooks.length && <p className="text-sm font-medium text-gray-light">Nothing yet. Add a reason you'd want to reach out.</p>}
-            <form onSubmit={addHook} className="flex flex-col gap-2 sm:flex-row sm:items-end">
-              <label className="flex-1 text-sm font-bold text-gray-nav">Add a reason
-                <input name="hook" value={hook} onChange={(event) => setHook(event.target.value)} placeholder="e.g. intro to her designer" className={fieldClass} />
-              </label>
-              <Button type="submit" size="sm" variant="secondary">Add</Button>
-            </form>
+            {!openHooks.length && <p className="px-3 pb-1 text-sm font-medium text-gray-nav">No reasons saved yet.</p>}
+          </div>
+          <div className="mt-3">
+            <QuickAdd ariaLabel="Add a reason" placeholder="Add a reason… e.g. intro to her designer" value={hook} onChange={setHook} onSubmit={addHook} />
           </div>
         </Surface>
 
         {/* Reminders */}
-        <Surface variant="flat" tone="sage" className="p-6 md:p-8">
-          <h2 className="label-caps text-green">Reminders</h2>
-          <p className="mt-1 text-sm font-medium text-gray-light">To-dos for this person.</p>
-          <div className="mt-4 space-y-3">
-            {relationship.nextCare.map((item) => (
-              <button key={item.id} type="button" disabled={item.status === 'done'} onClick={() => void update({ nextCare: relationship.nextCare.map((candidate) => candidate.id === item.id ? { ...candidate, status: 'done' as const } : candidate) })} className="min-h-12 w-full rounded-2xl border border-green/20 p-4 text-left focus-visible:ring-2 focus-visible:ring-green/30 disabled:opacity-50 hover:bg-green/5">
-                <span className="block text-sm font-bold text-gray-text">{item.label}</span>
-                <span className="mt-1 block text-xs font-black uppercase tracking-[0.14em] text-gray-nav">{item.status === 'done' ? 'Done' : 'Mark done'}</span>
-              </button>
-            ))}
-            {!relationship.nextCare.length && <p className="text-sm font-medium text-gray-light">No reminders yet.</p>}
-            <form onSubmit={addNextCare} className="flex flex-col gap-2 sm:flex-row sm:items-end">
-              <label className="flex-1 text-sm font-bold text-gray-nav">Add a reminder
-                <input name="nextCare" value={nextCare} onChange={(event) => setNextCare(event.target.value)} placeholder="e.g. send the article I mentioned" className={fieldClass} />
-              </label>
-              <Button type="submit" size="sm" variant="secondary">Add</Button>
-            </form>
+        <Surface variant="flat" tone="sage" className="p-5 md:p-6">
+          <CardHeader icon={Bell} title="Reminders" subtitle="To-dos for this person." />
+          <div className="mt-4 space-y-1.5">
+            {relationship.nextCare.map((item) => {
+              const done = item.status === 'done';
+              return (
+                <button key={item.id} type="button" disabled={done} onClick={() => void update({ nextCare: relationship.nextCare.map((candidate) => candidate.id === item.id ? { ...candidate, status: 'done' as const } : candidate) })} className="group flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition duration-200 ease-out hover:bg-green/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/30 disabled:hover:bg-transparent">
+                  <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition ${done ? 'border-green bg-green text-on-accent' : 'border-gray-nav/40 text-transparent group-hover:border-green'}`}>
+                    <Check size={12} weight="bold" />
+                  </span>
+                  <span className={`flex-1 text-sm font-medium ${done ? 'text-gray-nav line-through' : 'text-gray-text'}`}>{item.label}</span>
+                </button>
+              );
+            })}
+            {!relationship.nextCare.length && <p className="px-3 pb-1 text-sm font-medium text-gray-nav">No reminders yet.</p>}
+          </div>
+          <div className="mt-3">
+            <QuickAdd ariaLabel="Add a reminder" placeholder="Add a reminder… e.g. send the article" value={nextCare} onChange={setNextCare} onSubmit={addNextCare} />
           </div>
         </Surface>
 
         {/* From your Life Wiki — surfaced in the default view when there's something to show */}
         {wikiMentions.length > 0 && (
-          <Surface variant="flat" tone="paper" className="p-6 md:p-8">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="label-caps text-green">From your Life Wiki</h2>
-              <Link to={RoutePath.SANCTUARY_ARTICLE.replace(':pageType', 'people')} className="text-sm font-bold text-green hover:underline">Open People room</Link>
-            </div>
-            <p className="mt-1 text-sm font-medium text-gray-light">Pulled from what you've written in Notes, refreshed by AI.</p>
+          <Surface variant="flat" tone="paper" className="p-5 md:p-6">
+            <CardHeader
+              icon={Sparkle}
+              title="From your Life Wiki"
+              subtitle="Pulled from what you've written in Notes, refreshed by AI."
+              action={<Link to={RoutePath.SANCTUARY_ARTICLE.replace(':pageType', 'people')} className="shrink-0 text-sm font-bold text-green hover:underline">Open People room</Link>}
+            />
             <div className="mt-4 space-y-3">
               {wikiMentions.map((snippet, index) => (
                 <div key={index} className="rounded-2xl border border-green/20 bg-green/5 p-4">
@@ -407,7 +462,7 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
             {/* Details + status */}
             <Surface variant="flat" tone="paper" className="p-6">
               <form onSubmit={saveDetails} className="space-y-5">
-                <h3 className="label-caps text-green">Details</h3>
+                <CardHeader icon={IdentificationCard} title="Details" subtitle="Contact info and how close you are." />
                 <div className="grid gap-4 sm:grid-cols-2">
                   <label className="text-sm font-bold text-gray-nav">Email<input name="email" value={context.email} onChange={(event) => setContext((current) => ({ ...current, email: event.target.value }))} className={fieldClass} /></label>
                   <label className="text-sm font-bold text-gray-nav">Phone<input name="phone" value={context.phone} onChange={(event) => setContext((current) => ({ ...current, phone: event.target.value }))} className={fieldClass} /></label>
@@ -440,7 +495,7 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
 
             {/* Catch-up history */}
             <Surface variant="flat" tone="paper" className="p-6">
-              <h3 className="label-caps text-green">Catch-ups</h3>
+              <CardHeader icon={ClockCounterClockwise} title="Catch-ups" subtitle="A log of when you connected." />
               <div className="mt-4 space-y-3">
                 {[...relationship.interactions].reverse().map((item) => (
                   <div key={item.id} className="rounded-2xl border border-green/20 p-4">
@@ -448,13 +503,13 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
                     <p className="mt-1 text-sm font-medium text-gray-light">{item.notes}</p>
                   </div>
                 ))}
-                {!relationship.interactions.length && <p className="text-sm font-medium text-gray-light">No catch-ups logged yet.</p>}
+                {!relationship.interactions.length && <p className="text-sm font-medium text-gray-nav">No catch-ups logged yet.</p>}
               </div>
             </Surface>
 
             {/* Favors */}
             <Surface variant="flat" tone="paper" className="p-6">
-              <h3 className="label-caps text-green">Favors</h3>
+              <CardHeader icon={HandHeart} title="Favors" subtitle="Help given or received." />
               <div className="mt-4 space-y-3">
                 {relationship.valueLedger.map((item) => (
                   <div key={item.id} className="rounded-2xl border border-border/60 p-4">
@@ -462,21 +517,21 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
                     <p className="mt-1 text-sm font-medium text-gray-light">{item.description}</p>
                   </div>
                 ))}
-                {!relationship.valueLedger.length && <p className="text-sm font-medium text-gray-light">No favors logged yet.</p>}
+                {!relationship.valueLedger.length && <p className="text-sm font-medium text-gray-nav">No favors logged yet.</p>}
                 <form onSubmit={addValueEntry} className="space-y-2">
                   <div className="grid gap-2 sm:grid-cols-2">
                     <label className="text-sm font-bold text-gray-nav">Who helped<select name="direction" value={valueEntry.direction} onChange={(event) => setValueEntry((current) => ({ ...current, direction: event.target.value }))} className={fieldClass}><option value="given">You gave</option><option value="received">They gave</option></select></label>
                     <label className="text-sm font-bold text-gray-nav">Kind<select name="category" value={valueEntry.category} onChange={(event) => setValueEntry((current) => ({ ...current, category: event.target.value }))} className={fieldClass}>{['introduction', 'opportunity', 'advice', 'knowledge', 'support', 'other'].map((category) => <option key={category}>{category}</option>)}</select></label>
                   </div>
                   <label className="block text-sm font-bold text-gray-nav">What happened<input name="description" value={valueEntry.description} onChange={(event) => setValueEntry((current) => ({ ...current, description: event.target.value }))} className={fieldClass} /></label>
-                  <Button type="submit" size="sm" variant="secondary">Add</Button>
+                  <Button type="submit" size="sm" variant="primary">Add</Button>
                 </form>
               </div>
             </Surface>
 
             {/* Connections */}
             <Surface variant="flat" tone="paper" className="p-6">
-              <h3 className="label-caps text-green">Connections</h3>
+              <CardHeader icon={UsersThree} title="Connections" subtitle="How this person knows others on your list." />
               <div className="mt-4 space-y-3">
                 {relationship.connections.map((item) => (
                   <div key={item.id} className="rounded-2xl border border-green/20 p-4">
@@ -484,7 +539,7 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
                     <p className="mt-1 text-sm font-medium text-gray-light">{item.label}</p>
                   </div>
                 ))}
-                {!relationship.connections.length && <p className="text-sm font-medium text-gray-light">No connections between people yet.</p>}
+                {!relationship.connections.length && <p className="text-sm font-medium text-gray-nav">No connections between people yet.</p>}
                 <form onSubmit={addConnection} className="space-y-2">
                   <label className="block text-sm font-bold text-gray-nav">Person
                     <select name="relatedRelationshipId" required value={connection.relatedRelationshipId} onChange={(event) => setConnection((current) => ({ ...current, relatedRelationshipId: event.target.value }))} className={fieldClass}>
@@ -493,7 +548,7 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
                     </select>
                   </label>
                   <label className="block text-sm font-bold text-gray-nav">How they know each other<input name="connectionLabel" required value={connection.label} onChange={(event) => setConnection((current) => ({ ...current, label: event.target.value }))} className={fieldClass} /></label>
-                  <Button type="submit" size="sm" variant="secondary">Add</Button>
+                  <Button type="submit" size="sm" variant="primary">Add</Button>
                 </form>
               </div>
             </Surface>
@@ -501,11 +556,12 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
             {/* From your Life Wiki — empty hint lives here so the People room link stays reachable */}
             {!wikiMentions.length && (
               <Surface variant="flat" tone="paper" className="p-6">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <h3 className="label-caps text-green">From your Life Wiki</h3>
-                  <Link to={RoutePath.SANCTUARY_ARTICLE.replace(':pageType', 'people')} className="text-sm font-bold text-green hover:underline">Open People room</Link>
-                </div>
-                <p className="mt-4 text-sm font-medium leading-relaxed text-gray-light">Nothing about {relationship.name} in your People room yet. As you write about them in Notes and refresh the Life Wiki, mentions show up here.</p>
+                <CardHeader
+                  icon={Sparkle}
+                  title="From your Life Wiki"
+                  action={<Link to={RoutePath.SANCTUARY_ARTICLE.replace(':pageType', 'people')} className="shrink-0 text-sm font-bold text-green hover:underline">Open People room</Link>}
+                />
+                <p className="mt-4 text-sm font-medium leading-relaxed text-gray-nav">Nothing about {relationship.name} in your People room yet. As you write about them in Notes and refresh the Life Wiki, mentions show up here.</p>
               </Surface>
             )}
           </div>
