@@ -81,5 +81,30 @@ export const relationshipService = {
     return relationshipService.update(id, { lastTendedAt: new Date().toISOString() });
   },
 
+  async archive(id: string): Promise<RelationshipRecord> {
+    return relationshipService.update(id, { stage: 'archived' });
+  },
+
+  async unarchive(id: string): Promise<RelationshipRecord> {
+    return relationshipService.update(id, { stage: 'active' });
+  },
+
+  async remove(id: string): Promise<void> {
+    const userId = await getAuthenticatedUserId();
+    const existing = await relationshipService.getById(id);
+    if (!existing) return;
+    // Mark pending_delete first so the row drops out of every list immediately
+    // (mergeRemoteWithPending + getById both exclude pending_delete). If the
+    // remote delete fails, flushPendingEntity retries it on the next load.
+    await saveRelationshipLocal(userId, existing, 'pending_delete');
+    try {
+      const { error } = await supabase.from('relationships').delete().eq('id', id).eq('user_id', userId);
+      if (error) throw error;
+      await db.relationships.delete(id);
+    } catch {
+      // Stays pending_delete locally; a later flush will retry the remote delete.
+    }
+  },
+
   buildWeeklySuggestions: buildWeeklyRelationshipSuggestions,
 };

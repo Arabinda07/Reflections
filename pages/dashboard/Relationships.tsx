@@ -7,6 +7,7 @@ import { Plus } from '@phosphor-icons/react/Plus';
 import { Tray } from '@phosphor-icons/react/Tray';
 
 import { Button } from '../../components/ui/Button';
+import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
 import { Input } from '../../components/ui/Input';
 import { MetadataPill } from '../../components/ui/MetadataPill';
 import { ModalSheet } from '../../components/ui/ModalSheet';
@@ -18,38 +19,18 @@ import { relationshipService } from '../../services/relationshipService';
 import { relationshipImportService } from '../../services/relationshipImportService';
 import { countMentionedNames } from '../../services/relationshipWikiLink';
 import { wikiService } from '../../services/wikiService';
-import type { RelationshipHook, RelationshipImportInboxItem, RelationshipRecord, RelationshipTag } from '../../types';
+import type { RelationshipImportInboxItem, RelationshipRecord } from '../../types';
 import { RoutePath } from '../../types';
 import { RelationshipImportInbox } from './RelationshipImportInbox';
-import { RelationshipProfile, relationshipStageLabels } from './RelationshipProfile';
+import { RelationshipProfile, relationshipStageLabels, OverflowMenu } from './RelationshipProfile';
 
 const relationshipPath = (id: string) => RoutePath.RELATIONSHIP_DETAIL.replace(':id', encodeURIComponent(id));
 // input-surface carries the themed background/border/focus ring; bg-panel was an
 // unregistered utility that left fields with the native (dark-mode) control bg.
 const fieldClass = 'input-surface mt-2 min-h-12 w-full px-4 py-3 text-base font-medium';
 
-const emptyDraft = { name: '', howWeMet: '', caresAbout: '', domain: '', roleTag: '', hook: '' };
+const emptyDraft = { name: '', howWeMet: '' };
 type Draft = typeof emptyDraft;
-
-const tagsForDraft = (draft: Draft): RelationshipTag[] => [
-  ...(draft.domain.trim() ? [{ id: crypto.randomUUID(), category: 'domain' as const, label: draft.domain.trim() }] : []),
-  ...(draft.roleTag.trim() ? [{ id: crypto.randomUUID(), category: 'role' as const, label: draft.roleTag.trim() }] : []),
-];
-
-const hooksForDraft = (draft: Draft): RelationshipHook[] => draft.hook.trim() ? [{
-  id: crypto.randomUUID(),
-  description: draft.hook.trim(),
-  source: 'manual',
-  createdAt: new Date().toISOString(),
-  used: false,
-}] : [];
-
-const stageClass = (stage: RelationshipRecord['stage']) => {
-  if (stage === 'trusted') return 'text-green';
-  if (stage === 'active') return 'text-sky';
-  if (stage === 'dormant') return 'text-clay';
-  return 'text-gray-nav';
-};
 
 export const Relationships: React.FC = () => {
   const navigate = useNavigate();
@@ -61,15 +42,20 @@ export const Relationships: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [draft, setDraft] = useState<Draft>(emptyDraft);
-  const [seed, setSeed] = useState({ topPeople: '', topDomains: '', lostTouch: '' });
+  const [seedNames, setSeedNames] = useState('');
   const [isSeeding, setIsSeeding] = useState(false);
   const [hasPendingSync, setHasPendingSync] = useState(false);
   const [peopleWiki, setPeopleWiki] = useState('');
+  const [showArchived, setShowArchived] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<RelationshipRecord | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const tab = searchParams.get('tab');
   const activeTab = tab === 'people' || tab === 'import' ? tab : 'weekly';
   const selectedRelationship = id ? relationships.find((relationship) => relationship.id === id) : undefined;
   const pendingInbox = useMemo(() => inbox.filter((item) => item.status === 'pending'), [inbox]);
+  const activePeople = useMemo(() => relationships.filter((item) => item.stage !== 'archived'), [relationships]);
+  const archivedPeople = useMemo(() => relationships.filter((item) => item.stage === 'archived'), [relationships]);
   const suggestions = useMemo(() => relationshipService.buildWeeklySuggestions(relationships), [relationships]);
   const wikiMentionCount = useMemo(
     () => countMentionedNames(peopleWiki, relationships.map((relationship) => relationship.name)),
@@ -110,9 +96,6 @@ export const Relationships: React.FC = () => {
       const relationship = await relationshipService.create({
         name: draft.name.trim(),
         howWeMet: draft.howWeMet.trim() || undefined,
-        caresAbout: draft.caresAbout.trim() || undefined,
-        tags: tagsForDraft(draft),
-        hooks: hooksForDraft(draft),
       });
       setRelationships((current) => [relationship, ...current]);
       setHasPendingSync(await relationshipService.hasPendingSync());
@@ -120,36 +103,63 @@ export const Relationships: React.FC = () => {
       setIsCreateOpen(false);
       navigate(relationshipPath(relationship.id));
     } catch {
-      showToast('Could not add that relationship.');
+      showToast('Could not add that person.');
     }
   };
 
   const seedRelationships = async (event: React.FormEvent) => {
     event.preventDefault();
-    const topPeople = seed.topPeople.split(/\r?\n/).map((name) => name.trim()).filter(Boolean).slice(0, 5);
-    const lostTouch = seed.lostTouch.split(/\r?\n/).map((name) => name.trim()).filter(Boolean).slice(0, 5);
-    if (!topPeople.length && !lostTouch.length) return;
-    const domains = seed.topDomains.split(',').map((label) => label.trim()).filter(Boolean);
+    const names = seedNames.split(/\r?\n/).map((name) => name.trim()).filter(Boolean).slice(0, 10);
+    if (!names.length) return;
     setIsSeeding(true);
     try {
-      const created = await Promise.all([
-        ...topPeople.map((name) => relationshipService.create({
-          name,
-          stage: 'trusted',
-          closeness: 5,
-          tags: domains.map((label) => ({ id: crypto.randomUUID(), category: 'domain' as const, label })),
-        })),
-        ...lostTouch.map((name) => relationshipService.create({ name, stage: 'dormant' })),
-      ]);
+      const created = await Promise.all(names.map((name) => relationshipService.create({ name, stage: 'active' })));
       setRelationships((current) => [...created, ...current]);
       setHasPendingSync(await relationshipService.hasPendingSync());
-      setSeed({ topPeople: '', topDomains: '', lostTouch: '' });
-      showToast(`${created.length} relationships seeded.`);
+      setSeedNames('');
+      showToast(`Added ${created.length} ${created.length === 1 ? 'person' : 'people'}.`);
     } catch {
-      showToast('Some relationships could not be seeded. Existing entries were kept.');
+      showToast('Some people could not be added. Existing entries were kept.');
       await load();
     } finally {
       setIsSeeding(false);
+    }
+  };
+
+  const archivePerson = async (person: RelationshipRecord) => {
+    try {
+      const updated = await relationshipService.archive(person.id);
+      setRelationships((current) => current.map((item) => item.id === updated.id ? updated : item));
+      setHasPendingSync(await relationshipService.hasPendingSync());
+      showToast(`${person.name} archived.`);
+    } catch {
+      showToast('Could not archive this person.');
+    }
+  };
+
+  const unarchivePerson = async (person: RelationshipRecord) => {
+    try {
+      const updated = await relationshipService.unarchive(person.id);
+      setRelationships((current) => current.map((item) => item.id === updated.id ? updated : item));
+      setHasPendingSync(await relationshipService.hasPendingSync());
+      showToast(`${person.name} restored.`);
+    } catch {
+      showToast('Could not restore this person.');
+    }
+  };
+
+  const deletePerson = async () => {
+    if (!pendingDelete) return;
+    setIsDeleting(true);
+    try {
+      await relationshipService.remove(pendingDelete.id);
+      setRelationships((current) => current.filter((item) => item.id !== pendingDelete.id));
+      setHasPendingSync(await relationshipService.hasPendingSync());
+      setPendingDelete(null);
+    } catch {
+      showToast('Could not delete this person.');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -164,6 +174,11 @@ export const Relationships: React.FC = () => {
         onChanged={(updated) => {
           setRelationships((current) => current.map((item) => item.id === updated.id ? updated : item));
           void relationshipService.hasPendingSync().then(setHasPendingSync);
+        }}
+        onDeleted={(deletedId) => {
+          setRelationships((current) => current.filter((item) => item.id !== deletedId));
+          void relationshipService.hasPendingSync().then(setHasPendingSync);
+          navigate(RoutePath.RELATIONSHIPS);
         }}
       />
     );
@@ -195,7 +210,7 @@ export const Relationships: React.FC = () => {
                 <Surface variant="bezel" tone="sage" innerClassName="p-6 md:p-8">
                   <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                     <div><h2 className="text-3xl font-display font-bold text-gray-text">Who to reach out to</h2><p className="mt-2 text-sm font-medium text-gray-light">A short list for this week. No pressure to clear it.</p></div>
-                    <Button variant="primary" onClick={() => setIsCreateOpen(true)}>Add relationship<Plus size={16} weight="bold" className="ml-2" /></Button>
+                    <Button variant="primary" onClick={() => setIsCreateOpen(true)}>Add person<Plus size={16} weight="bold" className="ml-2" /></Button>
                   </div>
 
                   {suggestions.length ? (
@@ -224,8 +239,8 @@ export const Relationships: React.FC = () => {
                         </article>
                       ))}
                     </div>
-                  ) : relationships.length ? (
-                    <div className="rounded-[1.5rem] border-2 border-dashed border-green/20 p-8 text-center"><h3 className="text-2xl font-display font-bold text-gray-text">You're all caught up this week.</h3><p className="mt-2 text-sm font-medium text-gray-light">New suggestions will show up here as things change.</p></div>
+                  ) : activePeople.length ? (
+                    <div className="rounded-[1.5rem] border-2 border-dashed border-green/20 p-8 text-center"><h3 className="text-2xl font-display font-bold text-gray-text">You're all caught up this week.</h3><p className="mt-2 text-sm font-medium text-gray-light">Check back later — new nudges appear as time passes.</p></div>
                   ) : (
                     <div className="rounded-[1.5rem] border-2 border-dashed border-green/20 p-8 text-center">
                       <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-green/10 text-green"><CirclesThreePlus size={28} weight="duotone" /></div>
@@ -252,29 +267,59 @@ export const Relationships: React.FC = () => {
                       <span className="text-sky">Review</span>
                     </Link>
                   )}
-                  {relationships.length ? (
+                  {activePeople.length ? (
                     <div className="grid gap-3">
-                      {relationships.map((relationship) => <Link key={relationship.id} to={relationshipPath(relationship.id)} className="flex min-h-20 items-center justify-between gap-4 rounded-2xl border border-border/70 p-4 focus-visible:ring-2 focus-visible:ring-green/30 hover:border-green/25 hover:bg-green/5"><span className="min-w-0"><span className="block text-base font-bold text-gray-text">{relationship.name}</span><span className="mt-1 block truncate text-sm font-medium text-gray-light">{relationship.role || relationship.company || relationship.howWeMet || 'Context pending'}</span></span><span className={`shrink-0 text-xs font-black uppercase tracking-[0.14em] ${stageClass(relationship.stage)}`}>{relationshipStageLabels[relationship.stage]}</span></Link>)}
+                      {activePeople.map((relationship) => (
+                        <div key={relationship.id} className="flex min-h-20 items-center gap-2 rounded-2xl border border-border/70 p-4 hover:border-green/25 hover:bg-green/5">
+                          <Link to={relationshipPath(relationship.id)} className="min-w-0 flex-1 rounded-xl focus-visible:ring-2 focus-visible:ring-green/30">
+                            <span className="block text-base font-bold text-gray-text">{relationship.name}</span>
+                            <span className="mt-1 block truncate text-sm font-medium text-gray-light">{relationship.role || relationship.company || relationship.howWeMet || 'No details yet'}</span>
+                          </Link>
+                          <OverflowMenu items={[
+                            { label: 'Archive', onClick: () => void archivePerson(relationship) },
+                            { label: 'Delete…', onClick: () => setPendingDelete(relationship), danger: true },
+                          ]} />
+                        </div>
+                      ))}
                     </div>
                   ) : !isLoading ? (
                     <form onSubmit={seedRelationships} className="rounded-[1.5rem] border-2 border-dashed border-green/20 p-6 md:p-8">
                       <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-green/10 text-green"><CirclesThreePlus size={28} weight="duotone" /></div>
-                      <h3 className="mt-4 text-2xl font-display font-bold text-gray-text">Add the people who already matter.</h3>
-                      <p className="mt-2 text-sm font-medium text-gray-light">One name per line. Start small; it doesn't need to be everyone.</p>
-                      <div className="mt-6 grid gap-4 md:grid-cols-2">
-                        <label className="text-sm font-bold text-gray-nav">Top people
-                          <textarea name="topPeople" value={seed.topPeople} onChange={(event) => setSeed((current) => ({ ...current, topPeople: event.target.value }))} className={`${fieldClass} min-h-32`} placeholder="Up to five names" />
-                        </label>
-                        <label className="text-sm font-bold text-gray-nav">People you've lost touch with
-                          <textarea name="lostTouch" value={seed.lostTouch} onChange={(event) => setSeed((current) => ({ ...current, lostTouch: event.target.value }))} className={`${fieldClass} min-h-32`} placeholder="Up to five names" />
-                        </label>
-                      </div>
-                      <label className="mt-4 block text-sm font-bold text-gray-nav">Domains shared by your top people
-                        <input name="topDomains" value={seed.topDomains} onChange={(event) => setSeed((current) => ({ ...current, topDomains: event.target.value }))} className={fieldClass} placeholder="AI, education, design" />
+                      <h3 className="mt-4 text-2xl font-display font-bold text-gray-text">Stay close to the people who matter.</h3>
+                      <p className="mt-2 text-sm font-medium text-gray-light">Keep the people you care about close — without it feeling like work.</p>
+                      <ol className="mt-5 grid gap-2 sm:grid-cols-3">
+                        {[['1', 'Add people'], ['2', 'Get a few weekly nudges'], ['3', 'Log catch-ups']].map(([num, label]) => (
+                          <li key={num} className="flex items-center gap-2 rounded-xl border border-green/15 bg-green/5 px-3 py-2 text-sm font-bold text-gray-text">
+                            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-green text-xs font-black text-on-accent">{num}</span>
+                            {label}
+                          </li>
+                        ))}
+                      </ol>
+                      <label className="mt-6 block text-sm font-bold text-gray-nav">Who matters most to you? One name per line.
+                        <textarea name="seedNames" value={seedNames} onChange={(event) => setSeedNames(event.target.value)} className={`${fieldClass} min-h-32`} placeholder={'Alex Rivera\nPriya Nair\nSam Devlin'} />
                       </label>
-                      <Button type="submit" variant="primary" className="mt-5" isLoading={isSeeding}>Add relationships</Button>
+                      <Button type="submit" variant="primary" className="mt-5" isLoading={isSeeding}>Add people</Button>
                     </form>
                   ) : null}
+
+                  {archivedPeople.length > 0 && (
+                    <div className="mt-6 border-t border-border/60 pt-5">
+                      <button type="button" onClick={() => setShowArchived((value) => !value)} className="flex min-h-11 items-center gap-2 rounded-xl text-sm font-bold text-gray-nav focus-visible:ring-2 focus-visible:ring-green/30 hover:text-green">
+                        {showArchived ? 'Hide' : 'Show'} archived ({archivedPeople.length})
+                      </button>
+                      {showArchived && (
+                        <div className="mt-3 grid gap-3">
+                          {archivedPeople.map((relationship) => (
+                            <div key={relationship.id} className="flex min-h-16 items-center gap-2 rounded-2xl border border-border/60 bg-surface-muted/40 p-4">
+                              <Link to={relationshipPath(relationship.id)} className="min-w-0 flex-1 truncate text-sm font-bold text-gray-text hover:text-green">{relationship.name}</Link>
+                              <Button variant="secondary" size="sm" onClick={() => void unarchivePerson(relationship)}>Restore</Button>
+                              <OverflowMenu items={[{ label: 'Delete…', onClick: () => setPendingDelete(relationship), danger: true }]} />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </Surface>
               )}
 
@@ -289,16 +334,24 @@ export const Relationships: React.FC = () => {
         </div>
       </PageContainer>
 
-      <ModalSheet isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title="Add relationship" description="Start with context. Details can wait." icon={<Tray size={20} weight="duotone" />} tone="sage" size="md">
+      <ModalSheet isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title="Add someone" description="Just a name to start. You can add more on their profile." icon={<Tray size={20} weight="duotone" />} tone="sage" size="md">
         <form onSubmit={createRelationship} className="space-y-4">
           <Input name="name" label="Name" value={draft.name} onChange={(event) => setDraft((current) => ({ ...current, name: event.target.value }))} autoComplete="name" required autoFocus />
-          <label className="block text-sm font-bold text-gray-nav">How you met<textarea name="howWeMet" value={draft.howWeMet} onChange={(event) => setDraft((current) => ({ ...current, howWeMet: event.target.value }))} className={`${fieldClass} min-h-24`} /></label>
-          <label className="block text-sm font-bold text-gray-nav">What they care about<textarea name="caresAbout" value={draft.caresAbout} onChange={(event) => setDraft((current) => ({ ...current, caresAbout: event.target.value }))} className={`${fieldClass} min-h-24`} /></label>
-          <div className="grid gap-3 sm:grid-cols-2"><Input name="domain" label="Domain" value={draft.domain} onChange={(event) => setDraft((current) => ({ ...current, domain: event.target.value }))} /><Input name="roleTag" label="Role" value={draft.roleTag} onChange={(event) => setDraft((current) => ({ ...current, roleTag: event.target.value }))} /></div>
-          <Input name="hook" label="A reason to reconnect (optional)" value={draft.hook} onChange={(event) => setDraft((current) => ({ ...current, hook: event.target.value }))} />
-          <Button type="submit" variant="primary" className="w-full">Save relationship</Button>
+          <label className="block text-sm font-bold text-gray-nav">How you know them (optional)<textarea name="howWeMet" value={draft.howWeMet} onChange={(event) => setDraft((current) => ({ ...current, howWeMet: event.target.value }))} className={`${fieldClass} min-h-24`} /></label>
+          <Button type="submit" variant="primary" className="w-full">Add</Button>
         </form>
       </ModalSheet>
+
+      <ConfirmationDialog
+        isOpen={Boolean(pendingDelete)}
+        onClose={() => { if (!isDeleting) setPendingDelete(null); }}
+        onConfirm={() => void deletePerson()}
+        variant="danger"
+        title={pendingDelete ? `Delete ${pendingDelete.name}?` : 'Delete this person?'}
+        description="This removes their notes, catch-ups, reasons to reconnect and reminders. This can't be undone."
+        confirmLabel="Delete"
+        isConfirming={isDeleting}
+      />
     </>
   );
 };
