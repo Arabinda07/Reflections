@@ -189,9 +189,9 @@ export const wikiService = {
       .select('*')
       .eq('user_id', userId)
       .eq('page_type', pageType)
-      .single();
+      .maybeSingle();
 
-    if (error) return null;
+    if (error || !data) return null;
     return mapEncryptedLifeTheme(data as SupabaseLifeThemeRow);
   },
 

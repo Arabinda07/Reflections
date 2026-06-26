@@ -27,6 +27,8 @@ const Relationships = lazy(() => import('@/pages/dashboard/Relationships').then(
 const FAQ = lazy(() => import('@/pages/dashboard/FAQ').then((m) => ({ default: m.FAQ })));
 const AboutArabinda = lazy(() => import('@/pages/dashboard/AboutArabinda').then((m) => ({ default: m.AboutArabinda })));
 const PrivacyPolicy = lazy(() => import('@/pages/dashboard/PrivacyPolicy').then((m) => ({ default: m.PrivacyPolicy })));
+const RelationshipsFeature = lazy(() => import('@/pages/dashboard/RelationshipsFeature').then((m) => ({ default: m.RelationshipsFeature })));
+const ComparisonPage = lazy(() => import('@/pages/dashboard/ComparisonPage').then((m) => ({ default: m.ComparisonPage })));
 const AuthCallback = lazy(() => import('@/pages/auth/AuthCallback').then((m) => ({ default: m.AuthCallback })));
 const HomeAuthenticated = lazy(() => import('@/pages/dashboard/HomeAuthenticated').then((m) => ({ default: m.HomeAuthenticated })));
 const NotFound = lazy(() => import('@/pages/NotFound').then((m) => ({ default: m.NotFound })));
@@ -85,6 +87,8 @@ const router = createBrowserRouter(
         <Route path={RoutePath.FAQ} element={withRouteFallback(<FAQ />)} />
         <Route path={RoutePath.ABOUT} element={withRouteFallback(<AboutArabinda />)} />
         <Route path={RoutePath.PRIVACY} element={withRouteFallback(<PrivacyPolicy />)} />
+        <Route path={RoutePath.FEATURE_RELATIONSHIPS} element={withRouteFallback(<RelationshipsFeature />)} />
+        <Route path={RoutePath.VS_DAY_ONE} element={withRouteFallback(<ComparisonPage seoKey="dayOne" />)} />
       </Route>
 
       <Route element={withRouteFallback(<AuthAppShell />, authRouteFallback)} errorElement={<RouteErrorBoundary />}>

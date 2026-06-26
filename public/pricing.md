@@ -1,12 +1,13 @@
 # Pricing - Reflections
 
-Reflections is a private journal for writing notes, naming moods, and noticing patterns. AI support stays optional.
+Reflections is a private journal for writing notes, naming moods, and noticing patterns. Private writing is encrypted on your device, and AI support stays optional.
 
 ## Free
 
 * Price: ₹0/month
 * Limits: 30 notes per calendar month
-* Features: Saved writing, mood tracking, tags, ambient sound, whisper mode, focus mode, one AI reflection sample, and one Life Wiki refresh after enough writing
+* Features: Saved writing, mood tracking, tags, Relationships, ambient sound, whisper mode, focus mode, one AI reflection sample, and one Life Wiki refresh after enough writing
+* Privacy: Device-side encryption for your private writing is included on every plan
 
 ## Pro
 

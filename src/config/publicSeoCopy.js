@@ -4,10 +4,10 @@ export const PUBLIC_SEO_COPY = {
   home: {
     key: 'home',
     path: '/',
-    title: 'Reflections - Private Journal for Writing and Mood Notes',
+    title: 'Reflections - Encrypted Private Journal for Notes, Moods & People',
     description:
       'A private journal for writing what is on your mind, naming moods, and noticing patterns. Your writing is encrypted on your device, and AI stays optional.',
-    h1: 'Private journal for writing and mood notes',
+    h1: 'Your private journal, encrypted on your device',
     intro:
       'Write a few lines, name the mood if it helps, and return to patterns at your own pace.',
     heroAriaLabel: 'Your mind beautifully organized',
@@ -184,9 +184,107 @@ export const PUBLIC_SEO_COPY = {
         'A note from Arabinda about building Reflections as a private journal where writing comes first and AI waits until invited.',
     },
   },
+  relationships: {
+    key: 'relationships',
+    path: '/features/relationships',
+    title: 'Relationships - Stay Close to the People Who Matter | Reflections',
+    description:
+      'A quiet place inside Reflections to keep track of the people you want to stay close to, with a few weekly suggestions for who to reach out to. Encrypted on your device.',
+    h1: 'Quietly keep up with the people who matter',
+    intro:
+      'A small, private space for the people you care about. Not a CRM, not a feed, not another inbox to clear.',
+    sections: [
+      {
+        title: 'What Relationships is',
+        body:
+          'A quiet list of the people you want to stay close to, kept private inside your journal. No social graph, no public profiles, no follower counts.',
+      },
+      {
+        title: 'A few gentle suggestions each week',
+        body:
+          'Each week Relationships surfaces a few people to reach out to, with a reason and a small next step. You decide what to do with them, or nothing at all.',
+      },
+      {
+        title: 'Encrypted like the rest of your writing',
+        body:
+          'The people you add and the context around them are encrypted on your device with a key only you hold, so the server stores data it cannot read.',
+      },
+      {
+        title: 'Always optional',
+        body:
+          'Add as little or as much as you like. Nothing is shared, scored, or pushed at you. Relationships waits until you choose to open it.',
+      },
+    ],
+  },
+  dayOne: {
+    key: 'dayOne',
+    path: '/vs/day-one',
+    title: 'Reflections vs Day One - Encrypted Private Journaling Compared',
+    description:
+      'How Reflections and Day One compare on encryption, platforms, pricing, and AI. Reflections encrypts on your device by default, runs on web and Android, and keeps a free tier.',
+    h1: 'Reflections vs Day One',
+    intro:
+      'A calm, honest comparison of two private journaling apps, so you can pick the one that fits how you write. Last verified June 2026 — check current prices before deciding.',
+    sections: [
+      {
+        title: 'In short',
+        body:
+          'Both are private journals. Day One is a mature, design-led app with deep Apple integration. Reflections is web-first and Android-friendly, encrypts your writing on your device by default, keeps a free tier, and only uses AI when you ask.',
+      },
+      {
+        title: 'Who Day One is best for',
+        body:
+          'People living inside the Apple ecosystem who want a polished, long-established journal with rich media, and who are comfortable on a paid subscription.',
+      },
+      {
+        title: 'Who Reflections is best for',
+        body:
+          'People who want device-side encryption by default, a free way to start, Android and web support, and a calm tool that keeps AI optional and adds gentle Relationships reminders.',
+      },
+      {
+        title: 'Moving your writing',
+        body:
+          'Start Reflections free and keep both for a while. Export your Day One entries as plain text or PDF, then paste what matters into Reflections at your own pace.',
+      },
+    ],
+    comparison: {
+      caption: 'Reflections compared with Day One',
+      headers: ['', 'Reflections', 'Day One'],
+      rows: [
+        ['Platforms', 'Web, PWA, Android', 'iOS, macOS, Android, web'],
+        ['Encryption', 'Zero-knowledge, on by default', 'End-to-end encryption available'],
+        ['Free tier', '30 notes/month, free to start', 'Limited free tier'],
+        ['AI', 'Optional, only when you ask', 'AI features included'],
+        ['Pricing', 'From ₹49/week or ₹149/month', 'Paid subscription'],
+        ['Relationships', 'Built-in weekly reach-out suggestions', 'Not a focus'],
+      ],
+    },
+    faqSchema: [
+      {
+        question: 'What is the best Day One alternative?',
+        answer:
+          'Reflections is a strong Day One alternative for people who want device-side zero-knowledge encryption by default, a free tier, and web plus Android support. It keeps AI optional and adds a quiet Relationships feature for staying in touch.',
+      },
+      {
+        question: 'Is Reflections cheaper than Day One?',
+        answer:
+          'Reflections has a free tier with 30 notes a month, plus Pro plans from ₹49/week or ₹149/month after a 3-day trial. Day One is a paid subscription. Check both current prices before deciding.',
+      },
+      {
+        question: 'Does Reflections work on Android?',
+        answer:
+          'Yes. Reflections runs as a web app, an installable PWA, and an Android APK, so you are not tied to the Apple ecosystem.',
+      },
+      {
+        question: 'Is my writing private in Reflections?',
+        answer:
+          'Yes. Your notes, moods, letters, attachments, Life Wiki, and relationships are encrypted on your device with a key derived from your password, so the server stores data it cannot read.',
+      },
+    ],
+  },
 };
 
-export const PUBLIC_SEO_PAGE_KEYS = ['home', 'faq', 'privacy', 'about'];
+export const PUBLIC_SEO_PAGE_KEYS = ['home', 'faq', 'privacy', 'about', 'relationships', 'dayOne'];
 export const PUBLIC_SEO_PAGES = PUBLIC_SEO_PAGE_KEYS.map((key) => PUBLIC_SEO_COPY[key]);
 export const PUBLIC_SEO_DEFAULT = PUBLIC_SEO_COPY.home;
 

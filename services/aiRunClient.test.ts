@@ -1,8 +1,34 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { readAiRunResponse } from './aiRunClient';
 
 vi.mock('./aiClient', () => ({
   getAccessToken: vi.fn(async () => 'test-token'),
 }));
+
+const mockResponse = (init: { ok: boolean; status?: number; body: unknown }) =>
+  ({
+    ok: init.ok,
+    status: init.status ?? (init.ok ? 200 : 500),
+    json: async () => init.body,
+  }) as unknown as Response;
+
+describe('readAiRunResponse', () => {
+  it('throws a clean error (not a TypeError) when an ok response has an empty body', async () => {
+    await expect(readAiRunResponse(mockResponse({ ok: true, body: null }))).rejects.toThrow(/empty|unexpected/i);
+  });
+
+  it('throws the server error message on a non-ok response', async () => {
+    await expect(
+      readAiRunResponse(mockResponse({ ok: false, status: 500, body: { error: 'nope' } })),
+    ).rejects.toThrow('nope');
+  });
+
+  it('returns the inner data on a well-formed ok response', async () => {
+    await expect(
+      readAiRunResponse<{ runs: unknown[] }>(mockResponse({ ok: true, body: { ok: true, data: { runs: [] } } })),
+    ).resolves.toEqual({ runs: [] });
+  });
+});
 
 const fetchMock = vi.fn();
 vi.stubGlobal('fetch', fetchMock);

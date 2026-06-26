@@ -7,6 +7,7 @@ export const PublicFooter: React.FC = () => {
   const homeHref = usePublicHomePath();
   const links = [
     { href: homeHref, label: 'Home' },
+    { href: RoutePath.FEATURE_RELATIONSHIPS, label: 'Relationships' },
     { href: RoutePath.FAQ, label: 'FAQ' },
     { href: RoutePath.PRIVACY, label: 'Privacy' },
     { href: RoutePath.ABOUT, label: 'About' },

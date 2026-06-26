@@ -29,6 +29,8 @@ describe('SEO crawlability contract', () => {
       `${CANONICAL_PUBLIC_ORIGIN}/faq`,
       `${CANONICAL_PUBLIC_ORIGIN}/privacy`,
       `${CANONICAL_PUBLIC_ORIGIN}/about`,
+      `${CANONICAL_PUBLIC_ORIGIN}/features/relationships`,
+      `${CANONICAL_PUBLIC_ORIGIN}/vs/day-one`,
     ]);
     expect(sitemap).not.toContain('localhost');
     expect(sitemap).not.toContain(FALLBACK_PUBLIC_ORIGIN);
@@ -88,7 +90,7 @@ describe('SEO crawlability contract', () => {
     expect(generator).toContain('<meta name="robots" content="index, follow" />');
     expect(generator).toContain('renderStaticLandingShell');
     expect(generator).toContain('<main id="public-seo-content" data-seo-snapshot="true" class="sr-only">');
-    expect(copySource).toContain('Reflections - Private Journal for Writing and Mood Notes');
+    expect(copySource).toContain('Reflections - Encrypted Private Journal for Notes, Moods & People');
     expect(copySource).toContain('Reflections FAQ - Journaling, AI, Privacy, and Pricing');
     expect(copySource).toContain('Reflections Privacy - Notes, AI, Payments, and Deletion');
     expect(copySource).toContain('About Reflections - A Private Journal by Arabinda');
@@ -143,6 +145,9 @@ describe('SEO crawlability contract', () => {
       '/wiki/:path*',
       '/sanctuary',
       '/sanctuary/:path*',
+      '/relationships',
+      '/relationships/:path*',
+      '/recover-private-writing',
     ]));
     expect(rewriteSources).not.toContain('/faq');
     expect(rewriteSources).not.toContain('/privacy');
@@ -277,6 +282,7 @@ describe('SEO crawlability contract', () => {
       ['pages/dashboard/FAQ.tsx', 'FAQ_SEO.path'],
       ['pages/dashboard/PrivacyPolicy.tsx', 'PRIVACY_SEO.path'],
       ['pages/dashboard/AboutArabinda.tsx', 'ABOUT_SEO.path'],
+      ['pages/dashboard/RelationshipsFeature.tsx', 'RELATIONSHIPS_SEO.path'],
     ] as const) {
       const source = read(file);
       expect(source).toContain('useDocumentMeta');
@@ -305,6 +311,7 @@ describe('SEO crawlability contract', () => {
     expect(footer).toContain("href: RoutePath.FAQ");
     expect(footer).toContain("href: RoutePath.ABOUT");
     expect(footer).toContain("href: RoutePath.PRIVACY");
+    expect(footer).toContain("href: RoutePath.FEATURE_RELATIONSHIPS");
     expect(header).toContain('Public navigation');
     expect(header).toContain('Mobile public navigation');
     expect(header).toContain('href={item.href}');

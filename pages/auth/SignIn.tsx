@@ -194,8 +194,8 @@ export const SignIn: React.FC = () => {
             {successMessage ? (
               <Alert
                 variant="success"
-                icon={<CheckCircle size={20} weight="fill" />}
-                title="You’re all set."
+                icon={<Envelope size={20} weight="fill" />}
+                title="Check your inbox."
                 description={successMessage}
               />
             ) : null}
@@ -208,6 +208,38 @@ export const SignIn: React.FC = () => {
                 description={resetMessage}
               />
             ) : null}
+
+            <div className="space-y-3">
+              {isVerifiedEmailAvailable() && (
+                <Button
+                  variant="secondary"
+                  type="button"
+                  onClick={handleVerifiedEmailLogin}
+                  disabled={loading}
+                  className="w-full min-h-14 gap-3"
+                >
+                  <CheckCircle size={20} weight="fill" className="text-green" />
+                  <span className="font-bold text-gray-text">Continue with Verified Email</span>
+                </Button>
+              )}
+
+              <Button
+                variant="secondary"
+                type="button"
+                onClick={handleGoogleLogin}
+                disabled={loading}
+                className="w-full min-h-14 gap-3"
+              >
+                <GoogleLogo size={20} weight="bold" aria-hidden="true" className="text-gray-text" />
+                <span className="font-bold text-gray-text">Continue with Google</span>
+              </Button>
+            </div>
+
+            <div className="my-2 flex w-full items-center gap-4">
+              <div className="h-[1px] flex-1 bg-border" />
+              <span className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Or sign in with email</span>
+              <div className="h-[1px] flex-1 bg-border" />
+            </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <motion.div 
@@ -270,38 +302,6 @@ export const SignIn: React.FC = () => {
                 </AnimatePresence>
               </div>
             </form>
-
-            <div className="my-2 flex w-full items-center gap-4">
-              <div className="h-[1px] flex-1 bg-border" />
-              <span className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Or</span>
-              <div className="h-[1px] flex-1 bg-border" />
-            </div>
-
-            <div className="space-y-3">
-              {isVerifiedEmailAvailable() && (
-                <Button
-                  variant="secondary"
-                  type="button"
-                  onClick={handleVerifiedEmailLogin}
-                  disabled={loading}
-                  className="w-full min-h-14 gap-3"
-                >
-                  <CheckCircle size={20} weight="fill" className="text-green" />
-                  <span className="font-bold text-gray-text">Continue with Verified Email</span>
-                </Button>
-              )}
-
-              <Button
-                variant="secondary"
-                type="button"
-                onClick={handleGoogleLogin}
-                disabled={loading}
-                className="w-full min-h-14 gap-3"
-              >
-              <GoogleLogo size={20} weight="bold" aria-hidden="true" className="text-gray-text" />
-              <span className="font-bold text-gray-text">Continue with Google</span>
-            </Button>
-          </div>
 
             <p className="text-[15px] font-bold text-gray-light text-center">
               Don&apos;t have an account?{' '}

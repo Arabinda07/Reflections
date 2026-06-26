@@ -564,7 +564,9 @@ export const HomeAuthenticated: React.FC = () => {
               <div className="home-hero-copy relative z-20 flex h-full flex-col items-center justify-start text-center px-6">
                 <div className="max-w-4xl">
                   <h1 className="h1-hero hero-ink mb-12 text-balance">
-                    <span className="whitespace-nowrap">Welcome back,</span>{' '}
+                    <span className="whitespace-nowrap">
+                      {cryptoContext.justCompletedSetup ? 'Welcome,' : 'Welcome back,'}
+                    </span>{' '}
                     <br className="home-hero-break" />
                     <span className="font-serif italic hero-ink-accent">
                       {authStoreDisplayName}

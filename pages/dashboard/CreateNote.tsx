@@ -303,6 +303,33 @@ export const CreateNote: React.FC = () => {
     }
   };
 
+  // First-ever save goes straight to a plain Save; the Save-vs-Release choice
+  // only appears once the writer has saved before, so note one isn't a quiz.
+  // ponytail: global flag (not per-user), set before save resolves; per-user
+  // tracking only if shared-browser onboarding becomes a real concern.
+  const handleSaveFabClick = () => {
+    setReleaseError(null);
+
+    let hasSavedBefore = false;
+    try {
+      hasSavedBefore = localStorage.getItem('reflections-save-choice-seen') === '1';
+    } catch {
+      hasSavedBefore = false;
+    }
+
+    if (!hasSavedBefore) {
+      try {
+        localStorage.setItem('reflections-save-choice-seen', '1');
+      } catch {
+        // Best-effort; if storage is blocked just fall through to a plain save.
+      }
+      void handleSave();
+      return;
+    }
+
+    setIsSaveChoiceOpen(true);
+  };
+
   const cycleSparkPrompt = () => {
     const nextState = getNextWellnessPromptState(promptIndex, DEFAULT_WELLNESS_PROMPTS);
     setPromptIndex(nextState.nextIndex);
@@ -620,10 +647,7 @@ export const CreateNote: React.FC = () => {
           ) : (
             <button
               key="save-fab"
-              onClick={() => {
-                setReleaseError(null);
-                setIsSaveChoiceOpen(true);
-              }}
+              onClick={handleSaveFabClick}
               disabled={saving || isReleasing}
               className="group relative flex h-16 items-center gap-2.5 rounded-full bg-green px-7 text-white shadow-xl shadow-green/25 transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-90"
               aria-label="Save or release this reflection"

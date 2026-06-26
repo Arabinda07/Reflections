@@ -72,7 +72,7 @@ describe('relationshipService.buildWeeklySuggestions', () => {
       'dormant',
       'hook',
     ]);
-    expect(suggestions[1].suggestedCare).toContain('Started a new role');
+    expect(suggestions[1].suggestedHook?.description).toContain('Started a new role');
   });
 
   it('does not suggest archived relationships', () => {

@@ -102,7 +102,7 @@ export const SignUp: React.FC = () => {
           // in Authentication -> URL Configuration, or signup confirmation links will fail.
           emailRedirectTo: getSignupEmailRedirectTo(),
           data: {
-            full_name: name,
+            full_name: name.trim() || email.split('@')[0],
             ...buildNewsletterOptInMetadata(newsletterOptIn),
           },
         },
@@ -113,7 +113,7 @@ export const SignUp: React.FC = () => {
       } else if (data.user && !data.session) {
         navigate(RoutePath.LOGIN, {
           state: {
-            successMessage: 'Account created successfully! Please check your email and verify your address before logging in.',
+            successMessage: `We sent a verification link to ${email}. Open it, then sign in here to start writing.`,
             email,
           },
         });
@@ -200,6 +200,38 @@ export const SignUp: React.FC = () => {
               }
             />
 
+            <div className="space-y-3">
+              {isVerifiedEmailAvailable() && (
+                <Button
+                  variant="secondary"
+                  type="button"
+                  onClick={handleVerifiedEmailLogin}
+                  disabled={loading}
+                  className="w-full h-[52px] gap-3"
+                >
+                  <CheckCircle size={20} weight="fill" className="text-green" />
+                  <span className="font-bold text-gray-text">Continue with Verified Email</span>
+                </Button>
+              )}
+
+              <Button
+                variant="secondary"
+                type="button"
+                onClick={handleGoogleLogin}
+                disabled={loading}
+                className="w-full h-[52px] gap-3"
+              >
+                <GoogleLogo size={20} weight="bold" aria-hidden="true" className="text-gray-text" />
+                <span className="font-bold text-gray-text">Continue with Google</span>
+              </Button>
+            </div>
+
+            <div className="my-2 flex w-full items-center gap-4">
+              <div className="h-[1px] flex-1 bg-border" />
+              <span className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Or sign up with email</span>
+              <div className="h-[1px] flex-1 bg-border" />
+            </div>
+
             <form onSubmit={handleSubmit} className="space-y-5">
               <motion.div 
                 animate={error ? { x: [-8, 8, -6, 6, -4, 4, 0] } : {}} 
@@ -210,8 +242,7 @@ export const SignUp: React.FC = () => {
                   id="name"
                   name="name"
                   type="text"
-                  label="Full name"
-                  required
+                  label="Full name (optional)"
                   value={name}
                   onChange={(event) => setName(event.target.value)}
                   placeholder="Enter your name"
@@ -229,18 +260,25 @@ export const SignUp: React.FC = () => {
                   placeholder="Enter your email"
                   icon={Envelope}
                 />
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  label="Password"
-                  autoComplete="new-password"
-                  required
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  placeholder="Create a password"
-                  icon={Lock}
-                />
+                <div className="space-y-1.5">
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    label="Password"
+                    autoComplete="new-password"
+                    required
+                    minLength={8}
+                    aria-describedby="signup-password-hint"
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    placeholder="Create a password"
+                    icon={Lock}
+                  />
+                  <p id="signup-password-hint" className="ml-1 text-[12px] font-semibold text-gray-nav">
+                    At least 8 characters.
+                  </p>
+                </div>
               </motion.div>
 
               <label htmlFor="newsletter" className="mt-4 flex min-h-11 cursor-pointer select-none items-center gap-3 rounded-[var(--radius-control)] pr-2 text-[14px] font-medium text-gray-text">
@@ -270,7 +308,7 @@ export const SignUp: React.FC = () => {
                 Create account
               </Button>
 
-              <div className="min-h-[24px] mt-2 flex items-center justify-center">
+              <div className="min-h-[24px] mt-2 flex items-center justify-center" role="alert" aria-live="assertive">
                 <AnimatePresence>
                   {error ? (
                     <motion.p
@@ -285,38 +323,6 @@ export const SignUp: React.FC = () => {
                 </AnimatePresence>
               </div>
             </form>
-
-            <div className="my-2 flex w-full items-center gap-4">
-              <div className="h-[1px] flex-1 bg-border" />
-              <span className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Or</span>
-              <div className="h-[1px] flex-1 bg-border" />
-            </div>
-
-            <div className="space-y-3">
-              {isVerifiedEmailAvailable() && (
-                <Button
-                  variant="secondary"
-                  type="button"
-                  onClick={handleVerifiedEmailLogin}
-                  disabled={loading}
-                  className="w-full h-[52px] gap-3"
-                >
-                  <CheckCircle size={20} weight="fill" className="text-green" />
-                  <span className="font-bold text-gray-text">Continue with Verified Email</span>
-                </Button>
-              )}
-
-              <Button
-                variant="secondary"
-                type="button"
-                onClick={handleGoogleLogin}
-                disabled={loading}
-                className="w-full h-[52px] gap-3"
-              >
-              <GoogleLogo size={20} weight="bold" aria-hidden="true" className="text-gray-text" />
-              <span className="font-bold text-gray-text">Continue with Google</span>
-            </Button>
-          </div>
 
             <p className="text-[15px] font-bold text-gray-light text-center">
               Already have an account?{' '}

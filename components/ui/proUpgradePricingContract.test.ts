@@ -25,14 +25,15 @@ describe('Pro upgrade pricing contract', () => {
 
   it('handles non-JSON payment API failures without exposing parser errors', () => {
     const proUpgrade = read('components/ui/ProUpgradeCTA.tsx');
+    const payments = read('components/ui/proUpgradePayments.ts');
 
     expect(proUpgrade).toContain('readPaymentApiResponse');
-    expect(proUpgrade).toContain('response.text()');
-    expect(proUpgrade).toContain('Non-JSON API response');
-    expect(proUpgrade).toContain('Payment setup failed. Check the server logs for this request.');
-    expect(proUpgrade).toContain('Payment setup is not configured yet.');
-    expect(proUpgrade).toContain('Please sign in again before starting payment.');
-    expect(proUpgrade).toContain('Payment went through, but we could not verify it yet. Contact support with the payment ID.');
+    expect(payments).toContain('response.text()');
+    expect(payments).toContain('Non-JSON API response');
+    expect(payments).toContain('Payment setup failed. Check the server logs for this request.');
+    expect(payments).toContain('Payment setup is not configured yet.');
+    expect(payments).toContain('Please sign in again before starting payment.');
+    expect(payments).toContain('Payment went through, but we could not verify it yet. Contact support with the payment ID.');
     expect(proUpgrade).not.toContain('await res.json()');
     expect(proUpgrade).not.toContain('await verifyRes.json()');
   });

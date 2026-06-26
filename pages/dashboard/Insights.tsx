@@ -291,33 +291,51 @@ export const Insights: React.FC = () => {
           ) : (<>
           <Surface variant="flat" tone="sky" className="group relative overflow-hidden rounded-[2rem] p-8 md:p-10 transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-sky/5">
             <div className="relative z-10">
-            <div className="space-y-8">
+            {weeklyRecap.writingDays === 0 ? (
               <div className="space-y-5">
                 <div className="flex items-center gap-3 text-green">
                   <CalendarCheck size={18} weight="duotone" />
                   <p className="label-caps">This week</p>
                 </div>
-                <h2 className="text-3xl font-display font-extrabold text-gray-text md:text-5xl">
-                  You returned {weeklyRecap.writingDays} {weeklyRecap.writingDays === 1 ? 'day' : 'days'}
+                <h2 className="text-3xl font-display font-extrabold text-gray-text md:text-4xl text-balance">
+                  A quiet week — that&rsquo;s allowed.
                 </h2>
+                <p className="max-w-[44ch] text-base leading-relaxed text-gray-light">
+                  Nothing to count here. Your reflections are still in My notes whenever you want them.
+                </p>
+                <Button variant="ghost" onClick={() => navigate(RoutePath.CREATE_NOTE)} className="text-green">
+                  Write something
+                </Button>
               </div>
-
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-                {[
-                  ['Reflections', weeklyRecap.reflectionsSaved],
-                  ['Check-ins', weeklyRecap.moodCheckins],
-                  ['Release moments', weeklyRecap.releaseMoments],
-                  ['Letters scheduled', weeklyRecap.lettersScheduled],
-                  ['Letters opened', weeklyRecap.lettersOpened],
-                  ['Active days', weeklyRecap.activityDays.length],
-                ].map(([label, value]) => (
-                  <div key={label} className="tone-chip tone-chip-sky flex-col items-start p-4">
-                    <p className="dashboard-stat-value">{value}</p>
-                    <p className="dashboard-caption mt-1 text-gray-nav">{label}</p>
+            ) : (
+              <div className="space-y-8">
+                <div className="space-y-5">
+                  <div className="flex items-center gap-3 text-green">
+                    <CalendarCheck size={18} weight="duotone" />
+                    <p className="label-caps">This week</p>
                   </div>
-                ))}
+                  <h2 className="text-3xl font-display font-extrabold text-gray-text md:text-5xl">
+                    You returned {weeklyRecap.writingDays} {weeklyRecap.writingDays === 1 ? 'day' : 'days'}
+                  </h2>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+                  {[
+                    ['Reflections', weeklyRecap.reflectionsSaved],
+                    ['Check-ins', weeklyRecap.moodCheckins],
+                    ['Release moments', weeklyRecap.releaseMoments],
+                    ['Letters scheduled', weeklyRecap.lettersScheduled],
+                    ['Letters opened', weeklyRecap.lettersOpened],
+                    ['Active days', weeklyRecap.activityDays.length],
+                  ].map(([label, value]) => (
+                    <div key={label} className="tone-chip tone-chip-sky flex-col items-start p-4">
+                      <p className="dashboard-stat-value">{value}</p>
+                      <p className="dashboard-caption mt-1 text-gray-nav">{label}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="mt-8 border-t border-border/60 pt-0">
               {/* Mood Frequency Accordion */}

@@ -86,6 +86,9 @@
     { "source": "/wiki", "destination": "/index.html" },
     { "source": "/wiki/:path*", "destination": "/index.html" },
     { "source": "/sanctuary", "destination": "/index.html" },
-    { "source": "/sanctuary/:path*", "destination": "/index.html" }
+    { "source": "/sanctuary/:path*", "destination": "/index.html" },
+    { "source": "/relationships", "destination": "/index.html" },
+    { "source": "/relationships/:path*", "destination": "/index.html" },
+    { "source": "/recover-private-writing", "destination": "/index.html" }
   ]
 }

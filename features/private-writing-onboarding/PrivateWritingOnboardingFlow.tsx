@@ -208,28 +208,32 @@ export const PrivateWritingOnboardingFlow: React.FC<{
               </p>
             </div>
           </div>
-          <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-            <Button
-              variant="ghost"
-              onClick={() => void handleSkipOnboarding('ready_screen')}
-              className="min-h-12 sm:order-first"
-            >
-              Skip for now
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={handleShowMeAround}
-              className="min-h-12"
-            >
-              Show me around
-            </Button>
+          <div className="flex flex-col gap-3">
             <Button
               variant="primary"
               onClick={() => void handleWriteFirstReflection()}
-              className="min-h-12"
+              className="min-h-12 w-full"
             >
               Begin writing
             </Button>
+            <div className="flex items-center justify-center gap-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleShowMeAround}
+                className="px-3 text-gray-nav hover:text-green"
+              >
+                Show me around
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => void handleSkipOnboarding('ready_screen')}
+                className="px-3 text-gray-nav hover:text-green"
+              >
+                Maybe later
+              </Button>
+            </div>
           </div>
         </div>
       ) : shouldShowOptionalGuidance ? (
