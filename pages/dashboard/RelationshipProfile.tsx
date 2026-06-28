@@ -5,12 +5,9 @@ import { Bell } from '@phosphor-icons/react/Bell';
 import { ChatCircleText } from '@phosphor-icons/react/ChatCircleText';
 import { Check } from '@phosphor-icons/react/Check';
 import { ClockCounterClockwise } from '@phosphor-icons/react/ClockCounterClockwise';
-import { DotsThreeCircle } from '@phosphor-icons/react/DotsThreeCircle';
-import { HandHeart } from '@phosphor-icons/react/HandHeart';
-import { IdentificationCard } from '@phosphor-icons/react/IdentificationCard';
+import { DotsThreeVertical } from '@phosphor-icons/react/DotsThreeVertical';
 import { Plus } from '@phosphor-icons/react/Plus';
 import { Sparkle } from '@phosphor-icons/react/Sparkle';
-import { UsersThree } from '@phosphor-icons/react/UsersThree';
 
 import { Button } from '../../components/ui/Button';
 import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
@@ -26,11 +23,10 @@ import type {
   RelationshipNextCare,
   RelationshipRecord,
   RelationshipStage,
-  RelationshipTier,
-  RelationshipValueEntry,
 } from '../../types';
 import { RoutePath } from '../../types';
 
+// Kept for RelationshipImportInbox, which still labels the legacy stage field.
 export const relationshipStageLabels: Record<RelationshipStage, string> = {
   discover: 'Discover',
   acquaintance: 'Acquaintance',
@@ -40,8 +36,6 @@ export const relationshipStageLabels: Record<RelationshipStage, string> = {
   archived: 'Archived',
 };
 
-const stages = Object.keys(relationshipStageLabels) as RelationshipStage[];
-const tiers: RelationshipTier[] = ['none', 't1', 't2', 't3'];
 // input-surface carries the themed background/border/focus ring; bg-panel was an
 // unregistered utility that left fields with the native (dark-mode) control bg.
 const fieldClass = 'input-surface mt-2 min-h-12 w-full px-3 py-3 text-base font-medium';
@@ -57,7 +51,7 @@ export const OverflowMenu: React.FC<{ items: OverflowMenuItem[] }> = ({ items })
   return (
     <details ref={ref} className="relative">
       <summary aria-label="More actions" className="flex min-h-12 w-12 cursor-pointer list-none items-center justify-center rounded-xl text-gray-nav focus-visible:ring-2 focus-visible:ring-green/30 hover:bg-green/5 hover:text-green [&::-webkit-details-marker]:hidden">
-        <DotsThreeCircle size={24} weight="fill" />
+        <DotsThreeVertical size={24} weight="fill" />
       </summary>
       <div className="absolute right-0 z-20 mt-2 w-44 overflow-hidden rounded-xl border border-border bg-surface py-1 shadow-card">
         {items.map((item) => (
@@ -124,15 +118,10 @@ type Props = {
   onDeleted: (id: string) => void;
 };
 
-export const RelationshipProfile: React.FC<Props> = ({ relationship, relationships, onBack, onChanged, onDeleted }) => {
+export const RelationshipProfile: React.FC<Props> = ({ relationship, onBack, onChanged, onDeleted }) => {
   const { showToast } = useToast();
   const [context, setContext] = useState({
     name: relationship.name,
-    stage: relationship.stage,
-    tier: relationship.tier,
-    closeness: relationship.closeness,
-    energy: relationship.energy,
-    opportunity: relationship.opportunity,
     howWeMet: relationship.howWeMet || '',
     caresAbout: relationship.caresAbout || '',
     email: relationship.email || '',
@@ -144,16 +133,15 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
   const [nextCare, setNextCare] = useState('');
   const [catchUpOpen, setCatchUpOpen] = useState(false);
   const [catchUpNote, setCatchUpNote] = useState('');
-  const [valueEntry, setValueEntry] = useState({ direction: 'given', category: 'support', description: '' });
-  const [connection, setConnection] = useState({ relatedRelationshipId: '', label: '' });
   const [isSavingFacts, setIsSavingFacts] = useState(false);
+  const [editingFacts, setEditingFacts] = useState(false);
   const [isSavingDetails, setIsSavingDetails] = useState(false);
   const [isLoggingCatchUp, setIsLoggingCatchUp] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [wikiMentions, setWikiMentions] = useState<string[]>([]);
 
-  const subtitle = [relationship.role, relationship.company].filter(Boolean).join(' · ') || relationship.howWeMet || '';
+  const subtitle = relationship.howWeMet || [relationship.role, relationship.company].filter(Boolean).join(' · ') || '';
   const lastCaughtUp = useMemo(() => {
     const dates = [relationship.lastTendedAt, ...relationship.interactions.map((item) => item.date)].filter(Boolean) as string[];
     if (!dates.length) return null;
@@ -174,11 +162,6 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
   useEffect(() => {
     setContext({
       name: relationship.name,
-      stage: relationship.stage,
-      tier: relationship.tier,
-      closeness: relationship.closeness,
-      energy: relationship.energy,
-      opportunity: relationship.opportunity,
       howWeMet: relationship.howWeMet || '',
       caresAbout: relationship.caresAbout || '',
       email: relationship.email || '',
@@ -186,6 +169,7 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
       role: relationship.role || '',
       company: relationship.company || '',
     });
+    setEditingFacts(isNewProfile);
   }, [relationship.id]);
 
   const update = async (updates: Partial<RelationshipRecord>, success?: string) => {
@@ -195,7 +179,7 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
       if (success) showToast(success);
       return updated;
     } catch {
-      showToast('Could not save that change. Your existing relationship memory is unchanged.');
+      showToast("I couldn't save that. Your notes are unchanged — try again.");
       return undefined;
     }
   };
@@ -204,12 +188,13 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
     event.preventDefault();
     if (!context.name.trim()) return;
     setIsSavingFacts(true);
-    await update({
+    const saved = await update({
       name: context.name.trim(),
       howWeMet: context.howWeMet.trim() || undefined,
       caresAbout: context.caresAbout.trim() || undefined,
     }, 'Saved.');
     setIsSavingFacts(false);
+    if (saved) setEditingFacts(false);
   };
 
   const saveDetails = async (event: React.FormEvent) => {
@@ -220,11 +205,6 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
       phone: context.phone.trim() || undefined,
       role: context.role.trim() || undefined,
       company: context.company.trim() || undefined,
-      stage: context.stage,
-      tier: context.tier,
-      closeness: context.closeness,
-      energy: context.energy,
-      opportunity: context.opportunity,
     }, 'Saved.');
     setIsSavingDetails(false);
   };
@@ -284,30 +264,6 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
     if (await update({ nextCare: items })) setNextCare('');
   };
 
-  const addValueEntry = async (event: React.FormEvent) => {
-    event.preventDefault();
-    if (!valueEntry.description.trim()) return;
-    const valueLedger: RelationshipValueEntry[] = [...relationship.valueLedger, {
-      id: crypto.randomUUID(),
-      direction: valueEntry.direction as RelationshipValueEntry['direction'],
-      category: valueEntry.category as RelationshipValueEntry['category'],
-      description: valueEntry.description.trim(),
-      createdAt: new Date().toISOString(),
-    }];
-    if (await update({ valueLedger })) setValueEntry({ direction: 'given', category: 'support', description: '' });
-  };
-
-  const addConnection = async (event: React.FormEvent) => {
-    event.preventDefault();
-    if (!connection.relatedRelationshipId || !connection.label.trim()) return;
-    const connections = [...relationship.connections, {
-      id: crypto.randomUUID(),
-      relatedRelationshipId: connection.relatedRelationshipId,
-      label: connection.label.trim(),
-    }];
-    if (await update({ connections })) setConnection({ relatedRelationshipId: '', label: '' });
-  };
-
   const archive = async () => {
     try {
       const updated = await relationshipService.archive(relationship.id);
@@ -315,7 +271,7 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
       showToast(`${relationship.name} archived.`);
       onBack();
     } catch {
-      showToast('Could not archive this person.');
+      showToast("I couldn't archive them. Try again in a moment.");
     }
   };
 
@@ -325,7 +281,7 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
       await relationshipService.remove(relationship.id);
       onDeleted(relationship.id);
     } catch {
-      showToast('Could not delete this person.');
+      showToast("I couldn't delete them. Try again in a moment.");
       setIsDeleting(false);
       setConfirmDeleteOpen(false);
     }
@@ -337,16 +293,26 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
         <ArrowLeft size={16} weight="bold" /> Back
       </button>
 
-      <article className="mx-auto max-w-3xl space-y-6">
+      <article className="mx-auto max-w-3xl space-y-8">
         <header className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-          <div className="min-w-0 space-y-2">
+          <div className="min-w-0 space-y-3">
             <h1 className="text-4xl font-display font-extrabold text-gray-text sm:text-5xl">{relationship.name}</h1>
             {subtitle && <p className="text-lg leading-relaxed text-gray-light">{subtitle}</p>}
             <p className="text-sm font-bold text-gray-nav">
               {lastCaughtUp ? `Last caught up ${formatDate(lastCaughtUp.toISOString())}` : 'No catch-ups yet'}
             </p>
-            {isNewProfile && (
+            {!editingFacts && relationship.caresAbout && (
+              <p className="text-[15px] leading-relaxed text-gray-light">
+                <span className="font-bold text-gray-nav">Cares about</span> {relationship.caresAbout}
+              </p>
+            )}
+            {isNewProfile && !editingFacts && (
               <p className="text-sm font-medium text-gray-light">Add a note, a reason to reconnect, or log a catch-up to get started.</p>
+            )}
+            {!editingFacts && (
+              <button type="button" onClick={() => setEditingFacts(true)} className="inline-flex min-h-9 items-center text-sm font-bold text-green hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/30">
+                Edit details
+              </button>
             )}
           </div>
           <div className="flex shrink-0 items-center gap-2">
@@ -374,25 +340,32 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
           </Surface>
         )}
 
-        {/* Facts: the calm default */}
-        <Surface variant="flat" tone="paper" className="p-6 md:p-8">
-          <form onSubmit={saveFacts} className="space-y-5">
-            <label className="block text-sm font-bold text-gray-nav">Name
-              <input name="name" value={context.name} required autoComplete="name" onChange={(event) => setContext((current) => ({ ...current, name: event.target.value }))} className={fieldClass} />
-            </label>
-            <label className="block text-sm font-bold text-gray-nav">How you know them
-              <textarea name="howWeMet" value={context.howWeMet} onChange={(event) => setContext((current) => ({ ...current, howWeMet: event.target.value }))} placeholder="Add a note about how you know them." className={`${fieldClass} min-h-20 font-medium`} />
-            </label>
-            <label className="block text-sm font-bold text-gray-nav">What they care about
-              <textarea name="caresAbout" value={context.caresAbout} onChange={(event) => setContext((current) => ({ ...current, caresAbout: event.target.value }))} className={`${fieldClass} min-h-20 font-medium`} />
-            </label>
-            <Button type="submit" variant="secondary" isLoading={isSavingFacts}>Save</Button>
-          </form>
-        </Surface>
+        {/* Identity facts — edit on demand; read-only by default lives in the header */}
+        {editingFacts && (
+          <Surface variant="flat" tone="paper" className="p-6 md:p-8">
+            <form onSubmit={saveFacts} className="space-y-5">
+              <label className="block text-sm font-bold text-gray-nav">Name
+                <input name="name" value={context.name} required autoComplete="name" onChange={(event) => setContext((current) => ({ ...current, name: event.target.value }))} className={fieldClass} />
+              </label>
+              <label className="block text-sm font-bold text-gray-nav">How you know them
+                <textarea name="howWeMet" value={context.howWeMet} onChange={(event) => setContext((current) => ({ ...current, howWeMet: event.target.value }))} placeholder="Add a note about how you know them." className={`${fieldClass} min-h-20 font-medium`} />
+              </label>
+              <label className="block text-sm font-bold text-gray-nav">What they care about
+                <textarea name="caresAbout" value={context.caresAbout} onChange={(event) => setContext((current) => ({ ...current, caresAbout: event.target.value }))} placeholder="Add what matters to them." className={`${fieldClass} min-h-20 font-medium`} />
+              </label>
+              <div className="flex gap-2">
+                <Button type="submit" variant="secondary" isLoading={isSavingFacts}>Save</Button>
+                {!isNewProfile && (
+                  <Button type="button" variant="ghost" onClick={() => { setContext((current) => ({ ...current, name: relationship.name, howWeMet: relationship.howWeMet || '', caresAbout: relationship.caresAbout || '' })); setEditingFacts(false); }}>Cancel</Button>
+                )}
+              </div>
+            </form>
+          </Surface>
+        )}
 
         {/* Reasons to reconnect */}
         <Surface variant="flat" tone="paper" className="p-5 md:p-6">
-          <CardHeader icon={ChatCircleText} title="Reasons to reconnect" subtitle="Talking points for when you reach out." />
+          <CardHeader icon={ChatCircleText} title="Reasons to reconnect" />
           <div className="mt-4 space-y-1.5">
             {openHooks.map((item) => (
               <button key={item.id} type="button" onClick={() => void update({ hooks: relationship.hooks.map((candidate) => candidate.id === item.id ? { ...candidate, used: true } : candidate) })} className="group flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition duration-200 ease-out hover:bg-green/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40">
@@ -401,16 +374,16 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
                 <span className="text-xs font-bold text-gray-nav opacity-0 transition group-hover:opacity-100">Done</span>
               </button>
             ))}
-            {!openHooks.length && <p className="px-3 pb-1 text-sm font-medium text-gray-nav">No reasons saved yet.</p>}
+            {!openHooks.length && <p className="px-3 pb-1 text-sm font-medium text-gray-nav">No reasons yet.</p>}
           </div>
           <div className="mt-3">
-            <QuickAdd ariaLabel="Add a reason" placeholder="Add a reason… e.g. intro to her designer" value={hook} onChange={setHook} onSubmit={addHook} />
+            <QuickAdd ariaLabel="Add a reason" placeholder="Add a reason… e.g. ask about their new role" value={hook} onChange={setHook} onSubmit={addHook} />
           </div>
         </Surface>
 
         {/* Reminders */}
-        <Surface variant="flat" tone="sage" className="p-5 md:p-6">
-          <CardHeader icon={Bell} title="Reminders" subtitle="To-dos for this person." />
+        <Surface variant="flat" tone="paper" className="p-5 md:p-6">
+          <CardHeader icon={Bell} title="Reminders" />
           <div className="mt-4 space-y-1.5">
             {relationship.nextCare.map((item) => {
               const done = item.status === 'done';
@@ -430,13 +403,27 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
           </div>
         </Surface>
 
+        {/* Catch-ups — the aha record, promoted into the calm column */}
+        <Surface variant="flat" tone="paper" className="p-5 md:p-6">
+          <CardHeader icon={ClockCounterClockwise} title="Catch-ups" />
+          <div className="mt-4 space-y-3">
+            {[...relationship.interactions].reverse().map((item) => (
+              <div key={item.id} className="rounded-2xl border border-green/20 p-4">
+                <p className="text-sm font-bold text-gray-text">{formatDate(item.date)}</p>
+                <p className="mt-1 text-sm font-medium text-gray-light">{item.notes}</p>
+              </div>
+            ))}
+            {!relationship.interactions.length && <p className="text-sm font-medium text-gray-nav">No catch-ups yet.</p>}
+          </div>
+        </Surface>
+
         {/* From your Life Wiki — surfaced in the default view when there's something to show */}
         {wikiMentions.length > 0 && (
           <Surface variant="flat" tone="paper" className="p-5 md:p-6">
             <CardHeader
               icon={Sparkle}
-              title="From your Life Wiki"
-              subtitle="Pulled from what you've written in Notes, refreshed by AI."
+              title="From your People room"
+              subtitle="Pulled from what you've written about them in Notes."
               action={<Link to={RoutePath.SANCTUARY_ARTICLE.replace(':pageType', 'people')} className="shrink-0 text-sm font-bold text-green hover:underline">Open People room</Link>}
             />
             <div className="mt-4 space-y-3">
@@ -450,121 +437,36 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
           </Surface>
         )}
 
-        {/* Everything advanced, tucked away */}
-        <details className="group rounded-2xl border border-border/70 bg-surface/60">
-          <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between px-6 text-sm font-bold text-gray-nav focus-visible:ring-2 focus-visible:ring-green/30 hover:text-green [&::-webkit-details-marker]:hidden">
-            <span>More about {relationship.name}</span>
-            <span className="text-xs font-black uppercase tracking-[0.14em] text-gray-nav group-open:hidden">Show</span>
-            <span className="hidden text-xs font-black uppercase tracking-[0.14em] text-gray-nav group-open:inline">Hide</span>
+        {/* From your Life Wiki — empty hint keeps the People room link reachable */}
+        {!wikiMentions.length && (
+          <Surface variant="flat" tone="paper" className="p-5 md:p-6">
+            <CardHeader
+              icon={Sparkle}
+              title="From your People room"
+              action={<Link to={RoutePath.SANCTUARY_ARTICLE.replace(':pageType', 'people')} className="shrink-0 text-sm font-bold text-green hover:underline">Open People room</Link>}
+            />
+            <p className="mt-4 text-sm font-medium leading-relaxed text-gray-nav">Nothing about {relationship.name} in your People room yet. As you write about them in Notes, mentions will gather here.</p>
+          </Surface>
+        )}
+
+        {/* Contact details — a quiet, optional toggle; clearly secondary to the identity facts above */}
+        <details className="group pt-2">
+          <summary className="inline-flex min-h-11 w-fit cursor-pointer list-none items-center gap-2.5 rounded-xl px-1 text-sm font-bold text-gray-nav focus-visible:ring-2 focus-visible:ring-green/30 hover:text-green [&::-webkit-details-marker]:hidden">
+            <span>Contact details <span className="font-medium text-gray-nav/70">(optional)</span></span>
+            <span className="text-xs font-black uppercase tracking-[0.14em] text-gray-nav/60 group-open:hidden">Show</span>
+            <span className="hidden text-xs font-black uppercase tracking-[0.14em] text-gray-nav/60 group-open:inline">Hide</span>
           </summary>
-
-          <div className="space-y-5 px-6 pb-6 pt-2">
-            {/* Details + status */}
-            <Surface variant="flat" tone="paper" className="p-6">
-              <form onSubmit={saveDetails} className="space-y-5">
-                <CardHeader icon={IdentificationCard} title="Details" subtitle="Contact info and how close you are." />
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <label className="text-sm font-bold text-gray-nav">Email<input name="email" value={context.email} onChange={(event) => setContext((current) => ({ ...current, email: event.target.value }))} className={fieldClass} /></label>
-                  <label className="text-sm font-bold text-gray-nav">Phone<input name="phone" value={context.phone} onChange={(event) => setContext((current) => ({ ...current, phone: event.target.value }))} className={fieldClass} /></label>
-                  <label className="text-sm font-bold text-gray-nav">Role<input name="role" value={context.role} onChange={(event) => setContext((current) => ({ ...current, role: event.target.value }))} className={fieldClass} /></label>
-                  <label className="text-sm font-bold text-gray-nav">Company<input name="company" value={context.company} onChange={(event) => setContext((current) => ({ ...current, company: event.target.value }))} className={fieldClass} /></label>
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <label className="text-sm font-bold text-gray-nav">Stage
-                    <select name="stage" value={context.stage} onChange={(event) => setContext((current) => ({ ...current, stage: event.target.value as RelationshipStage }))} className={fieldClass}>
-                      {stages.map((stage) => <option key={stage} value={stage}>{relationshipStageLabels[stage]}</option>)}
-                    </select>
-                  </label>
-                  <label className="text-sm font-bold text-gray-nav">Tier
-                    <select name="tier" value={context.tier} onChange={(event) => setContext((current) => ({ ...current, tier: event.target.value as RelationshipTier }))} className={fieldClass}>
-                      {tiers.map((tier) => <option key={tier} value={tier}>{tier === 'none' ? 'None' : tier.toUpperCase()}</option>)}
-                    </select>
-                  </label>
-                </div>
-                <div className="grid gap-5 md:grid-cols-3">
-                  {(['closeness', 'energy', 'opportunity'] as const).map((field) => (
-                    <label key={field} className="border-t border-border/60 pt-4 text-sm font-bold capitalize text-gray-nav">
-                      {field} {context[field]}/5
-                      <input name={field} type="range" min={1} max={5} value={context[field]} onChange={(event) => setContext((current) => ({ ...current, [field]: Number(event.target.value) }))} className="mt-3 w-full accent-green" />
-                    </label>
-                  ))}
-                </div>
-                <Button type="submit" variant="secondary" isLoading={isSavingDetails}>Save</Button>
-              </form>
-            </Surface>
-
-            {/* Catch-up history */}
-            <Surface variant="flat" tone="paper" className="p-6">
-              <CardHeader icon={ClockCounterClockwise} title="Catch-ups" subtitle="A log of when you connected." />
-              <div className="mt-4 space-y-3">
-                {[...relationship.interactions].reverse().map((item) => (
-                  <div key={item.id} className="rounded-2xl border border-green/20 p-4">
-                    <p className="text-sm font-bold text-gray-text">{formatDate(item.date)}</p>
-                    <p className="mt-1 text-sm font-medium text-gray-light">{item.notes}</p>
-                  </div>
-                ))}
-                {!relationship.interactions.length && <p className="text-sm font-medium text-gray-nav">No catch-ups logged yet.</p>}
+          <Surface variant="flat" tone="paper" className="mt-3 p-5 md:p-6">
+            <form onSubmit={saveDetails} className="space-y-5">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="text-sm font-bold text-gray-nav">Email<input name="email" value={context.email} onChange={(event) => setContext((current) => ({ ...current, email: event.target.value }))} className={fieldClass} /></label>
+                <label className="text-sm font-bold text-gray-nav">Phone<input name="phone" value={context.phone} onChange={(event) => setContext((current) => ({ ...current, phone: event.target.value }))} className={fieldClass} /></label>
+                <label className="text-sm font-bold text-gray-nav">Role<input name="role" value={context.role} onChange={(event) => setContext((current) => ({ ...current, role: event.target.value }))} className={fieldClass} /></label>
+                <label className="text-sm font-bold text-gray-nav">Company<input name="company" value={context.company} onChange={(event) => setContext((current) => ({ ...current, company: event.target.value }))} className={fieldClass} /></label>
               </div>
-            </Surface>
-
-            {/* Favors */}
-            <Surface variant="flat" tone="paper" className="p-6">
-              <CardHeader icon={HandHeart} title="Favors" subtitle="Help given or received." />
-              <div className="mt-4 space-y-3">
-                {relationship.valueLedger.map((item) => (
-                  <div key={item.id} className="rounded-2xl border border-border/60 p-4">
-                    <p className="text-sm font-bold text-gray-text">{item.direction === 'given' ? 'You gave' : 'They gave'} · {item.category}</p>
-                    <p className="mt-1 text-sm font-medium text-gray-light">{item.description}</p>
-                  </div>
-                ))}
-                {!relationship.valueLedger.length && <p className="text-sm font-medium text-gray-nav">No favors logged yet.</p>}
-                <form onSubmit={addValueEntry} className="space-y-2">
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    <label className="text-sm font-bold text-gray-nav">Who helped<select name="direction" value={valueEntry.direction} onChange={(event) => setValueEntry((current) => ({ ...current, direction: event.target.value }))} className={fieldClass}><option value="given">You gave</option><option value="received">They gave</option></select></label>
-                    <label className="text-sm font-bold text-gray-nav">Kind<select name="category" value={valueEntry.category} onChange={(event) => setValueEntry((current) => ({ ...current, category: event.target.value }))} className={fieldClass}>{['introduction', 'opportunity', 'advice', 'knowledge', 'support', 'other'].map((category) => <option key={category}>{category}</option>)}</select></label>
-                  </div>
-                  <label className="block text-sm font-bold text-gray-nav">What happened<input name="description" value={valueEntry.description} onChange={(event) => setValueEntry((current) => ({ ...current, description: event.target.value }))} className={fieldClass} /></label>
-                  <Button type="submit" size="sm" variant="primary">Add</Button>
-                </form>
-              </div>
-            </Surface>
-
-            {/* Connections */}
-            <Surface variant="flat" tone="paper" className="p-6">
-              <CardHeader icon={UsersThree} title="Connections" subtitle="How this person knows others on your list." />
-              <div className="mt-4 space-y-3">
-                {relationship.connections.map((item) => (
-                  <div key={item.id} className="rounded-2xl border border-green/20 p-4">
-                    <p className="text-sm font-bold text-gray-text">{relationships.find((candidate) => candidate.id === item.relatedRelationshipId)?.name || 'Unknown person'}</p>
-                    <p className="mt-1 text-sm font-medium text-gray-light">{item.label}</p>
-                  </div>
-                ))}
-                {!relationship.connections.length && <p className="text-sm font-medium text-gray-nav">No connections between people yet.</p>}
-                <form onSubmit={addConnection} className="space-y-2">
-                  <label className="block text-sm font-bold text-gray-nav">Person
-                    <select name="relatedRelationshipId" required value={connection.relatedRelationshipId} onChange={(event) => setConnection((current) => ({ ...current, relatedRelationshipId: event.target.value }))} className={fieldClass}>
-                      <option value="">Choose a person</option>
-                      {relationships.filter((candidate) => candidate.id !== relationship.id).map((candidate) => <option key={candidate.id} value={candidate.id}>{candidate.name}</option>)}
-                    </select>
-                  </label>
-                  <label className="block text-sm font-bold text-gray-nav">How they know each other<input name="connectionLabel" required value={connection.label} onChange={(event) => setConnection((current) => ({ ...current, label: event.target.value }))} className={fieldClass} /></label>
-                  <Button type="submit" size="sm" variant="primary">Add</Button>
-                </form>
-              </div>
-            </Surface>
-
-            {/* From your Life Wiki — empty hint lives here so the People room link stays reachable */}
-            {!wikiMentions.length && (
-              <Surface variant="flat" tone="paper" className="p-6">
-                <CardHeader
-                  icon={Sparkle}
-                  title="From your Life Wiki"
-                  action={<Link to={RoutePath.SANCTUARY_ARTICLE.replace(':pageType', 'people')} className="shrink-0 text-sm font-bold text-green hover:underline">Open People room</Link>}
-                />
-                <p className="mt-4 text-sm font-medium leading-relaxed text-gray-nav">Nothing about {relationship.name} in your People room yet. As you write about them in Notes and refresh the Life Wiki, mentions show up here.</p>
-              </Surface>
-            )}
-          </div>
+              <Button type="submit" variant="secondary" isLoading={isSavingDetails}>Save</Button>
+            </form>
+          </Surface>
         </details>
       </article>
 
@@ -574,7 +476,7 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, relationshi
         onConfirm={() => void remove()}
         variant="danger"
         title={`Delete ${relationship.name}?`}
-        description="This removes their notes, catch-ups, reasons to reconnect and reminders. This can't be undone."
+        description={`This removes everything saved about ${relationship.name}: catch-ups, reasons to reconnect, and reminders. It can't be undone.`}
         confirmLabel="Delete"
         isConfirming={isDeleting}
       />

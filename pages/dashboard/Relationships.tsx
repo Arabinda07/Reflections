@@ -5,6 +5,7 @@ import { CirclesThreePlus } from '@phosphor-icons/react/CirclesThreePlus';
 import { ClockCounterClockwise } from '@phosphor-icons/react/ClockCounterClockwise';
 import { Plus } from '@phosphor-icons/react/Plus';
 import { Tray } from '@phosphor-icons/react/Tray';
+import { UserPlus } from '@phosphor-icons/react/UserPlus';
 
 import { Button } from '../../components/ui/Button';
 import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
@@ -44,6 +45,8 @@ export const Relationships: React.FC = () => {
   const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [seedNames, setSeedNames] = useState('');
   const [isSeeding, setIsSeeding] = useState(false);
+  const [quickName, setQuickName] = useState('');
+  const [isAddingName, setIsAddingName] = useState(false);
   const [hasPendingSync, setHasPendingSync] = useState(false);
   const [peopleWiki, setPeopleWiki] = useState('');
   const [showArchived, setShowArchived] = useState(false);
@@ -73,7 +76,7 @@ export const Relationships: React.FC = () => {
       setInbox(nextInbox);
       setHasPendingSync(await relationshipService.hasPendingSync());
     } catch {
-      showToast('Could not load relationships right now.');
+      showToast("I couldn't load your people right now. Try again in a moment.");
     } finally {
       setIsLoading(false);
     }
@@ -103,7 +106,26 @@ export const Relationships: React.FC = () => {
       setIsCreateOpen(false);
       navigate(relationshipPath(relationship.id));
     } catch {
-      showToast('Could not add that person.');
+      showToast("I couldn't add them. Nothing was lost — try again.");
+    }
+  };
+
+  const addQuickName = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const name = quickName.trim();
+    if (!name) return;
+    setIsAddingName(true);
+    try {
+      const created = await relationshipService.create({ name });
+      setRelationships((current) => [created, ...current]);
+      setHasPendingSync(await relationshipService.hasPendingSync());
+      setQuickName('');
+      // First name added — land on the Weekly nudge (the value), not a second empty state.
+      navigate(RoutePath.RELATIONSHIPS);
+    } catch {
+      showToast("I couldn't add them. Nothing was lost — try again.");
+    } finally {
+      setIsAddingName(false);
     }
   };
 
@@ -133,7 +155,7 @@ export const Relationships: React.FC = () => {
       setHasPendingSync(await relationshipService.hasPendingSync());
       showToast(`${person.name} archived.`);
     } catch {
-      showToast('Could not archive this person.');
+      showToast("I couldn't archive them. Try again in a moment.");
     }
   };
 
@@ -144,7 +166,7 @@ export const Relationships: React.FC = () => {
       setHasPendingSync(await relationshipService.hasPendingSync());
       showToast(`${person.name} restored.`);
     } catch {
-      showToast('Could not restore this person.');
+      showToast("I couldn't restore them. Try again in a moment.");
     }
   };
 
@@ -157,7 +179,7 @@ export const Relationships: React.FC = () => {
       setHasPendingSync(await relationshipService.hasPendingSync());
       setPendingDelete(null);
     } catch {
-      showToast('Could not delete this person.');
+      showToast("I couldn't delete them. Try again in a moment.");
     } finally {
       setIsDeleting(false);
     }
@@ -233,7 +255,7 @@ export const Relationships: React.FC = () => {
                               setHasPendingSync(await relationshipService.hasPendingSync());
                               showToast(`Marked ${updated.name} as done for this week.`);
                             } catch {
-                              showToast('Could not update that relationship.');
+                              showToast("I couldn't save that. Nothing was lost — try again.");
                             }
                           }}>Mark done</Button><Button variant="ghost" size="sm" onClick={() => navigate(relationshipPath(suggestion.relationship.id))}>Open profile</Button></div>
                         </article>
@@ -283,23 +305,30 @@ export const Relationships: React.FC = () => {
                       ))}
                     </div>
                   ) : !isLoading ? (
-                    <form onSubmit={seedRelationships} className="rounded-[1.5rem] border-2 border-dashed border-green/20 p-6 md:p-8">
-                      <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-green/10 text-green"><CirclesThreePlus size={28} weight="duotone" /></div>
-                      <h3 className="mt-4 text-2xl font-display font-bold text-gray-text">Stay close to the people who matter.</h3>
-                      <p className="mt-2 text-sm font-medium text-gray-light">Keep the people you care about close — without it feeling like work.</p>
-                      <ol className="mt-5 grid gap-2 sm:grid-cols-3">
-                        {[['1', 'Add people'], ['2', 'Get a few weekly nudges'], ['3', 'Log catch-ups']].map(([num, label]) => (
-                          <li key={num} className="flex items-center gap-2 rounded-xl border border-green/15 bg-green/5 px-3 py-2 text-sm font-bold text-gray-text">
-                            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-green text-xs font-black text-on-accent">{num}</span>
-                            {label}
-                          </li>
-                        ))}
-                      </ol>
-                      <label className="mt-6 block text-sm font-bold text-gray-nav">Who matters most to you? One name per line.
-                        <textarea name="seedNames" value={seedNames} onChange={(event) => setSeedNames(event.target.value)} className={`${fieldClass} min-h-32`} placeholder={'Alex Rivera\nPriya Nair\nSam Devlin'} />
-                      </label>
-                      <Button type="submit" variant="primary" className="mt-5" isLoading={isSeeding}>Add people</Button>
-                    </form>
+                    <div className="rounded-[1.5rem] border-2 border-dashed border-green/20 p-6 md:p-8">
+                      <h3 className="text-2xl font-display font-bold text-gray-text">Never lose touch with someone who matters.</h3>
+                      <p className="mt-2 max-w-prose text-sm font-medium text-gray-light">Add one name. Each week we&rsquo;ll point you toward someone worth a hello — no scores, no streaks.</p>
+                      <form onSubmit={addQuickName} className="relative mt-6">
+                        <input
+                          autoFocus
+                          value={quickName}
+                          onChange={(event) => setQuickName(event.target.value)}
+                          placeholder="Add a name…"
+                          aria-label="Add a name"
+                          className="input-surface w-full rounded-xl py-3 pl-3.5 pr-24 text-base font-medium"
+                        />
+                        <Button type="submit" variant="primary" size="sm" isLoading={isAddingName} className="absolute right-1.5 top-1/2 -translate-y-1/2">Add</Button>
+                      </form>
+                      <details className="group mt-4">
+                        <summary className="inline-flex min-h-9 cursor-pointer list-none items-center text-sm font-bold text-gray-nav focus-visible:ring-2 focus-visible:ring-green/30 hover:text-green [&::-webkit-details-marker]:hidden">or paste a few names</summary>
+                        <form onSubmit={seedRelationships} className="mt-3">
+                          <label className="block text-sm font-bold text-gray-nav">One name per line.
+                            <textarea name="seedNames" value={seedNames} onChange={(event) => setSeedNames(event.target.value)} className={`${fieldClass} min-h-32`} placeholder={'Priya Nair\nArjun Mehta\nMeera Iyer'} />
+                          </label>
+                          <Button type="submit" variant="secondary" className="mt-4" isLoading={isSeeding}>Add people</Button>
+                        </form>
+                      </details>
+                    </div>
                   ) : null}
 
                   {archivedPeople.length > 0 && (
@@ -334,7 +363,7 @@ export const Relationships: React.FC = () => {
         </div>
       </PageContainer>
 
-      <ModalSheet isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title="Add someone" description="Just a name to start. You can add more on their profile." icon={<Tray size={20} weight="duotone" />} tone="sage" size="md">
+      <ModalSheet isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title="Add someone" description="Just a name to start. You can add more on their profile." icon={<UserPlus size={20} weight="duotone" />} tone="sage" size="md">
         <form onSubmit={createRelationship} className="space-y-4">
           <Input name="name" label="Name" value={draft.name} onChange={(event) => setDraft((current) => ({ ...current, name: event.target.value }))} autoComplete="name" required autoFocus />
           <label className="block text-sm font-bold text-gray-nav">How you know them (optional)<textarea name="howWeMet" value={draft.howWeMet} onChange={(event) => setDraft((current) => ({ ...current, howWeMet: event.target.value }))} className={`${fieldClass} min-h-24`} /></label>

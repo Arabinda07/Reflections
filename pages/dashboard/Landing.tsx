@@ -230,11 +230,6 @@ export const Landing: React.FC = () => {
                 {HOME_SEO.ctaLabel}
                 <ArrowRightIcon className="ml-2.5 h-[1.125rem] w-[1.125rem] text-white/80 transition-transform duration-500 ease-out-expo group-hover:translate-x-1.5 sm:ml-3 sm:h-5 sm:w-5" />
               </button>
-              <p className="flex flex-wrap items-center gap-x-2 gap-y-1 pl-1 font-sans text-[13px] font-semibold text-gray-text/70">
-                <span>Encrypted on your device</span>
-                <span aria-hidden="true" className="text-gray-text/30">·</span>
-                <span>Free, no card</span>
-              </p>
             </div>
 
             <div className="flex w-full items-center justify-between gap-4 sm:w-auto sm:gap-x-10 lg:gap-x-12">

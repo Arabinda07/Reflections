@@ -13,7 +13,7 @@ export const PUBLIC_SEO_COPY = {
     heroAriaLabel: 'Your mind beautifully organized',
     heroLines: ['Your mind', 'beautifully', 'organized'],
     heroIntro:
-      "A private journal for writing what's on your mind, noticing patterns, and reflecting only when you're ready.",
+      "An encrypted journal for writing what's on your mind and noticing patterns. Free to start.",
     ctaLabel: 'Begin writing',
     sections: [
       {
@@ -184,38 +184,6 @@ export const PUBLIC_SEO_COPY = {
         'A note from Arabinda about building Reflections as a private journal where writing comes first and AI waits until invited.',
     },
   },
-  relationships: {
-    key: 'relationships',
-    path: '/features/relationships',
-    title: 'Relationships - Stay Close to the People Who Matter | Reflections',
-    description:
-      'A quiet place inside Reflections to keep track of the people you want to stay close to, with a few weekly suggestions for who to reach out to. Encrypted on your device.',
-    h1: 'Quietly keep up with the people who matter',
-    intro:
-      'A small, private space for the people you care about. Not a CRM, not a feed, not another inbox to clear.',
-    sections: [
-      {
-        title: 'What Relationships is',
-        body:
-          'A quiet list of the people you want to stay close to, kept private inside your journal. No social graph, no public profiles, no follower counts.',
-      },
-      {
-        title: 'A few gentle suggestions each week',
-        body:
-          'Each week Relationships surfaces a few people to reach out to, with a reason and a small next step. You decide what to do with them, or nothing at all.',
-      },
-      {
-        title: 'Encrypted like the rest of your writing',
-        body:
-          'The people you add and the context around them are encrypted on your device with a key only you hold, so the server stores data it cannot read.',
-      },
-      {
-        title: 'Always optional',
-        body:
-          'Add as little or as much as you like. Nothing is shared, scored, or pushed at you. Relationships waits until you choose to open it.',
-      },
-    ],
-  },
   dayOne: {
     key: 'dayOne',
     path: '/vs/day-one',
@@ -284,7 +252,7 @@ export const PUBLIC_SEO_COPY = {
   },
 };
 
-export const PUBLIC_SEO_PAGE_KEYS = ['home', 'faq', 'privacy', 'about', 'relationships', 'dayOne'];
+export const PUBLIC_SEO_PAGE_KEYS = ['home', 'faq', 'privacy', 'about', 'dayOne'];
 export const PUBLIC_SEO_PAGES = PUBLIC_SEO_PAGE_KEYS.map((key) => PUBLIC_SEO_COPY[key]);
 export const PUBLIC_SEO_DEFAULT = PUBLIC_SEO_COPY.home;
 

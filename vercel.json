@@ -11,6 +11,11 @@
           "value": "reflections-sanctuary.space"
         }
       ]
+    },
+    {
+      "source": "/features/relationships",
+      "destination": "/faq",
+      "statusCode": 301
     }
   ],
   "headers": [

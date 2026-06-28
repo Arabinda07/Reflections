@@ -20,7 +20,7 @@ describe('adapt and distill source contract', () => {
     expect(home).toContain('h-11 min-w-11');
     expect(button).toContain('sm: "min-h-11 px-3 py-2');
     expect(myNotes).toContain('control-surface inline-flex h-11 w-11');
-    expect(myNotes).toContain('inline-flex min-h-11 items-center');
+    expect(myNotes).toContain('flex min-h-11 w-full items-center');
     expect(createNote).toContain('inline-flex min-h-11 items-center gap-2 whitespace-nowrap');
     expect(lifeWiki).toContain('flex min-h-11 w-fit items-center');
     expect(lifeWiki).toContain('flex min-h-11 min-w-11 items-center justify-center gap-2');
@@ -40,7 +40,7 @@ describe('adapt and distill source contract', () => {
     expect(createNote).toContain('editor-title-input');
     expect(home).toContain('home-hero-shell relative isolate');
     expect(css).toContain('--home-hero-intro-height: max(300px, 44dvh);');
-    expect(faq).toContain('flex flex-col gap-4 sm:flex-row sm:gap-6');
+    expect(faq).toContain('PublicPageSection');
     expect(css).toContain('@media (max-width: 768px)');
     expect(css).toContain('background-attachment: scroll');
     expect(faq).not.toContain('bezel-outer group');

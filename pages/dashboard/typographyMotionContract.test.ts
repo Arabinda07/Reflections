@@ -119,8 +119,8 @@ describe('Typography and motion contract', () => {
     const insights = read('pages/dashboard/Insights.tsx');
     const ambientButton = read('components/ui/AmbientMusicButton.tsx');
 
-    expect(insights).toContain("gridTemplateRows: '1fr'");
-    expect(insights).toContain('scaleX: percent / 100');
+    // Insights is prose-led now: no broad or layout-property animations.
+    expect(insights).not.toContain('transition-all');
     expect(ambientButton).toContain('scaleY: bar.h.map');
   });
 

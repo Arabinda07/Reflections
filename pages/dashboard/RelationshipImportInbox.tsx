@@ -77,7 +77,7 @@ export const RelationshipImportInbox: React.FC<Props> = ({ relationships, pendin
       await onRefresh();
       showToast(success);
     } catch {
-      showToast('Could not complete that import action. Nothing was discarded.');
+      showToast("I couldn't finish that. Nothing was deleted — try again.");
     }
   };
 
@@ -95,7 +95,7 @@ export const RelationshipImportInbox: React.FC<Props> = ({ relationships, pendin
       await onRefresh();
       showToast(`${result.imported} Google contacts moved into the import inbox.`);
     } catch {
-      showToast('Google Contacts import failed.');
+      showToast("I couldn't import from Google Contacts. Try again in a moment.");
     } finally {
       setIsImporting(false);
     }
@@ -107,7 +107,7 @@ export const RelationshipImportInbox: React.FC<Props> = ({ relationships, pendin
         <div>
           <p className="label-caps text-sky">Import inbox</p>
           <h2 className="mt-2 text-3xl font-display font-bold text-gray-text">Review one by one</h2>
-          <p className="mt-2 max-w-xl text-sm font-medium leading-relaxed text-gray-light">Imports wait here until you decide who belongs in your relationship system.</p>
+          <p className="mt-2 max-w-xl text-sm font-medium leading-relaxed text-gray-light">Imports wait here until you decide who you want to keep close.</p>
         </div>
         {canImport ? (
           <div className="flex flex-wrap gap-2">
@@ -134,12 +134,12 @@ export const RelationshipImportInbox: React.FC<Props> = ({ relationships, pendin
                 energy: draft.energy,
                 opportunity: draft.opportunity,
                 ...additions,
-              }), `${item.name} added to Relationships.`);
+              }), `Added ${item.name}.`);
             }} className="rounded-2xl border border-sky/20 bg-sky/5 p-4">
               <fieldset className="space-y-4">
                 <legend className="w-full text-base font-bold text-gray-text">{item.name}</legend>
                 <p className="text-sm font-medium text-gray-light">{[item.email, item.phone, item.company, item.role].filter(Boolean).join(' - ') || 'Minimal identity imported'}</p>
-                {mergeTarget && <p className="text-sm font-bold text-honey">Possible match: {mergeTarget.name}. You choose whether to merge.</p>}
+                {mergeTarget && <p className="text-sm font-bold text-honey">Possible match: {mergeTarget.name}. You choose whether to combine them.</p>}
 
                 <div className="grid gap-3 md:grid-cols-4">
                   <label className="text-sm font-bold text-gray-nav">Stage
@@ -158,7 +158,7 @@ export const RelationshipImportInbox: React.FC<Props> = ({ relationships, pendin
                     ['domain', 'Domain'],
                     ['roleTag', 'Role'],
                     ['context', 'Context'],
-                    ['hook', 'Human reason to reconnect'],
+                    ['hook', 'Reason to reconnect'],
                   ] as const).map(([field, label]) => (
                     <label key={field} className="text-sm font-bold text-gray-nav">{label}
                       <input name={field} value={draft[field]} onChange={(event) => updateDraft(item.id, { [field]: event.target.value })} className={`mt-2 ${fieldClass}`} />
@@ -167,8 +167,8 @@ export const RelationshipImportInbox: React.FC<Props> = ({ relationships, pendin
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  {mergeTarget && <Button type="button" variant="secondary" onClick={() => void run(() => relationshipImportService.mergeImportItem(item.id, mergeTarget.id, additionsFor(draft)), `${item.name} merged into ${mergeTarget.name}.`)}>Merge into {mergeTarget.name}</Button>}
-                  <Button type="submit" variant="primary"><Check size={16} weight="bold" className="mr-2" />{mergeTarget ? 'Keep separate' : 'Add relationship'}</Button>
+                  {mergeTarget && <Button type="button" variant="secondary" onClick={() => void run(() => relationshipImportService.mergeImportItem(item.id, mergeTarget.id, additionsFor(draft)), `Combined ${item.name} with ${mergeTarget.name}.`)}>Combine with {mergeTarget.name}</Button>}
+                  <Button type="submit" variant="primary"><Check size={16} weight="bold" className="mr-2" />{mergeTarget ? 'Add as new' : 'Add person'}</Button>
                   <Button type="button" variant="ghost" onClick={() => void run(() => relationshipImportService.archiveImportItem(item.id), `${item.name} archived.`)}><X size={16} weight="bold" className="mr-2" />Archive</Button>
                 </div>
               </fieldset>

@@ -16,7 +16,7 @@ describe('voice refresh copy safety', () => {
     expect(publicSeoCopy).toContain("heroAriaLabel: 'Your mind beautifully organized'");
     expect(publicSeoCopy).toContain("heroLines: ['Your mind', 'beautifully', 'organized']");
     expect(publicSeoCopy).toContain(
-      "A private journal for writing what's on your mind, noticing patterns, and reflecting only when you're ready.",
+      "An encrypted journal for writing what's on your mind and noticing patterns. Free to start.",
     );
     expect(privacy).toContain('What Reflections keeps');
     expect(privacy).toContain('AI and Smart Mode');

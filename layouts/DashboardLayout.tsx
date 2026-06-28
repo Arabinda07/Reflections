@@ -26,6 +26,7 @@ const ModalSheet = React.lazy(() => import('../components/ui/ModalSheet').then(m
 const ReferralInvitePanel = React.lazy(() => import('../components/ui/ReferralInvitePanel').then(m => ({ default: m.ReferralInvitePanel })));
 const SyncBanner = React.lazy(() => import('../components/ui/SyncBanner').then(m => ({ default: m.SyncBanner })));
 const MobileSidebar = React.lazy(() => import('./MobileSidebar').then(m => ({ default: m.MobileSidebar })));
+const NoteSearchPalette = React.lazy(() => import('../components/ui/NoteSearchPalette').then(m => ({ default: m.NoteSearchPalette })));
 const BugReportFlow = React.lazy(() => import('./BugReportFlow').then(m => ({ default: m.BugReportFlow })));
 const AuthenticatedMobileNav = React.lazy(() => import('./AuthenticatedMobileNav').then(m => ({ default: m.AuthenticatedMobileNav })));
 
@@ -62,6 +63,7 @@ export const DashboardLayout: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isBugReportOpen, setIsBugReportOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useAndroidBackHandler();
 
@@ -73,6 +75,16 @@ export const DashboardLayout: React.FC = () => {
       navigate(RoutePath.CREATE_NOTE);
     },
     [navigate],
+  );
+
+  // Keyboard shortcut: Ctrl/Cmd + K → search notes (signed-in only)
+  useKeyboardShortcut(
+    { key: 'k', ctrlOrCmd: true },
+    (e) => {
+      e.preventDefault();
+      if (isAuthenticated) setIsSearchOpen(true);
+    },
+    [isAuthenticated],
   );
 
   // Capture referral codes from URL params
@@ -118,6 +130,7 @@ export const DashboardLayout: React.FC = () => {
           isMobileMenuOpen={isMobileMenuOpen}
           onMobileMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           onInvite={() => setIsInviteModalOpen(true)}
+          onSearch={isAuthenticated ? () => setIsSearchOpen(true) : undefined}
         />
       )}
 
@@ -224,6 +237,13 @@ export const DashboardLayout: React.FC = () => {
           <ReferralInvitePanel compact />
         </ModalSheet>
       </React.Suspense>
+
+      {/* Note search palette (⌘K) */}
+      {isAuthenticated && (
+        <React.Suspense fallback={null}>
+          <NoteSearchPalette isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+        </React.Suspense>
+      )}
     </div>
   );
 };

@@ -307,7 +307,6 @@ export enum RoutePath {
   FAQ = '/faq',
   ABOUT = '/about',
   PRIVACY = '/privacy',
-  FEATURE_RELATIONSHIPS = '/features/relationships',
   VS_DAY_ONE = '/vs/day-one',
   WIKI = '/wiki',
   SANCTUARY = '/sanctuary',

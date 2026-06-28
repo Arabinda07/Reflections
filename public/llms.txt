@@ -29,7 +29,7 @@ Notes, moods, future letters, attachments, Life Wiki pages, and relationships ar
 
 ## Links
 - Homepage: https://www.reflections-sanctuary.space/
-- Relationships: https://www.reflections-sanctuary.space/features/relationships
 - FAQ: https://www.reflections-sanctuary.space/faq
 - Privacy: https://www.reflections-sanctuary.space/privacy
 - About: https://www.reflections-sanctuary.space/about
+- OKF knowledge bundle: https://www.reflections-sanctuary.space/okf/index.md

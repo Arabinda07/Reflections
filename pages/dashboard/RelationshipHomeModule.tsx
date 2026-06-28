@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart } from '@phosphor-icons/react/Heart';
 import { Sparkle } from '@phosphor-icons/react/Sparkle';
+import { UsersThree } from '@phosphor-icons/react/UsersThree';
 
 import { Surface } from '../../components/ui/Surface';
 import { relationshipService } from '../../services/relationshipService';
@@ -41,13 +41,13 @@ export const RelationshipHomeModule: React.FC = () => {
   }, []);
 
   return (
-    <Surface variant="flat" tone="honey" className="rounded-[2rem] p-6 sm:p-8">
+    <Surface variant="flat" tone="sage" className="rounded-[2rem] p-6 sm:p-8">
       <div className="mb-6 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2 text-gray-nav">
-          <Heart size={18} weight="duotone" className="text-honey" />
+          <UsersThree size={18} weight="duotone" className="text-green" />
           <p className="label-caps">Relationships</p>
         </div>
-        <Link to={RoutePath.RELATIONSHIPS} className="label-caps text-honey hover:text-green">
+        <Link to={RoutePath.RELATIONSHIPS} className="label-caps text-green hover:text-green-hover">
           Open
         </Link>
       </div>
@@ -58,7 +58,7 @@ export const RelationshipHomeModule: React.FC = () => {
             <Link
               key={suggestion.relationship.id}
               to={relationshipPath(suggestion.relationship.id)}
-              className="surface-inline-panel flex items-center justify-between gap-4 rounded-2xl p-4 text-left transition-colors hover:bg-honey/10"
+              className="surface-inline-panel flex items-center justify-between gap-4 rounded-2xl p-4 text-left transition-colors hover:bg-green/10"
             >
               <span className="min-w-0">
                 <span className="block text-base font-bold text-gray-text">{suggestion.relationship.name}</span>
@@ -66,14 +66,14 @@ export const RelationshipHomeModule: React.FC = () => {
                   {suggestion.suggestedCare}
                 </span>
               </span>
-              <Sparkle size={18} weight="duotone" className="shrink-0 text-honey" />
+              <Sparkle size={18} weight="duotone" className="shrink-0 text-green" />
             </Link>
           ))}
         </div>
       ) : (
-        <div className="rounded-2xl border border-dashed border-honey/30 p-5">
+        <div className="rounded-2xl border border-dashed border-green/30 p-5">
           <p className="font-serif text-base italic text-gray-text">
-            Add a few people to start getting weekly reminders to reach out.
+            Add a few people, and you'll get a couple of gentle nudges each week to reach out.
           </p>
         </div>
       )}

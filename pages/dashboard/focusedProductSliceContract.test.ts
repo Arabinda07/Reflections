@@ -55,8 +55,6 @@ describe('focused product slice source contract', () => {
     const chip = read('components/ui/Chip.tsx');
     const styles = read('index.css');
 
-    expect(myNotes).toContain('tag-filter-shelf');
-    expect(myNotes).toContain('tag-filter-chip-rail');
     expect(myNotes).toContain('Filter by tag');
     expect(myNotes).toContain('tagSummaries');
     expect(myNotes).toContain('countLabel');
@@ -165,7 +163,6 @@ describe('focused product slice source contract', () => {
       expect(read(filePath).toLowerCase()).not.toContain('quietly');
     });
     expect(read('pages/dashboard/FutureLetters.tsx')).toContain('Waiting to open');
-    expect(read('pages/dashboard/Account.tsx')).toContain('while Smart Mode is on');
     expect(read('api/ai.ts')).toContain('calm, and reflective');
   });
 

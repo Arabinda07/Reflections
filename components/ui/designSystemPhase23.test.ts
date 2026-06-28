@@ -78,7 +78,7 @@ describe('phase 2/3 design-system rollout', () => {
 
     expect(signIn).not.toContain('href="#"');
     expect(signUp).toContain('<SectionHeader');
-    expect(privacyPolicy).toContain('max-w-[1440px]');
+    expect(privacyPolicy).toContain('PublicPageShell');
     expect(privacyPolicy).toContain('What Reflections keeps');
     expect(privacyPolicy).toContain('AI and Smart Mode');
     expect(privacyPolicy).not.toContain('Privacy and terms');
@@ -127,7 +127,6 @@ describe('phase 2/3 design-system rollout', () => {
     expect(product).toContain('AI is invited, not ambient.');
     expect(home).toContain('surface-scope-sage');
     expect(insights).toContain('tone="sky"');
-    expect(insights).toContain('tone="honey"');
   });
 
   it('applies subtle pastel page washes without raw body-surface escape hatches', () => {
@@ -177,8 +176,9 @@ describe('phase 2/3 design-system rollout', () => {
     expect(insights).toContain('surface-scope-sky page-wash');
     expect(lifeWiki).toContain('surface-scope-sage page-wash');
     expect(account).toContain('surface-scope-paper page-wash');
-    expect(faq).toContain('surface-scope-sky page-wash');
-    expect(privacyPolicy).toContain('surface-scope-paper page-wash');
+    expect(faq).toContain('scope="sky"');
+    expect(privacyPolicy).toContain('scope="paper"');
+    expect(read('components/ui/PublicPageShell.tsx')).toContain('page-wash');
     expect(signIn).toContain('surface-scope-paper page-wash');
     expect(signUp).toContain('surface-scope-paper page-wash');
     expect(resetPassword).toContain('surface-scope-paper page-wash');
@@ -212,7 +212,6 @@ describe('phase 2/3 design-system rollout', () => {
     expect(confirmationDialog).toContain("tone={variant === 'danger' ? 'clay' : 'paper'}");
 
     expect(proUpgrade).toContain('tone="honey"');
-    expect(proUpgrade).toContain('surface-tone-honey');
     expect(proUpgrade).toContain('!bg-honey');
     expect(proUpgrade).not.toContain("selectedPlan === 'monthly' ? 'border-green bg-green/5'");
 
@@ -234,7 +233,6 @@ describe('phase 2/3 design-system rollout', () => {
 
     expect(insights).toContain('surface-scope-sky');
     expect(insights).toContain('tone="sky"');
-    expect(insights).toContain("const TAG_TONE_CLASSES = ['text-green', 'text-green/80', 'text-green/70', 'text-green/60'];");
   });
 
   it('keeps header buttons responsive without changing the calm brand treatment', () => {

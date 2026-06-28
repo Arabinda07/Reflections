@@ -2,12 +2,15 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
 import { Calendar } from '@phosphor-icons/react/Calendar';
+import { CaretLeft } from '@phosphor-icons/react/CaretLeft';
+import { CaretRight } from '@phosphor-icons/react/CaretRight';
 import { Check } from '@phosphor-icons/react/Check';
-import { Download } from '@phosphor-icons/react/Download';
+import { DotsThreeVertical } from '@phosphor-icons/react/DotsThreeVertical';
+import { DownloadSimple } from '@phosphor-icons/react/DownloadSimple';
 import { FileText } from '@phosphor-icons/react/FileText';
 import { ListChecks } from '@phosphor-icons/react/ListChecks';
 import { Paperclip } from '@phosphor-icons/react/Paperclip';
-import { PencilSimple } from '@phosphor-icons/react/PencilSimple';
+import { PencilSimpleLine } from '@phosphor-icons/react/PencilSimpleLine';
 import { Plus } from '@phosphor-icons/react/Plus';
 import { Smiley } from '@phosphor-icons/react/Smiley';
 import { Tag } from '@phosphor-icons/react/Tag';
@@ -15,16 +18,15 @@ import { Trash } from '@phosphor-icons/react/Trash';
 import { WarningCircle } from '@phosphor-icons/react/WarningCircle';
 import { X } from '@phosphor-icons/react/X';
 import { Button } from '../../components/ui/Button';
-import { Chip } from '../../components/ui/Chip';
 import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
 import { Input } from '../../components/ui/Input';
 import { LoadingState } from '../../components/ui/LoadingState';
 import { Alert } from '../../components/ui/Alert';
 import { MetadataPill } from '../../components/ui/MetadataPill';
 import { ModalSheet } from '../../components/ui/ModalSheet';
+import { Tooltip } from '../../components/ui/Tooltip';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { StorageImage } from '../../components/ui/StorageImage';
-import { Surface } from '../../components/ui/Surface';
 import { noteService } from '../../services/noteService';
 import { storageService } from '../../services/storageService';
 import { useViewTransitionNavigation } from '../../hooks/useViewTransitionNavigation';
@@ -32,6 +34,7 @@ import { type Note, type NoteAttachment, RoutePath, type Task } from '../../type
 import { sanitizeNoteHtml } from './noteContent';
 import { downloadNoteExport } from './noteExport';
 import { getMoodConfig } from './moodConfig';
+import { getAdjacent } from './noteAdjacency';
 import { MoodPicker, type MoodPickerStage } from './MoodPicker';
 
 export const SingleNote: React.FC = () => {
@@ -45,9 +48,10 @@ export const SingleNote: React.FC = () => {
   const [isMoodOpen, setIsMoodOpen] = useState(false);
   const [moodPickerStage, setMoodPickerStage] = useState<MoodPickerStage>('group');
   const [isExportSheetOpen, setIsExportSheetOpen] = useState(false);
-  const [isTagsOpen, setIsTagsOpen] = useState(false);
+  const [isActionsOpen, setIsActionsOpen] = useState(false);
   const [isTasksOpen, setIsTasksOpen] = useState(false);
   const [tagDraft, setTagDraft] = useState('');
+  const [isAddingTag, setIsAddingTag] = useState(false);
   const [taskDraft, setTaskDraft] = useState('');
 
   useEffect(() => {
@@ -64,7 +68,7 @@ export const SingleNote: React.FC = () => {
         setNote(data);
       } catch (err) {
         console.error('Failed to fetch note', err);
-        setError('This reflection could not be loaded right now.');
+        setError("This note couldn't be loaded right now. Try again in a moment.");
       } finally {
         setLoading(false);
       }
@@ -72,6 +76,30 @@ export const SingleNote: React.FC = () => {
 
     fetchNote();
   }, [id, navigate]);
+
+  // Ordered note ids (createdAt desc) for prev/next — loaded once per visit.
+  const [orderedIds, setOrderedIds] = useState<string[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    noteService
+      .getAll()
+      .then((all) => {
+        if (cancelled) return;
+        const ids = [...all]
+          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+          .map((entry) => entry.id);
+        setOrderedIds(ids);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const { prevId, nextId } = getAdjacent(orderedIds, id ?? '');
+  const goToNote = (targetId: string | null) => {
+    if (targetId) navigate(RoutePath.NOTE_DETAIL.replace(':id', targetId));
+  };
 
   const pendingTaskCount = useMemo(
     () => note?.tasks?.filter((task) => !task.completed).length ?? 0,
@@ -108,7 +136,7 @@ export const SingleNote: React.FC = () => {
       navigate(RoutePath.NOTES);
     } catch (err) {
       console.error('Failed to delete note:', err);
-      setError('Something went wrong while deleting this note. Please try again.');
+      setError("That delete didn't go through. Your note is safe — try again.");
       setIsDeleting(false);
       setIsConfirmOpen(false);
     }
@@ -295,57 +323,66 @@ export const SingleNote: React.FC = () => {
   const noteMoodConfig = getMoodConfig(note.mood);
   const noteAttachments = note.attachments || [];
 
+  const fullDate = new Date(note.createdAt).toLocaleDateString(undefined, {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+  const navButtonClass =
+    'flex h-10 w-10 items-center justify-center rounded-[var(--radius-control)] text-gray-nav transition-colors hover:bg-green/5 hover:text-green disabled:pointer-events-none disabled:opacity-30';
+
   return (
     <>
-      <PageContainer className="surface-scope-paper page-wash pb-20 pt-4 md:pt-8">
-        <div className="core-page-stack selection:bg-green/10">
-          <div className="sticky-bar !px-2 sm:!px-4">
-            <Button
-              variant="ghost"
-              size="sm"
+      <PageContainer className="surface-scope-paper page-wash pb-24 pt-6 md:pt-10">
+          {/* Top row — Back (matches Insights) + prev/next only */}
+          <div className="mb-8 flex items-center justify-between gap-2">
+            <button
+              type="button"
               onClick={() => navigate(RoutePath.NOTES)}
-              className="text-gray-nav hover:text-gray-text font-bold text-xs !px-2 sm:!px-3"
+              className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-green/5 hover:text-green"
               aria-label="Go back to my reflections"
             >
-              <ArrowLeft className="h-5 w-5 shrink-0 sm:mr-2" weight="bold" />
-              <span className="hidden sm:inline">Back</span>
-            </Button>
+              <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
+              <span>Back</span>
+            </button>
 
-            <div className="flex items-center gap-1 sm:gap-2">
-              <Button
-                variant="secondary"
-                size="md"
-                onClick={handleExportClick}
-                disabled={isDeleting}
-                className="shadow-sm hover:border-green/20 hover:bg-green/5 !px-3 sm:!px-4"
-                aria-label="Export this reflection"
-              >
-                <Download weight="bold" className="h-5 w-5 shrink-0 text-green sm:mr-2" />
-                <span className="hidden sm:inline">Export</span>
-              </Button>
-              <Button
-                variant="secondary"
-                size="md"
-                onClick={handleEdit}
-                disabled={isDeleting}
-                className="shadow-sm hover:border-green/20 hover:bg-green/5 !px-3 sm:!px-4"
-                aria-label="Edit this reflection"
-              >
-                <PencilSimple weight="bold" className="h-5 w-5 shrink-0 text-green sm:mr-2" />
-                <span className="hidden sm:inline">Edit</span>
-              </Button>
-              <Button
-                variant="secondary"
-                size="md"
-                onClick={() => setIsConfirmOpen(true)}
-                isLoading={isDeleting}
-                disabled={isDeleting}
-                className="shadow-sm text-clay hover:bg-clay/5 hover:border-clay/30 !px-3 sm:!px-4"
-                aria-label="Delete this reflection"
-              >
-                <Trash weight="bold" className="h-5 w-5 shrink-0 text-clay sm:mr-2" />
-                <span className="hidden sm:inline">Delete</span>
-              </Button>
+            <div className="flex items-center gap-1">
+              <Tooltip label="Older entry" placement="bottom">
+                <button
+                  type="button"
+                  onClick={() => goToNote(prevId)}
+                  disabled={!prevId}
+                  aria-label="Older entry"
+                  className={navButtonClass}
+                >
+                  <CaretLeft size={18} weight="bold" />
+                </button>
+              </Tooltip>
+              <Tooltip label="Newer entry" placement="bottom">
+                <button
+                  type="button"
+                  onClick={() => goToNote(nextId)}
+                  disabled={!nextId}
+                  aria-label="Newer entry"
+                  className={navButtonClass}
+                >
+                  <CaretRight size={18} weight="bold" />
+                </button>
+              </Tooltip>
+              <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
+              <Tooltip label="Actions" placement="bottom">
+                <button
+                  type="button"
+                  onClick={() => setIsActionsOpen(true)}
+                  aria-haspopup="dialog"
+                  aria-expanded={isActionsOpen}
+                  aria-label="Note actions"
+                  className={navButtonClass}
+                >
+                  <DotsThreeVertical size={20} weight="bold" />
+                </button>
+              </Tooltip>
             </div>
           </div>
 
@@ -356,49 +393,22 @@ export const SingleNote: React.FC = () => {
                 icon={<WarningCircle size={20} weight="fill" />}
                 title="Something went off track"
                 description={error}
+                className="mb-8"
               />
             ) : null}
           </div>
 
-          <div className="mx-auto typographic-measure-wide">
-
-
-            <Surface variant="bezel" tone="paper">
-              <article>
+          <article className="max-w-[var(--measure-wide)] selection:bg-green/10">
                 {note.thumbnailUrl ? (
-                  <div className="h-64 w-full border-b border-border/40 bg-[var(--surface-current-control-bg)]">
-                    <StorageImage path={note.thumbnailUrl} alt={note.title} className="h-full w-full object-cover" />
+                  <div className="mb-10 overflow-hidden rounded-[var(--radius-panel)] border border-border/40">
+                    <StorageImage path={note.thumbnailUrl} alt={note.title} className="h-64 w-full object-cover" />
                   </div>
                 ) : null}
 
-                <div className="p-8 md:p-12">
-                  <h1 className="h1-hero mb-8 !text-4xl">{note.title}</h1>
-
-                  {note.tags && note.tags.length > 0 ? (
-                    <div className="mb-6 flex flex-wrap gap-2">
-                      {note.tags.map((tag) => (
-                        <Chip
-                          key={tag}
-                          as="button"
-                          active
-                          icon={<Tag size={12} weight="bold" />}
-                          onClick={() => navigate(`${RoutePath.NOTES}?tag=${encodeURIComponent(tag)}`)}
-                        >
-                          {tag}
-                        </Chip>
-                      ))}
-                    </div>
-                  ) : null}
-
-                  <div className="mb-8 flex flex-wrap items-center gap-3 border-b border-border/40 pb-6">
-                    <MetadataPill icon={<Calendar size={14} weight="bold" />}>
-                      {new Date(note.createdAt).toLocaleDateString(undefined, {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
-                    </MetadataPill>
-
+                {/* Date-led header */}
+                <header className="mb-8">
+                  <div className="mb-4 flex flex-wrap items-center gap-2.5">
+                    <MetadataPill icon={<Calendar size={14} weight="bold" />}>{fullDate}</MetadataPill>
                     <button
                       type="button"
                       onClick={() => setIsMoodOpen(true)}
@@ -411,81 +421,100 @@ export const SingleNote: React.FC = () => {
                       }`}
                     >
                       {note.mood ? getMoodIcon(note.mood) : <Smiley size={14} weight="bold" />}
-                      <span className="mt-0.5">{noteMoodConfig?.label || note.mood || 'Mood'}</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setIsTagsOpen(true)}
-                      aria-haspopup="dialog"
-                      aria-expanded={isTagsOpen}
-                      className="control-surface group flex items-center gap-1.5 rounded-full px-2.5 py-1 label-caps text-gray-nav transition-colors hover:border-green/30 hover:bg-green/5 hover:text-green"
-                    >
-                      <Tag size={14} weight="bold" />
-                      <span className="mt-0.5">{note.tags?.length || 'Tags'}</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setIsTasksOpen(true)}
-                      aria-haspopup="dialog"
-                      aria-expanded={isTasksOpen}
-                      className={`group flex items-center gap-1.5 rounded-full border px-2.5 py-1 label-caps transition-colors ${
-                        pendingTaskCount > 0
-                          ? 'border-green/30 bg-green/5 text-green'
-                          : 'control-surface text-gray-nav hover:border-green/30 hover:bg-green/5 hover:text-green'
-                      }`}
-                    >
-                      <ListChecks size={14} weight="bold" />
-                      <span className="mt-0.5">{pendingTaskCount || 'Tasks'}</span>
+                      <span className="mt-0.5">{noteMoodConfig?.label || note.mood || 'Add mood'}</span>
                     </button>
                   </div>
 
-                  <div
-                    className="dashboard-prose mx-auto prose prose-zinc prose-lg"
-                    dangerouslySetInnerHTML={{ __html: sanitizedContent }}
-                  />
+                  <h1 className="font-serif text-[2.25rem] font-semibold leading-[1.12] text-gray-text text-balance sm:text-[2.75rem]">
+                    {note.title || 'Untitled reflection'}
+                  </h1>
 
-                  {note.attachments && note.attachments.length > 0 ? (
-                    <div className="mt-12 border-t border-border/40 pt-8">
-                      <h3 className="mb-4 flex items-center gap-2 text-sm font-extrabold text-gray-text">
-                        <Paperclip size={16} weight="bold" className="text-gray-nav" />
-                        Attachments
-                      </h3>
+                  {/* Inline tags — add expands on click */}
+                  <div className="mt-5 flex flex-wrap items-center gap-2">
+                    {(note.tags || []).map((tag) => (
+                      <span key={tag} className="chip-filter chip-filter--active inline-flex items-center gap-1.5 !pr-1.5">
+                        <Tag size={12} weight="bold" />
+                        <span className="chip-filter-label">{tag}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeTag(tag)}
+                          aria-label={`Remove tag ${tag}`}
+                          className="flex h-5 w-5 items-center justify-center rounded-full text-gray-nav transition-colors hover:bg-clay/10 hover:text-clay"
+                        >
+                          <X size={11} weight="bold" />
+                        </button>
+                      </span>
+                    ))}
+                    {isAddingTag ? (
+                      <form
+                        onSubmit={(event) => {
+                          event.preventDefault();
+                          void addTag();
+                        }}
+                        className="inline-flex items-center duration-200 animate-in fade-in slide-in-from-left-2 motion-reduce:animate-none"
+                      >
+                        <input
+                          autoFocus
+                          value={tagDraft}
+                          onChange={(event) => setTagDraft(event.target.value)}
+                          onBlur={() => {
+                            if (!tagDraft.trim()) setIsAddingTag(false);
+                          }}
+                          placeholder="Add tag"
+                          aria-label="Add a tag"
+                          className="input-surface min-h-9 w-32 rounded-full px-3 text-[13px] font-bold text-gray-text placeholder:text-gray-nav"
+                        />
+                      </form>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setIsAddingTag(true)}
+                        className="inline-flex min-h-9 items-center gap-1 rounded-full border border-dashed border-border px-2.5 py-1 text-[12px] font-bold text-gray-nav transition-colors hover:border-green/40 hover:bg-green/5 hover:text-green"
+                      >
+                        <Plus size={12} weight="bold" />
+                        Add tag
+                      </button>
+                    )}
+                  </div>
+                </header>
 
-                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        {note.attachments.map((attachment, index) => (
-                          <Surface key={index} variant="flat" tone="sky" className="overflow-hidden">
-                            <div className="flex items-center gap-3 p-4">
-                              <div className="tone-icon tone-icon-sky flex h-10 w-10 shrink-0 rounded-xl text-gray-nav shadow-sm">
-                                <FileText size={20} weight="duotone" />
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <p className="truncate text-sm font-bold text-gray-text">{attachment.name}</p>
-                                <p className="text-xs font-bold text-gray-nav">
-                                  {(attachment.size / 1024).toFixed(1)} KB
-                                </p>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() => downloadAttachment(attachment)}
-                                className="rounded-[var(--radius-control)] border border-transparent p-2 text-gray-nav transition-colors hover:border-green/20 hover:bg-green/10 hover:text-green"
-                                title="Download attachment"
-                                aria-label={`Download ${attachment.name}`}
-                              >
-                                <Download size={16} weight="bold" />
-                              </button>
-                            </div>
-                          </Surface>
-                        ))}
-                      </div>
-                    </div>
-                  ) : null}
-                </div>
-              </article>
-            </Surface>
-          </div>
-        </div>
+                <div
+                  className="dashboard-prose prose prose-zinc prose-lg"
+                  dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+                />
+
+                {/* Attachments */}
+                {noteAttachments.length > 0 ? (
+                  <section className="mt-12">
+                    <h2 className="mb-4 flex items-center gap-2 text-sm font-extrabold text-gray-text">
+                      <Paperclip size={16} weight="bold" className="text-gray-nav" />
+                      Attachments
+                    </h2>
+                    <ul className="space-y-1">
+                      {noteAttachments.map((attachment, index) => (
+                        <li key={attachment.id || attachment.path || index} className="flex items-center gap-3 py-3">
+                          <span className="tone-icon tone-icon-sky flex h-10 w-10 shrink-0 rounded-xl text-gray-nav">
+                            <FileText size={20} weight="duotone" />
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-bold text-gray-text">{attachment.name}</p>
+                            <p className="text-xs font-bold text-gray-nav">{(attachment.size / 1024).toFixed(1)} KB</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => downloadAttachment(attachment)}
+                            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-control)] text-gray-nav transition-colors hover:bg-green/10 hover:text-green"
+                            title="Download attachment"
+                            aria-label={`Download ${attachment.name}`}
+                          >
+                            <DownloadSimple size={16} weight="bold" />
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                ) : null}
+          </article>
       </PageContainer>
 
       <ModalSheet
@@ -503,7 +532,7 @@ export const SingleNote: React.FC = () => {
             className="surface-inline-panel flex w-full items-center gap-3 px-4 py-4 text-left transition-colors hover:border-green/20 hover:bg-green/5"
           >
             <span className="tone-icon tone-icon-green flex h-10 w-10 shrink-0 rounded-xl">
-              <Download size={20} weight="bold" />
+              <DownloadSimple size={20} weight="bold" />
             </span>
             <span className="min-w-0">
               <span className="block text-sm font-extrabold text-gray-text">Download Markdown</span>
@@ -535,11 +564,117 @@ export const SingleNote: React.FC = () => {
                     </span>
                   </span>
                 </span>
-                <Download size={16} weight="bold" className="shrink-0 text-green" />
+                <DownloadSimple size={16} weight="bold" className="shrink-0 text-green" />
               </button>
             ))}
           </div>
         </div>
+      </ModalSheet>
+
+      <ModalSheet
+        isOpen={isActionsOpen}
+        onClose={() => setIsActionsOpen(false)}
+        title="Note actions"
+        ariaLabel="Choose an action for this reflection"
+        size="sm"
+      >
+        <div className="space-y-2">
+          <button
+            type="button"
+            onClick={() => {
+              setIsActionsOpen(false);
+              handleEdit();
+            }}
+            className="surface-inline-panel flex min-h-11 w-full items-center gap-3 px-4 py-4 text-left transition-colors hover:border-green/20 hover:bg-green/5"
+          >
+            <span className="tone-icon tone-icon-green flex h-10 w-10 shrink-0 rounded-xl">
+              <PencilSimpleLine size={18} weight="bold" />
+            </span>
+            <span className="text-sm font-extrabold text-gray-text">Edit</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setIsActionsOpen(false);
+              handleExportClick();
+            }}
+            aria-label="Export this reflection"
+            className="surface-inline-panel flex min-h-11 w-full items-center gap-3 px-4 py-4 text-left transition-colors hover:border-green/20 hover:bg-green/5"
+          >
+            <span className="tone-icon tone-icon-sky flex h-10 w-10 shrink-0 rounded-xl text-gray-nav">
+              <DownloadSimple size={18} weight="bold" />
+            </span>
+            <span className="text-sm font-extrabold text-gray-text">Export</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setIsActionsOpen(false);
+              setIsTasksOpen(true);
+            }}
+            className="surface-inline-panel flex min-h-11 w-full items-center justify-between gap-3 px-4 py-4 text-left transition-colors hover:border-green/20 hover:bg-green/5"
+          >
+            <span className="flex items-center gap-3">
+              <span className="tone-icon tone-icon-honey flex h-10 w-10 shrink-0 rounded-xl text-gray-nav">
+                <ListChecks size={18} weight="bold" />
+              </span>
+              <span className="text-sm font-extrabold text-gray-text">Tasks</span>
+            </span>
+            {pendingTaskCount > 0 ? <span className="label-caps text-green">{pendingTaskCount} open</span> : null}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setIsActionsOpen(false);
+              setIsConfirmOpen(true);
+            }}
+            className="surface-inline-panel flex min-h-11 w-full items-center gap-3 px-4 py-4 text-left transition-colors hover:border-clay/30 hover:bg-clay/5"
+          >
+            <span className="tone-icon tone-icon-clay flex h-10 w-10 shrink-0 rounded-xl text-clay">
+              <Trash size={18} weight="bold" />
+            </span>
+            <span className="text-sm font-extrabold text-clay">Delete</span>
+          </button>
+        </div>
+      </ModalSheet>
+
+      <ModalSheet
+        isOpen={isTasksOpen}
+        onClose={() => setIsTasksOpen(false)}
+        title="Tasks"
+        ariaLabel="Tasks for this reflection"
+        size="md"
+        footer={
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              void addTask();
+            }}
+            className="flex flex-col gap-3 sm:flex-row"
+          >
+            <Input
+              id="note-task"
+              value={taskDraft}
+              onChange={(event) => setTaskDraft(event.target.value)}
+              placeholder="Add a task"
+              aria-label="Add a task"
+              className="sm:flex-1"
+            />
+            <Button type="submit" variant="primary" className="sm:min-w-[140px]">
+              <Plus size={16} weight="bold" className="mr-2" />
+              Add task
+            </Button>
+          </form>
+        }
+      >
+        {note.tasks && note.tasks.length > 0 ? (
+          <div className="space-y-3">{note.tasks.map(renderTaskRow)}</div>
+        ) : (
+          <p className="text-sm font-medium text-gray-light">No associated tasks</p>
+        )}
       </ModalSheet>
 
       <ModalSheet
@@ -566,89 +701,11 @@ export const SingleNote: React.FC = () => {
         />
       </ModalSheet>
 
-      <ModalSheet
-        isOpen={isTagsOpen}
-        onClose={() => setIsTagsOpen(false)}
-        title="Reflection tags"
-        size="md"
-        footer={
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Input
-              id="note-tag"
-              value={tagDraft}
-              onChange={(event) => setTagDraft(event.target.value)}
-              placeholder="Add a tag"
-              aria-label="Add a tag"
-              className="sm:flex-1"
-            />
-            <Button onClick={addTag} variant="primary" className="sm:min-w-[120px]">
-              Add tag
-            </Button>
-          </div>
-        }
-      >
-        {note.tags && note.tags.length > 0 ? (
-          <div className="flex flex-wrap gap-2">
-            {note.tags.map((tag) => (
-              <Chip
-                key={tag}
-                as="button"
-                active
-                icon={<Tag size={12} weight="bold" />}
-                onClick={() => removeTag(tag)}
-                className="pr-3"
-                aria-label={`Remove tag: ${tag}`}
-              >
-                {tag}
-                <X size={12} weight="bold" />
-              </Chip>
-            ))}
-          </div>
-        ) : (
-          <p className="text-sm font-medium text-gray-light">
-            No tags yet. Add one below to keep this reflection organized.
-          </p>
-        )}
-      </ModalSheet>
-
-      <ModalSheet
-        isOpen={isTasksOpen}
-        onClose={() => setIsTasksOpen(false)}
-        title="Tasks tied to this reflection"
-        size="lg"
-        footer={
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Input
-              id="note-task"
-              value={taskDraft}
-              onChange={(event) => setTaskDraft(event.target.value)}
-              placeholder="Add a task"
-              aria-label="Add a task"
-              className="sm:flex-1"
-            />
-            <Button onClick={addTask} variant="primary" className="sm:min-w-[140px]">
-              <Plus size={16} weight="bold" className="mr-2" />
-              Add task
-            </Button>
-          </div>
-        }
-      >
-        {note.tasks && note.tasks.length > 0 ? (
-          <div className="space-y-3">
-            {note.tasks.map(renderTaskRow)}
-          </div>
-        ) : (
-          <p className="text-sm font-medium text-gray-light">
-            No tasks yet. Add one below if this reflection points to a next step.
-          </p>
-        )}
-      </ModalSheet>
-
       <ConfirmationDialog
         isOpen={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
         onConfirm={performDelete}
-        title="Delete this reflection?"
+        title="Delete this note?"
         confirmLabel={isDeleting ? 'Deleting...' : 'Delete note'}
         isConfirming={isDeleting}
         variant="danger"

@@ -3,17 +3,11 @@ import { Link } from 'react-router-dom';
 
 import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
 import { Book } from '@phosphor-icons/react/Book';
-import { CalendarCheck } from '@phosphor-icons/react/CalendarCheck';
 import { CaretRight } from '@phosphor-icons/react/CaretRight';
-import { Hash } from '@phosphor-icons/react/Hash';
-import { Heart } from '@phosphor-icons/react/Heart';
-import { Leaf } from '@phosphor-icons/react/Leaf';
 
 import { LottieAnimation } from '../../components/ui/LottieAnimation';
 import { Button } from '../../components/ui/Button';
 import { EmptyState } from '../../components/ui/EmptyState';
-import { CompletionCardActions } from '../../components/ui/CompletionCardActions';
-import { MetadataPill } from '../../components/ui/MetadataPill';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { Surface } from '../../components/ui/Surface';
@@ -26,26 +20,21 @@ import { FREE_WIKI_MINIMUM_ENTRIES, getWikiInsightsGate } from '../../services/w
 import { buildWeeklyRecap } from '../../services/weeklyRecapService';
 import { moodCheckinService } from '../../services/moodService';
 import { ritualEventService } from '../../services/ritualService';
-import { buildCompletionCardPayload } from '../../services/completionCardPayload';
 import {
   SANCTUARY_LEVEL_UP_ANIMATION_ID,
   SANCTUARY_LEVEL_UP_ANIMATION_SRC,
 } from '../../src/lottie/sanctuaryAnimation';
-import { DEFAULT_MOOD_TONE, getMoodConfig, getMoodGroupConfig } from './moodConfig';
+import { getMoodConfig, getMoodGroupConfig } from './moodConfig';
+import {
+  buildMonthSummary,
+  buildMoodSentence,
+  buildTagsSentence,
+  buildWeekSummary,
+} from './insightsNarrative';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useViewTransitionNavigation } from '../../hooks/useViewTransitionNavigation';
-import { runScopedTransition } from '../../hooks/viewTransitionUtils';
-
-const TAG_TONE_CLASSES = ['text-green', 'text-green/80', 'text-green/70', 'text-green/60'];
 
 const SANCTUARY_ENTRANCE_FALLBACK_MS = 2200;
-const OPEN_ACCORDION_GRID_STYLE = { gridTemplateRows: '1fr' } as const;
-const CLOSED_ACCORDION_GRID_STYLE = { gridTemplateRows: '0fr' } as const;
-
-const getAccordionGridStyle = (isOpen: boolean) =>
-  isOpen ? OPEN_ACCORDION_GRID_STYLE : CLOSED_ACCORDION_GRID_STYLE;
-
-const getMoodBarScale = (percent: number) => ({ scaleX: percent / 100 });
 
 const getWeekSignalSince = () => {
   const start = new Date();
@@ -56,27 +45,17 @@ const getWeekSignalSince = () => {
 
 export const Insights: React.FC = () => {
   const navigate = useViewTransitionNavigation();
-  const insightsScopeRef = useRef<HTMLDivElement | null>(null);
 
   const [notes, setNotes] = useState<Note[]>([]);
   const [themes, setThemes] = useState<LifeTheme[]>([]);
   const [moodCheckins, setMoodCheckins] = useState<MoodCheckin[]>([]);
   const [ritualEvents, setRitualEvents] = useState<RitualEvent[]>([]);
   const [access, setAccess] = useState<WellnessAccess | null>(null);
-  const [isOverviewOpen, setIsOverviewOpen] = useState(false);
-  const [isMoodOpen, setIsMoodOpen] = useState(false);
-  const [isTagsOpen, setIsTagsOpen] = useState(false);
-  const [isCompletionOpen, setIsCompletionOpen] = useState(false);
   const [isOpeningSanctuary, setIsOpeningSanctuary] = useState(false);
-  const [cardTitle, setCardTitle] = useState('');
   const [loading, setLoading] = useState(true);
   const isOpeningSanctuaryRef = useRef(false);
   const openingTimerRef = useRef<number | null>(null);
   const shouldReduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
-
-  const toggleInsightPanel = (update: () => void) => {
-    runScopedTransition(insightsScopeRef.current, update);
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -156,19 +135,6 @@ export const Insights: React.FC = () => {
     ritualEvents,
   }), [moodCheckins, notes, ritualEvents]);
 
-  const weeklyCardPayload = useMemo(() => buildCompletionCardPayload({
-    kind: 'weekly_recap',
-    date: new Date(weeklyRecap.weekEnd),
-    weekLabel: `${new Date(weeklyRecap.weekStart).toLocaleDateString(undefined, {
-      month: 'short',
-      day: 'numeric',
-    })} - ${new Date(weeklyRecap.weekEnd).toLocaleDateString(undefined, {
-      month: 'short',
-      day: 'numeric',
-    })}`,
-    customTitle: cardTitle || undefined,
-  }), [cardTitle, weeklyRecap.weekEnd, weeklyRecap.weekStart]);
-
   const wikiGate = useMemo(() => {
     if (!access) return null;
     return getWikiInsightsGate(access, notes.length);
@@ -177,6 +143,21 @@ export const Insights: React.FC = () => {
   const isWikiReadyToBuild = Boolean(
     wikiGate?.canGenerate && notes.length >= FREE_WIKI_MINIMUM_ENTRIES && themes.length === 0,
   );
+
+  // Weave the weekly/monthly signal into prose rather than a stat grid.
+  const moodLabels = weeklyRecap.moodFamilyData
+    .slice(0, 2)
+    .map((entry) => (getMoodGroupConfig(entry.name)?.label || getMoodConfig(entry.name)?.label || entry.name).toLowerCase());
+  const weekSummary = buildWeekSummary(weeklyRecap);
+  const moodSentence = buildMoodSentence(moodLabels);
+  const tagsSentence = buildTagsSentence(weeklyRecap.recurringTags.slice(0, 4).map((entry) => entry.tag));
+  const monthTone = getMoodConfig(stats.topMood)?.label || stats.topMood || null;
+  const monthSummary = buildMonthSummary({
+    monthNotes: stats.monthNotes,
+    daysCheckedIn: stats.daysCheckedIn,
+    wordsWritten: stats.wordsWritten,
+    tone: monthTone,
+  });
 
   const completeOpenSanctuary = useCallback(() => {
     if (!isOpeningSanctuaryRef.current) return;
@@ -204,8 +185,6 @@ export const Insights: React.FC = () => {
     openingTimerRef.current = window.setTimeout(completeOpenSanctuary, SANCTUARY_ENTRANCE_FALLBACK_MS);
   }, [completeOpenSanctuary, navigate, shouldReduceMotion]);
 
-
-
   useEffect(() => {
     return () => {
       if (openingTimerRef.current !== null) {
@@ -213,6 +192,9 @@ export const Insights: React.FC = () => {
       }
     };
   }, []);
+
+  const isEmpty = notes.length === 0 && weeklyRecap.writingDays === 0;
+  const isQuietWeek = weeklyRecap.writingDays === 0;
 
   return (
     <>
@@ -256,7 +238,7 @@ export const Insights: React.FC = () => {
 
       <PageContainer className="surface-scope-sky page-wash pb-24 pt-6 md:pt-10">
         <div className="core-page-stack">
-          <button 
+          <button
             onClick={() => navigate(RoutePath.DASHBOARD)}
             className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-green/5 hover:text-green"
             aria-label="Back to home"
@@ -271,12 +253,12 @@ export const Insights: React.FC = () => {
             className="insights-section-header"
           />
 
-          <div ref={insightsScopeRef} aria-live="polite" aria-busy={loading} className="w-full core-section-stack">
+          <div aria-live="polite" aria-busy={loading} className="w-full core-section-stack">
             {loading ? (
             <Surface variant="flat" tone="sky" className="p-8 md:p-10">
               <WeeklyRecapLoadingSkeleton />
             </Surface>
-          ) : notes.length === 0 && weeklyRecap.writingDays === 0 ? (
+          ) : isEmpty ? (
             <EmptyState
               surface="bezel"
               illustration={<LottieAnimation src="/assets/lottie/empty-notes.json" className="h-full w-full" autoplay loop />}
@@ -289,286 +271,39 @@ export const Insights: React.FC = () => {
               }
             />
           ) : (<>
-          <Surface variant="flat" tone="sky" className="group relative overflow-hidden rounded-[2rem] p-8 md:p-10 transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-sky/5">
-            <div className="relative z-10">
-            {weeklyRecap.writingDays === 0 ? (
-              <div className="space-y-5">
-                <div className="flex items-center gap-3 text-green">
-                  <CalendarCheck size={18} weight="duotone" />
-                  <p className="label-caps">This week</p>
-                </div>
-                <h2 className="text-3xl font-display font-extrabold text-gray-text md:text-4xl text-balance">
-                  A quiet week — that&rsquo;s allowed.
-                </h2>
-                <p className="max-w-[44ch] text-base leading-relaxed text-gray-light">
-                  Nothing to count here. Your reflections are still in My notes whenever you want them.
-                </p>
-                <Button variant="ghost" onClick={() => navigate(RoutePath.CREATE_NOTE)} className="text-green">
-                  Write something
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-8">
-                <div className="space-y-5">
-                  <div className="flex items-center gap-3 text-green">
-                    <CalendarCheck size={18} weight="duotone" />
-                    <p className="label-caps">This week</p>
-                  </div>
-                  <h2 className="text-3xl font-display font-extrabold text-gray-text md:text-5xl">
-                    You returned {weeklyRecap.writingDays} {weeklyRecap.writingDays === 1 ? 'day' : 'days'}
-                  </h2>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-                  {[
-                    ['Reflections', weeklyRecap.reflectionsSaved],
-                    ['Check-ins', weeklyRecap.moodCheckins],
-                    ['Release moments', weeklyRecap.releaseMoments],
-                    ['Letters scheduled', weeklyRecap.lettersScheduled],
-                    ['Letters opened', weeklyRecap.lettersOpened],
-                    ['Active days', weeklyRecap.activityDays.length],
-                  ].map(([label, value]) => (
-                    <div key={label} className="tone-chip tone-chip-sky flex-col items-start p-4">
-                      <p className="dashboard-stat-value">{value}</p>
-                      <p className="dashboard-caption mt-1 text-gray-nav">{label}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="mt-8 border-t border-border/60 pt-0">
-              {/* Mood Frequency Accordion */}
-                <button
-                  type="button"
-                  onClick={() => toggleInsightPanel(() => setIsMoodOpen((prev) => !prev))}
-                  aria-expanded={isMoodOpen}
-                  aria-controls="insights-mood-panel"
-                  className="group/acc flex w-full items-center justify-between gap-4 py-5 text-left"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="tone-icon tone-icon-sky h-12 w-12 rounded-2xl transition-transform duration-500 ease-out-expo group-hover/acc:scale-110 group-hover/acc:rotate-6">
-                      <Heart size={18} weight="duotone" />
-                    </div>
-                    <h3 className="text-lg font-display font-bold text-gray-text transition-colors group-hover/acc:text-sky">Mood frequency</h3>
-                  </div>
-                  <CaretRight
-                    size={18}
-                    weight="bold"
-                    className={`shrink-0 text-gray-nav/40 transition-[color,transform] duration-500 ease-out-expo ${isMoodOpen ? 'rotate-90 text-sky' : 'group-hover/acc:translate-x-1'}`}
-                  />
-                </button>
-
-                <div
-                  id="insights-mood-panel"
-                  className={`grid overflow-hidden transition-opacity duration-200 ease-out-expo ${isMoodOpen ? 'opacity-100' : 'opacity-0'}`}
-                  style={getAccordionGridStyle(isMoodOpen)}
-                >
-                      <div className="min-h-0 pb-8">
-                        {weeklyRecap.moodFamilyData.length === 0 ? (
-                          <EmptyState
-                            surface="none"
-                            icon={<Heart size={22} weight="duotone" />}
-                            title="Mood labels will start to form a pattern here."
-                            description="Check in or add a mood to a reflection and this week will stay readable."
-                          />
-                        ) : (
-                          <div className="flex flex-col gap-5">
-                            {weeklyRecap.moodFamilyData.map((entry) => {
-                              const maxValue = weeklyRecap.moodFamilyData[0].value;
-                              const percent = Math.round((entry.value / maxValue) * 100);
-                              const { scaleX } = getMoodBarScale(percent);
-                              const moodFamily = getMoodGroupConfig(entry.name);
-                              const moodConfig = getMoodConfig(moodFamily?.id || entry.name);
-                              const tone = moodConfig || DEFAULT_MOOD_TONE;
-
-                              return (
-                                <div key={entry.name} className="flex items-center gap-4 group/bar">
-                                  <span className={`w-20 shrink-0 label-caps transition-colors group-hover/bar:text-gray-text ${tone.labelClass}`}>
-                                    {moodFamily?.label || moodConfig?.label || entry.name}
-                                  </span>
-                                  <div className={`relative h-10 flex-1 overflow-hidden rounded-2xl ${tone.trackClass}`}>
-                                    <div
-                                      className={`absolute inset-y-0 left-0 w-full origin-left rounded-2xl transition-transform duration-1000 ease-out-expo scale-x-[var(--mood-bar-scale)] ${tone.fillClass}`}
-                                      style={{ '--mood-bar-scale': isMoodOpen ? scaleX : 0 } as React.CSSProperties}
-                                    />
-                                    <div className="absolute inset-0 bg-white/5 opacity-0 transition-opacity group-hover/bar:opacity-100" />
-                                  </div>
-                                  <span className="w-8 shrink-0 text-right text-sm font-bold tabular-nums text-gray-nav">
-                                    {entry.value}
-                                  </span>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-              </div>
-
-              {/* Recurring Tags Accordion */}
-              <div>
-                <button
-                  type="button"
-                  onClick={() => toggleInsightPanel(() => setIsTagsOpen((prev) => !prev))}
-                  aria-expanded={isTagsOpen}
-                  aria-controls="insights-tags-panel"
-                  className="group/acc flex w-full items-center justify-between gap-4 py-5 text-left"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="tone-icon tone-icon-honey h-12 w-12 rounded-2xl transition-transform duration-500 ease-out-expo group-hover/acc:scale-110 group-hover/acc:-rotate-6">
-                      <Hash size={18} weight="duotone" />
-                    </div>
-                    <h3 className="text-lg font-display font-bold text-gray-text transition-colors group-hover/acc:text-honey">Recurring tags</h3>
-                  </div>
-                  <CaretRight
-                    size={18}
-                    weight="bold"
-                    className={`shrink-0 text-gray-nav/40 transition-[color,transform] duration-500 ease-out-expo ${isTagsOpen ? 'rotate-90 text-honey' : 'group-hover/acc:translate-x-1'}`}
-                  />
-                </button>
-
-                <div
-                  id="insights-tags-panel"
-                  className={`grid overflow-hidden transition-opacity duration-200 ease-out-expo ${isTagsOpen ? 'opacity-100' : 'opacity-0'}`}
-                  style={getAccordionGridStyle(isTagsOpen)}
-                >
-                      <div className="min-h-0 pb-8">
-                        {weeklyRecap.recurringTags.length === 0 ? (
-                          <EmptyState
-                            surface="none"
-                            icon={<Hash size={22} weight="duotone" />}
-                            title="Tags will appear here."
-                            description="Tag entries this week and the repeated subjects will collect here."
-                          />
-                        ) : (
-                          <div className="flex flex-wrap items-center gap-4">
-                            {weeklyRecap.recurringTags.map(({ tag, count }, index) => {
-                              const scale = Math.min(1.45, Math.max(0.92, count / 2.4));
-                              return (
-                                <span
-                                  key={tag}
-                                  className={`font-display font-bold lowercase transition-transform hover:scale-110 cursor-default text-[length:var(--tag-font-size)] leading-none ${TAG_TONE_CLASSES[index % TAG_TONE_CLASSES.length]}`}
-                                  style={{ '--tag-font-size': `${scale}rem` } as React.CSSProperties}
-                                >
-                                  #{tag}
-                                </span>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-              </div>
-            </div>
-            {/* Subtle background glow effect on hover */}
-
-          </Surface>
-
-          <Surface variant="bezel" tone="sage" className="group relative overflow-hidden rounded-[2rem] transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-green/5">
-            <button
-              type="button"
-              onClick={() => toggleInsightPanel(() => setIsOverviewOpen((current) => !current))}
-              aria-expanded={isOverviewOpen}
-              aria-controls="insights-overview-panel"
-              className="flex w-full items-center justify-between gap-4 p-6 text-left md:p-8"
-            >
-              <div className="flex items-center gap-3">
-                <div className="tone-icon tone-icon-sage h-12 w-12 rounded-2xl transition-transform duration-500 ease-out-expo group-hover:scale-110 group-hover:rotate-6">
-                  <Book size={18} weight="duotone" />
-                </div>
-                <div>
-                  <p className="label-caps text-green">Overview</p>
-                  <h2 className="mt-1 text-2xl font-display font-bold text-gray-text group-hover:text-green transition-colors duration-300">
-                    {stats.monthNotes} reflections this month
-                  </h2>
-                </div>
-              </div>
-              <CaretRight
-                size={18}
-                weight="bold"
-                className={`shrink-0 text-gray-nav/40 transition-[color,transform] duration-500 ease-out-expo ${isOverviewOpen ? 'rotate-90 text-green' : 'group-hover:translate-x-1'}`}
-              />
-            </button>
-
-            <div
-                  id="insights-overview-panel"
-                  className={`grid overflow-hidden transition-opacity duration-200 ease-out-expo ${isOverviewOpen ? 'opacity-100' : 'opacity-0'}`}
-                  style={getAccordionGridStyle(isOverviewOpen)}
-                >
-                  <div className="min-h-0 space-y-5 border-t border-border/60 p-6 md:p-8">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <MetadataPill tone="sage" icon={<Book size={13} weight="regular" />}>
-                        {stats.wordsWritten.toLocaleString()} words written
-                      </MetadataPill>
-                    </div>
-                    <p className="max-w-[65ch] text-lg font-serif italic leading-relaxed text-gray-light md:text-xl">
-                      This month, you checked in on {stats.daysCheckedIn} different days, and the current emotional tone leans{' '}
-                      <span className="font-bold not-italic text-green">
-                        {getMoodConfig(stats.topMood)?.label || stats.topMood || 'toward clarity'}
-                      </span>
-                      .
+          <Surface variant="flat" tone="sky" className="rounded-[2rem] p-8 md:p-12">
+            <div className="space-y-10">
+              <section className="space-y-5">
+                <h2 className="text-2xl font-display font-bold text-gray-text md:text-3xl">This week</h2>
+                {isQuietWeek ? (
+                  <div className="space-y-5">
+                    <p className="dashboard-prose">
+                      A quiet week — that&rsquo;s allowed. Nothing to count here; your reflections are still in My notes whenever you want them.
                     </p>
+                    <Button variant="ghost" onClick={() => navigate(RoutePath.CREATE_NOTE)} className="text-green">
+                      Write something
+                    </Button>
                   </div>
-                </div>
-          </Surface>
-
-          <Surface variant="flat" tone="honey" className="group relative overflow-hidden rounded-[2rem] transition-shadow duration-500 ease-out-expo hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-honey/5">
-            <button
-              type="button"
-              onClick={() => toggleInsightPanel(() => setIsCompletionOpen((prev) => !prev))}
-              aria-expanded={isCompletionOpen}
-              aria-controls="insights-completion-panel"
-              className="flex w-full items-center justify-between gap-4 p-6 text-left md:p-8"
-            >
-              <div className="flex items-center gap-3">
-                <div className="tone-icon tone-icon-honey h-12 w-12 rounded-2xl transition-transform duration-500 ease-out-expo group-hover:scale-110 group-hover:-rotate-12">
-                  <Leaf size={18} weight="fill" />
-                </div>
-                <div>
-                  <p className="label-caps text-honey">Completion card</p>
-                  <h2 className="mt-1 text-2xl font-display font-bold text-gray-text group-hover:text-honey transition-colors duration-300">This week's card</h2>
-                </div>
-              </div>
-              <CaretRight
-                size={18}
-                weight="bold"
-                className={`shrink-0 text-gray-nav/40 transition-[color,transform] duration-500 ease-out-expo ${isCompletionOpen ? 'rotate-90 text-honey' : 'group-hover:translate-x-1'}`}
-              />
-            </button>
-
-            <div
-                  id="insights-completion-panel"
-                  className={`grid overflow-hidden transition-opacity duration-200 ease-out-expo ${isCompletionOpen ? 'opacity-100' : 'opacity-0'}`}
-                  style={getAccordionGridStyle(isCompletionOpen)}
-                >
-                  <div className="min-h-0 space-y-5 border-t border-border/60 p-6 md:p-8">
-                    <div className="space-y-2">
-                      <label htmlFor="completion-card-title" className="label-caps text-gray-nav">
-                        Card message
-                      </label>
-                      <input
-                        id="completion-card-title"
-                        type="text"
-                        value={cardTitle}
-                        onChange={(e) => setCardTitle(e.target.value)}
-                        maxLength={80}
-                        placeholder="Write a message for your card..."
-                        className="input-surface h-12 w-full px-4 text-base font-semibold text-gray-text"
-                      />
-                      <p className="text-xs font-medium text-gray-nav/60">
-                        {cardTitle.length}/80 — leave blank for the default
-                      </p>
-                    </div>
-                    <CompletionCardActions payload={weeklyCardPayload} />
+                ) : (
+                  <div className="dashboard-prose space-y-4 text-pretty">
+                    <p>{weekSummary}</p>
+                    {moodSentence ? <p>{moodSentence}</p> : null}
+                    {tagsSentence ? <p>{tagsSentence}</p> : null}
                   </div>
-                </div>
+                )}
+              </section>
+
+              <section className="space-y-5">
+                <h2 className="text-2xl font-display font-bold text-gray-text md:text-3xl">This month</h2>
+                <p className="dashboard-prose text-pretty">{monthSummary}</p>
+              </section>
+            </div>
           </Surface>
 
           <Surface
             variant="flat"
             tone="sage"
-            className="group relative overflow-hidden rounded-[2rem] border border-transparent transition-[border-color,box-shadow] duration-500 ease-out-expo hover:border-green/20 hover:shadow-[0_20px_50px_var(--tw-shadow-color)] hover:shadow-green/5"
+            className="group relative overflow-hidden rounded-[2rem] border border-transparent transition-[border-color] duration-500 ease-out-expo hover:border-green/20"
           >
             <Link
               to={RoutePath.SANCTUARY}
@@ -578,17 +313,14 @@ export const Insights: React.FC = () => {
               aria-label="Open your Life Wiki"
             >
               <div className="space-y-5">
-                {isWikiReadyToBuild ? (
-                  <div className="h-28 w-28 overflow-hidden rounded-[2rem] bg-[oklch(from_var(--color-accent)_l_c_h_/_0.16)] transition-transform duration-500 group-hover:scale-105 group-hover:rotate-3">
+                {isWikiReadyToBuild && (
+                  <div className="h-24 w-24 overflow-hidden rounded-[2rem] bg-[oklch(from_var(--color-accent)_l_c_h_/_0.16)]">
                     <LottieAnimation src={SANCTUARY_LEVEL_UP_ANIMATION_SRC} animationId={SANCTUARY_LEVEL_UP_ANIMATION_ID} autoplay loop />
-                  </div>
-                ) : (
-                  <div className="tone-icon tone-icon-sage h-14 w-14 rounded-2xl transition-transform duration-500 ease-out-expo group-hover:scale-110 group-hover:rotate-6">
-                    <Book size={26} weight="duotone" />
                   </div>
                 )}
                 <div className="space-y-3">
-                  <h2 className="text-3xl font-display font-bold text-gray-text group-hover:text-green transition-colors duration-300">
+                  <h2 className="flex items-center gap-2.5 text-3xl font-display font-bold text-gray-text">
+                    {!isWikiReadyToBuild && <Book size={24} weight="duotone" className="flex-none text-green" />}
                     {isWikiReadyToBuild ? 'Your wiki is ready for insights' : 'Your Life Wiki'}
                   </h2>
                   <p className="text-gray-light max-w-lg text-lg leading-relaxed font-serif italic">
@@ -598,8 +330,8 @@ export const Insights: React.FC = () => {
                   </p>
                 </div>
               </div>
-              
-              <div className="relative flex h-12 shrink-0 items-center justify-center overflow-hidden rounded-[var(--radius-control)] border border-green bg-green text-white px-6 label-caps transition-colors duration-300 group-hover:bg-green/90 group-hover:shadow-lg group-hover:shadow-green/20">
+
+              <div className="relative flex h-12 shrink-0 items-center justify-center overflow-hidden rounded-[var(--radius-control)] border border-green bg-green text-white px-6 label-caps transition-colors duration-300 group-hover:bg-green/90">
                 Open Sanctuary
                 <CaretRight size={16} weight="regular" className="ml-2 transition-transform duration-500 ease-out-expo group-hover:translate-x-1" />
               </div>

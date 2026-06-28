@@ -18,20 +18,18 @@ const startOfCurrentWeek = () => {
   return start.getTime();
 };
 
-const suggestedCare = (relationship: RelationshipRecord, hook?: RelationshipHook) => {
+const suggestedCare = (relationship: RelationshipRecord, hook: RelationshipHook | undefined, isDormant: boolean) => {
   const openCare = relationship.nextCare.find((care) => care.status === 'open');
   if (openCare) return openCare.label;
   if (hook) return 'Message them about it.';
-  if (relationship.stage === 'dormant') return 'Send a no-pressure hello.';
+  if (isDormant) return 'Send a no-pressure hello.';
   return 'Share something they’d appreciate.';
 };
 
-const reason = (relationship: RelationshipRecord, last?: RelationshipInteraction, hook?: RelationshipHook) => {
-  if (relationship.stage === 'dormant') return 'It’s been a while — easy to pick back up.';
+const reason = (last: RelationshipInteraction | undefined, hook: RelationshipHook | undefined, isDormant: boolean) => {
   if (hook) return 'You’ve got a real reason to reach out.';
   if (!last) return 'You haven’t talked yet — a good time to start.';
-  const gap = daysSince(last.date);
-  if (gap > 90) return `Quiet for ${gap} days — worth a hello.`;
+  if (isDormant) return `Quiet for ${daysSince(last.date)} days — worth a hello.`;
   return 'Worth keeping close this week.';
 };
 
@@ -44,20 +42,18 @@ export const buildWeeklyRelationshipSuggestions = (
     const hook = relationship.hooks.find((item) => !item.used);
     const last = latestInteraction(relationship);
     const gap = daysSince(last?.date);
+    const isDormant = Boolean(last) && gap > 90;
     const score =
-      (relationship.stage === 'dormant' ? 25 : 0) +
+      (isDormant ? 25 : 0) +
       (hook ? 20 : 0) +
-      Math.min(gap === Number.POSITIVE_INFINITY ? 18 : gap / 7, 18) +
-      relationship.closeness * 2 +
-      relationship.energy +
-      relationship.opportunity;
+      Math.min(gap === Number.POSITIVE_INFINITY ? 18 : gap / 7, 18);
 
     return {
       relationship,
-      reason: reason(relationship, last, hook),
+      reason: reason(last, hook, isDormant),
       suggestedHook: hook,
       lastInteraction: last,
-      suggestedCare: suggestedCare(relationship, hook),
+      suggestedCare: suggestedCare(relationship, hook, isDormant),
       score,
     };
   })

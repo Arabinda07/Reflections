@@ -142,14 +142,14 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
 
       const rzp = new (window as any).Razorpay(options);
       rzp.on('payment.failed', function (response: any) {
-        setError(response?.error?.description || 'Payment failed. Please try again.');
+        setError(response?.error?.description || "That payment didn't go through. You haven't been charged — try again.");
         setIsProcessing(false);
       });
       
       rzp.open();
     } catch (err: any) {
       console.error('Subscription error:', err);
-      setError(err.message || 'Please try again later.');
+      setError(err.message || "Checkout didn't start. You haven't been charged. Try again in a moment.");
       setIsProcessing(false);
     }
   };
@@ -263,7 +263,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
                 onSuccess?.();
               }}
             >
-              Continue
+              Start writing
             </Button>
           </div>
         )}
@@ -310,10 +310,10 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
 
   return (
     <>
-      <div className={`border-t border-border/50 pt-6 surface-tone-honey ${className}`}>
+      <div className={`surface-tone-sage rounded-[var(--radius-panel)] p-5 ${className}`}>
         <div className="flex flex-col justify-between gap-5 md:flex-row md:items-center">
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-honey">
+            <div className="flex items-center gap-2 text-green">
               <Crown size={18} weight="fill" />
               <span className="label-caps">Reflections Pro</span>
             </div>
@@ -325,7 +325,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
           <div className="flex flex-col gap-2 md:items-end">
             <Button
               variant="primary"
-              className="w-full md:w-auto h-12 px-6 rounded-[var(--radius-control)] !bg-honey !text-white border-none hover:opacity-90 whitespace-nowrap"
+              className="w-full md:w-auto h-12 px-6 rounded-[var(--radius-control)] whitespace-nowrap"
               onClick={openPaywall}
             >
               Start my free trial

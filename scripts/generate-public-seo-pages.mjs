@@ -15,6 +15,7 @@ import {
   AUTH_HINT_STALE_STORAGE_KEY,
   AUTH_HINT_STALE_VALUE,
 } from '../src/config/authHintKeys.js';
+import { buildOkfBundle } from '../src/config/okfBundle.js';
 
 const INDEX_FOLLOW_ROBOTS_META = '<meta name="robots" content="index, follow" />';
 const NOINDEX_NOFOLLOW_ROBOTS_META = '<meta name="robots" content="noindex, nofollow" />';
@@ -441,4 +442,10 @@ for (const route of appShellRoutes) {
     mkdirSync(dirname(outputPath), { recursive: true });
     writeFileSync(outputPath, html);
   }
+}
+
+for (const [relativePath, content] of Object.entries(buildOkfBundle())) {
+  const outputPath = fileURLToPath(new URL(`okf/${relativePath}`, distDir));
+  mkdirSync(dirname(outputPath), { recursive: true });
+  writeFileSync(outputPath, content);
 }

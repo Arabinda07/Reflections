@@ -346,12 +346,9 @@ export const LifeWiki: React.FC = () => {
   const hasEnoughEntriesForWiki = notes.length >= FREE_WIKI_MINIMUM_ENTRIES;
   const entriesNeededForWiki = Math.max(FREE_WIKI_MINIMUM_ENTRIES - notes.length, 0);
   const canShowSanctuaryRooms = hasEnoughEntriesForWiki || primaryPages.length > 0;
-  const roomsReadyLabel =
-    primaryPages.length > 0
-      ? `${primaryPages.length} of ${SANCTUARY_META.length} generated`
-      : hasEnoughEntriesForWiki
-        ? 'Ready for first refresh'
-        : `${entriesNeededForWiki} more ${entriesNeededForWiki === 1 ? 'entry' : 'entries'}`;
+  const lastRefreshLabel = getLastRefreshLabel(wikiPages);
+  const refreshClause = lastRefreshLabel === 'Not refreshed yet' ? 'not refreshed yet' : `last refreshed ${lastRefreshLabel}`;
+  const librarySummary = `${notes.length} ${notes.length === 1 ? 'entry' : 'entries'} · ${wikiPages.length} generated ${wikiPages.length === 1 ? 'page' : 'pages'} · ${refreshClause}`;
 
   const articlePageType =
     pageType !== 'theme' && pageType !== 'index' && isUserVisibleWikiPage(pageType)
@@ -422,7 +419,8 @@ export const LifeWiki: React.FC = () => {
     );
   };
 
-  const renderPageCard = (
+  // A single chapter row in the library's table of contents — no card grid.
+  const renderRoomRow = (
     meta: PageMeta,
     page?: LifeTheme | null,
     isSupporting = false,
@@ -433,164 +431,109 @@ export const LifeWiki: React.FC = () => {
     const isEmptyRoom = !page;
     const sources = page ? extractSourceIds(page.content) : [];
     const tone = ROOM_TONE_CLASSES[meta.tone];
-    const cardClass = `group relative h-full overflow-hidden rounded-[2rem] surface-flat ${tone.surface} dashboard-tone-card transition-[box-shadow,transform] duration-500 ease-out`;
+    const metaLine = locked
+      ? 'Opens after 3 entries'
+      : isSupporting
+        ? 'Supporting page'
+        : isEmptyRoom
+          ? 'Awaiting signal'
+          : `${sources.length} source${sources.length === 1 ? '' : 's'} · updated ${new Date(page!.updatedAt).toLocaleDateString()}`;
 
     const innerContent = (
-      <>
-        <div className="space-y-6">
-          <div className="flex items-center justify-between gap-4">
-            <span className={`dashboard-caption ${tone.accent}`}>
-              {locked
-                ? 'Opens after 3 entries'
-                : isSupporting
-                  ? 'Supporting page'
-                  : isEmptyRoom
-                    ? 'Room awaiting signal'
-                    : 'Generated page'}
-            </span>
-            {locked ? (
-              <Lock size={16} weight="duotone" className={tone.text} />
-            ) : (
-              <CaretRight size={18} weight="bold" className={`${tone.text} transition-transform duration-500 ease-out-expo group-hover:translate-x-1`} />
-            )}
-          </div>
-          <div className="space-y-4">
-            <h2 className="dashboard-card-title-lg dashboard-hover-title">{meta.label}</h2>
-            <p className="dashboard-editorial-preview line-clamp-4 transition-colors duration-300 group-hover:text-gray-text">
-              {isEmptyRoom ? meta.emptyLine || meta.description : previewText(page!.content)}
-            </p>
-            {isEmptyRoom && !locked && (
-              <div className="dashboard-caption flex items-center gap-2 opacity-70">
-                <Sparkle size={12} weight="fill" className="text-green" />
-                <span>Awaiting signal</span>
-              </div>
-            )}
-          </div>
+      <div className="flex items-start justify-between gap-6 py-6">
+        <div className="min-w-0 space-y-2">
+          <h3 className="text-xl font-display font-bold text-gray-text md:text-2xl">{meta.label}</h3>
+          <p className="dashboard-editorial-preview line-clamp-2">
+            {isEmptyRoom ? meta.emptyLine || meta.description : previewText(page!.content)}
+          </p>
+          <p className="dashboard-caption text-gray-nav/70">{metaLine}</p>
         </div>
-
-        <div className="mt-8 flex flex-wrap gap-2">
+        <div className="shrink-0 pt-1.5">
           {locked ? (
-            <MetadataPill className="transition-transform group-hover:scale-105">Locked</MetadataPill>
+            <Lock size={18} weight="duotone" className="text-gray-nav/50" />
           ) : (
-            <>
-              <MetadataPill tone={isEmptyRoom ? undefined : 'green'} className="transition-transform group-hover:scale-105">
-                {isEmptyRoom ? 'Empty room' : `${sources.length} source${sources.length === 1 ? '' : 's'}`}
-              </MetadataPill>
-              <MetadataPill className="transition-transform group-hover:scale-105">
-                {isEmptyRoom ? 'Ready' : new Date(page!.updatedAt).toLocaleDateString()}
-              </MetadataPill>
-            </>
+            <CaretRight size={18} weight="bold" className={`${tone.text} transition-transform duration-500 ease-out-expo group-hover:translate-x-1`} />
           )}
         </div>
-      </>
+      </div>
     );
 
     if (locked) {
       return (
-        <div key={meta.pageType} className={`${cardClass} opacity-75`}>
-          <div className="relative z-10 flex h-full min-h-64 flex-col justify-between p-8 text-left md:p-10">
-            {innerContent}
-          </div>
+        <div key={meta.pageType} className="opacity-70">
+          {innerContent}
         </div>
       );
     }
 
     return (
-      <div
+      <Link
         key={meta.pageType}
-        className={`${cardClass} hover:-translate-y-1 hover:[box-shadow:0_20px_50px_-20px_oklch(from_var(--bg-color)_0.2_0.01_h_/_0.18)]`}
+        to={articlePath(meta.pageType)}
+        className="group block rounded-[var(--radius-control)] px-2 transition-colors duration-300 hover:bg-green/[0.03] focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
+        aria-label={`Open ${meta.label} Sanctuary page`}
       >
-        <Link
-          to={articlePath(meta.pageType)}
-          className="relative z-10 flex h-full min-h-64 flex-col justify-between p-8 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 md:p-10"
-          aria-label={`Open ${meta.label} Sanctuary page`}
-        >
-          {innerContent}
-        </Link>
-      </div>
+        {innerContent}
+      </Link>
     );
   };
 
   const renderRunActivity = () => {
-    if (recentRuns.length === 0 && !runDetail) {
-      return (
-        <Surface variant="flat" tone="paper" className="rounded-[2rem] border-border/50 p-5 sm:p-6">
-          <div className="flex flex-col gap-1">
-            <p className="label-caps text-green">Smart Mode activity</p>
-            <p className="text-sm font-medium leading-relaxed text-gray-light">
-              No Life Wiki runs yet — Smart Mode keeps a short, private trail of what each refresh touched here.
-            </p>
-          </div>
-        </Surface>
-      );
-    }
+    const lastRun = recentRuns[0];
+    if (!lastRun) return null;
+    const summary = `Last refreshed ${new Date(lastRun.started_at || lastRun.created_at).toLocaleDateString()} · ${lastRun.page_count || 0} room${lastRun.page_count === 1 ? '' : 's'} touched.`;
 
     return (
-    <Surface variant="flat" tone="paper" className="rounded-[2rem] border-border/50 p-5 sm:p-6">
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-        <div className="max-w-md space-y-2">
-          <p className="label-caps text-green">Smart Mode activity</p>
-          <h2 className="text-2xl font-display font-bold text-gray-text">Recent Life Wiki runs</h2>
-          <p className="text-sm font-medium leading-relaxed text-gray-light">
-            Reflections keeps a short, private trail of what the Life Wiki refresh touched.
-          </p>
-        </div>
+      <section>
+        <p className="dashboard-supporting-text">{summary}</p>
 
-        <div className="grid flex-1 gap-3 md:grid-cols-2">
-          {recentRuns.length > 0 ? recentRuns.slice(0, 4).map((run) => (
-            <button
-              key={run.id}
-              type="button"
-              onClick={() => {
-                void loadRunActivity(run.id);
-              }}
-              className={`rounded-[1.25rem] border p-4 text-left transition-colors hover:border-green/25 hover:bg-green/5 ${
-                runDetail?.run.id === run.id ? 'border-green/30 bg-green/5' : 'border-border/60 bg-panel/40'
-              }`}
-            >
-              <span className="flex items-center justify-between gap-3">
-                <span className="label-caps text-gray-nav">{formatRunTrigger(run.trigger)}</span>
-                <span className="text-[11px] font-black uppercase tracking-[0.16em] text-green">
-                  {formatRunStatus(run.status)}
-                </span>
-              </span>
-              <span className="mt-3 block text-sm font-bold text-gray-text">
-                {run.page_count || 0} room{run.page_count === 1 ? '' : 's'} touched
-              </span>
-              <span className="mt-1 block text-xs font-semibold text-gray-nav">
-                {new Date(run.started_at || run.created_at).toLocaleString()}
-              </span>
-              {run.error ? <span className="mt-2 block text-xs font-bold text-clay">{run.error}</span> : null}
-            </button>
-          )) : (
-            <div className="rounded-[1.25rem] border border-border/60 bg-panel/40 p-4 text-sm font-semibold text-gray-light">
-              No Life Wiki runs have been recorded yet.
+        <details className="group mt-2">
+            <summary className="inline-flex w-fit cursor-pointer list-none items-center gap-1.5 label-caps text-green transition-colors hover:text-green/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40">
+              View refresh history
+              <CaretRight size={14} weight="bold" className="transition-transform duration-300 group-open:rotate-90" />
+            </summary>
+
+            <div className="mt-4 space-y-1">
+              {recentRuns.slice(0, 6).map((run) => (
+                <button
+                  key={run.id}
+                  type="button"
+                  onClick={() => {
+                    void loadRunActivity(run.id);
+                  }}
+                  className={`flex w-full items-center justify-between gap-3 py-3 text-left transition-colors hover:text-green ${
+                    runDetail?.run.id === run.id ? 'text-green' : 'text-gray-text'
+                  }`}
+                >
+                  <span className="flex items-baseline gap-2">
+                    <span className="text-sm font-bold">{formatRunTrigger(run.trigger)}</span>
+                    <span className="dashboard-caption text-gray-nav/70">
+                      {new Date(run.started_at || run.created_at).toLocaleDateString()}
+                    </span>
+                  </span>
+                  <span className="dashboard-caption text-green">
+                    {formatRunStatus(run.status)} · {run.page_count || 0} room{run.page_count === 1 ? '' : 's'}
+                  </span>
+                </button>
+              ))}
             </div>
-          )}
-        </div>
-      </div>
 
-      {runDetail ? (
-        <div className="mt-5 border-t border-border/60 pt-5">
-          <p className="label-caps text-gray-nav">Timeline</p>
-          <div className="mt-3 grid gap-2">
-            {runDetail.events.length > 0 ? runDetail.events.map((event) => (
-              <div key={event.id} className="flex flex-col gap-1 rounded-[1rem] bg-green/5 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-                <span className="text-sm font-bold text-gray-text">
-                  {event.event_type.replace(/_/g, ' ')}
-                  {event.page_type ? <span className="text-gray-nav"> · {event.page_type}</span> : null}
-                </span>
-                <span className="text-xs font-semibold text-gray-nav">
-                  {new Date(event.created_at).toLocaleTimeString()}
-                </span>
+            {runDetail && runDetail.events.length > 0 ? (
+              <div className="mt-4">
+                <p className="dashboard-caption text-gray-nav/70">Timeline</p>
+                <ul className="mt-2 space-y-1.5">
+                  {runDetail.events.map((event) => (
+                    <li key={event.id} className="text-sm font-medium text-gray-light">
+                      {event.event_type.replace(/_/g, ' ')}
+                      {event.page_type ? <span className="text-gray-nav"> · {event.page_type}</span> : null}
+                      <span className="text-gray-nav/60"> · {new Date(event.created_at).toLocaleTimeString()}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            )) : (
-              <p className="text-sm font-semibold text-gray-light">This run has not recorded timeline events yet.</p>
-            )}
-          </div>
-        </div>
-      ) : null}
-    </Surface>
+            ) : null}
+          </details>
+      </section>
     );
   };
 
@@ -951,7 +894,7 @@ export const LifeWiki: React.FC = () => {
           ) : null}
 
           {hasEnoughEntriesForWiki && primaryPages.length === 0 ? (
-            <Surface variant="bezel" tone="honey" innerClassName="p-7 md:p-9">
+            <Surface variant="bezel" tone="sage" innerClassName="p-7 md:p-9">
               <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                 <div className="max-w-2xl space-y-3">
                   <p className="label-caps text-green">
@@ -988,38 +931,22 @@ export const LifeWiki: React.FC = () => {
             </Surface>
           ) : null}
 
-          <section className="border-y border-border/60 py-5">
-            <div className="grid gap-0 divide-y divide-border/60 md:grid-cols-4 md:divide-x md:divide-y-0">
-              {[
-                ['Entries', notes.length.toString()],
-                ['Generated pages', wikiPages.length.toString()],
-                ['Last refresh', getLastRefreshLabel(wikiPages)],
-                ['Rooms ready', roomsReadyLabel],
-              ].map(([label, value]) => (
-                <div key={label} className="px-0 py-4 first:pt-0 last:pb-0 md:px-5 md:py-0 md:first:pl-0 md:last:pr-0">
-                  <p className="label-caps text-gray-nav">{label}</p>
-                  <p className="dashboard-stat-value mt-2 !text-base">{value}</p>
-                </div>
-              ))}
-            </div>
-          </section>
+          <p className="dashboard-supporting-text">{librarySummary}</p>
 
-          <section className="space-y-5">
+          <section className="space-y-2">
             <div className="max-w-2xl">
-              <div>
-                <h2 className="text-2xl font-display font-bold text-gray-text">Life Wiki pages</h2>
-                <p className="mt-2 text-sm font-medium text-gray-light">
-                  The five main rooms for this library
-                  {hasEnoughEntriesForWiki
-                    ? ', kept visible once your Life Wiki is ready.'
-                    : ' — they open once you have 3 entries.'}
-                </p>
-              </div>
+              <h2 className="text-2xl font-display font-bold text-gray-text">Life Wiki pages</h2>
+              <p className="mt-2 text-sm font-medium text-gray-light">
+                The five main rooms for this library
+                {hasEnoughEntriesForWiki
+                  ? ', kept visible once your Life Wiki is ready.'
+                  : ' — they open once you have 3 entries.'}
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+            <div>
               {SANCTUARY_META.map((meta) =>
-                renderPageCard(
+                renderRoomRow(
                   meta,
                   pageMap.get(meta.pageType),
                   false,
@@ -1030,16 +957,16 @@ export const LifeWiki: React.FC = () => {
           </section>
 
           {supportingPages.length > 0 ? (
-            <section className="space-y-5">
+            <section className="space-y-2">
               <div>
                 <h2 className="text-2xl font-display font-bold text-gray-text">Supporting shelf</h2>
                 <p className="mt-2 text-sm font-medium text-gray-light">
                   Earlier generated summaries remain readable, but the five Life Wiki pages are the main surface.
                 </p>
               </div>
-              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+              <div>
                 {SUPPORTING_META.filter((meta) => pageMap.has(meta.pageType)).map((meta) =>
-                  renderPageCard(meta, pageMap.get(meta.pageType), true),
+                  renderRoomRow(meta, pageMap.get(meta.pageType), true),
                 )}
               </div>
             </section>

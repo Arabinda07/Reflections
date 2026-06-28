@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { PublicPageIcon, type PublicPageIconName } from '../../components/ui/PublicPageIcon';
+import { PublicPageHero, PublicPageSection, PublicPageShell } from '../../components/ui/PublicPageShell';
 import { useDocumentMeta } from '../../hooks/useDocumentMeta';
 import { PUBLIC_SEO_COPY } from '../../src/config/publicSeoCopy.js';
 
@@ -7,7 +8,6 @@ type PublicIconCard = {
   icon: PublicPageIconName;
   title: string;
   body: string;
-  label?: string;
 };
 
 const FAQ_SEO = PUBLIC_SEO_COPY.faq;
@@ -59,13 +59,37 @@ const practiceItems: PublicIconCard[] = [
     body: "Check in with your mood. Feelings, but make them less loud.",
     icon: 'heart',
   },
+  {
+    title: 'Keeping up with people',
+    body: 'Keep a private list of the people you want to stay close to. Each week it names a few worth reaching out to, with a reason.',
+    icon: 'user',
+  },
+];
+
+// The substantive trust/billing answers, featured in a tone panel.
+const featuredDetails: PublicIconCard[] = [
+  {
+    title: 'Encrypted on your device',
+    body: 'Your notes, moods, letters, attachments, Life Wiki, and relationships are encrypted on your device before they are saved. The key comes from your password, so the server stores writing it cannot read.',
+    icon: 'shield',
+  },
+  {
+    title: 'Your password and recovery phrase',
+    body: 'You unlock your writing once on each device. If you forget your password, the recovery phrase you saved during setup is the only other way in, so keep it somewhere safe. On a device you trust, you can choose to stay unlocked.',
+    icon: 'shield',
+  },
+  {
+    title: 'Plans and billing',
+    body:
+      'Pro has weekly and monthly options. The trial lasts 3 days. No payment is due during the trial, and Reflections shows the first charge date before checkout. After that, weekly Pro renews at ₹49/week and monthly Pro renews at ₹149/month until canceled.',
+    icon: 'creditCard',
+  },
 ];
 
 const detailItems: PublicIconCard[] = [
   {
     title: 'Private to your account',
     body: 'Your notes are tied to your login and protected by account-level security. You own your writing, period.',
-    label: 'Account protected',
     icon: 'shield',
   },
   {
@@ -81,27 +105,12 @@ const detailItems: PublicIconCard[] = [
   {
     title: 'AI on your terms',
     body: 'Reflections can spot patterns or refresh your Life Wiki, but only when you choose. It never fires in the background. See our Privacy page for how your notes are protected.',
-    label: 'On demand only • Private by design',
     icon: 'brain',
   },
   {
-    title: 'Encrypted on your device',
-    body: 'Your notes, moods, letters, attachments, Life Wiki, and relationships are encrypted on your device before they are saved. The key comes from your password, so the server stores writing it cannot read.',
-    label: 'Zero-knowledge • The key stays with you',
-    icon: 'shield',
-  },
-  {
-    title: 'Your password and recovery phrase',
-    body: 'You unlock your writing once on each device. If you forget your password, the recovery phrase you saved during setup is the only other way in, so keep it somewhere safe. On a device you trust, you can choose to stay unlocked.',
-    label: 'Keep your recovery phrase safe',
-    icon: 'shield',
-  },
-  {
-    title: 'Plans and billing',
-    body:
-      'Pro has weekly and monthly options. The trial lasts 3 days. No payment is due during the trial, and Reflections shows the first charge date before checkout. After that, weekly Pro renews at ₹49/week and monthly Pro renews at ₹149/month until canceled.',
-    label: '3-day trial • No payment today',
-    icon: 'creditCard',
+    title: 'Relationships, kept private',
+    body: 'The people you add and the notes around them are encrypted on your device like the rest of your writing. Nothing is shared, scored, or pushed at you — it waits until you open it.',
+    icon: 'heart',
   },
 ];
 
@@ -112,7 +121,7 @@ const featureGrid: PublicIconCard[] = [
   { title: 'Visual covers', body: 'Add atmospheric imagery to set the mood for your entries.', icon: 'image' },
   { title: 'Embedded tasks', body: 'Keep track of follow-ups and intentions right inside your prose.', icon: 'checklist' },
   { title: 'Life Wiki', body: 'A high-level summary of your world, updated only when you choose.', icon: 'brain' },
-  { title: 'Relationships', body: 'Keep track of the people you want to tend, with a few gentle nudges each week.', icon: 'heart' },
+  { title: 'Relationships', body: 'A private list of the people who matter, with a few weekly reach-outs worth making.', icon: 'heart' },
 ];
 
 const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
@@ -129,145 +138,117 @@ export const FAQ: React.FC = () => {
   }, []);
 
   return (
-    <section className="surface-scope-sky page-wash relative min-h-full bg-body pb-28 text-gray-text transition-colors duration-300">
-      <section className="mx-auto grid w-full max-w-[1440px] gap-12 px-6 py-20 sm:px-10 lg:grid-cols-12 lg:items-end lg:px-16 lg:py-28">
-        <div className="lg:col-span-8">
-          <h1 className="text-mk-display font-display font-extrabold leading-[0.95] tracking-normal text-gray-text text-balance">
+    <PublicPageShell scope="sky">
+      <PublicPageHero
+        title={
+          <>
             Untangle your <br />
             <span className="font-serif italic font-normal text-green">thoughts</span>
-          </h1>
-        </div>
-
-        <div className="space-y-4 lg:col-span-4">
-
+          </>
+        }
+        updated="June 2026"
+        intro={
           <p className="max-w-[36rem] font-serif text-[18px] leading-relaxed text-gray-light">
-            Reflections is a calm, private writing space for the thoughts that keep doing laps.
-            This guide explains what the product does, how AI waits, and what stays yours.
+            Reflections is a calm, private writing space for the thoughts that keep doing laps. This guide explains what
+            the product does, how AI waits, and what stays yours.
           </p>
-          <p className="text-[12px] font-bold uppercase tracking-widest text-gray-nav">Last updated · June 2026</p>
+        }
+      />
+
+      {/* Quick guide */}
+      <section className="grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-stretch">
+        <article className="surface-flat surface-tone-sage flex flex-col justify-center rounded-[var(--radius-panel)] p-8 md:p-12">
+          <h2 className="max-w-[12ch] text-mk-h2 font-display font-bold leading-tight text-gray-text">
+            Writing stays at the center.
+          </h2>
+          <p className="mt-6 max-w-[52ch] font-serif text-[20px] italic leading-relaxed text-gray-text/75">
+            Reflections is not a feed, a coach, or a scoreboard. It is a private place for notes, mood labels, and
+            patterns you choose to inspect.
+          </p>
+        </article>
+
+        <div className="flex flex-col justify-center gap-8">
+          {guideSections.map((section) => (
+            <article key={section.title} className="group">
+              <h3 className="flex items-center gap-2.5 text-[22px] font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green">
+                <PublicPageIcon name={section.icon} size={20} className="flex-none text-green" />
+                {section.title}
+              </h3>
+              <p className="mt-2.5 font-sans text-[16px] leading-relaxed text-gray-light">{section.body}</p>
+            </article>
+          ))}
         </div>
       </section>
 
-      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-20 px-6 sm:px-10 lg:gap-28 lg:px-16">
-        <section className="faq-editorial-lead grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-stretch">
-          <article className="surface-flat surface-tone-sage rounded-[2rem] p-8 md:p-12">
-            <p className="label-caps text-green">Quick guide</p>
-            <h2 className="mt-5 max-w-[12ch] text-mk-h2 font-display font-bold leading-tight text-gray-text">
-              Writing stays at the center.
-            </h2>
-            <p className="mt-6 max-w-[52ch] font-serif text-[20px] italic leading-relaxed text-gray-text/75">
-              Reflections is not a feed, a coach, or a scoreboard. It is a private place for notes, mood labels, and patterns you choose to inspect.
-            </p>
-          </article>
+      {/* The practice */}
+      <PublicPageSection
+        heading="A space to write, one reflection at a time"
+        lead="The interface is deliberately quiet. The useful pieces stay close to the page, not above it."
+      >
+        <div className="grid gap-x-12 gap-y-9 sm:grid-cols-2">
+          {practiceItems.map((item) => (
+            <article key={item.title} className="group">
+              <h3 className="flex items-center gap-2.5 text-[20px] font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">
+                <PublicPageIcon name={item.icon} size={19} className="flex-none text-green" />
+                {item.title}
+              </h3>
+              <p className="mt-2 font-sans text-[16px] leading-relaxed text-gray-light">{item.body}</p>
+            </article>
+          ))}
+        </div>
+      </PublicPageSection>
 
-          <div className="faq-compact-list rounded-[2rem] border border-border/70 bg-[oklch(from_var(--panel-bg)_l_c_h_/_0.54)]">
-            {guideSections.map((section, index) => (
-              <article
-                key={section.title}
-                className="group grid gap-5 border-b border-border/60 p-6 last:border-b-0 sm:grid-cols-[3.25rem_minmax(0,1fr)] md:p-8"
-              >
-                <div className="tone-icon tone-icon-sage flex h-12 w-12 rounded-2xl transition-transform duration-500 ease-out-expo group-hover:scale-105">
-                  <PublicPageIcon name={section.icon} size={24} />
-                </div>
-                <div>
-                  <p className="label-caps text-green/70">0{index + 1}</p>
-                  <h2 className="mt-2 text-[22px] font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green">
-                    {section.title}
-                  </h2>
-                  <p className="mt-3 font-sans text-[16px] leading-relaxed text-gray-light">
-                    {section.body}
-                  </p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
+      {/* The details — featured trust/billing trio + the quieter list */}
+      <PublicPageSection heading="Tools built to support you without getting in the way">
+        <div className="surface-flat surface-tone-sky grid gap-x-10 gap-y-8 rounded-[var(--radius-panel)] p-7 md:grid-cols-3 md:p-10">
+          {featuredDetails.map((item) => (
+            <article key={item.title} className="group">
+              <h3 className="flex items-center gap-2.5 text-[22px] font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">
+                <PublicPageIcon name={item.icon} size={20} className="flex-none text-green" />
+                {item.title}
+              </h3>
+              <p className="mt-3 font-sans text-[16px] leading-relaxed text-gray-light">{item.body}</p>
+            </article>
+          ))}
+        </div>
 
-        <section className="grid gap-10 border-y border-border py-16 lg:grid-cols-[0.72fr_1.28fr] lg:py-20">
-          <div className="space-y-4">
-            <p className="label-caps text-green">The practice</p>
-            <h2 className="text-mk-h2 font-display font-bold text-gray-text">A space to write, one reflection at a time</h2>
-            <p className="max-w-[38rem] font-sans text-[16px] leading-relaxed text-gray-light">
-              The interface is deliberately quiet. The useful pieces stay close to the page, not above it.
-            </p>
-          </div>
+        <div className="mt-10 grid gap-x-10 gap-y-8 md:grid-cols-2">
+          {detailItems.map((item) => (
+            <article key={item.title} className="group">
+              <h3 className="flex items-center gap-2.5 text-[20px] font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">
+                <PublicPageIcon name={item.icon} size={19} className="flex-none text-green" />
+                {item.title}
+              </h3>
+              <p className="mt-2 font-sans text-[16px] leading-relaxed text-gray-light">{item.body}</p>
+            </article>
+          ))}
+        </div>
+      </PublicPageSection>
 
-          <div className="faq-compact-list divide-y divide-border/60">
-            {practiceItems.map((item) => (
-              <article key={item.title} className="group flex gap-5 py-6 first:pt-0 last:pb-0">
-                <div className="tone-icon tone-icon-sky mt-1 h-11 w-11 flex-none rounded-2xl transition-transform duration-500 ease-out-expo group-hover:rotate-3">
-                  <PublicPageIcon name={item.icon} size={22} />
-                </div>
-                <div>
-                  <h3 className="text-[20px] font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">
-                    {item.title}
-                  </h3>
-                  <p className="mt-2 font-sans text-[16px] leading-relaxed text-gray-light">{item.body}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
+      {/* Feature shelf */}
+      <PublicPageSection heading="Small tools, close to the page">
+        <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2">
+          {featureGrid.map((feature) => (
+            <article key={feature.title} className="group">
+              <h3 className="flex items-center gap-2.5 text-[20px] font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">
+                <PublicPageIcon name={feature.icon} size={19} className="flex-none text-green" />
+                {feature.title}
+              </h3>
+              <p className="mt-2 font-sans text-[16px] leading-relaxed text-gray-light">{feature.body}</p>
+            </article>
+          ))}
+        </div>
+      </PublicPageSection>
 
-        <section className="faq-comparison-band surface-flat surface-tone-sky rounded-[2rem] p-7 md:p-10">
-          <div className="mb-10 max-w-3xl space-y-4">
-            <p className="label-caps text-green">The details</p>
-            <h2 className="text-mk-h2 font-display font-bold text-gray-text">Tools built to support you without getting in the way</h2>
-          </div>
-
-          <div className="faq-detail-ledger grid gap-x-10 gap-y-8 md:grid-cols-2">
-            {detailItems.map((item) => (
-              <article key={item.title} className="group flex flex-col gap-4 sm:flex-row sm:gap-6">
-                <div className="tone-icon tone-icon-sky flex h-14 w-14 flex-none rounded-2xl transition-transform duration-500 ease-out-expo group-hover:-rotate-3">
-                  <PublicPageIcon name={item.icon} size={28} />
-                </div>
-                <div>
-                  {item.label && <p className="mb-2 text-[11px] font-black uppercase tracking-widest text-green/60">{item.label}</p>}
-                  <h3 className="text-[24px] font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">{item.title}</h3>
-                  <p className="mt-3 font-sans text-[17px] leading-relaxed text-gray-light">{item.body}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="grid gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
-          <div className="space-y-4">
-            <p className="label-caps text-green">Feature shelf</p>
-            <h2 className="text-mk-h2 font-display font-bold text-gray-text">Small tools, close to the page</h2>
-          </div>
-
-          <div className="faq-compact-list grid gap-x-8 gap-y-0 sm:grid-cols-2">
-            {featureGrid.map((feature) => (
-              <article key={feature.title} className="group flex gap-4 border-t border-border/60 py-5">
-                <div className="tone-icon tone-icon-honey mt-1 h-10 w-10 flex-none rounded-2xl transition-transform duration-500 ease-out-expo group-hover:scale-105">
-                  <PublicPageIcon name={feature.icon} size={21} />
-                </div>
-                <div>
-                  <h3 className="text-[13px] font-black uppercase tracking-widest text-gray-text transition-colors duration-300 group-hover:text-green">{feature.title}</h3>
-                  <p className="mt-2 font-sans text-[15px] leading-relaxed text-gray-light">{feature.body}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-
-        <section className="border-t border-border pt-10">
-          <p className="label-caps text-green">Contact</p>
-          <p className="mt-3 max-w-[42rem] font-sans text-[16px] leading-relaxed text-gray-light">
-            Questions about Reflections can go to{' '}
-            <a
-              className="public-contact-link"
-              href={`mailto:${SUPPORT_EMAIL}`}
-            >
-              {SUPPORT_EMAIL}
-            </a>
-            .
-          </p>
-        </section>
-
-      </div>
-    </section>
+      {/* Contact */}
+      <section>
+        <p className="max-w-[42rem] font-sans text-[16px] leading-relaxed text-gray-light">
+          Questions about Reflections can go to{' '}
+          <a className="public-contact-link" href={`mailto:${SUPPORT_EMAIL}`}>
+            {SUPPORT_EMAIL}
+          </a>
+        </p>
+      </section>
+    </PublicPageShell>
   );
 };

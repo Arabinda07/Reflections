@@ -64,7 +64,14 @@ describe('relationshipService.buildWeeklySuggestions', () => {
       baseRelationship({
         id: 'dormant',
         name: 'Dormant Person',
-        stage: 'dormant',
+        // Dormant is now derived from a >90-day gap, not the stage field.
+        interactions: [{
+          id: 'touch-old',
+          date: new Date(Date.now() - 120 * 86_400_000).toISOString(),
+          channel: 'email',
+          notes: 'Old note',
+          direction: 'mutual',
+        }],
       }),
     ]);
 
@@ -73,6 +80,23 @@ describe('relationshipService.buildWeeklySuggestions', () => {
       'hook',
     ]);
     expect(suggestions[1].suggestedHook?.description).toContain('Started a new role');
+  });
+
+  it('ranks on behavior only — closeness/energy/opportunity do not change order', () => {
+    const recent = () => [{
+      id: 'touch',
+      date: new Date().toISOString(),
+      channel: 'email' as const,
+      notes: 'Recent',
+      direction: 'mutual' as const,
+    }];
+    const suggestions = relationshipService.buildWeeklySuggestions([
+      baseRelationship({ id: 'low', closeness: 1, energy: 1, opportunity: 1, interactions: recent() }),
+      baseRelationship({ id: 'high', closeness: 5, energy: 5, opportunity: 5, interactions: recent() }),
+    ]);
+
+    // Equal behavior → stable input order. Old slider weights would have floated 'high' to the top.
+    expect(suggestions.map((suggestion) => suggestion.relationship.id)).toEqual(['low', 'high']);
   });
 
   it('does not suggest archived relationships', () => {

@@ -29,7 +29,6 @@ describe('SEO crawlability contract', () => {
       `${CANONICAL_PUBLIC_ORIGIN}/faq`,
       `${CANONICAL_PUBLIC_ORIGIN}/privacy`,
       `${CANONICAL_PUBLIC_ORIGIN}/about`,
-      `${CANONICAL_PUBLIC_ORIGIN}/features/relationships`,
       `${CANONICAL_PUBLIC_ORIGIN}/vs/day-one`,
     ]);
     expect(sitemap).not.toContain('localhost');
@@ -282,7 +281,6 @@ describe('SEO crawlability contract', () => {
       ['pages/dashboard/FAQ.tsx', 'FAQ_SEO.path'],
       ['pages/dashboard/PrivacyPolicy.tsx', 'PRIVACY_SEO.path'],
       ['pages/dashboard/AboutArabinda.tsx', 'ABOUT_SEO.path'],
-      ['pages/dashboard/RelationshipsFeature.tsx', 'RELATIONSHIPS_SEO.path'],
     ] as const) {
       const source = read(file);
       expect(source).toContain('useDocumentMeta');
@@ -298,8 +296,10 @@ describe('SEO crawlability contract', () => {
       'pages/dashboard/AboutArabinda.tsx',
     ]) {
       const source = read(file);
-      expect(source).toMatch(/Last updated/i);
+      expect(source).toMatch(/updated=/);
     }
+    // The visible "Last updated" label is rendered by the shared public-page hero.
+    expect(read('components/ui/PublicPageShell.tsx')).toMatch(/Last updated/i);
   });
 
   it('renders a global footer with crawlable links to all public routes', () => {
@@ -311,7 +311,6 @@ describe('SEO crawlability contract', () => {
     expect(footer).toContain("href: RoutePath.FAQ");
     expect(footer).toContain("href: RoutePath.ABOUT");
     expect(footer).toContain("href: RoutePath.PRIVACY");
-    expect(footer).toContain("href: RoutePath.FEATURE_RELATIONSHIPS");
     expect(header).toContain('Public navigation');
     expect(header).toContain('Mobile public navigation');
     expect(header).toContain('href={item.href}');

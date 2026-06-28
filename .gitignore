@@ -19,6 +19,13 @@ dist-ssr
 .worktrees/
 graphify-out/
 
+# Local agent tooling / session artifacts — never commit
+.playwright-mcp/
+.claude/
+.agents/
+.specify/
+.mcp.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

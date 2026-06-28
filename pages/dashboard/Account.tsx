@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Camera } from '@phosphor-icons/react/Camera';
-import { CaretDown } from '@phosphor-icons/react/CaretDown';
 import { Check } from '@phosphor-icons/react/Check';
 import { CircleNotch } from '@phosphor-icons/react/CircleNotch';
 import { DeviceMobile } from '@phosphor-icons/react/DeviceMobile';
@@ -33,8 +32,7 @@ import { offlineStorage } from '../../services/offlineStorage';
 import { useAuthStore } from '../../hooks/useAuthStore';
 import { profileService } from '../../services/profileService';
 import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
-import { aiRunClient, type LifeWikiRunResult } from '../../services/aiRunClient';
-import { getStrictPrivateModeDisabledMessage, isPrivateAiDisabled } from '../../services/privateMode';
+import { isPrivateAiDisabled } from '../../services/privateMode';
 import { getPasswordResetRedirectTo } from '../../src/auth/authRedirectConfig';
 
 const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
@@ -48,7 +46,7 @@ type FeedbackState =
   | {
       variant: 'info' | 'success' | 'warning' | 'error';
       title: string;
-      description: string;
+      description?: string;
     }
   | null;
 
@@ -68,8 +66,6 @@ export const Account: React.FC = () => {
   const [isPasswordResetting, setIsPasswordResetting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeletingData, setIsDeletingData] = useState(false);
-  const [isSmartModeChanging, setIsSmartModeChanging] = useState(false);
-  const [smartModeRun, setSmartModeRun] = useState<LifeWikiRunResult | null>(null);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
 
   const [formData, setFormData] = useState({
@@ -135,10 +131,6 @@ export const Account: React.FC = () => {
       return 'Zero-knowledge mode is active. Your writing stays encrypted, and AI features that require server reading are disabled.';
     }
 
-    if (access?.smartModeEnabled) {
-      return 'Smart Mode is on. Reflections can refresh your Life Wiki after saves while keeping manual Refresh with AI available.';
-    }
-
     if (access?.planTier === 'pro') {
       return 'Pro is active. You have more writing room, on-demand AI reflections, and more Life Wiki refreshes for the weeks when life is a lot.';
     }
@@ -168,14 +160,13 @@ export const Account: React.FC = () => {
       setFeedback({
         variant: 'success',
         title: 'Profile photo updated.',
-        description: 'Your profile photo is now up to date.',
       });
     } catch (err) {
       console.error(err);
       setFeedback({
         variant: 'error',
-        title: 'Avatar upload failed.',
-        description: 'Please try a different image or try again in a moment.',
+        title: "That photo didn't upload.",
+        description: 'Try a different image, or try again in a moment.',
       });
     } finally {
       setLoading(false);
@@ -200,7 +191,6 @@ export const Account: React.FC = () => {
       setFeedback({
         variant: 'success',
         title: 'Changes saved.',
-        description: 'Your account details are now up to date.',
       });
     } catch (err) {
       console.error(err);
@@ -247,67 +237,6 @@ export const Account: React.FC = () => {
       });
     } finally {
       setIsPasswordResetting(false);
-    }
-  };
-
-  const handleSmartModeToggle = async () => {
-    if (!access || isSmartModeChanging) return;
-    if (isPrivateAiDisabled()) {
-      setFeedback({
-        variant: 'info',
-        title: 'Smart Mode is disabled.',
-        description: getStrictPrivateModeDisabledMessage(),
-      });
-      return;
-    }
-
-    const nextEnabled = !access.smartModeEnabled;
-    setIsSmartModeChanging(true);
-    setSmartModeRun(null);
-    setFeedback(null);
-
-    try {
-      const updatedAccess = await profileService.setSmartModeEnabled(nextEnabled);
-      setAccess(updatedAccess);
-
-      if (!nextEnabled) {
-        setFeedback({
-          variant: 'info',
-          title: 'Smart Mode is off.',
-          description: 'Your existing Life Wiki stays readable. Future saves will not refresh it in the background.',
-        });
-        return;
-      }
-
-      try {
-        const result = await aiRunClient.startLifeWikiRefresh({ trigger: 'account_enable' });
-        setSmartModeRun(result);
-
-        setFeedback({
-          variant: result.pageCount > 0 ? 'success' : 'warning',
-          title: result.pageCount > 0 ? 'Smart Mode is ready.' : 'Smart Mode is on.',
-          description:
-            result.pageCount > 0
-              ? 'Your Life Wiki has been refreshed from your saved notes. New saves can keep it up to date while Smart Mode is on.'
-              : 'There was not enough writing to build the Life Wiki yet. It will try again after future saves.',
-        });
-      } catch (ingestError) {
-        console.error(ingestError);
-        setFeedback({
-          variant: 'warning',
-          title: 'Smart Mode is on.',
-          description: 'The first Life Wiki refresh could not finish. It will try again after future saves.',
-        });
-      }
-    } catch (err) {
-      console.error(err);
-      setFeedback({
-        variant: 'error',
-        title: 'Smart Mode could not be changed.',
-        description: 'Please try again in a moment.',
-      });
-    } finally {
-      setIsSmartModeChanging(false);
     }
   };
 
@@ -400,9 +329,8 @@ export const Account: React.FC = () => {
             />
           ) : null}
 
-          <Surface variant="flat" tone="paper" className="overflow-hidden">
-            <form onSubmit={handleSubmit} className="divide-y divide-border/70">
-              <div className="grid gap-10 p-8 lg:grid-cols-[180px_minmax(0,1fr)] lg:p-10">
+          <form onSubmit={handleSubmit} className="space-y-5">
+              <Surface variant="flat" tone="paper" className="grid gap-10 p-8 lg:grid-cols-[180px_minmax(0,1fr)] lg:p-10">
                 <div className="flex flex-col items-center gap-4">
                   <button
                     type="button"
@@ -478,245 +406,106 @@ export const Account: React.FC = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </Surface>
 
-              <div className="grid gap-4 p-6 md:grid-cols-2 lg:p-8">
-                <Surface variant="bezel" tone="paper">
-                  <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors duration-300 hover:bg-gray-text/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green">
-                      <div className="flex items-center gap-3">
-                        <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
-                          <Sparkle size={24} weight="duotone" className="text-green" />
-                        </div>
-                        <div>
-                          <p className="dashboard-caption text-gray-nav/60">Membership</p>
-                          <h3 className="text-[20px] font-display font-bold text-gray-text capitalize group-hover:text-green transition-colors">
-                            {access?.planTier || 'Free'} plan
-                          </h3>
-                        </div>
-                      </div>
-                      <div className="text-gray-nav/40 transition-[color,transform] duration-500 group-open:rotate-180 group-hover:text-green">
-                        <CaretDown size={20} weight="bold" />
-                      </div>
-                    </summary>
-                    <div className="border-t border-border/50 p-5 pt-4 space-y-4">
-                      <div className="flex flex-wrap gap-2">
-                        <MetadataPill tone={access?.planTier === 'pro' ? 'green' : undefined}>
-                          {access?.planTier === 'pro' ? 'Active' : 'Free tier'}
-                        </MetadataPill>
-                      </div>
-                      <p className="text-[14px] font-medium leading-relaxed text-gray-light">{membershipCopy}</p>
-                      {access?.planTier !== 'pro' ? (
-                        <div className="pt-2">
-                          <ProUpgradeCTA />
-                        </div>
-                      ) : null}
-                    </div>
-                  </details>
-                </Surface>
+              <Surface variant="flat" tone="paper" className="space-y-4 p-6 lg:p-8">
+                <div className="flex items-center gap-3">
+                  <div className="icon-block icon-block-sm bg-body">
+                    <Sparkle size={22} weight="duotone" className="text-green" />
+                  </div>
+                  <h3 className="text-xl font-display font-bold text-gray-text">Membership</h3>
+                </div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <MetadataPill tone={access?.planTier === 'pro' ? 'green' : undefined}>
+                    {access?.planTier === 'pro' ? 'Active' : 'Free tier'}
+                  </MetadataPill>
+                  <span className="text-sm font-bold capitalize text-gray-text">{access?.planTier || 'Free'} plan</span>
+                </div>
+                <p className="dashboard-supporting-text">{membershipCopy}</p>
+                {access?.planTier !== 'pro' ? (
+                  <div className="pt-1">
+                    <ProUpgradeCTA />
+                  </div>
+                ) : null}
+              </Surface>
 
-                <Surface variant="bezel" tone="paper">
-                  <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors duration-300 hover:bg-gray-text/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky">
-                      <div className="flex items-center gap-3">
-                        <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
-                          <ShieldCheck size={24} weight="duotone" className="text-sky" />
-                        </div>
-                        <div>
-                          <p className="dashboard-caption text-gray-nav/60">Security</p>
-                          <h3 className="text-[20px] font-display font-bold text-gray-text group-hover:text-sky transition-colors">Keep this private</h3>
-                        </div>
-                      </div>
-                      <div className="text-gray-nav/40 transition-[color,transform] duration-500 group-open:rotate-180 group-hover:text-sky">
-                        <CaretDown size={20} weight="bold" />
-                      </div>
-                    </summary>
-                    <div className="border-t border-border/50 p-5 pt-4 space-y-4">
-                      <div className="space-y-3">
-                        <button
-                          type="button"
-                          onClick={handlePasswordReset}
-                          disabled={isPasswordResetting || !email}
-                          className="surface-inline-panel flex w-full items-center justify-between px-4 py-4 text-left transition-colors hover:border-border/80 disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                          <div className="flex items-center gap-3">
-                            <Key size={20} weight="regular" className="text-gray-nav" />
-                            <div>
-                              <p className="text-[14px] font-bold text-gray-text">Password reset</p>
-                            </div>
-                          </div>
-                          {isPasswordResetting ? (
-                            <CircleNotch size={18} className="animate-spin text-gray-nav" />
-                          ) : (
-                            <EnvelopeSimple size={18} weight="regular" className="text-gray-nav" />
-                          )}
-                        </button>
+              <Surface variant="flat" tone="paper" className="space-y-4 p-6 lg:p-8">
+                <div className="flex items-center gap-3">
+                  <div className="icon-block icon-block-sm bg-body">
+                    <ShieldCheck size={22} weight="duotone" className="text-green" />
+                  </div>
+                  <h3 className="text-xl font-display font-bold text-gray-text">Security</h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={handlePasswordReset}
+                  disabled={isPasswordResetting || !email}
+                  className="surface-inline-panel flex w-full items-center justify-between px-4 py-4 text-left transition-colors hover:border-border/80 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <div className="flex items-center gap-3">
+                    <Key size={20} weight="regular" className="text-gray-nav" />
+                    <p className="text-[14px] font-bold text-gray-text">Password reset</p>
+                  </div>
+                  {isPasswordResetting ? (
+                    <CircleNotch size={18} className="animate-spin text-gray-nav" />
+                  ) : (
+                    <EnvelopeSimple size={18} weight="regular" className="text-gray-nav" />
+                  )}
+                </button>
 
-                        {passwordResetFeedback ? (
-                          <Alert
-                            variant={passwordResetFeedback.variant}
-                            title={passwordResetFeedback.title}
-                            description={passwordResetFeedback.description}
-                            icon={
-                              passwordResetFeedback.variant === 'error' ? (
-                                <Warning size={20} weight="fill" />
-                              ) : (
-                                <EnvelopeSimple size={20} weight="duotone" />
-                              )
-                            }
-                          />
-                        ) : null}
-                      </div>
+                {passwordResetFeedback ? (
+                  <Alert
+                    variant={passwordResetFeedback.variant}
+                    title={passwordResetFeedback.title}
+                    description={passwordResetFeedback.description}
+                    icon={
+                      passwordResetFeedback.variant === 'error' ? (
+                        <Warning size={20} weight="fill" />
+                      ) : (
+                        <EnvelopeSimple size={20} weight="duotone" />
+                      )
+                    }
+                  />
+                ) : null}
 
-                      <div className="surface-inline-panel flex items-center justify-between px-4 py-4 opacity-70">
-                        <div className="flex items-center gap-3">
-                          <DeviceMobile size={20} weight="regular" className="text-gray-nav" />
-                          <div>
-                            <p className="text-[14px] font-bold text-gray-text">Two-factor authentication</p>
-                          </div>
-                        </div>
-                        <MetadataPill>Coming soon</MetadataPill>
-                      </div>
-                    </div>
-                  </details>
-                </Surface>
+                <div className="surface-inline-panel flex items-center justify-between px-4 py-4 opacity-70">
+                  <div className="flex items-center gap-3">
+                    <DeviceMobile size={20} weight="regular" className="text-gray-nav" />
+                    <p className="text-[14px] font-bold text-gray-text">Two-factor authentication</p>
+                  </div>
+                  <MetadataPill>Coming soon</MetadataPill>
+                </div>
+              </Surface>
 
-                <Surface variant="bezel" tone="paper">
-                  <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors duration-300 hover:bg-gray-text/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-honey">
-                      <div className="flex items-center gap-3">
-                        <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12">
-                          <EnvelopeSimple size={24} weight="duotone" className="text-honey" />
-                        </div>
-                        <div>
-                          <p className="dashboard-caption text-gray-nav/60">Invites</p>
-                          <h3 className="text-[20px] font-display font-bold text-gray-text group-hover:text-honey transition-colors">Share Reflections</h3>
-                        </div>
-                      </div>
-                      <div className="text-gray-nav/40 transition-[color,transform] duration-500 group-open:rotate-180 group-hover:text-honey">
-                        <CaretDown size={20} weight="bold" />
-                      </div>
-                    </summary>
-                    <div className="border-t border-border/50 p-5 pt-4 space-y-4">
-                      <p className="text-[14px] font-medium leading-relaxed text-gray-light">
-                        Account tracks how many people joined from your invite. There is no prize or public list.
-                      </p>
-                      <ReferralInvitePanel />
-                    </div>
-                  </details>
-                </Surface>
+              <Surface variant="flat" tone="paper" className="space-y-4 p-6 lg:p-8">
+                <div className="flex items-center gap-3">
+                  <div className="icon-block icon-block-sm bg-body">
+                    <EnvelopeSimple size={22} weight="duotone" className="text-green" />
+                  </div>
+                  <h3 className="text-xl font-display font-bold text-gray-text">Share Reflections</h3>
+                </div>
+                <p className="dashboard-supporting-text">
+                  Account tracks how many people joined from your invite. There is no prize or public list.
+                </p>
+                <ReferralInvitePanel />
+              </Surface>
 
-                <Surface variant="bezel" tone="paper">
-                  <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors duration-300 hover:bg-gray-text/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green">
-                      <div className="flex items-center gap-3">
-                        <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-12">
-                          <Sparkle size={24} weight="duotone" className="text-green" />
-                        </div>
-                        <div>
-                          <p className="dashboard-caption text-gray-nav/60">Life Wiki</p>
-                          <h3 className="text-[20px] font-display font-bold text-gray-text group-hover:text-green transition-colors">Smart Mode</h3>
-                        </div>
-                      </div>
-                      <div className="text-gray-nav/40 transition-[color,transform] duration-500 group-open:rotate-180 group-hover:text-green">
-                        <CaretDown size={20} weight="bold" />
-                      </div>
-                    </summary>
-                    <div className="border-t border-border/50 p-5 pt-4 space-y-4">
-                      <p className="text-[14px] font-medium leading-relaxed text-gray-light">
-                        Smart Mode is unavailable in zero-knowledge mode because the server cannot read your private writing.
-                      </p>
+              <Surface variant="flat" tone="paper" className="space-y-4 p-6 lg:p-8">
+                <div className="flex items-center gap-3">
+                  <div className="icon-block icon-block-sm">
+                    <Warning size={22} weight="duotone" className="text-clay" />
+                  </div>
+                  <h3 className="text-xl font-display font-bold text-clay">Danger zone</h3>
+                </div>
+                <p className="max-w-xl dashboard-supporting-text text-clay/80">
+                  Saved writing and app data will be removed.
+                </p>
+                <Button type="button" variant="danger" onClick={() => setShowDeleteConfirm(true)}>
+                  Delete my data
+                </Button>
+              </Surface>
 
-                      {smartModeRun ? (
-                        <div className="surface-inline-panel p-4">
-                          <p className="dashboard-caption text-gray-nav/60">
-                            Preparing Life Wiki
-                          </p>
-                          <p className="mt-2 text-[14px] font-bold text-gray-text">
-                            {smartModeRun.status === 'skipped'
-                              ? 'No refresh was needed for unchanged writing.'
-                              : `${smartModeRun.pageCount} page${smartModeRun.pageCount === 1 ? '' : 's'} refreshed on the server.`}
-                          </p>
-                        </div>
-                      ) : null}
-
-                      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pt-2">
-                        <div className="space-y-1">
-                          <MetadataPill tone={access?.smartModeEnabled ? 'green' : undefined}>
-                            {isPrivateAiDisabled() ? 'Disabled' : access?.smartModeEnabled ? 'Enabled' : 'Off'}
-                          </MetadataPill>
-                          <p className="text-[12px] font-medium text-gray-light" id="smart-mode-state">
-                            {isPrivateAiDisabled()
-                              ? 'AI and Smart Mode stay off while strict privacy is enabled.'
-                              : isSmartModeChanging
-                              ? 'Updating Smart Mode...'
-                              : access?.smartModeEnabled
-                                ? 'Future saves can refresh the Life Wiki while Smart Mode is on.'
-                                : 'AI stays on demand until you switch this on.'}
-                          </p>
-                        </div>
-                        <button
-                          type="button"
-                          role="switch"
-                          aria-checked={Boolean(access?.smartModeEnabled)}
-                          aria-label={isPrivateAiDisabled() ? 'Smart Mode disabled in zero-knowledge mode' : access?.smartModeEnabled ? 'Turn off Smart Mode' : 'Enable Smart Mode'}
-                          aria-describedby="smart-mode-state"
-                          onClick={handleSmartModeToggle}
-                          disabled={!access || isSmartModeChanging || isPrivateAiDisabled()}
-                          className={`relative flex h-11 w-[156px] shrink-0 items-center rounded-[var(--radius-control)] border px-1.5 transition-[border-color,background-color,opacity] duration-500 ease-out-expo focus:outline-none focus-visible:ring-4 focus-visible:ring-green/15 disabled:pointer-events-none disabled:opacity-50 ${
-                            access?.smartModeEnabled
-                              ? 'border-green/30 bg-green/10 text-green'
-                              : 'control-surface text-gray-nav hover:border-border/80'
-                          }`}
-                        >
-                          <span
-                            className={`absolute h-8 w-8 rounded-[var(--radius-chip)] bg-white shadow-sm shadow-gray-text/10 transition-transform duration-500 ease-out-expo ${
-                              access?.smartModeEnabled ? 'translate-x-[110px]' : 'translate-x-0'
-                            }`}
-                          />
-                          <span className="relative z-10 flex w-full items-center justify-between px-2 label-caps">
-                            <span>{access?.smartModeEnabled ? 'On' : 'Off'}</span>
-                            <span className="text-gray-text">
-                              {isSmartModeChanging ? 'Saving' : 'Smart Mode'}
-                            </span>
-                          </span>
-                        </button>
-                      </div>
-                    </div>
-                  </details>
-                </Surface>
-              </div>
-
-              <div className="p-6 lg:p-8">
-                <Surface variant="bezel" tone="clay">
-                  <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors hover:bg-clay/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-clay">
-                      <div className="flex items-center gap-3">
-                        <div className="icon-block icon-block-sm">
-                          <Warning size={24} weight="duotone" className="text-clay" />
-                        </div>
-                        <div>
-                          <p className="dashboard-caption text-clay/60">Danger zone</p>
-                          <h3 className="text-[20px] font-display font-bold text-clay">Delete account</h3>
-                        </div>
-                      </div>
-                      <div className="text-clay/60 transition-transform duration-300 group-open:rotate-180">
-                        <CaretDown size={20} weight="bold" />
-                      </div>
-                    </summary>
-                    <div className="border-t border-clay/10 p-5 pt-4 space-y-4">
-                      <p className="max-w-xl text-[14px] font-medium leading-relaxed text-clay/80">
-                        Saved writing and app data will be removed.
-                      </p>
-                      <Button type="button" variant="danger" onClick={() => setShowDeleteConfirm(true)}>
-                        Delete my data
-                      </Button>
-                    </div>
-                  </details>
-                </Surface>
-              </div>
-
-              <div className="p-6 lg:p-8">
+              <div className="px-1 pt-1">
                 <div className="sticky-bar !top-auto relative">
                   <button
                     type="button"
@@ -759,8 +548,7 @@ export const Account: React.FC = () => {
                   </div>
                 </div>
               </div>
-            </form>
-          </Surface>
+          </form>
         </div>
       </PageContainer>
 

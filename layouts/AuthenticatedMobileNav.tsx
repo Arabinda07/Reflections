@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Book } from '@phosphor-icons/react/Book';
 import { Bug } from '@phosphor-icons/react/Bug';
 import { CaretRight } from '@phosphor-icons/react/CaretRight';
-import { DotsThreeCircle } from '@phosphor-icons/react/DotsThreeCircle';
+import { DotsThreeVertical } from '@phosphor-icons/react/DotsThreeVertical';
 import { DownloadSimple } from '@phosphor-icons/react/DownloadSimple';
 import { EnvelopeSimple } from '@phosphor-icons/react/EnvelopeSimple';
 import { House } from '@phosphor-icons/react/House';
@@ -87,7 +87,7 @@ export const AUTHENTICATED_MOBILE_TABS: MobileTabItem[] = [
   },
   {
     label: 'More',
-    icon: DotsThreeCircle,
+    icon: DotsThreeVertical,
     matches: isMoreRoute,
   },
 ];

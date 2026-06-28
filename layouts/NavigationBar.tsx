@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Leaf } from '@phosphor-icons/react/Leaf';
+import { MagnifyingGlass } from '@phosphor-icons/react/MagnifyingGlass';
 import { Moon } from '@phosphor-icons/react/Moon';
 import { PaperPlaneTilt } from '@phosphor-icons/react/PaperPlaneTilt';
 import { Sun } from '@phosphor-icons/react/Sun';
@@ -20,6 +21,7 @@ interface NavigationBarProps {
   isMobileMenuOpen: boolean;
   onMobileMenuToggle: () => void;
   onInvite: () => void;
+  onSearch?: () => void;
 }
 
 /**
@@ -33,6 +35,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
   isMobileMenuOpen,
   onMobileMenuToggle,
   onInvite,
+  onSearch,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -87,6 +90,17 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
     </button>
   );
 
+  const SearchButton = onSearch ? (
+    <button
+      onClick={onSearch}
+      className={`relative flex h-11 w-11 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green ${landingControlClass}`}
+      title="Search notes (Ctrl/⌘ K)"
+      aria-label="Search notes"
+    >
+      <MagnifyingGlass size={20} weight="bold" />
+    </button>
+  ) : null;
+
   return (
     <nav
       aria-label="Dashboard navigation"
@@ -118,6 +132,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
           className={`hidden lg:flex items-center gap-1.5 xl:gap-2`}
         >
           {DarkModeToggle}
+          {SearchButton}
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
@@ -184,6 +199,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
 
         {/* Mobile Menu Icon */}
         <div className="flex items-center gap-2 lg:hidden">
+          {SearchButton}
           {DarkModeToggle}
           {!isMobileNavSuppressed && (
             <button

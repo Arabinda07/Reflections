@@ -46,18 +46,21 @@ describe('public review fixes contract', () => {
     const faq = read('pages/dashboard/FAQ.tsx');
     const privacy = read('pages/dashboard/PrivacyPolicy.tsx');
 
-    expect(faq).toContain('faq-editorial-lead');
-    expect(faq).toContain('faq-compact-list');
-    expect(faq).toContain('faq-comparison-band');
-    expect(privacy).toContain('privacy-editorial-lead');
-    expect(privacy).toContain('privacy-compact-list');
-    expect(privacy).toContain('privacy-comparison-band');
+    // Both pages now compose the shared public-page shell; FAQ splits the trust
+    // trio out of the flat detail grid, Privacy keeps a borderless full-policy list.
+    expect(faq).toContain('PublicPageShell');
+    expect(faq).toContain('featuredDetails');
+    expect(privacy).toContain('PublicPageShell');
+    expect(privacy).toContain('The full data picture');
 
     for (const [file, source] of [
       ['FAQ.tsx', faq],
       ['PrivacyPolicy.tsx', privacy],
     ] as const) {
       expect(source, file).not.toContain('transition-all');
+      // No separator rules — grouping comes from whitespace and tone surfaces.
+      expect(source, file).not.toContain('divide-y');
+      expect(source, file).not.toContain('border-b border-border');
     }
   });
 

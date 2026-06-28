@@ -29,7 +29,6 @@ type ThemeModeButtonProps = {
 };
 
 const publicInfoNavItems = [
-  { label: 'Relationships', href: RoutePath.FEATURE_RELATIONSHIPS },
   { label: 'FAQ', href: RoutePath.FAQ },
   { label: 'About', href: RoutePath.ABOUT },
   { label: 'Privacy', href: RoutePath.PRIVACY },
@@ -137,25 +136,6 @@ const HelpBubbleIcon: React.FC<IconProps> = ({ className = '' }) => (
   </svg>
 );
 
-const PeopleSparkIcon: React.FC<IconProps> = ({ className = '' }) => (
-  <svg viewBox="0 0 24 24" aria-hidden="true" className={className} fill="none">
-    <path
-      d="M8.5 11.2a2.9 2.9 0 1 0 0-5.8 2.9 2.9 0 0 0 0 5.8ZM3.9 18.6a4.7 4.7 0 0 1 9.2 0"
-      stroke="currentColor"
-      strokeWidth="1.9"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M16.4 6.5v3.1M18 8h-3.1M17.6 14.1a3.7 3.7 0 0 1 2.5 3.5"
-      stroke="currentColor"
-      strokeWidth="1.9"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
 const HeartLineIcon: React.FC<IconProps> = ({ className = '' }) => (
   <svg viewBox="0 0 24 24" aria-hidden="true" className={className} fill="none">
     <path
@@ -229,7 +209,6 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
 
   const mobileMenuItems = [
     { label: 'Home', href: RoutePath.HOME, icon: HomeLineIcon },
-    { label: 'Relationships', href: RoutePath.FEATURE_RELATIONSHIPS, icon: PeopleSparkIcon },
     { label: 'FAQ', href: RoutePath.FAQ, icon: HelpBubbleIcon },
     { label: 'About', href: RoutePath.ABOUT, icon: HeartLineIcon },
     { label: 'Privacy', href: RoutePath.PRIVACY, icon: ShieldLeafIcon },

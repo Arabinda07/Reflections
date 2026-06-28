@@ -23,7 +23,6 @@ describe('public header regression fixes', () => {
     );
     expect(header).toContain('const HomeLineIcon');
     expect(header).toContain('const HelpBubbleIcon');
-    expect(header).toContain('const PeopleSparkIcon');
     expect(header).toContain('const ShieldLeafIcon');
   });
 
@@ -149,7 +148,6 @@ describe('public header regression fixes', () => {
     expect(header).toContain("label: 'Privacy'");
     expect(header).toContain('icon: HomeLineIcon');
     expect(header).toContain('icon: HelpBubbleIcon');
-    expect(header).toContain('icon: PeopleSparkIcon');
     expect(header).toContain('icon: ShieldLeafIcon');
     expect(header).toContain("label: 'Begin writing'");
     expect(header).toContain('href: RoutePath.SIGNUP');
