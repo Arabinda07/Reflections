@@ -757,6 +757,21 @@ npm exec vitest run
 
 The Vite dev server is configured for port 3000.
 
+### How do I use the local architecture graph?
+
+Graphify outputs are local and ignored by Git. Build a directed graph after checking that the detected corpus excludes `.codex`, `node_modules`, `dist`, native build output, generated binaries, and secrets:
+
+```bash
+graphify . --directed --mode deep
+graphify . --update --directed
+```
+
+If the Windows uv launcher cannot resolve its trampoline, use the equivalent portable form: `uv tool run --from graphifyy graphify <command>`.
+
+Use `graphify query` for broad dependency questions, `graphify path` for end-to-end flows, and `graphify explain` for one module or concept. The most useful project traces are private data to APIs/storage/AI, authentication to crypto sessions, Dexie to Supabase sync, SQL migration state to row mappers, and changed modules to their tests. `graphify hook install` can refresh code relationships after local commits; documentation changes still need the explicit update command.
+
+Keep this lightweight: do not commit `graphify-out`, run it in CI, or add Neo4j/MCP/watch infrastructure unless repeated team use justifies it.
+
 ### How do I run the public SEO audit?
 
 Use:

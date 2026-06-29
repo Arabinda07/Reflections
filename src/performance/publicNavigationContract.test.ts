@@ -51,7 +51,6 @@ describe('public navigation shell contract', () => {
     expect(header).toContain('const AppLeafIcon');
     expect(header).toContain('const HomeLineIcon');
     expect(header).toContain('const HelpBubbleIcon');
-    expect(header).toContain('const PeopleSparkIcon');
     expect(header).toContain('const ShieldLeafIcon');
     expect(header).toContain("import { createPortal } from 'react-dom';");
     expect(header).toContain('public-mobile-menu-sheet');

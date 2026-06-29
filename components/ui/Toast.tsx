@@ -48,7 +48,7 @@ const ToastItem: React.FC<{ toast: ToastData; onDismiss: (id: string) => void }>
 
   return (
     <div
-      className={`pointer-events-auto flex items-center gap-3 rounded-2xl border px-5 py-3.5 shadow-lg shadow-black/5 backdrop-blur-xl text-[13px] font-bold ${variantStyles[toast.variant]} transition-[opacity,transform] duration-300 ease-out-expo transform-gpu ${
+      className={`pointer-events-auto flex items-center gap-3 rounded-2xl border px-5 py-3.5 shadow-lg shadow-black/5 backdrop-blur-xl text-btn-sm font-bold ${variantStyles[toast.variant]} transition-[opacity,transform] duration-300 ease-out-expo transform-gpu ${
         isMounted && !toast.isExiting ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-2 scale-95'
       }`}
       role="status"

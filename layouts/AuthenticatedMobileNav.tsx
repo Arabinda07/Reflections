@@ -3,12 +3,14 @@ import { Link, useLocation } from 'react-router-dom';
 import { Book } from '@phosphor-icons/react/Book';
 import { Bug } from '@phosphor-icons/react/Bug';
 import { CaretRight } from '@phosphor-icons/react/CaretRight';
-import { DotsThreeCircle } from '@phosphor-icons/react/DotsThreeCircle';
+import { SquaresFour } from '@phosphor-icons/react/SquaresFour';
 import { DownloadSimple } from '@phosphor-icons/react/DownloadSimple';
 import { EnvelopeSimple } from '@phosphor-icons/react/EnvelopeSimple';
 import { House } from '@phosphor-icons/react/House';
+import { Heart } from '@phosphor-icons/react/Heart';
+import { List } from '@phosphor-icons/react/List';
 import { Notebook } from '@phosphor-icons/react/Notebook';
-import { PaperPlaneTilt } from '@phosphor-icons/react/PaperPlaneTilt';
+import { UserPlus } from '@phosphor-icons/react/UserPlus';
 import { PencilSimpleLine } from '@phosphor-icons/react/PencilSimpleLine';
 import { Question } from '@phosphor-icons/react/Question';
 import { SignOut } from '@phosphor-icons/react/SignOut';
@@ -56,6 +58,8 @@ const isNoteRoute = (pathname: string) =>
 const isMoreRoute = (pathname: string) =>
   pathname === RoutePath.INSIGHTS ||
   pathname === RoutePath.FUTURE_LETTERS ||
+  pathname === RoutePath.RELATIONSHIPS ||
+  pathname.startsWith(`${RoutePath.RELATIONSHIPS}/`) ||
   pathname === RoutePath.ACCOUNT ||
   pathname === RoutePath.FAQ ||
   pathname === RoutePath.WIKI ||
@@ -84,7 +88,7 @@ export const AUTHENTICATED_MOBILE_TABS: MobileTabItem[] = [
   },
   {
     label: 'More',
-    icon: DotsThreeCircle,
+    icon: SquaresFour,
     matches: isMoreRoute,
   },
 ];
@@ -94,6 +98,7 @@ export const MORE_NAV_GROUPS: MoreNavGroup[] = [
     label: 'Reflect',
     items: [
       { label: 'Insights', path: RoutePath.INSIGHTS, icon: Sparkle },
+      { label: 'Relationships', path: RoutePath.RELATIONSHIPS, icon: Heart },
       { label: 'Future Letters', path: RoutePath.FUTURE_LETTERS, icon: EnvelopeSimple },
       {
         label: 'Life Wiki',
@@ -123,10 +128,10 @@ const isMoreNavItemActive = (item: MoreNavItem, pathname: string) =>
   });
 
 const tabBaseClass =
-  'auth-mobile-tab relative flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-[0.875rem] px-2 py-1 text-[12px] font-bold leading-none transition-[background-color,border-color,color,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
+  'auth-mobile-tab relative flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-[0.875rem] px-2 py-1 text-ui-xs font-bold leading-none transition-[background-color,border-color,color,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
 
 const moreLinkClass =
-  'auth-mobile-more-link flex min-h-11 w-full items-center justify-between gap-3 rounded-[0.9rem] border border-transparent px-2.5 py-1.5 text-left text-[14px] font-bold text-gray-text transition-colors hover:border-green/15 hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
+  'auth-mobile-more-link flex min-h-11 w-full items-center justify-between gap-3 rounded-[0.9rem] border border-transparent px-2.5 py-1.5 text-left text-ui-sm font-bold text-gray-text transition-colors hover:border-green/15 hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
 
 const neutralIconTileClass =
   'auth-mobile-more-icon-tile flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.8rem] bg-green/10 text-green';
@@ -147,13 +152,78 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
   const { canInstall, isInstalled, triggerInstall } = usePWAInstall();
 
   const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const moreSheetId = useId();
 
   const closeMore = () => setIsMoreOpen(false);
 
   useEffect(() => {
+    setIsVisible(true);
     setIsMoreOpen(false);
   }, [location.pathname]);
+
+  useEffect(() => {
+    const scrollContainer = document.getElementById('main-content');
+    if (!scrollContainer) return;
+
+    let lastScrollY = scrollContainer.scrollTop;
+    let startY = 0;
+    const threshold = 10;
+
+    const handleScroll = () => {
+      if (isMoreOpen) return;
+      const currentScrollY = scrollContainer.scrollTop;
+      const maxScrollY = scrollContainer.scrollHeight - scrollContainer.clientHeight;
+
+      if (currentScrollY <= 10) {
+        setIsVisible(true);
+        lastScrollY = currentScrollY;
+        return;
+      }
+      if (currentScrollY >= maxScrollY - 10) {
+        setIsVisible(true);
+        lastScrollY = currentScrollY;
+        return;
+      }
+
+      if (Math.abs(currentScrollY - lastScrollY) > threshold) {
+        if (currentScrollY > lastScrollY) {
+          setIsVisible(false);
+        } else {
+          setIsVisible(true);
+        }
+        lastScrollY = currentScrollY;
+      }
+    };
+
+    const handleTouchStart = (e: TouchEvent) => {
+      startY = e.touches[0].clientY;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isMoreOpen) return;
+      const currentY = e.touches[0].clientY;
+      const diffY = currentY - startY;
+
+      if (Math.abs(diffY) > 20) {
+        if (diffY < 0) {
+          setIsVisible(false);
+        } else {
+          setIsVisible(true);
+        }
+      }
+    };
+
+    scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
+    scrollContainer.addEventListener('touchstart', handleTouchStart, { passive: true });
+    scrollContainer.addEventListener('touchmove', handleTouchMove, { passive: true });
+
+    return () => {
+      scrollContainer.removeEventListener('scroll', handleScroll);
+      scrollContainer.removeEventListener('touchstart', handleTouchStart);
+      scrollContainer.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, [isMoreOpen]);
 
   const handleInvite = () => {
     closeMore();
@@ -175,11 +245,15 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
     closeMore();
   };
 
+  const isNavVisible = isVisible || isMoreOpen;
+
   return (
     <>
       <nav
         aria-label="Signed-in mobile navigation"
-        className="auth-mobile-bottom-nav fixed inset-x-0 bottom-0 z-[95] px-3 pb-[calc(0.45rem+env(safe-area-inset-bottom))] lg:hidden"
+        className={`auth-mobile-bottom-nav fixed inset-x-0 bottom-0 z-[95] px-3 pb-[calc(0.45rem+env(safe-area-inset-bottom))] lg:hidden ${
+          isNavVisible ? '' : 'auth-mobile-bottom-nav--hidden'
+        }`}
       >
         <div className="mx-auto flex min-h-[3.625rem] max-w-[23rem] items-center gap-1 rounded-[1.45rem] border border-border/70 bg-surface/95 p-1 shadow-[0_-10px_28px_-24px_oklch(from_var(--green-shadow)_l_c_h_/_0.28)] backdrop-blur-sm">
           {AUTHENTICATED_MOBILE_TABS.map((tab) => {
@@ -233,6 +307,7 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
         isOpen={isMoreOpen}
         onClose={closeMore}
         title="Navigation"
+        icon={<List size={22} weight="duotone" />}
         size="sm"
         mobilePlacement="bottom"
         closeLabel="Close more navigation"
@@ -244,8 +319,11 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
         <div className="auth-mobile-more-sheet-content space-y-3">
           <nav aria-label="More navigation" className="space-y-3">
             {MORE_NAV_GROUPS.map((group, groupIndex) => (
-              <section key={group.label} className="space-y-1.5">
-                <h3 className="px-1 text-[10px] font-black uppercase tracking-[0.16em] text-gray-nav">
+              <section
+                key={group.label}
+                className={`space-y-1.5 ${groupIndex > 0 ? 'pt-3' : ''}`.trim()}
+              >
+                <h3 className="px-1 text-ui-xs font-black uppercase tracking-[0.16em] text-gray-nav">
                   {group.label}
                 </h3>
                 <div className="space-y-1">
@@ -285,16 +363,16 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
 
           <section
             aria-label="Share actions"
-            className="auth-mobile-more-actions space-y-1.5 border-t border-border/60 pt-3"
+            className="auth-mobile-more-actions space-y-1.5 pt-3"
           >
-            <h3 className="px-1 text-[10px] font-black uppercase tracking-[0.16em] text-gray-nav">
+            <h3 className="px-1 text-ui-xs font-black uppercase tracking-[0.16em] text-gray-nav">
               Share
             </h3>
             <div className="space-y-1">
               <button type="button" onClick={handleInvite} className={moreLinkClass}>
                 <span className="auth-mobile-more-link-content">
                   <span className={neutralIconTileClass}>
-                    <PaperPlaneTilt size={19} weight="regular" aria-hidden="true" />
+                    <UserPlus size={19} weight="regular" aria-hidden="true" />
                   </span>
                   <span>Invite</span>
                 </span>
@@ -324,7 +402,7 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
 
           <section
             aria-label="Session"
-            className="auth-mobile-more-session space-y-1.5 border-t border-border/70 pt-3"
+            className="auth-mobile-more-session space-y-1.5 pt-3"
           >
             <div className="space-y-1">
               <button

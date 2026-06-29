@@ -40,7 +40,7 @@ describe('core app typography and layout contract', () => {
     expect(pages.createNote).toContain('editor-title-input');
     expect(pages.singleNote).toContain('dashboard-prose');
     expect(pages.insights).toContain('core-page-stack');
-    expect(pages.insights).toContain('dashboard-stat-value');
+    expect(pages.insights).toContain('dashboard-prose');
     expect(pages.lifeWiki).toContain('core-page-stack');
     expect(pages.lifeWiki).toContain('dashboard-prose');
     expect(pages.futureLetters).toContain('core-page-stack');

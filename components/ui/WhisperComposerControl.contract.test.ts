@@ -38,7 +38,7 @@ describe('WhisperComposerControl contract', () => {
 
     expect(createNote).not.toContain('label="Voice capture"');
     expect(sidebarWhisper).toContain('gap-3');
-    expect(sidebarWhisper).toContain('text-[13px] font-bold');
+    expect(sidebarWhisper).toContain('text-btn-sm font-bold');
     expect(sidebarWhisper).not.toContain('justify-between');
     expect(sidebarWhisper).not.toContain('CaretRight');
   });

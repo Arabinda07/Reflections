@@ -115,7 +115,6 @@ export const BugReportFlow: React.FC<BugReportFlowProps> = ({ isOpen, onOpenChan
         onClose={() => onOpenChange(false)}
         title="Report a bug"
         description="Tell us what broke or felt off. Add the page or step if you can."
-        icon={<Bug size={20} weight="duotone" />}
         tone="sage"
         size="md"
       >
@@ -136,7 +135,7 @@ export const BugReportFlow: React.FC<BugReportFlowProps> = ({ isOpen, onOpenChan
                 className="input-surface w-full min-h-[160px] resize-none rounded-[20px] p-5 font-serif text-[17px] leading-relaxed placeholder:text-gray-nav/50"
               />
               {submitError && (
-                <p className="text-[12px] font-bold text-clay animate-in fade-in slide-in-from-top-1">
+                <p className="text-ui-xs font-bold text-clay animate-in fade-in slide-in-from-top-1">
                   {submitError}
                 </p>
               )}

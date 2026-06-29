@@ -14,7 +14,7 @@ export const Input: React.FC<InputProps> = ({ label, error, icon: Icon, classNam
   return (
     <div className="w-full space-y-2">
       {label && (
-        <label htmlFor={inputId} className="ml-1 block text-[11px] font-extrabold text-gray-nav dark:text-zinc-300">
+        <label htmlFor={inputId} className="ml-1 block text-ui-xs font-extrabold text-gray-nav dark:text-zinc-300">
           {label}
         </label>
       )}
@@ -25,7 +25,7 @@ export const Input: React.FC<InputProps> = ({ label, error, icon: Icon, classNam
           </div>
         )}
         <input
-          className={`input-surface w-full h-12 px-4 text-[15px] font-semibold placeholder:text-gray-nav placeholder:font-medium disabled:cursor-not-allowed disabled:opacity-50 focus:border-green focus:ring-2 focus:ring-green/10 transition-[background-color,border-color,box-shadow,color] duration-200 ease-out-expo ${
+          className={`input-surface w-full h-12 px-4 text-ui-base font-semibold placeholder:text-gray-nav placeholder:font-medium disabled:cursor-not-allowed disabled:opacity-50 focus:border-green focus:ring-2 focus:ring-green/10 transition-[background-color,border-color,box-shadow,color] duration-200 ease-out-expo ${
             Icon ? 'pl-12' : ''
           } ${error ? 'border-clay' : ''} ${className}`}
           {...props}

@@ -6,6 +6,8 @@ import { RoutePath } from '../types';
 import { noteService } from '../services/noteService';
 import { notePublishingOrchestrator } from '../services/notePublishingOrchestrator';
 import { profileService } from '../services/profileService';
+import { PRIVATE_WRITING_ONBOARDING_VERSION } from '../features/private-writing-onboarding/onboardingContent';
+import { recordOnboardingFunnelEvent } from '../services/onboardingFunnelService';
 import { ritualEventService } from '../services/ritualService';
 import { getMonthlyNoteUsage } from '../services/wellnessPolicy';
 import {
@@ -16,6 +18,7 @@ import {
 
 export interface SaveResult {
   observation: { text: string } | null;
+  wasFirstPrivateReflection: boolean;
 }
 
 interface NoteDraftState {
@@ -108,6 +111,7 @@ export const useNoteDraft = (): NoteDraftState => {
 
   const isUnmountedRef = useRef(false);
   const allowNavigationRef = useRef(false);
+  const existingNoteCountRef = useRef<number | null>(null);
 
   useEffect(() => {
     isUnmountedRef.current = false;
@@ -179,6 +183,7 @@ export const useNoteDraft = (): NoteDraftState => {
         }
 
         const allNotes = await noteService.getAll();
+        existingNoteCountRef.current = allNotes.length;
         const usage = getMonthlyNoteUsage(allNotes, access);
         if (!isUnmountedRef.current) {
           setCanCreateNote(usage.canCreateNote);
@@ -252,7 +257,7 @@ export const useNoteDraft = (): NoteDraftState => {
   // ── Save orchestration ──
   const save = useCallback(async (): Promise<SaveResult> => {
     if (!currentSnapshot.title && !currentSnapshot.content) {
-      return { observation: null };
+      return { observation: null, wasFirstPrivateReflection: false };
     }
 
     setSaving(true);
@@ -292,7 +297,9 @@ export const useNoteDraft = (): NoteDraftState => {
       });
 
       clearTimeout(nuclearTimer);
-      if (isUnmountedRef.current) return { observation: null };
+      if (isUnmountedRef.current) {
+        return { observation: null, wasFirstPrivateReflection: false };
+      }
 
       setExistingAttachments(result.mergedAttachments);
       setNewAttachments([]);
@@ -300,13 +307,21 @@ export const useNoteDraft = (): NoteDraftState => {
       setBaselineSnapshot(savedSnapshot);
       setSaving(false);
 
-      return { observation: result.observation };
+      const wasFirstPrivateReflection = !id && existingNoteCountRef.current === 0;
+      if (wasFirstPrivateReflection) {
+        recordOnboardingFunnelEvent('first_private_reflection_saved', {});
+        recordOnboardingFunnelEvent('onboarding_completed', { source: 'first_reflection_saved' });
+        void profileService.completeOnboarding(PRIVATE_WRITING_ONBOARDING_VERSION);
+        existingNoteCountRef.current = 1;
+      }
+
+      return { observation: result.observation, wasFirstPrivateReflection };
     } catch {
       clearTimeout(nuclearTimer);
       if (!isUnmountedRef.current) {
         setSaving(false);
       }
-      return { observation: null };
+      return { observation: null, wasFirstPrivateReflection: false };
     }
   }, [
     currentSnapshot.title,

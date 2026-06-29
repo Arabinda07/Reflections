@@ -3,6 +3,8 @@ import type { LifeTheme, ThemeCitation, Note } from '../types';
 import { WikiPageType, STRUCTURED_WIKI_PAGES } from './wikiTypes';
 import { mapToNote, type SupabaseNoteRow } from './noteService';
 import { getAuthenticatedUserId } from './authUtils';
+import type { EncryptedEnvelope } from './cryptoService';
+import { decryptEnvelope, encryptedColumns, rowAad } from './encryptedPayload';
 
 const VALID_THEME_STATES = new Set<LifeTheme['state']>(['active', 'archived', 'resolved']);
 const parseThemeState = (raw: string): LifeTheme['state'] =>
@@ -17,6 +19,7 @@ export interface SupabaseLifeThemeRow {
   page_type: string;
   created_at: string;
   updated_at: string;
+  encrypted_payload?: EncryptedEnvelope | null;
 }
 
 export interface SupabaseThemeCitationRow {
@@ -30,6 +33,8 @@ export interface SupabaseThemeCitationRow {
 // ─────────────────────────────────────────────
 // Mappers
 // ─────────────────────────────────────────────
+const wikiAad = rowAad('life_themes');
+
 const mapToLifeTheme = (data: SupabaseLifeThemeRow): LifeTheme => ({
   id: data.id,
   userId: data.user_id,
@@ -40,6 +45,20 @@ const mapToLifeTheme = (data: SupabaseLifeThemeRow): LifeTheme => ({
   createdAt: data.created_at,
   updatedAt: data.updated_at,
 });
+
+const mapEncryptedLifeTheme = async (data: SupabaseLifeThemeRow): Promise<LifeTheme> => {
+  const payload = await decryptEnvelope<Pick<LifeTheme, 'title' | 'content'>>(
+    data.encrypted_payload,
+    wikiAad(data.user_id, data.id),
+  );
+  if (!payload) return mapToLifeTheme(data);
+
+  return {
+    ...mapToLifeTheme(data),
+    title: payload.title,
+    content: payload.content,
+  };
+};
 
 const mapToThemeCitation = (data: SupabaseThemeCitationRow): ThemeCitation => ({
   id: data.id,
@@ -71,7 +90,7 @@ export const wikiService = {
       .order('updated_at', { ascending: false });
 
     if (error) throw error;
-    return (data || []).map(mapToLifeTheme);
+    return Promise.all(((data || []) as SupabaseLifeThemeRow[]).map(mapEncryptedLifeTheme));
   },
 
   /**
@@ -89,7 +108,7 @@ export const wikiService = {
       .order('updated_at', { ascending: false });
 
     if (error) throw error;
-    return (data || []).map(mapToLifeTheme);
+    return Promise.all(((data || []) as SupabaseLifeThemeRow[]).map(mapEncryptedLifeTheme));
   },
 
   /**
@@ -106,7 +125,7 @@ export const wikiService = {
       .single();
 
     if (error) return null;
-    return mapToLifeTheme(data);
+    return mapEncryptedLifeTheme(data as SupabaseLifeThemeRow);
   },
 
   /**
@@ -114,21 +133,23 @@ export const wikiService = {
    */
   createTheme: async (title: string, content: string): Promise<LifeTheme> => {
     const userId = await getAuthenticatedUserId();
-
+    const id = crypto.randomUUID();
     const { data, error } = await supabase
       .from('life_themes')
       .insert({
+        id,
         user_id: userId,
-        title,
-        content,
+        title: 'Encrypted theme',
+        content: '',
         state: 'active',
         page_type: 'theme',
+        ...(await encryptedColumns({ title, content }, wikiAad(userId, id))),
       })
       .select()
       .single();
 
     if (error) throw error;
-    return mapToLifeTheme(data);
+    return mapEncryptedLifeTheme(data as SupabaseLifeThemeRow);
   },
 
   /**
@@ -136,17 +157,22 @@ export const wikiService = {
    */
   updateThemeContent: async (themeId: string, newContent: string): Promise<LifeTheme> => {
     const userId = await getAuthenticatedUserId();
-
+    const existingTheme = await wikiService.getThemeById(themeId);
+    if (!existingTheme) throw new Error('Theme not found.');
     const { data, error } = await supabase
       .from('life_themes')
-      .update({ content: newContent })
+      .update({
+        content: '',
+        ...(await encryptedColumns({ title: existingTheme.title, content: newContent }, wikiAad(userId, themeId))),
+        updated_at: new Date().toISOString(),
+      })
       .eq('id', themeId)
       .eq('user_id', userId)
       .select()
       .single();
 
     if (error) throw error;
-    return mapToLifeTheme(data);
+    return mapEncryptedLifeTheme(data as SupabaseLifeThemeRow);
   },
 
   // ── Structured Wiki Pages ─────────────────
@@ -163,10 +189,10 @@ export const wikiService = {
       .select('*')
       .eq('user_id', userId)
       .eq('page_type', pageType)
-      .single();
+      .maybeSingle();
 
-    if (error) return null;
-    return mapToLifeTheme(data);
+    if (error || !data) return null;
+    return mapEncryptedLifeTheme(data as SupabaseLifeThemeRow);
   },
 
   /**
@@ -184,7 +210,7 @@ export const wikiService = {
       .eq('state', 'active');
 
     if (error) throw error;
-    return (data || []).map(mapToLifeTheme);
+    return Promise.all(((data || []) as SupabaseLifeThemeRow[]).map(mapEncryptedLifeTheme));
   },
 
   /**
@@ -197,18 +223,20 @@ export const wikiService = {
     content: string
   ): Promise<LifeTheme> => {
     const userId = await getAuthenticatedUserId();
-
-    // Single atomic upsert on (user_id, page_type) — avoids two round-trips
-    // and eliminates the race condition in concurrent refresh calls.
+    const existing = await wikiService.getWikiPage(pageType);
+    const id = existing?.id || crypto.randomUUID();
     const { data, error } = await supabase
       .from('life_themes')
       .upsert(
         {
+          id,
           user_id: userId,
           page_type: pageType,
-          title,
-          content,
+          title: 'Encrypted wiki page',
+          content: '',
           state: 'active',
+          ...(await encryptedColumns({ title, content }, wikiAad(userId, id))),
+          updated_at: new Date().toISOString(),
         },
         { onConflict: 'user_id,page_type' }
       )
@@ -216,7 +244,7 @@ export const wikiService = {
       .single();
 
     if (error) throw error;
-    return mapToLifeTheme(data);
+    return mapEncryptedLifeTheme(data as SupabaseLifeThemeRow);
   },
 
   // ── Citations ─────────────────────────────

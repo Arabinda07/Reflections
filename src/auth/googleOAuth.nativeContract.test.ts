@@ -7,12 +7,12 @@ const read = (filePath: string) =>
 
 describe('native Google OAuth contract', () => {
   it('keeps the app callback aligned between auth code and Android deep links', () => {
+    const config = read('src/auth/authRedirectConfig.ts');
     const auth = read('src/auth/googleOAuth.ts');
     const manifest = read('android/app/src/main/AndroidManifest.xml');
 
-    expect(auth).toContain(
-      "const NATIVE_GOOGLE_AUTH_REDIRECT_URL = 'com.arabinda.reflections://auth/callback';",
-    );
+    expect(config).toContain("const NATIVE_OAUTH_REDIRECT_TO = 'com.arabinda.reflections://auth/callback';");
+    expect(auth).toContain('getOAuthRedirectTo');
     expect(manifest).toContain('android:scheme="com.arabinda.reflections"');
     expect(manifest).toContain('android:host="auth"');
     expect(manifest).toContain('android:pathPrefix="/callback"');

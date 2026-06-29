@@ -14,100 +14,24 @@ import {
   getTrialChargeDateLabel,
   type BillingPeriod,
 } from '../../src/config/pricingCatalog';
+import {
+  getPaymentErrorMessage,
+  getRazorpayThemeColor,
+  loadRazorpay,
+  readPaymentApiResponse,
+  PAYMENT_NOT_CONFIGURED_ERROR,
+  PAYMENT_VERIFY_ERROR,
+  RAZORPAY_LOAD_ERROR,
+  SIGN_IN_AGAIN_ERROR,
+  type CreateSubscriptionResponse,
+  type VerifyPaymentResponse,
+} from './proUpgradePayments';
 
 interface ProUpgradeCTAProps {
   onSuccess?: () => void;
   className?: string;
   variant?: 'card' | 'fullscreen';
 }
-
-interface PaymentApiResponse<T> {
-  data: T | null;
-  error: string | null;
-}
-
-interface CreateSubscriptionResponse {
-  keyId?: string;
-  subscriptionId?: string;
-}
-
-interface VerifyPaymentResponse {
-  ok?: boolean;
-  message?: string;
-}
-
-const PAYMENT_SETUP_ERROR = 'Payment setup failed. Check the server logs for this request.';
-const PAYMENT_NOT_CONFIGURED_ERROR = 'Payment setup is not configured yet.';
-const PAYMENT_VERIFY_ERROR = 'Payment went through, but we could not verify it yet. Contact support with the payment ID.';
-const SIGN_IN_AGAIN_ERROR = 'Please sign in again before starting payment.';
-const RAZORPAY_LOAD_ERROR = 'Could not load Razorpay. Check your connection and try again.';
-const RESPONSE_PREVIEW_LIMIT = 180;
-
-export const readPaymentApiResponse = async <T,>(
-  response: Response,
-  endpoint: string,
-): Promise<PaymentApiResponse<T>> => {
-  const text = await response.text();
-  const preview = text.slice(0, RESPONSE_PREVIEW_LIMIT);
-
-  if (!text.trim()) {
-    if (!response.ok) {
-      console.error('[payments] Empty API response', {
-        endpoint,
-        status: response.status,
-      });
-    }
-
-    return { data: null, error: null };
-  }
-
-  try {
-    return { data: JSON.parse(text) as T, error: null };
-  } catch (error) {
-    console.error('[payments] Non-JSON API response', {
-      endpoint,
-      status: response.status,
-      preview,
-      error,
-    });
-
-    return { data: null, error: PAYMENT_SETUP_ERROR };
-  }
-};
-
-const getPaymentErrorMessage = (
-  response: Response,
-  parsed: PaymentApiResponse<{ error?: string | null }>,
-  fallback: string,
-) => {
-  const serverError = parsed.data?.error || parsed.error;
-
-  if (serverError === 'Razorpay plan is not configured' || serverError === 'Razorpay keys are missing in environment variables') {
-    return PAYMENT_NOT_CONFIGURED_ERROR;
-  }
-
-  if (response.status === 401) {
-    return SIGN_IN_AGAIN_ERROR;
-  }
-
-  return serverError || fallback;
-};
-
-const getRazorpayThemeColor = () => {
-  if (typeof document === 'undefined' || !document.body) {
-    return 'var(--honey)';
-  }
-
-  const probe = document.createElement('span');
-  probe.style.color = 'var(--honey)';
-  probe.style.position = 'absolute';
-  probe.style.visibility = 'hidden';
-  document.body.appendChild(probe);
-  const color = getComputedStyle(probe).color;
-  probe.remove();
-
-  return color || 'var(--honey)';
-};
 
 export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, className = '', variant = 'card' }) => {
   useAuthStore();
@@ -119,38 +43,6 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
   const [wantsNewsletter, setWantsNewsletter] = useState(false);
   const trialChargeDateLabel = useMemo(() => getTrialChargeDateLabel(), []);
   const selectedPlanDetails = PRO_PRICING_PLANS[selectedPlan];
-
-  const loadRazorpay = () => {
-    return new Promise<boolean>((resolve) => {
-      if ((window as any).Razorpay) {
-        resolve(true);
-        return;
-      }
-
-      const existingScript = document.querySelector<HTMLScriptElement>('script[data-razorpay-checkout="true"]');
-      if (existingScript) {
-        if (existingScript.dataset.razorpayFailed === 'true') {
-          existingScript.remove();
-        } else {
-          existingScript.addEventListener('load', () => resolve(true), { once: true });
-          existingScript.addEventListener('error', () => resolve(false), { once: true });
-          return;
-        }
-      }
-
-      const script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      script.async = true;
-      script.dataset.razorpayCheckout = 'true';
-      script.onload = () => resolve(true);
-      script.onerror = () => {
-        script.dataset.razorpayFailed = 'true';
-        script.remove();
-        resolve(false);
-      };
-      document.body.appendChild(script);
-    });
-  };
 
   const openPaywall = () => {
     setIsModalOpen(true);
@@ -233,13 +125,6 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
 
             setIsUnlocked(true);
             await supabase.auth.refreshSession();
-            
-            if (onSuccess) {
-              setTimeout(() => {
-                setIsModalOpen(false);
-                onSuccess();
-              }, 4000);
-            }
           } catch (err: any) {
             setError(err.message || 'Payment verification failed');
             setIsProcessing(false);
@@ -257,14 +142,14 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
 
       const rzp = new (window as any).Razorpay(options);
       rzp.on('payment.failed', function (response: any) {
-        setError(response?.error?.description || 'Payment failed. Please try again.');
+        setError(response?.error?.description || "That payment didn't go through. You haven't been charged — try again.");
         setIsProcessing(false);
       });
       
       rzp.open();
     } catch (err: any) {
       console.error('Subscription error:', err);
-      setError(err.message || 'Please try again later.');
+      setError(err.message || "Checkout didn't start. You haven't been charged. Try again in a moment.");
       setIsProcessing(false);
     }
   };
@@ -280,7 +165,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
       isOpen={isModalOpen}
       onClose={closePaywall}
       title="More room when life gets loud"
-      icon={<Crown size={20} weight="duotone" />}
+      icon={<Crown size={22} weight="duotone" />}
       size="md"
       tone="honey"
       panelClassName="modal-sheet-panel--compact"
@@ -318,7 +203,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
               ))}
             </div>
 
-            <ul className="space-y-2 border-y border-border/50 py-3">
+            <ul className="space-y-3 py-3">
               {features.map((feature) => (
                 <li key={feature} className="flex items-center gap-3 text-sm font-semibold text-gray-text">
                   <CheckCircle size={16} weight="fill" className="text-honey" />
@@ -370,6 +255,16 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
             <p className="text-base font-medium text-gray-light leading-relaxed max-w-[280px]">
               Pro access activates as soon as Razorpay confirms the subscription. First charge is scheduled for {trialChargeDateLabel}.
             </p>
+            <Button
+              variant="primary"
+              className="mt-8 h-12 px-8 rounded-[var(--radius-control)] !bg-honey !text-white border-none hover:opacity-90"
+              onClick={() => {
+                setIsModalOpen(false);
+                onSuccess?.();
+              }}
+            >
+              Start writing
+            </Button>
           </div>
         )}
       </div>
@@ -390,7 +285,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
             </p>
           </div>
 
-          <div className="border-y border-border/50 py-5 text-left space-y-4">
+          <div className="py-5 text-left space-y-4">
             {features.map((feature) => (
               <div key={feature} className="flex items-center gap-3">
                 <CheckCircle size={20} weight="fill" className="text-honey" />
@@ -415,27 +310,25 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
 
   return (
     <>
-      <div className={`border-t border-border/50 pt-6 surface-tone-honey ${className}`}>
-        <div className="flex flex-col justify-between gap-5 md:flex-row md:items-center">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-honey">
+      <div className={`surface-tone-sage rounded-[var(--radius-panel)] p-5 ${className}`}>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between items-start gap-4">
+          <div className="space-y-2 max-w-lg">
+            <div className="flex items-center gap-2 text-green">
               <Crown size={18} weight="fill" />
               <span className="label-caps">Reflections Pro</span>
             </div>
             <p className="text-sm font-medium leading-relaxed text-gray-light">
-              More space for the weeks when life is a lot.
+              Unlimited notes and more AI reflections, for the weeks when life is a lot.
             </p>
           </div>
 
-          <div className="flex flex-col gap-2 md:items-end">
-            <Button
-              variant="primary"
-              className="w-full md:w-auto h-12 px-6 rounded-[var(--radius-control)] !bg-honey !text-white border-none hover:opacity-90 whitespace-nowrap"
-              onClick={openPaywall}
-            >
-              Start my free trial
-            </Button>
-          </div>
+          <Button
+            variant="primary"
+            className="w-fit h-12 px-6 rounded-[var(--radius-control)] whitespace-nowrap"
+            onClick={openPaywall}
+          >
+            Start my free trial
+          </Button>
         </div>
       </div>
       {renderSubscriptionModal()}

@@ -13,6 +13,29 @@ This document turns the Reflections voice into practical rules for product copy,
 7. Never imply clinical, therapeutic, or diagnostic authority.
 8. Never make absence feel like failure.
 
+## Public Site Copy
+
+Public pages can carry a slightly more poetic brand line when the nearby copy explains the actual product behavior. The headline may create feeling; the supporting line must make the promise concrete.
+
+Rules:
+
+- A poetic H1 is allowed when the next sentence names the product category or action.
+- The hero should still make privacy, writing, and optional reflection easy to understand.
+- Do not let a metaphor imply that Reflections can organize, diagnose, or fully understand a person's mind.
+- Keep the primary CTA direct and action-based.
+
+Good:
+
+> Your mind beautifully organized
+>
+> A private journal for writing what's on your mind, noticing patterns, and reflecting only when you're ready.
+
+Avoid:
+
+> Your mind beautifully organized
+>
+> Let AI decode your inner world and transform your life.
+
 ## Sentence Style
 
 Use:
@@ -509,4 +532,3 @@ Feedback:
 - Delete account
 - This cannot be undone.
 - Your saved notes will be deleted from Reflections.
-

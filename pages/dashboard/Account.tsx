@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
 import { Camera } from '@phosphor-icons/react/Camera';
 import { CaretDown } from '@phosphor-icons/react/CaretDown';
 import { Check } from '@phosphor-icons/react/Check';
@@ -21,6 +22,7 @@ import { Alert } from '../../components/ui/Alert';
 import { MetadataPill } from '../../components/ui/MetadataPill';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { PageContainer } from '../../components/ui/PageContainer';
+import { Tooltip } from '../../components/ui/Tooltip';
 import { ReferralInvitePanel } from '../../components/ui/ReferralInvitePanel';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { StorageImage } from '../../components/ui/StorageImage';
@@ -33,9 +35,40 @@ import { offlineStorage } from '../../services/offlineStorage';
 import { useAuthStore } from '../../hooks/useAuthStore';
 import { profileService } from '../../services/profileService';
 import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
-import { aiRunClient, type LifeWikiRunResult } from '../../services/aiRunClient';
+import { isPrivateAiDisabled } from '../../services/privateMode';
+import { getPasswordResetRedirectTo } from '../../src/auth/authRedirectConfig';
 
 const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
+
+const TIMEZONE_OPTIONS = [
+  { value: 'Etc/GMT+12', label: 'GMT-12:00 (International Date Line West)' },
+  { value: 'Pacific/Honolulu', label: 'GMT-10:00 (Hawaii)' },
+  { value: 'America/Anchorage', label: 'GMT-09:00 (Alaska)' },
+  { value: 'America/Los_Angeles', label: 'GMT-08:00 (Pacific Time)' },
+  { value: 'America/Denver', label: 'GMT-07:00 (Mountain Time)' },
+  { value: 'America/Chicago', label: 'GMT-06:00 (Central Time)' },
+  { value: 'America/New_York', label: 'GMT-05:00 (Eastern Time)' },
+  { value: 'America/Halifax', label: 'GMT-04:00 (Atlantic Time)' },
+  { value: 'America/Argentina/Buenos_Aires', label: 'GMT-03:00 (Buenos Aires)' },
+  { value: 'Atlantic/South_Georgia', label: 'GMT-02:00 (Mid-Atlantic)' },
+  { value: 'Atlantic/Azores', label: 'GMT-01:00 (Azores)' },
+  { value: 'UTC', label: 'GMT+00:00 (Greenwich Mean Time / UTC)' },
+  { value: 'Europe/London', label: 'GMT+00:00 (London)' },
+  { value: 'Europe/Paris', label: 'GMT+01:00 (Central European Time)' },
+  { value: 'Europe/Kyiv', label: 'GMT+02:00 (Eastern European Time)' },
+  { value: 'Europe/Moscow', label: 'GMT+03:00 (Moscow)' },
+  { value: 'Asia/Dubai', label: 'GMT+04:00 (Gulf Standard Time)' },
+  { value: 'Asia/Karachi', label: 'GMT+05:00 (Pakistan Standard Time)' },
+  { value: 'Asia/Kolkata', label: 'GMT+05:30 (India Standard Time)' },
+  { value: 'Asia/Dhaka', label: 'GMT+06:00 (Bangladesh Time)' },
+  { value: 'Asia/Bangkok', label: 'GMT+07:00 (Indochina Time)' },
+  { value: 'Asia/Singapore', label: 'GMT+08:00 (Singapore / Beijing)' },
+  { value: 'Asia/Tokyo', label: 'GMT+09:00 (Japan Standard Time)' },
+  { value: 'Australia/Adelaide', label: 'GMT+09:30 (Central Australia Time)' },
+  { value: 'Australia/Sydney', label: 'GMT+10:00 (Eastern Australia Time)' },
+  { value: 'Pacific/Guadalcanal', label: 'GMT+11:00 (Solomon Islands)' },
+  { value: 'Pacific/Auckland', label: 'GMT+12:00 (New Zealand Time)' },
+];
 
 const getAuthAvatarPath = (metadata: Record<string, unknown> | undefined) => {
   const avatar = metadata?.avatar_url || metadata?.picture || metadata?.avatar;
@@ -46,13 +79,13 @@ type FeedbackState =
   | {
       variant: 'info' | 'success' | 'warning' | 'error';
       title: string;
-      description: string;
+      description?: string;
     }
   | null;
 
 export const Account: React.FC = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated, logout } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [isSaved, setIsSaved] = useState(false);
@@ -66,9 +99,8 @@ export const Account: React.FC = () => {
   const [isPasswordResetting, setIsPasswordResetting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeletingData, setIsDeletingData] = useState(false);
-  const [isSmartModeChanging, setIsSmartModeChanging] = useState(false);
-  const [smartModeRun, setSmartModeRun] = useState<LifeWikiRunResult | null>(null);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
+  const timezoneDetailsRef = useRef<HTMLDetailsElement | null>(null);
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -129,8 +161,8 @@ export const Account: React.FC = () => {
   }, [isSaved]);
 
   const membershipCopy = useMemo(() => {
-    if (access?.smartModeEnabled) {
-      return 'Smart Mode is on. Reflections can refresh your Life Wiki after saves while keeping manual Refresh with AI available.';
+    if (isPrivateAiDisabled()) {
+      return 'Zero-knowledge mode is active. Your writing stays encrypted, and AI features that require server reading are disabled.';
     }
 
     if (access?.planTier === 'pro') {
@@ -162,14 +194,13 @@ export const Account: React.FC = () => {
       setFeedback({
         variant: 'success',
         title: 'Profile photo updated.',
-        description: 'Your profile photo is now up to date.',
       });
     } catch (err) {
       console.error(err);
       setFeedback({
         variant: 'error',
-        title: 'Avatar upload failed.',
-        description: 'Please try a different image or try again in a moment.',
+        title: "That photo didn't upload.",
+        description: 'Try a different image, or try again in a moment.',
       });
     } finally {
       setLoading(false);
@@ -194,7 +225,6 @@ export const Account: React.FC = () => {
       setFeedback({
         variant: 'success',
         title: 'Changes saved.',
-        description: 'Your account details are now up to date.',
       });
     } catch (err) {
       console.error(err);
@@ -209,7 +239,7 @@ export const Account: React.FC = () => {
   };
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    await logout();
     navigate(RoutePath.LOGIN);
   };
 
@@ -222,7 +252,7 @@ export const Account: React.FC = () => {
 
     try {
       const response = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}${RoutePath.AUTH_CALLBACK}?next=${RoutePath.RESET_PASSWORD}`,
+        redirectTo: getPasswordResetRedirectTo(),
       });
 
       if (response.error) throw response.error;
@@ -230,7 +260,7 @@ export const Account: React.FC = () => {
       setPasswordResetFeedback({
         variant: 'info',
         title: 'Password reset email sent.',
-        description: 'Check your inbox for a secure recovery link.',
+        description: 'This restores sign-in first. If your private writing uses your account password, recovery will reconnect it after reset.',
       });
     } catch (err) {
       console.error(err);
@@ -241,59 +271,6 @@ export const Account: React.FC = () => {
       });
     } finally {
       setIsPasswordResetting(false);
-    }
-  };
-
-  const handleSmartModeToggle = async () => {
-    if (!access || isSmartModeChanging) return;
-
-    const nextEnabled = !access.smartModeEnabled;
-    setIsSmartModeChanging(true);
-    setSmartModeRun(null);
-    setFeedback(null);
-
-    try {
-      const updatedAccess = await profileService.setSmartModeEnabled(nextEnabled);
-      setAccess(updatedAccess);
-
-      if (!nextEnabled) {
-        setFeedback({
-          variant: 'info',
-          title: 'Smart Mode is off.',
-          description: 'Your existing Life Wiki stays readable. Future saves will not refresh it in the background.',
-        });
-        return;
-      }
-
-      try {
-        const result = await aiRunClient.startLifeWikiRefresh({ trigger: 'account_enable' });
-        setSmartModeRun(result);
-
-        setFeedback({
-          variant: result.pageCount > 0 ? 'success' : 'warning',
-          title: result.pageCount > 0 ? 'Smart Mode is ready.' : 'Smart Mode is on.',
-          description:
-            result.pageCount > 0
-              ? 'Your Life Wiki has been refreshed from your saved notes. New saves can keep it up to date while Smart Mode is on.'
-              : 'There was not enough writing to build the Life Wiki yet. It will try again after future saves.',
-        });
-      } catch (ingestError) {
-        console.error(ingestError);
-        setFeedback({
-          variant: 'warning',
-          title: 'Smart Mode is on.',
-          description: 'The first Life Wiki refresh could not finish. It will try again after future saves.',
-        });
-      }
-    } catch (err) {
-      console.error(err);
-      setFeedback({
-        variant: 'error',
-        title: 'Smart Mode could not be changed.',
-        description: 'Please try again in a moment.',
-      });
-    } finally {
-      setIsSmartModeChanging(false);
     }
   };
 
@@ -317,20 +294,7 @@ export const Account: React.FC = () => {
     setFeedback(null);
 
     try {
-      const notes = await noteService.getAll();
-      const storedPaths = Array.from(
-        new Set(
-          [
-            avatarPath,
-            ...notes.flatMap((note) => [
-              note.thumbnailUrl,
-              ...(note.attachments || []).map((attachment) => attachment.path),
-            ]),
-          ].filter((path): path is string => Boolean(path && !path.startsWith('blob:'))),
-        ),
-      );
-
-      await storageService.deleteFiles(storedPaths);
+      await storageService.deleteUserPrefix(userId);
 
       const { error } = await supabase.rpc('delete_user_data');
       if (error) throw error;
@@ -338,7 +302,7 @@ export const Account: React.FC = () => {
       await offlineStorage.clearUserData(userId);
       setShowDeleteConfirm(false);
 
-      await supabase.auth.signOut();
+      await logout();
       navigate(RoutePath.LOGIN, {
         replace: true,
         state: {
@@ -370,14 +334,18 @@ export const Account: React.FC = () => {
     <>
       <PageContainer className="surface-scope-paper page-wash pb-24 pt-6 md:pt-10">
         <div className="core-page-stack">
+          <button
+            type="button"
+            onClick={() => navigate(RoutePath.DASHBOARD)}
+            className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-green/5 hover:text-green"
+            aria-label="Back to home"
+          >
+            <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
+            <span>Back</span>
+          </button>
+
           <SectionHeader
-            eyebrow="Account"
             title="Your account settings"
-            icon={
-              <div className="icon-block icon-block-lg">
-                <User size={34} weight="duotone" />
-              </div>
-            }
           />
 
           {feedback ? (
@@ -399,365 +367,264 @@ export const Account: React.FC = () => {
             />
           ) : null}
 
-          <Surface variant="flat" tone="paper" className="overflow-hidden">
-            <form onSubmit={handleSubmit} className="divide-y divide-border/70">
-              <div className="grid gap-10 p-8 lg:grid-cols-[180px_minmax(0,1fr)] lg:p-10">
-                <div className="flex flex-col items-center gap-4">
-                  <button
-                    type="button"
-                    className="relative group transition-transform duration-500 hover:scale-105"
-                    onClick={() => avatarInputRef.current?.click()}
-                    aria-label="Upload a new profile photo"
-                  >
-                    <div className="surface-inline-panel h-32 w-32 overflow-hidden rounded-full border-4 border-white/50 shadow-xl shadow-gray-text/10 transition-[border-color,box-shadow,transform] duration-500 group-hover:border-green/50 group-hover:shadow-green/10">
-                      {avatarPath ? (
-                        <StorageImage path={avatarPath} alt="Profile" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center text-gray-nav transition-colors group-hover:text-green">
-                          <User size={48} weight="duotone" />
+          <form onSubmit={handleSubmit} className="space-y-5">
+              <Surface variant="flat" tone="paper" className="p-5 sm:p-8 lg:p-10 space-y-8 sm:space-y-12 lg:space-y-14">
+                <div className="grid gap-6 lg:gap-10 lg:grid-cols-[180px_minmax(0,1fr)]">
+                  <div className="flex flex-col items-center gap-4">
+                    <Tooltip label="Upload new profile photo">
+                      <button
+                        type="button"
+                        className="relative group transition-transform duration-500 hover:scale-105"
+                        onClick={() => avatarInputRef.current?.click()}
+                        aria-label="Upload a new profile photo"
+                      >
+                        <div className="surface-inline-panel h-32 w-32 overflow-hidden rounded-[2.25rem] border-4 border-white bg-surface shadow-xl shadow-gray-text/10 transition-[border-color,box-shadow,transform] duration-500 group-hover:border-green/50 group-hover:shadow-green/10">
+                          {avatarPath ? (
+                            <StorageImage path={avatarPath} alt="Profile" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center text-gray-nav transition-colors group-hover:text-green">
+                              <User size={48} weight="duotone" />
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                    <div className="absolute bottom-1 right-1 flex h-11 w-11 items-center justify-center rounded-full border-4 border-white bg-gray-text text-white shadow-xl shadow-gray-text/15 transition-[background-color,box-shadow,transform] duration-500 group-hover:bg-green group-hover:scale-110">
-                      <Camera size={18} weight="bold" className="transition-transform group-hover:rotate-12" />
-                    </div>
-                  </button>
-                  <input
-                    id="avatar-upload"
-                    ref={avatarInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleAvatarChange}
-                  />
+                        <div className="absolute bottom-1 right-1 flex h-11 w-11 items-center justify-center rounded-xl border-4 border-white bg-gray-text text-white shadow-xl shadow-gray-text/15 transition-[background-color,box-shadow,transform] duration-500 group-hover:bg-green group-hover:scale-110">
+                          <Camera size={18} weight="bold" className="transition-transform group-hover:rotate-12" />
+                        </div>
+                      </button>
+                    </Tooltip>
+                    <input
+                      id="avatar-upload"
+                      ref={avatarInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleAvatarChange}
+                    />
 
-                  {lastSignIn ? (
-                    <MetadataPill>
-                      Last sign-in {new Date(lastSignIn).toLocaleDateString()}
-                    </MetadataPill>
+                    {lastSignIn ? (
+                      <MetadataPill>
+                        Last sign-in {new Date(lastSignIn).toLocaleDateString()}
+                      </MetadataPill>
+                    ) : null}
+                  </div>
+
+                  <div className="space-y-8">
+                    <div className="grid gap-6 md:grid-cols-2">
+                      <div className="w-full max-w-md">
+                        <Input
+                          id="account-full-name"
+                          label="Full Name"
+                          name="fullName"
+                          value={formData.fullName}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <div className="w-full max-w-md">
+                        <Input
+                          id="account-display-name"
+                          label="Display Name"
+                          name="displayName"
+                          value={formData.displayName}
+                          onChange={handleChange}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid gap-6 md:grid-cols-2">
+                      <div className="w-full max-w-md">
+                        <Input id="account-email" label="Email" name="email" value={email} disabled />
+                      </div>
+
+                      <div className="w-full max-w-md space-y-2">
+                        <label htmlFor="account-timezone" className="ml-1 block text-ui-xs font-extrabold text-gray-nav">Timezone</label>
+                        <details id="account-timezone" ref={timezoneDetailsRef} className="relative w-full">
+                          <summary className="input-surface flex h-12 w-full cursor-pointer list-none items-center justify-between px-4 text-ui-base font-semibold text-gray-text [&::-webkit-details-marker]:hidden">
+                            <span>{TIMEZONE_OPTIONS.find((opt) => opt.value === formData.timezone)?.label || formData.timezone}</span>
+                            <CaretDown size={16} weight="bold" className="text-gray-nav transition-transform" />
+                          </summary>
+                          <div className="absolute left-0 right-0 z-20 mt-1 max-h-60 overflow-y-auto rounded-xl border border-border bg-surface py-1 shadow-card wellness-scroll">
+                            {TIMEZONE_OPTIONS.map((option) => (
+                              <button
+                                key={option.value}
+                                type="button"
+                                onClick={() => {
+                                  setFormData((previous) => ({ ...previous, timezone: option.value }));
+                                  if (timezoneDetailsRef.current) timezoneDetailsRef.current.open = false;
+                                }}
+                                className={`block w-full px-4 py-2.5 text-left text-sm font-bold hover:bg-green/5 ${
+                                  option.value === formData.timezone ? 'text-green bg-green/5' : 'text-gray-text'
+                                }`}
+                              >
+                                {option.label}
+                              </button>
+                            ))}
+                          </div>
+                        </details>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-6 sm:pt-10 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="icon-block icon-block-sm bg-body">
+                      <Sparkle size={22} weight="duotone" className="text-green" />
+                    </div>
+                    <h3 className="text-xl font-display font-bold text-gray-text">Membership</h3>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3">
+                    {access?.planTier === 'pro' ? (
+                      <MetadataPill tone="green">Active</MetadataPill>
+                    ) : null}
+                    <span className="text-sm font-bold capitalize text-gray-text">{access?.planTier || 'Free'} plan</span>
+                  </div>
+                  <p className="dashboard-supporting-text">{membershipCopy}</p>
+                  {access?.planTier !== 'pro' ? (
+                    <div className="pt-1">
+                      <ProUpgradeCTA />
+                    </div>
                   ) : null}
                 </div>
 
-                <div className="space-y-8">
-                  <div className="grid gap-6 md:grid-cols-2">
-                    <Input
-                      id="account-full-name"
-                      label="Full Name"
-                      name="fullName"
-                      value={formData.fullName}
-                      onChange={handleChange}
-                    />
-                    <Input
-                      id="account-display-name"
-                      label="Display Name"
-                      name="displayName"
-                      value={formData.displayName}
-                      onChange={handleChange}
-                    />
+                <div className="pt-6 sm:pt-10 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="icon-block icon-block-sm bg-body">
+                      <ShieldCheck size={22} weight="duotone" className="text-green" />
+                    </div>
+                    <h3 className="text-xl font-display font-bold text-gray-text">Security</h3>
                   </div>
 
-                  <div className="grid gap-6 md:grid-cols-2">
-                    <Input id="account-email" label="Email" name="email" value={email} disabled />
+                  <div className="space-y-1">
+                    <button
+                      type="button"
+                      onClick={handlePasswordReset}
+                      disabled={isPasswordResetting || !email}
+                      className="group flex w-full items-center justify-between px-2 py-4 text-left transition-colors hover:bg-green/5 rounded-xl disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Key size={18} weight="duotone" className="text-gray-light" />
+                        <span className="text-sm font-bold text-gray-text">Password reset</span>
+                      </div>
+                      {isPasswordResetting ? (
+                        <CircleNotch size={18} className="animate-spin text-gray-nav" />
+                      ) : (
+                        <EnvelopeSimple size={18} weight="duotone" className="text-gray-light transition-transform duration-300 group-hover:scale-110 group-hover:-translate-y-1 group-hover:text-green" />
+                      )}
+                    </button>
 
-                    <div className="w-full space-y-2">
-                      <label htmlFor="account-timezone" className="ml-1 block text-[11px] font-extrabold text-gray-nav">Timezone</label>
-                      <select
-                        id="account-timezone"
-                        name="timezone"
-                        value={formData.timezone}
-                        onChange={handleChange}
-                        className="input-surface h-12 w-full px-4 text-[15px] font-semibold text-gray-text"
-                      >
-                        <option value="UTC">UTC</option>
-                        <option value="America/New_York">Eastern Time</option>
-                        <option value="America/Los_Angeles">Pacific Time</option>
-                        <option value="Europe/London">London</option>
-                        <option value="Asia/Kolkata">India (IST)</option>
-                      </select>
+                    {passwordResetFeedback ? (
+                      <div className="py-3">
+                        <Alert
+                          variant={passwordResetFeedback.variant}
+                          title={passwordResetFeedback.title}
+                          description={passwordResetFeedback.description}
+                          icon={
+                            passwordResetFeedback.variant === 'error' ? (
+                              <Warning size={20} weight="fill" />
+                            ) : (
+                              <EnvelopeSimple size={20} weight="duotone" />
+                            )
+                          }
+                        />
+                      </div>
+                    ) : null}
+
+                    <div className="flex items-center justify-between px-2 py-4 opacity-60">
+                      <div className="flex items-center gap-3">
+                        <DeviceMobile size={20} weight="regular" className="text-gray-nav" />
+                        <span className="text-sm font-bold text-gray-text">Two-factor authentication</span>
+                      </div>
+                      <MetadataPill>Coming soon</MetadataPill>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="grid gap-4 p-6 md:grid-cols-2 lg:p-8">
-                <Surface variant="bezel" tone="paper">
-                  <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors duration-300 hover:bg-gray-text/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green">
-                      <div className="flex items-center gap-3">
-                        <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
-                          <Sparkle size={24} weight="duotone" className="text-green" />
-                        </div>
-                        <div>
-                          <p className="dashboard-caption text-gray-nav/60">Membership</p>
-                          <h3 className="text-[20px] font-display font-bold text-gray-text capitalize group-hover:text-green transition-colors">
-                            {access?.planTier || 'Free'} plan
-                          </h3>
-                        </div>
-                      </div>
-                      <div className="text-gray-nav/40 transition-[color,transform] duration-500 group-open:rotate-180 group-hover:text-green">
-                        <CaretDown size={20} weight="bold" />
-                      </div>
-                    </summary>
-                    <div className="border-t border-border/50 p-5 pt-4 space-y-4">
-                      <div className="flex flex-wrap gap-2">
-                        <MetadataPill tone={access?.planTier === 'pro' ? 'green' : undefined}>
-                          {access?.planTier === 'pro' ? 'Active' : 'Free tier'}
-                        </MetadataPill>
-                      </div>
-                      <p className="text-[14px] font-medium leading-relaxed text-gray-light">{membershipCopy}</p>
-                      {access?.planTier !== 'pro' ? (
-                        <div className="pt-2">
-                          <ProUpgradeCTA />
-                        </div>
-                      ) : null}
+                <div className="pt-6 sm:pt-10 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="icon-block icon-block-sm bg-body">
+                      <EnvelopeSimple size={22} weight="duotone" className="text-green" />
                     </div>
-                  </details>
-                </Surface>
+                    <h3 className="text-xl font-display font-bold text-gray-text">Share Reflections</h3>
+                  </div>
+                  <p className="dashboard-supporting-text">
+                    Account tracks how many people joined from your invite. There is no prize or public list.
+                  </p>
+                  <ReferralInvitePanel />
+                </div>
+              </Surface>
 
-                <Surface variant="bezel" tone="paper">
-                  <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors duration-300 hover:bg-gray-text/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky">
-                      <div className="flex items-center gap-3">
-                        <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
-                          <ShieldCheck size={24} weight="duotone" className="text-sky" />
-                        </div>
-                        <div>
-                          <p className="dashboard-caption text-gray-nav/60">Security</p>
-                          <h3 className="text-[20px] font-display font-bold text-gray-text group-hover:text-sky transition-colors">Keep this private</h3>
-                        </div>
+              <Surface variant="flat" tone="clay" className="-mx-5 px-5 py-5 sm:mx-0 sm:px-6 lg:p-8 rounded-none sm:rounded-3xl border-y sm:border border-clay/10 bg-clay/5">
+                <div className="flex flex-col justify-between gap-5 md:flex-row md:items-center">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <div className="icon-block icon-block-sm bg-clay/10">
+                        <Warning size={22} weight="duotone" className="text-clay" />
                       </div>
-                      <div className="text-gray-nav/40 transition-[color,transform] duration-500 group-open:rotate-180 group-hover:text-sky">
-                        <CaretDown size={20} weight="bold" />
-                      </div>
-                    </summary>
-                    <div className="border-t border-border/50 p-5 pt-4 space-y-4">
-                      <div className="space-y-3">
-                        <button
-                          type="button"
-                          onClick={handlePasswordReset}
-                          disabled={isPasswordResetting || !email}
-                          className="surface-inline-panel flex w-full items-center justify-between px-4 py-4 text-left transition-colors hover:border-border/80 disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                          <div className="flex items-center gap-3">
-                            <Key size={20} weight="regular" className="text-gray-nav" />
-                            <div>
-                              <p className="text-[14px] font-bold text-gray-text">Password reset</p>
-                            </div>
-                          </div>
-                          {isPasswordResetting ? (
-                            <CircleNotch size={18} className="animate-spin text-gray-nav" />
-                          ) : (
-                            <EnvelopeSimple size={18} weight="regular" className="text-gray-nav" />
-                          )}
-                        </button>
-
-                        {passwordResetFeedback ? (
-                          <Alert
-                            variant={passwordResetFeedback.variant}
-                            title={passwordResetFeedback.title}
-                            description={passwordResetFeedback.description}
-                            icon={
-                              passwordResetFeedback.variant === 'error' ? (
-                                <Warning size={20} weight="fill" />
-                              ) : (
-                                <EnvelopeSimple size={20} weight="duotone" />
-                              )
-                            }
-                          />
-                        ) : null}
-                      </div>
-
-                      <div className="surface-inline-panel flex items-center justify-between px-4 py-4 opacity-70">
-                        <div className="flex items-center gap-3">
-                          <DeviceMobile size={20} weight="regular" className="text-gray-nav" />
-                          <div>
-                            <p className="text-[14px] font-bold text-gray-text">Two-factor authentication</p>
-                          </div>
-                        </div>
-                        <MetadataPill>Coming soon</MetadataPill>
-                      </div>
+                      <h3 className="text-xl font-display font-bold text-clay">Danger zone</h3>
                     </div>
-                  </details>
-                </Surface>
-
-                <Surface variant="bezel" tone="paper">
-                  <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors duration-300 hover:bg-gray-text/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-honey">
-                      <div className="flex items-center gap-3">
-                        <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12">
-                          <EnvelopeSimple size={24} weight="duotone" className="text-honey" />
-                        </div>
-                        <div>
-                          <p className="dashboard-caption text-gray-nav/60">Invites</p>
-                          <h3 className="text-[20px] font-display font-bold text-gray-text group-hover:text-honey transition-colors">Share Reflections</h3>
-                        </div>
-                      </div>
-                      <div className="text-gray-nav/40 transition-[color,transform] duration-500 group-open:rotate-180 group-hover:text-honey">
-                        <CaretDown size={20} weight="bold" />
-                      </div>
-                    </summary>
-                    <div className="border-t border-border/50 p-5 pt-4 space-y-4">
-                      <p className="text-[14px] font-medium leading-relaxed text-gray-light">
-                        Account tracks how many people joined from your invite. There is no prize or public list.
-                      </p>
-                      <ReferralInvitePanel />
-                    </div>
-                  </details>
-                </Surface>
-
-                <Surface variant="bezel" tone="paper">
-                  <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors duration-300 hover:bg-gray-text/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green">
-                      <div className="flex items-center gap-3">
-                        <div className="icon-block icon-block-sm bg-body transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-12">
-                          <Sparkle size={24} weight="duotone" className="text-green" />
-                        </div>
-                        <div>
-                          <p className="dashboard-caption text-gray-nav/60">Life Wiki</p>
-                          <h3 className="text-[20px] font-display font-bold text-gray-text group-hover:text-green transition-colors">Smart Mode</h3>
-                        </div>
-                      </div>
-                      <div className="text-gray-nav/40 transition-[color,transform] duration-500 group-open:rotate-180 group-hover:text-green">
-                        <CaretDown size={20} weight="bold" />
-                      </div>
-                    </summary>
-                    <div className="border-t border-border/50 p-5 pt-4 space-y-4">
-                      <p className="text-[14px] font-medium leading-relaxed text-gray-light">
-                        Keep AI on demand by default, or let Smart Mode refresh the Life Wiki after saves. Your writing screen stays quiet either way.
-                      </p>
-
-                      {smartModeRun ? (
-                        <div className="surface-inline-panel p-4">
-                          <p className="dashboard-caption text-gray-nav/60">
-                            Preparing Life Wiki
-                          </p>
-                          <p className="mt-2 text-[14px] font-bold text-gray-text">
-                            {smartModeRun.status === 'skipped'
-                              ? 'No refresh was needed for unchanged writing.'
-                              : `${smartModeRun.pageCount} page${smartModeRun.pageCount === 1 ? '' : 's'} refreshed on the server.`}
-                          </p>
-                        </div>
-                      ) : null}
-
-                      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pt-2">
-                        <div className="space-y-1">
-                          <MetadataPill tone={access?.smartModeEnabled ? 'green' : undefined}>
-                            {access?.smartModeEnabled ? 'Enabled' : 'Off'}
-                          </MetadataPill>
-                          <p className="text-[12px] font-medium text-gray-light" id="smart-mode-state">
-                            {isSmartModeChanging
-                              ? 'Updating Smart Mode...'
-                              : access?.smartModeEnabled
-                                ? 'Future saves can refresh the Life Wiki while Smart Mode is on.'
-                                : 'AI stays on demand until you switch this on.'}
-                          </p>
-                        </div>
-                        <button
-                          type="button"
-                          role="switch"
-                          aria-checked={Boolean(access?.smartModeEnabled)}
-                          aria-label={access?.smartModeEnabled ? 'Turn off Smart Mode' : 'Enable Smart Mode'}
-                          aria-describedby="smart-mode-state"
-                          onClick={handleSmartModeToggle}
-                          disabled={!access || isSmartModeChanging}
-                          className={`relative flex h-11 w-[156px] shrink-0 items-center rounded-[var(--radius-control)] border px-1.5 transition-[border-color,background-color,opacity] duration-500 ease-out-expo focus:outline-none focus-visible:ring-4 focus-visible:ring-green/15 disabled:pointer-events-none disabled:opacity-50 ${
-                            access?.smartModeEnabled
-                              ? 'border-green/30 bg-green/10 text-green'
-                              : 'control-surface text-gray-nav hover:border-border/80'
-                          }`}
-                        >
-                          <span
-                            className={`absolute h-8 w-8 rounded-[var(--radius-chip)] bg-white shadow-sm shadow-gray-text/10 transition-transform duration-500 ease-out-expo ${
-                              access?.smartModeEnabled ? 'translate-x-[110px]' : 'translate-x-0'
-                            }`}
-                          />
-                          <span className="relative z-10 flex w-full items-center justify-between px-2 label-caps">
-                            <span>{access?.smartModeEnabled ? 'On' : 'Off'}</span>
-                            <span className="text-gray-text">
-                              {isSmartModeChanging ? 'Saving' : 'Smart Mode'}
-                            </span>
-                          </span>
-                        </button>
-                      </div>
-                    </div>
-                  </details>
-                </Surface>
-              </div>
-
-              <div className="p-6 lg:p-8">
-                <Surface variant="bezel" tone="clay">
-                  <details className="group marker:content-['']">
-                    <summary className="list-none flex cursor-pointer items-center justify-between p-5 outline-none transition-colors hover:bg-clay/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-clay">
-                      <div className="flex items-center gap-3">
-                        <div className="icon-block icon-block-sm">
-                          <Warning size={24} weight="duotone" className="text-clay" />
-                        </div>
-                        <div>
-                          <p className="dashboard-caption text-clay/60">Danger zone</p>
-                          <h3 className="text-[20px] font-display font-bold text-clay">Delete account</h3>
-                        </div>
-                      </div>
-                      <div className="text-clay/60 transition-transform duration-300 group-open:rotate-180">
-                        <CaretDown size={20} weight="bold" />
-                      </div>
-                    </summary>
-                    <div className="border-t border-clay/10 p-5 pt-4 space-y-4">
-                      <p className="max-w-xl text-[14px] font-medium leading-relaxed text-clay/80">
-                        Saved writing and app data will be removed.
-                      </p>
-                      <Button type="button" variant="danger" onClick={() => setShowDeleteConfirm(true)}>
+                    <p className="max-w-xl dashboard-supporting-text text-clay/80">
+                      Saved writing and app data will be removed.
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-2 items-start md:items-end">
+                    <Tooltip label="Permanently delete all your data">
+                      <Button type="button" variant="danger" onClick={() => setShowDeleteConfirm(true)} className="w-fit h-12 px-6 rounded-[var(--radius-control)] whitespace-nowrap">
                         Delete my data
                       </Button>
-                    </div>
-                  </details>
-                </Surface>
-              </div>
+                    </Tooltip>
+                  </div>
+                </div>
+              </Surface>
 
-              <div className="p-6 lg:p-8">
-                <div className="sticky-bar !top-auto relative">
-                  <button
-                    type="button"
-                    onClick={handleSignOut}
-                    className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-[var(--radius-control)] px-2 label-caps text-gray-nav transition-[background-color,color] hover:bg-clay/5 hover:text-clay sm:min-w-0"
-                    aria-label="Sign out of your account"
-                  >
-                    <SignOut size={20} weight="regular" />
-                    <span className="hidden sm:inline">Sign out</span>
-                  </button>
-
-                  <div className="flex items-center gap-3">
-                    <Button
+              <div className="px-1 pt-1">
+                <div className="sticky-bar !top-auto relative flex items-center justify-between gap-4 p-4">
+                  <Tooltip label="Sign out securely" placement="top">
+                    <button
                       type="button"
-                      variant="secondary"
-                      onClick={() => navigate(-1)}
-                      className="px-4 sm:px-6"
-                      aria-label="Discard account changes"
+                      onClick={handleSignOut}
+                      className="flex h-12 w-12 md:h-auto md:w-auto items-center justify-center gap-2 rounded-xl border border-clay/10 bg-clay/5 px-0 md:px-4 md:py-2.5 text-sm font-bold text-clay transition-all hover:bg-clay/10 active:scale-[0.98]"
+                      aria-label="Sign out of your account"
                     >
-                      <X size={18} weight="regular" className="sm:mr-2" />
-                      <span className="hidden sm:inline">Cancel</span>
-                    </Button>
-                    <Button
-                      type="submit"
-                      disabled={loading || isSaved}
-                      className="px-4 sm:px-8"
-                      aria-label="Save account changes"
-                    >
-                      {loading ? (
-                        <CircleNotch size={18} className="animate-spin sm:mr-2" />
-                      ) : isSaved ? (
-                        <Check size={18} weight="regular" className="sm:mr-2" />
-                      ) : (
-                        <FloppyDisk size={18} weight="regular" className="sm:mr-2" />
-                      )}
-                      <span className="hidden sm:inline">
-                        {loading ? 'Saving...' : isSaved ? 'Saved' : 'Save changes'}
-                      </span>
-                    </Button>
+                      <SignOut size={20} weight="bold" />
+                      <span className="hidden md:inline">Sign out</span>
+                    </button>
+                  </Tooltip>
+
+                  <div className="flex items-center gap-4">
+                    <Tooltip label="Discard unsaved changes" placement="top">
+                      <button
+                        type="button"
+                        onClick={() => navigate(-1)}
+                        className="flex h-12 w-12 md:h-auto md:w-auto items-center justify-center gap-2 rounded-xl border border-border bg-surface px-0 md:px-4 md:py-2.5 text-sm font-bold text-gray-nav transition-all hover:bg-green/5 hover:text-green active:scale-[0.98]"
+                        aria-label="Discard account changes"
+                      >
+                        <X size={20} weight="bold" />
+                        <span className="hidden md:inline">Cancel</span>
+                      </button>
+                    </Tooltip>
+                    <Tooltip label="Save your profile updates" placement="top">
+                      <button
+                        type="submit"
+                        disabled={loading || isSaved}
+                        className="flex h-12 w-12 md:h-auto md:w-auto items-center justify-center gap-2 rounded-xl bg-green px-0 md:px-5 md:py-2.5 text-sm font-bold text-white transition-all hover:bg-green-hover active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+                        aria-label="Save account changes"
+                      >
+                        {loading ? (
+                          <CircleNotch size={20} className="animate-spin" />
+                        ) : isSaved ? (
+                          <Check size={20} weight="bold" />
+                        ) : (
+                          <FloppyDisk size={20} weight="regular" />
+                        )}
+                        <span className="hidden md:inline">
+                          {loading ? 'Saving...' : isSaved ? 'Saved' : 'Save changes'}
+                        </span>
+                      </button>
+                    </Tooltip>
                   </div>
                 </div>
               </div>
-            </form>
-          </Surface>
+          </form>
         </div>
       </PageContainer>
 
@@ -765,7 +632,7 @@ export const Account: React.FC = () => {
         isOpen={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
         title="Delete your saved writing"
-        icon={<Trash size={20} weight="duotone" />}
+        icon={<Trash size={22} weight="duotone" />}
         size="md"
         tone="clay"
         footer={
@@ -782,7 +649,7 @@ export const Account: React.FC = () => {
           </div>
         }
       >
-        <div className="space-y-4 text-[14px] font-medium leading-relaxed text-gray-light">
+        <div className="space-y-4 text-ui-sm font-medium leading-relaxed text-gray-light">
           <p>
             This removes your saved notes, moods, tags, tasks, and profile row from the app. It also removes stored attachments and avatar files before we close your session.
           </p>

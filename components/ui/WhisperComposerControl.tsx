@@ -71,7 +71,7 @@ export const WhisperComposerControl: React.FC<WhisperComposerControlProps> = ({
       </button>
 
       {whisper.feedback ? (
-        <p className="mt-2 text-[12px] font-bold leading-relaxed text-clay" aria-live="polite">
+        <p className="mt-2 text-ui-xs font-bold leading-relaxed text-clay" aria-live="polite">
           {whisper.feedback}
         </p>
       ) : null}

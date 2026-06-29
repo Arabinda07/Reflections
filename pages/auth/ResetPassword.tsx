@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle } from '@phosphor-icons/react/CheckCircle';
-import { LockKey } from '@phosphor-icons/react/LockKey';
 import { Warning } from '@phosphor-icons/react/Warning';
 import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
@@ -10,6 +9,7 @@ import { SectionHeader } from '../../components/ui/SectionHeader';
 import { Surface } from '../../components/ui/Surface';
 import { RoutePath } from '../../types';
 import { supabase } from '../../src/supabaseClient';
+import { storePendingResetAccountPassword } from '../../features/private-writing-recovery/resetPasswordRecoveryHandoff';
 
 export const ResetPassword: React.FC = () => {
   const navigate = useNavigate();
@@ -62,6 +62,26 @@ export const ResetPassword: React.FC = () => {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
 
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user?.id) {
+        const { data: encryptionRow, error: encryptionError } = await supabase
+          .from('user_encryption_keys')
+          .select('unlock_method')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (encryptionError) throw encryptionError;
+
+        if (encryptionRow?.unlock_method === 'account_password') {
+          storePendingResetAccountPassword(password, user.id);
+          navigate(RoutePath.RECOVER_PRIVATE_WRITING, { replace: true });
+          return;
+        }
+      }
+
       setFeedback({
         variant: 'success',
         title: 'Password updated.',
@@ -94,11 +114,6 @@ export const ResetPassword: React.FC = () => {
             <SectionHeader
               eyebrow="Recovery"
               title="Create a new password"
-              icon={
-                <div className="icon-block icon-block-md">
-                  <LockKey size={24} weight="duotone" />
-                </div>
-              }
             />
 
             {feedback ? (

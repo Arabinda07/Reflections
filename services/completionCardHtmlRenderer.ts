@@ -36,22 +36,21 @@ const buildCompletionCardElement = (payload: CompletionCardPayload) => {
     'box-sizing:border-box',
     'padding:48px',
     'font-family:Manrope,system-ui,sans-serif',
-    'color:#293127',
-    'background:linear-gradient(135deg,#f0f4ec,#f7f8f4 52%,#f4f6f0)',
+    'color:#DDE3D5',
+    'background:linear-gradient(135deg,#191D18,#1F251E 55%,#161A15)',
   ].join(';');
   card.innerHTML = `
-    <div style="box-sizing:border-box;width:100%;height:100%;border:2px solid #d8dfd1;border-radius:36px;background:rgba(251,252,248,.88);padding:56px;display:flex;flex-direction:column;justify-content:space-between;">
+    <div style="box-sizing:border-box;width:100%;height:100%;border:2px solid #2C3329;border-radius:36px;background:#232820;padding:56px;display:flex;flex-direction:column;justify-content:space-between;">
       <header style="display:flex;align-items:center;gap:16px;">
-        <span style="width:44px;height:44px;border-radius:50%;background:#4f6f46;display:inline-flex;align-items:center;justify-content:center;color:#f7f8f4;font-weight:800;">R</span>
-        <strong style="font-family:Spectral,serif;font-style:italic;font-size:30px;color:#4f6f46;">${escapeHtml(payload.brand)}</strong>
+        <strong style="font-family:Spectral,serif;font-style:italic;font-size:30px;color:#8FCB82;">${escapeHtml(payload.brand)}</strong>
       </header>
       <main>
-        <h1 style="max-width:820px;margin:0 0 28px;font-size:64px;line-height:1.14;letter-spacing:0;font-weight:800;">${escapeHtml(payload.title)}</h1>
-        <p style="margin:0;font-size:26px;line-height:1.45;color:#65705e;font-weight:600;">${escapeHtml(payload.subtitle)}</p>
+        <h1 style="max-width:820px;margin:0 0 28px;font-size:64px;line-height:1.14;letter-spacing:0;font-weight:800;color:#DDE3D5;">${escapeHtml(payload.title)}</h1>
+        <p style="margin:0;font-size:26px;line-height:1.45;color:#9AA391;font-weight:600;">${escapeHtml(payload.subtitle)}</p>
       </main>
       <footer style="display:flex;align-items:center;justify-content:space-between;gap:24px;">
-        <span style="display:inline-flex;align-items:center;height:38px;border-radius:999px;border:1.5px solid #ddd0c0;background:#f2ece5;padding:0 20px;color:#8a6a4a;font-size:16px;font-weight:800;text-transform:uppercase;">${escapeHtml(payload.badge)}</span>
-        <span style="color:#819076;font-size:20px;font-weight:800;">${escapeHtml(payload.dateLabel)}</span>
+        <span style="display:inline-flex;align-items:center;height:38px;border-radius:999px;border:1.5px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);padding:0 20px;color:#C7B69A;font-size:16px;font-weight:800;text-transform:uppercase;">${escapeHtml(payload.badge)}</span>
+        <span style="color:#9AA391;font-size:20px;font-weight:800;">${escapeHtml(payload.dateLabel)}</span>
       </footer>
     </div>
   `;

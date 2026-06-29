@@ -1,17 +1,12 @@
-import { Archive } from '@phosphor-icons/react/Archive';
 import { ArrowsClockwise } from '@phosphor-icons/react/ArrowsClockwise';
 import { Brain } from '@phosphor-icons/react/Brain';
 import { CaretRight } from '@phosphor-icons/react/CaretRight';
 import { CheckCircle as CheckCircleIcon } from '@phosphor-icons/react/CheckCircle';
 import { EnvelopeSimple } from '@phosphor-icons/react/EnvelopeSimple';
-import { Feather } from '@phosphor-icons/react/Feather';
 import { FolderOpen } from '@phosphor-icons/react/FolderOpen';
 import { Heart } from '@phosphor-icons/react/Heart';
 import { ListChecks } from '@phosphor-icons/react/ListChecks';
-import { LockKey } from '@phosphor-icons/react/LockKey';
-import { NotePencil } from '@phosphor-icons/react/NotePencil';
 import { Plus } from '@phosphor-icons/react/Plus';
-import { Sparkle } from '@phosphor-icons/react/Sparkle';
 import { Target } from '@phosphor-icons/react/Target';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -23,11 +18,17 @@ import { Button } from '../../components/ui/Button';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { useToast } from '../../components/ui/Toast';
 import { WhisperComposerControl } from '../../components/ui/WhisperComposerControl';
+import { useCrypto } from '../../context/CryptoContext';
+import {
+  PrivateWritingOnboardingFlow,
+  usePrivateWritingOnboarding,
+} from '../../features/private-writing-onboarding';
 import { useAuthStore } from '../../hooks/useAuthStore';
 import { useHaptics } from '../../hooks/useHaptics';
 import { moodCheckinService } from '../../services/moodService';
 import { noteService } from '../../services/noteService';
 import { DEFAULT_WELLNESS_PROMPTS } from '../../services/wellnessPrompts';
+import { hasPendingAccountPassword } from '../../src/auth/accountPasswordHandoff';
 import { supabase } from '../../src/supabaseClient';
 import { Note, RoutePath } from '../../types';
 import {
@@ -39,58 +40,8 @@ import {
 import { getMoodConfig } from './moodConfig';
 import { MoodPicker, type MoodPickerStage } from './MoodPicker';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
+import { RelationshipHomeModule } from './RelationshipHomeModule';
 
-
-const WRITING_NOTES = [
-  {
-    text: 'Start with the sentence that keeps trying to get your attention.',
-    author: 'Julia Cameron',
-  },
-  {
-    text: 'You do not need to explain the whole day. One true detail is enough.',
-    author: 'Natalie Goldberg',
-  },
-  {
-    text: 'Write what happened. Then write what stayed with you.',
-    author: 'Joan Didion',
-  },
-  { text: 'If the thought feels messy, put it down messy.', author: 'Natalie Goldberg' },
-  { text: 'Notice the thing you keep circling. It may be asking for a name.', author: 'Julia Cameron' },
-  { text: 'You do not have to be certain before you start writing.', author: 'Reflections' },
-];
-
-const ONBOARDING_STEPS = [
-  {
-    label: 'Intro',
-    title: 'A private space for notes',
-    body:
-      'This is a private journal for your writing. Use it to get thoughts down and come back to them later.',
-    note: 'One honest line is already enough to begin.',
-  },
-  {
-    label: 'Focus',
-    title: 'Focus on the writing',
-    body:
-      'Start with one sentence. Write what you need to say and let the page hold the rest.',
-    note: 'The page can hold the unfinished part too.',
-  },
-  {
-    label: 'Privacy',
-    title: 'Private and secure',
-    body:
-      'Your notes stay with you. AI only runs if you specifically ask it to help you find a pattern.',
-    note: 'Support appears only when you invite it in.',
-  },
-  {
-    label: 'Ready',
-    title: 'Ready to start',
-    body:
-      'Start with a blank note or use a daily focus prompt. Your archived reflections are always available.',
-    note: 'When you are ready, begin with the smallest true thing.',
-  },
-];
-
-const onboardingStepIcons = [NotePencil, Feather, LockKey, Archive] as const;
 
 const prefetchCreateNoteRoute = () => {
   void import('@/pages/dashboard/CreateNote');
@@ -131,20 +82,12 @@ const rememberHomeHeroIntroSeen = () => {
   }
 };
 
-const getRandomWritingNote = () =>
-  WRITING_NOTES[Math.floor(Math.random() * WRITING_NOTES.length)];
-
 export const HomeAuthenticated: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const haptics = useHaptics();
-  const isFromSave = location.state?.fromSave;
   const { user } = useAuthStore();
-  const [noteCount, setNoteCount] = useState<number | null>(null);
-  const [displayCount, setDisplayCount] = useState<number | string>('...');
-  const [isCountLoading, setIsCountLoading] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
-  const [onboardingStep, setOnboardingStep] = useState(0);
+  const cryptoContext = useCrypto();
   const [dailyPrompt, setDailyPrompt] = useState(DEFAULT_WELLNESS_PROMPTS[0]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isCheckInOpen, setIsCheckInOpen] = useState(false);
@@ -152,7 +95,6 @@ export const HomeAuthenticated: React.FC = () => {
   const [isSavingCheckIn, setIsSavingCheckIn] = useState(false);
   const [checkInFeedback, setCheckInFeedback] = useState<string | null>(null);
   const [intentionFeedback, setIntentionFeedback] = useState<string | null>(null);
-  const [quote] = useState(getRandomWritingNote);
   const [taskNotes, setTaskNotes] = useState<Note[]>([]);
   const [intentionSummary, setIntentionSummary] = useState<HomeIntentionSummary>(() =>
     buildHomeIntentionSummary([]),
@@ -177,11 +119,16 @@ export const HomeAuthenticated: React.FC = () => {
   const heroDismissPointerIdRef = useRef<number | null>(null);
   const authStoreDisplayName = user?.name?.trim() || 'Reflector';
   const shouldRenderHeroIntro = heroIntroState !== 'gone';
-
-
-  const currentOnboardingStep = ONBOARDING_STEPS[onboardingStep];
-  const isLastOnboardingStep = onboardingStep === ONBOARDING_STEPS.length - 1;
-  const CurrentOnboardingIcon = onboardingStepIcons[onboardingStep];
+  const isPrivateWritingSetupRequired = cryptoContext.status === 'setupRequired';
+  const isPrivateWritingReady = cryptoContext.status === 'unlocked';
+  const onboarding = usePrivateWritingOnboarding({
+    hasUser: Boolean(user),
+    isSetupRequired: isPrivateWritingSetupRequired,
+  });
+  // shouldShowOnboarding only covers mandatory setup; justCompletedSetup keeps the
+  // post-setup "ready" screen visible for this session (it resets on reload).
+  const showOnboarding = onboarding.shouldShowOnboarding || cryptoContext.justCompletedSetup;
+  const isGoogleLikeAuth = user?.authProvider === 'google';
 
   const moveFocusFromHeroIntro = useCallback(() => {
     if (typeof document === 'undefined') return;
@@ -279,9 +226,6 @@ export const HomeAuthenticated: React.FC = () => {
     setDailyPrompt(
       DEFAULT_WELLNESS_PROMPTS[Math.floor(Math.random() * DEFAULT_WELLNESS_PROMPTS.length)],
     );
-
-    const hasSeen = localStorage.getItem('hasSeenOnboarding');
-    if (!hasSeen) setShowOnboarding(true);
   }, []);
 
   const refreshPrompt = useCallback(
@@ -305,29 +249,6 @@ export const HomeAuthenticated: React.FC = () => {
     },
     [dailyPrompt, isRefreshing],
   );
-
-  useEffect(() => {
-    if (noteCount === null) return;
-
-    if (shouldReduceMotion) {
-      setDisplayCount(noteCount);
-      return;
-    }
-
-    let raf: number;
-    const start = performance.now();
-    const duration = 900;
-    const step = (now: number) => {
-      const t = Math.min((now - start) / duration, 1);
-      // cubic-bezier(0.16, 1, 0.3, 1) approximation
-      const eased = 1 - Math.pow(1 - t, 3);
-      setDisplayCount(Math.round(eased * noteCount));
-      if (t < 1) raf = requestAnimationFrame(step);
-    };
-    raf = requestAnimationFrame(step);
-
-    return () => cancelAnimationFrame(raf);
-  }, [noteCount, shouldReduceMotion]);
 
   useEffect(() => {
     const saveData = Boolean(
@@ -411,40 +332,14 @@ export const HomeAuthenticated: React.FC = () => {
     };
   }, [collapseHeroIntro, heroIntroState, showOnboarding]);
 
-  const handleCloseOnboarding = useCallback(() => {
-    localStorage.setItem('hasSeenOnboarding', 'true');
-    setOnboardingStep(0);
-    setShowOnboarding(false);
-  }, []);
-
-  const handleFinishOnboarding = useCallback(() => {
-    handleCloseOnboarding();
-    // Route directly to the editor with a gentle first-time prompt
+  const handleBeginWritingFromOnboarding = useCallback(() => {
     prefetchCreateNoteRoute();
-    navigate(RoutePath.CREATE_NOTE, { state: { initialPrompt: "What's on your mind?" } });
-  }, [handleCloseOnboarding, navigate]);
-
-  const handleSkipOnboarding = useCallback(() => {
-    handleCloseOnboarding();
-    navigate(RoutePath.DASHBOARD, { replace: true });
-  }, [handleCloseOnboarding, navigate]);
+    navigate(RoutePath.CREATE_NOTE, { state: { initialPrompt: 'Start with one true sentence.' } });
+  }, [navigate]);
 
   const updateIntentionSummary = useCallback((notes: Note[]) => {
     setTaskNotes(notes);
     setIntentionSummary(buildHomeIntentionSummary(notes));
-  }, []);
-
-  const handleNextOnboardingStep = useCallback(() => {
-    if (isLastOnboardingStep) {
-      handleFinishOnboarding();
-      return;
-    }
-
-    setOnboardingStep((current) => Math.min(current + 1, ONBOARDING_STEPS.length - 1));
-  }, [handleFinishOnboarding, isLastOnboardingStep]);
-
-  const handlePreviousOnboardingStep = useCallback(() => {
-    setOnboardingStep((current) => Math.max(current - 1, 0));
   }, []);
 
   useEffect(() => {
@@ -457,25 +352,19 @@ export const HomeAuthenticated: React.FC = () => {
 
   useEffect(() => {
     const fetchCount = async () => {
-      if (!user) return;
+      if (!user || !isPrivateWritingReady) return;
 
-      setIsCountLoading(true);
       try {
-        const [count, notes] = await Promise.all([
-          noteService.getCount(),
-          noteService.getAll()
-        ]);
-        setNoteCount(count);
+        const notes = await noteService.getAll();
         updateIntentionSummary(notes);
       } catch {
-        setNoteCount(0);
         updateIntentionSummary([]);
-      } finally {
-        setIsCountLoading(false);
       }
     };
 
     fetchCount();
+
+    if (!isPrivateWritingReady) return;
 
     const channel = supabase
       .channel('note-count-updates')
@@ -489,7 +378,7 @@ export const HomeAuthenticated: React.FC = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [updateIntentionSummary, user]);
+  }, [isPrivateWritingReady, updateIntentionSummary, user]);
 
   const handleCreateClick = (prompt?: string) => {
     prefetchCreateNoteRoute();
@@ -568,7 +457,7 @@ export const HomeAuthenticated: React.FC = () => {
       let targetNote = taskNotes[0];
       
       const newTask = {
-        id: crypto.randomUUID(),
+        id: globalThis.crypto.randomUUID(),
         text: newTaskText.trim(),
         completed: false,
       };
@@ -675,7 +564,9 @@ export const HomeAuthenticated: React.FC = () => {
               <div className="home-hero-copy relative z-20 flex h-full flex-col items-center justify-start text-center px-6">
                 <div className="max-w-4xl">
                   <h1 className="h1-hero hero-ink mb-12 text-balance">
-                    <span className="whitespace-nowrap">Welcome back,</span>{' '}
+                    <span className="whitespace-nowrap">
+                      {cryptoContext.justCompletedSetup ? 'Welcome,' : 'Welcome back,'}
+                    </span>{' '}
                     <br className="home-hero-break" />
                     <span className="font-serif italic hero-ink-accent">
                       {authStoreDisplayName}
@@ -709,14 +600,15 @@ export const HomeAuthenticated: React.FC = () => {
             aria-label="Dashboard"
             className="core-bento-grid"
           >
+            <div className="flex flex-col gap-6">
             <div
-              className="home-primary-reflection-card group relative surface-flat overflow-hidden rounded-[2.5rem] p-8 sm:p-10 lg:p-12 flex flex-col justify-between h-full transition-[border-color,box-shadow] duration-300 ease-out-expo hover:shadow-[0_12px_32px_var(--tw-shadow-color)] hover:shadow-green/5 hover:border-green/10"
+              className="home-primary-reflection-card group relative surface-flat overflow-hidden rounded-[2rem] p-8 sm:p-10 lg:p-12 flex flex-col transition-[border-color,box-shadow] duration-300 ease-out-expo hover:shadow-[0_12px_32px_var(--tw-shadow-color)] hover:shadow-green/5 hover:border-green/10"
             >
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center gap-2 text-gray-nav">
                     <Target size={18} weight="duotone" className="text-green" />
-                    <span className="label-caps">
+                    <span className="text-sm font-bold text-gray-nav">
                       Today's Reflection
                     </span>
                   </div>
@@ -731,71 +623,72 @@ export const HomeAuthenticated: React.FC = () => {
                   </button>
                 </div>
 
-                <div className="mb-12 space-y-8">
+                <div className="space-y-8">
                   <p
                     className={`dashboard-prompt-text typographic-measure transition-opacity duration-[400ms] ease-out ${isRefreshing ? 'opacity-0' : 'opacity-100'}`}
                   >
                     {dailyPrompt}
                   </p>
-                  <div className="home-primary-action-cluster flex max-w-xl flex-col gap-3">
-                    <div className="home-primary-action-row flex w-full flex-col gap-3 sm:flex-row sm:items-stretch">
+                  <div className="home-primary-action-cluster flex flex-col gap-3">
+                    <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-row sm:items-center">
                       <Button
                         variant="primary"
-                        className="h-14 w-full rounded-xl bg-green px-8 text-base font-bold text-white shadow-none transition-colors hover:bg-green/90 sm:flex-[1.05]"
+                        className="h-13 w-full sm:w-auto rounded-xl bg-green px-4 sm:px-8 text-sm sm:text-base font-bold text-white shadow-none transition-colors hover:bg-green/90"
                         onPointerEnter={prefetchCreateNoteRoute}
                         onFocus={prefetchCreateNoteRoute}
                         onClick={() => handleCreateClick(dailyPrompt)}
                         aria-label="Begin writing with today's prompt"
                       >
-                        Begin Writing
-                        <Plus size={18} weight="regular" className="ml-2" />
+                        <span>Begin Writing</span>
+                        <Plus size={16} weight="regular" className="ml-1.5 shrink-0" />
                       </Button>
                       <WhisperComposerControl
                         onFinalTranscript={handleVoiceDraft}
                         label="Speak a note"
                         stopOnFinalTranscript
-                        className="w-full sm:flex-1"
-                        buttonClassName="inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl border px-6 text-base font-bold transition-colors"
-                        idleButtonClassName="control-surface text-gray-text hover:border-green/20 hover:bg-green/5 hover:text-green"
+                        className="w-full sm:w-auto"
+                        buttonClassName="inline-flex h-13 w-full sm:w-auto items-center justify-center gap-1.5 rounded-xl border px-4 sm:px-6 text-sm sm:text-base font-bold transition-colors"
+                        idleButtonClassName="bg-gray-text/5 border-transparent text-gray-text hover:bg-green/5 hover:text-green"
                         activeButtonClassName="border-green/25 bg-green/10 text-green"
                       />
                     </div>
-                    <div className="home-secondary-action-row grid w-full gap-3 sm:grid-cols-2">
+                    <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-row sm:items-center">
                       <Button
-                        variant="secondary"
-
-                        className="h-12 w-full rounded-xl px-6 text-base font-bold"
+                        variant="ghost"
+                        className="h-13 w-full sm:w-auto rounded-xl px-4 sm:px-6 text-sm sm:text-base font-bold bg-gray-text/5 !text-gray-text hover:!text-green"
                         onClick={() => setIsCheckInOpen(true)}
                         aria-label="Save a quick mood check-in"
                       >
-                        Quick check-in
-                        <Heart size={18} weight="duotone" className="ml-2" />
+                        <span>Quick check-in</span>
+                        <Heart size={16} weight="duotone" className="ml-1.5 shrink-0" />
                       </Button>
                       <Button
-                        variant="outline"
-
-                        className="h-12 w-full justify-center rounded-xl border-sky/25 bg-sky/5 px-6 text-sky hover:bg-sky/10"
+                        variant="ghost"
+                        className="h-13 w-full sm:w-auto rounded-xl px-4 sm:px-6 text-sm sm:text-base font-bold bg-gray-text/5 !text-gray-text hover:!text-green"
                         onClick={() => navigate(RoutePath.FUTURE_LETTERS)}
                         aria-label="Write a future letter"
                       >
-                        Future letter
-                        <EnvelopeSimple size={18} weight="duotone" className="ml-2" />
+                        <span>Future letter</span>
+                        <EnvelopeSimple size={16} weight="duotone" className="ml-1.5 shrink-0" />
                       </Button>
                     </div>
                   </div>
                 </div>
             </div>
+              {/* Subtle background glow effect on hover */}
+              <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-green/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+            </div>
 
-            <div className="border-t border-border/60 pt-8 text-left">
+            <div className="home-intentions-card surface-flat overflow-hidden rounded-[2rem] p-8 sm:p-10 lg:p-12 text-left">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-gray-nav">
-                  <ListChecks size={16} weight="duotone" className="text-honey" />
-                  <span className="label-caps">
+                  <ListChecks size={16} weight="duotone" className="text-green" />
+                  <span className="text-sm font-bold text-gray-nav">
                     Your Intentions
                   </span>
                 </div>
                 {intentionSummary.openCount > 0 && (
-                  <span className="text-xs font-bold text-gray-nav/60">
+                  <span className="text-xs font-bold text-gray-nav">
                     {intentionSummary.openCount} open
                   </span>
                 )}
@@ -806,15 +699,15 @@ export const HomeAuthenticated: React.FC = () => {
                     intentionSummary.items.slice(0, 3).map((intention) => (
                       <button
                         key={intention.id}
-                        className="w-full flex items-center gap-4 p-4 rounded-2xl border border-honey/15 bg-honey/5 hover:border-honey/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-honey/40 transition-[colors,opacity,transform] text-left shadow-none group/btn active:scale-[0.98]"
+                        className="w-full flex items-center gap-4 p-4 rounded-2xl border border-green/15 bg-green/5 hover:border-green/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 transition-[colors,opacity,transform] text-left shadow-none group/btn active:scale-[0.98]"
                         onClick={() => handleToggleIntention(intention.noteId, intention.id)}
                         aria-label={`Mark "${intention.text}" from ${intention.noteTitle} as complete`}
                       >
-                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-2 border-border group-hover/btn:border-honey transition-colors">
-                           <div className="h-2 w-2 rounded-full bg-honey opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-2 border-border group-hover/btn:border-green transition-colors">
+                           <div className="h-2 w-2 rounded-full bg-green opacity-0 group-hover/btn:opacity-100 transition-opacity" />
                         </div>
                         <span className="min-w-0 flex-1">
-                          <span className="block font-serif italic text-base text-gray-text group-hover/btn:text-honey transition-colors line-clamp-2 leading-snug">
+                          <span className="block font-serif italic text-base text-gray-text group-hover/btn:text-green transition-colors line-clamp-2 leading-snug">
                             {intention.text}
                           </span>
                         </span>
@@ -844,18 +737,18 @@ export const HomeAuthenticated: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setIsIntentionModalOpen(true)}
-                    className="w-full flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-honey/25 p-8 text-honey hover:border-honey/40 hover:bg-honey/5 transition-colors"
+                    className="w-full flex flex-col items-center justify-center gap-2 rounded-2xl bg-green/5 border border-green/10 p-8 text-green hover:bg-green/10 transition-colors"
                   >
                     <Plus size={24} weight="bold" />
                     <span className="text-base font-bold">Set your first intention</span>
-                    <span className="text-sm font-medium text-gray-nav/60">What matters most today?</span>
+                    <span className="text-sm font-medium text-gray-nav">What matters most today?</span>
                   </button>
                 )}
 
                 {(intentionSummary.hiddenCount > 0 || intentionSummary.items.length > 3) && (
                   <button 
                     onClick={() => navigate(RoutePath.NOTES)}
-                    className="w-full text-center label-caps text-gray-nav/40 hover:text-honey transition-colors pt-4"
+                    className="w-full text-center label-caps text-gray-nav hover:text-green transition-colors pt-4"
                   >
                     + {intentionSummary.hiddenCount + Math.max(0, intentionSummary.items.length - 3)} more
                   </button>
@@ -867,7 +760,7 @@ export const HomeAuthenticated: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setIsIntentionModalOpen(true)}
-                      className="w-full flex items-center justify-center gap-2 rounded-xl py-2 text-sm font-bold text-honey/60 hover:text-honey transition-colors"
+                      className="w-full flex items-center justify-center gap-2 rounded-xl py-2 text-sm font-bold text-green hover:text-green/80 transition-colors"
                     >
                       <Plus size={14} weight="bold" />
                       Add intention
@@ -876,184 +769,72 @@ export const HomeAuthenticated: React.FC = () => {
                 )}
               </div>
             </div>
-            {/* Subtle background glow effect on hover */}
-            <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-green/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
           </div>
 
           <div className="grid gap-6">
+            <RelationshipHomeModule />
+
             <div
-              className="group relative surface-flat surface-tone-sky overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-shadow duration-300 ease-out-expo hover:shadow-[0_12px_32px_var(--tw-shadow-color)] hover:shadow-sky/5"
+              className="group relative surface-flat surface-tone-sky overflow-hidden rounded-[2rem] p-6 sm:p-8 transition-shadow duration-300 ease-out-expo hover:shadow-[0_12px_32px_var(--tw-shadow-color)] hover:shadow-sky/5"
             >
               <div className="relative z-10">
               <div className="mb-6 flex items-center gap-2 text-gray-nav">
-                <FolderOpen size={18} weight="duotone" className="text-sky" />
-                <p className="label-caps">
+                <Brain size={18} weight="duotone" className="text-sky" />
+                <p className="text-sm font-bold text-gray-nav">
                   Your Rhythm
                 </p>
-              </div>
-
-              <div className="mb-6">
-                <p className="dashboard-stat-value flex items-center overflow-hidden h-[1.2em]">
-                    <span
-                      className="inline-block"
-                    >
-                      {isCountLoading ? '...' : displayCount}
-                    </span>
-                </p>
-                <p className="mt-1 text-sm font-semibold text-gray-nav">reflections saved</p>
               </div>
 
               <div className="space-y-3">
                 <button
                   onClick={() => navigate(RoutePath.NOTES)}
-                  className="surface-inline-panel surface-tone-sage dashboard-tone-card group flex w-full items-center justify-between p-4 text-left transition-colors"
+                  className="flex w-full items-center justify-between p-4 px-2 text-left rounded-xl transition-colors hover:bg-green/5 group"
                   aria-label="View all reflections"
                 >
-                  <div className="flex items-center gap-3">
-                    <FolderOpen size={18} weight="duotone" className="text-gray-nav group-hover:text-green transition-transform duration-300 group-hover:rotate-6" />
-                    <div>
-                      <p className="dashboard-action-title dashboard-hover-title">View archive</p>
-                      <p className="dashboard-action-description">Read saved reflections</p>
-                    </div>
+                  <div className="min-w-0 flex-1 pr-4">
+                    <p className="dashboard-action-title dashboard-hover-title">View archive</p>
+                    <p className="dashboard-action-description">Read saved reflections</p>
                   </div>
-                  <CaretRight size={16} weight="regular" className="text-gray-nav/40 group-hover:text-green transition-colors" />
+                  <CaretRight size={16} weight="regular" className="text-gray-nav/40 group-hover:text-green transition-colors shrink-0" />
                 </button>
 
                 <button
                   onClick={() => navigate(RoutePath.INSIGHTS)}
-                  className="surface-inline-panel surface-tone-sky dashboard-tone-card group flex w-full items-center justify-between p-4 text-left transition-colors"
+                  className="flex w-full items-center justify-between p-4 px-2 text-left rounded-xl transition-colors hover:bg-sky/5 group"
                   aria-label="View writing patterns"
                 >
-                  <div className="flex items-center gap-3">
-                    <Brain size={18} weight="duotone" className="text-sky transition-transform duration-300 group-hover:-rotate-6" />
-                    <div>
-                      <p className="dashboard-action-title dashboard-hover-title">Writing patterns</p>
-                      <p className="dashboard-action-description">Mood, rhythm, and recurring themes</p>
-                    </div>
+                  <div className="min-w-0 flex-1 pr-4">
+                    <p className="dashboard-action-title dashboard-hover-title">Writing patterns</p>
+                    <p className="dashboard-action-description">Mood, rhythm, and recurring themes</p>
                   </div>
-                  <CaretRight size={16} weight="regular" className="text-gray-nav/40 group-hover:text-sky transition-colors" />
+                  <CaretRight size={16} weight="regular" className="text-gray-nav/40 group-hover:text-sky transition-colors shrink-0" />
                 </button>
               </div>
             </div>
-            {/* Subtle background glow effect on hover */}
-
           </div>
 
-            <div
-              className="group relative surface-flat surface-tone-honey overflow-hidden rounded-[2.5rem] p-6 sm:p-8 transition-shadow duration-300 ease-out-expo hover:shadow-[0_12px_32px_var(--tw-shadow-color)] hover:shadow-honey/5"
-            >
-              <div className="relative z-10">
-              <div className="mb-8 flex items-center gap-2 text-gray-nav">
-                <Sparkle size={18} weight="duotone" className="text-honey" />
-                <span className="label-caps">
-                  Before you write
-                </span>
-              </div>
-
-              <div className="space-y-5">
-                {isFromSave ? (
-                  <p className="text-sm font-bold text-green">Reflection saved.</p>
-                ) : null}
-                <p className="dashboard-prose typographic-measure-compact relative italic">
-                  <span className="absolute -left-4 -top-5 font-serif text-5xl text-honey/10 pointer-events-none">
-                    "
-                  </span>
-                  {quote.text}
-                </p>
-                <div className="flex items-center gap-4">
-                  <div className="h-px w-8 bg-honey/20" />
-                  <p className="dashboard-caption text-gray-nav">
-                    {quote.author}
-                  </p>
-                </div>
-                </div>
-              </div>
-              {/* Subtle sweep effect on hover */}
-              <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-honey/0 via-honey/5 to-honey/0 translate-x-[-100%] transition-transform duration-1000 group-hover:translate-x-[100%]" />
-            </div>
           </div>
         </section>
         </div>
       </div>
 
-      <ModalSheet
+      <PrivateWritingOnboardingFlow
         isOpen={showOnboarding}
-        onClose={handleCloseOnboarding}
-        title={currentOnboardingStep.title}
-        size="lg"
-        mobilePlacement="center"
-        closeLabel="Skip onboarding"
-        panelClassName="onboarding-modal-panel"
-        bodyClassName="onboarding-modal-body"
-        footer={
-          <div className="onboarding-footer-actions flex flex-col gap-3 sm:gap-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleSkipOnboarding}
-              aria-label="Skip onboarding"
-              className="self-center px-3 text-gray-nav/75 hover:text-green"
-            >
-              Skip onboarding
-            </Button>
-            <div className="flex items-center justify-between gap-3 sm:justify-between">
-              <Button
-                variant="secondary"
-                onClick={handlePreviousOnboardingStep}
-                disabled={onboardingStep === 0}
-                className="min-w-[6.75rem] flex-1 sm:flex-none"
-              >
-                Back
-              </Button>
-              <Button
-                variant="primary"
-                onClick={handleNextOnboardingStep}
-                className="min-w-[8.75rem] flex-1 sm:flex-none"
-              >
-                {isLastOnboardingStep ? 'Begin writing' : 'Next'}
-              </Button>
-            </div>
-          </div>
-        }
-      >
-          <div
-            key={currentOnboardingStep.title}
-            className="onboarding-step-copy flex min-h-[18rem] flex-col justify-between gap-6 pb-1 sm:min-h-[19rem] animate-fade-in-up"
-          >
-            <div className="space-y-4">
-              <p className="label-caps text-green" aria-live="polite">
-                Step {onboardingStep + 1} of {ONBOARDING_STEPS.length}
-              </p>
-
-              <div className="onboarding-progress-rail grid grid-cols-4 gap-2" aria-hidden="true">
-                {ONBOARDING_STEPS.map((step, index) => (
-                  <span
-                    key={step.label}
-                    className={`h-1.5 rounded-full bg-green transition-opacity duration-300 ease-out-expo ${
-                      index <= onboardingStep ? 'opacity-100' : 'opacity-20'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div className="onboarding-step-stage">
-              <div className="relative flex flex-col gap-6 sm:flex-row sm:items-start">
-                <div className="onboarding-step-icon" aria-hidden="true">
-                  <CurrentOnboardingIcon size={28} weight="duotone" />
-                </div>
-                <div className="space-y-4">
-                  <p className="max-w-[65ch] text-base font-semibold leading-relaxed text-gray-text sm:text-lg">
-                    {currentOnboardingStep.body}
-                  </p>
-                  <p className="onboarding-step-note font-serif italic">
-                    {currentOnboardingStep.note}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-      </ModalSheet>
+        onClose={onboarding.dismiss}
+        onExitToWriting={onboarding.exitToWriting}
+        onBeginWriting={handleBeginWritingFromOnboarding}
+        isSetupRequired={onboarding.isSetupRequired}
+        canOfferAccountPassword={!isGoogleLikeAuth}
+        hasFreshAccountPassword={Boolean(user?.id && hasPendingAccountPassword(user.id))}
+        userId={user?.id || ''}
+        email={user?.email}
+        setupEncryption={cryptoContext.setupEncryption}
+        confirmRecoveryKey={cryptoContext.confirmRecoveryKey}
+        recoveryKey={cryptoContext.recoveryKey}
+        completeOnboarding={onboarding.complete}
+        justCompletedSetup={cryptoContext.justCompletedSetup}
+        clearJustCompletedSetup={cryptoContext.clearJustCompletedSetup}
+      />
 
       <ModalSheet
         isOpen={isCheckInOpen}
@@ -1065,7 +846,6 @@ export const HomeAuthenticated: React.FC = () => {
         title={moodPickerStage === 'group' ? 'How does it feel right now?' : undefined}
         description={moodPickerStage === 'group' ? 'Pick a broad mood. Details are optional.' : undefined}
         ariaLabel="Choose a mood for this reflection"
-        icon={moodPickerStage === 'group' ? <Heart size={20} weight="duotone" /> : undefined}
         size="sm"
         tone="sage"
         panelClassName={`modal-sheet-panel--compact ${moodPickerStage === 'detail' ? 'modal-sheet-panel--mood-detail' : ''}`.trim()}
@@ -1114,7 +894,7 @@ export const HomeAuthenticated: React.FC = () => {
           setIntentionFeedback(null);
         }}
         title="Intentions"
-        icon={<ListChecks size={24} weight="bold" className="text-green" />}
+        icon={<ListChecks size={22} weight="duotone" />}
         size="md"
         bodyClassName="max-h-[72vh] pt-2"
       >
@@ -1132,7 +912,7 @@ export const HomeAuthenticated: React.FC = () => {
                   <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border-2 border-border text-transparent transition-colors group-hover:border-green/50">
                     <span />
                   </div>
-                  <span className="flex-1 text-[14px] font-bold text-gray-text line-clamp-2">{intention.text}</span>
+                  <span className="flex-1 text-ui-sm font-bold text-gray-text line-clamp-2">{intention.text}</span>
                 </button>
               ))}
             </div>
@@ -1168,7 +948,7 @@ export const HomeAuthenticated: React.FC = () => {
               )}
             </form>
           ) : (
-            <p className="text-sm font-medium text-gray-nav/60 text-center py-2">
+            <p className="text-sm font-medium text-gray-nav text-center py-2">
               Cross off an existing intention to add a new one.
             </p>
           )}

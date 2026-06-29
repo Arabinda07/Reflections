@@ -22,10 +22,11 @@ describe('Insights layout contract', () => {
     expect(insights).toContain('moodCheckinService.list');
     expect(insights).toContain('ritualEventService.listSince');
     expect(insights).toContain('This week');
-    expect(insights).toContain('Mood frequency');
+    expect(insights).toContain('This month');
     expect(insights).toContain('weeklyRecap.moodFamilyData');
-    expect(insights).toContain('Overview');
-    expect(insights).toContain('Completion card');
+    expect(insights).toContain('buildMonthSummary');
+    // The weekly scoreboard (6-tile grid) is gone in favour of prose.
+    expect(insights).not.toContain('lg:grid-cols-6');
     expect(insights).not.toContain('nextQuestion');
     expect(insights).not.toContain('Common mood');
     expect(insights.toLowerCase()).not.toMatch(/\b(streak|lost|xp|leaderboard)\b/);

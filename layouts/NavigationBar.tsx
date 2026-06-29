@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Leaf } from '@phosphor-icons/react/Leaf';
+import { MagnifyingGlass } from '@phosphor-icons/react/MagnifyingGlass';
 import { Moon } from '@phosphor-icons/react/Moon';
-import { PaperPlaneTilt } from '@phosphor-icons/react/PaperPlaneTilt';
+import { UserPlus } from '@phosphor-icons/react/UserPlus';
 import { Sun } from '@phosphor-icons/react/Sun';
 import { Button } from '../components/ui/Button';
 import { useAuthStore } from '../hooks/useAuthStore';
@@ -20,6 +21,7 @@ interface NavigationBarProps {
   isMobileMenuOpen: boolean;
   onMobileMenuToggle: () => void;
   onInvite: () => void;
+  onSearch?: () => void;
 }
 
 /**
@@ -33,6 +35,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
   isMobileMenuOpen,
   onMobileMenuToggle,
   onInvite,
+  onSearch,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -87,6 +90,17 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
     </button>
   );
 
+  const SearchButton = onSearch ? (
+    <button
+      onClick={onSearch}
+      className={`relative flex h-11 w-11 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green ${landingControlClass}`}
+      title="Search notes (Ctrl/⌘ K)"
+      aria-label="Search notes"
+    >
+      <MagnifyingGlass size={20} weight="bold" />
+    </button>
+  ) : null;
+
   return (
     <nav
       aria-label="Dashboard navigation"
@@ -118,6 +132,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
           className={`hidden lg:flex items-center gap-1.5 xl:gap-2`}
         >
           {DarkModeToggle}
+          {SearchButton}
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
@@ -125,7 +140,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
                 key={item.label}
                 to={item.path}
                 aria-current={isActive ? 'page' : undefined}
-                className={`inline-flex min-h-11 items-center rounded-xl px-3 py-2 text-[12px] font-extrabold transition-[background-color,color] duration-200 hover:bg-green/5 hover:text-green xl:px-4 xl:text-[13px] ${
+                className={`inline-flex min-h-11 items-center rounded-xl px-3 py-2 text-ui-xs font-extrabold transition-[background-color,color] duration-200 hover:bg-green/5 hover:text-green xl:px-4 xl:text-btn-sm ${
                   isActive
                     ? 'bg-green/5 text-green'
                     : 'text-gray-nav'
@@ -143,19 +158,19 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
           {isAuthenticated ? (
             <>
               <Button
-                variant="secondary"
+                variant="ghost"
                 size="sm"
                 onClick={onInvite}
-                className="gap-2 px-3 xl:px-4"
+                className="gap-2 px-3 hover:bg-green/5 text-green xl:px-4"
               >
-                Invite
-                <PaperPlaneTilt size={16} weight="regular" />
+                <span>Invite</span>
+                <UserPlus size={16} weight="regular" />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => logout()}
-                className="px-3 text-clay hover:bg-clay/5 xl:px-4"
+                className="px-3 text-gray-light hover:text-clay hover:bg-clay/5 xl:px-4"
               >
                 Logout
               </Button>
@@ -184,6 +199,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
 
         {/* Mobile Menu Icon */}
         <div className="flex items-center gap-2 lg:hidden">
+          {SearchButton}
           {DarkModeToggle}
           {!isMobileNavSuppressed && (
             <button

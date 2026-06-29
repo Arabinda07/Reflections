@@ -14,6 +14,11 @@ import type { LocalNote } from './db';
 const isFlushing = new Map<string, boolean>();
 const isFlushQueued = new Map<string, boolean>();
 
+// ponytail: in-memory per-op retry counter, resets per session. Persist to a Dexie
+// column only if a permanent poison-op proves it needs to survive reloads.
+const opFailures = new Map<string, number>();
+const MAX_OP_RETRIES = 5;
+
 export const syncEngine = {
   /**
    * Saves a note locally as 'pending_insert' and immediately attempts a background flush.
@@ -74,6 +79,7 @@ export const syncEngine = {
         if (pendingOps.length === 0) break;
 
         for (const op of pendingOps) {
+          if ((opFailures.get(op.id) ?? 0) >= MAX_OP_RETRIES) continue; // quarantined poison op
           try {
             if (op.syncStatus === 'pending_insert') {
               await noteRemoteStore.insert(userId, op);
@@ -85,9 +91,14 @@ export const syncEngine = {
               await noteRemoteStore.remove(userId, op.id);
               await offlineStorage.markAsSynced(op.id);
             }
+            opFailures.delete(op.id);
           } catch (err) {
-            console.warn(`[SyncEngine] Failed to sync op ${op.id}, pausing flush:`, err);
-            return; // Exit entirely to maintain order, wait for next network trigger
+            // Skip this op (quarantine after MAX_OP_RETRIES) and keep syncing the rest,
+            // so one bad op can't block the whole queue. Note ops are independent per id.
+            const attempts = (opFailures.get(op.id) ?? 0) + 1;
+            opFailures.set(op.id, attempts);
+            console.warn(`[SyncEngine] Failed to sync op ${op.id} (attempt ${attempts}/${MAX_OP_RETRIES}), skipping:`, err);
+            continue;
           }
         }
       } while (isFlushQueued.get(userId));

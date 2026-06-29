@@ -1,5 +1,8 @@
 import { supabase } from '../src/supabaseClient';
 import type { Note, NoteAttachment, Task, MoodValue } from '../types';
+import type { CryptoSession, EncryptedEnvelope } from './cryptoService';
+import { requireCurrentCryptoSession } from './cryptoSessionStore';
+import { decryptEnvelope, encryptedColumns, rowAad } from './encryptedPayload';
 
 export interface SupabaseNoteRow {
   id: string;
@@ -12,6 +15,7 @@ export interface SupabaseNoteRow {
   attachments: NoteAttachment[] | null;
   mood: string | null;
   tasks: Task[] | null;
+  encrypted_payload?: EncryptedEnvelope | null;
 }
 
 /**
@@ -47,6 +51,69 @@ export const mapToDbNote = (note: Note, userId: string) => ({
   updated_at: note.updatedAt,
 });
 
+const noteAad = rowAad('notes');
+
+const encryptedNotePayload = (note: Note) => ({
+  title: note.title,
+  content: note.content,
+  thumbnailUrl: note.thumbnailUrl,
+  tags: note.tags || [],
+  attachments: note.attachments || [],
+  tasks: note.tasks || [],
+  mood: note.mood,
+});
+
+const mapEncryptedPayloadToNote = async (
+  data: SupabaseNoteRow,
+  userId: string,
+  session: CryptoSession,
+): Promise<Note> => {
+  const payload = await decryptEnvelope<ReturnType<typeof encryptedNotePayload>>(
+    data.encrypted_payload,
+    noteAad(userId, data.id),
+    session,
+  );
+
+  if (!payload) {
+    return mapToNote(data);
+  }
+
+  return {
+    id: data.id,
+    title: payload.title || '',
+    content: payload.content || '',
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
+    thumbnailUrl: payload.thumbnailUrl,
+    tags: payload.tags || [],
+    attachments: payload.attachments || [],
+    mood: (payload.mood as MoodValue) || undefined,
+    tasks: payload.tasks || [],
+  };
+};
+
+export const mapToEncryptedDbNote = async (
+  note: Note,
+  userId: string,
+  session: CryptoSession = requireCurrentCryptoSession(),
+) => ({
+  id: note.id,
+  user_id: userId,
+  title: null,
+  content: null,
+  thumbnail_url: null,
+  tags: [],
+  attachments: [],
+  tasks: [],
+  mood: null,
+  ...(await encryptedColumns(encryptedNotePayload(note), noteAad(userId, note.id), session)),
+  created_at: note.createdAt,
+  updated_at: note.updatedAt,
+});
+
+const mapRemoteNote = (userId: string, data: SupabaseNoteRow) =>
+  mapEncryptedPayloadToNote(data, userId, requireCurrentCryptoSession());
+
 /**
  * Pure Supabase CRUD for notes.
  * No offline storage, no auth checks inlined.
@@ -61,7 +128,7 @@ export const noteRemoteStore = {
       .order('updated_at', { ascending: false });
 
     if (error) throw error;
-    return (data || []).map(mapToNote);
+    return Promise.all(((data || []) as SupabaseNoteRow[]).map((row) => mapRemoteNote(userId, row)));
   },
 
   fetchById: async (userId: string, noteId: string): Promise<Note | null> => {
@@ -73,16 +140,16 @@ export const noteRemoteStore = {
       .single();
 
     if (error || !data) return null;
-    return mapToNote(data);
+    return mapRemoteNote(userId, data as SupabaseNoteRow);
   },
 
   insert: async (userId: string, note: Note): Promise<void> => {
-    const { error } = await supabase.from('notes').insert(mapToDbNote(note, userId));
+    const { error } = await supabase.from('notes').insert(await mapToEncryptedDbNote(note, userId));
     if (error) throw error;
   },
 
   upsert: async (userId: string, note: Note): Promise<void> => {
-    const { error } = await supabase.from('notes').upsert(mapToDbNote(note, userId));
+    const { error } = await supabase.from('notes').upsert(await mapToEncryptedDbNote(note, userId));
     if (error) throw error;
   },
 

@@ -78,9 +78,8 @@ describe('transcript-inspired implementation contracts', () => {
     expect(myNotes).toContain('NOTE_SWIPE_OPEN_THRESHOLD');
     expect(myNotes).toContain('haptics.light()');
     expect(modalSheet).toContain('dragOffsetYRef');
-    expect(insights).toContain('runScopedTransition');
-    expect(insights).toContain('insightsScopeRef');
-    expect(insights).toContain('toggleInsightPanel');
+    // Insights is a single prose scroll now — no in-page toggles to scope.
+    expect(insights).toContain('useViewTransitionNavigation');
     expect(lifeWiki).toContain('runScopedTransition');
     expect(lifeWiki).toContain('lifeWikiScopeRef');
     expect(modalSheet).toContain('SHEET_DRAG_CLOSE_THRESHOLD');

@@ -1,11 +1,13 @@
-import React, { useEffect, useMemo, useState } from 'react';
-
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
 import { CalendarBlank } from '@phosphor-icons/react/CalendarBlank';
 import { EnvelopeOpen } from '@phosphor-icons/react/EnvelopeOpen';
 import { LockKey } from '@phosphor-icons/react/LockKey';
-import { PaperPlaneTilt } from '@phosphor-icons/react/PaperPlaneTilt';
-import { useNavigate } from 'react-router-dom';
+import ReactCalendar from 'react-calendar';
+import './react-calendar.css';
+import './Calendar.css';
+import { format } from 'date-fns';
 import { Button } from '../../components/ui/Button';
 import { CompletionCardActions } from '../../components/ui/CompletionCardActions';
 import { ModalSheet } from '../../components/ui/ModalSheet';
@@ -73,6 +75,7 @@ export const FutureLetters: React.FC = () => {
   const [openingLetterId, setOpeningLetterId] = useState<string | null>(null);
   const [shakeLetterId, setShakeLetterId] = useState<string | null>(null);
   const [cardPayload, setCardPayload] = useState<CompletionCardPayload | null>(null);
+  const datePickerRef = useRef<HTMLDetailsElement | null>(null);
 
   const minCustomDate = useMemo(() => toDateInputValue(addDays(new Date(), 1)), []);
   const openDate = useMemo(
@@ -176,24 +179,17 @@ export const FutureLetters: React.FC = () => {
         <div className="core-page-stack">
           <button
             onClick={() => navigate(RoutePath.DASHBOARD)}
-            className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-green/5 hover:text-green"
+            className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-honey/10 hover:text-honey"
             aria-label="Back to home"
           >
             <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
             <span>Back</span>
           </button>
 
-          <SectionHeader
-            title="Write a letter to yourself"
-            icon={
-              <div className="icon-block icon-block-lg">
-                <PaperPlaneTilt size={34} weight="duotone" />
-              </div>
-            }
-          />
+          <SectionHeader title="Write a letter to yourself" />
 
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
-            <Surface variant="flat" tone="paper" className="rounded-[2.5rem] overflow-hidden">
+            <Surface variant="flat" tone="paper" className="rounded-[2.5rem]">
               <form onSubmit={handleSchedule} className="space-y-6 p-6 sm:p-8">
                 <div className="space-y-2">
                   <label htmlFor="future-letter-title" className="label-caps text-gray-nav">
@@ -232,8 +228,8 @@ export const FutureLetters: React.FC = () => {
                         aria-pressed={selectedOption === option.id}
                         className={`dashboard-caption min-h-11 rounded-[var(--radius-control)] border px-3 transition-colors ${
                           selectedOption === option.id
-                            ? 'border-green/30 bg-green/10 text-green'
-                            : 'control-surface text-gray-nav hover:border-green/20 hover:text-green'
+                            ? 'border-honey/30 bg-honey/10 text-honey'
+                            : 'control-surface text-gray-nav hover:border-honey/20 hover:text-honey'
                         }`}
                       >
                         {option.label}
@@ -241,14 +237,31 @@ export const FutureLetters: React.FC = () => {
                     ))}
                   </div>
                   {selectedOption === 'custom' ? (
-                    <input
-                      type="date"
-                      value={customDate}
-                      min={minCustomDate}
-                      onChange={(event) => setCustomDate(event.target.value)}
-                      aria-label="Custom open date"
-                      className="input-surface dashboard-field-text h-12 w-full px-4"
-                    />
+                    <div className="relative w-full">
+                      <details ref={datePickerRef} className="relative w-full">
+                        <summary 
+                          aria-label="Custom open date"
+                          className="input-surface flex h-12 w-full cursor-pointer list-none items-center justify-between px-4 text-ui-base font-semibold text-gray-text [&::-webkit-details-marker]:hidden"
+                        >
+                          <span>{customDate ? format(new Date(`${customDate}T12:00:00`), 'MMMM do, yyyy') : 'Select custom date...'}</span>
+                          <CalendarBlank size={18} weight="regular" className="text-gray-nav" />
+                        </summary>
+                        <div className="absolute left-0 z-20 mt-1.5 w-full max-w-[320px] rounded-2xl border border-border bg-surface p-4 shadow-card sm:max-w-[340px]">
+                          <ReactCalendar
+                            onChange={(value) => {
+                              const dateVal = Array.isArray(value) ? value[0] : value;
+                              if (dateVal instanceof Date) {
+                                setCustomDate(toDateInputValue(dateVal));
+                              }
+                              if (datePickerRef.current) datePickerRef.current.open = false;
+                            }}
+                            value={customDate ? new Date(`${customDate}T12:00:00`) : new Date()}
+                            minDate={new Date(`${minCustomDate}T12:00:00`)}
+                            className="w-full border-none font-sans"
+                          />
+                        </div>
+                      </details>
+                    </div>
                   ) : null}
                 </fieldset>
 
@@ -315,7 +328,7 @@ export const FutureLetters: React.FC = () => {
                                     Opens {formatLongDateUTC(letter.openAt)}
                                   </p>
                                 </div>
-                                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-500 group-hover:scale-110 ${isLocked ? '[background-color:oklch(from_var(--bg-color)_l_c_h_/_0.5)] text-gray-nav' : 'bg-green/10 text-green group-hover:rotate-12'}`}>
+                                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-500 group-hover:scale-110 ${isLocked ? '[background-color:oklch(from_var(--bg-color)_l_c_h_/_0.5)] text-gray-nav' : 'bg-honey/10 text-honey group-hover:rotate-12'}`}>
                                   {isLocked ? (
                                     <div className={shakeLetterId === letter.id ? 'animate-shake-x' : ''}>
                                       <LockKey size={20} weight="duotone" />
@@ -332,7 +345,7 @@ export const FutureLetters: React.FC = () => {
                                 disabled={Boolean(openingLetterId)}
                                 isLoading={isOpening}
                                 onClick={() => handleOpenLetter(letter)}
-                                className={`min-h-11 w-full rounded-2xl font-bold transition-[background-color,border-color,color,opacity] ${isLocked ? 'opacity-60' : 'group-hover:bg-green group-hover:text-white group-hover:border-transparent'}`}
+                                className={`min-h-11 w-full rounded-2xl font-bold transition-[background-color,border-color,color,opacity] ${isLocked ? 'opacity-60' : 'group-hover:bg-honey group-hover:text-white group-hover:border-transparent'}`}
                                 aria-label={
                                   isOpening
                                     ? `Opening ${letter.title}`
@@ -359,7 +372,7 @@ export const FutureLetters: React.FC = () => {
         isOpen={Boolean(openedLetter)}
         onClose={() => setOpenedLetter(null)}
         title={openedLetter?.title || 'Letter'}
-        icon={<EnvelopeOpen size={20} weight="duotone" />}
+        icon={<EnvelopeOpen size={22} weight="duotone" />}
         size="lg"
       >
         {openedLetter ? (

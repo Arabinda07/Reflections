@@ -55,6 +55,7 @@ export interface User {
   name: string;
   email: string;
   avatarUrl?: string;
+  authProvider?: string;
 }
 
 export type PlanTier = 'free' | 'pro';
@@ -175,6 +176,117 @@ export interface Referral {
   acceptedAt: string;
 }
 
+export type RelationshipStage =
+  | 'discover'
+  | 'acquaintance'
+  | 'active'
+  | 'trusted'
+  | 'dormant'
+  | 'archived';
+
+export type RelationshipTier = 't1' | 't2' | 't3' | 'none';
+
+export interface RelationshipInteraction {
+  id: string;
+  date: string;
+  channel: 'linkedin' | 'email' | 'coffee' | 'phone' | 'event' | 'introduction' | 'other';
+  notes: string;
+  direction: 'outbound' | 'inbound' | 'mutual';
+}
+
+export interface RelationshipHook {
+  id: string;
+  description: string;
+  source: string;
+  createdAt: string;
+  used: boolean;
+}
+
+export interface RelationshipNextCare {
+  id: string;
+  label: string;
+  priority: 'low' | 'medium' | 'high';
+  status: 'open' | 'done' | 'snoozed';
+  createdAt: string;
+}
+
+export interface RelationshipConnection {
+  id: string;
+  relatedRelationshipId: string;
+  label: string;
+  notes?: string;
+}
+
+export interface RelationshipValueEntry {
+  id: string;
+  direction: 'given' | 'received';
+  category: 'introduction' | 'opportunity' | 'advice' | 'knowledge' | 'support' | 'other';
+  description: string;
+  createdAt: string;
+}
+
+export interface RelationshipTag {
+  id: string;
+  category: 'domain' | 'role' | 'context' | 'project';
+  label: string;
+}
+
+export interface RelationshipRecord {
+  id: string;
+  userId: string;
+  name: string;
+  photoUrl?: string;
+  email?: string;
+  phone?: string;
+  linkedinUrl?: string;
+  company?: string;
+  role?: string;
+  location?: string;
+  howWeMet?: string;
+  caresAbout?: string;
+  notes?: string;
+  tier: RelationshipTier;
+  stage: RelationshipStage;
+  closeness: number;
+  energy: number;
+  opportunity: number;
+  tags: RelationshipTag[];
+  interactions: RelationshipInteraction[];
+  hooks: RelationshipHook[];
+  nextCare: RelationshipNextCare[];
+  connections: RelationshipConnection[];
+  valueLedger: RelationshipValueEntry[];
+  lastTendedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RelationshipImportInboxItem {
+  id: string;
+  userId: string;
+  source: 'google_contacts' | 'csv' | 'manual';
+  status: 'pending' | 'accepted' | 'archived' | 'merged';
+  sourceFingerprint?: string;
+  googleResourceName?: string;
+  name: string;
+  photoUrl?: string;
+  email?: string;
+  phone?: string;
+  company?: string;
+  role?: string;
+  suggestedMergeRelationshipId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WeeklyRelationshipSuggestion {
+  relationship: RelationshipRecord;
+  reason: string;
+  suggestedHook?: RelationshipHook;
+  lastInteraction?: RelationshipInteraction;
+  suggestedCare: string;
+}
+
 export enum RoutePath {
   HOME = '/',
   DASHBOARD_ALIAS = '/dashboard',
@@ -188,13 +300,17 @@ export enum RoutePath {
   LOGIN = '/login',
   SIGNUP = '/signup',
   RESET_PASSWORD = '/reset-password',
+  RECOVER_PRIVATE_WRITING = '/recover-private-writing',
   INSIGHTS = '/insights',
   RELEASE = '/release',
   FUTURE_LETTERS = '/letters',
   FAQ = '/faq',
   ABOUT = '/about',
   PRIVACY = '/privacy',
+  VS_DAY_ONE = '/vs/day-one',
   WIKI = '/wiki',
   SANCTUARY = '/sanctuary',
   SANCTUARY_ARTICLE = '/sanctuary/:pageType',
+  RELATIONSHIPS = '/relationships',
+  RELATIONSHIP_DETAIL = '/relationships/:id',
 }

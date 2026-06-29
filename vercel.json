@@ -1,5 +1,23 @@
 {
   "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "destination": "https://www.reflections-sanctuary.space/$1",
+      "statusCode": 301,
+      "has": [
+        {
+          "type": "host",
+          "value": "reflections-sanctuary.space"
+        }
+      ]
+    },
+    {
+      "source": "/features/relationships",
+      "destination": "/faq",
+      "statusCode": 301
+    }
+  ],
   "headers": [
     {
       "source": "/sw.js",
@@ -73,6 +91,9 @@
     { "source": "/wiki", "destination": "/index.html" },
     { "source": "/wiki/:path*", "destination": "/index.html" },
     { "source": "/sanctuary", "destination": "/index.html" },
-    { "source": "/sanctuary/:path*", "destination": "/index.html" }
+    { "source": "/sanctuary/:path*", "destination": "/index.html" },
+    { "source": "/relationships", "destination": "/index.html" },
+    { "source": "/relationships/:path*", "destination": "/index.html" },
+    { "source": "/recover-private-writing", "destination": "/index.html" }
   ]
 }

@@ -305,7 +305,7 @@ export const AmbientMusicButton: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
               transition={{ duration: 0.25 }}
-              className="text-[11px] font-bold text-white/85 whitespace-nowrap [text-shadow:0_1px_4px_rgba(0,0,0,0.5)]"
+              className="text-ui-xs font-bold text-white/85 whitespace-nowrap [text-shadow:0_1px_4px_rgba(0,0,0,0.5)]"
             >
               {activeTrack.label}
             </motion.span>

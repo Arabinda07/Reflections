@@ -8,7 +8,6 @@ import { Envelope } from '@phosphor-icons/react/Envelope';
 import { GoogleLogo } from '@phosphor-icons/react/GoogleLogo';
 import { Lock } from '@phosphor-icons/react/Lock';
 import { User } from '@phosphor-icons/react/User';
-import { UserPlus } from '@phosphor-icons/react/UserPlus';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { SectionHeader } from '@/components/ui/SectionHeader';
@@ -34,6 +33,8 @@ import {
 import { NEWSLETTER_SIGNUP_LABEL, buildNewsletterOptInMetadata } from '@/src/newsletter';
 import { referralService } from '@/services/referralService';
 import { commitAuthSession } from '@/src/auth/sessionUser';
+import { storePendingAccountPassword } from '@/src/auth/accountPasswordHandoff';
+import { getSignupEmailRedirectTo } from '@/src/auth/authRedirectConfig';
 
 export const SignUp: React.FC = () => {
   useDocumentMeta({
@@ -98,9 +99,9 @@ export const SignUp: React.FC = () => {
         options: {
           // Supabase hosted auth must allow-list this exact production callback URL
           // in Authentication -> URL Configuration, or signup confirmation links will fail.
-          emailRedirectTo: `${window.location.origin}${RoutePath.AUTH_CALLBACK}`,
+          emailRedirectTo: getSignupEmailRedirectTo(),
           data: {
-            full_name: name,
+            full_name: name.trim() || email.split('@')[0],
             ...buildNewsletterOptInMetadata(newsletterOptIn),
           },
         },
@@ -111,12 +112,13 @@ export const SignUp: React.FC = () => {
       } else if (data.user && !data.session) {
         navigate(RoutePath.LOGIN, {
           state: {
-            successMessage: 'Account created successfully! Please check your email and verify your address before logging in.',
+            successMessage: `We sent a verification link to ${email}. Open it, then sign in here to start writing.`,
             email,
           },
         });
       } else if (data.session) {
         commitAuthSession(data.session);
+        storePendingAccountPassword(password, data.session.user.id);
         await recordAcceptedReferral();
         navigate(postLoginPath, { replace: true, state: { justLoggedIn: true } });
       }
@@ -180,7 +182,7 @@ export const SignUp: React.FC = () => {
           <div className="p-8 sm:p-10 space-y-6">
             <Link
               to={homePath}
-              className="-ml-3 inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] px-3 text-[13px] font-bold text-gray-nav transition-colors hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
+              className="-ml-3 inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] px-3 text-btn-sm font-bold text-gray-nav transition-colors hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
               aria-label="Back to home"
             >
               <ArrowLeft size={16} weight="bold" />
@@ -190,104 +192,7 @@ export const SignUp: React.FC = () => {
             <SectionHeader
               eyebrow="Join Reflections"
               title="Create account"
-              icon={
-                <div className="icon-block icon-block-md">
-                  <UserPlus size={24} weight="duotone" />
-                </div>
-              }
             />
-
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <motion.div 
-                animate={error ? { x: [-8, 8, -6, 6, -4, 4, 0] } : {}} 
-                transition={{ duration: 0.4 }}
-                className="space-y-5"
-              >
-                <Input
-                  id="name"
-                  name="name"
-                  type="text"
-                  label="Full name"
-                  required
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
-                  placeholder="Enter your name"
-                  icon={User}
-                />
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  label="Email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  placeholder="Enter your email"
-                  icon={Envelope}
-                />
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  label="Password"
-                  autoComplete="new-password"
-                  required
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  placeholder="Create a password"
-                  icon={Lock}
-                />
-              </motion.div>
-
-              <label htmlFor="newsletter" className="mt-4 flex min-h-11 cursor-pointer select-none items-center gap-3 rounded-[var(--radius-control)] pr-2 text-[14px] font-medium text-gray-text">
-                <span className="relative flex h-11 w-11 shrink-0 items-center justify-center">
-                  <input
-                    type="checkbox"
-                    id="newsletter"
-                    checked={newsletterOptIn}
-                    onChange={(e) => setNewsletterOptIn(e.target.checked)}
-                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                  />
-                  <span
-                    aria-hidden="true"
-                    className={`flex h-6 w-6 items-center justify-center rounded-md border transition-colors ${
-                      newsletterOptIn ? 'border-green bg-green text-white' : 'border-border bg-body text-transparent'
-                    }`}
-                  >
-                    <Check size={16} weight="bold" />
-                  </span>
-                </span>
-                <span>
-                  {NEWSLETTER_SIGNUP_LABEL}
-                </span>
-              </label>
-
-              <Button type="submit" variant="primary" className="w-full h-[52px] text-[15px] font-bold mt-6" isLoading={loading}>
-                Create account
-              </Button>
-
-              <div className="min-h-[24px] mt-2 flex items-center justify-center">
-                <AnimatePresence>
-                  {error ? (
-                    <motion.p
-                      initial={{ opacity: 0, y: -5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -5 }}
-                      className="text-[13px] font-bold text-clay text-center"
-                    >
-                      {error}
-                    </motion.p>
-                  ) : null}
-                </AnimatePresence>
-              </div>
-            </form>
-
-            <div className="my-2 flex w-full items-center gap-4">
-              <div className="h-[1px] flex-1 bg-border" />
-              <span className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Or</span>
-              <div className="h-[1px] flex-1 bg-border" />
-            </div>
 
             <div className="space-y-3">
               {isVerifiedEmailAvailable() && (
@@ -310,12 +215,110 @@ export const SignUp: React.FC = () => {
                 disabled={loading}
                 className="w-full h-[52px] gap-3"
               >
-              <GoogleLogo size={20} weight="bold" aria-hidden="true" className="text-gray-text" />
-              <span className="font-bold text-gray-text">Continue with Google</span>
-            </Button>
-          </div>
+                <GoogleLogo size={20} weight="bold" aria-hidden="true" className="text-gray-text" />
+                <span className="font-bold text-gray-text">Continue with Google</span>
+              </Button>
+            </div>
 
-            <p className="text-[15px] font-bold text-gray-light text-center">
+            <div className="my-2 flex w-full items-center gap-4">
+              <div className="h-[1px] flex-1 bg-border" />
+              <span className="text-ui-xs font-black uppercase tracking-widest text-gray-nav">Or sign up with email</span>
+              <div className="h-[1px] flex-1 bg-border" />
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <motion.div 
+                animate={error ? { x: [-8, 8, -6, 6, -4, 4, 0] } : {}} 
+                transition={{ duration: 0.4 }}
+                className="space-y-5"
+              >
+                <Input
+                  id="name"
+                  name="name"
+                  type="text"
+                  label="Full name (optional)"
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  placeholder="Enter your name"
+                  icon={User}
+                />
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  label="Email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  placeholder="Enter your email"
+                  icon={Envelope}
+                />
+                <div className="space-y-1.5">
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    label="Password"
+                    autoComplete="new-password"
+                    required
+                    minLength={8}
+                    aria-describedby="signup-password-hint"
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    placeholder="Create a password"
+                    icon={Lock}
+                  />
+                  <p id="signup-password-hint" className="ml-1 text-ui-xs font-semibold text-gray-nav">
+                    At least 8 characters.
+                  </p>
+                </div>
+              </motion.div>
+
+              <label htmlFor="newsletter" className="mt-4 flex min-h-11 cursor-pointer select-none items-center gap-3 rounded-[var(--radius-control)] pr-2 text-ui-sm font-medium text-gray-text">
+                <span className="relative flex h-11 w-11 shrink-0 items-center justify-center">
+                  <input
+                    type="checkbox"
+                    id="newsletter"
+                    checked={newsletterOptIn}
+                    onChange={(e) => setNewsletterOptIn(e.target.checked)}
+                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                  />
+                  <span
+                    aria-hidden="true"
+                    className={`flex h-6 w-6 items-center justify-center rounded-md border transition-colors ${
+                      newsletterOptIn ? 'border-green bg-green text-white' : 'border-border bg-body text-transparent'
+                    }`}
+                  >
+                    <Check size={16} weight="bold" />
+                  </span>
+                </span>
+                <span>
+                  {NEWSLETTER_SIGNUP_LABEL}
+                </span>
+              </label>
+
+              <Button type="submit" variant="primary" className="w-full h-[52px] text-ui-base font-bold mt-6" isLoading={loading}>
+                Create account
+              </Button>
+
+              <div className="min-h-[24px] mt-2 flex items-center justify-center" role="alert" aria-live="assertive">
+                <AnimatePresence>
+                  {error ? (
+                    <motion.p
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -5 }}
+                      className="text-btn-sm font-bold text-clay text-center"
+                    >
+                      {error}
+                    </motion.p>
+                  ) : null}
+                </AnimatePresence>
+              </div>
+            </form>
+
+            <p className="text-ui-base font-bold text-gray-light text-center">
               Already have an account?{' '}
               <Link
                 to={RoutePath.LOGIN}

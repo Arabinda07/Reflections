@@ -4,7 +4,6 @@ interface SectionHeaderProps {
   eyebrow?: string;
   title: React.ReactNode;
   description?: React.ReactNode;
-  icon?: React.ReactNode;
   actions?: React.ReactNode;
   align?: 'left' | 'center';
   titleAs?: 'h1' | 'h2' | 'h3';
@@ -15,7 +14,6 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   eyebrow,
   title,
   description,
-  icon,
   actions,
   align = 'left',
   titleAs = 'h1',
@@ -35,7 +33,6 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
     <div className={rootClassName}>
       <div className="section-header-row">
         <div className="section-header-copy">
-          {icon ? <div className="section-header-icon">{icon}</div> : null}
           {eyebrow ? <span className="section-header-eyebrow">{eyebrow}</span> : null}
           <TitleTag className="section-header-title">{title}</TitleTag>
           {description ? <div className="section-header-description">{description}</div> : null}

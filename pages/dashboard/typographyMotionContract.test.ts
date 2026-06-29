@@ -97,7 +97,7 @@ describe('Typography and motion contract', () => {
     expect(app).not.toContain('<MotionConfig reducedMotion="user">');
     expect(indexCss).toContain('@media (prefers-reduced-motion: reduce)');
     expect(indexCss).toContain('animation-duration: 0.01ms !important');
-    expect(home).toContain('if (shouldReduceMotion)');
+    expect(home).toContain("shouldReduceMotion ? 'gone' : 'exiting'");
   });
 
   it('keeps dashboard motion off broad and layout-property animations', () => {
@@ -119,8 +119,8 @@ describe('Typography and motion contract', () => {
     const insights = read('pages/dashboard/Insights.tsx');
     const ambientButton = read('components/ui/AmbientMusicButton.tsx');
 
-    expect(insights).toContain("gridTemplateRows: '1fr'");
-    expect(insights).toContain('scaleX: percent / 100');
+    // Insights is prose-led now: no broad or layout-property animations.
+    expect(insights).not.toContain('transition-all');
     expect(ambientButton).toContain('scaleY: bar.h.map');
   });
 

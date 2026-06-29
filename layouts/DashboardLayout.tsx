@@ -4,9 +4,10 @@ import { Outlet, useLocation, useNavigate, useOutlet } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { House } from '@phosphor-icons/react/House';
 import { Notebook } from '@phosphor-icons/react/Notebook';
-import { PaperPlaneTilt } from '@phosphor-icons/react/PaperPlaneTilt';
 import { PencilSimpleLine } from '@phosphor-icons/react/PencilSimpleLine';
 import { Question } from '@phosphor-icons/react/Question';
+import { Sparkle } from '@phosphor-icons/react/Sparkle';
+import { Heart } from '@phosphor-icons/react/Heart';
 import { SignIn } from '@phosphor-icons/react/SignIn';
 import { UserCircle } from '@phosphor-icons/react/UserCircle';
 import { UserPlus } from '@phosphor-icons/react/UserPlus';
@@ -24,6 +25,7 @@ const ModalSheet = React.lazy(() => import('../components/ui/ModalSheet').then(m
 const ReferralInvitePanel = React.lazy(() => import('../components/ui/ReferralInvitePanel').then(m => ({ default: m.ReferralInvitePanel })));
 const SyncBanner = React.lazy(() => import('../components/ui/SyncBanner').then(m => ({ default: m.SyncBanner })));
 const MobileSidebar = React.lazy(() => import('./MobileSidebar').then(m => ({ default: m.MobileSidebar })));
+const NoteSearchPalette = React.lazy(() => import('../components/ui/NoteSearchPalette').then(m => ({ default: m.NoteSearchPalette })));
 const BugReportFlow = React.lazy(() => import('./BugReportFlow').then(m => ({ default: m.BugReportFlow })));
 const AuthenticatedMobileNav = React.lazy(() => import('./AuthenticatedMobileNav').then(m => ({ default: m.AuthenticatedMobileNav })));
 
@@ -35,6 +37,8 @@ const GUEST_NAV_ITEMS: SidebarNavItem[] = [
 const AUTH_NAV_ITEMS: SidebarNavItem[] = [
   { label: 'My notes', path: RoutePath.NOTES, icon: Notebook, description: 'Return to your saved reflections.' },
   { label: 'Create note', path: RoutePath.CREATE_NOTE, icon: PencilSimpleLine, description: 'Open a fresh writing surface.' },
+  { label: 'Insights', path: RoutePath.INSIGHTS, icon: Sparkle, description: 'See patterns drawn from your writing.' },
+  { label: 'Relationships', path: RoutePath.RELATIONSHIPS, icon: Heart, description: 'Tend people, hooks, and weekly care.' },
   { label: 'Account', path: RoutePath.ACCOUNT, icon: UserCircle, description: 'Manage your profile and plan.' },
   { label: 'FAQ', path: RoutePath.FAQ, icon: Question, description: 'Read how Reflections works.' },
 ];
@@ -46,7 +50,7 @@ const GUEST_SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
 ];
 
 const footerLinkClass =
-  'inline-flex min-h-11 min-w-11 items-center justify-center text-[11px] font-black uppercase tracking-widest text-gray-nav transition-colors hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
+  'inline-flex min-h-11 min-w-11 items-center justify-center text-ui-xs font-black uppercase tracking-widest text-gray-nav transition-colors hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
 
 export const DashboardLayout: React.FC = () => {
   const navigate = useNavigate();
@@ -58,6 +62,7 @@ export const DashboardLayout: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isBugReportOpen, setIsBugReportOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useAndroidBackHandler();
 
@@ -71,10 +76,27 @@ export const DashboardLayout: React.FC = () => {
     [navigate],
   );
 
+  // Keyboard shortcut: Ctrl/Cmd + K → search notes (signed-in only)
+  useKeyboardShortcut(
+    { key: 'k', ctrlOrCmd: true },
+    (e) => {
+      e.preventDefault();
+      if (isAuthenticated) setIsSearchOpen(true);
+    },
+    [isAuthenticated],
+  );
+
   // Capture referral codes from URL params
   useEffect(() => {
     referralService.captureReferralCode(location.search);
   }, [location.search]);
+
+  // Scroll the main content container to the top on route change.
+  // React Router's <ScrollRestoration /> targets window.scrollTo(), which has
+  // no effect because #main-content (overflow-y-auto) is the actual scroller.
+  useEffect(() => {
+    document.getElementById('main-content')?.scrollTo(0, 0);
+  }, [location.pathname]);
 
   // Derived route flags
   const isNoteEditRoute =
@@ -99,7 +121,7 @@ export const DashboardLayout: React.FC = () => {
 
   return (
     <div
-      className={`${routeSurfaceScopeClass} app-shell--fixed-scroll page-wash relative flex h-[100dvh] min-h-[100dvh] flex-col overflow-hidden bg-body font-sans selection:bg-green/30 selection:text-green`}
+      className={`${routeSurfaceScopeClass} page-wash app-shell--fixed-scroll relative flex h-[100dvh] min-h-[100dvh] flex-col overflow-hidden bg-body font-sans selection:bg-green/30 selection:text-green`}
     >
       <a href="#main-content" className="skip-link">
         Skip to content
@@ -114,6 +136,7 @@ export const DashboardLayout: React.FC = () => {
           isMobileMenuOpen={isMobileMenuOpen}
           onMobileMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           onInvite={() => setIsInviteModalOpen(true)}
+          onSearch={isAuthenticated ? () => setIsSearchOpen(true) : undefined}
         />
       )}
 
@@ -173,7 +196,7 @@ export const DashboardLayout: React.FC = () => {
                 </Link>
               </nav>
 
-              <div className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">
+              <div className="text-ui-xs font-black uppercase tracking-widest text-gray-nav/60">
                 © 2026{' '}
                 <a
                   href="https://arabinda07.github.io/"
@@ -213,13 +236,21 @@ export const DashboardLayout: React.FC = () => {
           onClose={() => setIsInviteModalOpen(false)}
           title="Invite someone"
           description="Share Reflections with someone who might want a space to write."
-          icon={<PaperPlaneTilt size={20} weight="duotone" />}
-          tone="honey"
+          tone="paper"
           size="md"
+          panelClassName="modal-sheet-panel--compact"
+          bodyClassName="modal-sheet-body--compact"
         >
           <ReferralInvitePanel compact />
         </ModalSheet>
       </React.Suspense>
+
+      {/* Note search palette (⌘K) */}
+      {isAuthenticated && (
+        <React.Suspense fallback={null}>
+          <NoteSearchPalette isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+        </React.Suspense>
+      )}
     </div>
   );
 };

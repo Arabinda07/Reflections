@@ -55,8 +55,6 @@ describe('focused product slice source contract', () => {
     const chip = read('components/ui/Chip.tsx');
     const styles = read('index.css');
 
-    expect(myNotes).toContain('tag-filter-shelf');
-    expect(myNotes).toContain('tag-filter-chip-rail');
     expect(myNotes).toContain('Filter by tag');
     expect(myNotes).toContain('tagSummaries');
     expect(myNotes).toContain('countLabel');
@@ -77,8 +75,25 @@ describe('focused product slice source contract', () => {
     expect(singleNote).toContain("import { downloadNoteExport } from './noteExport';");
     expect(singleNote).not.toContain('<NoteExportDialog');
     expect(singleNote).not.toContain('setIsExportOpen(true)');
-    expect(singleNote).toContain("onClick={() => downloadNoteExport(note, 'md')}");
+    expect(singleNote).toContain('handleExportClick');
     expect(singleNote).toContain('aria-label="Export this reflection"');
+  });
+
+  it('offers attachment downloads from the single-note export sheet without adding download-all', () => {
+    const singleNote = read('pages/dashboard/SingleNote.tsx');
+
+    expect(singleNote).toContain('isExportSheetOpen');
+    expect(singleNote).toContain('setIsExportSheetOpen');
+    expect(singleNote).toContain('hasAttachments');
+    expect(singleNote).toContain("downloadNoteExport(note, 'md')");
+    expect(singleNote).toContain('Download Markdown');
+    expect(singleNote).toContain('Choose an attachment to download');
+    expect(singleNote).toContain('noteAttachments.map');
+    expect(singleNote).toContain('downloadAttachment(attachment)');
+    expect(singleNote).toContain('link.download = attachment.name');
+    expect(singleNote).toContain('aria-label={`Download attachment: ${attachment.name}`}');
+    expect(singleNote).not.toContain('Download all');
+    expect(singleNote).not.toContain('downloadAllAttachments');
   });
 
   it('keeps the home dashboard organized around the primary writing action', () => {
@@ -90,7 +105,6 @@ describe('focused product slice source contract', () => {
     expect(homeAuthenticated).toContain('Quick check-in');
     expect(homeAuthenticated).toContain('Future letter');
     expect(homeAuthenticated).toContain('Your Rhythm');
-    expect(homeAuthenticated).toContain('Before you write');
     expect(homeAuthenticated).toContain('core-bento-grid');
     expect(homeAuthenticated).toContain('home-primary-action-row');
     expect(homeAuthenticated).toContain('home-secondary-action-row');
@@ -149,7 +163,6 @@ describe('focused product slice source contract', () => {
       expect(read(filePath).toLowerCase()).not.toContain('quietly');
     });
     expect(read('pages/dashboard/FutureLetters.tsx')).toContain('Waiting to open');
-    expect(read('pages/dashboard/Account.tsx')).toContain('while Smart Mode is on');
     expect(read('api/ai.ts')).toContain('calm, and reflective');
   });
 

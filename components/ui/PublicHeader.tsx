@@ -136,17 +136,10 @@ const HelpBubbleIcon: React.FC<IconProps> = ({ className = '' }) => (
   </svg>
 );
 
-const PeopleSparkIcon: React.FC<IconProps> = ({ className = '' }) => (
+const HeartLineIcon: React.FC<IconProps> = ({ className = '' }) => (
   <svg viewBox="0 0 24 24" aria-hidden="true" className={className} fill="none">
     <path
-      d="M8.5 11.2a2.9 2.9 0 1 0 0-5.8 2.9 2.9 0 0 0 0 5.8ZM3.9 18.6a4.7 4.7 0 0 1 9.2 0"
-      stroke="currentColor"
-      strokeWidth="1.9"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M16.4 6.5v3.1M18 8h-3.1M17.6 14.1a3.7 3.7 0 0 1 2.5 3.5"
+      d="M12 19.2c-.4 0-.8-.14-1.1-.42C6.6 15.1 4 12.7 4 9.7A3.9 3.9 0 0 1 7.9 5.8c1.5 0 2.9.8 3.6 2 .7-1.2 2.1-2 3.6-2A3.9 3.9 0 0 1 19 9.7c0 3-2.6 5.4-6.9 9.08-.3.28-.7.42-1.1.42Z"
       stroke="currentColor"
       strokeWidth="1.9"
       strokeLinecap="round"
@@ -217,7 +210,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
   const mobileMenuItems = [
     { label: 'Home', href: RoutePath.HOME, icon: HomeLineIcon },
     { label: 'FAQ', href: RoutePath.FAQ, icon: HelpBubbleIcon },
-    { label: 'About', href: RoutePath.ABOUT, icon: PeopleSparkIcon },
+    { label: 'About', href: RoutePath.ABOUT, icon: HeartLineIcon },
     { label: 'Privacy', href: RoutePath.PRIVACY, icon: ShieldLeafIcon },
   ] satisfies PublicMobileMenuItem[];
 
@@ -483,7 +476,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
                   href={item.href}
                   onClick={(event) => handleAppRouteNavigation(event, item.href)}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`inline-flex min-h-11 items-center rounded-xl border px-3 py-2 text-[12px] font-extrabold transition-colors duration-200 hover:border-green/20 hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-1 xl:px-4 xl:text-[13px] ${
+                  className={`inline-flex min-h-11 items-center rounded-xl border px-3 py-2 text-ui-xs font-extrabold transition-colors duration-200 hover:border-green/20 hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-1 xl:px-4 xl:text-btn-sm ${
                     isActive ? 'border-green/20 bg-green/[0.025] text-green' : 'border-transparent text-gray-nav'
                   }`}
                 >
@@ -495,14 +488,14 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
             <a
               href={RoutePath.LOGIN}
               onClick={(event) => handleAppRouteNavigation(event, RoutePath.LOGIN)}
-              className="inline-flex min-h-11 items-center rounded-xl px-3 py-2 text-[13px] font-extrabold text-gray-nav transition-colors hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+              className="inline-flex min-h-11 items-center rounded-xl px-3 py-2 text-btn-sm font-extrabold text-gray-nav transition-colors hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
             >
               Sign in
             </a>
             <a
               href={RoutePath.SIGNUP}
               onClick={(event) => handleAppRouteNavigation(event, RoutePath.SIGNUP)}
-              className="inline-flex min-h-11 items-center rounded-xl bg-green px-4 py-2 text-[13px] font-extrabold text-white shadow-sm shadow-green/10 transition-colors hover:bg-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
+              className="inline-flex min-h-11 items-center rounded-xl bg-green px-4 py-2 text-btn-sm font-extrabold text-white shadow-sm shadow-green/10 transition-colors hover:bg-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
             >
               Sign up
             </a>

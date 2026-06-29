@@ -7,18 +7,23 @@ const read = (filePath: string) =>
 
 describe('auth redirect origin contract', () => {
   it('keeps browser auth callbacks tied to the current origin', () => {
+    const config = read('src/auth/authRedirectConfig.ts');
     const googleOAuth = read('src/auth/googleOAuth.ts');
     const signIn = read('pages/auth/SignIn.tsx');
     const signUp = read('pages/auth/SignUp.tsx');
     const account = read('pages/dashboard/Account.tsx');
     const callback = read('pages/auth/AuthCallback.tsx');
 
-    expect(googleOAuth).toContain('`${window.location.origin}${RoutePath.AUTH_CALLBACK}`');
-    expect(signIn).toContain('`${window.location.origin}${RoutePath.AUTH_CALLBACK}?next=${RoutePath.RESET_PASSWORD}`');
-    expect(signUp).toContain('emailRedirectTo: `${window.location.origin}${RoutePath.AUTH_CALLBACK}`');
-    expect(account).toContain('`${window.location.origin}${RoutePath.AUTH_CALLBACK}?next=${RoutePath.RESET_PASSWORD}`');
-    expect(callback).toContain('new URL(nextPath, window.location.origin)');
-    expect(callback).toContain('if (url.origin !== window.location.origin) return null;');
+    expect(config).toContain('getBrowserAuthCallbackUrl');
+    expect(config).toContain('window.location.origin');
+    expect(config).toContain('getPasswordResetRedirectTo');
+    expect(config).toContain('getSignupEmailRedirectTo');
+    expect(config).toContain('resolveSafeCallbackNextPath');
+    expect(googleOAuth).toContain('getOAuthRedirectTo');
+    expect(signIn).toContain('getPasswordResetRedirectTo()');
+    expect(signUp).toContain('emailRedirectTo: getSignupEmailRedirectTo()');
+    expect(account).toContain('getPasswordResetRedirectTo()');
+    expect(callback).toContain('resolveSafeCallbackNextPath(nextPath)');
   });
 
   it('does not hardcode the canonical web domain into browser auth redirects', () => {
@@ -31,5 +36,18 @@ describe('auth redirect origin contract', () => {
       expect(source).not.toContain('https://www.reflections-sanctuary.space/auth/callback');
       expect(source).not.toContain('https://reflections-ebon.vercel.app/auth/callback');
     }
+  });
+
+  it('documents external auth allow-list values that must match the redirect config', () => {
+    const envExample = read('.env.example');
+    const vercel = read('vercel.json');
+
+    expect(envExample).toContain('Supabase Auth URL allow-list');
+    expect(envExample).toContain('https://www.reflections-sanctuary.space/auth/callback');
+    expect(envExample).toContain('http://localhost:3000/auth/callback');
+    expect(envExample).toContain('https://*-*.vercel.app/auth/callback');
+    expect(envExample).toContain('com.arabinda.reflections://auth/callback');
+    expect(vercel).toContain('"source": "/auth/:path*"');
+    expect(vercel).toContain('"source": "/reset-password"');
   });
 });

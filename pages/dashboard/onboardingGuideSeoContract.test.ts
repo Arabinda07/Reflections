@@ -20,32 +20,56 @@ const structuredDataTypes = () => {
 describe('onboarding, guide, install, feedback, and SEO contract', () => {
   it('keeps authenticated onboarding as a four-step writing-first dialog', () => {
     const home = read('pages/dashboard/HomeAuthenticated.tsx');
+    const flow = read('features/private-writing-onboarding/PrivateWritingOnboardingFlow.tsx');
+    const setupStep = read('features/private-writing-onboarding/PrivateWritingSetupStep.tsx');
+    const hook = read('features/private-writing-onboarding/usePrivateWritingOnboarding.ts');
+    const content = read('features/private-writing-onboarding/onboardingContent.ts');
 
-    expect(home).toContain('const ONBOARDING_STEPS');
-    expect(home).toContain('onboardingStep');
-    expect(home).toContain('Step {onboardingStep + 1} of {ONBOARDING_STEPS.length}');
-    expect(home).toContain('onboarding-step-copy');
-    expect(home).toContain('Skip onboarding');
-    expect(home).toContain('Back');
-    expect(home).toContain('Next');
-    expect(home).toContain('Begin writing');
-    expect(home).toContain('Private and secure');
-    expect(home).toContain('AI only runs if you specifically ask');
-    expect(home).toContain('hasSeenOnboarding');
-    expect(home).toContain('aria-live="polite"');
+    expect(home).toContain('PrivateWritingOnboardingFlow');
+    expect(home).toContain('usePrivateWritingOnboarding');
+    expect(home).toContain('onExitToWriting={onboarding.exitToWriting}');
+    expect(home).toContain('setupEncryption={cryptoContext.setupEncryption}');
+    expect(home).toContain('confirmRecoveryKey={cryptoContext.confirmRecoveryKey}');
+    expect(home).not.toContain('profileService.getOnboardingState');
+    expect(home).not.toContain('profileService.completeOnboarding');
+    expect(home).not.toContain('PrivateWritingOnboardingSetup');
+
+    expect(content).toContain('PRIVATE_WRITING_ONBOARDING_STEPS');
+    expect(flow).toContain('onboardingStep');
+    expect(flow).toContain('Step {onboardingStep + 1} of {PRIVATE_WRITING_ONBOARDING_STEPS.length}');
+    expect(flow).toContain('shouldShowSetupReady');
+    expect(flow).toContain('Show me around');
+    expect(flow).toContain('onboarding-step-copy');
+    expect(flow).toContain('Skip onboarding');
+    expect(flow).toContain('disableDismiss={!canDismissOnboarding}');
+    expect(flow).toContain('Back');
+    expect(flow).toContain('Next');
+    expect(flow).toContain('Begin writing');
+    expect(flow).toContain('PrivateWritingSetupStep');
+    expect(setupStep).toContain('Use my account password');
+    expect(setupStep).toContain('Use a separate password');
+    expect(content).toContain('Private and secure');
+    expect(content).toContain('AI only runs if you specifically ask');
+    expect(hook).toContain('profileService.getOnboardingState');
+    expect(hook).toContain('profileService.completeOnboarding');
+    expect(home).not.toContain('hasSeenOnboarding');
+    expect(flow).toContain('aria-live="polite"');
   });
 
   it('keeps onboarding centered and non-repetitive on mobile', () => {
     const home = read('pages/dashboard/HomeAuthenticated.tsx');
+    const flow = read('features/private-writing-onboarding/PrivateWritingOnboardingFlow.tsx');
     const modalSheet = read('components/ui/ModalSheet.tsx');
     const modalCss = read('components/ui/modal-sheet.css');
 
-    expect(home).toContain('mobilePlacement="center"');
-    expect(home).toContain('title={currentOnboardingStep.title}');
-    expect(home).not.toContain('description={currentOnboardingStep.body}');
-    expect(home).toContain('onboarding-footer-actions');
-    expect(home).toContain('sm:justify-between');
-    expect(home).toContain('onboarding-progress-rail');
+    expect(flow).toContain('mobilePlacement="center"');
+    expect(flow).toContain("shouldShowPrivateWritingSetup");
+    expect(flow).toContain("'Set up private writing'");
+    expect(flow).toContain("'Your private space is ready'");
+    expect(flow).not.toContain('description={currentOnboardingStep.body}');
+    expect(flow).toContain('onboarding-footer-actions');
+    expect(flow).toContain('sm:justify-between');
+    expect(flow).toContain('onboarding-progress-rail');
     expect(home).not.toContain('const OnboardingIcon');
     expect(home).not.toContain('icon={<OnboardingIcon');
 
@@ -56,13 +80,16 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
 
   it('gives onboarding modal a distinctive editorial treatment', () => {
     const home = read('pages/dashboard/HomeAuthenticated.tsx');
+    const flow = read('features/private-writing-onboarding/PrivateWritingOnboardingFlow.tsx');
     const modalCss = read('components/ui/modal-sheet.css');
 
-    expect(home).toContain('panelClassName="onboarding-modal-panel"');
-    expect(home).toContain('CurrentOnboardingIcon');
-    expect(home).toContain('onboarding-step-stage');
-    expect(home).toContain('onboarding-step-note');
-    expect(home).toContain('font-serif italic');
+    expect(flow).toContain('panelClassName="onboarding-modal-panel"');
+    expect(flow).toContain('CurrentOnboardingIcon');
+    expect(flow).toContain('onboarding-step-stage');
+    expect(flow).toContain('onboarding-step-note');
+    // Editorial treatment now lives in the serif modal title (modalCss below); the
+    // step-note italic-serif subhead was dropped as a design tell.
+    expect(flow).not.toContain('font-serif italic');
     expect(home).not.toContain('currentOnboardingStep.signal');
     expect(home).not.toContain('onboarding-step-index');
     expect(home).not.toContain('onboarding-step-folio');

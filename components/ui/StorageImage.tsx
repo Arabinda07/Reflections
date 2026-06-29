@@ -22,6 +22,7 @@ export const StorageImage: React.FC<StorageImageProps> = ({
 
   useEffect(() => {
     let isMounted = true;
+    let objectUrl: string | null = null;
     
     const loadSrc = async () => {
       setLoading(true);
@@ -40,7 +41,12 @@ export const StorageImage: React.FC<StorageImageProps> = ({
 
       try {
         const url = await storageService.getSignedUrl(path);
-        if (isMounted) setSrc(url);
+        if (url.startsWith('blob:')) objectUrl = url;
+        if (isMounted) {
+          setSrc(url);
+        } else if (objectUrl) {
+          URL.revokeObjectURL(objectUrl);
+        }
       } catch (err) {
         console.error("Failed to load image", err);
         if (isMounted) setSrc(fallbackSrc || null);
@@ -50,7 +56,10 @@ export const StorageImage: React.FC<StorageImageProps> = ({
     };
 
     loadSrc();
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
   }, [path, fallbackSrc]);
 
   if (loading && showLoading) {

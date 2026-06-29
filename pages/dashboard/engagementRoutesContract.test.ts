@@ -100,11 +100,10 @@ describe('engagement routes source contract', () => {
     expect(letters).not.toContain('noteService');
   });
 
-  it('renders private-safe completion card actions on recap, release, and letter flows', () => {
+  it('renders private-safe completion card actions on release and letter flows', () => {
     const cardActionsPath = 'components/ui/CompletionCardActions.tsx';
     expect(existsSync(path.resolve(process.cwd(), cardActionsPath))).toBe(true);
     const actions = read(cardActionsPath);
-    const insights = read('pages/dashboard/Insights.tsx');
     const releaseMode = read('pages/dashboard/ReleaseMode.tsx');
     const letters = read('pages/dashboard/FutureLetters.tsx');
 
@@ -115,7 +114,6 @@ describe('engagement routes source contract', () => {
     expect(actions).toContain('isErrorStatus');
     expect(actions).toContain('min-h-11 w-full sm:w-auto');
     expect(actions).not.toMatch(/note\.content|mood|tags|aiSummary|theme/i);
-    expect(insights).toContain('<CompletionCardActions');
     expect(releaseMode).toContain('<CompletionCardActions');
     expect(letters).toContain('<CompletionCardActions');
   });
@@ -134,7 +132,7 @@ describe('engagement routes source contract', () => {
     expect(signUp).toContain('referralService.recordAcceptedReferral');
     const referralPanel = read('components/ui/ReferralInvitePanel.tsx');
     expect(referralPanel).toContain('WarningCircle');
-    expect(referralPanel).toContain('min-h-11 w-full sm:w-auto');
+    expect(referralPanel).toContain('min-h-11 w-fit self-end sm:self-auto');
     expect(`${layout}\n${account}`.toLowerCase()).not.toMatch(/\b(reward|badge|leaderboard|feed|friends)\b/);
   });
 
@@ -148,8 +146,8 @@ describe('engagement routes source contract', () => {
     expect(about).toContain('AI should wait');
     expect(about).toContain('Private writing');
     expect(about).toContain('Thank you for trusting me with a few minutes of your day.');
-    expect(about).toContain('-ml-2');
-    expect(about).toContain('min-h-11');
+    expect(about).toContain('PublicPageShell');
+    expect(about).toContain('onBack');
     expect(about.toLowerCase()).not.toMatch(/\b(streak|score|xp|leaderboard|diagnose|therapy replacement)\b/);
   });
 

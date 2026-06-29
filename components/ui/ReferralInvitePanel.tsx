@@ -1,11 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { motion } from 'motion/react';
 import { Check } from '@phosphor-icons/react/Check';
 import { CopySimple } from '@phosphor-icons/react/CopySimple';
-import { PaperPlaneTilt } from '@phosphor-icons/react/PaperPlaneTilt';
 import { WarningCircle } from '@phosphor-icons/react/WarningCircle';
 import { Button } from './Button';
-import { MetadataPill } from './MetadataPill';
 import { buildReferralLink, referralService } from '../../services/referralService';
 import type { ReferralInvite } from '../../types';
 import { useHaptics } from '../../hooks/useHaptics';
@@ -22,6 +19,7 @@ export const ReferralInvitePanel: React.FC<ReferralInvitePanelProps> = ({ compac
   const { playSaveChime } = useSound();
   const [isLoading, setIsLoading] = useState(true);
   const [status, setStatus] = useState<string | null>(null);
+  const [justCopied, setJustCopied] = useState(false);
   const isErrorStatus = status ? status.startsWith('I could not') || status.startsWith('Copy did not') : false;
 
   useEffect(() => {
@@ -96,6 +94,8 @@ export const ReferralInvitePanel: React.FC<ReferralInvitePanelProps> = ({ compac
     try {
       await copyInviteLink();
       setStatus('Invite link copied.');
+      setJustCopied(true);
+      window.setTimeout(() => setJustCopied(false), 2000);
       haptics.confirming();
       playSaveChime();
     } catch (error) {
@@ -145,37 +145,29 @@ export const ReferralInvitePanel: React.FC<ReferralInvitePanelProps> = ({ compac
 
   return (
     <div className={compact ? 'space-y-4' : 'space-y-5'}>
-      <div className="flex flex-wrap items-center gap-2">
-        <MetadataPill tone="green">
-          {acceptedCount} {acceptedCount === 1 ? 'person' : 'people'} joined
-        </MetadataPill>
-        {invite?.lastSharedAt ? <MetadataPill>Shared {new Date(invite.lastSharedAt).toLocaleDateString()}</MetadataPill> : null}
-      </div>
+      <p className="text-xs font-bold text-gray-nav">
+        {acceptedCount === 0 ? 'No one has joined yet' : `${acceptedCount} ${acceptedCount === 1 ? 'person' : 'people'} joined`}
+        {invite?.lastSharedAt ? ` · Shared ${new Date(invite.lastSharedAt).toLocaleDateString()}` : ''}
+      </p>
 
-      <div className="surface-inline-panel p-4">
-        <p className="mb-2 label-caps text-gray-nav">
-          Invite link
-        </p>
-        <p className="break-all font-mono text-sm leading-relaxed text-gray-text">
-          {inviteLink || 'Invite link unavailable'}
-        </p>
-      </div>
-
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <Button type="button" size="sm" onClick={handleShare} disabled={!inviteLink} className="min-h-11 w-full sm:w-auto overflow-hidden group relative">
-          <span className="relative z-10 flex items-center">
-            Invite
-            <motion.div
-              animate={status === 'Invite shared.' ? { x: 30, y: -30, opacity: 0, scale: 0.5 } : { x: 0, y: 0, opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <PaperPlaneTilt size={16} weight="bold" className="ml-2" />
-            </motion.div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="surface-inline-panel flex items-center gap-2 py-1.5 pl-4 pr-1.5 flex-1 min-w-0">
+          <span className="min-w-0 flex-1 truncate font-mono text-sm text-gray-text">
+            {inviteLink || 'Invite link unavailable'}
           </span>
-        </Button>
-        <Button type="button" variant="secondary" size="sm" onClick={handleCopy} disabled={!inviteLink} className="min-h-11 w-full sm:w-auto">
-          Copy link
-          <CopySimple size={16} weight="bold" className="ml-2" />
+          <button
+            type="button"
+            onClick={handleCopy}
+            disabled={!inviteLink}
+            aria-label="Copy invite link"
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-[var(--radius-control)] text-gray-nav transition-colors hover:bg-green/5 hover:text-green disabled:pointer-events-none disabled:opacity-50"
+          >
+            {justCopied ? <Check size={16} weight="bold" className="text-green" /> : <CopySimple size={16} weight="bold" />}
+          </button>
+        </div>
+
+        <Button type="button" size="sm" onClick={handleShare} disabled={!inviteLink} className="min-h-11 w-fit self-end sm:self-auto shrink-0">
+          Invite
         </Button>
       </div>
 

@@ -1,12 +1,11 @@
 import React, { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
-import { ArrowUpRight } from '@phosphor-icons/react/ArrowUpRight';
 import { Calendar as CalendarIcon } from '@phosphor-icons/react/Calendar';
 import { CircleNotch } from '@phosphor-icons/react/CircleNotch';
-import { Download } from '@phosphor-icons/react/Download';
+import { DownloadSimple } from '@phosphor-icons/react/DownloadSimple';
 import { FileText } from '@phosphor-icons/react/FileText';
-import { Plus } from '@phosphor-icons/react/Plus';
+import { PencilSimpleLine } from '@phosphor-icons/react/PencilSimpleLine';
 import { SquaresFour } from '@phosphor-icons/react/SquaresFour';
 import { Tag } from '@phosphor-icons/react/Tag';
 import { Trash } from '@phosphor-icons/react/Trash';
@@ -19,6 +18,7 @@ import { EmptyState } from '../../components/ui/EmptyState';
 import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
 import { LoadingState } from '../../components/ui/LoadingState';
 import { MetadataPill } from '../../components/ui/MetadataPill';
+import { ModalSheet } from '../../components/ui/ModalSheet';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { StorageImage } from '../../components/ui/StorageImage';
@@ -52,6 +52,8 @@ export const MyNotes: React.FC = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [noteIdToDelete, setNoteIdToDelete] = useState<string | null>(null);
+  const [actionMenuNote, setActionMenuNote] = useState<Note | null>(null);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'calendar'>('grid');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [swipedNoteId, setSwipedNoteId] = useState<string | null>(null);
@@ -238,7 +240,7 @@ export const MyNotes: React.FC = () => {
             className="flex h-11 w-11 items-center justify-center self-end rounded-2xl bg-green text-white"
             aria-label={`Export ${note.title}`}
           >
-            <Download size={15} weight="bold" />
+            <DownloadSimple size={15} weight="bold" />
           </button>
           <button
             type="button"
@@ -290,19 +292,6 @@ export const MyNotes: React.FC = () => {
               )}
             </Link>
 
-            <button
-              onClick={(event) => initiateDelete(event, note.id)}
-              disabled={isDeleting && noteIdToDelete === note.id}
-              className="control-surface absolute left-4 top-4 z-20 inline-flex h-11 w-11 items-center justify-center rounded-2xl text-gray-text shadow-sm backdrop-blur-xl transition-[transform,border-color,color] duration-500 hover:scale-110 hover:border-clay/30 hover:text-clay"
-              aria-label={`Delete ${note.title}`}
-            >
-              {isDeleting && noteIdToDelete === note.id ? (
-                <CircleNotch size={16} weight="bold" className="animate-spin text-clay" />
-              ) : (
-                <Trash size={16} weight="bold" className="transition-transform group-hover:rotate-12" />
-              )}
-            </button>
-
             <div className="absolute right-4 top-4 z-20 flex flex-wrap justify-end gap-2">
               <MetadataPill icon={<CalendarIcon size={12} weight="regular" />}>
                 {new Date(note.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
@@ -330,11 +319,11 @@ export const MyNotes: React.FC = () => {
               className="group/title rounded-[var(--radius-control)] focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
               aria-label={`Open ${note.title}`}
             >
-              <h3 className="mb-2 text-xl font-display font-extrabold tracking-normal text-gray-text leading-tight transition-colors group-hover:text-green text-balance">
+              <h3 className="dashboard-card-title mb-2 transition-colors group-hover:text-green text-balance">
                 {note.title}
               </h3>
 
-              <p className="mb-5 font-serif text-[15px] italic leading-relaxed text-gray-text/70 transition-colors group-hover:text-gray-text line-clamp-3">
+              <p className="dashboard-editorial-preview mb-5 max-w-none transition-colors group-hover:text-gray-text line-clamp-3">
                 {getPreviewText(note.content)}
               </p>
             </Link>
@@ -349,34 +338,17 @@ export const MyNotes: React.FC = () => {
                 </span>
               </div>
 
-              <div className="flex shrink-0 items-center gap-2">
-                <button
-                  type="button"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    downloadNoteExport(note, 'md');
-                  }}
-                  className="control-surface inline-flex h-11 w-11 items-center justify-center rounded-2xl text-gray-nav transition-[transform,border-color,background-color,color] duration-500 hover:scale-110 hover:border-green/25 hover:bg-green/5 hover:text-green"
-                  title={`Export ${note.title}`}
-                  aria-label={`Export ${note.title}`}
-                >
-                  <Download size={15} weight="bold" />
-                </button>
-
-                <Link
-                  to={noteDetailPath}
-                  onClick={openNote}
-                  className="inline-flex min-h-11 items-center rounded-2xl bg-green px-4 label-caps text-white shadow-lg shadow-green/10 transition-[background-color,transform] duration-300 hover:bg-green/90 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
-                  aria-label={`Open ${note.title}`}
-                >
-                  <span>Open</span>
-                  <ArrowUpRight
-                    size={14}
-                    weight="bold"
-                    className="ml-2 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                  />
-                </Link>
-              </div>
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setActionMenuNote(note);
+                }}
+                className="control-surface inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-gray-nav transition-[transform,border-color,background-color,color] duration-500 hover:scale-110 hover:border-green/25 hover:bg-green/5 hover:text-green"
+                aria-label={`More actions for ${note.title}`}
+              >
+                <SquaresFour size={18} weight="bold" />
+              </button>
             </div>
           </div>
         </article>
@@ -420,65 +392,36 @@ export const MyNotes: React.FC = () => {
                     >
                       Calendar
                     </Chip>
+                    {tagSummaries.length > 0 ? (
+                      <Chip
+                        active={!!tagFilter}
+                        icon={<Tag size={16} weight="regular" />}
+                        onClick={() => setIsFilterOpen(true)}
+                        title="Filter by tag"
+                        aria-label="Filter by tag"
+                      >
+                        Filter
+                      </Chip>
+                    ) : null}
                   </div>
-
-                  <Button onClick={() => navigate(RoutePath.CREATE_NOTE)} variant="primary" className="px-6">
-                    <Plus className="mr-2 h-5 w-5" weight="regular" />
-                    Create entry
-                  </Button>
                 </div>
               }
             />
 
-            {tagSummaries.length > 0 || tagFilter ? (
-              <Surface
-                variant="flat"
-                tone="paper"
-                className="tag-filter-shelf rounded-[2rem] border-border/50 p-5 sm:p-6"
-              >
-                <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-gray-nav">
-                      <Tag size={15} weight="duotone" className="text-green" />
-                      <p className="label-caps">Filter by tag</p>
-                    </div>
-                    <p className="text-sm font-semibold leading-relaxed text-gray-light">
-                      {tagFilter
-                        ? `Showing reflections tagged "${tagFilter}".`
-                        : `${countLabel} across ${taggedReflectionLabel}.`}
-                    </p>
-                  </div>
-
-                  {tagFilter ? (
-                    <div className="tag-filter-chip-rail flex max-w-full items-center gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0">
-                      <Chip as="span" active icon={<Tag size={12} weight="regular" />}>
-                        {tagFilter}
-                      </Chip>
-                      <span className="metadata-pill metadata-pill--sage">
-                        {selectedTagSummary?.count || 0} {(selectedTagSummary?.count || 0) === 1 ? 'reflection' : 'reflections'}
-                      </span>
-                      <Button variant="ghost" size="sm" onClick={() => handleTagFilterChange(RoutePath.NOTES)} className="text-clay">
-                        <X size={12} weight="regular" className="mr-1" />
-                        Clear filter
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="tag-filter-chip-rail flex max-w-full items-center gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0 lg:justify-end">
-                      {tagSummaries.map((tag) => (
-                        <Chip
-                          key={tag.name}
-                          icon={<Tag size={12} weight="regular" />}
-                          onClick={() => handleTagFilterChange(`${RoutePath.NOTES}?tag=${encodeURIComponent(tag.name)}`)}
-                          aria-label={`Show ${tag.name} reflections`}
-                        >
-                          <span>{tag.name}</span>
-                          <span className="tag-filter-count">{tag.count}</span>
-                        </Chip>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </Surface>
+            {tagFilter ? (
+              <div className="flex flex-wrap items-center gap-3">
+                <Chip as="span" active icon={<Tag size={12} weight="regular" />}>
+                  {tagFilter}
+                </Chip>
+                <p className="text-sm font-semibold text-gray-light">
+                  Showing reflections tagged "{tagFilter}" · {selectedTagSummary?.count || 0}{' '}
+                  {(selectedTagSummary?.count || 0) === 1 ? 'reflection' : 'reflections'}
+                </p>
+                <Button variant="ghost" size="sm" onClick={() => handleTagFilterChange(RoutePath.NOTES)} className="text-clay">
+                  <X size={12} weight="regular" className="mr-1" />
+                  Clear filter
+                </Button>
+              </div>
             ) : null}
 
             <div ref={notesViewScopeRef}>
@@ -520,11 +463,11 @@ export const MyNotes: React.FC = () => {
                       <EmptyState
                         surface="flat"
                         icon={<FileText size={22} weight="duotone" />}
-                        title="Nothing here yet. Suspiciously peaceful."
-                        description="Choose another date or drop a fresh reflection here."
+                        title="No notes on this day yet."
+                        description="Pick another day, or write one here."
                         action={
                           <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.CREATE_NOTE)} className="text-green">
-                            Create one now
+                            Write a note
                           </Button>
                         }
                       />
@@ -540,10 +483,10 @@ export const MyNotes: React.FC = () => {
               <EmptyState
                 surface="bezel"
                 illustration={<LottieAnimation src="/assets/lottie/empty-notes.json" className="h-full w-full" autoplay loop />}
-                title={tagFilter ? `No reflections with “${tagFilter}” yet.` : 'Nothing here yet. Suspiciously peaceful.'}
+                title={tagFilter ? `No notes tagged “${tagFilter}” yet.` : 'No notes yet.'}
                 description={
                   tagFilter
-                    ? 'Clear the filter to return to your full reflection library.'
+                    ? 'Clear the filter to see all your notes.'
                     : 'Start with the thought that keeps doing laps.'
                 }
                 action={
@@ -553,7 +496,7 @@ export const MyNotes: React.FC = () => {
                     </Button>
                   ) : (
                     <Button onClick={() => navigate(RoutePath.CREATE_NOTE)} variant="primary">
-                      Log a reflection
+                      Write a note
                     </Button>
                   )
                 }
@@ -568,11 +511,107 @@ export const MyNotes: React.FC = () => {
         isOpen={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
         onConfirm={performDelete}
-        title="Delete this reflection?"
+        title="Delete this note?"
         confirmLabel={isDeleting ? 'Deleting...' : 'Delete note'}
         isConfirming={isDeleting}
         variant="danger"
       />
+
+      <ModalSheet
+        isOpen={!!actionMenuNote}
+        onClose={() => setActionMenuNote(null)}
+        title="Note actions"
+        icon={<SquaresFour size={22} weight="duotone" />}
+        ariaLabel="Choose an action for this reflection"
+        size="sm"
+      >
+        <div className="space-y-2">
+          <button
+            type="button"
+            onClick={() => {
+              if (!actionMenuNote) return;
+              navigate(RoutePath.EDIT_NOTE.replace(':id', actionMenuNote.id));
+              setActionMenuNote(null);
+            }}
+            className="surface-inline-panel flex min-h-11 w-full items-center gap-3 px-4 py-4 text-left transition-colors hover:border-green/20 hover:bg-green/5"
+          >
+            <PencilSimpleLine size={20} weight="regular" className="flex-none text-green" />
+            <span className="text-sm font-extrabold text-gray-text">Edit</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              if (!actionMenuNote) return;
+              downloadNoteExport(actionMenuNote, 'md');
+              setActionMenuNote(null);
+            }}
+            className="surface-inline-panel flex min-h-11 w-full items-center gap-3 px-4 py-4 text-left transition-colors hover:border-green/20 hover:bg-green/5"
+          >
+            <DownloadSimple size={20} weight="regular" className="flex-none text-green" />
+            <span className="text-sm font-extrabold text-gray-text">Export</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              if (!actionMenuNote) return;
+              setNoteIdToDelete(actionMenuNote.id);
+              setActionMenuNote(null);
+              setIsConfirmOpen(true);
+            }}
+            className="surface-inline-panel flex min-h-11 w-full items-center gap-3 px-4 py-4 text-left transition-colors hover:border-clay/30 hover:bg-clay/5"
+          >
+            <Trash size={20} weight="regular" className="flex-none text-clay" />
+            <span className="text-sm font-extrabold text-clay">Delete</span>
+          </button>
+        </div>
+      </ModalSheet>
+
+      <ModalSheet
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        title="Filter by tag"
+        description={`${countLabel} across ${taggedReflectionLabel}.`}
+        ariaLabel="Filter reflections by tag"
+        size="sm"
+      >
+        <div className="space-y-2">
+          <button
+            type="button"
+            onClick={() => {
+              setIsFilterOpen(false);
+              handleTagFilterChange(RoutePath.NOTES);
+            }}
+            className={`surface-inline-panel flex min-h-11 w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:border-green/20 hover:bg-green/5 ${
+              !tagFilter ? 'border-green/30 bg-green/5' : ''
+            }`}
+          >
+            <span className="text-sm font-extrabold text-gray-text">All reflections</span>
+          </button>
+          {tagSummaries.map((tag) => (
+            <button
+              key={tag.name}
+              type="button"
+              onClick={() => {
+                setIsFilterOpen(false);
+                setSwipedNoteId(null);
+                navigate(`${RoutePath.NOTES}?tag=${encodeURIComponent(tag.name)}`);
+              }}
+              aria-label={`Show ${tag.name} reflections`}
+              className={`surface-inline-panel flex min-h-11 w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:border-green/20 hover:bg-green/5 ${
+                tagFilter === tag.name ? 'border-green/30 bg-green/5' : ''
+              }`}
+            >
+              <span className="flex items-center gap-2 text-sm font-bold text-gray-text">
+                <Tag size={14} weight="regular" className="text-green" />
+                {tag.name}
+              </span>
+              <span className="metadata-pill metadata-pill--sage">{tag.count}</span>
+            </button>
+          ))}
+        </div>
+      </ModalSheet>
     </>
   );
 };

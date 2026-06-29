@@ -6,9 +6,11 @@ import { CalendarBlank } from '@phosphor-icons/react/CalendarBlank';
 import { CaretRight } from '@phosphor-icons/react/CaretRight';
 import { Check } from '@phosphor-icons/react/Check';
 import { CircleNotch } from '@phosphor-icons/react/CircleNotch';
-import { DotsThreeCircle } from '@phosphor-icons/react/DotsThreeCircle';
+import { SquaresFour } from '@phosphor-icons/react/SquaresFour';
 import { FloppyDisk } from '@phosphor-icons/react/FloppyDisk';
 import { Headphones } from '@phosphor-icons/react/Headphones';
+import { Sparkle } from '@phosphor-icons/react/Sparkle';
+import { Tag } from '@phosphor-icons/react/Tag';
 import { Image as ImageIcon } from '@phosphor-icons/react/Image';
 import { ListChecks } from '@phosphor-icons/react/ListChecks';
 import { Paperclip } from '@phosphor-icons/react/Paperclip';
@@ -129,7 +131,7 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
           readOnly={task.completed}
           placeholder="What needs to be done?"
           aria-label={`Edit task: ${taskLabel}`}
-          className={`w-full bg-transparent border-none outline-none font-bold text-[14px] placeholder:text-gray-nav/40 transition-colors duration-300 ${
+          className={`w-full bg-transparent border-none outline-none font-bold text-ui-sm placeholder:text-gray-nav/40 transition-colors duration-300 ${
             showCompletedText ? 'text-gray-text/40' : 'text-gray-text'
           }`}
         />
@@ -303,6 +305,33 @@ export const CreateNote: React.FC = () => {
     }
   };
 
+  // First-ever save goes straight to a plain Save; the Save-vs-Release choice
+  // only appears once the writer has saved before, so note one isn't a quiz.
+  // ponytail: global flag (not per-user), set before save resolves; per-user
+  // tracking only if shared-browser onboarding becomes a real concern.
+  const handleSaveFabClick = () => {
+    setReleaseError(null);
+
+    let hasSavedBefore = false;
+    try {
+      hasSavedBefore = localStorage.getItem('reflections-save-choice-seen') === '1';
+    } catch {
+      hasSavedBefore = false;
+    }
+
+    if (!hasSavedBefore) {
+      try {
+        localStorage.setItem('reflections-save-choice-seen', '1');
+      } catch {
+        // Best-effort; if storage is blocked just fall through to a plain save.
+      }
+      void handleSave();
+      return;
+    }
+
+    setIsSaveChoiceOpen(true);
+  };
+
   const cycleSparkPrompt = () => {
     const nextState = getNextWellnessPromptState(promptIndex, DEFAULT_WELLNESS_PROMPTS);
     setPromptIndex(nextState.nextIndex);
@@ -445,7 +474,7 @@ export const CreateNote: React.FC = () => {
             {/* Desktop Back Button */}
             <button 
               onClick={() => navigate(RoutePath.NOTES)}
-              className="flex min-h-11 items-center gap-2 text-gray-nav hover:text-gray-text text-[13px] font-bold mb-8 group transition-colors"
+              className="flex min-h-11 items-center gap-2 text-gray-nav hover:text-gray-text text-btn-sm font-bold mb-8 group transition-colors"
             >
               <div className="control-surface flex h-8 w-8 items-center justify-center transition-colors group-hover:border-green/20 group-hover:bg-green/5">
                 <ArrowLeft size={14} weight="regular" />
@@ -457,17 +486,17 @@ export const CreateNote: React.FC = () => {
             
             {/* Options */}
             <button onClick={() => setIsMoodOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-[20px] transition-colors border border-border/40 ${mood ? getMoodConfig(mood)?.nav || 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>
-              <div className="flex items-center gap-3"><ActiveMoodIcon size={20} weight={mood ? "fill" : "regular"} /><span className="text-[13px] font-bold capitalize">{mood ? getMoodConfig(mood)?.label || mood : 'Mood'}</span></div>
+              <div className="flex items-center gap-3"><ActiveMoodIcon size={20} weight={mood ? "fill" : "regular"} /><span className="text-btn-sm font-bold capitalize">{mood ? getMoodConfig(mood)?.label || mood : 'Mood'}</span></div>
               <CaretRight size={14} className="opacity-40" />
             </button>
 
             <button onClick={() => setIsTagsOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-[20px] transition-colors border border-border/40 ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>
-              <div className="flex items-center gap-3"><TagIcon size={20} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-[13px] font-bold">{tags.length > 0 ? `${tags.length} Tags` : 'Tags'}</span></div>
+              <div className="flex items-center gap-3"><TagIcon size={20} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-btn-sm font-bold">{tags.length > 0 ? `${tags.length} Tags` : 'Tags'}</span></div>
               <CaretRight size={14} className="opacity-40" />
             </button>
 
             <button onClick={() => setIsMusicOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-[20px] transition-colors border border-border/40 ${musicPlaying ? 'bg-honey/10 border-honey/25 text-honey' : 'control-surface text-gray-text'}`}>
-              <div className="flex items-center gap-3"><Headphones size={20} weight={musicPlaying ? "fill" : "regular"} /><span className="text-[13px] font-bold">{musicPlaying && activeMusicTrack ? activeMusicTrack.emoji : 'Sounds'}</span></div>
+              <div className="flex items-center gap-3"><Headphones size={20} weight={musicPlaying ? "fill" : "regular"} /><span className="text-btn-sm font-bold">{musicPlaying && activeMusicTrack ? activeMusicTrack.emoji : 'Sounds'}</span></div>
               <CaretRight size={14} className="opacity-40" />
             </button>
 
@@ -475,17 +504,17 @@ export const CreateNote: React.FC = () => {
               onFinalTranscript={appendWhisperTranscript}
               label="Whisper"
               className="w-full"
-              buttonClassName="w-full flex min-h-14 items-center gap-3 rounded-[20px] border border-border/40 p-4 text-[13px] font-bold transition-colors"
+              buttonClassName="w-full flex min-h-14 items-center gap-3 rounded-[20px] border border-border/40 p-4 text-btn-sm font-bold transition-colors"
             />
 
             <button onClick={() => setIsTasksOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-[20px] transition-colors border border-border/40 ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>
-              <div className="flex items-center gap-3"><ListChecks size={20} weight={tasks.some(t => !t.completed) ? "fill" : "regular"} /><span className="text-[13px] font-bold">{getTaskDrawerTriggerLabel(tasks).label}</span></div>
+              <div className="flex items-center gap-3"><ListChecks size={20} weight={tasks.some(t => !t.completed) ? "fill" : "regular"} /><span className="text-btn-sm font-bold">{getTaskDrawerTriggerLabel(tasks).label}</span></div>
               <CaretRight size={14} className="opacity-40" />
             </button>
             
             <div className="grid grid-cols-2 gap-2 pt-2">
               <label className="control-surface flex flex-col items-center justify-center p-4 rounded-[20px] text-gray-text transition-colors cursor-pointer">
-                <Paperclip size={20} className="mb-2" /><span className="text-[10px] font-bold uppercase">Files</span>
+                <Paperclip size={20} className="mb-2" /><span className="text-ui-xs font-bold uppercase">Files</span>
                 <input type="file" multiple className="hidden" onChange={(e) => {
                   if (e.target.files) {
                 draft.addFiles(Array.from(e.target.files || []));
@@ -493,7 +522,7 @@ export const CreateNote: React.FC = () => {
                 }} />
               </label>
               <label className="control-surface flex flex-col items-center justify-center p-4 rounded-[20px] text-gray-text transition-colors cursor-pointer">
-                <ImageIcon size={20} className="mb-2" /><span className="text-[10px] font-bold uppercase">Cover</span>
+                <ImageIcon size={20} className="mb-2" /><span className="text-ui-xs font-bold uppercase">Cover</span>
                 <input type="file" className="hidden" accept="image/*" onChange={(e) => {
                   if (e.target.files?.[0]) setImagePreview(URL.createObjectURL(e.target.files[0]));
                 }} />
@@ -583,7 +612,7 @@ export const CreateNote: React.FC = () => {
 
           {/* Word count Ã¢â‚¬â€ shown only after 50+ words */}
           {wordCount >= 50 && (
-            <p className="mt-2 text-right text-[12px] font-medium text-gray-nav/40 select-none" aria-label={`${wordCount} words`}>
+            <p className="mt-2 text-right text-ui-xs font-medium text-gray-nav/40 select-none" aria-label={`${wordCount} words`}>
               {wordCount} words
             </p>
           )}
@@ -602,40 +631,37 @@ export const CreateNote: React.FC = () => {
             className="surface-floating group relative flex h-16 w-16 items-center justify-center rounded-full hover:text-green"
             aria-label="Open reflection options"
           >
-            <DotsThreeCircle size={28} weight="fill" className="opacity-80" />
+            <SquaresFour size={24} weight="fill" className="opacity-80" />
           </button>
         )}
 
-        {/* Interchangeable Action FAB (Spark / Save) */}
+        {/* Interchangeable Action FAB: cycles prompts while empty, becomes Save once you write */}
           {!hasContent ? (
             <button
               key="spark-fab"
               onClick={cycleSparkPrompt}
-              className="surface-floating group relative flex h-16 w-16 items-center justify-center rounded-full text-green transition-transform hover:scale-[1.02] active:scale-[0.98]"
+              className="surface-floating group relative flex h-16 items-center gap-2.5 rounded-full px-6 text-green transition-transform hover:scale-[1.02] active:scale-[0.98]"
               aria-label="Show another writing prompt"
             >
-              <div className="absolute inset-2 rounded-full bg-green/5 group-hover:bg-green/10 transition-colors" />
-              <Target size={28} weight="fill" />
+              <Target size={24} weight="fill" className="shrink-0" />
+              <span className="text-ui-sm font-bold">New prompt</span>
             </button>
           ) : (
             <button
               key="save-fab"
-              onClick={() => {
-                setReleaseError(null);
-                setIsSaveChoiceOpen(true);
-              }}
+              onClick={handleSaveFabClick}
               disabled={saving || isReleasing}
-              className="group relative h-16 w-16 rounded-full bg-green text-white shadow-xl shadow-green/25 flex items-center justify-center transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-90"
-              aria-label="Choose what to do with this reflection"
+              className="group relative flex h-16 items-center gap-2.5 rounded-full bg-green px-7 text-white shadow-xl shadow-green/25 transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-90"
+              aria-label="Save or release this reflection"
             >
-              {(saving || isReleasing) && (
-                <div
-                  className="absolute inset-0 rounded-full bg-green pointer-events-none animate-ping opacity-25"
-                />
+              {saving || isReleasing ? (
+                <CircleNotch size={24} className="relative z-10 animate-spin shrink-0" />
+              ) : (
+                <FloppyDisk size={24} weight="fill" className="relative z-10 shrink-0" />
               )}
-              
-              <div className="absolute inset-2 rounded-full bg-white/12 transition-transform duration-300 ease-out group-hover:scale-105" />
-              {saving || isReleasing ? <CircleNotch size={28} className="relative z-10 animate-spin" /> : <FloppyDisk size={26} weight="fill" className="relative z-10" />}
+              <span className="relative z-10 text-ui-base font-bold">
+                {saving ? 'Saving' : isReleasing ? 'Releasing' : 'Save'}
+              </span>
             </button>
           )}
       </div>
@@ -645,22 +671,23 @@ export const CreateNote: React.FC = () => {
         isOpen={isMobile && isMobileOptionsOpen}
         onClose={() => setIsMobileOptionsOpen(false)}
         title="Personalize"
+        icon={<Sparkle size={22} weight="duotone" />}
         size="sm"
         bodyClassName="pt-2"
       >
         <div className="grid grid-cols-2 gap-3">
-          <button onClick={() => { setIsMobileOptionsOpen(false); setIsMoodOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${mood ? getMoodConfig(mood)?.nav || 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><ActiveMoodIcon size={24} weight={mood ? "fill" : "regular"} /><span className="text-[14px] font-bold capitalize">{mood ? getMoodConfig(mood)?.label || mood : 'Mood'}</span></button>
-          <button onClick={() => { setIsMobileOptionsOpen(false); setIsTagsOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><TagIcon size={24} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-[14px] font-bold">Tags</span></button>
-          <button onClick={() => { setIsMobileOptionsOpen(false); setIsMusicOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${musicPlaying ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><Headphones size={24} weight={musicPlaying ? "fill" : "regular"} /><span className="text-[14px] font-bold">Sounds</span></button>
-          <button onClick={() => { setIsMobileOptionsOpen(false); setIsTasksOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><ListChecks size={24} weight={tasks.some(t => !t.completed) ? "fill" : "regular"} /><span className="text-[14px] font-bold">Tasks</span></button>
+          <button onClick={() => { setIsMobileOptionsOpen(false); setIsMoodOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${mood ? getMoodConfig(mood)?.nav || 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><ActiveMoodIcon size={24} weight={mood ? "fill" : "regular"} /><span className="text-ui-sm font-bold capitalize">{mood ? getMoodConfig(mood)?.label || mood : 'Mood'}</span></button>
+          <button onClick={() => { setIsMobileOptionsOpen(false); setIsTagsOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><TagIcon size={24} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-ui-sm font-bold">Tags</span></button>
+          <button onClick={() => { setIsMobileOptionsOpen(false); setIsMusicOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${musicPlaying ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><Headphones size={24} weight={musicPlaying ? "fill" : "regular"} /><span className="text-ui-sm font-bold">Sounds</span></button>
+          <button onClick={() => { setIsMobileOptionsOpen(false); setIsTasksOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><ListChecks size={24} weight={tasks.some(t => !t.completed) ? "fill" : "regular"} /><span className="text-ui-sm font-bold">Tasks</span></button>
           <WhisperComposerControl
             onFinalTranscript={appendWhisperTranscript}
             label="Whisper"
-            buttonClassName="flex w-full items-center gap-3 rounded-2xl border p-4 text-[14px] font-bold transition-colors"
+            buttonClassName="flex w-full items-center gap-3 rounded-2xl border p-4 text-ui-sm font-bold transition-colors"
           />
 
           <label className="control-surface flex cursor-pointer items-center gap-3 rounded-2xl p-4 text-gray-text transition-colors hover:border-green/20 hover:bg-green/5">
-            <Paperclip size={24} weight="regular" /><span className="text-[14px] font-bold">Files</span>
+            <Paperclip size={24} weight="regular" /><span className="text-ui-sm font-bold">Files</span>
             <input type="file" multiple className="hidden" onChange={(e) => {
               if (e.target.files) {
                 draft.addFiles(Array.from(e.target.files || []));
@@ -669,7 +696,7 @@ export const CreateNote: React.FC = () => {
             }} />
           </label>
           <label className="control-surface flex cursor-pointer items-center gap-3 rounded-2xl p-4 text-gray-text transition-colors hover:border-green/20 hover:bg-green/5">
-            <ImageIcon size={24} weight="regular" /><span className="text-[14px] font-bold">Cover</span>
+            <ImageIcon size={24} weight="regular" /><span className="text-ui-sm font-bold">Cover</span>
             <input type="file" className="hidden" accept="image/*" onChange={(e) => {
               if (e.target.files?.[0]) setImagePreview(URL.createObjectURL(e.target.files[0]));
               setIsMobileOptionsOpen(false);
@@ -684,7 +711,7 @@ export const CreateNote: React.FC = () => {
           if (!saving && !isReleasing) setIsSaveChoiceOpen(false);
         }}
         title="Keep it, or let it go"
-        icon={<FloppyDisk size={20} weight="duotone" />}
+        icon={<FloppyDisk size={22} weight="duotone" />}
         size="sm"
         bodyClassName="pt-2"
       >
@@ -697,8 +724,8 @@ export const CreateNote: React.FC = () => {
             className="flex min-h-16 w-full items-center justify-between rounded-2xl border border-green bg-green p-4 text-left text-white transition-colors hover:bg-green-hover disabled:opacity-60"
           >
             <span>
-              <span className="block text-[15px] font-bold text-white">Keep this one</span>
-              <span className="mt-1 block text-[12px] font-medium text-white/75">Save it for the version of you who checks later.</span>
+              <span className="block text-ui-base font-bold text-white">Keep this one</span>
+              <span className="mt-1 block text-ui-xs font-medium text-white/75">Save it for the version of you who checks later.</span>
             </span>
             {saving ? <CircleNotch size={20} className="animate-spin" /> : <FloppyDisk size={20} weight="regular" />}
           </button>
@@ -711,14 +738,14 @@ export const CreateNote: React.FC = () => {
             className="flex min-h-16 w-full items-center justify-between rounded-2xl border border-clay/20 bg-clay/5 p-4 text-left text-clay transition-colors hover:border-clay/35 hover:bg-clay/10 disabled:opacity-60"
           >
             <span>
-              <span className="block text-[15px] font-bold text-gray-text">Let it go</span>
-              <span className="mt-1 block text-[12px] font-medium text-gray-light">No archive. Just the exhale.</span>
+              <span className="block text-ui-base font-bold text-gray-text">Let it go</span>
+              <span className="mt-1 block text-ui-xs font-medium text-gray-light">No archive. Just the exhale.</span>
             </span>
             {isReleasing ? <CircleNotch size={20} className="animate-spin" /> : <Wind size={20} weight="duotone" />}
           </button>
 
           {releaseError ? (
-            <p className="text-[13px] font-bold leading-relaxed text-clay" aria-live="polite">
+            <p className="text-btn-sm font-bold leading-relaxed text-clay" aria-live="polite">
               {releaseError}
             </p>
           ) : null}
@@ -735,7 +762,7 @@ export const CreateNote: React.FC = () => {
         isOpen={isTasksOpen}
         onClose={() => setIsTasksOpen(false)}
         title="Tasks"
-        icon={<ListChecks size={24} weight="bold" className="text-green" />}
+        icon={<ListChecks size={22} weight="duotone" />}
         size="md"
         bodyClassName="max-h-[72vh] pt-2"
       >
@@ -795,13 +822,14 @@ export const CreateNote: React.FC = () => {
         isOpen={isTagsOpen}
         onClose={() => setIsTagsOpen(false)}
         title="Tags"
+        icon={<Tag size={22} weight="duotone" />}
         size="sm"
         bodyClassName="pt-2"
       >
         <div className="space-y-5">
           <div className="flex flex-wrap gap-2">
             {tags.map((tag) => (
-              <span key={tag} className="flex items-center gap-2 rounded-xl bg-green/10 px-3 py-1.5 text-[12px] font-bold text-green">
+              <span key={tag} className="flex items-center gap-2 rounded-xl bg-green/10 px-3 py-1.5 text-ui-xs font-bold text-green">
                 #{tag}
                 <button
                   type="button"
@@ -819,7 +847,7 @@ export const CreateNote: React.FC = () => {
             type="text"
             value={tagInput}
             placeholder="Add tag and press Enter"
-            className="input-surface w-full px-4 py-3 text-[14px] font-semibold text-gray-text"
+            className="input-surface w-full px-4 py-3 text-ui-sm font-semibold text-gray-text"
             onChange={(event) => setTagInput(event.target.value)}
             onKeyDown={(event) => {
               if (event.key === 'Enter' && tagInput.trim()) {
@@ -860,6 +888,7 @@ export const CreateNote: React.FC = () => {
         isOpen={isMusicOpen}
         onClose={() => setIsMusicOpen(false)}
         title="Sounds"
+        icon={<Headphones size={22} weight="duotone" />}
         size="sm"
         bodyClassName="pt-2"
       >
@@ -871,7 +900,7 @@ export const CreateNote: React.FC = () => {
                 void handleTrackSelect(track);
               }}
               disabled={pendingTrackId !== null && pendingTrackId !== track.id}
-              className={`flex w-full items-center justify-between rounded-2xl border-2 p-4 text-left text-[14px] font-bold transition-opacity ${activeMusicTrack?.id === track.id || pendingTrackId === track.id ? 'border-green bg-green/10 text-green' : 'control-surface text-gray-text hover:border-border hover:bg-green/5'} ${pendingTrackId !== null && pendingTrackId !== track.id ? 'opacity-60' : ''}`}
+              className={`flex w-full items-center justify-between rounded-2xl border-2 p-4 text-left text-ui-sm font-bold transition-opacity ${activeMusicTrack?.id === track.id || pendingTrackId === track.id ? 'border-green bg-green/10 text-green' : 'control-surface text-gray-text hover:border-border hover:bg-green/5'} ${pendingTrackId !== null && pendingTrackId !== track.id ? 'opacity-60' : ''}`}
             >
               <span className="flex items-center gap-3">
                 <span className="text-[18px]">{track.emoji}</span>
@@ -899,7 +928,7 @@ export const CreateNote: React.FC = () => {
         isOpen={Boolean(aiReflection)}
         onClose={() => setAiReflection(null)}
         title="A reflection, not a verdict"
-        icon={<Brain size={24} weight="duotone" className="text-green" />}
+        icon={<Sparkle size={22} weight="duotone" />}
         size="lg"
         tone="sage"
         bodyClassName="pt-4"

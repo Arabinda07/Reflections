@@ -23,7 +23,6 @@ describe('public header regression fixes', () => {
     );
     expect(header).toContain('const HomeLineIcon');
     expect(header).toContain('const HelpBubbleIcon');
-    expect(header).toContain('const PeopleSparkIcon');
     expect(header).toContain('const ShieldLeafIcon');
   });
 
@@ -89,7 +88,7 @@ describe('public header regression fixes', () => {
     expect(header).toContain('aria-expanded={isMobileMenuOpen}');
     expect(header).toContain('aria-controls={mobileMenuId}');
     expect(header).toContain('text-gray-nav transition-colors hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green');
-    expect(header).toContain('bg-green px-4 py-2 text-[13px] font-extrabold text-white');
+    expect(header).toContain('bg-green px-4 py-2 text-btn-sm font-extrabold text-white');
     expect(header).toContain('hover:bg-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green');
     expect(indexHtml).toContain('.public-header nav[aria-label="Public navigation"] a:hover,');
     expect(indexHtml).toContain('.public-header nav[aria-label="Public navigation"] button:hover');
@@ -149,7 +148,6 @@ describe('public header regression fixes', () => {
     expect(header).toContain("label: 'Privacy'");
     expect(header).toContain('icon: HomeLineIcon');
     expect(header).toContain('icon: HelpBubbleIcon');
-    expect(header).toContain('icon: PeopleSparkIcon');
     expect(header).toContain('icon: ShieldLeafIcon');
     expect(header).toContain("label: 'Begin writing'");
     expect(header).toContain('href: RoutePath.SIGNUP');

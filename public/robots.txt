@@ -12,6 +12,9 @@ Disallow: /release
 Disallow: /letters
 Disallow: /wiki
 Disallow: /sanctuary
+Disallow: /relationships
+Disallow: /relationships/
+Disallow: /recover-private-writing
 Disallow: /auth/
 
 User-agent: ChatGPT-User
@@ -53,6 +56,9 @@ Disallow: /release
 Disallow: /letters
 Disallow: /wiki
 Disallow: /sanctuary
+Disallow: /relationships
+Disallow: /relationships/
+Disallow: /recover-private-writing
 Disallow: /auth/
 
 Sitemap: https://www.reflections-sanctuary.space/sitemap.xml

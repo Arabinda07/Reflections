@@ -50,11 +50,15 @@ type AiRunResponse<T> = {
 
 const AI_RUNS_ENDPOINT = '/api/ai-runs';
 
-const readAiRunResponse = async <T>(response: Response): Promise<T> => {
+export const readAiRunResponse = async <T>(response: Response): Promise<T> => {
   const data = await response.json().catch(() => null);
 
   if (!response.ok) {
-    throw new Error(data?.error || `AI run failed with status ${response.status}`);
+    throw new Error((data as { error?: string } | null)?.error || `AI run failed with status ${response.status}`);
+  }
+
+  if (data == null || typeof data !== 'object') {
+    throw new Error('AI run response was empty or unexpected.');
   }
 
   return (data as AiRunResponse<T>).data;

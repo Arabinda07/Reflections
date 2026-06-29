@@ -38,6 +38,8 @@ create table if not exists profiles (
   plan text default 'free', -- 'free' or 'pro'
   newsletter_opt_in boolean default false,
   newsletter_unsubscribed_at timestamptz,
+  onboarding_completed_at timestamptz,
+  onboarding_version_seen integer,
   free_ai_reflections_used int default 0,
   free_wiki_insights_used int default 0,
   updated_at timestamp with time zone default timezone('utc'::text, now())

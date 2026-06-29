@@ -43,7 +43,7 @@ describe('impeccable audit follow-up contract', () => {
     expect(quillCss).toContain('min-width: 44px;');
 
     expect(about).not.toContain('lg:gap-24');
-    expect(about).toContain('lg:gap-12');
+    expect(about).toContain('PublicPageHero');
 
     expect(indexHtml).not.toContain('landing_video_mobile.webp" as="image"');
     expect(indexHtml).not.toContain('landing_video.webp" as="image"');

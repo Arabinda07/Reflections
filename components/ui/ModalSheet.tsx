@@ -11,8 +11,9 @@ interface ModalSheetProps {
   onClose: () => void;
   title?: string;
   description?: string;
-  ariaLabel?: string;
+  /** Inline header glyph. Use ONLY for title-only modals (no `description`) to balance the header. */
   icon?: React.ReactNode;
+  ariaLabel?: string;
   children?: React.ReactNode;
   footer?: React.ReactNode;
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -22,6 +23,7 @@ interface ModalSheetProps {
   panelClassName?: string;
   panelId?: string;
   hideClose?: boolean;
+  disableDismiss?: boolean;
   closeLabel?: string;
   mobilePlacement?: 'bottom' | 'center';
   tone?: SurfaceTone;
@@ -48,8 +50,8 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
   onClose,
   title,
   description,
-  ariaLabel,
   icon,
+  ariaLabel,
   children,
   footer,
   size = 'md',
@@ -59,6 +61,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
   panelClassName = '',
   panelId,
   hideClose = false,
+  disableDismiss = false,
   closeLabel = 'Close dialog',
   mobilePlacement = 'bottom',
   tone = 'paper',
@@ -121,6 +124,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
     setDragOffsetY(0);
     if (shouldClose) {
       void haptics.light();
+      if (disableDismiss) return;
       onCloseRef.current();
     }
   };
@@ -133,10 +137,11 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
     if (!isOpen) return;
 
     return registerAndroidBackAction(() => {
+      if (disableDismiss) return true;
       onCloseRef.current();
       return true;
     });
-  }, [isOpen]);
+  }, [disableDismiss, isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -146,6 +151,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        if (disableDismiss) return;
         onCloseRef.current();
         return;
       }
@@ -199,7 +205,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
       window.clearTimeout(focusTimer);
       previousFocusRef.current?.focus();
     };
-  }, [isOpen]);
+  }, [disableDismiss, isOpen]);
 
   if (typeof document === 'undefined' || !mounted) return null;
 
@@ -211,7 +217,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
     >
       <div
         className={`modal-sheet-backdrop ${backdropClassName}`.trim()}
-        onClick={onClose}
+        onClick={disableDismiss ? undefined : onClose}
       />
 
       <div className="modal-sheet-shell">
@@ -240,10 +246,10 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
                 onPointerCancel={handleDragEnd}
               />
 
-              {(icon || title || description || !hideClose) && (
+              {(icon || title || description) && (
                 <div className="modal-sheet-header">
-                  <div className="modal-sheet-heading">
-                    {icon ? <div className="modal-sheet-icon">{icon}</div> : null}
+                  <div className="modal-sheet-heading pr-12">
+                    {icon ? <span className="modal-sheet-title-icon">{icon}</span> : null}
                     <div className="modal-sheet-copy">
                       {title ? (
                         <h2 id={titleId} className="modal-sheet-title">
@@ -257,20 +263,20 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
                       ) : null}
                     </div>
                   </div>
-
-                  {!hideClose ? (
-                    <button
-                      ref={closeButtonRef}
-                      type="button"
-                      onClick={onClose}
-                      className="modal-sheet-close"
-                      aria-label={closeLabel}
-                    >
-                      <X size={18} weight="bold" />
-                    </button>
-                  ) : null}
                 </div>
               )}
+
+              {!hideClose && !disableDismiss ? (
+                <button
+                  ref={closeButtonRef}
+                  type="button"
+                  onClick={onClose}
+                  className="modal-sheet-close"
+                  aria-label={closeLabel}
+                >
+                  <X size={18} weight="bold" />
+                </button>
+              ) : null}
 
               <div className={`modal-sheet-body ${bodyClassName}`.trim()}>{children}</div>
 

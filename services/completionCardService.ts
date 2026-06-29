@@ -84,69 +84,45 @@ const CARD_LAYOUT = {
 } as const;
 
 const BADGE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  weekly_recap: { bg: '#e8f0e3', text: '#4f6f46', border: '#c4d8bb' },
-  release_completed: { bg: '#f2ece5', text: '#8a6a4a', border: '#ddd0c0' },
-  letter_scheduled: { bg: '#f4f0e2', text: '#8a7a40', border: '#e2d8b8' },
+  weekly_recap: { bg: 'rgba(255,255,255,0.06)', text: '#8FCB82', border: 'rgba(255,255,255,0.14)' },
+  release_completed: { bg: 'rgba(255,255,255,0.06)', text: '#C7B69A', border: 'rgba(255,255,255,0.14)' },
+  letter_scheduled: { bg: 'rgba(255,255,255,0.06)', text: '#D6C98A', border: 'rgba(255,255,255,0.14)' },
 };
 
 const drawCardBackground = (ctx: CanvasRenderingContext2D) => {
   const { width, height } = ctx.canvas;
 
   const bgGradient = ctx.createLinearGradient(0, 0, width, height);
-  bgGradient.addColorStop(0, '#f0f4ec');
-  bgGradient.addColorStop(0.5, '#f7f8f4');
-  bgGradient.addColorStop(1, '#f4f6f0');
+  bgGradient.addColorStop(0, '#191D18');
+  bgGradient.addColorStop(0.5, '#1F251E');
+  bgGradient.addColorStop(1, '#161A15');
   ctx.fillStyle = bgGradient;
   ctx.fillRect(0, 0, width, height);
 
   const glow = ctx.createRadialGradient(200, 140, 60, 200, 140, 420);
-  glow.addColorStop(0, 'rgba(79, 111, 70, 0.07)');
-  glow.addColorStop(1, 'rgba(79, 111, 70, 0)');
+  glow.addColorStop(0, 'rgba(143, 203, 130, 0.10)');
+  glow.addColorStop(1, 'rgba(143, 203, 130, 0)');
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, width, height);
 
-  ctx.fillStyle = 'rgba(251, 252, 248, 0.85)';
+  ctx.fillStyle = '#232820';
   roundRect(ctx, CARD_LAYOUT.padding, CARD_LAYOUT.innerPaddingY, width - CARD_LAYOUT.padding * 2, height - CARD_LAYOUT.innerPaddingY * 2, CARD_LAYOUT.innerRadius);
   ctx.fill();
-  ctx.strokeStyle = '#d8dfd1';
+  ctx.strokeStyle = '#2C3329';
   ctx.lineWidth = 2;
   ctx.stroke();
 };
 
 const drawCardLogo = (ctx: CanvasRenderingContext2D) => {
-  ctx.fillStyle = '#4f6f46';
-  ctx.beginPath();
-  ctx.arc(CARD_LAYOUT.logoCircleX, CARD_LAYOUT.logoCircleY, CARD_LAYOUT.logoCircleRadius, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = '#f7f8f4';
-  const lx = CARD_LAYOUT.logoCircleX;
-  const ly = CARD_LAYOUT.logoCircleY;
-  const size = 10;
-  
-  ctx.beginPath();
-  ctx.moveTo(lx, ly - size);
-  ctx.quadraticCurveTo(lx + size * 1.2, ly, lx, ly + size);
-  ctx.quadraticCurveTo(lx - size * 1.2, ly, lx, ly - size);
-  ctx.fill();
-  
-  // Stem
-  ctx.strokeStyle = '#f7f8f4';
-  ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  ctx.moveTo(lx, ly + size);
-  ctx.lineTo(lx, ly + size + 4);
-  ctx.stroke();
-
-  ctx.fillStyle = '#4f6f46';
+  ctx.fillStyle = '#8FCB82';
   ctx.font = `italic 700 26px ${CARD_FONT_SERIF}`;
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
-  ctx.fillText('Reflections', CARD_LAYOUT.wordmarkX, CARD_LAYOUT.wordmarkY);
+  ctx.fillText('Reflections', CARD_LAYOUT.contentLeft, CARD_LAYOUT.wordmarkY);
 };
 
 const drawCardTitle = (ctx: CanvasRenderingContext2D, payload: CompletionCardPayload): number => {
-  ctx.fillStyle = '#293127';
+  ctx.fillStyle = '#DDE3D5';
   ctx.font = `800 64px ${CARD_FONT_SANS}`;
   const titleLines = wrapText(ctx, payload.title, CARD_LAYOUT.titleMaxWidth);
   titleLines.forEach((line, index) => {
@@ -154,7 +130,7 @@ const drawCardTitle = (ctx: CanvasRenderingContext2D, payload: CompletionCardPay
   });
 
   const subtitleY = CARD_LAYOUT.titleY + titleLines.length * CARD_LAYOUT.titleLineHeight + CARD_LAYOUT.subtitleOffsetY;
-  ctx.fillStyle = '#65705e';
+  ctx.fillStyle = '#9AA391';
   ctx.font = `500 26px ${CARD_FONT_SANS}`;
   ctx.fillText(payload.subtitle, CARD_LAYOUT.contentLeft, subtitleY);
 
@@ -188,7 +164,7 @@ const drawCardBadge = (ctx: CanvasRenderingContext2D, payload: CompletionCardPay
 const drawCardFooter = (ctx: CanvasRenderingContext2D, payload: CompletionCardPayload, badgeY: number) => {
   const { width } = ctx.canvas;
 
-  ctx.fillStyle = '#819076';
+  ctx.fillStyle = '#9AA391';
   ctx.font = `700 20px ${CARD_FONT_SANS}`;
   ctx.textAlign = 'right';
   ctx.fillText(payload.dateLabel, width - CARD_LAYOUT.contentLeft, badgeY + 25);

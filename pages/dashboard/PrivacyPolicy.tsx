@@ -2,10 +2,10 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { PublicPageIcon, type PublicPageIconName } from '../../components/ui/PublicPageIcon';
+import { PublicPageHero, PublicPageSection, PublicPageShell } from '../../components/ui/PublicPageShell';
 import { useDocumentMeta } from '../../hooks/useDocumentMeta';
 import { PUBLIC_SEO_COPY } from '../../src/config/publicSeoCopy.js';
 import { getPublicHomePath } from '../../src/utils/authHints';
-import { RoutePath } from '../../types';
 
 const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
 const PRIVACY_SEO = PUBLIC_SEO_COPY.privacy;
@@ -13,7 +13,6 @@ const PRIVACY_SEO = PUBLIC_SEO_COPY.privacy;
 type PolicySection = {
   title: string;
   icon: PublicPageIconName;
-  color: string;
   body: string[];
 };
 
@@ -21,16 +20,23 @@ const policySections: PolicySection[] = [
   {
     title: 'What Reflections keeps',
     icon: 'database',
-    color: 'tone-icon-sky',
     body: [
       'Reflections stores the account information needed to sign you in, including your email address and profile details you choose to save, such as your name, display name, timezone, and avatar.',
-      'The app stores the writing you create here: notes, moods, tags, tasks, attachments, note covers, future letters, mood check-ins, Life Wiki pages, referral invite status, and the small usage counters needed for Free and Pro access.',
+      'The app stores the writing you create here: notes, moods, tags, tasks, attachments, note covers, future letters, mood check-ins, Life Wiki pages, relationships, referral invite status, and the small usage counters needed for Free and Pro access. Your private writing is encrypted on your device before it reaches the server.',
+    ],
+  },
+  {
+    title: 'Device-side encryption',
+    icon: 'shield',
+    body: [
+      'Your private writing — notes, moods, tags, tasks, attachments, future letters, Life Wiki pages, and relationships — is encrypted on your device before it is saved. The key is derived from your password and never sent to the server, so what Reflections stores is data it cannot read.',
+      'Because the key stays on your device, you unlock your writing once on each device you use. On a device you trust, you can choose "Keep me unlocked on this device" to skip that step; signing out clears it.',
+      'When you turn on private writing you save a recovery phrase. If you forget your password, that phrase is the only other way to unlock your writing. Reflections cannot reset it for you, so keep it somewhere safe. AI features that need the server to read your writing, including Smart Mode, stay off while this protection is on.',
     ],
   },
   {
     title: 'Local and offline copies',
     icon: 'device',
-    color: 'tone-icon-sage',
     body: [
       'Reflections keeps a local copy of your notes in the browser or app database so writing can feel quick and can keep working through short connection drops.',
       'Local copies are tied to the device and browser you use. Clearing browser data, uninstalling the app, or signing out may remove local copies from that device, but server copies remain until you delete them from your account.',
@@ -39,7 +45,6 @@ const policySections: PolicySection[] = [
   {
     title: 'Attachments and files',
     icon: 'image',
-    color: 'tone-icon-honey',
     body: [
       'Images, avatars, and note attachments are stored in a private Supabase Storage bucket. The app creates short-lived signed links when it needs to show those files back to you.',
       'If you delete saved writing from Account, Reflections also tries to remove stored attachments and avatar files before signing you out.',
@@ -48,10 +53,9 @@ const policySections: PolicySection[] = [
   {
     title: 'AI and Smart Mode',
     icon: 'robot',
-    color: 'tone-icon-sky',
     body: [
       'Most AI work runs when you choose an AI action, or when you explicitly turn on Smart Mode. If you use Reflect with AI, Refresh with AI, or Smart Mode, the relevant writing is sent to the AI service so it can return that result.',
-      'The Home dashboard may also refresh short Writing Note suggestions. If your Life Wiki has an index page, that index may be sent as context for those suggestions.',
+      'The Home dashboard may also refresh short note suggestions. If your Life Wiki has an index page, that index may be sent as context for those suggestions.',
       'We do not use your personal notes to train AI models. AI reflections and Life Wiki updates are saved only to your account. They are for personal reflection, not medical advice.',
       'Smart Mode can be turned off in Account. Turning it off stops future automatic Life Wiki refreshes. It does not delete Life Wiki pages that already exist.',
     ],
@@ -59,7 +63,6 @@ const policySections: PolicySection[] = [
   {
     title: 'No product analytics',
     icon: 'chart',
-    color: 'tone-icon-clay',
     body: [
       'Reflections does not send product analytics, route tracking, session replay, or error-monitoring events to PostHog, Sentry, Vercel Analytics, or Vercel Speed Insights.',
       'The services that run chosen features can still process the data needed for those features, such as Supabase sign-in and storage, AI requests, payments, email delivery, and ordinary hosting logs.',
@@ -68,7 +71,6 @@ const policySections: PolicySection[] = [
   {
     title: 'Payments and referrals',
     icon: 'creditCard',
-    color: 'tone-icon-honey',
     body: [
       'Razorpay handles checkout, subscription billing, and card or bank details. Reflections stores the selected plan, Razorpay subscription ID, payment status, and enough billing metadata to manage Pro access.',
       'If you use an invite link, Reflections stores the invite code and whether someone joined from it. Invites do not create a public social graph, rewards feed, or public list.',
@@ -77,7 +79,6 @@ const policySections: PolicySection[] = [
   {
     title: 'Export, deletion, and account closure',
     icon: 'trash',
-    color: 'tone-icon-sage',
     body: [
       'Your notes belong to you. You can export saved notes from note pages in the formats currently available in the app.',
       'You can delete individual notes, and you can delete saved writing and app data from Account. That removes saved notes, moods, tags, tasks, profile data, engagement data, and stored files that the app can find.',
@@ -87,7 +88,6 @@ const policySections: PolicySection[] = [
   {
     title: 'Using Reflections',
     icon: 'user',
-    color: 'tone-icon-sky',
     body: [
       'Use Reflections as a personal writing tool. Do not use it for anything illegal or harmful, and do not try to access another person\'s account or files.',
       'You must be at least 13 years old to use Reflections. If you are under 18, a parent or guardian should review this page with you.',
@@ -96,11 +96,28 @@ const policySections: PolicySection[] = [
   {
     title: 'Security and service limits',
     icon: 'shield',
-    color: 'tone-icon-honey',
     body: [
-      'Reflections uses Supabase account security, private storage, Row Level Security, and encrypted connections to protect saved writing. No online service can promise perfect security.',
+      'Private writing is encrypted on your device before it is saved, as described in Device-side encryption. On top of that, Reflections uses Supabase account security, private storage, Row Level Security, and encrypted connections. No online service can promise perfect security.',
       'Some features require an internet connection. AI features, sync, payments, and exports can fail if a provider is unavailable. Features and Free or Pro limits may change as the product changes, but the app should explain limits plainly where they matter.',
     ],
+  },
+];
+
+const principles = [
+  {
+    title: 'Stays private',
+    body: 'Notes, moods, tags, tasks, letters, and Life Wiki pages are scoped to your account.',
+    icon: 'shield' as const,
+  },
+  {
+    title: 'Leaves only by action',
+    body: 'AI receives relevant writing only when you choose an AI action, or when Smart Mode is enabled.',
+    icon: 'robot' as const,
+  },
+  {
+    title: 'Can be removed',
+    body: 'You can delete notes and app data, then email support if you want the sign-in account closed.',
+    icon: 'trash' as const,
   },
 ];
 
@@ -118,158 +135,108 @@ export const PrivacyPolicy: React.FC = () => {
   }, []);
 
   return (
-    <div className="surface-scope-paper page-wash relative min-h-full bg-body pb-28 text-gray-text transition-colors duration-300">
-      <section className="mx-auto grid w-full max-w-[1440px] gap-12 px-6 py-20 sm:px-10 lg:grid-cols-12 lg:items-end lg:px-16 lg:py-28">
-        <div className="lg:col-span-8">
-          <button
-            type="button"
-            onClick={() => navigate(homePath)}
-            className="-ml-2 mb-8 inline-flex min-h-11 items-center rounded-[var(--radius-control)] px-3 text-[13px] font-bold text-gray-nav transition-colors hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
-          >
-            <PublicPageIcon name="arrowLeft" size={16} className="mr-2" />
-            Back
-          </button>
-          <h1 className="text-mk-display font-display font-extrabold leading-[0.95] tracking-normal text-gray-text text-balance">
-            Privacy
-          </h1>
-        </div>
-
-        <div className="space-y-4 lg:col-span-4">
+    <PublicPageShell scope="paper">
+      <PublicPageHero
+        onBack={() => navigate(homePath)}
+        title="Privacy"
+        updated="June 2026"
+        intro={
           <p className="max-w-[36rem] font-serif text-[18px] leading-relaxed text-gray-light">
-            This page explains what Reflections stores, when AI is used, how payments work, and how you can remove your writing.
+            This page explains what Reflections stores, when AI is used, how payments work, and how you can remove your
+            writing.
           </p>
-          <p className="text-[12px] font-bold uppercase tracking-widest text-gray-nav">Last updated · May 2026</p>
+        }
+      />
+
+      {/* Short version + the three things that matter most */}
+      <section className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+        <article className="surface-flat surface-tone-paper rounded-[var(--radius-panel)] p-8 md:p-12">
+          <h2 className="max-w-[14ch] text-mk-h2 font-display font-bold leading-tight text-gray-text">
+            Your writing is yours.
+          </h2>
+          <div className="mt-7 max-w-[62ch] space-y-4 font-sans text-ui-base leading-relaxed text-gray-light">
+            <p>
+              Reflections stores the account and writing data needed to make the journal work. AI runs only for the
+              actions you choose, or for Smart Mode if you turn it on.
+            </p>
+            <p>
+              You can export notes, delete individual notes, and request account closure when you want the sign-in
+              account removed too.
+            </p>
+          </div>
+        </article>
+
+        <div className="flex flex-col justify-center gap-7">
+          {policySections.slice(0, 3).map((section) => (
+            <article key={section.title} className="group">
+              <h3 className="flex items-center gap-2.5 text-ui-lg font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green">
+                <PublicPageIcon name={section.icon} size={19} className="flex-none text-green" />
+                {section.title}
+              </h3>
+              <p className="mt-2.5 font-sans text-ui-base leading-relaxed text-gray-light">{section.body[0]}</p>
+            </article>
+          ))}
         </div>
       </section>
 
-      <div className="mx-auto w-full max-w-[1440px] px-6 sm:px-10 lg:px-16">
-        <section className="privacy-editorial-lead mb-20 grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-          <article className="surface-flat surface-tone-paper rounded-[2rem] p-8 md:p-12">
-            <p className="label-caps text-green">Short version</p>
-            <h2 className="mt-5 max-w-[14ch] text-mk-h2 font-display font-bold leading-tight text-gray-text">
-              Your writing is yours.
-            </h2>
-            <div className="mt-7 max-w-[62ch] space-y-4 font-sans text-[17px] leading-relaxed text-gray-light">
-              <p>
-                Reflections stores the account and writing data needed to make the journal work. AI runs only for the actions you choose, or for Smart Mode if you turn it on.
-              </p>
-              <p>
-                You can export notes, delete individual notes, and request account closure when you want the sign-in account removed too.
-              </p>
-            </div>
-          </article>
+      {/* Principles */}
+      <PublicPageSection tone="sage">
+        <div className="grid gap-8 lg:grid-cols-3">
+          {principles.map((item) => (
+            <article key={item.title} className="group">
+              <h2 className="flex items-center gap-2.5 text-ui-lg font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">
+                <PublicPageIcon name={item.icon} size={20} className="flex-none text-green" />
+                {item.title}
+              </h2>
+              <p className="mt-2.5 font-sans text-ui-base leading-relaxed text-gray-light">{item.body}</p>
+            </article>
+          ))}
+        </div>
+      </PublicPageSection>
 
-          <aside className="privacy-compact-list rounded-[2rem] border border-border/70 bg-[oklch(from_var(--panel-bg)_l_c_h_/_0.54)]">
-            {policySections.slice(0, 3).map((section) => (
-              <article key={section.title} className="group flex gap-5 border-b border-border/60 p-6 last:border-b-0 md:p-8">
-                <div className={`tone-icon ${section.color} mt-1 h-12 w-12 flex-none rounded-2xl transition-transform duration-500 ease-out-expo group-hover:scale-105`}>
-                  <PublicPageIcon name={section.icon} size={24} />
-                </div>
-                <div>
-                  <h2 className="text-[21px] font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green">
-                    {section.title}
-                  </h2>
-                  <p className="mt-3 font-sans text-[15px] leading-relaxed text-gray-light">
-                    {section.body[0]}
+      {/* Full policy — borderless rows, generous rhythm */}
+      <PublicPageSection
+        heading="The full data picture."
+        lead="Read what Reflections stores, what can leave your device, and what you can remove."
+      >
+        <div className="flex flex-col gap-12">
+          {policySections.map((section) => (
+            <article
+              key={section.title}
+              className="group grid gap-x-5 gap-y-3 md:grid-cols-[minmax(13rem,0.34fr)_minmax(0,1fr)]"
+            >
+              <h3 className="flex items-center gap-2.5 text-ui-lg font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green">
+                <PublicPageIcon name={section.icon} size={19} className="flex-none text-green" />
+                {section.title}
+              </h3>
+
+              <div className="space-y-3 md:pt-1">
+                {section.body.map((paragraph) => (
+                  <p key={paragraph} className="max-w-[72ch] font-sans text-ui-base leading-relaxed text-gray-light">
+                    {paragraph}
                   </p>
-                </div>
-              </article>
-            ))}
-          </aside>
-        </section>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+      </PublicPageSection>
 
-        <section className="privacy-comparison-band mb-20 surface-flat surface-tone-sage rounded-[2rem] p-7 md:p-10">
-          <div className="privacy-principle-strip grid gap-8 lg:grid-cols-3">
-            {[
-              {
-                title: 'Stays private',
-                body: 'Notes, moods, tags, tasks, letters, and Life Wiki pages are scoped to your account.',
-                icon: 'shield' as const,
-              },
-              {
-                title: 'Leaves only by action',
-                body: 'AI receives relevant writing only when you choose an AI action, or when Smart Mode is enabled.',
-                icon: 'robot' as const,
-              },
-              {
-                title: 'Can be removed',
-                body: 'You can delete notes and app data, then email support if you want the sign-in account closed.',
-                icon: 'trash' as const,
-              },
-            ].map((item) => (
-              <article key={item.title} className="group flex gap-5">
-                <div className="tone-icon tone-icon-sage mt-1 h-12 w-12 flex-none rounded-2xl transition-transform duration-500 ease-out-expo group-hover:-rotate-3">
-                  <PublicPageIcon name={item.icon} size={24} />
-                </div>
-                <div>
-                  <h2 className="text-[22px] font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">{item.title}</h2>
-                  <p className="mt-3 font-sans text-[16px] leading-relaxed text-gray-light">{item.body}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="privacy-policy-ledger mb-20">
-          <div className="mb-8 flex flex-col gap-3 border-t border-border pt-10 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="label-caps text-green">Full policy</p>
-              <h2 className="mt-3 text-[32px] font-display font-bold leading-tight text-gray-text md:text-[40px]">
-                The full data picture.
-              </h2>
-            </div>
-            <p className="max-w-[34rem] font-sans text-[15px] leading-relaxed text-gray-light">
-              Read what Reflections stores, what can leave your device, and what you can remove.
-            </p>
-          </div>
-
-          <div className="space-y-5">
-            {policySections.map((section) => (
-              <article key={section.title} className="privacy-policy-row group grid gap-5 border-b border-border/60 py-8 transition-colors duration-300 md:grid-cols-[minmax(13rem,0.34fr)_minmax(0,1fr)] md:px-4">
-                <div className="flex gap-4 md:block">
-                  <div className={`tone-icon ${section.color} mt-1 h-11 w-11 flex-none rounded-2xl transition-transform duration-500 ease-out-expo group-hover:scale-105`}>
-                    <PublicPageIcon name={section.icon} size={22} />
-                  </div>
-                  <h3 className="mt-0 text-[21px] font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green md:mt-5">
-                    {section.title}
-                  </h3>
-                </div>
-
-                <div className="space-y-3 md:pt-1">
-                  {section.body.map((paragraph) => (
-                    <p key={paragraph} className="max-w-[72ch] font-sans text-[15px] leading-relaxed text-gray-light">
-                      {paragraph}
-                    </p>
-                  ))}
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-28 surface-flat surface-tone-paper rounded-[2rem] p-8 md:p-10">
-          <div className="flex flex-col gap-6 md:flex-row md:items-center md:gap-12">
-            <div className="tone-icon tone-icon-sage h-14 w-14 flex-none rounded-2xl">
-              <PublicPageIcon name="envelope" size={26} />
-            </div>
-            <div className="space-y-4">
-              <h2 className="text-[24px] font-display font-bold text-gray-text">
-                Questions or account deletion
-              </h2>
-              <p className="max-w-2xl font-sans text-[16px] leading-relaxed text-gray-light">
-                If you have questions, want everything deleted, or need the sign-in account closed, email us directly.
-              </p>
-              <a
-                href={`mailto:${SUPPORT_EMAIL}`}
-                className="inline-flex min-h-11 items-center gap-2 text-[15px] font-black uppercase tracking-widest text-green transition-colors duration-300 hover:text-gray-text"
-              >
-                <PublicPageIcon name="envelope" size={16} />
-                {SUPPORT_EMAIL}
-              </a>
-            </div>
-          </div>
-        </section>
-      </div>
-    </div>
+      {/* Contact */}
+      <PublicPageSection tone="paper">
+        <div className="space-y-3">
+          <h2 className="flex items-center gap-2.5 text-ui-xl font-display font-bold text-gray-text">
+            <PublicPageIcon name="envelope" size={20} className="flex-none text-green" />
+            Questions or account deletion
+          </h2>
+          <p className="max-w-2xl font-sans text-ui-base leading-relaxed text-gray-light">
+            If you have questions, want everything deleted, or need the sign-in account closed, email us at{' '}
+            <a className="public-contact-link" href={`mailto:${SUPPORT_EMAIL}`}>
+              {SUPPORT_EMAIL}
+            </a>
+          </p>
+        </div>
+      </PublicPageSection>
+    </PublicPageShell>
   );
 };

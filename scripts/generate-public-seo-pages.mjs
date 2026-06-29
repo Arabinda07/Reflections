@@ -15,6 +15,7 @@ import {
   AUTH_HINT_STALE_STORAGE_KEY,
   AUTH_HINT_STALE_VALUE,
 } from '../src/config/authHintKeys.js';
+import { buildOkfBundle } from '../src/config/okfBundle.js';
 
 const INDEX_FOLLOW_ROBOTS_META = '<meta name="robots" content="index, follow" />';
 const NOINDEX_NOFOLLOW_ROBOTS_META = '<meta name="robots" content="noindex, nofollow" />';
@@ -37,6 +38,8 @@ const appShellRoutes = [
   { path: '/letters', title: 'Opening future letters' },
   { path: '/wiki', title: 'Opening Life Wiki' },
   { path: '/sanctuary', title: 'Opening Life Wiki' },
+  { path: '/relationships', title: 'Opening relationships' },
+  { path: '/recover-private-writing', title: 'Recovering private writing' },
 ];
 
 const escapeHtml = (value) =>
@@ -108,6 +111,35 @@ const buildExtraSchema = (page) => {
   return null;
 };
 
+const renderComparisonTable = (comparison) => {
+  if (!comparison) {
+    return '';
+  }
+
+  const head = comparison.headers
+    .map((header) => `<th scope="col">${escapeHtml(header)}</th>`)
+    .join('');
+  const body = comparison.rows
+    .map(
+      (row) =>
+        `<tr>${row
+          .map((cell, index) =>
+            index === 0
+              ? `<th scope="row">${escapeHtml(cell)}</th>`
+              : `<td>${escapeHtml(cell)}</td>`,
+          )
+          .join('')}</tr>`,
+    )
+    .join('');
+
+  return `
+        <table>
+          ${comparison.caption ? `<caption>${escapeHtml(comparison.caption)}</caption>` : ''}
+          <thead><tr>${head}</tr></thead>
+          <tbody>${body}</tbody>
+        </table>`;
+};
+
 const renderSeoContent = (page) => {
   const navLinks = publicPages
     .map((item) => `<a href="${item.path}">${item.path === '/' ? 'Home' : escapeHtml(item.h1)}</a>`)
@@ -128,6 +160,7 @@ const renderSeoContent = (page) => {
       <h1>${escapeHtml(page.h1)}</h1>
       <p>${escapeHtml(page.intro)}</p>
       ${sections}
+      ${renderComparisonTable(page.comparison)}
       <p><a href="/signup">Begin writing</a></p>
     </main>`;
 };
@@ -409,4 +442,10 @@ for (const route of appShellRoutes) {
     mkdirSync(dirname(outputPath), { recursive: true });
     writeFileSync(outputPath, html);
   }
+}
+
+for (const [relativePath, content] of Object.entries(buildOkfBundle())) {
+  const outputPath = fileURLToPath(new URL(`okf/${relativePath}`, distDir));
+  mkdirSync(dirname(outputPath), { recursive: true });
+  writeFileSync(outputPath, content);
 }

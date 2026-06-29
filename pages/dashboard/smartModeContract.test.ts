@@ -5,8 +5,7 @@ import { join } from 'node:path';
 const read = (path: string) => readFileSync(join(process.cwd(), path), 'utf8');
 
 describe('Smart Mode Sanctuary contract', () => {
-  it('keeps v1 on-demand while adding Smart Mode as an explicit opt-in', () => {
-    const account = read('pages/dashboard/Account.tsx');
+  it('keeps v1 on-demand Life Wiki refresh and the Smart Mode auto-ingest plumbing', () => {
     const createNote = read('pages/dashboard/CreateNote.tsx');
     const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
     const productContract = read('components/ui/productContractPhase1.test.ts');
@@ -14,14 +13,6 @@ describe('Smart Mode Sanctuary contract', () => {
     expect(lifeWiki).toContain('Refresh with AI');
     expect(lifeWiki).toContain('startLifeWikiRefresh');
     expect(productContract).toContain("expect(createNote).not.toContain('processNoteIntoWiki')");
-
-    expect(account).toContain('Smart Mode');
-    expect(account).toContain('setSmartModeEnabled');
-    expect(account).toContain('startLifeWikiRefresh');
-    expect(account).toContain('role="switch"');
-    expect(account).toContain('aria-checked={Boolean(access?.smartModeEnabled)}');
-    expect(account).toContain('Turn off Smart Mode');
-    expect(account).toContain('Enable Smart Mode');
 
     const noteDraft = read('hooks/useNoteDraft.ts');
     const notePublishingOrchestrator = read('services/notePublishingOrchestrator.ts');

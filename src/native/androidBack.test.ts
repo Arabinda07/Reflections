@@ -121,6 +121,7 @@ describe('isTopLevelAndroidRoute', () => {
     expect(isTopLevelAndroidRoute('/login')).toBe(true);
     expect(isTopLevelAndroidRoute('/signup')).toBe(true);
     expect(isTopLevelAndroidRoute('/reset-password')).toBe(true);
+    expect(isTopLevelAndroidRoute('/recover-private-writing')).toBe(true);
     expect(isTopLevelAndroidRoute('/faq')).toBe(true);
     expect(isTopLevelAndroidRoute('/about')).toBe(true);
     expect(isTopLevelAndroidRoute('/privacy')).toBe(true);
