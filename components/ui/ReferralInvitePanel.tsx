@@ -150,24 +150,26 @@ export const ReferralInvitePanel: React.FC<ReferralInvitePanelProps> = ({ compac
         {invite?.lastSharedAt ? ` · Shared ${new Date(invite.lastSharedAt).toLocaleDateString()}` : ''}
       </p>
 
-      <div className="surface-inline-panel flex items-center gap-2 py-1.5 pl-4 pr-1.5">
-        <span className="min-w-0 flex-1 truncate font-mono text-sm text-gray-text">
-          {inviteLink || 'Invite link unavailable'}
-        </span>
-        <button
-          type="button"
-          onClick={handleCopy}
-          disabled={!inviteLink}
-          aria-label="Copy invite link"
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-[var(--radius-control)] text-gray-nav transition-colors hover:bg-green/5 hover:text-green disabled:pointer-events-none disabled:opacity-50"
-        >
-          {justCopied ? <Check size={16} weight="bold" className="text-green" /> : <CopySimple size={16} weight="bold" />}
-        </button>
-      </div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="surface-inline-panel flex items-center gap-2 py-1.5 pl-4 pr-1.5 flex-1 min-w-0">
+          <span className="min-w-0 flex-1 truncate font-mono text-sm text-gray-text">
+            {inviteLink || 'Invite link unavailable'}
+          </span>
+          <button
+            type="button"
+            onClick={handleCopy}
+            disabled={!inviteLink}
+            aria-label="Copy invite link"
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-[var(--radius-control)] text-gray-nav transition-colors hover:bg-green/5 hover:text-green disabled:pointer-events-none disabled:opacity-50"
+          >
+            {justCopied ? <Check size={16} weight="bold" className="text-green" /> : <CopySimple size={16} weight="bold" />}
+          </button>
+        </div>
 
-      <Button type="button" size="sm" onClick={handleShare} disabled={!inviteLink} className="min-h-11 w-full sm:w-auto">
-        Invite
-      </Button>
+        <Button type="button" size="sm" onClick={handleShare} disabled={!inviteLink} className="min-h-11 w-fit self-end sm:self-auto shrink-0">
+          Invite
+        </Button>
+      </div>
 
       {status ? (
         <p

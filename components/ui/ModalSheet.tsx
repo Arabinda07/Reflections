@@ -246,9 +246,9 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
                 onPointerCancel={handleDragEnd}
               />
 
-              {(icon || title || description || (!hideClose && !disableDismiss)) && (
+              {(icon || title || description) && (
                 <div className="modal-sheet-header">
-                  <div className="modal-sheet-heading">
+                  <div className="modal-sheet-heading pr-12">
                     {icon ? <span className="modal-sheet-title-icon">{icon}</span> : null}
                     <div className="modal-sheet-copy">
                       {title ? (
@@ -263,20 +263,20 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
                       ) : null}
                     </div>
                   </div>
-
-                  {!hideClose && !disableDismiss ? (
-                    <button
-                      ref={closeButtonRef}
-                      type="button"
-                      onClick={onClose}
-                      className="modal-sheet-close"
-                      aria-label={closeLabel}
-                    >
-                      <X size={18} weight="bold" />
-                    </button>
-                  ) : null}
                 </div>
               )}
+
+              {!hideClose && !disableDismiss ? (
+                <button
+                  ref={closeButtonRef}
+                  type="button"
+                  onClick={onClose}
+                  className="modal-sheet-close"
+                  aria-label={closeLabel}
+                >
+                  <X size={18} weight="bold" />
+                </button>
+              ) : null}
 
               <div className={`modal-sheet-body ${bodyClassName}`.trim()}>{children}</div>
 

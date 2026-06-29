@@ -1,12 +1,16 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
+import { AddressBook } from '@phosphor-icons/react/AddressBook';
 import { Bell } from '@phosphor-icons/react/Bell';
+import { CaretDown } from '@phosphor-icons/react/CaretDown';
 import { ChatCircleText } from '@phosphor-icons/react/ChatCircleText';
 import { Check } from '@phosphor-icons/react/Check';
 import { ClockCounterClockwise } from '@phosphor-icons/react/ClockCounterClockwise';
-import { DotsThreeVertical } from '@phosphor-icons/react/DotsThreeVertical';
+import { PencilSimple } from '@phosphor-icons/react/PencilSimple';
+import { SquaresFour } from '@phosphor-icons/react/SquaresFour';
 import { Plus } from '@phosphor-icons/react/Plus';
+import { ArrowUpRight } from '@phosphor-icons/react/ArrowUpRight';
 import { Sparkle } from '@phosphor-icons/react/Sparkle';
 
 import { Button } from '../../components/ui/Button';
@@ -51,7 +55,7 @@ export const OverflowMenu: React.FC<{ items: OverflowMenuItem[] }> = ({ items })
   return (
     <details ref={ref} className="relative">
       <summary aria-label="More actions" className="flex min-h-12 w-12 cursor-pointer list-none items-center justify-center rounded-xl text-gray-nav focus-visible:ring-2 focus-visible:ring-green/30 hover:bg-green/5 hover:text-green [&::-webkit-details-marker]:hidden">
-        <DotsThreeVertical size={24} weight="fill" />
+        <SquaresFour size={24} weight="fill" />
       </summary>
       <div className="absolute right-0 z-20 mt-2 w-44 overflow-hidden rounded-xl border border-border bg-surface py-1 shadow-card">
         {items.map((item) => (
@@ -113,13 +117,15 @@ const QuickAdd: React.FC<{
 type Props = {
   relationship: RelationshipRecord;
   relationships: RelationshipRecord[];
+  autoOpenCatchUp?: boolean;
   onBack: () => void;
   onChanged: (relationship: RelationshipRecord) => void;
   onDeleted: (id: string) => void;
 };
 
-export const RelationshipProfile: React.FC<Props> = ({ relationship, onBack, onChanged, onDeleted }) => {
+export const RelationshipProfile: React.FC<Props> = ({ relationship, autoOpenCatchUp, onBack, onChanged, onDeleted }) => {
   const { showToast } = useToast();
+  const catchUpSectionRef = useRef<HTMLDivElement>(null);
   const [context, setContext] = useState({
     name: relationship.name,
     howWeMet: relationship.howWeMet || '',
@@ -131,7 +137,7 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, onBack, onC
   });
   const [hook, setHook] = useState('');
   const [nextCare, setNextCare] = useState('');
-  const [catchUpOpen, setCatchUpOpen] = useState(false);
+  const [catchUpOpen, setCatchUpOpen] = useState(!!autoOpenCatchUp);
   const [catchUpNote, setCatchUpNote] = useState('');
   const [isSavingFacts, setIsSavingFacts] = useState(false);
   const [editingFacts, setEditingFacts] = useState(false);
@@ -140,6 +146,23 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, onBack, onC
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [wikiMentions, setWikiMentions] = useState<string[]>([]);
+
+  const handleHeaderLogCatchUp = () => {
+    setCatchUpOpen(true);
+    setTimeout(() => {
+      catchUpSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const textarea = catchUpSectionRef.current?.querySelector('textarea');
+      if (textarea instanceof HTMLTextAreaElement) {
+        textarea.focus();
+      }
+    }, 100);
+  };
+
+  useEffect(() => {
+    if (autoOpenCatchUp) {
+      setCatchUpOpen(true);
+    }
+  }, [autoOpenCatchUp, relationship.id]);
 
   const subtitle = relationship.howWeMet || [relationship.role, relationship.company].filter(Boolean).join(' · ') || '';
   const lastCaughtUp = useMemo(() => {
@@ -298,9 +321,22 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, onBack, onC
           <div className="min-w-0 space-y-3">
             <h1 className="text-4xl font-display font-extrabold text-gray-text sm:text-5xl">{relationship.name}</h1>
             {subtitle && <p className="text-lg leading-relaxed text-gray-light">{subtitle}</p>}
-            <p className="text-sm font-bold text-gray-nav">
-              {lastCaughtUp ? `Last caught up ${formatDate(lastCaughtUp.toISOString())}` : 'No catch-ups yet'}
-            </p>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-bold text-gray-nav">
+              <span>{lastCaughtUp ? `Last caught up ${formatDate(lastCaughtUp.toISOString())}` : 'No catch-ups yet'}</span>
+              {!editingFacts && (
+                <>
+                  <span className="text-gray-nav/40" aria-hidden="true">•</span>
+                  <button
+                    type="button"
+                    onClick={() => setEditingFacts(true)}
+                    className="inline-flex items-center gap-1.5 text-green hover:text-green-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/30"
+                  >
+                    <PencilSimple size={14} weight="bold" className="shrink-0" />
+                    <span>Edit details</span>
+                  </button>
+                </>
+              )}
+            </div>
             {!editingFacts && relationship.caresAbout && (
               <p className="text-ui-base leading-relaxed text-gray-light">
                 <span className="font-bold text-gray-nav">Cares about</span> {relationship.caresAbout}
@@ -309,15 +345,17 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, onBack, onC
             {isNewProfile && !editingFacts && (
               <p className="text-sm font-medium text-gray-light">Add a note, a reason to reconnect, or log a catch-up to get started.</p>
             )}
-            {!editingFacts && (
-              <button type="button" onClick={() => setEditingFacts(true)} className="inline-flex min-h-9 items-center text-sm font-bold text-green hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/30">
-                Edit details
-              </button>
-            )}
           </div>
           <div className="flex shrink-0 items-center gap-2">
-            <Button variant="primary" onClick={() => setCatchUpOpen((open) => !open)}>
-              <Check size={16} weight="bold" className="mr-2" /> Log a catch-up
+            <Button
+              type="button"
+              variant="primary"
+              size="sm"
+              onClick={handleHeaderLogCatchUp}
+              className="inline-flex items-center gap-1.5"
+            >
+              <ClockCounterClockwise size={14} weight="bold" />
+              <span>Log catch-up</span>
             </Button>
             <OverflowMenu items={[
               { label: 'Archive', onClick: () => void archive() },
@@ -326,19 +364,6 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, onBack, onC
           </div>
         </header>
 
-        {catchUpOpen && (
-          <Surface variant="flat" tone="sage" className="p-5 md:p-6">
-            <form onSubmit={logCatchUp} className="space-y-3">
-              <label className="block text-sm font-bold text-gray-nav">What happened? (optional)
-                <textarea autoFocus value={catchUpNote} onChange={(event) => setCatchUpNote(event.target.value)} placeholder="Coffee, a call, a quick message…" className={`${fieldClass} min-h-20 font-medium`} />
-              </label>
-              <div className="flex gap-2">
-                <Button type="submit" variant="primary" size="sm" isLoading={isLoggingCatchUp}>Save catch-up</Button>
-                <Button type="button" variant="ghost" size="sm" onClick={() => { setCatchUpOpen(false); setCatchUpNote(''); }}>Cancel</Button>
-              </div>
-            </form>
-          </Surface>
-        )}
 
         {/* Identity facts — edit on demand; read-only by default lives in the header */}
         {editingFacts && (
@@ -363,57 +388,95 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, onBack, onC
           </Surface>
         )}
 
-        {/* Reasons to reconnect */}
-        <Surface variant="flat" tone="paper" className="p-5 md:p-6">
-          <CardHeader icon={ChatCircleText} title="Reasons to reconnect" />
-          <div className="mt-4 space-y-1.5">
-            {openHooks.map((item) => (
-              <button key={item.id} type="button" onClick={() => void update({ hooks: relationship.hooks.map((candidate) => candidate.id === item.id ? { ...candidate, used: true } : candidate) })} className="group flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition duration-200 ease-out hover:bg-green/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40">
-                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-green/60" />
-                <span className="flex-1 text-sm font-medium text-gray-text">{item.description}</span>
-                <span className="text-xs font-bold text-gray-nav opacity-0 transition group-hover:opacity-100">Done</span>
-              </button>
-            ))}
-            {!openHooks.length && <p className="px-3 pb-1 text-sm font-medium text-gray-nav">No reasons yet.</p>}
-          </div>
-          <div className="mt-3">
-            <QuickAdd ariaLabel="Add a reason" placeholder="Add a reason… e.g. ask about their new role" value={hook} onChange={setHook} onSubmit={addHook} />
-          </div>
-        </Surface>
-
-        {/* Reminders */}
-        <Surface variant="flat" tone="paper" className="p-5 md:p-6">
-          <CardHeader icon={Bell} title="Reminders" />
-          <div className="mt-4 space-y-1.5">
-            {relationship.nextCare.map((item) => {
-              const done = item.status === 'done';
-              return (
-                <button key={item.id} type="button" disabled={done} onClick={() => void update({ nextCare: relationship.nextCare.map((candidate) => candidate.id === item.id ? { ...candidate, status: 'done' as const } : candidate) })} className="group flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition duration-200 ease-out hover:bg-green/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/30 disabled:hover:bg-transparent">
-                  <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition ${done ? 'border-green bg-green text-on-accent' : 'border-gray-nav/40 text-transparent group-hover:border-green'}`}>
-                    <Check size={12} weight="bold" />
-                  </span>
-                  <span className={`flex-1 text-sm font-medium ${done ? 'text-gray-nav line-through' : 'text-gray-text'}`}>{item.label}</span>
+        {/* Consolidated Relationship details (Reasons, Reminders, and Catch-ups) */}
+        <Surface variant="flat" tone="paper" className="p-6 md:p-8 space-y-12">
+          {/* Reasons to reconnect */}
+          <div>
+            <CardHeader icon={ChatCircleText} title="Reasons to reconnect" />
+            <div className="mt-4 space-y-1.5">
+              {openHooks.map((item) => (
+                <button key={item.id} type="button" onClick={() => void update({ hooks: relationship.hooks.map((candidate) => candidate.id === item.id ? { ...candidate, used: true } : candidate) })} className="group flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition duration-200 ease-out hover:bg-green/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40">
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-green/60" />
+                  <span className="flex-1 text-sm font-medium text-gray-text">{item.description}</span>
+                  <span className="text-xs font-bold text-gray-nav opacity-0 transition group-hover:opacity-100">Done</span>
                 </button>
-              );
-            })}
-            {!relationship.nextCare.length && <p className="px-3 pb-1 text-sm font-medium text-gray-nav">No reminders yet.</p>}
+              ))}
+              {!openHooks.length && <p className="px-3 pb-1 text-sm font-medium text-gray-nav">No reasons yet.</p>}
+            </div>
+            <div className="mt-3">
+              <QuickAdd ariaLabel="Add a reason" placeholder="Add a reason… e.g. ask about their new role" value={hook} onChange={setHook} onSubmit={addHook} />
+            </div>
           </div>
-          <div className="mt-3">
-            <QuickAdd ariaLabel="Add a reminder" placeholder="Add a reminder… e.g. send the article" value={nextCare} onChange={setNextCare} onSubmit={addNextCare} />
-          </div>
-        </Surface>
 
-        {/* Catch-ups — the aha record, promoted into the calm column */}
-        <Surface variant="flat" tone="paper" className="p-5 md:p-6">
-          <CardHeader icon={ClockCounterClockwise} title="Catch-ups" />
-          <div className="mt-4 space-y-3">
-            {[...relationship.interactions].reverse().map((item) => (
-              <div key={item.id} className="rounded-2xl border border-green/20 p-4">
-                <p className="text-sm font-bold text-gray-text">{formatDate(item.date)}</p>
-                <p className="mt-1 text-sm font-medium text-gray-light">{item.notes}</p>
+          {/* Reminders */}
+          <div>
+            <CardHeader icon={Bell} title="Reminders" />
+            <div className="mt-4 space-y-1.5">
+              {relationship.nextCare.map((item) => {
+                const done = item.status === 'done';
+                return (
+                  <button key={item.id} type="button" disabled={done} onClick={() => void update({ nextCare: relationship.nextCare.map((candidate) => candidate.id === item.id ? { ...candidate, status: 'done' as const } : candidate) })} className="group flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition duration-200 ease-out hover:bg-green/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/30 disabled:hover:bg-transparent">
+                    <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition ${done ? 'border-green bg-green text-on-accent' : 'border-gray-nav/40 text-transparent group-hover:border-green'}`}>
+                      <Check size={12} weight="bold" />
+                    </span>
+                    <span className={`flex-1 text-sm font-medium ${done ? 'text-gray-nav line-through' : 'text-gray-text'}`}>{item.label}</span>
+                  </button>
+                );
+              })}
+              {!relationship.nextCare.length && <p className="px-3 pb-1 text-sm font-medium text-gray-nav">No reminders yet.</p>}
+            </div>
+            <div className="mt-3">
+              <QuickAdd ariaLabel="Add a reminder" placeholder="Add a reminder… e.g. send the article" value={nextCare} onChange={setNextCare} onSubmit={addNextCare} />
+            </div>
+          </div>
+
+          {/* Catch-ups */}
+          <div ref={catchUpSectionRef}>
+            <CardHeader
+              icon={ClockCounterClockwise}
+              title="Catch-ups"
+              action={
+                <button
+                  type="button"
+                  onClick={() => setCatchUpOpen((open) => !open)}
+                  className="inline-flex items-center gap-1 text-sm font-bold text-green hover:text-green-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/30"
+                >
+                  <Plus size={14} weight="bold" />
+                  <span>Log catch-up</span>
+                </button>
+              }
+            />
+            
+            {catchUpOpen && (
+              <div className="mt-4 pb-4">
+                <form onSubmit={logCatchUp} className="space-y-4">
+                  <label className="block text-sm font-bold text-gray-nav">
+                    What happened? <span className="font-normal text-gray-nav/75">(optional)</span>
+                    <textarea
+                      autoFocus
+                      value={catchUpNote}
+                      onChange={(event) => setCatchUpNote(event.target.value)}
+                      placeholder="Coffee, a call, a quick message…"
+                      className={`${fieldClass} min-h-20 font-medium`}
+                    />
+                  </label>
+                  <div className="flex gap-2">
+                    <Button type="submit" variant="primary" size="sm" isLoading={isLoggingCatchUp}>Save catch-up</Button>
+                    <Button type="button" variant="ghost" size="sm" onClick={() => { setCatchUpOpen(false); setCatchUpNote(''); }}>Cancel</Button>
+                  </div>
+                </form>
               </div>
-            ))}
-            {!relationship.interactions.length && <p className="text-sm font-medium text-gray-nav">No catch-ups yet.</p>}
+            )}
+
+            <div className="mt-4 space-y-4">
+              {[...relationship.interactions].reverse().map((item) => (
+                <div key={item.id} className="py-2 first:pt-0 last:pb-0 border-l-2 border-green/15 pl-4 space-y-1">
+                  <p className="text-sm font-bold text-gray-text">{formatDate(item.date)}</p>
+                  <p className="text-sm font-medium text-gray-light leading-relaxed">{item.notes}</p>
+                </div>
+              ))}
+              {!relationship.interactions.length && <p className="px-3 pb-1 text-sm font-medium text-gray-nav">No catch-ups yet.</p>}
+            </div>
           </div>
         </Surface>
 
@@ -424,13 +487,21 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, onBack, onC
               icon={Sparkle}
               title="From your People room"
               subtitle="Pulled from what you've written about them in Notes."
-              action={<Link to={RoutePath.SANCTUARY_ARTICLE.replace(':pageType', 'people')} className="shrink-0 text-sm font-bold text-green hover:underline">Open People room</Link>}
+              action={
+                <Link
+                  to={RoutePath.SANCTUARY_ARTICLE.replace(':pageType', 'people')}
+                  className="shrink-0 text-sm font-bold text-green hover:text-green-hover transition-colors inline-flex items-center gap-1"
+                >
+                  <span>Open People room</span>
+                  <ArrowUpRight size={14} weight="bold" />
+                </Link>
+              }
             />
             <div className="mt-4 space-y-3">
               {wikiMentions.map((snippet, index) => (
-                <div key={index} className="rounded-2xl border border-green/20 bg-green/5 p-4">
+                <div key={index} className="rounded-2xl bg-green/5 p-5 space-y-3">
                   <p className="text-sm font-medium leading-relaxed text-gray-text">{snippet}</p>
-                  <Button type="button" size="sm" variant="secondary" className="mt-3" onClick={() => void saveSnippetAsHook(snippet)}>Save as a reason to reconnect</Button>
+                  <Button type="button" size="sm" variant="secondary" className="mt-1" onClick={() => void saveSnippetAsHook(snippet)}>Save as a reason to reconnect</Button>
                 </div>
               ))}
             </div>
@@ -443,7 +514,15 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, onBack, onC
             <CardHeader
               icon={Sparkle}
               title="From your People room"
-              action={<Link to={RoutePath.SANCTUARY_ARTICLE.replace(':pageType', 'people')} className="shrink-0 text-sm font-bold text-green hover:underline">Open People room</Link>}
+              action={
+                <Link
+                  to={RoutePath.SANCTUARY_ARTICLE.replace(':pageType', 'people')}
+                  className="shrink-0 text-sm font-bold text-green hover:text-green-hover transition-colors inline-flex items-center gap-1"
+                >
+                  <span>Open People room</span>
+                  <ArrowUpRight size={14} weight="bold" />
+                </Link>
+              }
             />
             <p className="mt-4 text-sm font-medium leading-relaxed text-gray-nav">Nothing about {relationship.name} in your People room yet. As you write about them in Notes, mentions will gather here.</p>
           </Surface>
@@ -451,12 +530,17 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, onBack, onC
 
         {/* Contact details — a quiet, optional toggle; clearly secondary to the identity facts above */}
         <details className="group pt-2">
-          <summary className="inline-flex min-h-11 w-fit cursor-pointer list-none items-center gap-2.5 rounded-xl px-1 text-sm font-bold text-gray-nav focus-visible:ring-2 focus-visible:ring-green/30 hover:text-green [&::-webkit-details-marker]:hidden">
-            <span>Contact details <span className="font-medium text-gray-nav/70">(optional)</span></span>
-            <span className="text-xs font-black uppercase tracking-[0.14em] text-gray-nav/60 group-open:hidden">Show</span>
-            <span className="hidden text-xs font-black uppercase tracking-[0.14em] text-gray-nav/60 group-open:inline">Hide</span>
+          <summary className="flex min-h-11 w-full cursor-pointer list-none items-center justify-between rounded-xl px-1 text-sm font-bold text-gray-text hover:bg-green/5 hover:text-green transition-colors focus-visible:ring-2 focus-visible:ring-green/30 [&::-webkit-details-marker]:hidden">
+            <span className="flex items-center gap-2">
+              <AddressBook size={18} weight="duotone" className="text-green" />
+              <span>Contact details</span>
+              <span className="text-xs font-normal text-gray-light">(optional)</span>
+            </span>
+            <span className="transition-transform duration-300 group-open:rotate-180 px-2">
+              <CaretDown size={16} weight="bold" className="text-gray-nav" />
+            </span>
           </summary>
-          <Surface variant="flat" tone="paper" className="mt-3 p-5 md:p-6">
+          <div className="mt-3 p-5 md:p-6 rounded-2xl bg-surface">
             <form onSubmit={saveDetails} className="space-y-5">
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="text-sm font-bold text-gray-nav">Email<input name="email" value={context.email} onChange={(event) => setContext((current) => ({ ...current, email: event.target.value }))} className={fieldClass} /></label>
@@ -466,7 +550,7 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, onBack, onC
               </div>
               <Button type="submit" variant="secondary" isLoading={isSavingDetails}>Save</Button>
             </form>
-          </Surface>
+          </div>
         </details>
       </article>
 

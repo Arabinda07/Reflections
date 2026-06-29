@@ -91,6 +91,13 @@ export const DashboardLayout: React.FC = () => {
     referralService.captureReferralCode(location.search);
   }, [location.search]);
 
+  // Scroll the main content container to the top on route change.
+  // React Router's <ScrollRestoration /> targets window.scrollTo(), which has
+  // no effect because #main-content (overflow-y-auto) is the actual scroller.
+  useEffect(() => {
+    document.getElementById('main-content')?.scrollTo(0, 0);
+  }, [location.pathname]);
+
   // Derived route flags
   const isNoteEditRoute =
     location.pathname.startsWith(`${RoutePath.NOTES}/`) && location.pathname.endsWith('/edit');
@@ -231,6 +238,8 @@ export const DashboardLayout: React.FC = () => {
           description="Share Reflections with someone who might want a space to write."
           tone="paper"
           size="md"
+          panelClassName="modal-sheet-panel--compact"
+          bodyClassName="modal-sheet-body--compact"
         >
           <ReferralInvitePanel compact />
         </ModalSheet>

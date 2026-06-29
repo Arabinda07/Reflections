@@ -203,7 +203,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
               ))}
             </div>
 
-            <ul className="space-y-2 border-y border-border/50 py-3">
+            <ul className="space-y-3 py-3">
               {features.map((feature) => (
                 <li key={feature} className="flex items-center gap-3 text-sm font-semibold text-gray-text">
                   <CheckCircle size={16} weight="fill" className="text-honey" />
@@ -285,7 +285,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
             </p>
           </div>
 
-          <div className="border-y border-border/50 py-5 text-left space-y-4">
+          <div className="py-5 text-left space-y-4">
             {features.map((feature) => (
               <div key={feature} className="flex items-center gap-3">
                 <CheckCircle size={20} weight="fill" className="text-honey" />
@@ -311,8 +311,8 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
   return (
     <>
       <div className={`surface-tone-sage rounded-[var(--radius-panel)] p-5 ${className}`}>
-        <div className="flex flex-col justify-between gap-5 md:flex-row md:items-center">
-          <div className="space-y-2">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between items-start gap-4">
+          <div className="space-y-2 max-w-lg">
             <div className="flex items-center gap-2 text-green">
               <Crown size={18} weight="fill" />
               <span className="label-caps">Reflections Pro</span>
@@ -322,15 +322,13 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
             </p>
           </div>
 
-          <div className="flex flex-col gap-2 md:items-end">
-            <Button
-              variant="primary"
-              className="w-full md:w-auto h-12 px-6 rounded-[var(--radius-control)] whitespace-nowrap"
-              onClick={openPaywall}
-            >
-              Start my free trial
-            </Button>
-          </div>
+          <Button
+            variant="primary"
+            className="w-fit h-12 px-6 rounded-[var(--radius-control)] whitespace-nowrap"
+            onClick={openPaywall}
+          >
+            Start my free trial
+          </Button>
         </div>
       </div>
       {renderSubscriptionModal()}

@@ -585,22 +585,23 @@ export const LifeWiki: React.FC = () => {
         <div className="fixed inset-0 pointer-events-none z-deep overflow-hidden bg-body">
           <div className="sanctuary-page-fade absolute inset-0 opacity-50" />
         </div>
-        <PageContainer size="narrow" className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10 relative z-10">
+        <PageContainer className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10 relative z-10">
           <div
             ref={lifeWikiScopeRef}
             className={`core-page-stack transition-[opacity,transform] duration-500 ease-out-expo ${isEnteringWiki ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}
           >
             <button
               onClick={() => navigate(RoutePath.SANCTUARY)}
-              className="group flex items-center gap-2 text-sm font-bold text-gray-nav hover:text-green transition-[color,transform] duration-300 w-fit hover:-translate-x-1"
+              className="mb-8 group flex items-center gap-2 text-sm font-bold text-gray-nav hover:text-green transition-[color,transform] duration-300 w-fit hover:-translate-x-1"
               aria-label="Back to Sanctuary"
             >
               <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
               <span>Back</span>
             </button>
 
-            {!articlePage ? (
-              !hasLoadedLibrary ? (
+            <div className="mx-auto max-w-[760px] w-full">
+              {!articlePage ? (
+                !hasLoadedLibrary ? (
                 <Surface variant="flat" tone="sky" className="p-8 md:p-10">
                   <div className="max-w-xl">
                     <p className="label-caps text-green">
@@ -787,6 +788,7 @@ export const LifeWiki: React.FC = () => {
               </article>
             )}
             </div>
+          </div>
         </PageContainer>
       </>
     );

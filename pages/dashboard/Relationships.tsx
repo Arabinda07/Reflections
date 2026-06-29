@@ -3,13 +3,15 @@ import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { AddressBook } from '@phosphor-icons/react/AddressBook';
 import { CirclesThreePlus } from '@phosphor-icons/react/CirclesThreePlus';
 import { ClockCounterClockwise } from '@phosphor-icons/react/ClockCounterClockwise';
+import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
 import { Plus } from '@phosphor-icons/react/Plus';
 import { Tray } from '@phosphor-icons/react/Tray';
+import { User } from '@phosphor-icons/react/User';
 
 import { Button } from '../../components/ui/Button';
 import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
 import { Input } from '../../components/ui/Input';
-import { MetadataPill } from '../../components/ui/MetadataPill';
+import { Check } from '@phosphor-icons/react/Check';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { SectionHeader } from '../../components/ui/SectionHeader';
@@ -90,6 +92,13 @@ export const Relationships: React.FC = () => {
       .catch(() => {});
     return () => { active = false; };
   }, []);
+
+  useEffect(() => {
+    if (searchParams.get('add') === '1' || searchParams.get('add') === 'true') {
+      setIsCreateOpen(true);
+      navigate(RoutePath.RELATIONSHIPS, { replace: true });
+    }
+  }, [searchParams, navigate]);
 
   const createRelationship = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -191,6 +200,7 @@ export const Relationships: React.FC = () => {
       <RelationshipProfile
         relationship={selectedRelationship}
         relationships={relationships}
+        autoOpenCatchUp={searchParams.get('catchup') === '1' || searchParams.get('catchup') === 'true'}
         onBack={() => navigate(RoutePath.RELATIONSHIPS)}
         onChanged={(updated) => {
           setRelationships((current) => current.map((item) => item.id === updated.id ? updated : item));
@@ -209,6 +219,14 @@ export const Relationships: React.FC = () => {
     <>
       <PageContainer className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10">
         <div className="core-page-stack">
+          <button
+            onClick={() => navigate(RoutePath.DASHBOARD)}
+            className="group flex items-center gap-2 text-sm font-bold text-gray-nav hover:text-green transition-[color,transform] duration-300 w-fit hover:-translate-x-1"
+            aria-label="Back to home"
+          >
+            <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
+            <span>Back</span>
+          </button>
           <SectionHeader
             title="Relationships"
             description="A calm place to keep track of the people who matter, with a few reminders each week to reach out."
@@ -229,45 +247,92 @@ export const Relationships: React.FC = () => {
             <div className="space-y-5">
               {activeTab === 'weekly' && (
                 <Surface variant="bezel" tone="sage" innerClassName="p-6 md:p-8">
-                  <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                    <div><h2 className="text-3xl font-display font-bold text-gray-text">Who to reach out to</h2><p className="mt-2 text-sm font-medium text-gray-light">A short list for this week. No pressure to clear it.</p></div>
-                    <Button variant="primary" onClick={() => setIsCreateOpen(true)}>Add person<Plus size={16} weight="bold" className="ml-2" /></Button>
-                  </div>
+                    <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                      <div>
+                        <h2 className="text-3xl font-display font-bold text-gray-text">Who to reach out to</h2>
+                        <p className="mt-2 text-sm font-medium text-gray-light">A short list for this week. No pressure to clear it.</p>
+                      </div>
+                      <Button variant="ghost" size="sm" className="text-gray-nav hover:text-green" onClick={() => setIsCreateOpen(true)}>
+                        Add person<Plus size={16} weight="bold" className="ml-1.5" />
+                      </Button>
+                    </div>
 
                   {suggestions.length ? (
                     <div className="grid gap-4">
                       {suggestions.map((suggestion) => (
-                        <article key={suggestion.relationship.id} className="rounded-[1.5rem] border border-green/15 bg-green/5 p-5">
-                          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                            <div className="min-w-0"><Link to={relationshipPath(suggestion.relationship.id)} className="text-xl font-display font-bold text-gray-text hover:text-green">{suggestion.relationship.name}</Link><p className="mt-2 text-sm font-semibold leading-relaxed text-gray-light">{suggestion.reason}</p></div>
-                            <MetadataPill tone="green">{relationshipStageLabels[suggestion.relationship.stage]}</MetadataPill>
+                        <article key={suggestion.relationship.id} className="rounded-[1.5rem] border border-green/12 bg-green/5 p-6 md:p-8 space-y-4">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                            <div className="min-w-0">
+                              <Link to={relationshipPath(suggestion.relationship.id)} className="text-2xl font-display font-bold text-gray-text hover:text-green transition-colors">
+                                {suggestion.relationship.name}
+                              </Link>
+                              <p className="mt-1.5 text-base font-semibold leading-relaxed text-gray-light">
+                                {suggestion.reason}
+                              </p>
+                            </div>
                           </div>
-                          <div className="mt-5 grid gap-3 md:grid-cols-3">
-                            <div><p className="label-caps text-gray-nav">Why reach out</p><p className="mt-1 text-sm font-bold text-gray-text">{suggestion.suggestedHook?.description || 'Nothing saved yet'}</p></div>
-                            <div><p className="label-caps text-gray-nav">Last contact</p><p className="mt-1 text-sm font-bold text-gray-text">{suggestion.lastInteraction ? new Date(suggestion.lastInteraction.date).toLocaleDateString() : 'No contact yet'}</p></div>
-                            <div><p className="label-caps text-gray-nav">Suggested step</p><p className="mt-1 text-sm font-bold text-gray-text">{suggestion.suggestedCare}</p></div>
+
+                          <div className="text-sm space-y-2 text-gray-light border-l border-green/20 pl-4 py-1">
+                            {suggestion.suggestedHook?.description && (
+                              <p>
+                                <span className="font-semibold text-gray-text">Why: </span>
+                                {suggestion.suggestedHook.description}
+                              </p>
+                            )}
+                            <p>
+                              <span className="font-semibold text-gray-text">Suggested step: </span>
+                              {suggestion.suggestedCare}
+                            </p>
+                            <p className="text-xs text-gray-nav/80">
+                              Last contact: {suggestion.lastInteraction ? new Date(suggestion.lastInteraction.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'No contact yet'}
+                            </p>
                           </div>
-                          <div className="mt-5 flex flex-wrap gap-2"><Button variant="secondary" size="sm" onClick={async () => {
-                            try {
-                              const updated = await relationshipService.markTended(suggestion.relationship.id);
-                              setRelationships((current) => current.map((item) => item.id === updated.id ? updated : item));
-                              setHasPendingSync(await relationshipService.hasPendingSync());
-                              showToast(`Marked ${updated.name} as done for this week.`);
-                            } catch {
-                              showToast("I couldn't save that. Nothing was lost — try again.");
-                            }
-                          }}>Mark done</Button><Button variant="ghost" size="sm" onClick={() => navigate(relationshipPath(suggestion.relationship.id))}>Open profile</Button></div>
+
+                          <div className="pt-2 flex flex-wrap items-center gap-3">
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              onClick={() => navigate(`${relationshipPath(suggestion.relationship.id)}?catchup=1`)}
+                            >
+                              <Check size={16} weight="bold" className="mr-2" />
+                              Log a catch-up
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-gray-nav hover:text-green"
+                              onClick={async () => {
+                                try {
+                                  const updated = await relationshipService.markTended(suggestion.relationship.id);
+                                  setRelationships((current) => current.map((item) => item.id === updated.id ? updated : item));
+                                  setHasPendingSync(await relationshipService.hasPendingSync());
+                                  showToast(`Marked ${updated.name} as done for this week.`);
+                                } catch {
+                                  showToast("I couldn't save that. Nothing was lost — try again.");
+                                }
+                              }}
+                            >
+                              Mark done
+                            </Button>
+                          </div>
                         </article>
                       ))}
                     </div>
                   ) : activePeople.length ? (
-                    <div className="rounded-[1.5rem] border-2 border-dashed border-green/20 p-8 text-center"><h3 className="text-2xl font-display font-bold text-gray-text">You're all caught up this week.</h3><p className="mt-2 text-sm font-medium text-gray-light">Check back later — new nudges appear as time passes.</p></div>
+                    <div className="py-16 text-center max-w-md mx-auto space-y-2">
+                      <h3 className="text-xl font-display font-bold text-gray-text">You're all caught up this week</h3>
+                      <p className="text-sm font-medium text-gray-light leading-relaxed">Check back later — new nudges appear as time passes.</p>
+                    </div>
                   ) : (
-                    <div className="rounded-[1.5rem] border-2 border-dashed border-green/20 p-8 text-center">
-                      <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-green/10 text-green"><CirclesThreePlus size={28} weight="duotone" /></div>
-                      <h3 className="mt-4 text-2xl font-display font-bold text-gray-text">No people yet.</h3>
-                      <p className="mt-2 text-sm font-medium text-gray-light">Add the people who matter over in the People tab, and your weekly list will show up here.</p>
-                      <Button variant="secondary" className="mt-5" onClick={() => navigate(`${RoutePath.RELATIONSHIPS}?tab=people`)}>Go to People</Button>
+                    <div className="py-16 text-center max-w-md mx-auto space-y-5">
+                      <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-xl bg-green/5 text-green">
+                        <CirclesThreePlus size={24} weight="duotone" />
+                      </div>
+                      <div className="space-y-2">
+                        <h3 className="text-xl font-display font-bold text-gray-text">No people yet</h3>
+                        <p className="text-sm font-medium text-gray-light leading-relaxed">Add the people who matter over in the People tab, and your weekly list will show up here.</p>
+                      </div>
+                      <Button variant="primary" className="mt-2" onClick={() => navigate(`${RoutePath.RELATIONSHIPS}?tab=people`)}>Go to People</Button>
                     </div>
                   )}
                 </Surface>
@@ -289,9 +354,9 @@ export const Relationships: React.FC = () => {
                     </Link>
                   )}
                   {activePeople.length ? (
-                    <div className="grid gap-3">
+                    <div className="space-y-1.5">
                       {activePeople.map((relationship) => (
-                        <div key={relationship.id} className="flex min-h-20 items-center gap-2 rounded-2xl border border-border/70 p-4 hover:border-green/25 hover:bg-green/5">
+                        <div key={relationship.id} className="flex min-h-20 items-center gap-2 px-2 py-4 rounded-xl transition-colors hover:bg-green/5">
                           <Link to={relationshipPath(relationship.id)} className="min-w-0 flex-1 rounded-xl focus-visible:ring-2 focus-visible:ring-green/30">
                             <span className="block text-base font-bold text-gray-text">{relationship.name}</span>
                             <span className="mt-1 block truncate text-sm font-medium text-gray-light">{relationship.role || relationship.company || relationship.howWeMet || 'No details yet'}</span>
@@ -331,14 +396,14 @@ export const Relationships: React.FC = () => {
                   ) : null}
 
                   {archivedPeople.length > 0 && (
-                    <div className="mt-6 border-t border-border/60 pt-5">
+                    <div className="mt-6">
                       <button type="button" onClick={() => setShowArchived((value) => !value)} className="flex min-h-11 items-center gap-2 rounded-xl text-sm font-bold text-gray-nav focus-visible:ring-2 focus-visible:ring-green/30 hover:text-green">
                         {showArchived ? 'Hide' : 'Show'} archived ({archivedPeople.length})
                       </button>
                       {showArchived && (
-                        <div className="mt-3 grid gap-3">
+                        <div className="mt-3 space-y-1.5">
                           {archivedPeople.map((relationship) => (
-                            <div key={relationship.id} className="flex min-h-16 items-center gap-2 rounded-2xl border border-border/60 bg-surface-muted/40 p-4">
+                            <div key={relationship.id} className="flex min-h-16 items-center gap-2 px-2 py-3 rounded-xl transition-colors hover:bg-green/5">
                               <Link to={relationshipPath(relationship.id)} className="min-w-0 flex-1 truncate text-sm font-bold text-gray-text hover:text-green">{relationship.name}</Link>
                               <Button variant="secondary" size="sm" onClick={() => void unarchivePerson(relationship)}>Restore</Button>
                               <OverflowMenu items={[{ label: 'Delete…', onClick: () => setPendingDelete(relationship), danger: true }]} />
@@ -355,7 +420,38 @@ export const Relationships: React.FC = () => {
             </div>
 
             <aside className="space-y-5">
-              <Surface variant="flat" tone="paper" className="p-6"><div className="flex items-center gap-2"><ClockCounterClockwise size={18} weight="duotone" className="text-green" /><p className="label-caps text-gray-nav">This week</p></div><div className="mt-5 grid gap-4"><div><p className="text-3xl font-display font-bold text-gray-text">{suggestions.length}</p><p className="text-sm font-bold text-gray-nav">people suggested</p></div><div><p className="text-3xl font-display font-bold text-gray-text">{pendingInbox.length}</p><p className="text-sm font-bold text-gray-nav">imports waiting</p></div></div></Surface>
+              <Surface variant="flat" tone="paper" className="p-5 sm:p-6 space-y-4">
+                <div className="flex items-center gap-2.5">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-green/10 text-green">
+                    <ClockCounterClockwise size={15} weight="duotone" />
+                  </span>
+                  <h4 className="text-sm font-bold text-gray-text">This week</h4>
+                </div>
+                <div className="space-y-3 pt-1">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green/5 text-green">
+                      <User size={16} weight="duotone" />
+                    </span>
+                    <div>
+                      <p className="text-sm font-bold text-gray-text">
+                        {suggestions.length === 1 ? '1 person suggested' : `${suggestions.length} people suggested`}
+                      </p>
+                      <p className="text-xs font-semibold text-gray-light">To keep in touch with</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${pendingInbox.length > 0 ? 'bg-sky/15 text-sky' : 'bg-green/5 text-gray-nav'}`}>
+                      <Tray size={16} weight="duotone" />
+                    </span>
+                    <div>
+                      <p className="text-sm font-bold text-gray-text">
+                        {pendingInbox.length === 0 ? 'No imports waiting' : pendingInbox.length === 1 ? '1 import waiting' : `${pendingInbox.length} imports waiting`}
+                      </p>
+                      <p className="text-xs font-semibold text-gray-light">From contact books</p>
+                    </div>
+                  </div>
+                </div>
+              </Surface>
               <Surface variant="flat" tone="paper" className="p-6"><div className="flex items-center gap-2"><AddressBook size={18} weight="duotone" className="text-green" /><p className="label-caps text-gray-nav">Life Wiki</p></div><p className="mt-4 text-sm font-medium leading-relaxed text-gray-light">{wikiMentionCount > 0 ? `${wikiMentionCount} of your people ${wikiMentionCount === 1 ? 'appears' : 'appear'} in your People room. Open a profile to see what you've written and turn it into a reason to reach out.` : "Your People room holds what you've written about people. Names that match your relationships show up on their profiles."}</p><Button variant="secondary" className="mt-5 w-full" onClick={() => navigate(RoutePath.SANCTUARY_ARTICLE.replace(':pageType', 'people'))}>Open People room</Button></Surface>
             </aside>
           </section>

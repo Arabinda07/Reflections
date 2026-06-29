@@ -3,11 +3,9 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import { Calendar as CalendarIcon } from '@phosphor-icons/react/Calendar';
 import { CircleNotch } from '@phosphor-icons/react/CircleNotch';
-import { DotsThreeVertical } from '@phosphor-icons/react/DotsThreeVertical';
 import { DownloadSimple } from '@phosphor-icons/react/DownloadSimple';
 import { FileText } from '@phosphor-icons/react/FileText';
 import { PencilSimpleLine } from '@phosphor-icons/react/PencilSimpleLine';
-import { Plus } from '@phosphor-icons/react/Plus';
 import { SquaresFour } from '@phosphor-icons/react/SquaresFour';
 import { Tag } from '@phosphor-icons/react/Tag';
 import { Trash } from '@phosphor-icons/react/Trash';
@@ -349,7 +347,7 @@ export const MyNotes: React.FC = () => {
                 className="control-surface inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-gray-nav transition-[transform,border-color,background-color,color] duration-500 hover:scale-110 hover:border-green/25 hover:bg-green/5 hover:text-green"
                 aria-label={`More actions for ${note.title}`}
               >
-                <DotsThreeVertical size={18} weight="bold" />
+                <SquaresFour size={18} weight="bold" />
               </button>
             </div>
           </div>
@@ -406,11 +404,6 @@ export const MyNotes: React.FC = () => {
                       </Chip>
                     ) : null}
                   </div>
-
-                  <Button onClick={() => navigate(RoutePath.CREATE_NOTE)} variant="primary" className="px-6">
-                    <Plus className="mr-2 h-5 w-5" weight="regular" />
-                    Write a note
-                  </Button>
                 </div>
               }
             />
@@ -528,7 +521,7 @@ export const MyNotes: React.FC = () => {
         isOpen={!!actionMenuNote}
         onClose={() => setActionMenuNote(null)}
         title="Note actions"
-        icon={<DotsThreeVertical size={22} weight="duotone" />}
+        icon={<SquaresFour size={22} weight="duotone" />}
         ariaLabel="Choose an action for this reflection"
         size="sm"
       >

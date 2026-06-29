@@ -1,10 +1,13 @@
-import React, { useEffect, useMemo, useState } from 'react';
-
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
 import { CalendarBlank } from '@phosphor-icons/react/CalendarBlank';
 import { EnvelopeOpen } from '@phosphor-icons/react/EnvelopeOpen';
 import { LockKey } from '@phosphor-icons/react/LockKey';
-import { useNavigate } from 'react-router-dom';
+import ReactCalendar from 'react-calendar';
+import './react-calendar.css';
+import './Calendar.css';
+import { format } from 'date-fns';
 import { Button } from '../../components/ui/Button';
 import { CompletionCardActions } from '../../components/ui/CompletionCardActions';
 import { ModalSheet } from '../../components/ui/ModalSheet';
@@ -72,6 +75,7 @@ export const FutureLetters: React.FC = () => {
   const [openingLetterId, setOpeningLetterId] = useState<string | null>(null);
   const [shakeLetterId, setShakeLetterId] = useState<string | null>(null);
   const [cardPayload, setCardPayload] = useState<CompletionCardPayload | null>(null);
+  const datePickerRef = useRef<HTMLDetailsElement | null>(null);
 
   const minCustomDate = useMemo(() => toDateInputValue(addDays(new Date(), 1)), []);
   const openDate = useMemo(
@@ -185,7 +189,7 @@ export const FutureLetters: React.FC = () => {
           <SectionHeader title="Write a letter to yourself" />
 
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
-            <Surface variant="flat" tone="paper" className="rounded-[2.5rem] overflow-hidden">
+            <Surface variant="flat" tone="paper" className="rounded-[2.5rem]">
               <form onSubmit={handleSchedule} className="space-y-6 p-6 sm:p-8">
                 <div className="space-y-2">
                   <label htmlFor="future-letter-title" className="label-caps text-gray-nav">
@@ -233,14 +237,31 @@ export const FutureLetters: React.FC = () => {
                     ))}
                   </div>
                   {selectedOption === 'custom' ? (
-                    <input
-                      type="date"
-                      value={customDate}
-                      min={minCustomDate}
-                      onChange={(event) => setCustomDate(event.target.value)}
-                      aria-label="Custom open date"
-                      className="input-surface dashboard-field-text h-12 w-full px-4"
-                    />
+                    <div className="relative w-full">
+                      <details ref={datePickerRef} className="relative w-full">
+                        <summary 
+                          aria-label="Custom open date"
+                          className="input-surface flex h-12 w-full cursor-pointer list-none items-center justify-between px-4 text-ui-base font-semibold text-gray-text [&::-webkit-details-marker]:hidden"
+                        >
+                          <span>{customDate ? format(new Date(`${customDate}T12:00:00`), 'MMMM do, yyyy') : 'Select custom date...'}</span>
+                          <CalendarBlank size={18} weight="regular" className="text-gray-nav" />
+                        </summary>
+                        <div className="absolute left-0 z-20 mt-1.5 w-full max-w-[320px] rounded-2xl border border-border bg-surface p-4 shadow-card sm:max-w-[340px]">
+                          <ReactCalendar
+                            onChange={(value) => {
+                              const dateVal = Array.isArray(value) ? value[0] : value;
+                              if (dateVal instanceof Date) {
+                                setCustomDate(toDateInputValue(dateVal));
+                              }
+                              if (datePickerRef.current) datePickerRef.current.open = false;
+                            }}
+                            value={customDate ? new Date(`${customDate}T12:00:00`) : new Date()}
+                            minDate={new Date(`${minCustomDate}T12:00:00`)}
+                            className="w-full border-none font-sans"
+                          />
+                        </div>
+                      </details>
+                    </div>
                   ) : null}
                 </fieldset>
 

@@ -200,7 +200,7 @@ export const FAQ: React.FC = () => {
 
       {/* The details — featured trust/billing trio + the quieter list */}
       <PublicPageSection heading="Tools built to support you without getting in the way">
-        <div className="surface-flat surface-tone-sky grid gap-x-10 gap-y-8 rounded-[var(--radius-panel)] p-7 md:grid-cols-3 md:p-10">
+        <div className="surface-flat surface-tone-sage grid gap-x-10 gap-y-8 rounded-[var(--radius-panel)] p-7 md:grid-cols-3 md:p-10">
           {featuredDetails.map((item) => (
             <article key={item.title} className="group">
               <h3 className="flex items-center gap-2.5 text-ui-lg font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">

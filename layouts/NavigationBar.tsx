@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Leaf } from '@phosphor-icons/react/Leaf';
 import { MagnifyingGlass } from '@phosphor-icons/react/MagnifyingGlass';
 import { Moon } from '@phosphor-icons/react/Moon';
-import { PaperPlaneTilt } from '@phosphor-icons/react/PaperPlaneTilt';
+import { UserPlus } from '@phosphor-icons/react/UserPlus';
 import { Sun } from '@phosphor-icons/react/Sun';
 import { Button } from '../components/ui/Button';
 import { useAuthStore } from '../hooks/useAuthStore';
@@ -158,19 +158,19 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
           {isAuthenticated ? (
             <>
               <Button
-                variant="secondary"
+                variant="ghost"
                 size="sm"
                 onClick={onInvite}
-                className="gap-2 px-3 xl:px-4"
+                className="gap-2 px-3 hover:bg-green/5 text-green xl:px-4"
               >
-                Invite
-                <PaperPlaneTilt size={16} weight="regular" />
+                <span>Invite</span>
+                <UserPlus size={16} weight="regular" />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => logout()}
-                className="px-3 text-clay hover:bg-clay/5 xl:px-4"
+                className="px-3 text-gray-light hover:text-clay hover:bg-clay/5 xl:px-4"
               >
                 Logout
               </Button>

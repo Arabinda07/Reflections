@@ -16,9 +16,11 @@ const MENU_FILES = [
 ];
 
 describe('icon framework contract', () => {
-  it('uses one overflow-menu icon (DotsThreeVertical), not DotsThreeCircle', () => {
+  it('uses one overflow-menu icon (SquaresFour), not DotsThreeCircle or DotsThreeVertical', () => {
     for (const file of MENU_FILES) {
       expect(read(file), file).not.toContain('DotsThreeCircle');
+      expect(read(file), file).not.toContain('DotsThreeVertical');
+      expect(read(file), file).toContain('SquaresFour');
     }
   });
 

@@ -5,7 +5,7 @@ import { Calendar } from '@phosphor-icons/react/Calendar';
 import { CaretLeft } from '@phosphor-icons/react/CaretLeft';
 import { CaretRight } from '@phosphor-icons/react/CaretRight';
 import { Check } from '@phosphor-icons/react/Check';
-import { DotsThreeVertical } from '@phosphor-icons/react/DotsThreeVertical';
+import { SquaresFour } from '@phosphor-icons/react/SquaresFour';
 import { DownloadSimple } from '@phosphor-icons/react/DownloadSimple';
 import { FileText } from '@phosphor-icons/react/FileText';
 import { ListChecks } from '@phosphor-icons/react/ListChecks';
@@ -380,7 +380,7 @@ export const SingleNote: React.FC = () => {
                   aria-label="Note actions"
                   className={navButtonClass}
                 >
-                  <DotsThreeVertical size={20} weight="bold" />
+                  <SquaresFour size={20} weight="bold" />
                 </button>
               </Tooltip>
             </div>
@@ -571,7 +571,7 @@ export const SingleNote: React.FC = () => {
         isOpen={isActionsOpen}
         onClose={() => setIsActionsOpen(false)}
         title="Note actions"
-        icon={<DotsThreeVertical size={22} weight="duotone" />}
+        icon={<SquaresFour size={22} weight="duotone" />}
         ariaLabel="Choose an action for this reflection"
         size="sm"
       >

@@ -608,7 +608,7 @@ export const HomeAuthenticated: React.FC = () => {
                 <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center gap-2 text-gray-nav">
                     <Target size={18} weight="duotone" className="text-green" />
-                    <span className="label-caps">
+                    <span className="text-sm font-bold text-gray-nav">
                       Today's Reflection
                     </span>
                   </div>
@@ -630,47 +630,46 @@ export const HomeAuthenticated: React.FC = () => {
                     {dailyPrompt}
                   </p>
                   <div className="home-primary-action-cluster flex flex-col gap-3">
-                    <div className="home-primary-action-row flex w-full flex-col gap-3 sm:flex-row sm:items-stretch">
+                    <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-row sm:items-center">
                       <Button
                         variant="primary"
-                        className="h-14 w-full rounded-xl bg-green px-8 text-base font-bold text-white shadow-none transition-colors hover:bg-green/90 sm:flex-[1.05]"
+                        className="h-13 w-full sm:w-auto rounded-xl bg-green px-4 sm:px-8 text-sm sm:text-base font-bold text-white shadow-none transition-colors hover:bg-green/90"
                         onPointerEnter={prefetchCreateNoteRoute}
                         onFocus={prefetchCreateNoteRoute}
                         onClick={() => handleCreateClick(dailyPrompt)}
                         aria-label="Begin writing with today's prompt"
                       >
-                        Begin Writing
-                        <Plus size={18} weight="regular" className="ml-2" />
+                        <span>Begin Writing</span>
+                        <Plus size={16} weight="regular" className="ml-1.5 shrink-0" />
                       </Button>
                       <WhisperComposerControl
                         onFinalTranscript={handleVoiceDraft}
                         label="Speak a note"
                         stopOnFinalTranscript
-                        className="w-full sm:flex-1"
-                        buttonClassName="inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl border px-6 text-base font-bold transition-colors"
-                        idleButtonClassName="control-surface text-gray-text hover:border-green/20 hover:bg-green/5 hover:text-green"
+                        className="w-full sm:w-auto"
+                        buttonClassName="inline-flex h-13 w-full sm:w-auto items-center justify-center gap-1.5 rounded-xl border px-4 sm:px-6 text-sm sm:text-base font-bold transition-colors"
+                        idleButtonClassName="bg-gray-text/5 border-transparent text-gray-text hover:bg-green/5 hover:text-green"
                         activeButtonClassName="border-green/25 bg-green/10 text-green"
                       />
                     </div>
-                    <div className="home-secondary-action-row grid w-full gap-3 sm:grid-cols-2">
+                    <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-row sm:items-center">
                       <Button
-                        variant="secondary"
-
-                        className="h-12 w-full rounded-xl px-6 text-base font-bold"
+                        variant="ghost"
+                        className="h-13 w-full sm:w-auto rounded-xl px-4 sm:px-6 text-sm sm:text-base font-bold bg-gray-text/5 !text-gray-text hover:!text-green"
                         onClick={() => setIsCheckInOpen(true)}
                         aria-label="Save a quick mood check-in"
                       >
-                        Quick check-in
-                        <Heart size={18} weight="duotone" className="ml-2" />
+                        <span>Quick check-in</span>
+                        <Heart size={16} weight="duotone" className="ml-1.5 shrink-0" />
                       </Button>
                       <Button
-                        variant="secondary"
-                        className="h-12 w-full rounded-xl px-6 text-base font-bold"
+                        variant="ghost"
+                        className="h-13 w-full sm:w-auto rounded-xl px-4 sm:px-6 text-sm sm:text-base font-bold bg-gray-text/5 !text-gray-text hover:!text-green"
                         onClick={() => navigate(RoutePath.FUTURE_LETTERS)}
                         aria-label="Write a future letter"
                       >
-                        Future letter
-                        <EnvelopeSimple size={18} weight="duotone" className="ml-2" />
+                        <span>Future letter</span>
+                        <EnvelopeSimple size={16} weight="duotone" className="ml-1.5 shrink-0" />
                       </Button>
                     </div>
                   </div>
@@ -683,8 +682,8 @@ export const HomeAuthenticated: React.FC = () => {
             <div className="home-intentions-card surface-flat overflow-hidden rounded-[2rem] p-8 sm:p-10 lg:p-12 text-left">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-gray-nav">
-                  <ListChecks size={16} weight="duotone" className="text-honey" />
-                  <span className="label-caps">
+                  <ListChecks size={16} weight="duotone" className="text-green" />
+                  <span className="text-sm font-bold text-gray-nav">
                     Your Intentions
                   </span>
                 </div>
@@ -700,15 +699,15 @@ export const HomeAuthenticated: React.FC = () => {
                     intentionSummary.items.slice(0, 3).map((intention) => (
                       <button
                         key={intention.id}
-                        className="w-full flex items-center gap-4 p-4 rounded-2xl border border-honey/15 bg-honey/5 hover:border-honey/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-honey/40 transition-[colors,opacity,transform] text-left shadow-none group/btn active:scale-[0.98]"
+                        className="w-full flex items-center gap-4 p-4 rounded-2xl border border-green/15 bg-green/5 hover:border-green/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 transition-[colors,opacity,transform] text-left shadow-none group/btn active:scale-[0.98]"
                         onClick={() => handleToggleIntention(intention.noteId, intention.id)}
                         aria-label={`Mark "${intention.text}" from ${intention.noteTitle} as complete`}
                       >
-                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-2 border-border group-hover/btn:border-honey transition-colors">
-                           <div className="h-2 w-2 rounded-full bg-honey opacity-0 group-hover/btn:opacity-100 transition-opacity" />
+                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-2 border-border group-hover/btn:border-green transition-colors">
+                           <div className="h-2 w-2 rounded-full bg-green opacity-0 group-hover/btn:opacity-100 transition-opacity" />
                         </div>
                         <span className="min-w-0 flex-1">
-                          <span className="block font-serif italic text-base text-gray-text group-hover/btn:text-honey transition-colors line-clamp-2 leading-snug">
+                          <span className="block font-serif italic text-base text-gray-text group-hover/btn:text-green transition-colors line-clamp-2 leading-snug">
                             {intention.text}
                           </span>
                         </span>
@@ -738,7 +737,7 @@ export const HomeAuthenticated: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setIsIntentionModalOpen(true)}
-                    className="w-full flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-honey/25 p-8 text-honey hover:border-honey/40 hover:bg-honey/5 transition-colors"
+                    className="w-full flex flex-col items-center justify-center gap-2 rounded-2xl bg-green/5 border border-green/10 p-8 text-green hover:bg-green/10 transition-colors"
                   >
                     <Plus size={24} weight="bold" />
                     <span className="text-base font-bold">Set your first intention</span>
@@ -749,7 +748,7 @@ export const HomeAuthenticated: React.FC = () => {
                 {(intentionSummary.hiddenCount > 0 || intentionSummary.items.length > 3) && (
                   <button 
                     onClick={() => navigate(RoutePath.NOTES)}
-                    className="w-full text-center label-caps text-gray-nav hover:text-honey transition-colors pt-4"
+                    className="w-full text-center label-caps text-gray-nav hover:text-green transition-colors pt-4"
                   >
                     + {intentionSummary.hiddenCount + Math.max(0, intentionSummary.items.length - 3)} more
                   </button>
@@ -761,7 +760,7 @@ export const HomeAuthenticated: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setIsIntentionModalOpen(true)}
-                      className="w-full flex items-center justify-center gap-2 rounded-xl py-2 text-sm font-bold text-honey hover:text-honey/80 transition-colors"
+                      className="w-full flex items-center justify-center gap-2 rounded-xl py-2 text-sm font-bold text-green hover:text-green/80 transition-colors"
                     >
                       <Plus size={14} weight="bold" />
                       Add intention
@@ -780,8 +779,8 @@ export const HomeAuthenticated: React.FC = () => {
             >
               <div className="relative z-10">
               <div className="mb-6 flex items-center gap-2 text-gray-nav">
-                <FolderOpen size={18} weight="duotone" className="text-sky" />
-                <p className="label-caps">
+                <Brain size={18} weight="duotone" className="text-sky" />
+                <p className="text-sm font-bold text-gray-nav">
                   Your Rhythm
                 </p>
               </div>
@@ -789,32 +788,26 @@ export const HomeAuthenticated: React.FC = () => {
               <div className="space-y-3">
                 <button
                   onClick={() => navigate(RoutePath.NOTES)}
-                  className="surface-inline-panel surface-tone-sage dashboard-tone-card group flex w-full items-center justify-between p-4 text-left transition-colors"
+                  className="flex w-full items-center justify-between p-4 px-2 text-left rounded-xl transition-colors hover:bg-green/5 group"
                   aria-label="View all reflections"
                 >
-                  <div className="flex items-center gap-3">
-                    <FolderOpen size={18} weight="duotone" className="text-gray-nav group-hover:text-green transition-transform duration-300 group-hover:rotate-6" />
-                    <div>
-                      <p className="dashboard-action-title dashboard-hover-title">View archive</p>
-                      <p className="dashboard-action-description">Read saved reflections</p>
-                    </div>
+                  <div className="min-w-0 flex-1 pr-4">
+                    <p className="dashboard-action-title dashboard-hover-title">View archive</p>
+                    <p className="dashboard-action-description">Read saved reflections</p>
                   </div>
-                  <CaretRight size={16} weight="regular" className="text-gray-nav/40 group-hover:text-green transition-colors" />
+                  <CaretRight size={16} weight="regular" className="text-gray-nav/40 group-hover:text-green transition-colors shrink-0" />
                 </button>
 
                 <button
                   onClick={() => navigate(RoutePath.INSIGHTS)}
-                  className="surface-inline-panel surface-tone-sky dashboard-tone-card group flex w-full items-center justify-between p-4 text-left transition-colors"
+                  className="flex w-full items-center justify-between p-4 px-2 text-left rounded-xl transition-colors hover:bg-sky/5 group"
                   aria-label="View writing patterns"
                 >
-                  <div className="flex items-center gap-3">
-                    <Brain size={18} weight="duotone" className="text-sky transition-transform duration-300 group-hover:-rotate-6" />
-                    <div>
-                      <p className="dashboard-action-title dashboard-hover-title">Writing patterns</p>
-                      <p className="dashboard-action-description">Mood, rhythm, and recurring themes</p>
-                    </div>
+                  <div className="min-w-0 flex-1 pr-4">
+                    <p className="dashboard-action-title dashboard-hover-title">Writing patterns</p>
+                    <p className="dashboard-action-description">Mood, rhythm, and recurring themes</p>
                   </div>
-                  <CaretRight size={16} weight="regular" className="text-gray-nav/40 group-hover:text-sky transition-colors" />
+                  <CaretRight size={16} weight="regular" className="text-gray-nav/40 group-hover:text-sky transition-colors shrink-0" />
                 </button>
               </div>
             </div>
@@ -854,7 +847,7 @@ export const HomeAuthenticated: React.FC = () => {
         description={moodPickerStage === 'group' ? 'Pick a broad mood. Details are optional.' : undefined}
         ariaLabel="Choose a mood for this reflection"
         size="sm"
-        tone="paper"
+        tone="sage"
         panelClassName={`modal-sheet-panel--compact ${moodPickerStage === 'detail' ? 'modal-sheet-panel--mood-detail' : ''}`.trim()}
         bodyClassName={`modal-sheet-body--compact ${moodPickerStage === 'detail' ? 'modal-sheet-body--mood-detail' : ''}`.trim()}
       >

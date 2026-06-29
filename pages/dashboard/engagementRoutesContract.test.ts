@@ -132,7 +132,7 @@ describe('engagement routes source contract', () => {
     expect(signUp).toContain('referralService.recordAcceptedReferral');
     const referralPanel = read('components/ui/ReferralInvitePanel.tsx');
     expect(referralPanel).toContain('WarningCircle');
-    expect(referralPanel).toContain('min-h-11 w-full sm:w-auto');
+    expect(referralPanel).toContain('min-h-11 w-fit self-end sm:self-auto');
     expect(`${layout}\n${account}`.toLowerCase()).not.toMatch(/\b(reward|badge|leaderboard|feed|friends)\b/);
   });
 

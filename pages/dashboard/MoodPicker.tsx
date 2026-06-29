@@ -76,7 +76,7 @@ export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, onSelect, 
   const GroupIcon = selectedGroup.icon;
 
   return (
-    <div className="mood-picker-detail space-y-3">
+    <div className="mood-picker-detail space-y-2">
       <button
         type="button"
         onClick={() => setSelectedGroupId(null)}
@@ -86,24 +86,17 @@ export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, onSelect, 
         Back
       </button>
 
-      <div className="space-y-2">
-        <div className="flex items-start gap-3">
-          <span className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${selectedGroupConfig?.trackClass || 'bg-green/10'}`}>
-            <GroupIcon size={20} weight="duotone" className={selectedGroupConfig?.labelClass || 'text-green'} />
-          </span>
-          <div>
-            <h3 className="font-display text-ui-lg font-bold leading-tight text-gray-text">Want a closer word?</h3>
-            <p className="mt-1 text-sm font-medium leading-relaxed text-gray-light">
-              Choose one, or keep it broad.
-            </p>
-          </div>
-        </div>
+      <div>
+        <h3 className="font-display text-ui-lg font-bold leading-tight text-gray-text">Want a closer word?</h3>
+        <p className="mt-1 text-sm font-medium leading-relaxed text-gray-light">
+          Choose one, or keep it broad.
+        </p>
       </div>
 
       <button
         type="button"
         onClick={() => handleKeepGroup(selectedGroup)}
-        className={`flex min-h-12 w-full items-center justify-between rounded-[var(--radius-control)] border px-4 py-3 text-left text-sm font-bold transition-[border-color,background-color,color,transform] duration-300 ease-out-expo hover:-translate-y-px ${selectedGroupConfig?.selectedOption || 'border-green/30 bg-green/10 text-green'}`}
+        className={`flex min-h-10 w-full items-center justify-between rounded-[var(--radius-control)] border px-4 py-2 text-left text-sm font-bold transition-[border-color,background-color,color,transform] duration-300 ease-out-expo hover:-translate-y-px ${selectedGroupConfig?.selectedOption || 'border-green/30 bg-green/10 text-green'}`}
       >
         <span>Keep {selectedGroup.label}</span>
         {selectedMood === selectedGroup.id ? (
@@ -113,7 +106,7 @@ export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, onSelect, 
         ) : null}
       </button>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="grid gap-2.5">
         {selectedGroup.options.map((entry) => {
           const moodConfig = getMoodConfig(entry);
           const Icon = moodConfig?.icon;
@@ -126,11 +119,19 @@ export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, onSelect, 
               key={entry}
               type="button"
               onClick={() => handleMoodSelect(entry)}
-              className={`relative inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] border px-3.5 py-2 text-sm font-bold transition-[border-color,background-color,color,transform] duration-300 ease-out-expo hover:-translate-y-px ${isSelected ? moodConfig.modal : `${moodConfig.option} dark:bg-white/5`}`}
+              className={`group flex min-h-[3.65rem] w-full items-center justify-between rounded-[var(--radius-control)] border p-3.5 text-left transition-[border-color,background-color,box-shadow,transform] duration-300 ease-out-expo hover:-translate-y-px ${isSelected ? moodConfig.modal : `${moodConfig.option} dark:bg-white/5`}`}
             >
-              <Icon size={18} weight={isSelected ? 'fill' : 'regular'} />
-              <span>{moodConfig.label}</span>
-              {isSelected ? <Check size={13} weight="bold" /> : null}
+              <span className="flex items-center gap-3">
+                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${isSelected ? 'bg-white/30' : 'bg-white/40'} transition-transform duration-500 group-hover:scale-105`}>
+                  <Icon size={18} weight={isSelected ? 'fill' : 'regular'} className={isSelected ? 'text-current' : moodConfig.labelClass} />
+                </span>
+                <span className="text-sm font-bold text-gray-text">{moodConfig.label}</span>
+              </span>
+              {isSelected ? (
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/60 text-green">
+                  <Check size={11} weight="bold" />
+                </span>
+              ) : null}
             </button>
           );
         })}

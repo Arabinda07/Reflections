@@ -6,7 +6,7 @@ import { CalendarBlank } from '@phosphor-icons/react/CalendarBlank';
 import { CaretRight } from '@phosphor-icons/react/CaretRight';
 import { Check } from '@phosphor-icons/react/Check';
 import { CircleNotch } from '@phosphor-icons/react/CircleNotch';
-import { DotsThreeVertical } from '@phosphor-icons/react/DotsThreeVertical';
+import { SquaresFour } from '@phosphor-icons/react/SquaresFour';
 import { FloppyDisk } from '@phosphor-icons/react/FloppyDisk';
 import { Headphones } from '@phosphor-icons/react/Headphones';
 import { Sparkle } from '@phosphor-icons/react/Sparkle';
@@ -631,7 +631,7 @@ export const CreateNote: React.FC = () => {
             className="surface-floating group relative flex h-16 w-16 items-center justify-center rounded-full hover:text-green"
             aria-label="Open reflection options"
           >
-            <DotsThreeVertical size={24} weight="fill" className="opacity-80" />
+            <SquaresFour size={24} weight="fill" className="opacity-80" />
           </button>
         )}
 
