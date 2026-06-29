@@ -165,7 +165,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
       isOpen={isModalOpen}
       onClose={closePaywall}
       title="More room when life gets loud"
-      icon={<Crown size={20} weight="duotone" />}
+      icon={<Crown size={22} weight="duotone" />}
       size="md"
       tone="honey"
       panelClassName="modal-sheet-panel--compact"

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { LockKey } from '@phosphor-icons/react/LockKey';
 import { Check } from '@phosphor-icons/react/Check';
 import { useCrypto } from '../../context/CryptoContext';
 import { RouteLoadingFrame } from '../ui/RouteLoadingFrame';
@@ -23,16 +22,10 @@ const CryptoShell: React.FC<{
   children: React.ReactNode;
   title: string;
   description?: string;
-  icon?: React.ReactNode;
   eyebrow?: string | null;
-}> = ({ children, title, description, icon, eyebrow = 'Private writing' }) => (
+}> = ({ children, title, description, eyebrow = 'Private writing' }) => (
   <div className={panelClassName}>
     <section className={cardClassName} aria-labelledby="private-data-title">
-      {icon ? (
-        <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-full bg-green/10 text-green">
-          {icon}
-        </div>
-      ) : null}
       {eyebrow ? <p className="label-caps mb-3 text-gray-nav">{eyebrow}</p> : null}
       <h1 id="private-data-title" className="text-2xl font-semibold text-primary">{title}</h1>
       {description ? <p className="mt-2 text-sm leading-6 text-gray-text">{description}</p> : null}
@@ -76,9 +69,8 @@ const UnlockPanel: React.FC = () => {
   return (
     <CryptoShell
       eyebrow={null}
-      icon={<LockKey size={24} weight="duotone" />}
       title="Unlock your private writing"
-      description="Your writing is encrypted on this device. Enter your password to unlock it."
+      description="Your writing is encrypted on this device."
     >
       <div className="space-y-5">
         <div className="space-y-2">

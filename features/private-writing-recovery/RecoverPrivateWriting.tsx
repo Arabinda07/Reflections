@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle } from '@phosphor-icons/react/CheckCircle';
-import { Key } from '@phosphor-icons/react/Key';
 import { Warning } from '@phosphor-icons/react/Warning';
 import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
@@ -112,11 +111,6 @@ export const RecoverPrivateWriting: React.FC = () => {
             <SectionHeader
               eyebrow="Private writing"
               title="Recover private writing"
-              icon={
-                <div className="icon-block icon-block-md">
-                  <Key size={24} weight="duotone" />
-                </div>
-              }
             />
 
             <Alert
@@ -153,7 +147,7 @@ export const RecoverPrivateWriting: React.FC = () => {
                   }`}
                 >
                   <span className="block text-sm font-bold">Recovery phrase</span>
-                  <span className="mt-1 inline-block text-[11px] font-black uppercase tracking-widest text-green">
+                  <span className="mt-1 inline-block text-ui-xs font-black uppercase tracking-widest text-green">
                     Recommended
                   </span>
                 </button>

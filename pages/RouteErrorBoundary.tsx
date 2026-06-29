@@ -127,14 +127,14 @@ export const RouteErrorBoundary: React.FC = () => {
           <button
             type="button"
             onClick={onReload}
-            className="inline-flex min-h-14 w-full items-center justify-center rounded-[var(--radius-control)] border border-transparent bg-green px-5 py-4 text-[16px] font-bold text-white shadow-lg shadow-green/20 transition-[background-color,box-shadow,transform] duration-300 ease-out-expo hover:-translate-y-0.5 hover:bg-green-hover hover:shadow-xl hover:shadow-green/30 active:translate-y-0 sm:w-auto sm:px-8"
+            className="inline-flex min-h-14 w-full items-center justify-center rounded-[var(--radius-control)] border border-transparent bg-green px-5 py-4 text-ui-base font-bold text-white shadow-lg shadow-green/20 transition-[background-color,box-shadow,transform] duration-300 ease-out-expo hover:-translate-y-0.5 hover:bg-green-hover hover:shadow-xl hover:shadow-green/30 active:translate-y-0 sm:w-auto sm:px-8"
           >
             {isChunkFailure ? 'Reload Reflections' : 'Try again'}
           </button>
           <button
             type="button"
             onClick={() => navigate(homePath)}
-            className="control-surface inline-flex min-h-14 w-full items-center justify-center rounded-[var(--radius-control)] px-5 py-4 text-[16px] font-bold text-gray-text transition-[background-color,border-color,color,transform] duration-300 ease-out-expo hover:-translate-y-0.5 hover:border-green/20 hover:bg-green/5 active:translate-y-0 sm:w-auto sm:px-8"
+            className="control-surface inline-flex min-h-14 w-full items-center justify-center rounded-[var(--radius-control)] px-5 py-4 text-ui-base font-bold text-gray-text transition-[background-color,border-color,color,transform] duration-300 ease-out-expo hover:-translate-y-0.5 hover:border-green/20 hover:bg-green/5 active:translate-y-0 sm:w-auto sm:px-8"
           >
             Return home
           </button>

@@ -110,7 +110,7 @@ export const NoteSearchPalette: React.FC<NoteSearchPaletteProps> = ({ isOpen, on
             role="combobox"
             aria-expanded={results.length > 0}
             aria-controls="note-search-results"
-            className="input-surface min-h-12 w-full rounded-[var(--radius-control)] pl-11 pr-4 text-[15px] font-semibold text-gray-text outline-none placeholder:text-gray-nav focus-visible:ring-2 focus-visible:ring-green"
+            className="input-surface min-h-12 w-full rounded-[var(--radius-control)] pl-11 pr-4 text-ui-base font-semibold text-gray-text outline-none placeholder:text-gray-nav focus-visible:ring-2 focus-visible:ring-green"
           />
         </div>
 
@@ -147,12 +147,12 @@ export const NoteSearchPalette: React.FC<NoteSearchPaletteProps> = ({ isOpen, on
                     }`}
                   >
                     <span className="flex items-baseline justify-between gap-3">
-                      <span className="truncate text-[15px] font-extrabold">{note.title || 'Untitled reflection'}</span>
-                      <span className="shrink-0 text-[11px] font-black uppercase tracking-widest text-gray-nav">
+                      <span className="truncate text-ui-base font-extrabold">{note.title || 'Untitled reflection'}</span>
+                      <span className="shrink-0 text-ui-xs font-black uppercase tracking-widest text-gray-nav">
                         {formatNoteDate(note.createdAt)}
                       </span>
                     </span>
-                    <span className="truncate text-[13px] font-medium text-gray-light">
+                    <span className="truncate text-btn-sm font-medium text-gray-light">
                       {buildNotePreviewText(note.content)}
                     </span>
                   </button>

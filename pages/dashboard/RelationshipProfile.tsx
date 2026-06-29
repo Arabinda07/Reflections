@@ -302,7 +302,7 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, onBack, onC
               {lastCaughtUp ? `Last caught up ${formatDate(lastCaughtUp.toISOString())}` : 'No catch-ups yet'}
             </p>
             {!editingFacts && relationship.caresAbout && (
-              <p className="text-[15px] leading-relaxed text-gray-light">
+              <p className="text-ui-base leading-relaxed text-gray-light">
                 <span className="font-bold text-gray-nav">Cares about</span> {relationship.caresAbout}
               </p>
             )}

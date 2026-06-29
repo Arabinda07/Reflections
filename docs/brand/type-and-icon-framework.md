@@ -59,7 +59,16 @@ One ladder, two tracks. Stop using arbitrary `text-[Npx]`.
 | `subhead` | modal & subsection heads | `text-ui-xl` | 25px |
 | `section` | page section heads | `.h2-section` / `text-2xl` | 1.5–2rem |
 
-> **Reconcile the duplicate names first.** `--text-*` (1.25 ratio, 18px base — `index.css:245-262`) and Tailwind `text-*` currently disagree (`--text-xl` ≈ 28px vs Tailwind `text-xl` = 20px). When this framework is applied, pick the **Tailwind `ui-*` track as the app source of truth** and treat the `--text-*` ladder as legacy (or align them). Until then, prefer the `ui-*` tokens and the `.dashboard-*` classes, which already use `--text-*` internally and are self-consistent.
+> **Source of truth (applied).** The Tailwind **`ui-*` track (16px base, `tailwind.config.js`)
+> is the single source of truth for UI chrome.** The `--text-*` ladder (18px base) is **legacy
+> and reading-leaning** — do not use it for new UI. The UI `.dashboard-*` classes were retuned to
+> the 16px ladder (`.dashboard-card-title` 20, `-lg` 24, `.dashboard-supporting-text` 14,
+> `.dashboard-caption` 12). **Reading text stays generous** (serif): `.dashboard-letter-text`
+> (18), `.dashboard-editorial-preview` (17), `.dashboard-prose`, `.dashboard-prompt-text`.
+>
+> Arbitrary `text-[Npx]` is retired across `pages/` + `components/`. The only allowed literals are
+> **serif reading text, brand wordmarks, and emoji glyphs** (all on `font-serif` or emoji lines) —
+> these are the "reading/brand stays generous" exceptions, not UI chrome.
 
 ### A.4 Migration map — arbitrary literal → canonical
 
@@ -164,6 +173,41 @@ The approved set. Pick the canonical icon for the concept; collapse the variants
 \* **Feather** is the one allowed exception: it may stay as a brand/quill accent for "the author's voice" (e.g. the About page), but not as the generic "write" action icon — that's `PencilSimpleLine`.
 
 When a concept needs a new icon, add a row here first; don't introduce a second icon for an existing concept.
+
+### B.6 Header icons — none on page headers; modal icon only when title-only
+
+**Page headers** (`SectionHeader`) and **auth/gate cards** (`CryptoShell`) get **no icon** — a
+header is eyebrow + title + description; the words label it. A tinted icon box beside a large
+title is ornament, and nothing sits tastefully next to a display-scale heading.
+
+**Modal headers** (`ModalSheet`) follow one balance rule: a modal header always has **two
+elements** — never a lonely title.
+- **Title + description → no icon** (the description balances the title).
+- **Title only → one inline icon** (`size≈22`, `weight="duotone"`, **no color class**), rendered
+  boxless before the title and centered on the title line. `.modal-sheet-title-icon` is
+  tone-aware (paper→green, honey→honey, clay→clay). E.g. Tasks (`ListChecks`), Tags (`Tag`),
+  note-actions (`DotsThreeVertical`), delete (`Trash`), Pro (`Crown`).
+
+Everywhere else, icons live **only where they are an affordance**: buttons that genuinely benefit
+(not redundant — the Invite button is plain text), inputs, list/option rows (§B.7), status/alert
+components, empty states.
+
+### B.7 Modal option rows — one inline pattern
+
+Selectable options inside a modal (action menus, pickers) use one row built on
+`.surface-inline-panel` — **not** a `tone-icon` decorative box:
+
+```tsx
+<button className="surface-inline-panel flex min-h-11 w-full items-center gap-3 px-4 py-4 text-left transition-colors hover:border-green/20 hover:bg-green/5">
+  <Icon size={20} weight="regular" className="flex-none text-green" />   {/* tone-color by role: green / honey / clay */}
+  <span className="text-sm font-extrabold text-gray-text">Label</span>
+  {/* optional trailing: count pill / check / chevron */}
+</button>
+```
+
+- Leading icon **20px `regular`, inline (`flex-none`)**, colored by role (green default, `clay`
+  for destructive). No tinted box wrapper.
+- `min-h-11` (44px touch target); one shared hover + `aria-pressed`/selected style.
 
 ---
 

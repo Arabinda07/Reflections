@@ -1,14 +1,22 @@
 # Context Glossary
 
+## Trusted Reflection Infrastructure
+
+Working category for the human-first Reflections strategy.
+
+Plain definition: software that helps people write privately, preserve personal context, and return to it as useful memory.
+
+This is the primary strategic frame. It starts with people, thinking, writing, trust, memory, and understanding. AI enters after that foundation exists.
+
 ## Private AI Memory
 
-Working category for Reflections.
+Investor shorthand for the AI-enabled version of Reflections' long-term category.
 
 Plain definition: software that helps users turn private, user-owned life context into useful memory through Invited AI.
 
-In Reflections, the entry point is private writing. The product is not defined as "an AI journal" because the long-term claim is broader than journaling: personal context that becomes more valuable as it compounds.
+Use this term after the human-first chain is established. The product is not defined by AI-first journal framing because the long-term claim is broader than journaling: personal context that becomes more valuable as it compounds.
 
-Category alternatives to revisit later: personal AI context layer, user-owned memory graph, personal memory infrastructure.
+Category alternatives to revisit later: personal reflection infrastructure, personal AI context layer, user-owned memory graph, personal memory infrastructure.
 
 ## Personal Memory OS
 
@@ -56,13 +64,13 @@ This loop is only an investment-grade advantage if retention, conversion, and us
 
 The single argument the pitch deck exists to prove.
 
-For Reflections, the investment theorem is that personal AI will need a memory layer users trust, and private writing is the strongest wedge for earning that trust.
+For Reflections, the investment theorem is that private writing can become trusted long-term personal memory, and that memory can become the foundation for a larger personal intelligence platform.
 
 ## Assertion Headline
 
 A slide title written as a claim the investor should believe after reading the slide.
 
-Example: "Private writing is the trust wedge for personal AI memory." Avoid label headlines such as "Product," "Problem," or "Market."
+Example: "Private writing is the trust mechanism for long-term personal memory." Avoid label headlines such as "Product," "Problem," or "Market."
 
 ## Active Assertion-Evidence Pair
 
@@ -80,7 +88,7 @@ The proof object can be a metric, quote, screenshot, diagram, market assumption,
 
 The contrast between the current broken state and the better future Reflections makes possible.
 
-Example: generic AI needs personal context, but the most useful personal context is the least safe to hand to generic tools. Reflections resolves that tension through private writing, encryption, and invited AI.
+Example: people write private thoughts to understand themselves, but that context is often scattered or forgotten. Reflections resolves that tension through private writing, trust, memory, and invited AI.
 
 ## Proof Obligation
 

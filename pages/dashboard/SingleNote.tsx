@@ -462,14 +462,14 @@ export const SingleNote: React.FC = () => {
                           }}
                           placeholder="Add tag"
                           aria-label="Add a tag"
-                          className="input-surface min-h-9 w-32 rounded-full px-3 text-[13px] font-bold text-gray-text placeholder:text-gray-nav"
+                          className="input-surface min-h-9 w-32 rounded-full px-3 text-btn-sm font-bold text-gray-text placeholder:text-gray-nav"
                         />
                       </form>
                     ) : (
                       <button
                         type="button"
                         onClick={() => setIsAddingTag(true)}
-                        className="inline-flex min-h-9 items-center gap-1 rounded-full border border-dashed border-border px-2.5 py-1 text-[12px] font-bold text-gray-nav transition-colors hover:border-green/40 hover:bg-green/5 hover:text-green"
+                        className="inline-flex min-h-9 items-center gap-1 rounded-full border border-dashed border-border px-2.5 py-1 text-ui-xs font-bold text-gray-nav transition-colors hover:border-green/40 hover:bg-green/5 hover:text-green"
                       >
                         <Plus size={12} weight="bold" />
                         Add tag
@@ -531,9 +531,7 @@ export const SingleNote: React.FC = () => {
             onClick={downloadMarkdown}
             className="surface-inline-panel flex w-full items-center gap-3 px-4 py-4 text-left transition-colors hover:border-green/20 hover:bg-green/5"
           >
-            <span className="tone-icon tone-icon-green flex h-10 w-10 shrink-0 rounded-xl">
-              <DownloadSimple size={20} weight="bold" />
-            </span>
+            <DownloadSimple size={20} weight="regular" className="flex-none text-green" />
             <span className="min-w-0">
               <span className="block text-sm font-extrabold text-gray-text">Download Markdown</span>
               <span className="block text-xs font-bold text-gray-nav">Save the written note as a .md file.</span>
@@ -554,9 +552,7 @@ export const SingleNote: React.FC = () => {
                 aria-label={`Download attachment: ${attachment.name}`}
               >
                 <span className="flex min-w-0 items-center gap-3">
-                  <span className="tone-icon tone-icon-sky flex h-10 w-10 shrink-0 rounded-xl text-gray-nav">
-                    <FileText size={20} weight="duotone" />
-                  </span>
+                  <FileText size={20} weight="regular" className="flex-none text-gray-nav" />
                   <span className="min-w-0">
                     <span className="block truncate text-sm font-extrabold text-gray-text">{attachment.name}</span>
                     <span className="block text-xs font-bold text-gray-nav">
@@ -575,6 +571,7 @@ export const SingleNote: React.FC = () => {
         isOpen={isActionsOpen}
         onClose={() => setIsActionsOpen(false)}
         title="Note actions"
+        icon={<DotsThreeVertical size={22} weight="duotone" />}
         ariaLabel="Choose an action for this reflection"
         size="sm"
       >
@@ -587,9 +584,7 @@ export const SingleNote: React.FC = () => {
             }}
             className="surface-inline-panel flex min-h-11 w-full items-center gap-3 px-4 py-4 text-left transition-colors hover:border-green/20 hover:bg-green/5"
           >
-            <span className="tone-icon tone-icon-green flex h-10 w-10 shrink-0 rounded-xl">
-              <PencilSimpleLine size={18} weight="bold" />
-            </span>
+            <PencilSimpleLine size={20} weight="regular" className="flex-none text-green" />
             <span className="text-sm font-extrabold text-gray-text">Edit</span>
           </button>
 
@@ -602,9 +597,7 @@ export const SingleNote: React.FC = () => {
             aria-label="Export this reflection"
             className="surface-inline-panel flex min-h-11 w-full items-center gap-3 px-4 py-4 text-left transition-colors hover:border-green/20 hover:bg-green/5"
           >
-            <span className="tone-icon tone-icon-sky flex h-10 w-10 shrink-0 rounded-xl text-gray-nav">
-              <DownloadSimple size={18} weight="bold" />
-            </span>
+            <DownloadSimple size={20} weight="regular" className="flex-none text-green" />
             <span className="text-sm font-extrabold text-gray-text">Export</span>
           </button>
 
@@ -617,9 +610,7 @@ export const SingleNote: React.FC = () => {
             className="surface-inline-panel flex min-h-11 w-full items-center justify-between gap-3 px-4 py-4 text-left transition-colors hover:border-green/20 hover:bg-green/5"
           >
             <span className="flex items-center gap-3">
-              <span className="tone-icon tone-icon-honey flex h-10 w-10 shrink-0 rounded-xl text-gray-nav">
-                <ListChecks size={18} weight="bold" />
-              </span>
+              <ListChecks size={20} weight="regular" className="flex-none text-honey" />
               <span className="text-sm font-extrabold text-gray-text">Tasks</span>
             </span>
             {pendingTaskCount > 0 ? <span className="label-caps text-green">{pendingTaskCount} open</span> : null}
@@ -633,9 +624,7 @@ export const SingleNote: React.FC = () => {
             }}
             className="surface-inline-panel flex min-h-11 w-full items-center gap-3 px-4 py-4 text-left transition-colors hover:border-clay/30 hover:bg-clay/5"
           >
-            <span className="tone-icon tone-icon-clay flex h-10 w-10 shrink-0 rounded-xl text-clay">
-              <Trash size={18} weight="bold" />
-            </span>
+            <Trash size={20} weight="regular" className="flex-none text-clay" />
             <span className="text-sm font-extrabold text-clay">Delete</span>
           </button>
         </div>
@@ -645,6 +634,7 @@ export const SingleNote: React.FC = () => {
         isOpen={isTasksOpen}
         onClose={() => setIsTasksOpen(false)}
         title="Tasks"
+        icon={<ListChecks size={22} weight="duotone" />}
         ariaLabel="Tasks for this reflection"
         size="md"
         footer={

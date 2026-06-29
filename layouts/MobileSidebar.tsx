@@ -224,7 +224,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                 <Leaf size={20} weight="fill" />
               </div>
               <div className="min-w-0">
-                <p className="text-[10px] font-black uppercase tracking-[0.22em] text-gray-nav">
+                <p className="text-ui-xs font-black uppercase tracking-[0.22em] text-gray-nav">
                   Menu
                 </p>
                 <p className="font-serif text-[22px] italic leading-tight text-green">
@@ -259,10 +259,10 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-[15px] font-extrabold leading-tight text-gray-text">
+                <p className="truncate text-ui-base font-extrabold leading-tight text-gray-text">
                   {user.name}
                 </p>
-                <p className="truncate text-[12px] font-semibold text-gray-nav">{user.email}</p>
+                <p className="truncate text-ui-xs font-semibold text-gray-nav">{user.email}</p>
               </div>
             </div>
           )}
@@ -285,10 +285,10 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                       <Icon size={20} weight={isActive ? 'fill' : 'regular'} />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[15px] font-extrabold leading-tight">
+                      <span className="block truncate text-ui-base font-extrabold leading-tight">
                         {item.label}
                       </span>
-                      <span className="mt-1 block text-[12px] font-semibold leading-snug text-gray-nav">
+                      <span className="mt-1 block text-ui-xs font-semibold leading-snug text-gray-nav">
                         {item.description}
                       </span>
                     </span>
@@ -319,10 +319,10 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                   />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[15px] font-extrabold leading-tight">
+                  <span className="block truncate text-ui-base font-extrabold leading-tight">
                     Settings
                   </span>
-                  <span className="mt-0.5 block text-[11px] font-semibold leading-snug text-gray-nav">
+                  <span className="mt-0.5 block text-ui-xs font-semibold leading-snug text-gray-nav">
                     Manage profile and plan.
                   </span>
                 </span>
@@ -347,7 +347,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                   <DownloadSimple size={20} weight="regular" />
                 </span>
                 <span className="min-w-0 flex-1 text-left">
-                  <span className="block text-[15px] font-extrabold leading-tight">
+                  <span className="block text-ui-base font-extrabold leading-tight">
                     Install app
                   </span>
                 </span>
@@ -366,10 +366,10 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                 <Bug size={20} weight="regular" />
               </span>
               <span className="min-w-0 flex-1 text-left">
-                <span className="block text-[15px] font-extrabold leading-tight">
+                <span className="block text-ui-base font-extrabold leading-tight">
                   Report a bug
                 </span>
-                <span className="mt-0.5 block text-[11px] font-semibold leading-snug text-gray-nav">
+                <span className="mt-0.5 block text-ui-xs font-semibold leading-snug text-gray-nav">
                   Tell us what felt off.
                 </span>
               </span>
@@ -382,7 +382,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                     onInvite();
                     onClose();
                   }}
-                  className="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl bg-green/5 text-green text-[13px] font-extrabold hover:bg-green/10 transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl bg-green/5 text-green text-btn-sm font-extrabold hover:bg-green/10 transition-colors"
                 >
                   <PaperPlaneTilt size={18} weight="regular" />
                   Invite
@@ -392,7 +392,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
                     logout();
                     onClose();
                   }}
-                  className="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl bg-clay/5 text-clay text-[13px] font-extrabold hover:bg-clay/10 transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl bg-clay/5 text-clay text-btn-sm font-extrabold hover:bg-clay/10 transition-colors"
                 >
                   <SignOut size={18} weight="regular" />
                   Logout

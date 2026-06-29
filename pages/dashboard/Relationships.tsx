@@ -5,7 +5,6 @@ import { CirclesThreePlus } from '@phosphor-icons/react/CirclesThreePlus';
 import { ClockCounterClockwise } from '@phosphor-icons/react/ClockCounterClockwise';
 import { Plus } from '@phosphor-icons/react/Plus';
 import { Tray } from '@phosphor-icons/react/Tray';
-import { UserPlus } from '@phosphor-icons/react/UserPlus';
 
 import { Button } from '../../components/ui/Button';
 import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
@@ -363,7 +362,7 @@ export const Relationships: React.FC = () => {
         </div>
       </PageContainer>
 
-      <ModalSheet isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title="Add someone" description="Just a name to start. You can add more on their profile." icon={<UserPlus size={20} weight="duotone" />} tone="sage" size="md">
+      <ModalSheet isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title="Add someone" description="Just a name to start. You can add more on their profile." tone="sage" size="md">
         <form onSubmit={createRelationship} className="space-y-4">
           <Input name="name" label="Name" value={draft.name} onChange={(event) => setDraft((current) => ({ ...current, name: event.target.value }))} autoComplete="name" required autoFocus />
           <label className="block text-sm font-bold text-gray-nav">How you know them (optional)<textarea name="howWeMet" value={draft.howWeMet} onChange={(event) => setDraft((current) => ({ ...current, howWeMet: event.target.value }))} className={`${fieldClass} min-h-24`} /></label>

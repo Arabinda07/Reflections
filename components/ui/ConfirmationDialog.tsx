@@ -1,6 +1,4 @@
 import React from 'react';
-import { Sparkle } from '@phosphor-icons/react/Sparkle';
-import { Warning } from '@phosphor-icons/react/Warning';
 import { Button } from './Button';
 import { ModalSheet } from './ModalSheet';
 
@@ -43,20 +41,13 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
       tone={variant === 'danger' ? 'clay' : 'paper'}
       title={resolvedTitle}
       description={resolvedDescription}
-      icon={
-        variant === 'danger' ? (
-          <Warning size={20} weight="fill" />
-        ) : (
-          <Sparkle size={20} weight="duotone" />
-        )
-      }
       footer={
         <div className="flex flex-col gap-3">
           <Button
             variant={variant}
             onClick={onConfirm}
             isLoading={isConfirming}
-            className="w-full h-14 text-[15px] font-extrabold"
+            className="w-full h-14 text-ui-base font-extrabold"
           >
             {confirmLabel}
           </Button>
@@ -64,7 +55,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             variant="secondary"
             onClick={onClose}
             disabled={isConfirming}
-            className="w-full h-14 text-[15px] font-extrabold"
+            className="w-full h-14 text-ui-base font-extrabold"
           >
             {cancelLabel}
           </Button>

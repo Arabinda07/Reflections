@@ -8,6 +8,7 @@ import { DownloadSimple } from '@phosphor-icons/react/DownloadSimple';
 import { EnvelopeSimple } from '@phosphor-icons/react/EnvelopeSimple';
 import { House } from '@phosphor-icons/react/House';
 import { Heart } from '@phosphor-icons/react/Heart';
+import { List } from '@phosphor-icons/react/List';
 import { Notebook } from '@phosphor-icons/react/Notebook';
 import { PaperPlaneTilt } from '@phosphor-icons/react/PaperPlaneTilt';
 import { PencilSimpleLine } from '@phosphor-icons/react/PencilSimpleLine';
@@ -127,10 +128,10 @@ const isMoreNavItemActive = (item: MoreNavItem, pathname: string) =>
   });
 
 const tabBaseClass =
-  'auth-mobile-tab relative flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-[0.875rem] px-2 py-1 text-[12px] font-bold leading-none transition-[background-color,border-color,color,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
+  'auth-mobile-tab relative flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-[0.875rem] px-2 py-1 text-ui-xs font-bold leading-none transition-[background-color,border-color,color,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
 
 const moreLinkClass =
-  'auth-mobile-more-link flex min-h-11 w-full items-center justify-between gap-3 rounded-[0.9rem] border border-transparent px-2.5 py-1.5 text-left text-[14px] font-bold text-gray-text transition-colors hover:border-green/15 hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
+  'auth-mobile-more-link flex min-h-11 w-full items-center justify-between gap-3 rounded-[0.9rem] border border-transparent px-2.5 py-1.5 text-left text-ui-sm font-bold text-gray-text transition-colors hover:border-green/15 hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
 
 const neutralIconTileClass =
   'auth-mobile-more-icon-tile flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.8rem] bg-green/10 text-green';
@@ -237,6 +238,7 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
         isOpen={isMoreOpen}
         onClose={closeMore}
         title="Navigation"
+        icon={<List size={22} weight="duotone" />}
         size="sm"
         mobilePlacement="bottom"
         closeLabel="Close more navigation"
@@ -252,7 +254,7 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
                 key={group.label}
                 className={`space-y-1.5 ${groupIndex > 0 ? 'border-t border-border/60 pt-3' : ''}`.trim()}
               >
-                <h3 className="px-1 text-[10px] font-black uppercase tracking-[0.16em] text-gray-nav">
+                <h3 className="px-1 text-ui-xs font-black uppercase tracking-[0.16em] text-gray-nav">
                   {group.label}
                 </h3>
                 <div className="space-y-1">
@@ -294,7 +296,7 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
             aria-label="Share actions"
             className="auth-mobile-more-actions space-y-1.5 border-t border-border/60 pt-3"
           >
-            <h3 className="px-1 text-[10px] font-black uppercase tracking-[0.16em] text-gray-nav">
+            <h3 className="px-1 text-ui-xs font-black uppercase tracking-[0.16em] text-gray-nav">
               Share
             </h3>
             <div className="space-y-1">

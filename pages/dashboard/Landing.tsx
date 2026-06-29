@@ -215,7 +215,9 @@ export const Landing: React.FC = () => {
             </h1>
 
             <p className="pointer-events-auto max-w-[26ch] sm:max-w-[32ch] lg:max-w-[40ch] font-sans text-base font-normal leading-relaxed text-gray-text/85 sm:text-lg">
-              {HOME_SEO.heroIntro}
+              {HOME_SEO.heroIntro.split(/(\bFree\b)/).map((part, index) =>
+                part === 'Free' ? <em key={index} className="italic">{part}</em> : part,
+              )}
             </p>
           </div>
 

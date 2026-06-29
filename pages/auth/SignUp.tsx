@@ -8,7 +8,6 @@ import { Envelope } from '@phosphor-icons/react/Envelope';
 import { GoogleLogo } from '@phosphor-icons/react/GoogleLogo';
 import { Lock } from '@phosphor-icons/react/Lock';
 import { User } from '@phosphor-icons/react/User';
-import { UserPlus } from '@phosphor-icons/react/UserPlus';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { SectionHeader } from '@/components/ui/SectionHeader';
@@ -183,7 +182,7 @@ export const SignUp: React.FC = () => {
           <div className="p-8 sm:p-10 space-y-6">
             <Link
               to={homePath}
-              className="-ml-3 inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] px-3 text-[13px] font-bold text-gray-nav transition-colors hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
+              className="-ml-3 inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] px-3 text-btn-sm font-bold text-gray-nav transition-colors hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
               aria-label="Back to home"
             >
               <ArrowLeft size={16} weight="bold" />
@@ -193,11 +192,6 @@ export const SignUp: React.FC = () => {
             <SectionHeader
               eyebrow="Join Reflections"
               title="Create account"
-              icon={
-                <div className="icon-block icon-block-md">
-                  <UserPlus size={24} weight="duotone" />
-                </div>
-              }
             />
 
             <div className="space-y-3">
@@ -228,7 +222,7 @@ export const SignUp: React.FC = () => {
 
             <div className="my-2 flex w-full items-center gap-4">
               <div className="h-[1px] flex-1 bg-border" />
-              <span className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Or sign up with email</span>
+              <span className="text-ui-xs font-black uppercase tracking-widest text-gray-nav">Or sign up with email</span>
               <div className="h-[1px] flex-1 bg-border" />
             </div>
 
@@ -275,13 +269,13 @@ export const SignUp: React.FC = () => {
                     placeholder="Create a password"
                     icon={Lock}
                   />
-                  <p id="signup-password-hint" className="ml-1 text-[12px] font-semibold text-gray-nav">
+                  <p id="signup-password-hint" className="ml-1 text-ui-xs font-semibold text-gray-nav">
                     At least 8 characters.
                   </p>
                 </div>
               </motion.div>
 
-              <label htmlFor="newsletter" className="mt-4 flex min-h-11 cursor-pointer select-none items-center gap-3 rounded-[var(--radius-control)] pr-2 text-[14px] font-medium text-gray-text">
+              <label htmlFor="newsletter" className="mt-4 flex min-h-11 cursor-pointer select-none items-center gap-3 rounded-[var(--radius-control)] pr-2 text-ui-sm font-medium text-gray-text">
                 <span className="relative flex h-11 w-11 shrink-0 items-center justify-center">
                   <input
                     type="checkbox"
@@ -304,7 +298,7 @@ export const SignUp: React.FC = () => {
                 </span>
               </label>
 
-              <Button type="submit" variant="primary" className="w-full h-[52px] text-[15px] font-bold mt-6" isLoading={loading}>
+              <Button type="submit" variant="primary" className="w-full h-[52px] text-ui-base font-bold mt-6" isLoading={loading}>
                 Create account
               </Button>
 
@@ -315,7 +309,7 @@ export const SignUp: React.FC = () => {
                       initial={{ opacity: 0, y: -5 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -5 }}
-                      className="text-[13px] font-bold text-clay text-center"
+                      className="text-btn-sm font-bold text-clay text-center"
                     >
                       {error}
                     </motion.p>
@@ -324,7 +318,7 @@ export const SignUp: React.FC = () => {
               </div>
             </form>
 
-            <p className="text-[15px] font-bold text-gray-light text-center">
+            <p className="text-ui-base font-bold text-gray-light text-center">
               Already have an account?{' '}
               <Link
                 to={RoutePath.LOGIN}

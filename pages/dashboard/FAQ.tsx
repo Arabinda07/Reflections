@@ -170,11 +170,11 @@ export const FAQ: React.FC = () => {
         <div className="flex flex-col justify-center gap-8">
           {guideSections.map((section) => (
             <article key={section.title} className="group">
-              <h3 className="flex items-center gap-2.5 text-[22px] font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green">
+              <h3 className="flex items-center gap-2.5 text-ui-lg font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green">
                 <PublicPageIcon name={section.icon} size={20} className="flex-none text-green" />
                 {section.title}
               </h3>
-              <p className="mt-2.5 font-sans text-[16px] leading-relaxed text-gray-light">{section.body}</p>
+              <p className="mt-2.5 font-sans text-ui-base leading-relaxed text-gray-light">{section.body}</p>
             </article>
           ))}
         </div>
@@ -188,11 +188,11 @@ export const FAQ: React.FC = () => {
         <div className="grid gap-x-12 gap-y-9 sm:grid-cols-2">
           {practiceItems.map((item) => (
             <article key={item.title} className="group">
-              <h3 className="flex items-center gap-2.5 text-[20px] font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">
+              <h3 className="flex items-center gap-2.5 text-ui-lg font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">
                 <PublicPageIcon name={item.icon} size={19} className="flex-none text-green" />
                 {item.title}
               </h3>
-              <p className="mt-2 font-sans text-[16px] leading-relaxed text-gray-light">{item.body}</p>
+              <p className="mt-2 font-sans text-ui-base leading-relaxed text-gray-light">{item.body}</p>
             </article>
           ))}
         </div>
@@ -203,11 +203,11 @@ export const FAQ: React.FC = () => {
         <div className="surface-flat surface-tone-sky grid gap-x-10 gap-y-8 rounded-[var(--radius-panel)] p-7 md:grid-cols-3 md:p-10">
           {featuredDetails.map((item) => (
             <article key={item.title} className="group">
-              <h3 className="flex items-center gap-2.5 text-[22px] font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">
+              <h3 className="flex items-center gap-2.5 text-ui-lg font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">
                 <PublicPageIcon name={item.icon} size={20} className="flex-none text-green" />
                 {item.title}
               </h3>
-              <p className="mt-3 font-sans text-[16px] leading-relaxed text-gray-light">{item.body}</p>
+              <p className="mt-3 font-sans text-ui-base leading-relaxed text-gray-light">{item.body}</p>
             </article>
           ))}
         </div>
@@ -215,11 +215,11 @@ export const FAQ: React.FC = () => {
         <div className="mt-10 grid gap-x-10 gap-y-8 md:grid-cols-2">
           {detailItems.map((item) => (
             <article key={item.title} className="group">
-              <h3 className="flex items-center gap-2.5 text-[20px] font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">
+              <h3 className="flex items-center gap-2.5 text-ui-lg font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">
                 <PublicPageIcon name={item.icon} size={19} className="flex-none text-green" />
                 {item.title}
               </h3>
-              <p className="mt-2 font-sans text-[16px] leading-relaxed text-gray-light">{item.body}</p>
+              <p className="mt-2 font-sans text-ui-base leading-relaxed text-gray-light">{item.body}</p>
             </article>
           ))}
         </div>
@@ -230,11 +230,11 @@ export const FAQ: React.FC = () => {
         <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2">
           {featureGrid.map((feature) => (
             <article key={feature.title} className="group">
-              <h3 className="flex items-center gap-2.5 text-[20px] font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">
+              <h3 className="flex items-center gap-2.5 text-ui-lg font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">
                 <PublicPageIcon name={feature.icon} size={19} className="flex-none text-green" />
                 {feature.title}
               </h3>
-              <p className="mt-2 font-sans text-[16px] leading-relaxed text-gray-light">{feature.body}</p>
+              <p className="mt-2 font-sans text-ui-base leading-relaxed text-gray-light">{feature.body}</p>
             </article>
           ))}
         </div>
@@ -242,7 +242,7 @@ export const FAQ: React.FC = () => {
 
       {/* Contact */}
       <section>
-        <p className="max-w-[42rem] font-sans text-[16px] leading-relaxed text-gray-light">
+        <p className="max-w-[42rem] font-sans text-ui-base leading-relaxed text-gray-light">
           Questions about Reflections can go to{' '}
           <a className="public-contact-link" href={`mailto:${SUPPORT_EMAIL}`}>
             {SUPPORT_EMAIL}

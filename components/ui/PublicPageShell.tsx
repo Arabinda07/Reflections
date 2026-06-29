@@ -45,7 +45,7 @@ const BackButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
     type="button"
     onClick={onClick}
     aria-label="Back to home"
-    className="group -ml-2 mb-8 inline-flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-3 text-[13px] font-bold text-gray-nav transition-[color,transform] duration-300 hover:-translate-x-1 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+    className="group -ml-2 mb-8 inline-flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-3 text-btn-sm font-bold text-gray-nav transition-[color,transform] duration-300 hover:-translate-x-1 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
   >
     <PublicPageIcon name="arrowLeft" size={16} className="transition-transform group-hover:scale-110" />
     <span>Back</span>
@@ -60,7 +60,7 @@ const Heading: React.FC<{ title: React.ReactNode }> = ({ title }) => (
 
 const UpdatedLine: React.FC<{ updated?: string }> = ({ updated }) =>
   updated ? (
-    <p className="text-[12px] font-bold uppercase tracking-widest text-gray-nav">Last updated · {updated}</p>
+    <p className="text-ui-xs font-bold uppercase tracking-widest text-gray-nav">Last updated · {updated}</p>
   ) : null;
 
 /**
@@ -131,7 +131,7 @@ export const PublicPageSection: React.FC<PublicPageSectionProps> = ({
           {heading && (
             <h2 className="text-mk-h2 font-display font-bold leading-tight text-gray-text text-balance">{heading}</h2>
           )}
-          {lead && <p className="max-w-[60ch] font-sans text-[16px] leading-relaxed text-gray-light">{lead}</p>}
+          {lead && <p className="max-w-[60ch] font-sans text-ui-base leading-relaxed text-gray-light">{lead}</p>}
         </div>
       )}
       {children}

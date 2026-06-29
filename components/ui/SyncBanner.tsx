@@ -60,7 +60,7 @@ export const SyncBanner: React.FC = () => {
               <CloudCheck size={20} weight="bold" className="shrink-0" />
             )}
             
-            <span className="font-sans text-[12px] font-bold tracking-wide">
+            <span className="font-sans text-ui-xs font-bold tracking-wide">
               {bannerMode === 'offline' 
                 ? 'Offline. Changes are saved securely to this device.'
                 : 'Online. Secure sync is available again.'

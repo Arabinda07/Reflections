@@ -233,7 +233,7 @@ export const PrivateWritingSetupStep: React.FC<{
             }`}
           >
             <span className="block text-sm font-bold">Use my account password</span>
-            <span className="mt-1 inline-block text-[11px] font-black uppercase tracking-widest text-green">
+            <span className="mt-1 inline-block text-ui-xs font-black uppercase tracking-widest text-green">
               Recommended
             </span>
             <span className="mt-2 block text-xs leading-5">

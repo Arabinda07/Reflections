@@ -154,7 +154,7 @@ export const PrivacyPolicy: React.FC = () => {
           <h2 className="max-w-[14ch] text-mk-h2 font-display font-bold leading-tight text-gray-text">
             Your writing is yours.
           </h2>
-          <div className="mt-7 max-w-[62ch] space-y-4 font-sans text-[17px] leading-relaxed text-gray-light">
+          <div className="mt-7 max-w-[62ch] space-y-4 font-sans text-ui-base leading-relaxed text-gray-light">
             <p>
               Reflections stores the account and writing data needed to make the journal work. AI runs only for the
               actions you choose, or for Smart Mode if you turn it on.
@@ -169,11 +169,11 @@ export const PrivacyPolicy: React.FC = () => {
         <div className="flex flex-col justify-center gap-7">
           {policySections.slice(0, 3).map((section) => (
             <article key={section.title} className="group">
-              <h3 className="flex items-center gap-2.5 text-[21px] font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green">
+              <h3 className="flex items-center gap-2.5 text-ui-lg font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green">
                 <PublicPageIcon name={section.icon} size={19} className="flex-none text-green" />
                 {section.title}
               </h3>
-              <p className="mt-2.5 font-sans text-[15px] leading-relaxed text-gray-light">{section.body[0]}</p>
+              <p className="mt-2.5 font-sans text-ui-base leading-relaxed text-gray-light">{section.body[0]}</p>
             </article>
           ))}
         </div>
@@ -184,11 +184,11 @@ export const PrivacyPolicy: React.FC = () => {
         <div className="grid gap-8 lg:grid-cols-3">
           {principles.map((item) => (
             <article key={item.title} className="group">
-              <h2 className="flex items-center gap-2.5 text-[22px] font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">
+              <h2 className="flex items-center gap-2.5 text-ui-lg font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">
                 <PublicPageIcon name={item.icon} size={20} className="flex-none text-green" />
                 {item.title}
               </h2>
-              <p className="mt-2.5 font-sans text-[16px] leading-relaxed text-gray-light">{item.body}</p>
+              <p className="mt-2.5 font-sans text-ui-base leading-relaxed text-gray-light">{item.body}</p>
             </article>
           ))}
         </div>
@@ -205,14 +205,14 @@ export const PrivacyPolicy: React.FC = () => {
               key={section.title}
               className="group grid gap-x-5 gap-y-3 md:grid-cols-[minmax(13rem,0.34fr)_minmax(0,1fr)]"
             >
-              <h3 className="flex items-center gap-2.5 text-[21px] font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green">
+              <h3 className="flex items-center gap-2.5 text-ui-lg font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green">
                 <PublicPageIcon name={section.icon} size={19} className="flex-none text-green" />
                 {section.title}
               </h3>
 
               <div className="space-y-3 md:pt-1">
                 {section.body.map((paragraph) => (
-                  <p key={paragraph} className="max-w-[72ch] font-sans text-[15px] leading-relaxed text-gray-light">
+                  <p key={paragraph} className="max-w-[72ch] font-sans text-ui-base leading-relaxed text-gray-light">
                     {paragraph}
                   </p>
                 ))}
@@ -225,11 +225,11 @@ export const PrivacyPolicy: React.FC = () => {
       {/* Contact */}
       <PublicPageSection tone="paper">
         <div className="space-y-3">
-          <h2 className="flex items-center gap-2.5 text-[24px] font-display font-bold text-gray-text">
+          <h2 className="flex items-center gap-2.5 text-ui-xl font-display font-bold text-gray-text">
             <PublicPageIcon name="envelope" size={20} className="flex-none text-green" />
             Questions or account deletion
           </h2>
-          <p className="max-w-2xl font-sans text-[16px] leading-relaxed text-gray-light">
+          <p className="max-w-2xl font-sans text-ui-base leading-relaxed text-gray-light">
             If you have questions, want everything deleted, or need the sign-in account closed, email us at{' '}
             <a className="public-contact-link" href={`mailto:${SUPPORT_EMAIL}`}>
               {SUPPORT_EMAIL}

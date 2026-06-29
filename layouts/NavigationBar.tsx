@@ -140,7 +140,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
                 key={item.label}
                 to={item.path}
                 aria-current={isActive ? 'page' : undefined}
-                className={`inline-flex min-h-11 items-center rounded-xl px-3 py-2 text-[12px] font-extrabold transition-[background-color,color] duration-200 hover:bg-green/5 hover:text-green xl:px-4 xl:text-[13px] ${
+                className={`inline-flex min-h-11 items-center rounded-xl px-3 py-2 text-ui-xs font-extrabold transition-[background-color,color] duration-200 hover:bg-green/5 hover:text-green xl:px-4 xl:text-btn-sm ${
                   isActive
                     ? 'bg-green/5 text-green'
                     : 'text-gray-nav'

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle } from '@phosphor-icons/react/CheckCircle';
-import { LockKey } from '@phosphor-icons/react/LockKey';
 import { Warning } from '@phosphor-icons/react/Warning';
 import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
@@ -115,11 +114,6 @@ export const ResetPassword: React.FC = () => {
             <SectionHeader
               eyebrow="Recovery"
               title="Create a new password"
-              icon={
-                <div className="icon-block icon-block-md">
-                  <LockKey size={24} weight="duotone" />
-                </div>
-              }
             />
 
             {feedback ? (

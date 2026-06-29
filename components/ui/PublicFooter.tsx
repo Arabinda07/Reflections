@@ -20,14 +20,14 @@ export const PublicFooter: React.FC = () => {
             <Link
               key={link.href}
               to={link.href}
-              className="inline-flex min-h-11 min-w-11 items-center justify-center text-[11px] font-black uppercase tracking-widest text-gray-nav transition-colors hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
+              className="inline-flex min-h-11 min-w-11 items-center justify-center text-ui-xs font-black uppercase tracking-widest text-gray-nav transition-colors hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
             >
               {link.label}
             </Link>
           ))}
         </nav>
 
-        <div className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">
+        <div className="text-ui-xs font-black uppercase tracking-widest text-gray-nav/60">
           © 2026{' '}
           <a
             href="https://arabinda07.github.io/"

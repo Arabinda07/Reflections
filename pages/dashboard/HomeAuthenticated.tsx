@@ -853,9 +853,8 @@ export const HomeAuthenticated: React.FC = () => {
         title={moodPickerStage === 'group' ? 'How does it feel right now?' : undefined}
         description={moodPickerStage === 'group' ? 'Pick a broad mood. Details are optional.' : undefined}
         ariaLabel="Choose a mood for this reflection"
-        icon={moodPickerStage === 'group' ? <Heart size={20} weight="duotone" /> : undefined}
         size="sm"
-        tone="sage"
+        tone="paper"
         panelClassName={`modal-sheet-panel--compact ${moodPickerStage === 'detail' ? 'modal-sheet-panel--mood-detail' : ''}`.trim()}
         bodyClassName={`modal-sheet-body--compact ${moodPickerStage === 'detail' ? 'modal-sheet-body--mood-detail' : ''}`.trim()}
       >
@@ -902,7 +901,7 @@ export const HomeAuthenticated: React.FC = () => {
           setIntentionFeedback(null);
         }}
         title="Intentions"
-        icon={<ListChecks size={24} weight="bold" className="text-green" />}
+        icon={<ListChecks size={22} weight="duotone" />}
         size="md"
         bodyClassName="max-h-[72vh] pt-2"
       >
@@ -920,7 +919,7 @@ export const HomeAuthenticated: React.FC = () => {
                   <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border-2 border-border text-transparent transition-colors group-hover:border-green/50">
                     <span />
                   </div>
-                  <span className="flex-1 text-[14px] font-bold text-gray-text line-clamp-2">{intention.text}</span>
+                  <span className="flex-1 text-ui-sm font-bold text-gray-text line-clamp-2">{intention.text}</span>
                 </button>
               ))}
             </div>

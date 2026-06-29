@@ -476,7 +476,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
                   href={item.href}
                   onClick={(event) => handleAppRouteNavigation(event, item.href)}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`inline-flex min-h-11 items-center rounded-xl border px-3 py-2 text-[12px] font-extrabold transition-colors duration-200 hover:border-green/20 hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-1 xl:px-4 xl:text-[13px] ${
+                  className={`inline-flex min-h-11 items-center rounded-xl border px-3 py-2 text-ui-xs font-extrabold transition-colors duration-200 hover:border-green/20 hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-1 xl:px-4 xl:text-btn-sm ${
                     isActive ? 'border-green/20 bg-green/[0.025] text-green' : 'border-transparent text-gray-nav'
                   }`}
                 >
@@ -488,14 +488,14 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
             <a
               href={RoutePath.LOGIN}
               onClick={(event) => handleAppRouteNavigation(event, RoutePath.LOGIN)}
-              className="inline-flex min-h-11 items-center rounded-xl px-3 py-2 text-[13px] font-extrabold text-gray-nav transition-colors hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+              className="inline-flex min-h-11 items-center rounded-xl px-3 py-2 text-btn-sm font-extrabold text-gray-nav transition-colors hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
             >
               Sign in
             </a>
             <a
               href={RoutePath.SIGNUP}
               onClick={(event) => handleAppRouteNavigation(event, RoutePath.SIGNUP)}
-              className="inline-flex min-h-11 items-center rounded-xl bg-green px-4 py-2 text-[13px] font-extrabold text-white shadow-sm shadow-green/10 transition-colors hover:bg-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
+              className="inline-flex min-h-11 items-center rounded-xl bg-green px-4 py-2 text-btn-sm font-extrabold text-white shadow-sm shadow-green/10 transition-colors hover:bg-green-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
             >
               Sign up
             </a>

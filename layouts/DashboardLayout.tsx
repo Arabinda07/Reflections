@@ -4,7 +4,6 @@ import { Outlet, useLocation, useNavigate, useOutlet } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { House } from '@phosphor-icons/react/House';
 import { Notebook } from '@phosphor-icons/react/Notebook';
-import { PaperPlaneTilt } from '@phosphor-icons/react/PaperPlaneTilt';
 import { PencilSimpleLine } from '@phosphor-icons/react/PencilSimpleLine';
 import { Question } from '@phosphor-icons/react/Question';
 import { Sparkle } from '@phosphor-icons/react/Sparkle';
@@ -51,7 +50,7 @@ const GUEST_SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
 ];
 
 const footerLinkClass =
-  'inline-flex min-h-11 min-w-11 items-center justify-center text-[11px] font-black uppercase tracking-widest text-gray-nav transition-colors hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
+  'inline-flex min-h-11 min-w-11 items-center justify-center text-ui-xs font-black uppercase tracking-widest text-gray-nav transition-colors hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
 
 export const DashboardLayout: React.FC = () => {
   const navigate = useNavigate();
@@ -190,7 +189,7 @@ export const DashboardLayout: React.FC = () => {
                 </Link>
               </nav>
 
-              <div className="text-[11px] font-black uppercase tracking-widest text-gray-nav/60">
+              <div className="text-ui-xs font-black uppercase tracking-widest text-gray-nav/60">
                 © 2026{' '}
                 <a
                   href="https://arabinda07.github.io/"
@@ -230,8 +229,7 @@ export const DashboardLayout: React.FC = () => {
           onClose={() => setIsInviteModalOpen(false)}
           title="Invite someone"
           description="Share Reflections with someone who might want a space to write."
-          icon={<PaperPlaneTilt size={20} weight="duotone" />}
-          tone="honey"
+          tone="paper"
           size="md"
         >
           <ReferralInvitePanel compact />

@@ -528,6 +528,7 @@ export const MyNotes: React.FC = () => {
         isOpen={!!actionMenuNote}
         onClose={() => setActionMenuNote(null)}
         title="Note actions"
+        icon={<DotsThreeVertical size={22} weight="duotone" />}
         ariaLabel="Choose an action for this reflection"
         size="sm"
       >
@@ -541,9 +542,7 @@ export const MyNotes: React.FC = () => {
             }}
             className="surface-inline-panel flex min-h-11 w-full items-center gap-3 px-4 py-4 text-left transition-colors hover:border-green/20 hover:bg-green/5"
           >
-            <span className="tone-icon tone-icon-green flex h-10 w-10 shrink-0 rounded-xl">
-              <PencilSimpleLine size={18} weight="bold" />
-            </span>
+            <PencilSimpleLine size={20} weight="regular" className="flex-none text-green" />
             <span className="text-sm font-extrabold text-gray-text">Edit</span>
           </button>
 
@@ -556,9 +555,7 @@ export const MyNotes: React.FC = () => {
             }}
             className="surface-inline-panel flex min-h-11 w-full items-center gap-3 px-4 py-4 text-left transition-colors hover:border-green/20 hover:bg-green/5"
           >
-            <span className="tone-icon tone-icon-sky flex h-10 w-10 shrink-0 rounded-xl">
-              <DownloadSimple size={18} weight="bold" />
-            </span>
+            <DownloadSimple size={20} weight="regular" className="flex-none text-green" />
             <span className="text-sm font-extrabold text-gray-text">Export</span>
           </button>
 
@@ -572,9 +569,7 @@ export const MyNotes: React.FC = () => {
             }}
             className="surface-inline-panel flex min-h-11 w-full items-center gap-3 px-4 py-4 text-left transition-colors hover:border-clay/30 hover:bg-clay/5"
           >
-            <span className="tone-icon tone-icon-clay flex h-10 w-10 shrink-0 rounded-xl text-clay">
-              <Trash size={18} weight="bold" />
-            </span>
+            <Trash size={20} weight="regular" className="flex-none text-clay" />
             <span className="text-sm font-extrabold text-clay">Delete</span>
           </button>
         </div>

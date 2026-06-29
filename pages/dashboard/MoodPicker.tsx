@@ -63,7 +63,7 @@ export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, onSelect, 
               </span>
               <span className="min-w-0">
                 <span className="block text-sm font-bold leading-tight text-gray-text sm:text-base">{group.label}</span>
-                <span className="mt-1 block text-[11px] font-semibold leading-snug text-gray-nav sm:text-xs">{group.helper}</span>
+                <span className="mt-1 block text-ui-xs font-semibold leading-snug text-gray-nav sm:text-xs">{group.helper}</span>
               </span>
             </button>
           );
@@ -92,7 +92,7 @@ export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, onSelect, 
             <GroupIcon size={20} weight="duotone" className={selectedGroupConfig?.labelClass || 'text-green'} />
           </span>
           <div>
-            <h3 className="font-display text-[18px] font-bold leading-tight text-gray-text">Want a closer word?</h3>
+            <h3 className="font-display text-ui-lg font-bold leading-tight text-gray-text">Want a closer word?</h3>
             <p className="mt-1 text-sm font-medium leading-relaxed text-gray-light">
               Choose one, or keep it broad.
             </p>

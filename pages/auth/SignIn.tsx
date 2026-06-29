@@ -175,7 +175,7 @@ export const SignIn: React.FC = () => {
           <div className="p-8 sm:p-10 space-y-6">
             <Link
               to={homePath}
-              className="-ml-3 inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] px-3 text-[13px] font-bold text-gray-nav transition-colors hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
+              className="-ml-3 inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] px-3 text-btn-sm font-bold text-gray-nav transition-colors hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
               aria-label="Back to home"
             >
               <ArrowLeft size={16} weight="bold" />
@@ -185,11 +185,6 @@ export const SignIn: React.FC = () => {
             <SectionHeader
               eyebrow="Welcome back"
               title="Sign in"
-              icon={
-                <div className="icon-block icon-block-md">
-                  <Lock size={24} weight="duotone" />
-                </div>
-              }
             />
             {successMessage ? (
               <Alert
@@ -237,7 +232,7 @@ export const SignIn: React.FC = () => {
 
             <div className="my-2 flex w-full items-center gap-4">
               <div className="h-[1px] flex-1 bg-border" />
-              <span className="text-[11px] font-black uppercase tracking-widest text-gray-nav">Or sign in with email</span>
+              <span className="text-ui-xs font-black uppercase tracking-widest text-gray-nav">Or sign in with email</span>
               <div className="h-[1px] flex-1 bg-border" />
             </div>
 
@@ -277,13 +272,13 @@ export const SignIn: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleForgotPassword}
-                  className="inline-flex min-h-11 items-center rounded-[var(--radius-control)] px-3 text-[13px] font-bold text-green hover:opacity-70"
+                  className="inline-flex min-h-11 items-center rounded-[var(--radius-control)] px-3 text-btn-sm font-bold text-green hover:opacity-70"
                 >
                   Forgot password?
                 </button>
               </div>
 
-              <Button type="submit" variant="primary" className="w-full min-h-14 text-[15px] font-bold" isLoading={loading}>
+              <Button type="submit" variant="primary" className="w-full min-h-14 text-ui-base font-bold" isLoading={loading}>
                 Sign in
               </Button>
 
@@ -294,7 +289,7 @@ export const SignIn: React.FC = () => {
                       initial={{ opacity: 0, y: -5 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -5 }}
-                      className="text-[13px] font-bold text-clay text-center"
+                      className="text-btn-sm font-bold text-clay text-center"
                     >
                       {error}
                     </motion.p>
@@ -303,7 +298,7 @@ export const SignIn: React.FC = () => {
               </div>
             </form>
 
-            <p className="text-[15px] font-bold text-gray-light text-center">
+            <p className="text-ui-base font-bold text-gray-light text-center">
               Don&apos;t have an account?{' '}
               <Link
                 to={RoutePath.SIGNUP}

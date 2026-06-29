@@ -4,7 +4,6 @@ import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
 import { CalendarBlank } from '@phosphor-icons/react/CalendarBlank';
 import { EnvelopeOpen } from '@phosphor-icons/react/EnvelopeOpen';
 import { LockKey } from '@phosphor-icons/react/LockKey';
-import { PaperPlaneTilt } from '@phosphor-icons/react/PaperPlaneTilt';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { CompletionCardActions } from '../../components/ui/CompletionCardActions';
@@ -176,21 +175,14 @@ export const FutureLetters: React.FC = () => {
         <div className="core-page-stack">
           <button
             onClick={() => navigate(RoutePath.DASHBOARD)}
-            className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-green/5 hover:text-green"
+            className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-honey/10 hover:text-honey"
             aria-label="Back to home"
           >
             <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
             <span>Back</span>
           </button>
 
-          <SectionHeader
-            title="Write a letter to yourself"
-            icon={
-              <div className="icon-block icon-block-lg">
-                <PaperPlaneTilt size={34} weight="duotone" />
-              </div>
-            }
-          />
+          <SectionHeader title="Write a letter to yourself" />
 
           <div className="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
             <Surface variant="flat" tone="paper" className="rounded-[2.5rem] overflow-hidden">
@@ -232,8 +224,8 @@ export const FutureLetters: React.FC = () => {
                         aria-pressed={selectedOption === option.id}
                         className={`dashboard-caption min-h-11 rounded-[var(--radius-control)] border px-3 transition-colors ${
                           selectedOption === option.id
-                            ? 'border-green/30 bg-green/10 text-green'
-                            : 'control-surface text-gray-nav hover:border-green/20 hover:text-green'
+                            ? 'border-honey/30 bg-honey/10 text-honey'
+                            : 'control-surface text-gray-nav hover:border-honey/20 hover:text-honey'
                         }`}
                       >
                         {option.label}
@@ -315,7 +307,7 @@ export const FutureLetters: React.FC = () => {
                                     Opens {formatLongDateUTC(letter.openAt)}
                                   </p>
                                 </div>
-                                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-500 group-hover:scale-110 ${isLocked ? '[background-color:oklch(from_var(--bg-color)_l_c_h_/_0.5)] text-gray-nav' : 'bg-green/10 text-green group-hover:rotate-12'}`}>
+                                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-500 group-hover:scale-110 ${isLocked ? '[background-color:oklch(from_var(--bg-color)_l_c_h_/_0.5)] text-gray-nav' : 'bg-honey/10 text-honey group-hover:rotate-12'}`}>
                                   {isLocked ? (
                                     <div className={shakeLetterId === letter.id ? 'animate-shake-x' : ''}>
                                       <LockKey size={20} weight="duotone" />
@@ -332,7 +324,7 @@ export const FutureLetters: React.FC = () => {
                                 disabled={Boolean(openingLetterId)}
                                 isLoading={isOpening}
                                 onClick={() => handleOpenLetter(letter)}
-                                className={`min-h-11 w-full rounded-2xl font-bold transition-[background-color,border-color,color,opacity] ${isLocked ? 'opacity-60' : 'group-hover:bg-green group-hover:text-white group-hover:border-transparent'}`}
+                                className={`min-h-11 w-full rounded-2xl font-bold transition-[background-color,border-color,color,opacity] ${isLocked ? 'opacity-60' : 'group-hover:bg-honey group-hover:text-white group-hover:border-transparent'}`}
                                 aria-label={
                                   isOpening
                                     ? `Opening ${letter.title}`
@@ -359,7 +351,7 @@ export const FutureLetters: React.FC = () => {
         isOpen={Boolean(openedLetter)}
         onClose={() => setOpenedLetter(null)}
         title={openedLetter?.title || 'Letter'}
-        icon={<EnvelopeOpen size={20} weight="duotone" />}
+        icon={<EnvelopeOpen size={22} weight="duotone" />}
         size="lg"
       >
         {openedLetter ? (

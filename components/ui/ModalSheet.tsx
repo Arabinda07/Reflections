@@ -11,8 +11,9 @@ interface ModalSheetProps {
   onClose: () => void;
   title?: string;
   description?: string;
-  ariaLabel?: string;
+  /** Inline header glyph. Use ONLY for title-only modals (no `description`) to balance the header. */
   icon?: React.ReactNode;
+  ariaLabel?: string;
   children?: React.ReactNode;
   footer?: React.ReactNode;
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -49,8 +50,8 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
   onClose,
   title,
   description,
-  ariaLabel,
   icon,
+  ariaLabel,
   children,
   footer,
   size = 'md',
@@ -248,7 +249,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
               {(icon || title || description || (!hideClose && !disableDismiss)) && (
                 <div className="modal-sheet-header">
                   <div className="modal-sheet-heading">
-                    {icon ? <div className="modal-sheet-icon">{icon}</div> : null}
+                    {icon ? <span className="modal-sheet-title-icon">{icon}</span> : null}
                     <div className="modal-sheet-copy">
                       {title ? (
                         <h2 id={titleId} className="modal-sheet-title">

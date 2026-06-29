@@ -27,9 +27,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   };
 
   const sizes = {
-    sm: "min-h-11 px-3 py-2 text-[13px] rounded-[var(--radius-control)] sm:px-4",
-    md: "min-h-12 px-4 py-3 text-[15px] rounded-[var(--radius-control)] sm:px-6",
-    lg: "min-h-14 px-5 py-4 text-[16px] rounded-[var(--radius-control)] sm:px-8",
+    sm: "min-h-11 px-3 py-2 text-btn-sm rounded-[var(--radius-control)] sm:px-4",
+    md: "min-h-12 px-4 py-3 text-ui-base rounded-[var(--radius-control)] sm:px-6",
+    lg: "min-h-14 px-5 py-4 text-ui-base rounded-[var(--radius-control)] sm:px-8",
   };
 
   if (variant === 'bezel') {

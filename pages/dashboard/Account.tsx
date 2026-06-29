@@ -303,11 +303,6 @@ export const Account: React.FC = () => {
           <SectionHeader
             eyebrow="Account"
             title="Your account settings"
-            icon={
-              <div className="icon-block icon-block-lg">
-                <User size={34} weight="duotone" />
-              </div>
-            }
           />
 
           {feedback ? (
@@ -389,13 +384,13 @@ export const Account: React.FC = () => {
                     <Input id="account-email" label="Email" name="email" value={email} disabled />
 
                     <div className="w-full space-y-2">
-                      <label htmlFor="account-timezone" className="ml-1 block text-[11px] font-extrabold text-gray-nav">Timezone</label>
+                      <label htmlFor="account-timezone" className="ml-1 block text-ui-xs font-extrabold text-gray-nav">Timezone</label>
                       <select
                         id="account-timezone"
                         name="timezone"
                         value={formData.timezone}
                         onChange={handleChange}
-                        className="input-surface h-12 w-full px-4 text-[15px] font-semibold text-gray-text"
+                        className="input-surface h-12 w-full px-4 text-ui-base font-semibold text-gray-text"
                       >
                         <option value="UTC">UTC</option>
                         <option value="America/New_York">Eastern Time</option>
@@ -444,7 +439,7 @@ export const Account: React.FC = () => {
                 >
                   <div className="flex items-center gap-3">
                     <Key size={20} weight="regular" className="text-gray-nav" />
-                    <p className="text-[14px] font-bold text-gray-text">Password reset</p>
+                    <p className="text-ui-sm font-bold text-gray-text">Password reset</p>
                   </div>
                   {isPasswordResetting ? (
                     <CircleNotch size={18} className="animate-spin text-gray-nav" />
@@ -471,7 +466,7 @@ export const Account: React.FC = () => {
                 <div className="surface-inline-panel flex items-center justify-between px-4 py-4 opacity-70">
                   <div className="flex items-center gap-3">
                     <DeviceMobile size={20} weight="regular" className="text-gray-nav" />
-                    <p className="text-[14px] font-bold text-gray-text">Two-factor authentication</p>
+                    <p className="text-ui-sm font-bold text-gray-text">Two-factor authentication</p>
                   </div>
                   <MetadataPill>Coming soon</MetadataPill>
                 </div>
@@ -556,7 +551,7 @@ export const Account: React.FC = () => {
         isOpen={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
         title="Delete your saved writing"
-        icon={<Trash size={20} weight="duotone" />}
+        icon={<Trash size={22} weight="duotone" />}
         size="md"
         tone="clay"
         footer={
@@ -573,7 +568,7 @@ export const Account: React.FC = () => {
           </div>
         }
       >
-        <div className="space-y-4 text-[14px] font-medium leading-relaxed text-gray-light">
+        <div className="space-y-4 text-ui-sm font-medium leading-relaxed text-gray-light">
           <p>
             This removes your saved notes, moods, tags, tasks, and profile row from the app. It also removes stored attachments and avatar files before we close your session.
           </p>
