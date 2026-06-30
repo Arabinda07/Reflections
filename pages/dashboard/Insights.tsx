@@ -223,9 +223,6 @@ export const Insights: React.FC = () => {
             <div
               className="relative z-10 flex max-w-[42rem] flex-col items-center text-center animate-fade-in-up"
             >
-              <p className="label-caps text-green">
-                Private reading room
-              </p>
               <h2 className="mt-4 text-4xl font-display font-bold leading-tight text-gray-text md:text-5xl">
                 Opening Sanctuary
               </h2>
@@ -236,7 +233,7 @@ export const Insights: React.FC = () => {
           </div>
         ) : null}
 
-      <PageContainer className="surface-scope-sky page-wash pb-24 pt-6 md:pt-10">
+      <PageContainer className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10">
         <div className="core-page-stack">
           <button
             onClick={() => navigate(RoutePath.DASHBOARD)}
@@ -255,7 +252,7 @@ export const Insights: React.FC = () => {
 
           <div aria-live="polite" aria-busy={loading} className="w-full core-section-stack">
             {loading ? (
-            <Surface variant="flat" tone="sky" className="p-8 md:p-10">
+            <Surface variant="flat" tone="sage" className="p-8 md:p-10">
               <WeeklyRecapLoadingSkeleton />
             </Surface>
           ) : isEmpty ? (
@@ -271,13 +268,13 @@ export const Insights: React.FC = () => {
               }
             />
           ) : (<>
-          <Surface variant="flat" tone="sky" className="rounded-[2rem] p-8 md:p-12">
+          <Surface variant="flat" tone="sage" className="rounded-[2rem] p-8 md:p-12">
             <div className="space-y-10">
               <section className="space-y-5">
                 <h2 className="text-2xl font-display font-bold text-gray-text md:text-3xl">This week</h2>
                 {isQuietWeek ? (
                   <div className="space-y-5">
-                    <p className="dashboard-prose">
+                    <p className="dashboard-supporting-text">
                       A quiet week — that&rsquo;s allowed. Nothing to count here; your reflections are still in My notes whenever you want them.
                     </p>
                     <Button variant="ghost" onClick={() => navigate(RoutePath.CREATE_NOTE)} className="text-green">
@@ -285,7 +282,7 @@ export const Insights: React.FC = () => {
                     </Button>
                   </div>
                 ) : (
-                  <div className="dashboard-prose space-y-4 text-pretty">
+                  <div className="dashboard-supporting-text space-y-2 text-pretty">
                     <p>{weekSummary}</p>
                     {moodSentence ? <p>{moodSentence}</p> : null}
                     {tagsSentence ? <p>{tagsSentence}</p> : null}
@@ -295,7 +292,7 @@ export const Insights: React.FC = () => {
 
               <section className="space-y-5">
                 <h2 className="text-2xl font-display font-bold text-gray-text md:text-3xl">This month</h2>
-                <p className="dashboard-prose text-pretty">{monthSummary}</p>
+                <p className="dashboard-supporting-text text-pretty">{monthSummary}</p>
               </section>
             </div>
           </Surface>

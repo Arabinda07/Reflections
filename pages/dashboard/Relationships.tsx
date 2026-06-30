@@ -4,6 +4,7 @@ import { AddressBook } from '@phosphor-icons/react/AddressBook';
 import { CirclesThreePlus } from '@phosphor-icons/react/CirclesThreePlus';
 import { ClockCounterClockwise } from '@phosphor-icons/react/ClockCounterClockwise';
 import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
+import { ArrowUpRight } from '@phosphor-icons/react/ArrowUpRight';
 import { Plus } from '@phosphor-icons/react/Plus';
 import { Tray } from '@phosphor-icons/react/Tray';
 import { User } from '@phosphor-icons/react/User';
@@ -369,21 +370,22 @@ export const Relationships: React.FC = () => {
                       ))}
                     </div>
                   ) : !isLoading ? (
-                    <div className="rounded-[1.5rem] border-2 border-dashed border-green/20 p-6 md:p-8">
-                      <h3 className="text-2xl font-display font-bold text-gray-text">Never lose touch with someone who matters.</h3>
-                      <p className="mt-2 max-w-prose text-sm font-medium text-gray-light">Add one name. Each week we&rsquo;ll point you toward someone worth a hello — no scores, no streaks.</p>
-                      <form onSubmit={addQuickName} className="relative mt-6">
+                    <div className="space-y-6">
+                      <div>
+                        <h3 className="text-2xl font-display font-bold text-gray-text">Never lose touch with someone who matters.</h3>
+                        <p className="mt-2 max-w-prose text-sm font-medium text-gray-light">Add one name. Each week we&rsquo;ll point you toward someone worth a hello.</p>
+                      </div>
+                      <form onSubmit={addQuickName} className="space-y-3">
                         <input
-                          autoFocus
                           value={quickName}
                           onChange={(event) => setQuickName(event.target.value)}
                           placeholder="Add a name…"
                           aria-label="Add a name"
-                          className="input-surface w-full rounded-xl py-3 pl-3.5 pr-24 text-base font-medium"
+                          className="input-surface w-full rounded-xl py-3 px-3.5 text-base font-medium"
                         />
-                        <Button type="submit" variant="primary" size="sm" isLoading={isAddingName} className="absolute right-1.5 top-1/2 -translate-y-1/2">Add</Button>
+                        <Button type="submit" variant="primary" size="sm" isLoading={isAddingName}>Add</Button>
                       </form>
-                      <details className="group mt-4">
+                      <details className="group">
                         <summary className="inline-flex min-h-9 cursor-pointer list-none items-center text-sm font-bold text-gray-nav focus-visible:ring-2 focus-visible:ring-green/30 hover:text-green [&::-webkit-details-marker]:hidden">or paste a few names</summary>
                         <form onSubmit={seedRelationships} className="mt-3">
                           <label className="block text-sm font-bold text-gray-nav">One name per line.
@@ -452,7 +454,7 @@ export const Relationships: React.FC = () => {
                   </div>
                 </div>
               </Surface>
-              <Surface variant="flat" tone="paper" className="p-6"><div className="flex items-center gap-2"><AddressBook size={18} weight="duotone" className="text-green" /><p className="label-caps text-gray-nav">Life Wiki</p></div><p className="mt-4 text-sm font-medium leading-relaxed text-gray-light">{wikiMentionCount > 0 ? `${wikiMentionCount} of your people ${wikiMentionCount === 1 ? 'appears' : 'appear'} in your People room. Open a profile to see what you've written and turn it into a reason to reach out.` : "Your People room holds what you've written about people. Names that match your relationships show up on their profiles."}</p><Button variant="secondary" className="mt-5 w-full" onClick={() => navigate(RoutePath.SANCTUARY_ARTICLE.replace(':pageType', 'people'))}>Open People room</Button></Surface>
+              <Surface variant="flat" tone="paper" className="p-6"><div className="flex items-center gap-2"><AddressBook size={18} weight="duotone" className="text-green" /><p className="label-caps text-gray-nav">Life Wiki</p></div><p className="mt-4 text-sm font-medium leading-relaxed text-gray-light">{wikiMentionCount > 0 ? `${wikiMentionCount} of your people ${wikiMentionCount === 1 ? 'appears' : 'appear'} in your People room. Open a profile to see what you've written and turn it into a reason to reach out.` : "Your People room holds what you've written about people. Names that match your relationships show up on their profiles."}</p><Link to={RoutePath.SANCTUARY_ARTICLE.replace(':pageType', 'people')} className="mt-5 inline-flex items-center gap-1 text-sm font-bold text-green hover:text-green-hover transition-colors"><span>Open People room</span><ArrowUpRight size={14} weight="bold" /></Link></Surface>
             </aside>
           </section>
         </div>

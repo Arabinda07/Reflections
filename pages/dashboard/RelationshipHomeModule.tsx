@@ -73,13 +73,13 @@ export const RelationshipHomeModule: React.FC = () => {
         </div>
       ) : (
         <div className="py-4 text-center space-y-4">
-          <p className="font-serif text-sm italic text-gray-text leading-relaxed">
+          <p className="font-serif text-sm text-gray-light leading-relaxed">
             Add a few people, and you'll get a couple of gentle nudges each week to reach out.
           </p>
           <div className="pt-1">
             <Link
               to={`${RoutePath.RELATIONSHIPS}?add=1`}
-              className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg bg-green px-4 text-xs font-bold text-white transition-colors hover:bg-green-hover"
+              className="w-full flex items-center justify-center gap-2 py-2 text-sm font-bold text-green hover:text-green/80 transition-colors"
             >
               <Plus size={14} weight="bold" className="shrink-0" />
               <span>Add person</span>

@@ -1078,6 +1078,14 @@ details:focus-visible,
     }
   }
 
+  @media (min-width: 1024px) {
+    .dashboard-prompt-text {
+      font-size: var(--text-4xl, 2.25rem);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+  }
+
   .dashboard-stat-value {
     font-family: var(--font-display);
     font-size: var(--text-xl);

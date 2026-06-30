@@ -175,11 +175,11 @@ export const FutureLetters: React.FC = () => {
 
   return (
     <>
-      <PageContainer size="wide" className="surface-scope-honey page-wash pb-24 pt-6 md:pt-10">
+      <PageContainer size="wide" className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10">
         <div className="core-page-stack">
           <button
             onClick={() => navigate(RoutePath.DASHBOARD)}
-            className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-honey/10 hover:text-honey"
+            className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-green/10 hover:text-green"
             aria-label="Back to home"
           >
             <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
@@ -228,8 +228,8 @@ export const FutureLetters: React.FC = () => {
                         aria-pressed={selectedOption === option.id}
                         className={`dashboard-caption min-h-11 rounded-[var(--radius-control)] border px-3 transition-colors ${
                           selectedOption === option.id
-                            ? 'border-honey/30 bg-honey/10 text-honey'
-                            : 'control-surface text-gray-nav hover:border-honey/20 hover:text-honey'
+                            ? 'border-green/30 bg-green/10 text-green'
+                            : 'control-surface text-gray-nav hover:border-green/20 hover:text-green'
                         }`}
                       >
                         {option.label}
@@ -280,7 +280,7 @@ export const FutureLetters: React.FC = () => {
               </form>
             </Surface>
 
-            <Surface variant="bezel" tone="honey" className="rounded-[2.5rem] overflow-hidden">
+            <Surface variant="bezel" tone="sage" className="rounded-[2.5rem] overflow-hidden">
               <div className="space-y-5 p-6 sm:p-8">
                 <div className="flex items-center justify-between gap-3">
                   <div>
@@ -288,7 +288,7 @@ export const FutureLetters: React.FC = () => {
                       Waiting to open
                     </h2>
                   </div>
-                  <CalendarBlank size={26} weight="duotone" className="text-honey" />
+                  <CalendarBlank size={26} weight="duotone" className="text-green" />
                 </div>
 
                 {error ? (
@@ -328,7 +328,7 @@ export const FutureLetters: React.FC = () => {
                                     Opens {formatLongDateUTC(letter.openAt)}
                                   </p>
                                 </div>
-                                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-500 group-hover:scale-110 ${isLocked ? '[background-color:oklch(from_var(--bg-color)_l_c_h_/_0.5)] text-gray-nav' : 'bg-honey/10 text-honey group-hover:rotate-12'}`}>
+                                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-500 group-hover:scale-110 ${isLocked ? '[background-color:oklch(from_var(--bg-color)_l_c_h_/_0.5)] text-gray-nav' : 'bg-green/10 text-green group-hover:rotate-12'}`}>
                                   {isLocked ? (
                                     <div className={shakeLetterId === letter.id ? 'animate-shake-x' : ''}>
                                       <LockKey size={20} weight="duotone" />
@@ -345,7 +345,7 @@ export const FutureLetters: React.FC = () => {
                                 disabled={Boolean(openingLetterId)}
                                 isLoading={isOpening}
                                 onClick={() => handleOpenLetter(letter)}
-                                className={`min-h-11 w-full rounded-2xl font-bold transition-[background-color,border-color,color,opacity] ${isLocked ? 'opacity-60' : 'group-hover:bg-honey group-hover:text-white group-hover:border-transparent'}`}
+                                className={`min-h-11 w-full rounded-2xl font-bold transition-[background-color,border-color,color,opacity] ${isLocked ? 'opacity-60' : 'group-hover:bg-green group-hover:text-white group-hover:border-transparent'}`}
                                 aria-label={
                                   isOpening
                                     ? `Opening ${letter.title}`

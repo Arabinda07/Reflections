@@ -10,6 +10,7 @@ import { SquaresFour } from '@phosphor-icons/react/SquaresFour';
 import { Tag } from '@phosphor-icons/react/Tag';
 import { Trash } from '@phosphor-icons/react/Trash';
 import { X } from '@phosphor-icons/react/X';
+import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
 import { format, isSameDay } from 'date-fns';
 import { Button } from '../../components/ui/Button';
 import { Chip } from '../../components/ui/Chip';
@@ -368,6 +369,15 @@ export const MyNotes: React.FC = () => {
           <div 
             className="core-page-stack animate-fade-in-up"
           >
+            <button
+              onClick={() => navigate(RoutePath.DASHBOARD)}
+              className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-green/5 hover:text-green"
+              aria-label="Back to home"
+            >
+              <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
+              <span>Back</span>
+            </button>
+
             <SectionHeader
               title="Saved reflections"
               description="Cards or calendar: pick how you want to look through them."

@@ -412,7 +412,7 @@ export const LifeWiki: React.FC = () => {
       <button
         type="button"
         onClick={() => navigate(notePath(noteId))}
-        className="inline-flex rounded-full border border-green/20 bg-green/5 px-2 py-0.5 label-caps text-green transition-colors hover:border-green/40 hover:bg-green/10"
+        className="inline-flex rounded-full border border-sky/20 bg-sky/5 px-2 py-0.5 label-caps text-sky transition-colors hover:border-sky/40 hover:bg-sky/10"
       >
         {children}
       </button>
@@ -470,7 +470,7 @@ export const LifeWiki: React.FC = () => {
       <Link
         key={meta.pageType}
         to={articlePath(meta.pageType)}
-        className="group block rounded-[var(--radius-control)] px-2 transition-colors duration-300 hover:bg-green/[0.03] focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
+        className="group block rounded-[var(--radius-control)] px-2 transition-colors duration-300 hover:bg-sky/[0.03] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky/40"
         aria-label={`Open ${meta.label} Sanctuary page`}
       >
         {innerContent}
@@ -488,7 +488,7 @@ export const LifeWiki: React.FC = () => {
         <p className="dashboard-supporting-text">{summary}</p>
 
         <details className="group mt-2">
-            <summary className="inline-flex w-fit cursor-pointer list-none items-center gap-1.5 label-caps text-green transition-colors hover:text-green/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40">
+            <summary className="inline-flex w-fit cursor-pointer list-none items-center gap-1.5 label-caps text-sky transition-colors hover:text-sky/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky/40">
               View refresh history
               <CaretRight size={14} weight="bold" className="transition-transform duration-300 group-open:rotate-90" />
             </summary>
@@ -501,8 +501,8 @@ export const LifeWiki: React.FC = () => {
                   onClick={() => {
                     void loadRunActivity(run.id);
                   }}
-                  className={`flex w-full items-center justify-between gap-3 py-3 text-left transition-colors hover:text-green ${
-                    runDetail?.run.id === run.id ? 'text-green' : 'text-gray-text'
+                  className={`flex w-full items-center justify-between gap-3 py-3 text-left transition-colors hover:text-sky ${
+                    runDetail?.run.id === run.id ? 'text-sky' : 'text-gray-text'
                   }`}
                 >
                   <span className="flex items-baseline gap-2">
@@ -511,7 +511,7 @@ export const LifeWiki: React.FC = () => {
                       {new Date(run.started_at || run.created_at).toLocaleDateString()}
                     </span>
                   </span>
-                  <span className="dashboard-caption text-green">
+                  <span className="dashboard-caption text-sky">
                     {formatRunStatus(run.status)} · {run.page_count || 0} room{run.page_count === 1 ? '' : 's'}
                   </span>
                 </button>
@@ -560,9 +560,11 @@ export const LifeWiki: React.FC = () => {
           <div
             className="relative z-10 flex max-w-[42rem] flex-col items-center text-center animate-fade-in-up"
           >
-            <p className="label-caps text-green">
-              {isRefreshingWiki ? 'Reading only your saved notes' : 'Private reading room'}
-            </p>
+            {isRefreshingWiki && (
+              <p className="label-caps text-sky">
+                Reading only your saved notes
+              </p>
+            )}
             <h2 className="mt-4 text-4xl font-display font-bold leading-tight text-gray-text md:text-5xl">
               {isRefreshingWiki ? 'Refreshing your Life Wiki...' : 'Opening Sanctuary'}
             </h2>

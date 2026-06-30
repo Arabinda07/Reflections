@@ -346,6 +346,7 @@ export const Account: React.FC = () => {
 
           <SectionHeader
             title="Your account settings"
+            description="Profile, security, and membership."
           />
 
           {feedback ? (
@@ -368,7 +369,7 @@ export const Account: React.FC = () => {
           ) : null}
 
           <form onSubmit={handleSubmit} className="space-y-5">
-              <Surface variant="flat" tone="paper" className="p-5 sm:p-8 lg:p-10 space-y-8 sm:space-y-12 lg:space-y-14">
+              <Surface variant="flat" tone="paper" className="p-5 sm:p-8 lg:p-10 space-y-6 sm:space-y-8">
                 <div className="grid gap-6 lg:gap-10 lg:grid-cols-[180px_minmax(0,1fr)]">
                   <div className="flex flex-col items-center gap-4">
                     <Tooltip label="Upload new profile photo">
@@ -378,7 +379,7 @@ export const Account: React.FC = () => {
                         onClick={() => avatarInputRef.current?.click()}
                         aria-label="Upload a new profile photo"
                       >
-                        <div className="surface-inline-panel h-32 w-32 overflow-hidden rounded-[2.25rem] border-4 border-white bg-surface shadow-xl shadow-gray-text/10 transition-[border-color,box-shadow,transform] duration-500 group-hover:border-green/50 group-hover:shadow-green/10">
+                        <div className="surface-inline-panel h-32 w-32 overflow-hidden rounded-2xl border-4 border-surface bg-surface shadow-xl shadow-gray-text/10 transition-[border-color,box-shadow,transform] duration-500 group-hover:border-green/50 group-hover:shadow-green/10">
                           {avatarPath ? (
                             <StorageImage path={avatarPath} alt="Profile" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
                           ) : (
@@ -387,7 +388,7 @@ export const Account: React.FC = () => {
                             </div>
                           )}
                         </div>
-                        <div className="absolute bottom-1 right-1 flex h-11 w-11 items-center justify-center rounded-xl border-4 border-white bg-gray-text text-white shadow-xl shadow-gray-text/15 transition-[background-color,box-shadow,transform] duration-500 group-hover:bg-green group-hover:scale-110">
+                        <div className="absolute bottom-1 right-1 flex h-11 w-11 items-center justify-center rounded-xl border-4 border-surface bg-gray-text text-white shadow-xl shadow-gray-text/15 transition-[background-color,box-shadow,transform] duration-500 group-hover:bg-green group-hover:scale-110">
                           <Camera size={18} weight="bold" className="transition-transform group-hover:rotate-12" />
                         </div>
                       </button>
@@ -437,41 +438,34 @@ export const Account: React.FC = () => {
 
                       <div className="w-full max-w-md space-y-2">
                         <label htmlFor="account-timezone" className="ml-1 block text-ui-xs font-extrabold text-gray-nav">Timezone</label>
-                        <details id="account-timezone" ref={timezoneDetailsRef} className="relative w-full">
-                          <summary className="input-surface flex h-12 w-full cursor-pointer list-none items-center justify-between px-4 text-ui-base font-semibold text-gray-text [&::-webkit-details-marker]:hidden">
-                            <span>{TIMEZONE_OPTIONS.find((opt) => opt.value === formData.timezone)?.label || formData.timezone}</span>
-                            <CaretDown size={16} weight="bold" className="text-gray-nav transition-transform" />
-                          </summary>
-                          <div className="absolute left-0 right-0 z-20 mt-1 max-h-60 overflow-y-auto rounded-xl border border-border bg-surface py-1 shadow-card wellness-scroll">
+                        <div className="relative w-full">
+                          <select
+                            id="account-timezone"
+                            name="timezone"
+                            value={formData.timezone}
+                            onChange={handleChange}
+                            className="input-surface flex h-12 w-full appearance-none items-center px-4 text-ui-base font-semibold text-gray-text rounded-xl border-none outline-none focus:ring-2 focus:ring-green/30"
+                          >
                             {TIMEZONE_OPTIONS.map((option) => (
-                              <button
-                                key={option.value}
-                                type="button"
-                                onClick={() => {
-                                  setFormData((previous) => ({ ...previous, timezone: option.value }));
-                                  if (timezoneDetailsRef.current) timezoneDetailsRef.current.open = false;
-                                }}
-                                className={`block w-full px-4 py-2.5 text-left text-sm font-bold hover:bg-green/5 ${
-                                  option.value === formData.timezone ? 'text-green bg-green/5' : 'text-gray-text'
-                                }`}
-                              >
+                              <option key={option.value} value={option.value}>
                                 {option.label}
-                              </button>
+                              </option>
                             ))}
+                          </select>
+                          <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-nav">
+                            <CaretDown size={16} weight="bold" />
                           </div>
-                        </details>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-6 sm:pt-10 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="icon-block icon-block-sm bg-body">
-                      <Sparkle size={22} weight="duotone" className="text-green" />
-                    </div>
-                    <h3 className="text-xl font-display font-bold text-gray-text">Membership</h3>
-                  </div>
+                <div className="pt-6 sm:pt-8 border-t border-border space-y-4">
+                  <h3 className="flex items-center gap-2 text-xl font-display font-bold text-gray-text">
+                    <Sparkle size={22} weight="duotone" className="text-green" />
+                    Membership
+                  </h3>
                   <div className="flex flex-wrap items-center gap-3">
                     {access?.planTier === 'pro' ? (
                       <MetadataPill tone="green">Active</MetadataPill>
@@ -486,13 +480,11 @@ export const Account: React.FC = () => {
                   ) : null}
                 </div>
 
-                <div className="pt-6 sm:pt-10 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="icon-block icon-block-sm bg-body">
-                      <ShieldCheck size={22} weight="duotone" className="text-green" />
-                    </div>
-                    <h3 className="text-xl font-display font-bold text-gray-text">Security</h3>
-                  </div>
+                <div className="pt-6 sm:pt-8 border-t border-border space-y-4">
+                  <h3 className="flex items-center gap-2 text-xl font-display font-bold text-gray-text">
+                    <ShieldCheck size={22} weight="duotone" className="text-green" />
+                    Security
+                  </h3>
 
                   <div className="space-y-1">
                     <button
@@ -529,7 +521,7 @@ export const Account: React.FC = () => {
                       </div>
                     ) : null}
 
-                    <div className="flex items-center justify-between px-2 py-4 opacity-60">
+                    <div className="flex flex-wrap items-center justify-between gap-2 px-2 py-4 opacity-60">
                       <div className="flex items-center gap-3">
                         <DeviceMobile size={20} weight="regular" className="text-gray-nav" />
                         <span className="text-sm font-bold text-gray-text">Two-factor authentication</span>
@@ -539,13 +531,11 @@ export const Account: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="pt-6 sm:pt-10 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="icon-block icon-block-sm bg-body">
-                      <EnvelopeSimple size={22} weight="duotone" className="text-green" />
-                    </div>
-                    <h3 className="text-xl font-display font-bold text-gray-text">Share Reflections</h3>
-                  </div>
+                <div className="pt-6 sm:pt-8 border-t border-border space-y-4">
+                  <h3 className="flex items-center gap-2 text-xl font-display font-bold text-gray-text">
+                    <EnvelopeSimple size={22} weight="duotone" className="text-green" />
+                    Share Reflections
+                  </h3>
                   <p className="dashboard-supporting-text">
                     Account tracks how many people joined from your invite. There is no prize or public list.
                   </p>
@@ -553,22 +543,20 @@ export const Account: React.FC = () => {
                 </div>
               </Surface>
 
-              <Surface variant="flat" tone="clay" className="-mx-5 px-5 py-5 sm:mx-0 sm:px-6 lg:p-8 rounded-none sm:rounded-3xl border-y sm:border border-clay/10 bg-clay/5">
-                <div className="flex flex-col justify-between gap-5 md:flex-row md:items-center">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3">
-                      <div className="icon-block icon-block-sm bg-clay/10">
-                        <Warning size={22} weight="duotone" className="text-clay" />
-                      </div>
-                      <h3 className="text-xl font-display font-bold text-clay">Danger zone</h3>
+              <Surface variant="flat" tone="paper" className="p-5 sm:p-8 lg:p-10 border-y sm:border border-border">
+                <div className="flex flex-row items-center justify-between gap-4">
+                  <div className="space-y-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <Warning size={22} weight="duotone" className="text-clay shrink-0" />
+                      <h3 className="text-lg sm:text-xl font-display font-bold text-clay truncate">Danger zone</h3>
                     </div>
-                    <p className="max-w-xl dashboard-supporting-text text-clay/80">
+                    <p className="text-xs sm:text-sm font-medium text-clay/80 leading-snug">
                       Saved writing and app data will be removed.
                     </p>
                   </div>
-                  <div className="flex flex-col gap-2 items-start md:items-end">
+                  <div className="shrink-0">
                     <Tooltip label="Permanently delete all your data">
-                      <Button type="button" variant="danger" onClick={() => setShowDeleteConfirm(true)} className="w-fit h-12 px-6 rounded-[var(--radius-control)] whitespace-nowrap">
+                      <Button type="button" variant="danger" size="sm" onClick={() => setShowDeleteConfirm(true)} className="whitespace-nowrap">
                         Delete my data
                       </Button>
                     </Tooltip>
@@ -577,47 +565,47 @@ export const Account: React.FC = () => {
               </Surface>
 
               <div className="px-1 pt-1">
-                <div className="sticky-bar !top-auto relative flex items-center justify-between gap-4 p-4">
+                <div className="sticky-bar !top-auto relative flex items-center justify-between gap-2 p-3 sm:gap-4 sm:p-4">
                   <Tooltip label="Sign out securely" placement="top">
                     <button
                       type="button"
                       onClick={handleSignOut}
-                      className="flex h-12 w-12 md:h-auto md:w-auto items-center justify-center gap-2 rounded-xl border border-clay/10 bg-clay/5 px-0 md:px-4 md:py-2.5 text-sm font-bold text-clay transition-all hover:bg-clay/10 active:scale-[0.98]"
+                      className="flex h-12 items-center justify-center gap-1.5 sm:gap-2 rounded-xl border border-clay/10 bg-clay/5 px-3 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-bold text-clay transition-all hover:bg-clay/10 active:scale-[0.98]"
                       aria-label="Sign out of your account"
                     >
-                      <SignOut size={20} weight="bold" />
-                      <span className="hidden md:inline">Sign out</span>
+                      <SignOut size={18} weight="bold" />
+                      <span>Sign out</span>
                     </button>
                   </Tooltip>
 
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 sm:gap-4">
                     <Tooltip label="Discard unsaved changes" placement="top">
                       <button
                         type="button"
                         onClick={() => navigate(-1)}
-                        className="flex h-12 w-12 md:h-auto md:w-auto items-center justify-center gap-2 rounded-xl border border-border bg-surface px-0 md:px-4 md:py-2.5 text-sm font-bold text-gray-nav transition-all hover:bg-green/5 hover:text-green active:scale-[0.98]"
+                        className="flex h-12 items-center justify-center gap-1.5 sm:gap-2 rounded-xl border border-border bg-surface px-3 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-bold text-gray-nav transition-all hover:bg-green/5 hover:text-green active:scale-[0.98]"
                         aria-label="Discard account changes"
                       >
-                        <X size={20} weight="bold" />
-                        <span className="hidden md:inline">Cancel</span>
+                        <X size={18} weight="bold" />
+                        <span>Cancel</span>
                       </button>
                     </Tooltip>
                     <Tooltip label="Save your profile updates" placement="top">
                       <button
                         type="submit"
                         disabled={loading || isSaved}
-                        className="flex h-12 w-12 md:h-auto md:w-auto items-center justify-center gap-2 rounded-xl bg-green px-0 md:px-5 md:py-2.5 text-sm font-bold text-white transition-all hover:bg-green-hover active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+                        className="flex h-12 items-center justify-center gap-1.5 sm:gap-2 rounded-xl bg-green px-3 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-bold text-white transition-all hover:bg-green-hover active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
                         aria-label="Save account changes"
                       >
                         {loading ? (
-                          <CircleNotch size={20} className="animate-spin" />
+                          <CircleNotch size={18} className="animate-spin" />
                         ) : isSaved ? (
-                          <Check size={20} weight="bold" />
+                          <Check size={18} weight="bold" />
                         ) : (
-                          <FloppyDisk size={20} weight="regular" />
+                          <FloppyDisk size={18} weight="regular" />
                         )}
-                        <span className="hidden md:inline">
-                          {loading ? 'Saving...' : isSaved ? 'Saved' : 'Save changes'}
+                        <span>
+                          {loading ? 'Saving' : isSaved ? 'Saved' : 'Save'}
                         </span>
                       </button>
                     </Tooltip>
