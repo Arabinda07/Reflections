@@ -2,16 +2,16 @@
 
 > Encrypted private journal for notes, moods, and the people who matter. AI stays optional and writing comes first.
 
-## What it is
+**What it is**
 Reflections is a private journal where users write notes, name moods, add tags, and notice patterns over time. Private writing is encrypted on the user's device before it is saved, using a key derived from the user's password that the server never sees. AI support runs only when the user chooses it or turns on Smart Mode.
 
-## Who it's for
+**Who it's for**
 People who want a quiet place to think in writing, without pressure loops, public sharing, or AI that runs without being asked.
 
-## Privacy and encryption
+**Privacy and encryption**
 Notes, moods, future letters, attachments, Life Wiki pages, and relationships are encrypted on the device with a key only the user holds. The server stores data it cannot read. A recovery phrase set when private writing is turned on is the only other way in if the password is forgotten; Reflections cannot reset it.
 
-## Key features
+**Key features**
 - Private rich-text journal with mood tracking, tags, tasks, and attachments
 - Device-side zero-knowledge encryption for notes, moods, letters, attachments, Life Wiki, and relationships
 - Relationships: a quiet place to keep track of people you want to stay close to, with a few weekly suggestions for who to reach out to and why
@@ -21,15 +21,18 @@ Notes, moods, future letters, attachments, Life Wiki pages, and relationships ar
 - Future Letters: write to your future self
 - Available as web app, PWA, and Android APK
 
-## Pricing
+**Pricing**
 - Free: 30 notes/month, one AI reflection sample, one Life Wiki refresh after enough writing. Relationships and device-side encryption are included.
 - Pro weekly: ₹49/week after a 3-day trial
 - Pro monthly: ₹149/month after a 3-day trial
-- No payment is due during the trial. See /pricing.md for machine-readable pricing.
+- No payment is due during the trial. See the pricing file under Links for machine-readable details.
 
 ## Links
-- Homepage: https://www.reflections-sanctuary.space/
-- FAQ: https://www.reflections-sanctuary.space/faq
-- Privacy: https://www.reflections-sanctuary.space/privacy
-- About: https://www.reflections-sanctuary.space/about
-- OKF knowledge bundle: https://www.reflections-sanctuary.space/okf/index.md
+
+- [Homepage](https://www.reflections-sanctuary.space/): Quiet encrypted writing space
+- [FAQ](https://www.reflections-sanctuary.space/faq): Frequently asked questions about security and features
+- [Privacy](https://www.reflections-sanctuary.space/privacy): Privacy policy and encryption details
+- [About](https://www.reflections-sanctuary.space/about): The philosophy and team behind Reflections
+- [Pricing](https://www.reflections-sanctuary.space/pricing.md): Machine-readable subscription tiers
+- [OKF knowledge bundle](https://www.reflections-sanctuary.space/okf/index.md): Standardized knowledge structure for AI crawlers
+
