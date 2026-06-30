@@ -323,7 +323,11 @@ const renderStaticLandingShell = (page) => `
                 <span>${escapeHtml(PUBLIC_SEO_COPY.home.heroLines[1])}</span>
                 <span>${escapeHtml(PUBLIC_SEO_COPY.home.heroLines[2])}</span>
               </h1>
-              <p>${escapeHtml(PUBLIC_SEO_COPY.home.heroIntro)}</p>
+              <p>
+                ${PUBLIC_SEO_COPY.home.heroIntro.split(/(\bFree\b)/).map((part) =>
+                  part === 'Free' ? `<em class="font-serif italic text-green">${escapeHtml(part)}</em>` : escapeHtml(part)
+                ).join('')}
+              </p>
             </div>
             <div>
               <a href="/signup" aria-label="Begin writing">
