@@ -188,6 +188,8 @@ export const CreateNote: React.FC = () => {
   const [isMoodOpen, setIsMoodOpen] = useState(false);
   const [moodPickerStage, setMoodPickerStage] = useState<MoodPickerStage>('group');
   const [isTagsOpen, setIsTagsOpen] = useState(false);
+  const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [isMusicOpen, setIsMusicOpen] = useState(false);
   const [isTasksOpen, setIsTasksOpen] = useState(false);
   const [isSaveChoiceOpen, setIsSaveChoiceOpen] = useState(false);
@@ -251,7 +253,27 @@ export const CreateNote: React.FC = () => {
     navigate(RoutePath.NOTES);
   }, [navigate, stopMusic]);
 
-  // Blocker â†’ leave dialog sync
+  // ── AI tag suggestions when tags modal opens ──
+  useEffect(() => {
+    if (!isTagsOpen) {
+      setSuggestedTags([]);
+      return;
+    }
+    if (!content || content === '<p><br></p>') return;
+
+    let active = true;
+    setIsLoadingSuggestions(true);
+    aiService.suggestTags(content).then((suggestions) => {
+      if (active) setSuggestedTags(suggestions);
+    }).catch(() => {
+      // Silent failure; placeholder stays at default.
+    }).finally(() => {
+      if (active) setIsLoadingSuggestions(false);
+    });
+    return () => { active = false; };
+  }, [isTagsOpen, content]);
+
+  // Blocker ── leave dialog sync
   useEffect(() => {
     if (blocker.state === 'blocked') {
       setShowLeaveDialog(true);
@@ -846,7 +868,7 @@ export const CreateNote: React.FC = () => {
           <input
             type="text"
             value={tagInput}
-            placeholder="Add tag and press Enter"
+            placeholder={isLoadingSuggestions ? 'Thinking...' : suggestedTags.filter((t) => !tags.includes(t)).length > 0 ? `Try #${suggestedTags.filter((t) => !tags.includes(t)).slice(0, 2).join(', #')} or type here` : 'Add tag and press Enter'}
             className="input-surface w-full px-4 py-3 text-ui-sm font-semibold text-gray-text"
             onChange={(event) => setTagInput(event.target.value)}
             onKeyDown={(event) => {

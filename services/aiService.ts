@@ -379,4 +379,19 @@ export const aiService = {
       return [];
     }
   },
+
+  /**
+   * Suggests tags for a note based on its content.
+   */
+  suggestTags: async (content: string): Promise<string[]> => {
+    if (isPrivateAiDisabled()) return [];
+
+    try {
+      const tags = await aiClient.requestJson<string[]>('tags', { content });
+      return Array.isArray(tags) ? tags : [];
+    } catch (error) {
+      console.error('[aiService] Failed to suggest tags:', error);
+      return [];
+    }
+  },
 };

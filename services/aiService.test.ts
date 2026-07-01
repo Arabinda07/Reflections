@@ -85,4 +85,10 @@ describe('aiService in strict zero-knowledge mode', () => {
     expect(vi.mocked(absorbLogService.needsReAbsorb)).not.toHaveBeenCalled();
     expect(vi.mocked(aiClient.requestJson)).not.toHaveBeenCalled();
   });
+
+  it('skips tag suggestions without sending content to backend AI', async () => {
+    await expect(aiService.suggestTags('Some journal content')).resolves.toEqual([]);
+
+    expect(vi.mocked(aiClient.requestJson)).not.toHaveBeenCalled();
+  });
 });
