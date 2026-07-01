@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Check } from '@phosphor-icons/react/Check';
-import { CopySimple } from '@phosphor-icons/react/CopySimple';
+
 import { WarningCircle } from '@phosphor-icons/react/WarningCircle';
 import { Button } from './Button';
 import { buildReferralLink, referralService } from '../../services/referralService';
@@ -150,24 +150,22 @@ export const ReferralInvitePanel: React.FC<ReferralInvitePanelProps> = ({ compac
         {invite?.lastSharedAt ? ` · Shared ${new Date(invite.lastSharedAt).toLocaleDateString()}` : ''}
       </p>
 
-      <div className="flex flex-row items-center justify-between gap-3">
-        <div className="surface-inline-panel flex items-center gap-2 py-1.5 pl-4 pr-1.5 flex-1 min-w-0">
-          <span className="min-w-0 flex-1 truncate font-mono text-sm text-gray-text">
-            {inviteLink || 'Invite link unavailable'}
-          </span>
-          <button
-            type="button"
-            onClick={handleCopy}
-            disabled={!inviteLink}
-            aria-label="Copy invite link"
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-[var(--radius-control)] text-gray-nav transition-colors hover:bg-green/5 hover:text-green disabled:pointer-events-none disabled:opacity-50"
-          >
-            {justCopied ? <Check size={16} weight="bold" className="text-green" /> : <CopySimple size={16} weight="bold" />}
-          </button>
-        </div>
-
-        <Button type="button" size="sm" onClick={handleShare} disabled={!inviteLink} className="min-h-11 w-fit self-end sm:self-auto shrink-0">
-          Invite
+      <div className="pt-1">
+        <Button 
+          type="button" 
+          size="md"
+          onClick={handleShare} 
+          disabled={!inviteLink || justCopied} 
+          className="w-fit transition-all"
+        >
+          {justCopied ? (
+            <span className="flex items-center gap-2">
+              <Check size={18} weight="bold" />
+              Link Copied!
+            </span>
+          ) : (
+            'Invite a Friend'
+          )}
         </Button>
       </div>
 

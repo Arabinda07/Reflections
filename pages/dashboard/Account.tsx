@@ -551,7 +551,7 @@ export const Account: React.FC = () => {
                   </div>
                   <div className="shrink-0">
                     <Tooltip label="Permanently delete all your data">
-                      <Button type="button" variant="danger" size="sm" onClick={() => setShowDeleteConfirm(true)} className="whitespace-nowrap">
+                      <Button type="button" variant="danger" size="md" onClick={() => setShowDeleteConfirm(true)} className="whitespace-nowrap">
                         Delete my data
                       </Button>
                     </Tooltip>
@@ -565,7 +565,7 @@ export const Account: React.FC = () => {
                     <button
                       type="button"
                       onClick={handleSignOut}
-                      className="flex h-12 items-center justify-center gap-1.5 sm:gap-2 rounded-xl border border-clay/10 bg-clay/5 px-3 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-bold text-clay transition-all hover:bg-clay/10 active:scale-[0.98]"
+                      className="flex h-12 items-center justify-center gap-1.5 sm:gap-2 rounded-xl border border-clay/10 bg-clay/5 px-3 sm:px-4 sm:py-2.5 text-sm sm:text-base font-bold text-clay transition-all hover:bg-clay/10 active:scale-[0.98]"
                       aria-label="Sign out of your account"
                     >
                       <SignOut size={18} weight="bold" />
@@ -578,7 +578,7 @@ export const Account: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => navigate(-1)}
-                        className="flex h-12 items-center justify-center gap-1.5 sm:gap-2 rounded-xl border border-border bg-surface px-3 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-bold text-gray-nav transition-all hover:bg-green/5 hover:text-green active:scale-[0.98]"
+                        className="flex h-12 items-center justify-center gap-1.5 sm:gap-2 rounded-xl border border-border bg-surface px-3 sm:px-4 sm:py-2.5 text-sm sm:text-base font-bold text-gray-nav transition-all hover:bg-green/5 hover:text-green active:scale-[0.98]"
                         aria-label="Discard account changes"
                       >
                         <X size={18} weight="bold" />
@@ -589,7 +589,7 @@ export const Account: React.FC = () => {
                       <button
                         type="submit"
                         disabled={loading || isSaved}
-                        className="flex h-12 items-center justify-center gap-1.5 sm:gap-2 rounded-xl bg-green px-3 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-bold text-white transition-all hover:bg-green-hover active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+                        className="flex h-12 items-center justify-center gap-1.5 sm:gap-2 rounded-xl bg-green px-4 sm:px-6 sm:py-2.5 text-sm sm:text-base font-bold text-white transition-all hover:bg-green-hover active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
                         aria-label="Save account changes"
                       >
                         {loading ? (
