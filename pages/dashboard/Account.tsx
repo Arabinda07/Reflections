@@ -35,7 +35,6 @@ import { offlineStorage } from '../../services/offlineStorage';
 import { useAuthStore } from '../../hooks/useAuthStore';
 import { profileService } from '../../services/profileService';
 import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
-import { isPrivateAiDisabled } from '../../services/privateMode';
 import { getPasswordResetRedirectTo } from '../../src/auth/authRedirectConfig';
 
 const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
@@ -161,15 +160,11 @@ export const Account: React.FC = () => {
   }, [isSaved]);
 
   const membershipCopy = useMemo(() => {
-    if (isPrivateAiDisabled()) {
-      return 'Zero-knowledge mode is active. Your writing stays encrypted, and AI features that require server reading are disabled.';
-    }
-
     if (access?.planTier === 'pro') {
-      return 'Pro is active. You have more writing room, on-demand AI reflections, and more Life Wiki refreshes for the weeks when life is a lot.';
+      return 'Your writing is encrypted on this device. Pro gives you unlimited notes, on-demand AI reflections, and more Life Wiki refreshes.';
     }
 
-    return `Free gives you 30 notes each month, one AI reflection, and one Life Wiki refresh after there is enough writing to support them.`;
+    return 'Your writing is encrypted on this device. Free plan includes 30 notes each month, 1 AI reflection, and 1 Life Wiki refresh.';
   }, [access]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
