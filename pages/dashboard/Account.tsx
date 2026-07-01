@@ -363,9 +363,9 @@ export const Account: React.FC = () => {
             />
           ) : null}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-              <Surface variant="flat" tone="paper" className="p-5 sm:p-8 lg:p-10 space-y-6 sm:space-y-8">
-                <div className="grid gap-6 lg:gap-10 lg:grid-cols-[180px_minmax(0,1fr)]">
+          <form onSubmit={handleSubmit} className="space-y-5 min-w-0">
+              <Surface variant="flat" tone="paper" className="p-5 sm:p-8 lg:p-10 space-y-6 sm:space-y-8 min-w-0">
+                <div className="grid gap-6 lg:gap-10 lg:grid-cols-[180px_minmax(0,1fr)] min-w-0">
                   <div className="flex flex-col items-center gap-4">
                     <Tooltip label="Upload new profile photo">
                       <button
@@ -404,9 +404,9 @@ export const Account: React.FC = () => {
                     ) : null}
                   </div>
 
-                  <div className="space-y-8">
-                    <div className="grid gap-6 md:grid-cols-2">
-                      <div className="w-full max-w-md">
+                  <div className="space-y-8 min-w-0">
+                    <div className="grid gap-6 md:grid-cols-2 min-w-0">
+                      <div className="w-full max-w-md min-w-0">
                         <Input
                           id="account-full-name"
                           label="Full Name"
@@ -415,7 +415,7 @@ export const Account: React.FC = () => {
                           onChange={handleChange}
                         />
                       </div>
-                      <div className="w-full max-w-md">
+                      <div className="w-full max-w-md min-w-0">
                         <Input
                           id="account-display-name"
                           label="Display Name"
@@ -426,20 +426,20 @@ export const Account: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="grid gap-6 md:grid-cols-2">
-                      <div className="w-full max-w-md">
+                    <div className="grid gap-6 md:grid-cols-2 min-w-0">
+                      <div className="w-full max-w-md min-w-0">
                         <Input id="account-email" label="Email" name="email" value={email} disabled />
                       </div>
 
-                      <div className="w-full max-w-md space-y-2">
+                      <div className="w-full max-w-md space-y-2 min-w-0">
                         <label htmlFor="account-timezone" className="ml-1 block text-ui-xs font-extrabold text-gray-nav">Timezone</label>
-                        <div className="relative w-full">
+                        <div className="relative w-full min-w-0">
                           <select
                             id="account-timezone"
                             name="timezone"
                             value={formData.timezone}
                             onChange={handleChange}
-                            className="input-surface flex h-12 w-full appearance-none items-center px-4 text-ui-base font-semibold text-gray-text rounded-xl border-none outline-none focus:ring-2 focus:ring-green/30"
+                            className="input-surface flex h-12 w-full appearance-none items-center px-4 text-ui-base font-semibold text-gray-text rounded-xl border-none outline-none focus:ring-2 focus:ring-green/30 text-ellipsis overflow-hidden whitespace-nowrap"
                           >
                             {TIMEZONE_OPTIONS.map((option) => (
                               <option key={option.value} value={option.value}>

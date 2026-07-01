@@ -150,7 +150,7 @@ export const ReferralInvitePanel: React.FC<ReferralInvitePanelProps> = ({ compac
         {invite?.lastSharedAt ? ` · Shared ${new Date(invite.lastSharedAt).toLocaleDateString()}` : ''}
       </p>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-row items-center justify-between gap-3">
         <div className="surface-inline-panel flex items-center gap-2 py-1.5 pl-4 pr-1.5 flex-1 min-w-0">
           <span className="min-w-0 flex-1 truncate font-mono text-sm text-gray-text">
             {inviteLink || 'Invite link unavailable'}
