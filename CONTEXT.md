@@ -48,6 +48,14 @@ AI that acts when the user explicitly asks or enables a clearly bounded mode.
 
 Invited AI is different from ambient AI. It should not feel like a watcher, background analyst, diagnosis engine, or constant coach. In Reflections, Invited AI supports reflection, Life Wiki refreshes, and pattern recognition without replacing writing as the center of the product.
 
+## Encrypted Vault Mode
+
+A user-configured mode that enforces full end-to-end device-level encryption for all journals, moods, and relationships. It disables all server-side and client-side AI analysis features (such as reflections, Life Wiki compilation, and relationship link cards) to guarantee total zero-knowledge privacy.
+
+## Reflective Sanctuary Mode
+
+A user-configured mode that stores notes in plaintext in the database (or server-side decrypted) to fully enable invited AI reflections, index summaries, and Life Wiki insights. This mode bypasses local key setups, passwords, and recovery phrase mechanisms for a simplified, AI-guided writing experience.
+
 ## Encrypted Personal Data Loop
 
 The intended advantage loop for Reflections:
