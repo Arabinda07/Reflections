@@ -20,6 +20,7 @@ import { UserCircle } from '@phosphor-icons/react/UserCircle';
 import { ModalSheet } from '../components/ui/ModalSheet';
 import { usePWAInstall } from '../context/PWAInstallContext';
 import { useAuthStore } from '../hooks/useAuthStore';
+import { useUserMode } from '../context/UserModeContext';
 import { RoutePath } from '../types';
 
 interface MobileTabItem {
@@ -34,6 +35,7 @@ interface MoreNavItem {
   path: RoutePath;
   icon: React.ElementType;
   aliases?: RoutePath[];
+  requireMode?: 'reflective' | 'encrypted';
 }
 
 interface MoreNavGroup {
@@ -97,7 +99,7 @@ export const MORE_NAV_GROUPS: MoreNavGroup[] = [
   {
     label: 'Reflect',
     items: [
-      { label: 'Insights', path: RoutePath.INSIGHTS, icon: Sparkle },
+      { label: 'Insights', path: RoutePath.INSIGHTS, icon: Sparkle, requireMode: 'reflective' },
       { label: 'Relationships', path: RoutePath.RELATIONSHIPS, icon: Heart },
       { label: 'Future Letters', path: RoutePath.FUTURE_LETTERS, icon: EnvelopeSimple },
       {
@@ -105,6 +107,7 @@ export const MORE_NAV_GROUPS: MoreNavGroup[] = [
         path: RoutePath.SANCTUARY,
         icon: Book,
         aliases: [RoutePath.WIKI, RoutePath.SANCTUARY_ARTICLE],
+        requireMode: 'reflective',
       },
     ],
   },
@@ -149,6 +152,7 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
 }) => {
   const location = useLocation();
   const { logout } = useAuthStore();
+  const { userMode } = useUserMode();
   const { canInstall, isInstalled, triggerInstall } = usePWAInstall();
 
   const [isMoreOpen, setIsMoreOpen] = useState(false);
@@ -224,6 +228,8 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
       scrollContainer.removeEventListener('touchmove', handleTouchMove);
     };
   }, [isMoreOpen]);
+
+  const handleInstallClick = () => triggerInstall();
 
   const handleInvite = () => {
     closeMore();
@@ -327,7 +333,7 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
                   {group.label}
                 </h3>
                 <div className="space-y-1">
-                  {group.items.map((item, itemIndex) => {
+                  {group.items.filter((item) => !item.requireMode || item.requireMode === userMode).map((item, itemIndex) => {
                     const Icon = item.icon;
                     const isActive = isMoreNavItemActive(item, location.pathname);
 

@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useState, useEffect, useCallback, useRef } from 'react';
+import React, { Suspense, lazy, useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
 import { Brain } from '@phosphor-icons/react/Brain';
@@ -33,6 +33,8 @@ import { WhisperComposerControl, appendTranscriptToHtml } from '../../components
 import { InlineLoadingBadge } from '../../components/ui/InlineLoadingBadge';
 import { DEFAULT_WELLNESS_PROMPTS, getCurrentWellnessPrompt, getNextWellnessPromptState } from '../../services/wellnessPrompts';
 import { aiService } from '../../services/aiService';
+import { useUserMode } from '../../context/UserModeContext';
+import { isPrivateAiDisabled } from '../../services/privateMode';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useNoteDraft } from '../../hooks/useNoteDraft';
 import { useFocusMode } from '../../hooks/useFocusMode';
@@ -45,33 +47,17 @@ import { MoodPicker, type MoodPickerStage } from './MoodPicker';
 
 const TrailLoadingMark = lazy(() => import('../../components/ui/TrailLoadingMark')
   .then((module) => ({ default: module.TrailLoadingMark })));
-const CompanionObservation = lazy(() => import('../../components/ui/CompanionObservation')
-  .then((module) => ({ default: module.CompanionObservation })));
 const PaperPlaneToast = lazy(() => import('../../components/ui/PaperPlaneToast')
   .then((module) => ({ default: module.PaperPlaneToast })));
 
 const CREATE_NOTE_ENTRY_ANIMATION_FALLBACK_MS = 3600;
 
 const getSurfaceScopeForMood = (mood?: string) => {
-  switch (getMoodGroupForMood(mood)?.id) {
-    case 'light': return 'surface-scope-sky';
-    case 'steady': return 'surface-scope-sage';
-    case 'charged': return 'surface-scope-clay';
-    case 'heavy': return 'surface-scope-sky';
-    case 'mixed': return 'surface-scope-paper';
-    default: return 'surface-scope-paper';
-  }
+  return 'surface-scope-sage';
 };
 
 const getSurfacePanelForMood = (mood?: string) => {
-  switch (getMoodGroupForMood(mood)?.id) {
-    case 'light': return 'surface-panel-sky';
-    case 'steady': return 'surface-panel-sage';
-    case 'charged': return 'surface-panel-clay';
-    case 'heavy': return 'surface-panel-sky';
-    case 'mixed': return 'surface-panel-paper';
-    default: return 'surface-panel-sage';
-  }
+  return 'surface-panel-sage';
 };
 // --- Sub-Component: TaskRow ---
 interface TaskRowProps {
@@ -154,10 +140,43 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
   );
 };
 
+const LOADING_QUOTES = [
+  { text: "I write entirely to find out what I'm thinking.", author: "Joan Didion" },
+  { text: "Fill your paper with the breathings of your heart.", author: "William Wordsworth" },
+  { text: "The unexamined life is not worth living.", author: "Socrates" },
+  { text: "Look within. Within is the fountain of good.", author: "Marcus Aurelius" },
+  { text: "We suffer more often in imagination than in reality.", author: "Seneca" },
+  { text: "Faith is the bird that feels the light.", author: "Rabindranath Tagore" },
+  { text: "No need to hurry. No need to sparkle.", author: "Virginia Woolf" },
+  { text: "Live the questions now.", author: "Rainer Maria Rilke" },
+  { text: "It's not what you look at that matters, it's what you see.", author: "Henry David Thoreau" },
+  { text: "Nothing can bring you peace but yourself.", author: "Ralph Waldo Emerson" },
+  { text: "Attention is the rarest and purest form of generosity.", author: "Simone Weil" },
+  { text: "The beginning is always today.", author: "Mary Shelley" },
+  { text: "There is no greater agony than bearing an untold story inside you.", author: "Maya Angelou" },
+  { text: "The only journey is the journey within.", author: "Rainer Maria Rilke" },
+  { text: "Observe, and do not judge.", author: "Jiddu Krishnamurti" },
+  { text: "To know yourself is the beginning of wisdom.", author: "Aristotle" },
+  { text: "Not all those who wander are lost.", author: "J. R. R. Tolkien" },
+  { text: "The quieter you become, the more you are able to hear.", author: "Rumi" },
+  { text: "The child is father of the man.", author: "William Wordsworth" },
+  { text: "What we think, we become.", author: "Buddha" },
+  { text: "Knowing yourself is the beginning of all wisdom.", author: "Aristotle" },
+  { text: "The soul becomes dyed with the color of its thoughts.", author: "Marcus Aurelius" },
+  { text: "Life changes fast. Life changes in the instant.", author: "Joan Didion" },
+  { text: "I am rooted, but I flow.", author: "Virginia Woolf" },
+  { text: "The privilege of a lifetime is to become who you truly are.", author: "Carl Jung" }
+];
+
 export const CreateNote: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const initialPrompt = location.state?.initialPrompt;
+
+  const entryQuote = useMemo(() => {
+    const randomIndex = Math.floor(Math.random() * LOADING_QUOTES.length);
+    return LOADING_QUOTES[randomIndex];
+  }, []);
   const initialContent =
     typeof location.state?.initialContent === 'string' ? location.state.initialContent : '';
 
@@ -176,6 +195,7 @@ export const CreateNote: React.FC = () => {
 
   // â”€â”€ UI-local state (modals, editor chrome) â”€â”€
   const isMobile = useMediaQuery('(max-width: 1023px)');
+  const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const [tagInput, setTagInput] = useState('');
   const [activePlaceholder, setActivePlaceholder] = useState<string | null>(
     initialPrompt || getCurrentWellnessPrompt(0, DEFAULT_WELLNESS_PROMPTS),
@@ -185,6 +205,8 @@ export const CreateNote: React.FC = () => {
   const [aiReflection, setAiReflection] = useState<string | null>(null);
   const [isMobileOptionsOpen, setIsMobileOptionsOpen] = useState(false);
   const [entryAnimationComplete, setEntryAnimationComplete] = useState(false);
+  const [fadeOverlay, setFadeOverlay] = useState(false);
+  const [overlayMounted, setOverlayMounted] = useState(true);
   const [isMoodOpen, setIsMoodOpen] = useState(false);
   const [moodPickerStage, setMoodPickerStage] = useState<MoodPickerStage>('group');
   const [isTagsOpen, setIsTagsOpen] = useState(false);
@@ -194,11 +216,10 @@ export const CreateNote: React.FC = () => {
   const [isTasksOpen, setIsTasksOpen] = useState(false);
   const [isSaveChoiceOpen, setIsSaveChoiceOpen] = useState(false);
   const [releaseError, setReleaseError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [releaseSuccess, setReleaseSuccess] = useState<string | null>(null);
   const [newTaskText, setNewTaskText] = useState('');
   const [pendingTrackId, setPendingTrackId] = useState<string | null>(null);
-  const [showObservation, setShowObservation] = useState(false);
-  const [observationText, setObservationText] = useState<string | null>(null);
   const [showPlane, setShowPlane] = useState(false);
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
 
@@ -216,9 +237,23 @@ export const CreateNote: React.FC = () => {
 
   useEffect(() => {
     if (entryAnimationComplete) return;
+    // Reduced-motion users skip the cinematic entrance entirely.
+    if (prefersReducedMotion) {
+      setEntryAnimationComplete(true);
+      return;
+    }
+    // Clear the overlay the moment the draft is ready instead of holding for a
+    // fixed duration; the fade-out below smooths the hand-off to the editor.
+    if (!draft.loading) {
+      setEntryAnimationComplete(true);
+      return;
+    }
+    // Safety net only: if the draft never resolves, never trap the writer.
     const timer = window.setTimeout(() => setEntryAnimationComplete(true), CREATE_NOTE_ENTRY_ANIMATION_FALLBACK_MS);
     return () => window.clearTimeout(timer);
-  }, [entryAnimationComplete]);
+  }, [entryAnimationComplete, prefersReducedMotion, draft.loading]);
+
+
 
   useEffect(() => {
     return () => {
@@ -237,6 +272,12 @@ export const CreateNote: React.FC = () => {
   const { imagePreview, setImagePreview, loading, saving, releasing: isReleasing, canCreateNote, setCanCreateNote, hasUnsavedChanges } = draft;
   const { blocker, navigateWithBypass } = draft;
   const id = undefined as string | undefined; // id is read internally by useNoteDraft via useParams
+
+  const { userMode } = useUserMode();
+  // AI features are unavailable to encrypted users (no plaintext to send) and
+  // while the mode is still resolving. Gate the UI so encrypted users never see
+  // AI CTAs that would only return a "disabled" message.
+  const aiEnabled = userMode != null && !isPrivateAiDisabled(userMode);
 
   const handleMobileBack = useCallback(() => {
     stopMusic();
@@ -259,6 +300,7 @@ export const CreateNote: React.FC = () => {
       setSuggestedTags([]);
       return;
     }
+    if (!aiEnabled) return;
     if (!content || content === '<p><br></p>') return;
 
     let active = true;
@@ -271,7 +313,7 @@ export const CreateNote: React.FC = () => {
       if (active) setIsLoadingSuggestions(false);
     });
     return () => { active = false; };
-  }, [isTagsOpen, content]);
+  }, [isTagsOpen, content, aiEnabled]);
 
   // Blocker ── leave dialog sync
   useEffect(() => {
@@ -288,6 +330,7 @@ export const CreateNote: React.FC = () => {
   const handleSave = async () => {
     if (!draft.currentSnapshot.title && !draft.currentSnapshot.content) return;
 
+    setSaveError(null);
     setIsSaveChoiceOpen(false);
     setShowPlane(true);
 
@@ -296,16 +339,20 @@ export const CreateNote: React.FC = () => {
     if (isUnmounted.current) return;
     setShowPlane(false);
 
+    if (!result.success) {
+      // The publish stalled or failed. The draft is intact — keep the writer on
+      // the page (never navigate away) and surface a retry instead of silently
+      // dropping their writing and attachments.
+      setSaveError('We couldn’t finish saving just now. Check your connection and try again — your writing is still here.');
+      setIsSaveChoiceOpen(true);
+      return;
+    }
+
     haptics.confirming();
     playSaveChime();
 
-    if (result.observation) {
-      setObservationText(result.observation.text);
-      setShowObservation(true);
-    } else {
-      stopMusic();
-      navigateWithBypass(RoutePath.DASHBOARD, { state: { fromSave: true } });
-    }
+    stopMusic();
+    navigateWithBypass(RoutePath.DASHBOARD, { state: { fromSave: true } });
   };
 
   // â”€â”€ Release handler â”€â”€
@@ -333,6 +380,7 @@ export const CreateNote: React.FC = () => {
   // tracking only if shared-browser onboarding becomes a real concern.
   const handleSaveFabClick = () => {
     setReleaseError(null);
+    setSaveError(null);
 
     let hasSavedBefore = false;
     try {
@@ -414,10 +462,20 @@ export const CreateNote: React.FC = () => {
   const wordCount = React.useMemo(() => {
     return draft.currentSnapshot.content.replace(/<[^>]*>/g, '').trim().split(/\s+/).filter(Boolean).length;
   }, [draft.currentSnapshot.content]);
-  const canReflect = wordCount >= 100;
+  const canReflect = aiEnabled && wordCount >= 100;
   const isFocusModeActive = focusMode.isActive;
   const isFocusModeEnabled = focusMode.isEnabled;
   const showEntryExperience = loading || !entryAnimationComplete;
+
+  useEffect(() => {
+    if (!showEntryExperience) {
+      setFadeOverlay(true);
+      const timer = window.setTimeout(() => {
+        setOverlayMounted(false);
+      }, 700);
+      return () => window.clearTimeout(timer);
+    }
+  }, [showEntryExperience]);
 
   const handleStayOnDraft = () => {
     setShowLeaveDialog(false);
@@ -437,22 +495,7 @@ export const CreateNote: React.FC = () => {
 
 
 
-  if (showEntryExperience) {
-    return (
-      <div className="relative flex min-h-[100dvh] flex-1 items-center justify-center overflow-hidden bg-body px-6 text-center">
-        <div className="relative z-10 flex max-w-md flex-col items-center">
-          <div className="mb-6 h-40 w-40 max-w-full opacity-80 sm:h-44 sm:w-44" aria-hidden="true">
-            <Suspense fallback={<div className="h-full w-full rounded-full bg-green/5" />}>
-              <TrailLoadingMark loop={false} onComplete={() => setEntryAnimationComplete(true)} />
-            </Suspense>
-          </div>
 
-          <h2 className="h2-section mb-4">Opening the page.</h2>
-          <p className="body-editorial max-w-sm">Your writing space is almost ready.</p>
-        </div>
-      </div>
-    );
-  }
 
   if (!id && !canCreateNote) {
     return (
@@ -463,7 +506,8 @@ export const CreateNote: React.FC = () => {
   }
 
   return (
-    <div className={`${getSurfaceScopeForMood(mood)} page-wash relative flex-1 flex min-h-0 bg-body overflow-hidden`}>
+    <>
+      <div className={`${getSurfaceScopeForMood(mood)} page-wash relative flex-1 flex min-h-0 bg-body overflow-hidden`}>
       {/* Ã¢â€â‚¬Ã¢â€â‚¬ Mobile Back Button Ã¢â€â‚¬Ã¢â€â‚¬ */}
       {isMobile && (
         <button 
@@ -766,6 +810,12 @@ export const CreateNote: React.FC = () => {
             {isReleasing ? <CircleNotch size={20} className="animate-spin" /> : <Wind size={20} weight="duotone" />}
           </button>
 
+          {saveError ? (
+            <p className="text-btn-sm font-bold leading-relaxed text-clay" aria-live="assertive" role="alert">
+              {saveError}
+            </p>
+          ) : null}
+
           {releaseError ? (
             <p className="text-btn-sm font-bold leading-relaxed text-clay" aria-live="polite">
               {releaseError}
@@ -828,6 +878,7 @@ export const CreateNote: React.FC = () => {
                 value={newTaskText}
                 onChange={(e) => setNewTaskText(e.target.value)}
                 placeholder="What needs to be done?"
+                aria-label="Add task"
                 className="intention-entry-input"
               />
             </div>
@@ -851,12 +902,12 @@ export const CreateNote: React.FC = () => {
         <div className="space-y-5">
           <div className="flex flex-wrap gap-2">
             {tags.map((tag) => (
-              <span key={tag} className="flex items-center gap-2 rounded-xl bg-green/10 px-3 py-1.5 text-ui-xs font-bold text-green">
+              <span key={tag} className="flex items-center gap-1 rounded-xl bg-green/10 pl-3 pr-1 py-1.5 text-ui-xs font-bold text-green">
                 #{tag}
                 <button
                   type="button"
                   onClick={() => setTags(tags.filter((item) => item !== tag))}
-                  className="text-green/70 hover:text-clay"
+                  className="inline-flex h-11 w-11 -my-2 items-center justify-center text-green/70 hover:text-clay focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40 rounded-lg"
                   aria-label={`Remove ${tag} tag`}
                 >
                   <X size={12} />
@@ -868,6 +919,7 @@ export const CreateNote: React.FC = () => {
           <input
             type="text"
             value={tagInput}
+            aria-label="Add tag"
             placeholder={isLoadingSuggestions ? 'Thinking...' : suggestedTags.filter((t) => !tags.includes(t)).length > 0 ? `Try #${suggestedTags.filter((t) => !tags.includes(t)).slice(0, 2).join(', #')} or type here` : 'Add tag and press Enter'}
             className="input-surface w-full px-4 py-3 text-ui-sm font-semibold text-gray-text"
             onChange={(event) => setTagInput(event.target.value)}
@@ -973,16 +1025,33 @@ export const CreateNote: React.FC = () => {
         confirmLabel="Leave without saving"
         cancelLabel="Keep writing"
       />
-      {showObservation ? (
-        <Suspense fallback={null}>
-          <CompanionObservation isVisible text={observationText || ""} onComplete={() => { setShowObservation(false); navigateWithBypass(RoutePath.DASHBOARD, { state: { fromSave: true } }); }} />
-        </Suspense>
-      ) : null}
       {showPlane ? (
         <Suspense fallback={null}>
           <PaperPlaneToast isVisible onAnimationComplete={() => {}} />
         </Suspense>
       ) : null}
-    </div>
+      </div>
+
+      {overlayMounted && (
+        <div
+          className={`fixed inset-0 z-50 flex min-h-[100dvh] items-center justify-center overflow-hidden bg-body px-6 text-center transition-opacity duration-700 ease-out ${
+            fadeOverlay ? 'opacity-0 pointer-events-none' : 'opacity-100'
+          }`}
+        >
+          <div className="relative z-10 flex w-full max-w-md md:max-w-xl lg:max-w-2xl flex-col items-center">
+            <div className="mb-6 h-40 w-40 max-w-full opacity-80 sm:h-44 sm:w-44" aria-hidden="true">
+              <Suspense fallback={<div className="h-full w-full rounded-full bg-green/5" />}>
+                <TrailLoadingMark loop={true} />
+              </Suspense>
+            </div>
+
+            <h2 className="h2-section mb-4 font-serif italic font-normal text-gray-text">
+              "{entryQuote.text}"
+            </h2>
+            <p className="body-editorial max-w-sm">— {entryQuote.author}</p>
+          </div>
+        </div>
+      )}
+    </>
   );
 };

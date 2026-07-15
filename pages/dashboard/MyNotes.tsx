@@ -2,7 +2,6 @@ import React, { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import { Calendar as CalendarIcon } from '@phosphor-icons/react/Calendar';
-import { CircleNotch } from '@phosphor-icons/react/CircleNotch';
 import { DownloadSimple } from '@phosphor-icons/react/DownloadSimple';
 import { FileText } from '@phosphor-icons/react/FileText';
 import { PencilSimpleLine } from '@phosphor-icons/react/PencilSimpleLine';
@@ -17,11 +16,11 @@ import { Chip } from '../../components/ui/Chip';
 import { LottieAnimation } from '../../components/ui/LottieAnimation';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
-import { LoadingState } from '../../components/ui/LoadingState';
 import { MetadataPill } from '../../components/ui/MetadataPill';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { SectionHeader } from '../../components/ui/SectionHeader';
+import { Skeleton } from '../../components/ui/Skeleton';
 import { StorageImage } from '../../components/ui/StorageImage';
 import { Surface } from '../../components/ui/Surface';
 import { useAuthStore } from '../../hooks/useAuthStore';
@@ -41,6 +40,30 @@ const MyNotesCalendar = lazy(() =>
 const NOTE_SWIPE_OPEN_THRESHOLD = 72;
 const NOTE_SWIPE_CLOSE_THRESHOLD = 48;
 const NOTE_SWIPE_AXIS_INTENT_RATIO = 1.25;
+const NOTES_LIBRARY_SKELETON_COUNT = 6;
+
+const NotesLibrarySkeletonGrid: React.FC = () => (
+  <div
+    className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-8"
+    aria-busy="true"
+    aria-label="Loading saved reflections"
+  >
+    {Array.from({ length: NOTES_LIBRARY_SKELETON_COUNT }, (_, index) => (
+      <Surface
+        key={index}
+        variant="flat"
+        className="overflow-hidden rounded-[2.5rem] border border-border/40"
+      >
+        <Skeleton variant="card" className="rounded-none" />
+        <div className="space-y-3 p-6">
+          <Skeleton variant="text" className="w-3/4" />
+          <Skeleton variant="text" className="w-full" />
+          <Skeleton variant="text" className="w-5/6" />
+        </div>
+      </Surface>
+    ))}
+  </div>
+);
 
 export const MyNotes: React.FC = () => {
   const navigate = useViewTransitionNavigation();
@@ -58,6 +81,17 @@ export const MyNotes: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'calendar'>('grid');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [swipedNoteId, setSwipedNoteId] = useState<string | null>(null);
+  // Stagger card entrance only on the first library paint of a browser session.
+  const [staggerCards] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      if (window.sessionStorage.getItem('notes_card_stagger_seen') === 'true') return false;
+      window.sessionStorage.setItem('notes_card_stagger_seen', 'true');
+      return true;
+    } catch {
+      return false;
+    }
+  });
   const notesViewScopeRef = useRef<HTMLDivElement | null>(null);
   const swipeStartXRef = useRef<number | null>(null);
   const swipeStartYRef = useRef<number | null>(null);
@@ -202,7 +236,7 @@ export const MyNotes: React.FC = () => {
               )}
             </div>
           ))}
-          {dayNotes.length > 3 ? <div className="h-1.5 w-1.5 rounded-full bg-gray-300 ml-1" /> : null}
+          {dayNotes.length > 3 ? <div className="h-1.5 w-1.5 rounded-full bg-gray-light ml-1" /> : null}
         </div>
       </div>
     );
@@ -258,9 +292,9 @@ export const MyNotes: React.FC = () => {
           </button>
         </div>
         <article
-          className={`relative z-10 flex h-full flex-col bg-surface transition-transform duration-300 ease-out [animation-delay:var(--note-card-delay)] animation-fill-mode-both ${
-            isSwipedOpen ? '-translate-x-28' : 'translate-x-0'
-          }`}
+          className={`relative z-10 flex h-full flex-col bg-surface transition-transform duration-300 ease-out ${
+            staggerCards ? '[animation-delay:var(--note-card-delay)] animation-fill-mode-both' : ''
+          } ${isSwipedOpen ? '-translate-x-28' : 'translate-x-0'}`}
           onPointerDown={(event) => handleNotePointerDown(event, note.id)}
           onPointerUp={(event) => handleNotePointerEnd(event, note.id)}
           onPointerCancel={() => {
@@ -268,21 +302,26 @@ export const MyNotes: React.FC = () => {
             swipeStartYRef.current = null;
             swipeNoteIdRef.current = null;
           }}
-          style={{ '--note-card-delay': `${index * 50}ms` } as React.CSSProperties}
+          style={
+            staggerCards
+              ? ({ '--note-card-delay': `${index * 50}ms` } as React.CSSProperties)
+              : undefined
+          }
         >
-          <div className="relative h-44 w-full overflow-hidden border-b border-border/40">
-            <Link
-              to={noteDetailPath}
-              onClick={openNote}
-              className="block h-full w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
-              aria-label={`Open ${note.title}`}
-            >
+          {/* One open target: image + title + preview share a single accessible name. */}
+          <Link
+            to={noteDetailPath}
+            onClick={openNote}
+            className="flex min-h-0 flex-1 flex-col rounded-[var(--radius-control)] focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
+            aria-label={`Open ${note.title}`}
+          >
+            <div className="relative h-44 w-full overflow-hidden border-b border-border/40">
               {note.thumbnailUrl ? (
                 <>
                   <div className="absolute inset-0 z-10 bg-green/0 transition-colors duration-500 group-hover:bg-green/5" />
                   <StorageImage
                     path={note.thumbnailUrl}
-                    alt={note.title}
+                    alt=""
                     className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
                   />
                 </>
@@ -291,35 +330,30 @@ export const MyNotes: React.FC = () => {
                   <FileText className="text-border transition-colors group-hover:text-green/30" size={48} weight="light" />
                 </div>
               )}
-            </Link>
 
-            <div className="absolute right-4 top-4 z-20 flex flex-wrap justify-end gap-2">
-              <MetadataPill icon={<CalendarIcon size={12} weight="regular" />}>
-                {new Date(note.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-              </MetadataPill>
-              {note.mood ? (
-                <MetadataPill icon={getMoodIcon(note.mood)} className={moodConfig?.nav || ''}>
-                  <span>{moodConfig?.label || note.mood}</span>
+              <div className="pointer-events-none absolute right-4 top-4 z-20 flex flex-wrap justify-end gap-2">
+                <MetadataPill icon={<CalendarIcon size={12} weight="regular" />}>
+                  {new Date(note.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                 </MetadataPill>
+                {note.mood ? (
+                  <MetadataPill icon={getMoodIcon(note.mood)} className={moodConfig?.nav || ''}>
+                    <span>{moodConfig?.label || note.mood}</span>
+                  </MetadataPill>
+                ) : null}
+              </div>
+            </div>
+
+            <div className="flex flex-1 flex-col p-6 pb-0">
+              {note.tags?.length ? (
+                <div className="mb-3 flex flex-wrap gap-2">
+                  {note.tags.map((tag) => (
+                    <Chip key={tag} as="span" active className="text-xs">
+                      #{tag}
+                    </Chip>
+                  ))}
+                </div>
               ) : null}
-            </div>
-          </div>
 
-          <div className="flex flex-1 flex-col p-6">
-            <div className="mb-3 flex flex-wrap gap-2">
-              {note.tags?.map((tag) => (
-                <Chip key={tag} as="span" active className="text-xs">
-                  #{tag}
-                </Chip>
-              ))}
-            </div>
-
-            <Link
-              to={noteDetailPath}
-              onClick={openNote}
-              className="group/title rounded-[var(--radius-control)] focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
-              aria-label={`Open ${note.title}`}
-            >
               <h3 className="dashboard-card-title mb-2 transition-colors group-hover:text-green text-balance">
                 {note.title}
               </h3>
@@ -327,30 +361,30 @@ export const MyNotes: React.FC = () => {
               <p className="dashboard-editorial-preview mb-5 max-w-none transition-colors group-hover:text-gray-text line-clamp-3">
                 {getPreviewText(note.content)}
               </p>
-            </Link>
-
-            <div className="mt-auto flex items-center justify-between gap-3 border-t border-border/40 pt-4">
-              <div className="flex min-w-0 items-center gap-2">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green text-xs font-extrabold text-white shadow-sm">
-                  {user?.name?.charAt(0) || 'U'}
-                </div>
-                <span className="truncate text-xs font-bold text-gray-nav">
-                  Edited {format(new Date(note.updatedAt), 'MMM d')}
-                </span>
-              </div>
-
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setActionMenuNote(note);
-                }}
-                className="control-surface inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-gray-nav transition-[transform,border-color,background-color,color] duration-500 hover:scale-110 hover:border-green/25 hover:bg-green/5 hover:text-green"
-                aria-label={`More actions for ${note.title}`}
-              >
-                <SquaresFour size={18} weight="bold" />
-              </button>
             </div>
+          </Link>
+
+          <div className="mt-auto flex items-center justify-between gap-3 border-t border-border/40 px-6 pb-6 pt-4">
+            <div className="flex min-w-0 items-center gap-2">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green text-xs font-extrabold text-white shadow-sm">
+                {user?.name?.charAt(0) || 'U'}
+              </div>
+              <span className="truncate text-xs font-bold text-gray-nav">
+                Edited {format(new Date(note.updatedAt), 'MMM d')}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                setActionMenuNote(note);
+              }}
+              className="control-surface inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-gray-nav transition-[transform,border-color,background-color,color] duration-500 hover:scale-110 hover:border-green/25 hover:bg-green/5 hover:text-green"
+              aria-label={`More actions for ${note.title}`}
+            >
+              <SquaresFour size={18} weight="bold" />
+            </button>
           </div>
         </article>
       </Surface>
@@ -359,29 +393,22 @@ export const MyNotes: React.FC = () => {
 
   return (
     <>
-      <LoadingState
-        isVisible={loading}
-        title="Gathering your thoughts..."
-      />
-
-      {!loading ? (
-        <PageContainer className="surface-scope-sage page-wash pb-14 pt-4 md:pt-8">
-          <div 
-            className="core-page-stack animate-fade-in-up"
+      <PageContainer className="surface-scope-sage page-wash pb-14 pt-4 md:pt-8">
+        <div className="core-page-stack animate-fade-in-up">
+          <button
+            onClick={() => navigate(RoutePath.DASHBOARD)}
+            className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-green/5 hover:text-green"
+            aria-label="Back to home"
           >
-            <button
-              onClick={() => navigate(RoutePath.DASHBOARD)}
-              className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-green/5 hover:text-green"
-              aria-label="Back to home"
-            >
-              <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
-              <span>Back</span>
-            </button>
+            <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
+            <span>Back</span>
+          </button>
 
-            <SectionHeader
-              title="Saved reflections"
-              description="Cards or calendar: pick how you want to look through them."
-              actions={
+          <SectionHeader
+            title="Saved reflections"
+            description="Cards or calendar: pick how you want to look through them."
+            actions={
+              loading ? undefined : (
                 <div className="core-control-cluster">
                   <div className="flex items-center gap-2">
                     <Chip
@@ -415,9 +442,14 @@ export const MyNotes: React.FC = () => {
                     ) : null}
                   </div>
                 </div>
-              }
-            />
+              )
+            }
+          />
 
+          {loading ? (
+            <NotesLibrarySkeletonGrid />
+          ) : (
+            <>
             {tagFilter ? (
               <div className="flex flex-wrap items-center gap-3">
                 <Chip as="span" active icon={<Tag size={12} weight="regular" />}>
@@ -441,8 +473,19 @@ export const MyNotes: React.FC = () => {
                   <Surface variant="bezel" innerClassName="p-6 sm:p-8">
                     <Suspense
                       fallback={
-                        <div className="flex h-[420px] items-center justify-center text-green">
-                          <CircleNotch size={24} weight="bold" className="animate-spin" />
+                        <div className="min-h-[420px]" aria-busy="true" aria-label="Loading calendar">
+                          <div className="mb-6 flex items-center justify-between">
+                            <Skeleton variant="text" className="h-6 w-32" />
+                            <div className="flex gap-2">
+                              <Skeleton variant="circle" className="h-9 w-9" />
+                              <Skeleton variant="circle" className="h-9 w-9" />
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-7 gap-2">
+                            {Array.from({ length: 42 }).map((_, index) => (
+                              <Skeleton key={index} variant="text" className="h-12 rounded-lg" />
+                            ))}
+                          </div>
                         </div>
                       }
                     >
@@ -513,9 +556,10 @@ export const MyNotes: React.FC = () => {
               />
             )}
             </div>
-          </div>
-        </PageContainer>
-      ) : null}
+            </>
+          )}
+        </div>
+      </PageContainer>
 
       <ConfirmationDialog
         isOpen={isConfirmOpen}

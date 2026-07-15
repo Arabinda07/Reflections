@@ -1,10 +1,12 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
 import { CheckCircle } from '@phosphor-icons/react/CheckCircle';
 import { Warning } from '@phosphor-icons/react/Warning';
 import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
+import { PageContainer } from '../../components/ui/PageContainer';
 import { RouteLoadingFrame } from '../../components/ui/RouteLoadingFrame';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { Surface } from '../../components/ui/Surface';
@@ -104,119 +106,127 @@ export const RecoverPrivateWriting: React.FC = () => {
   }
 
   return (
-    <div className="surface-scope-paper page-wash flex flex-1 items-center justify-center bg-body p-6 transition-colors duration-300">
-      <div className="w-full max-w-[520px]">
-        <Surface variant="bezel">
-          <div className="space-y-6 p-8 sm:p-10">
-            <SectionHeader
-              eyebrow="Private writing"
-              title="Recover private writing"
-            />
+    <PageContainer size="narrow" className="surface-scope-paper page-wash pb-24 pt-6 md:pt-10">
+      <div className="core-page-stack">
+        <button
+          type="button"
+          onClick={() => navigate(RoutePath.ACCOUNT)}
+          className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-[var(--surface-current-soft-bg)] hover:text-[var(--surface-current-accent)]"
+          aria-label="Back to account"
+        >
+          <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
+          <span>Back</span>
+        </button>
 
-            <Alert
-              variant="info"
-              title="Your account password changed."
-              description="Use your recovery phrase to reconnect private writing to the new account password."
-              icon={<Warning size={20} weight="duotone" />}
-            />
+        <SectionHeader
+          title="Recover private writing"
+          description="Reconnect your private writing vault to your new account password using your recovery details."
+        />
 
-            {feedback ? (
-              <Alert
-                variant={feedback.variant}
-                title={feedback.title}
-                description={feedback.description}
-                icon={
-                  feedback.variant === 'success' ? (
-                    <CheckCircle size={20} weight="fill" />
-                  ) : (
-                    <Warning size={20} weight="fill" />
-                  )
-                }
+        <Alert
+          variant="info"
+          title="Your account password changed."
+          description="Use your recovery phrase to reconnect private writing to the new account password."
+          icon={<Warning size={20} weight="duotone" />}
+        />
+
+        {feedback ? (
+          <Alert
+            variant={feedback.variant}
+            title={feedback.title}
+            description={feedback.description}
+            icon={
+              feedback.variant === 'success' ? (
+                <CheckCircle size={20} weight="fill" />
+              ) : (
+                <Warning size={20} weight="fill" />
+              )
+            }
+          />
+        ) : null}
+
+        <Surface variant="flat" tone="paper" className="p-6 sm:p-8 rounded-[2rem]">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => setMode('recovery_phrase')}
+                className={`rounded-xl border p-4 text-left transition ${
+                  mode === 'recovery_phrase'
+                    ? 'border-[var(--surface-current-accent)] bg-[var(--surface-current-soft-bg)] text-primary'
+                    : 'border-border bg-surface text-gray-text hover:border-[var(--surface-current-accent)]/30'
+                }`}
+              >
+                <span className="block text-sm font-bold">Recovery phrase</span>
+                <span className="mt-1 inline-block label-caps text-[var(--surface-current-accent)]">
+                  Recommended
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode('previous_password')}
+                className={`rounded-xl border p-4 text-left transition ${
+                  mode === 'previous_password'
+                    ? 'border-[var(--surface-current-accent)] bg-[var(--surface-current-soft-bg)] text-primary'
+                    : 'border-border bg-surface text-gray-text hover:border-[var(--surface-current-accent)]/30'
+                }`}
+              >
+                <span className="block text-sm font-bold">I remember my previous password</span>
+                <span className="mt-2 block text-xs leading-5">
+                  Use the account password that unlocked writing before reset.
+                </span>
+              </button>
+            </div>
+
+            {mode === 'recovery_phrase' ? (
+              <Input
+                id="private-writing-recovery-phrase"
+                type="text"
+                label="Recovery phrase"
+                autoComplete="off"
+                value={recoveryPhrase}
+                onChange={(event) => setRecoveryPhrase(event.target.value)}
+                placeholder="Paste your recovery phrase"
               />
-            ) : null}
+            ) : (
+              <Input
+                id="private-writing-previous-password"
+                type="password"
+                label="Previous account password"
+                autoComplete="current-password"
+                value={previousPassword}
+                onChange={(event) => setPreviousPassword(event.target.value)}
+                placeholder="Enter previous account password"
+              />
+            )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="grid gap-3 sm:grid-cols-2">
-                <button
-                  type="button"
-                  onClick={() => setMode('recovery_phrase')}
-                  className={`rounded-xl border p-4 text-left transition ${
-                    mode === 'recovery_phrase'
-                      ? 'border-green bg-green/5 text-primary'
-                      : 'border-border bg-surface text-gray-text hover:border-green/30'
-                  }`}
-                >
-                  <span className="block text-sm font-bold">Recovery phrase</span>
-                  <span className="mt-1 inline-block text-ui-xs font-black uppercase tracking-widest text-green">
-                    Recommended
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMode('previous_password')}
-                  className={`rounded-xl border p-4 text-left transition ${
-                    mode === 'previous_password'
-                      ? 'border-green bg-green/5 text-primary'
-                      : 'border-border bg-surface text-gray-text hover:border-green/30'
-                  }`}
-                >
-                  <span className="block text-sm font-bold">I remember my previous password</span>
-                  <span className="mt-2 block text-xs leading-5">
-                    Use the account password that unlocked writing before reset.
-                  </span>
-                </button>
-              </div>
+            {needsNewPassword ? (
+              <Input
+                id="private-writing-new-account-password"
+                type="password"
+                label="New account password"
+                autoComplete="current-password"
+                value={newAccountPassword}
+                onChange={(event) => setNewAccountPassword(event.target.value)}
+                placeholder="Enter your new account password"
+              />
+            ) : (
+              <p className="rounded-xl border border-[var(--surface-current-accent)]/20 bg-[var(--surface-current-soft-bg)] p-3 text-sm font-semibold text-gray-text">
+                We can use the new account password you just created. It will not be stored.
+              </p>
+            )}
 
-              {mode === 'recovery_phrase' ? (
-                <Input
-                  id="private-writing-recovery-phrase"
-                  type="text"
-                  label="Recovery phrase"
-                  autoComplete="off"
-                  value={recoveryPhrase}
-                  onChange={(event) => setRecoveryPhrase(event.target.value)}
-                  placeholder="Paste your recovery phrase"
-                />
-              ) : (
-                <Input
-                  id="private-writing-previous-password"
-                  type="password"
-                  label="Previous account password"
-                  autoComplete="current-password"
-                  value={previousPassword}
-                  onChange={(event) => setPreviousPassword(event.target.value)}
-                  placeholder="Enter previous account password"
-                />
-              )}
-
-              {needsNewPassword ? (
-                <Input
-                  id="private-writing-new-account-password"
-                  type="password"
-                  label="New account password"
-                  autoComplete="current-password"
-                  value={newAccountPassword}
-                  onChange={(event) => setNewAccountPassword(event.target.value)}
-                  placeholder="Enter your new account password"
-                />
-              ) : (
-                <p className="rounded-xl border border-green/20 bg-green/5 p-3 text-sm font-semibold text-gray-text">
-                  We can use the new account password you just created. It will not be stored.
-                </p>
-              )}
-
-              <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-                <Button type="button" variant="secondary" onClick={() => navigate(RoutePath.ACCOUNT)}>
-                  Later
-                </Button>
-                <Button type="submit" variant="primary" isLoading={isSubmitting} disabled={!canSubmit}>
-                  Recover private writing
-                </Button>
-              </div>
-            </form>
-          </div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <Button type="button" variant="secondary" onClick={() => navigate(RoutePath.ACCOUNT)}>
+                Later
+              </Button>
+              <Button type="submit" variant="primary" isLoading={isSubmitting} disabled={!canSubmit}>
+                Recover private writing
+              </Button>
+            </div>
+          </form>
         </Surface>
       </div>
-    </div>
+    </PageContainer>
   );
 };

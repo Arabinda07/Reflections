@@ -30,8 +30,8 @@ describe('surgical route and landing contract', () => {
 
     expect(createNote).toContain('const showEntryExperience = loading || !entryAnimationComplete;');
     expect(createNote).toContain('CREATE_NOTE_ENTRY_ANIMATION_FALLBACK_MS = 3600');
-    expect(createNote).toContain('<TrailLoadingMark loop={false} onComplete={() => setEntryAnimationComplete(true)} />');
-    expect(createNote).toContain('if (showEntryExperience) {');
+    expect(createNote).toContain('<TrailLoadingMark loop={true} />');
+    expect(createNote).toContain('overlayMounted');
     expect(createNote).not.toContain('const [isBreathing');
     expect(createNote).not.toContain('setIsBreathing');
     expect(createNote).not.toContain('<OverlayFeedback isVisible={loading || isBreathing}');

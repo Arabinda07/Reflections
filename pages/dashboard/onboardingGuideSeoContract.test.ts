@@ -155,9 +155,9 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
     expect(faq).toContain('Who is Reflections for?');
     expect(faq).toContain('Why writing first?');
     expect(publicSeoCopy).toContain('What is Reflections?');
-    expect(publicSeoCopy).toContain('Reflections FAQ - Journaling, AI, Privacy, and Pricing');
+    expect(publicSeoCopy).toContain('Reflections FAQ - Personal Diary, AI, Privacy, and Pricing');
     expect(publicSeoCopy).toContain(
-      'Reflections is a private journal for writing notes, naming moods, adding tags, and noticing patterns over time.',
+      'Reflections is a private personal diary. It helps you write down daily notes, remember to stay in touch with friends and family, and notice patterns over time.',
     );
     expect(faq).toContain('robinsaha434@gmail.com');
     expect(faq).not.toContain('What does Reflections do?');

@@ -21,6 +21,7 @@ export interface SidebarNavItem {
   path: string;
   icon: React.ElementType;
   description: string;
+  requireMode?: 'reflective' | 'encrypted';
 }
 
 interface MobileSidebarProps {

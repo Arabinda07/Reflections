@@ -9,6 +9,9 @@ interface StorageImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   showLoading?: boolean;
 }
 
+const isDirectSrc = (path?: string | null): path is string =>
+  !!path && (path.startsWith('http') || path.startsWith('blob:') || path.startsWith('data:'));
+
 export const StorageImage: React.FC<StorageImageProps> = ({ 
   path, 
   fallbackSrc,
@@ -19,6 +22,34 @@ export const StorageImage: React.FC<StorageImageProps> = ({
 }) => {
   const [src, setSrc] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [node, setNode] = useState<HTMLElement | null>(null);
+  // Signed URLs are only worth fetching once the image approaches the viewport.
+  // Direct URLs (avatars, blob previews) never need signing, so they load eagerly.
+  const needsSigning = !!path && !isDirectSrc(path);
+  const [isInView, setIsInView] = useState(!needsSigning);
+
+  useEffect(() => {
+    setIsInView(!needsSigning);
+  }, [needsSigning, path]);
+
+  useEffect(() => {
+    if (isInView || !node) return;
+    if (typeof IntersectionObserver === 'undefined') {
+      setIsInView(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setIsInView(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '200px' },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [node, isInView]);
 
   useEffect(() => {
     let isMounted = true;
@@ -33,11 +64,14 @@ export const StorageImage: React.FC<StorageImageProps> = ({
       }
       
       // If it's already a full URL (e.g. Google avatar or blob preview)
-      if (path.startsWith('http') || path.startsWith('blob:') || path.startsWith('data:')) {
+      if (isDirectSrc(path)) {
         setSrc(path);
         setLoading(false);
         return;
       }
+
+      // Hold the placeholder until the element is near the viewport.
+      if (!isInView) return;
 
       try {
         const url = await storageService.getSignedUrl(path);
@@ -60,11 +94,14 @@ export const StorageImage: React.FC<StorageImageProps> = ({
       isMounted = false;
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
-  }, [path, fallbackSrc]);
+  }, [path, fallbackSrc, isInView]);
 
   if (loading && showLoading) {
     return (
-      <div className={`surface-inline-panel flex items-center justify-center rounded-none border-0 ${className}`}>
+      <div
+        ref={setNode}
+        className={`surface-inline-panel flex items-center justify-center rounded-none border-0 ${className}`}
+      >
         <CircleNotch className="animate-spin text-gray-nav" size={20} weight="bold" />
       </div>
     );
@@ -72,7 +109,10 @@ export const StorageImage: React.FC<StorageImageProps> = ({
 
   if (!src) {
      return (
-       <div className={`surface-inline-panel flex items-center justify-center rounded-none border-0 text-gray-nav ${className}`}>
+       <div
+         ref={setNode}
+         className={`surface-inline-panel flex items-center justify-center rounded-none border-0 text-gray-nav ${className}`}
+       >
          <ImageSquare size={24} weight="duotone" />
        </div>
      );

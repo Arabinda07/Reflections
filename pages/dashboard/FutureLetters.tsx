@@ -3,16 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
 import { CalendarBlank } from '@phosphor-icons/react/CalendarBlank';
 import { EnvelopeOpen } from '@phosphor-icons/react/EnvelopeOpen';
+import { EnvelopeSimple } from '@phosphor-icons/react/EnvelopeSimple';
 import { LockKey } from '@phosphor-icons/react/LockKey';
+import { Hourglass } from '@phosphor-icons/react/Hourglass';
 import ReactCalendar from 'react-calendar';
 import './react-calendar.css';
 import './Calendar.css';
 import { format } from 'date-fns';
 import { Button } from '../../components/ui/Button';
+import { Chip } from '../../components/ui/Chip';
 import { CompletionCardActions } from '../../components/ui/CompletionCardActions';
+import { EmptyState } from '../../components/ui/EmptyState';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { SectionHeader } from '../../components/ui/SectionHeader';
+import { Skeleton } from '../../components/ui/Skeleton';
 import { Surface } from '../../components/ui/Surface';
 import { buildCompletionCardPayload, type CompletionCardPayload } from '../../services/completionCardPayload';
 import {
@@ -175,31 +180,34 @@ export const FutureLetters: React.FC = () => {
 
   return (
     <>
-      <PageContainer size="wide" className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10">
+      <PageContainer className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10">
         <div className="core-page-stack">
           <button
             onClick={() => navigate(RoutePath.DASHBOARD)}
-            className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-green/10 hover:text-green"
+            className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-[var(--surface-current-soft-bg)] hover:text-[var(--surface-current-accent)]"
             aria-label="Back to home"
           >
             <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
             <span>Back</span>
           </button>
 
-          <SectionHeader title="Write a letter to yourself" />
+          <SectionHeader
+            title="Write a letter to your future self"
+            description="Write down your thoughts, memories, or a message today. We will keep it safe and locked. It will open only on the day you choose."
+          />
 
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
-            <Surface variant="flat" tone="paper" className="rounded-[2.5rem]">
+          <div className="grid gap-6 items-start lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
+            <Surface variant="flat" tone="paper" className="rounded-[2rem]">
               <form onSubmit={handleSchedule} className="space-y-6 p-6 sm:p-8">
                 <div className="space-y-2">
                   <label htmlFor="future-letter-title" className="label-caps text-gray-nav">
-                    Title
+                    Letter name
                   </label>
                   <input
                     id="future-letter-title"
                     value={title}
                     onChange={(event) => setTitle(event.target.value)}
-                    placeholder="A title for later"
+                    placeholder="Give this letter a name (e.g., Message for my 30th birthday)"
                     className="input-surface dashboard-field-text h-12 w-full px-4"
                   />
                 </div>
@@ -212,28 +220,23 @@ export const FutureLetters: React.FC = () => {
                     id="future-letter-content"
                     value={content}
                     onChange={(event) => setContent(event.target.value)}
-                    placeholder="Write what you want a future day to hold."
+                    placeholder="Write about your day, a hope, or a message to yourself."
                     className="input-surface dashboard-letter-text min-h-[320px] w-full resize-none rounded-[22px] p-5 placeholder:text-gray-nav/35"
                   />
                 </div>
 
                 <fieldset className="space-y-3">
                   <legend className="label-caps mb-3 text-gray-nav">Open date</legend>
-                  <div className="grid gap-2 sm:grid-cols-5">
+                  <div className="flex flex-wrap gap-2">
                     {DATE_OPTIONS.map((option) => (
-                      <button
+                      <Chip
                         key={option.id}
-                        type="button"
-                        onClick={() => setSelectedOption(option.id)}
+                        active={selectedOption === option.id}
                         aria-pressed={selectedOption === option.id}
-                        className={`dashboard-caption min-h-11 rounded-[var(--radius-control)] border px-3 transition-colors ${
-                          selectedOption === option.id
-                            ? 'border-green/30 bg-green/10 text-green'
-                            : 'control-surface text-gray-nav hover:border-green/20 hover:text-green'
-                        }`}
+                        onClick={() => setSelectedOption(option.id)}
                       >
                         {option.label}
-                      </button>
+                      </Chip>
                     ))}
                   </div>
                   {selectedOption === 'custom' ? (
@@ -268,11 +271,11 @@ export const FutureLetters: React.FC = () => {
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <p className="dashboard-supporting-text">
                     {isOpenDateValid
-                      ? `This letter opens on ${formatLongDateUTC(openDate)}.`
-                      : 'Choose an open date before scheduling.'}
+                      ? `This letter will stay locked until ${formatLongDateUTC(openDate)}.`
+                      : 'Choose a date when this letter should open.'}
                   </p>
                   <Button type="submit" disabled={!content.trim() || !isOpenDateValid} isLoading={isScheduling} className="w-full sm:w-auto">
-                    Schedule letter
+                    Lock and save letter
                   </Button>
                 </div>
 
@@ -280,15 +283,15 @@ export const FutureLetters: React.FC = () => {
               </form>
             </Surface>
 
-            <Surface variant="bezel" tone="sage" className="rounded-[2.5rem] overflow-hidden">
+            <Surface variant="bezel" tone="sage" className="rounded-[2rem] overflow-hidden">
               <div className="space-y-5 p-6 sm:p-8">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <h2 className="dashboard-card-title-lg">
-                      Waiting to open
+                      Letters waiting to open
                     </h2>
                   </div>
-                  <CalendarBlank size={26} weight="duotone" className="text-green" />
+                  <Hourglass size={26} weight="duotone" className="text-[var(--surface-current-accent)]" />
                 </div>
 
                 {error ? (
@@ -301,11 +304,18 @@ export const FutureLetters: React.FC = () => {
                 ) : null}
 
                 {isLoading ? (
-                  <p className="dashboard-supporting-text">Loading letters...</p>
+                  <div className="space-y-3" aria-label="Loading letters">
+                    <Skeleton variant="text" className="h-5 w-3/4" />
+                    <Skeleton variant="card" className="h-28" />
+                    <Skeleton variant="card" className="h-28" />
+                  </div>
                 ) : letters.length === 0 ? (
-                  <p className="dashboard-supporting-text">
-                    No letters yet. Write one when there is something you want to return to later.
-                  </p>
+                  <EmptyState
+                    surface="none"
+                    icon={<EnvelopeSimple size={32} weight="duotone" className="text-[var(--surface-current-accent)]/60" />}
+                    title="No letters locked yet"
+                    description="Write a letter today to remember a special feeling, a lesson, or a dream. It will open only when the time is right."
+                  />
                 ) : (
                     <div className="space-y-4">
                       {letters.map((letter) => {
@@ -316,7 +326,7 @@ export const FutureLetters: React.FC = () => {
                         return (
                           <div
                             key={letter.id}
-                            className="group relative surface-inline-panel dashboard-tone-card overflow-hidden rounded-3xl p-5 transition-[border-color,box-shadow] duration-300 hover:shadow-lg"
+                            className={`group relative surface-inline-panel dashboard-tone-card overflow-hidden rounded-3xl p-5 transition-[border-color,box-shadow,transform] duration-300 hover:shadow-lg ${shakeLetterId === letter.id ? 'animate-shake-x' : ''}`}
                           >
                             <div className="relative z-10">
                               <div className="mb-4 flex items-start justify-between gap-3">
@@ -328,15 +338,6 @@ export const FutureLetters: React.FC = () => {
                                     Opens {formatLongDateUTC(letter.openAt)}
                                   </p>
                                 </div>
-                                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform duration-500 group-hover:scale-110 ${isLocked ? '[background-color:oklch(from_var(--bg-color)_l_c_h_/_0.5)] text-gray-nav' : 'bg-green/10 text-green group-hover:rotate-12'}`}>
-                                  {isLocked ? (
-                                    <div className={shakeLetterId === letter.id ? 'animate-shake-x' : ''}>
-                                      <LockKey size={20} weight="duotone" />
-                                    </div>
-                                  ) : (
-                                    <EnvelopeOpen size={20} weight="duotone" />
-                                  )}
-                                </div>
                               </div>
                               <Button
                                 type="button"
@@ -345,7 +346,7 @@ export const FutureLetters: React.FC = () => {
                                 disabled={Boolean(openingLetterId)}
                                 isLoading={isOpening}
                                 onClick={() => handleOpenLetter(letter)}
-                                className={`min-h-11 w-full rounded-2xl font-bold transition-[background-color,border-color,color,opacity] ${isLocked ? 'opacity-60' : 'group-hover:bg-green group-hover:text-white group-hover:border-transparent'}`}
+                                className={`min-h-11 w-full sm:w-auto px-6 font-bold transition-[background-color,border-color,color,opacity] ${isLocked ? 'opacity-60' : 'group-hover:bg-[var(--surface-current-accent)] group-hover:text-white group-hover:border-transparent'}`}
                                 aria-label={
                                   isOpening
                                     ? `Opening ${letter.title}`

@@ -8,6 +8,7 @@ import { Heart } from '@phosphor-icons/react/Heart';
 import { ListChecks } from '@phosphor-icons/react/ListChecks';
 import { Plus } from '@phosphor-icons/react/Plus';
 import { Target } from '@phosphor-icons/react/Target';
+import { Wind } from '@phosphor-icons/react/Wind';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -54,7 +55,7 @@ const HOME_HERO_EXIT_MS = 650;
 const HOME_HERO_DRAG_DISMISS_THRESHOLD = 48;
 const HOME_HERO_SCROLL_DISMISS_THRESHOLD = 32;
 const HOME_HERO_VIDEO_LOAD_DELAY_MS = 1200;
-const HOME_HERO_SEEN_SESSION_KEY = 'home_hero_intro_seen';
+const HOME_HERO_SEEN_STORAGE_KEY = 'home_hero_intro_seen';
 
 const getInitialHomeHeroIntroState = (): HomeHeroIntroState => {
   if (typeof window === 'undefined') {
@@ -62,7 +63,8 @@ const getInitialHomeHeroIntroState = (): HomeHeroIntroState => {
   }
 
   try {
-    return window.sessionStorage.getItem(HOME_HERO_SEEN_SESSION_KEY) === 'true'
+    // Persist across sessions so return visits load straight into the dashboard.
+    return window.localStorage.getItem(HOME_HERO_SEEN_STORAGE_KEY) === 'true'
       ? 'gone'
       : 'visible';
   } catch {
@@ -76,9 +78,9 @@ const rememberHomeHeroIntroSeen = () => {
   }
 
   try {
-    window.sessionStorage.setItem(HOME_HERO_SEEN_SESSION_KEY, 'true');
+    window.localStorage.setItem(HOME_HERO_SEEN_STORAGE_KEY, 'true');
   } catch {
-    // The dashboard still opens if session storage is unavailable.
+    // The dashboard still opens if local storage is unavailable.
   }
 };
 
@@ -652,10 +654,10 @@ export const HomeAuthenticated: React.FC = () => {
                         activeButtonClassName="border-green/25 bg-green/20"
                       />
                     </div>
-                    <div className="flex flex-row items-center justify-start gap-8 pb-2">
+                    <div className="flex flex-row flex-wrap items-center justify-start gap-8 pb-2">
                       <button
                         onClick={() => setIsCheckInOpen(true)}
-                        className="group inline-flex items-center gap-2 text-sm font-bold text-gray-nav transition-colors hover:text-green"
+                        className="group inline-flex min-h-11 items-center gap-2 py-2 text-sm font-bold text-gray-nav transition-colors hover:text-green rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
                         aria-label="Save a quick mood check-in"
                       >
                         <Heart size={18} weight="duotone" className="text-green/80 transition-transform group-hover:scale-110" />
@@ -663,11 +665,19 @@ export const HomeAuthenticated: React.FC = () => {
                       </button>
                       <button
                         onClick={() => navigate(RoutePath.FUTURE_LETTERS)}
-                        className="group inline-flex items-center gap-2 text-sm font-bold text-gray-nav transition-colors hover:text-green"
+                        className="group inline-flex min-h-11 items-center gap-2 py-2 text-sm font-bold text-gray-nav transition-colors hover:text-green rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
                         aria-label="Write a future letter"
                       >
                         <EnvelopeSimple size={18} weight="duotone" className="text-green/80 transition-transform group-hover:scale-110" />
                         <span>Future letter</span>
+                      </button>
+                      <button
+                        onClick={() => navigate(RoutePath.RELEASE)}
+                        className="group inline-flex min-h-11 items-center gap-2 py-2 text-sm font-bold text-gray-nav transition-colors hover:text-green rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
+                        aria-label="Release a thought"
+                      >
+                        <Wind size={18} weight="duotone" className="text-green/80 transition-transform group-hover:scale-110" />
+                        <span>Release a thought</span>
                       </button>
                     </div>
                   </div>
@@ -929,6 +939,7 @@ export const HomeAuthenticated: React.FC = () => {
                   value={newTaskText}
                   onChange={(e) => setNewTaskText(e.target.value)}
                   placeholder="What needs to be done?"
+                  aria-label="Add an intention"
                   disabled={isCreatingTask}
                   className="intention-entry-input"
                 />

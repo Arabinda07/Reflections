@@ -16,6 +16,10 @@ vi.mock('../src/supabaseClient', () => ({
   },
 }));
 
+vi.mock('./userModeStore', () => ({
+  getCurrentUserMode: () => 'encrypted',
+}));
+
 const mockFrom = vi.mocked(supabase.storage.from);
 const mockGetUser = vi.mocked(supabase.auth.getUser);
 
@@ -127,6 +131,21 @@ describe('storageService upload hardening', () => {
 
     fetchSpy.mockRestore();
     createObjectUrl.mockRestore();
+  });
+
+  it('returns plaintext note attachments directly without attempting decryption', async () => {
+    setCurrentCryptoSession(null);
+    const path = 'user-1/notes/note-1/photo.jpg';
+    const createSignedUrl = vi
+      .fn()
+      .mockResolvedValue({ data: { signedUrl: 'https://signed-plaintext' }, error: null });
+    mockFrom.mockReturnValue({ createSignedUrl } as any);
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+
+    await expect(storageService.getSignedUrl(path)).resolves.toBe('https://signed-plaintext');
+    expect(fetchSpy).not.toHaveBeenCalled();
+
+    fetchSpy.mockRestore();
   });
 
   it('paginates user-prefix deletion beyond the first 1000 storage objects', async () => {

@@ -7,6 +7,12 @@ import { CompletionCardPreview } from './CompletionCardPreview';
 import type { CompletionCardPayload } from '../../services/completionCardPayload';
 import { ritualEventService } from '../../services/ritualService';
 
+const TONE_MAP: Record<string, string> = {
+  release_completed: 'clay',
+  letter_scheduled: 'honey',
+  weekly_recap: 'sage',
+};
+
 interface CompletionCardActionsProps {
   payload: CompletionCardPayload;
   className?: string;
@@ -18,6 +24,7 @@ export const CompletionCardActions: React.FC<CompletionCardActionsProps> = ({
   payload,
   className = '',
 }) => {
+  const tone = TONE_MAP[payload.kind] || 'honey';
   const [status, setStatus] = useState<string | null>(null);
   const [isWorking, setIsWorking] = useState(false);
   const isErrorStatus = status?.startsWith('I could not') ?? false;
@@ -100,10 +107,10 @@ export const CompletionCardActions: React.FC<CompletionCardActionsProps> = ({
 
   return (
     <div
-      className={`surface-inline-panel surface-tone-honey p-5 ${className}`.trim()}
+      className={`surface-inline-panel surface-tone-${tone} p-5 ${className}`.trim()}
     >
       <div className="mb-4">
-        <p className="text-ui-xs font-display font-extrabold uppercase tracking-widest text-honey">
+        <p className="text-ui-xs font-display font-extrabold uppercase tracking-widest text-[var(--surface-current-accent)]">
           Completion card
         </p>
       </div>

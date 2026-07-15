@@ -1,9 +1,31 @@
+import { Anchor } from '@phosphor-icons/react/Anchor';
+import { BatteryEmpty } from '@phosphor-icons/react/BatteryEmpty';
+import { Bed } from '@phosphor-icons/react/Bed';
+import { Brain } from '@phosphor-icons/react/Brain';
 import { Cloud } from '@phosphor-icons/react/Cloud';
+import { CloudRain } from '@phosphor-icons/react/CloudRain';
+import { Drop } from '@phosphor-icons/react/Drop';
+import { EyeClosed } from '@phosphor-icons/react/EyeClosed';
+import { Flame } from '@phosphor-icons/react/Flame';
+import { SmileyAngry } from '@phosphor-icons/react/SmileyAngry';
+import { HandPalm } from '@phosphor-icons/react/HandPalm';
+import { Heart } from '@phosphor-icons/react/Heart';
+import { Leaf } from '@phosphor-icons/react/Leaf';
 import { Lightning } from '@phosphor-icons/react/Lightning';
 import { Moon } from '@phosphor-icons/react/Moon';
+import { Question } from '@phosphor-icons/react/Question';
+import { Shield } from '@phosphor-icons/react/Shield';
 import { Smiley } from '@phosphor-icons/react/Smiley';
+import { SmileyBlank } from '@phosphor-icons/react/SmileyBlank';
 import { SmileySad } from '@phosphor-icons/react/SmileySad';
+import { SmileyWink } from '@phosphor-icons/react/SmileyWink';
+import { Sparkle } from '@phosphor-icons/react/Sparkle';
 import { Sun } from '@phosphor-icons/react/Sun';
+import { SunHorizon } from '@phosphor-icons/react/SunHorizon';
+import { Tornado } from '@phosphor-icons/react/Tornado';
+import { User } from '@phosphor-icons/react/User';
+import { WarningCircle } from '@phosphor-icons/react/WarningCircle';
+import { Wind } from '@phosphor-icons/react/Wind';
 import type { Icon as PhosphorIcon } from '@phosphor-icons/react/lib';
 
 export const MOOD_OPTIONS = [
@@ -120,6 +142,15 @@ const TONE_CLASSES = {
     trackClass: 'bg-mood-tired/10',
     fillClass: 'bg-mood-tired',
   },
+  mixed: {
+    nav: 'bg-mood-mixed/10 border-mood-mixed/20 text-mood-mixed',
+    modal: 'border-mood-mixed bg-mood-mixed/10 text-mood-mixed',
+    option: 'control-surface text-gray-text hover:border-mood-mixed/30 hover:bg-mood-mixed/5 hover:text-mood-mixed',
+    selectedOption: 'border-mood-mixed/40 bg-mood-mixed/10 text-mood-mixed',
+    labelClass: 'text-mood-mixed',
+    trackClass: 'bg-mood-mixed/10',
+    fillClass: 'bg-mood-mixed',
+  },
 } as const;
 
 const mood = (label: string, icon: PhosphorIcon, tone: keyof typeof TONE_CLASSES): MoodConfig => ({
@@ -129,66 +160,66 @@ const mood = (label: string, icon: PhosphorIcon, tone: keyof typeof TONE_CLASSES
 });
 
 export const MOOD_CONFIG: Record<MoodValue, MoodConfig> = {
-  light: mood('Light', Smiley, 'happy'),
-  steady: mood('Steady', Sun, 'calm'),
-  charged: mood('Charged', Lightning, 'anxious'),
-  heavy: mood('Heavy', Moon, 'sad'),
-  happy: mood('Happy', Smiley, 'happy'),
-  glad: mood('Glad', Smiley, 'happy'),
-  sparked: mood('Sparked', Lightning, 'happy'),
-  calm: mood('Calm', Sun, 'calm'),
-  settled: mood('Settled', Sun, 'calm'),
-  spacious: mood('Spacious', Cloud, 'calm'),
-  anxious: mood('Anxious', Cloud, 'anxious'),
-  wired: mood('Wired', Lightning, 'anxious'),
-  overthinking: mood('Overthinking', Cloud, 'anxious'),
-  sad: mood('Sad', SmileySad, 'sad'),
-  lonely: mood('Lonely', Moon, 'sad'),
-  tender: mood('Tender', SmileySad, 'sad'),
-  angry: mood('Angry', Lightning, 'angry'),
-  irritated: mood('Irritated', Lightning, 'angry'),
-  done: mood('Done', Lightning, 'angry'),
-  tired: mood('Tired', Moon, 'tired'),
-  drained: mood('Drained', Moon, 'tired'),
-  foggy: mood('Foggy', Cloud, 'tired'),
-  mixed: mood('Mixed', Cloud, 'anxious'),
-  raw: mood('Raw', SmileySad, 'sad'),
-  numb: mood('Numb', Moon, 'tired'),
+  light: mood('Happy', Smiley, 'happy'),
+  steady: mood('Calm', Sun, 'calm'),
+  charged: mood('Stressed', Lightning, 'anxious'),
+  heavy: mood('Sad', Moon, 'sad'),
+  happy: mood('Cheerful', SmileyWink, 'happy'),
+  glad: mood('Content', Heart, 'happy'),
+  sparked: mood('Excited', Sparkle, 'happy'),
+  calm: mood('Relaxed', Wind, 'calm'),
+  settled: mood('Peaceful', Anchor, 'calm'),
+  spacious: mood('Clear', Leaf, 'calm'),
+  anxious: mood('Anxious', WarningCircle, 'anxious'),
+  wired: mood('Overwhelmed', Tornado, 'anxious'),
+  overthinking: mood('Worrying', Brain, 'anxious'),
+  sad: mood('Down', SmileySad, 'sad'),
+  lonely: mood('Lonely', User, 'sad'),
+  tender: mood('Vulnerable', Shield, 'sad'),
+  angry: mood('Angry', Flame, 'angry'),
+  irritated: mood('Frustrated', SmileyAngry, 'angry'),
+  done: mood('Annoyed', HandPalm, 'angry'),
+  tired: mood('Tired', Bed, 'tired'),
+  drained: mood('Exhausted', BatteryEmpty, 'tired'),
+  foggy: mood('Unfocused', EyeClosed, 'tired'),
+  mixed: mood('Mixed', Cloud, 'mixed'),
+  raw: mood('Sensitive', Drop, 'mixed'),
+  numb: mood('Blank', SmileyBlank, 'mixed'),
 };
 
 export const MOOD_PICKER_GROUPS: readonly MoodGroup[] = [
   {
     id: 'light',
-    label: 'Light',
-    helper: 'Good, bright, or a little more alive.',
+    label: 'Happy',
+    helper: 'Feeling good, positive, or excited.',
     icon: Smiley,
     options: ['happy', 'sparked'],
   },
   {
     id: 'steady',
-    label: 'Steady',
-    helper: 'Calmer, clearer, or more spacious.',
+    label: 'Calm',
+    helper: 'Feeling peaceful, relaxed, or clear.',
     icon: Sun,
     options: ['calm', 'spacious'],
   },
   {
     id: 'charged',
-    label: 'Charged',
-    helper: 'Restless, wired, angry, or overfull.',
+    label: 'Stressed',
+    helper: 'Feeling worried, overwhelmed, or angry.',
     icon: Lightning,
     options: ['anxious', 'wired', 'angry'],
   },
   {
     id: 'heavy',
-    label: 'Heavy',
-    helper: 'Sad, tired, tender, or low on room.',
+    label: 'Sad',
+    helper: 'Feeling down, lonely, or exhausted.',
     icon: Moon,
     options: ['sad', 'tired', 'drained'],
   },
   {
     id: 'mixed',
     label: 'Mixed',
-    helper: 'Hard to name, layered, or in-between.',
+    helper: 'Feeling confused, unsure, or in-between.',
     icon: Cloud,
     options: ['raw', 'numb'],
   },

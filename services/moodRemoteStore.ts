@@ -2,6 +2,7 @@ import { supabase } from '../src/supabaseClient';
 import type { MoodCheckin } from '../types';
 import type { EncryptedEnvelope } from './cryptoService';
 import { decryptEnvelope, encryptedColumns, rowAad } from './encryptedPayload';
+import { getCurrentUserMode } from './userModeStore';
 
 export interface SupabaseMoodCheckinRow {
   id: string;
@@ -43,16 +44,21 @@ const mapEncryptedMoodCheckin = async (data: SupabaseMoodCheckinRow): Promise<Mo
 export const moodRemoteStore = {
   insert: async (userId: string, mood: string, label?: string, source?: string): Promise<MoodCheckin> => {
     const id = crypto.randomUUID();
+    const dbRow =
+      getCurrentUserMode() === 'reflective'
+        ? { id, user_id: userId, mood, label: label ?? null, source: source ?? null }
+        : {
+            id,
+            user_id: userId,
+            mood: null,
+            label: null,
+            source: null,
+            ...(await encryptedColumns({ mood, label, source }, moodAad(userId, id))),
+          };
+
     const { data, error } = await supabase
       .from('mood_checkins')
-      .insert({
-        id,
-        user_id: userId,
-        mood: null,
-        label: null,
-        source: null,
-        ...(await encryptedColumns({ mood, label, source }, moodAad(userId, id))),
-      })
+      .insert(dbRow)
       .select()
       .single();
 

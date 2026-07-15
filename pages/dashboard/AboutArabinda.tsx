@@ -16,24 +16,14 @@ const ABOUT_SEO = PUBLIC_SEO_COPY.about;
 
 const sections: AboutSection[] = [
   {
-    title: 'The pace around us',
-    icon: 'feather',
-    body: 'I keep thinking about how quickly ordinary life moves now. Work, reels, episodes, messages, family expectations, the whole thing. Even rest can start feeling like another tab you forgot to close. Reflections is my attempt at a slower counterweight.',
+    title: 'Our minds are always busy',
+    icon: 'pen',
+    body: 'Between office work, Instagram reels, WhatsApp chats, and family, our brains never get a break. Even when we try to rest, we are still thinking about the next thing. Reflections is my small attempt to help you pause and clear that mental clutter.',
   },
   {
-    title: 'Why writing helps',
-    icon: 'feather',
-    body: 'Therapy can help, and for many people it is the right support. It is also too expensive for a lot of us. Reflections is not a replacement for trained professionals. It is smaller and more ordinary: write it down before it becomes your whole personality.',
-  },
-  {
-    title: 'Private writing',
-    icon: 'lock',
-    body: 'I built Reflections to help writing stay private and ordinary. Your notes are yours. You can export them when you want. Write for 2 minutes before bed, add music if it helps, keep a small rhythm if you like, or restart whenever life gets crowded again.',
-  },
-  {
-    title: 'AI that waits',
+    title: 'Write it down to let it go',
     icon: 'sparkle',
-    body: 'AI should wait until you invite it. When it does appear, the job is simple: read carefully, reflect gently, and never act like it knows your life better than you do.',
+    body: 'Therapy is helpful, but it is too expensive or hard to find for many of us. Reflections is not a replacement for professional therapy. It is just a simple, everyday tool. When you write a thought down, it stops spinning in your head and taking over your day.',
   },
 ];
 
@@ -56,7 +46,7 @@ export const AboutArabinda: React.FC = () => {
             <span className="font-serif italic font-normal text-green">Arabinda</span>
           </>
         }
-        updated="May 2026"
+        updated="July 2026"
         media={
           <div className="aspect-[4/5] overflow-hidden rounded-[2rem] shadow-sm">
             <img
@@ -70,19 +60,19 @@ export const AboutArabinda: React.FC = () => {
         intro={
           <>
             <p className="max-w-[55ch] text-xl font-serif italic leading-relaxed text-gray-text">
-              Reflections began as a reminder to slow down before the day ends.
+              Tired of keeping everything in your head? This app might just be for you.
             </p>
             <p className="max-w-[55ch] font-sans text-ui-base leading-relaxed text-gray-light">
-              {'I made this app because a lot of us are carrying full days, full phones, and full heads. I wanted one private place to check in, write something down, and leave without being pushed to perform.'}
+              We all try to juggle too many things—tasks, random ideas, errands, and worries. It clogs up our brain and makes it hard to focus on what actually matters right now.
             </p>
             <p className="max-w-[55ch] font-sans text-ui-base leading-relaxed text-gray-light">
-              Thank you for trusting me with a few minutes of your day.
+              And when you open your phone to quickly write something down, you see a dozen notifications. Before you know it, you are distracted, and you have forgotten what you wanted to do in the first place.
             </p>
           </>
         }
       />
 
-      <div className="space-y-3">
+      <div className="space-y-3 mt-12">
         {sections.map((section) => (
           <section
             key={section.title}

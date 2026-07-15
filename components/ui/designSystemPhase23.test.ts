@@ -163,7 +163,7 @@ describe('phase 2/3 design-system rollout', () => {
     expect(dashboardLayout).toContain('`${routeSurfaceScopeClass} page-wash');
     expect(surfaceScope).toContain("[RoutePath.FAQ]: 'surface-scope-sky'");
     expect(surfaceScope).toContain("[RoutePath.INSIGHTS]: 'surface-scope-sky'");
-    expect(surfaceScope).toContain("[RoutePath.FUTURE_LETTERS]: 'surface-scope-honey'");
+    expect(surfaceScope).toContain("[RoutePath.FUTURE_LETTERS]: 'surface-scope-sage'");
     expect(surfaceScope).toContain("[RoutePath.RELEASE]: 'surface-scope-clay'");
     expect(surfaceScope).toContain("[RoutePath.ACCOUNT]: 'surface-scope-paper'");
     expect(landing).toContain('surface-scope-sage page-wash');
@@ -172,7 +172,7 @@ describe('phase 2/3 design-system rollout', () => {
     expect(createNote).toContain('page-wash');
     expect(singleNote).toContain('surface-scope-paper page-wash');
     expect(releaseMode).toContain('surface-scope-clay page-wash');
-    expect(futureLetters).toContain('surface-scope-honey page-wash');
+    expect(futureLetters).toContain('surface-scope-sage page-wash');
     expect(insights).toContain('surface-scope-sky page-wash');
     expect(lifeWiki).toContain('surface-scope-sage page-wash');
     expect(account).toContain('surface-scope-paper page-wash');

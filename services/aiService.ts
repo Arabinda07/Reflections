@@ -7,6 +7,7 @@ import { buildNotesCorpus, getSignalNotes, type NotesCorpus } from './aiContext'
 import { WIKI_PAGE_CONFIGS } from './aiPromptSpecs';
 import { buildWikiRetryInstruction, validateWikiPageOutput } from './aiOutputValidation';
 import { getStrictPrivateModeDisabledMessage, isPrivateAiDisabled } from './privateMode';
+import { getCurrentUserMode } from './userModeStore';
 
 export type WikiRefreshSource = 'themes' | 'notes' | 'none';
 
@@ -110,7 +111,7 @@ export const aiService = {
    * or update Life Wiki themes from a note.
    */
   processNoteIntoWiki: async (newNote: Note): Promise<void> => {
-    if (isPrivateAiDisabled()) return;
+    if (isPrivateAiDisabled(getCurrentUserMode())) return;
 
     const userThemes = await wikiService.getUserThemes();
 
@@ -174,7 +175,7 @@ export const aiService = {
    * wiki pages plus the note itself.
    */
   generateReflection: async (note: Note): Promise<string> => {
-    if (isPrivateAiDisabled()) {
+    if (isPrivateAiDisabled(getCurrentUserMode())) {
       return getStrictPrivateModeDisabledMessage();
     }
 
@@ -200,7 +201,7 @@ export const aiService = {
    * Rebuilds the primary Sanctuary pages directly from the user's saved notes.
    */
   refreshWikiOnDemand: async (notes: Note[]): Promise<WikiRefreshResult> => {
-    if (isPrivateAiDisabled()) {
+    if (isPrivateAiDisabled(getCurrentUserMode())) {
       return {
         pageCount: 0,
         source: 'none',
@@ -230,7 +231,7 @@ export const aiService = {
     notes: Note[],
     options: { onProgress?: (progress: GreatIngestProgress) => void } = {},
   ): Promise<GreatIngestResult> => {
-    if (isPrivateAiDisabled()) {
+    if (isPrivateAiDisabled(getCurrentUserMode())) {
       return {
         batchCount: 0,
         pageCount: 0,
@@ -293,7 +294,7 @@ export const aiService = {
    * editor; the saved note is already durable before this runs.
    */
   autoIngestSavedNote: async (savedNote: Note, notes: Note[] = [savedNote]): Promise<AutoIngestResult> => {
-    if (isPrivateAiDisabled()) {
+    if (isPrivateAiDisabled(getCurrentUserMode())) {
       return {
         pageCount: 0,
         skipped: true,
@@ -326,7 +327,7 @@ export const aiService = {
    * Preserves the older theme-first API for any existing callers.
    */
   refreshWikiSummaries: async (): Promise<void> => {
-    if (isPrivateAiDisabled()) return;
+    if (isPrivateAiDisabled(getCurrentUserMode())) return;
     await aiService.refreshWikiOnDemand([]);
   },
 
@@ -334,7 +335,7 @@ export const aiService = {
    * Rebuilds the `index` wiki page after ingest and refresh flows.
    */
   _rebuildIndex: async (): Promise<void> => {
-    if (isPrivateAiDisabled()) return;
+    if (isPrivateAiDisabled(getCurrentUserMode())) return;
 
     try {
       const [userThemes, wikiPages] = await Promise.all([
@@ -364,7 +365,7 @@ export const aiService = {
    * Generates a fresh set of writing notes (quotes/advice) for the dashboard.
    */
   generateWritingNotes: async (): Promise<{ text: string; author: string }[]> => {
-    if (isPrivateAiDisabled()) return [];
+    if (isPrivateAiDisabled(getCurrentUserMode())) return [];
 
     try {
       const indexPage = await wikiService.getWikiPage('index');
@@ -384,7 +385,7 @@ export const aiService = {
    * Suggests tags for a note based on its content.
    */
   suggestTags: async (content: string): Promise<string[]> => {
-    if (isPrivateAiDisabled()) return [];
+    if (isPrivateAiDisabled(getCurrentUserMode())) return [];
 
     try {
       const tags = await aiClient.requestJson<string[]>('tags', { content });

@@ -21,6 +21,7 @@ import { useToast } from '../../components/ui/Toast';
 import { relationshipService } from '../../services/relationshipService';
 import { relationshipImportService } from '../../services/relationshipImportService';
 import { countMentionedNames } from '../../services/relationshipWikiLink';
+import { useUserMode } from '../../context/UserModeContext';
 import { wikiService } from '../../services/wikiService';
 import type { RelationshipImportInboxItem, RelationshipRecord } from '../../types';
 import { RoutePath } from '../../types';
@@ -40,15 +41,12 @@ export const Relationships: React.FC = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const { showToast } = useToast();
+  const { userMode } = useUserMode();
   const [relationships, setRelationships] = useState<RelationshipRecord[]>([]);
   const [inbox, setInbox] = useState<RelationshipImportInboxItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [draft, setDraft] = useState<Draft>(emptyDraft);
-  const [seedNames, setSeedNames] = useState('');
-  const [isSeeding, setIsSeeding] = useState(false);
-  const [quickName, setQuickName] = useState('');
-  const [isAddingName, setIsAddingName] = useState(false);
   const [hasPendingSync, setHasPendingSync] = useState(false);
   const [peopleWiki, setPeopleWiki] = useState('');
   const [showArchived, setShowArchived] = useState(false);
@@ -119,43 +117,6 @@ export const Relationships: React.FC = () => {
     }
   };
 
-  const addQuickName = async (event: React.FormEvent) => {
-    event.preventDefault();
-    const name = quickName.trim();
-    if (!name) return;
-    setIsAddingName(true);
-    try {
-      const created = await relationshipService.create({ name });
-      setRelationships((current) => [created, ...current]);
-      setHasPendingSync(await relationshipService.hasPendingSync());
-      setQuickName('');
-      // First name added — land on the Weekly nudge (the value), not a second empty state.
-      navigate(RoutePath.RELATIONSHIPS);
-    } catch {
-      showToast("I couldn't add them. Nothing was lost — try again.");
-    } finally {
-      setIsAddingName(false);
-    }
-  };
-
-  const seedRelationships = async (event: React.FormEvent) => {
-    event.preventDefault();
-    const names = seedNames.split(/\r?\n/).map((name) => name.trim()).filter(Boolean).slice(0, 10);
-    if (!names.length) return;
-    setIsSeeding(true);
-    try {
-      const created = await Promise.all(names.map((name) => relationshipService.create({ name, stage: 'active' })));
-      setRelationships((current) => [...created, ...current]);
-      setHasPendingSync(await relationshipService.hasPendingSync());
-      setSeedNames('');
-      showToast(`Added ${created.length} ${created.length === 1 ? 'person' : 'people'}.`);
-    } catch {
-      showToast('Some people could not be added. Existing entries were kept.');
-      await load();
-    } finally {
-      setIsSeeding(false);
-    }
-  };
 
   const archivePerson = async (person: RelationshipRecord) => {
     try {
@@ -218,7 +179,7 @@ export const Relationships: React.FC = () => {
 
   return (
     <>
-      <PageContainer className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10">
+      <PageContainer className="surface-scope-sage page-wash pb-[calc(var(--mobile-bottom-nav-reserved-space)+1rem)] lg:pb-24 pt-6 md:pt-10">
         <div className="core-page-stack">
           <button
             onClick={() => navigate(RoutePath.DASHBOARD)}
@@ -340,10 +301,13 @@ export const Relationships: React.FC = () => {
               )}
 
               {activeTab === 'people' && (
-                <Surface variant="flat" tone="paper" className="p-6 md:p-8">
-                  <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <h2 className="text-3xl font-display font-bold text-gray-text">People library</h2>
-                    <div className="flex flex-wrap gap-2">
+                <Surface variant="flat" tone="sage" className="p-6 md:p-8">
+                  <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <h2 className="text-3xl font-display font-bold text-gray-text">People library</h2>
+                      <p className="mt-2 max-w-xl text-sm font-medium leading-relaxed text-gray-light">Your circle of close relationships, friends, and mentors.</p>
+                    </div>
+                    <div className="flex flex-wrap gap-2 shrink-0">
                       <Button variant="secondary" onClick={() => navigate(`${RoutePath.RELATIONSHIPS}?tab=import`)}>Import<Tray size={16} weight="bold" className="ml-2" /></Button>
                       <Button variant="primary" onClick={() => setIsCreateOpen(true)}>Add<Plus size={16} weight="bold" className="ml-2" /></Button>
                     </div>
@@ -370,30 +334,19 @@ export const Relationships: React.FC = () => {
                       ))}
                     </div>
                   ) : !isLoading ? (
-                    <div className="space-y-6">
-                      <div>
-                        <h3 className="text-2xl font-display font-bold text-gray-text">Never lose touch with someone who matters.</h3>
-                        <p className="mt-2 max-w-prose text-sm font-medium text-gray-light">Add one name. Each week we&rsquo;ll point you toward someone worth a hello.</p>
+                    <div className="py-16 text-center max-w-md mx-auto space-y-5">
+                      <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-xl bg-green/5 text-green">
+                        <User size={24} weight="duotone" />
                       </div>
-                      <form onSubmit={addQuickName} className="space-y-3">
-                        <input
-                          value={quickName}
-                          onChange={(event) => setQuickName(event.target.value)}
-                          placeholder="Add a name…"
-                          aria-label="Add a name"
-                          className="input-surface w-full rounded-xl py-3 px-3.5 text-base font-medium"
-                        />
-                        <Button type="submit" variant="primary" size="sm" isLoading={isAddingName}>Add</Button>
-                      </form>
-                      <details className="group">
-                        <summary className="inline-flex min-h-9 cursor-pointer list-none items-center text-sm font-bold text-gray-nav focus-visible:ring-2 focus-visible:ring-green/30 hover:text-green [&::-webkit-details-marker]:hidden">or paste a few names</summary>
-                        <form onSubmit={seedRelationships} className="mt-3">
-                          <label className="block text-sm font-bold text-gray-nav">One name per line.
-                            <textarea name="seedNames" value={seedNames} onChange={(event) => setSeedNames(event.target.value)} className={`${fieldClass} min-h-32`} placeholder={'Priya Nair\nArjun Mehta\nMeera Iyer'} />
-                          </label>
-                          <Button type="submit" variant="secondary" className="mt-4" isLoading={isSeeding}>Add people</Button>
-                        </form>
-                      </details>
+                      <div className="space-y-2">
+                        <h3 className="text-xl font-display font-bold text-gray-text">Your people library is empty</h3>
+                        <p className="text-sm font-medium text-gray-light leading-relaxed">
+                          Add the people who matter to keep track of your relationships and get weekly reach-out suggestions.
+                        </p>
+                      </div>
+                      <Button variant="primary" className="mt-2" onClick={() => setIsCreateOpen(true)}>
+                        Add your first contact
+                      </Button>
                     </div>
                   ) : null}
 
@@ -454,7 +407,9 @@ export const Relationships: React.FC = () => {
                   </div>
                 </div>
               </Surface>
-              <Surface variant="flat" tone="paper" className="p-6"><div className="flex items-center gap-2"><AddressBook size={18} weight="duotone" className="text-green" /><p className="label-caps text-gray-nav">Life Wiki</p></div><p className="mt-4 text-sm font-medium leading-relaxed text-gray-light">{wikiMentionCount > 0 ? `${wikiMentionCount} of your people ${wikiMentionCount === 1 ? 'appears' : 'appear'} in your People room. Open a profile to see what you've written and turn it into a reason to reach out.` : "Your People room holds what you've written about people. Names that match your relationships show up on their profiles."}</p><Link to={RoutePath.SANCTUARY_ARTICLE.replace(':pageType', 'people')} className="mt-5 inline-flex items-center gap-1 text-sm font-bold text-green hover:text-green-hover transition-colors"><span>Open People room</span><ArrowUpRight size={14} weight="bold" /></Link></Surface>
+              {userMode !== 'encrypted' && (
+                <Surface variant="flat" tone="paper" className="p-6"><div className="flex items-center gap-2"><AddressBook size={18} weight="duotone" className="text-green" /><p className="label-caps text-gray-nav">Life Wiki</p></div><p className="mt-4 text-sm font-medium leading-relaxed text-gray-light">{wikiMentionCount > 0 ? `${wikiMentionCount} of your people ${wikiMentionCount === 1 ? 'appears' : 'appear'} in your People room. Open a profile to see what you've written and turn it into a reason to reach out.` : "Your People room holds what you've written about people. Names that match your relationships show up on their profiles."}</p><Link to={RoutePath.SANCTUARY_ARTICLE.replace(':pageType', 'people')} className="mt-5 inline-flex items-center gap-1 text-sm font-bold text-green hover:text-green-hover transition-colors"><span>Open People room</span><ArrowUpRight size={14} weight="bold" /></Link></Surface>
+              )}
             </aside>
           </section>
         </div>

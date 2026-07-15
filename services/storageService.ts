@@ -1,6 +1,7 @@
 import { supabase } from '../src/supabaseClient';
 import { cryptoService, isEncryptedEnvelope, type EncryptedEnvelope } from './cryptoService';
 import { requireCurrentCryptoSession } from './cryptoSessionStore';
+import { getCurrentUserMode } from './userModeStore';
 
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 const IMAGE_MIME_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
@@ -64,7 +65,7 @@ const storageAad = (path: string, part?: 'metadata' | 'content') => {
   };
 };
 
-const isEncryptedNoteFilePath = (path: string) => path.includes('/notes/');
+const isEncryptedNoteFilePath = (path: string) => path.endsWith('.enc');
 
 interface StoredEncryptedFile {
   v: 1;
@@ -147,16 +148,17 @@ export const storageService = {
 
     const extension = getExtension(file);
     const uuid = crypto.randomUUID();
-    const path = featureName === 'notes'
+    const isEncrypted = featureName === 'notes' && getCurrentUserMode() !== 'reflective';
+    const path = isEncrypted
       ? `${userId}/${featureName}/${itemId}/${uuid}.enc`
       : `${userId}/${featureName}/${itemId}/${uuid}.${extension}`;
-    const uploadBody = featureName === 'notes' ? await encryptedFile(file, path) : file;
+    const uploadBody = isEncrypted ? await encryptedFile(file, path) : file;
     
     const { error } = await supabase.storage
       .from('app-files')
       .upload(path, uploadBody, { 
         cacheControl: '3600',
-        contentType: featureName === 'notes' ? 'application/json' : file.type,
+        contentType: isEncrypted ? 'application/json' : file.type,
         upsert: false
       });
 

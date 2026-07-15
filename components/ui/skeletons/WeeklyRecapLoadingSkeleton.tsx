@@ -1,24 +1,29 @@
 import React from 'react';
 import { Skeleton } from '../Skeleton';
 
-/** Skeleton for weekly recap stats and mood bars. */
+/** Skeleton for weekly and monthly recap narrative prose. */
 export const WeeklyRecapLoadingSkeleton: React.FC = () => (
-  <div className="space-y-6">
-    <div className="grid gap-4 sm:grid-cols-3">
-      {Array.from({ length: 3 }).map((_, i) => (
-        <div key={i} className="space-y-3 p-5 rounded-2xl border border-border/40">
-          <Skeleton variant="text" className="w-24 h-3" />
-          <Skeleton variant="text" className="w-16 h-8" />
-        </div>
-      ))}
+  <div className="space-y-10">
+    {/* This week section */}
+    <div className="space-y-5">
+      {/* Title skeleton: matches text-2xl md:text-3xl */}
+      <Skeleton variant="text" className="w-28 h-6 md:h-8" />
+      {/* Prose lines: matches the 1-3 sentences of week summary */}
+      <div className="space-y-3">
+        <Skeleton variant="text" className="w-full max-w-[45ch] h-4" />
+        <Skeleton variant="text" className="w-11/12 max-w-[35ch] h-4" />
+        <Skeleton variant="text" className="w-4/5 max-w-[30ch] h-4" />
+      </div>
     </div>
-    <div className="space-y-3">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <div key={i} className="flex items-center gap-3">
-          <Skeleton variant="text" className="w-16 h-3" />
-          <Skeleton variant="chart" className="flex-1 h-5" />
-        </div>
-      ))}
+
+    {/* This month section */}
+    <div className="space-y-5">
+      {/* Title skeleton */}
+      <Skeleton variant="text" className="w-32 h-6 md:h-8" />
+      {/* Prose lines: matches month summary */}
+      <div className="space-y-3">
+        <Skeleton variant="text" className="w-full max-w-[55ch] h-4" />
+      </div>
     </div>
   </div>
 );

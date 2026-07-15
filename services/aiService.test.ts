@@ -29,6 +29,11 @@ vi.mock('./absorbLogService', () => ({
   },
 }));
 
+vi.mock('./userModeStore', () => ({
+  getCurrentUserMode: () => 'encrypted',
+}));
+
+
 const baseNote = (overrides: Partial<Note> = {}): Note => ({
   id: 'note-1',
   title: 'Morning pages',

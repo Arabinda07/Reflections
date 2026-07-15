@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
@@ -32,6 +32,7 @@ import {
 import { commitAuthSession } from '@/src/auth/sessionUser';
 import { storePendingAccountPassword } from '@/src/auth/accountPasswordHandoff';
 import { getPasswordResetRedirectTo } from '@/src/auth/authRedirectConfig';
+import { isOnboardingIncomplete } from '@/src/auth/onboardingStatus';
 
 export const SignIn: React.FC = () => {
   useDocumentMeta({
@@ -41,7 +42,7 @@ export const SignIn: React.FC = () => {
   });
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, isInitialCheckDone } = useAuthStore();
+  const { isAuthenticated, isInitialCheckDone, user } = useAuthStore();
   const [loading, setLoading] = useState(() => isGoogleOAuthCallbackUrl(window.location.href));
   const [error, setError] = useState<string | null>(location.state?.errorMessage || null);
   const [email, setEmail] = useState(location.state?.email || '');
@@ -52,6 +53,21 @@ export const SignIn: React.FC = () => {
   const postLoginPath = resolvePostAuthRedirectPath(location.state?.from);
   const homePath = getPublicHomePath();
 
+  // Route through the permanent-mode onboarding gate on every successful auth.
+  // A user who abandoned onboarding (closed the tab on ModeSelect) must not be
+  // able to sign in straight to the dashboard and be silently locked to the
+  // default reflective mode — send them back to ModeSelect first.
+  const navigatePostAuth = useCallback(
+    async (userId: string, fallbackPath: string, fallbackState?: Record<string, unknown>) => {
+      if (await isOnboardingIncomplete(userId)) {
+        navigate(RoutePath.ONBOARDING_MODE_SELECT, { replace: true });
+        return;
+      }
+      navigate(fallbackPath, { replace: true, state: fallbackState });
+    },
+    [navigate],
+  );
+
   useEffect(() => {
     const flashError = consumeGoogleAuthError(RoutePath.LOGIN);
     if (flashError) {
@@ -60,12 +76,13 @@ export const SignIn: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!isInitialCheckDone || !isAuthenticated) {
+    if (!isInitialCheckDone || !isAuthenticated || !user?.id) {
       return;
     }
 
-    navigate(consumePendingGoogleAuthRedirectPath(RoutePath.LOGIN) || postLoginPath, { replace: true });
-  }, [isAuthenticated, isInitialCheckDone, navigate, postLoginPath]);
+    const fallbackPath = consumePendingGoogleAuthRedirectPath(RoutePath.LOGIN) || postLoginPath;
+    void navigatePostAuth(user.id, fallbackPath);
+  }, [isAuthenticated, isInitialCheckDone, user?.id, navigatePostAuth, postLoginPath]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -81,11 +98,11 @@ export const SignIn: React.FC = () => {
 
       if (signInError) {
         setError(signInError.message);
+      } else if (data.session) {
+        commitAuthSession(data.session);
+        storePendingAccountPassword(password, data.session.user.id);
+        await navigatePostAuth(data.session.user.id, postLoginPath, { justLoggedIn: true });
       } else {
-        if (data.session) {
-          commitAuthSession(data.session);
-          storePendingAccountPassword(password, data.session.user.id);
-        }
         navigate(postLoginPath, { replace: true, state: { justLoggedIn: true } });
       }
     } catch (err) {
@@ -128,10 +145,10 @@ export const SignIn: React.FC = () => {
       if (!success) {
         setError(authError || 'Failed to sign in with verified email.');
         setLoading(false);
+      } else if (authResult.data?.session) {
+        commitAuthSession(authResult.data.session);
+        await navigatePostAuth(authResult.data.session.user.id, postLoginPath, { justLoggedIn: true });
       } else {
-        if (authResult.data?.session) {
-          commitAuthSession(authResult.data.session);
-        }
         navigate(postLoginPath, { replace: true, state: { justLoggedIn: true } });
       }
     } catch (err) {

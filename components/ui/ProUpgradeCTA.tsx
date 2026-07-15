@@ -155,9 +155,9 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
   };
 
   const features = [
-    'Unlimited notes',
-    'More AI reflections',
-    'More Life Wiki refreshes',
+    'Lifelong commonplace archive (unlimited notes)',
+    'Life Wiki compilation and pattern analysis',
+    'Unlimited relationship rhythms',
   ];
 
   const renderSubscriptionModal = () => (
@@ -318,7 +318,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
               <span className="label-caps">Reflections Pro</span>
             </div>
             <p className="text-sm font-medium leading-relaxed text-gray-light">
-              Unlimited notes and more AI reflections, for the weeks when life is a lot.
+              More room to build an archive that lasts years. Pro unlocks unlimited notes, on-demand wiki compilation, and custom relationship rhythms.
             </p>
           </div>
 

@@ -22,16 +22,16 @@ const policySections: PolicySection[] = [
     icon: 'database',
     body: [
       'Reflections stores the account information needed to sign you in, including your email address and profile details you choose to save, such as your name, display name, timezone, and avatar.',
-      'The app stores the writing you create here: notes, moods, tags, tasks, attachments, note covers, future letters, mood check-ins, Life Wiki pages, relationships, referral invite status, and the small usage counters needed for Free and Pro access. Your private writing is encrypted on your device before it reaches the server.',
+      'The app stores the writing you create here: notes, moods, tags, tasks, attachments, note covers, future letters, mood check-ins, Life Wiki pages, relationships, referral invite status, and the small usage counters needed for Free and Pro access. For users in Encrypted Vault mode, private writing is encrypted on your device before it reaches the server.',
     ],
   },
   {
-    title: 'Device-side encryption',
+    title: 'Privacy Modes: Encrypted Vault vs Reflective Sanctuary',
     icon: 'shield',
     body: [
-      'Your private writing — notes, moods, tags, tasks, attachments, future letters, Life Wiki pages, and relationships — is encrypted on your device before it is saved. The key is derived from your password and never sent to the server, so what Reflections stores is data it cannot read.',
-      'Because the key stays on your device, you unlock your writing once on each device you use. On a device you trust, you can choose "Keep me unlocked on this device" to skip that step; signing out clears it.',
-      'When you turn on private writing you save a recovery phrase. If you forget your password, that phrase is the only other way to unlock your writing. Reflections cannot reset it for you, so keep it somewhere safe. AI features that need the server to read your writing, including Smart Mode, stay off while this protection is on.',
+      'Reflections offers two privacy modes. In Encrypted Vault, your private writing — notes, moods, tags, tasks, attachments, future letters, Life Wiki pages, and relationships — is encrypted on your device before it is saved. The key is derived from your password and never sent to the server, so what Reflections stores is data it cannot read.',
+      'Because the key stays on your device in Encrypted Vault mode, you unlock your writing once on each device you use. If you forget your password, the recovery phrase is the only other way to unlock your writing. AI features that need the server to read your writing stay off while this protection is on.',
+      'In Reflective Sanctuary mode, device-side encryption is bypassed so that the Gemini API can process your notes server-side for AI reflections. Your data is still secured with Supabase account security, private storage, and Row Level Security.',
     ],
   },
   {
@@ -97,7 +97,7 @@ const policySections: PolicySection[] = [
     title: 'Security and service limits',
     icon: 'shield',
     body: [
-      'Private writing is encrypted on your device before it is saved, as described in Device-side encryption. On top of that, Reflections uses Supabase account security, private storage, Row Level Security, and encrypted connections. No online service can promise perfect security.',
+      'For users in Encrypted Vault mode, private writing is encrypted on your device before it is saved. For all users, Reflections uses Supabase account security, private storage, Row Level Security, and encrypted connections. No online service can promise perfect security.',
       'Some features require an internet connection. AI features, sync, payments, and exports can fail if a provider is unavailable. Features and Free or Pro limits may change as the product changes, but the app should explain limits plainly where they matter.',
     ],
   },

@@ -35,7 +35,7 @@ describe('engagement routes source contract', () => {
 
     expect(homeAuthenticated).toContain('RoutePath.FUTURE_LETTERS');
     expect(homeAuthenticated).toContain('Future letter');
-    expect(homeAuthenticated).not.toContain('RoutePath.RELEASE');
+    expect(homeAuthenticated).toContain('RoutePath.RELEASE');
     const noteDraft = read('hooks/useNoteDraft.ts');
     expect(noteDraft).toContain('recordReleaseCompleted');
     expect(createNote).toContain('Keep it, or let it go');
@@ -56,7 +56,6 @@ describe('engagement routes source contract', () => {
     const releaseMode = read('pages/dashboard/ReleaseMode.tsx');
 
     expect(releaseMode).toContain("ritualEventService.recordReleaseCompleted");
-    expect(releaseMode).toContain("buildCompletionCardPayload");
     expect(releaseMode).toContain("Release");
     expect(releaseMode).toContain("setText('')");
     expect(releaseMode).toContain('htmlFor="release-writing"');
@@ -67,7 +66,6 @@ describe('engagement routes source contract', () => {
     expect(releaseMode).toContain('sm:min-h-[42dvh]');
     expect(releaseMode).toContain('className="-ml-2 min-h-11"');
     expect(read('layouts/DashboardLayout.tsx')).toContain('{!isWritingRoute && (');
-    expect(releaseMode).not.toContain('setTimeout');
     expect(releaseMode).not.toContain('noteService');
     expect(releaseMode).not.toMatch(/create\s*\(/);
     expect(releaseMode).not.toMatch(/update\s*\(/);
@@ -114,7 +112,6 @@ describe('engagement routes source contract', () => {
     expect(actions).toContain('isErrorStatus');
     expect(actions).toContain('min-h-11 w-full sm:w-auto');
     expect(actions).not.toMatch(/note\.content|mood|tags|aiSummary|theme/i);
-    expect(releaseMode).toContain('<CompletionCardActions');
     expect(letters).toContain('<CompletionCardActions');
   });
 

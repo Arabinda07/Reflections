@@ -1,6 +1,7 @@
 import { db, type LocalEncryptedNote, type LocalNote } from './db';
 import { cryptoService, type CryptoSession, isEncryptedEnvelope } from './cryptoService';
 import { requireCurrentCryptoSession } from './cryptoSessionStore';
+import { getCurrentUserMode } from './userModeStore';
 
 type LegacyLocalNote = LocalNote & {
   encryptedPayload?: unknown;
@@ -88,6 +89,10 @@ export const offlineStorage = {
   // --- Note Operations ---
 
   async saveNote(note: LocalNote): Promise<void> {
+    if (getCurrentUserMode() === 'reflective') {
+      await db.notes.put(note as any);
+      return;
+    }
     await offlineStorage.saveEncryptedNote(note, requireCurrentCryptoSession());
   },
 
@@ -96,7 +101,6 @@ export const offlineStorage = {
   },
 
   async getAllNotes(userId: string): Promise<LocalNote[]> {
-    const session = requireCurrentCryptoSession();
     const notes = await db.notes
       .where('userId')
       .equals(userId)
@@ -104,14 +108,24 @@ export const offlineStorage = {
       .reverse()
       .sortBy('updatedAt');
 
+    if (getCurrentUserMode() === 'reflective') {
+      return notes.map(n => normalizeLegacyLocalNote(n as LegacyLocalNote));
+    }
+
+    const session = requireCurrentCryptoSession();
     const decrypted = await Promise.all(notes.map((note) => decryptLocalNote(note, session)));
     return decrypted.filter((note): note is LocalNote => Boolean(note));
   },
 
   async getNoteById(id: string, userId: string): Promise<LocalNote | undefined> {
-    const session = requireCurrentCryptoSession();
     const note = await db.notes.get(id);
-    return note?.userId === userId ? decryptLocalNote(note, session) : undefined;
+    if (note?.userId !== userId) return undefined;
+    
+    if (getCurrentUserMode() === 'reflective') {
+      return normalizeLegacyLocalNote(note as LegacyLocalNote);
+    }
+    const session = requireCurrentCryptoSession();
+    return decryptLocalNote(note, session);
   },
 
   async deleteNote(id: string, userId: string): Promise<void> {
@@ -131,7 +145,6 @@ export const offlineStorage = {
   // --- Sync Engine Queries ---
 
   async getPendingOperations(userId: string): Promise<LocalNote[]> {
-    const session = requireCurrentCryptoSession();
     const pendingNotes = await db.notes
       .where('[userId+syncStatus]')
       .anyOf([
@@ -141,6 +154,10 @@ export const offlineStorage = {
       ])
       .toArray();
 
+    if (getCurrentUserMode() === 'reflective') {
+      return pendingNotes.map(n => normalizeLegacyLocalNote(n as LegacyLocalNote));
+    }
+    const session = requireCurrentCryptoSession();
     const decrypted = await Promise.all(pendingNotes.map((note) => decryptLocalNote(note, session)));
     return decrypted.filter((note): note is LocalNote => Boolean(note));
   },

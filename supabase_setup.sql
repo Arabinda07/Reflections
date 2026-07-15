@@ -1,3 +1,4 @@
+drop policy if exists "Users can view own files" on storage.objects;
 create policy "Users can view own files"
 on storage.objects for select
 to authenticated
@@ -6,6 +7,7 @@ using (
   and name like (auth.uid()::text || '/%')
 );
 
+drop policy if exists "Users can upload to own folder" on storage.objects;
 create policy "Users can upload to own folder"
 on storage.objects for insert
 to authenticated
@@ -14,6 +16,7 @@ with check (
   and name like (auth.uid()::text || '/%')
 );
 
+drop policy if exists "Users can update own files" on storage.objects;
 create policy "Users can update own files"
 on storage.objects for update
 to authenticated
@@ -22,6 +25,7 @@ using (
   and name like (auth.uid()::text || '/%')
 );
 
+drop policy if exists "Users can delete own files" on storage.objects;
 create policy "Users can delete own files"
 on storage.objects for delete
 to authenticated
@@ -40,6 +44,8 @@ create table if not exists profiles (
   newsletter_unsubscribed_at timestamptz,
   onboarding_completed_at timestamptz,
   onboarding_version_seen integer,
+  user_mode text not null default 'reflective'
+    check (user_mode in ('encrypted', 'reflective')),
   free_ai_reflections_used int default 0,
   free_wiki_insights_used int default 0,
   updated_at timestamp with time zone default timezone('utc'::text, now())
@@ -54,7 +60,8 @@ create table if not exists notes (
   mood text,
   thumbnail_url text,
   tags text[] default '{}',
-  attachments jsonb default '[]',
+  attachments jsonb default '[]'::jsonb,
+  tasks jsonb default '[]'::jsonb,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
@@ -64,14 +71,21 @@ alter table profiles enable row level security;
 alter table notes enable row level security;
 
 -- 4. Profiles Policies
+drop policy if exists "Public profiles are viewable by everyone." on profiles;
 create policy "Public profiles are viewable by everyone." on profiles for select using ( true );
+drop policy if exists "Users can insert their own profile." on profiles;
 create policy "Users can insert their own profile." on profiles for insert with check ( auth.uid() = id );
+drop policy if exists "Users can update own profile." on profiles;
 create policy "Users can update own profile." on profiles for update using ( auth.uid() = id );
 
 -- 5. Notes Policies (Strictly scoped to the authenticated user)
+drop policy if exists "Users can view their own notes" on notes;
 create policy "Users can view their own notes" on notes for select using (auth.uid() = user_id);
+drop policy if exists "Users can insert their own notes" on notes;
 create policy "Users can insert their own notes" on notes for insert with check (auth.uid() = user_id);
+drop policy if exists "Users can update their own notes" on notes;
 create policy "Users can update their own notes" on notes for update using (auth.uid() = user_id);
+drop policy if exists "Users can delete their own notes" on notes;
 create policy "Users can delete their own notes" on notes for delete using (auth.uid() = user_id);
 
 -- 6. SaaS Limit Enforcement (Server-side Trigger)

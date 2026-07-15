@@ -13,6 +13,7 @@ import { UserCircle } from '@phosphor-icons/react/UserCircle';
 import { UserPlus } from '@phosphor-icons/react/UserPlus';
 import { RoutePath } from '../types';
 import { useAuthStore } from '../hooks/useAuthStore';
+import { useUserMode } from '../context/UserModeContext';
 import { useKeyboardShortcut } from '../src/hooks/useKeyboardShortcut';
 import { referralService } from '../services/referralService';
 import { useAndroidBackHandler } from '../src/native/useAndroidBackHandler';
@@ -37,7 +38,7 @@ const GUEST_NAV_ITEMS: SidebarNavItem[] = [
 const AUTH_NAV_ITEMS: SidebarNavItem[] = [
   { label: 'My notes', path: RoutePath.NOTES, icon: Notebook, description: 'Return to your saved reflections.' },
   { label: 'Create note', path: RoutePath.CREATE_NOTE, icon: PencilSimpleLine, description: 'Open a fresh writing surface.' },
-  { label: 'Insights', path: RoutePath.INSIGHTS, icon: Sparkle, description: 'See patterns drawn from your writing.' },
+  { label: 'Insights', path: RoutePath.INSIGHTS, icon: Sparkle, description: 'See patterns drawn from your writing.', requireMode: 'reflective' },
   { label: 'Relationships', path: RoutePath.RELATIONSHIPS, icon: Heart, description: 'Tend people, hooks, and weekly care.' },
   { label: 'Account', path: RoutePath.ACCOUNT, icon: UserCircle, description: 'Manage your profile and plan.' },
   { label: 'FAQ', path: RoutePath.FAQ, icon: Question, description: 'Read how Reflections works.' },
@@ -57,6 +58,7 @@ export const DashboardLayout: React.FC = () => {
   const location = useLocation();
   const outlet = useOutlet();
   const { isAuthenticated } = useAuthStore();
+  const { userMode } = useUserMode();
   const routeSurfaceScopeClass = useSurfaceScope();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -103,7 +105,6 @@ export const DashboardLayout: React.FC = () => {
     location.pathname.startsWith(`${RoutePath.NOTES}/`) && location.pathname.endsWith('/edit');
 
   const isWritingRoute =
-    location.pathname === RoutePath.RELEASE ||
     location.pathname === RoutePath.CREATE_NOTE ||
     isNoteEditRoute;
 
@@ -116,8 +117,8 @@ export const DashboardLayout: React.FC = () => {
   const routeTransitionClass = isWritingRoute ? '' : 'animate-in fade-in duration-300 ease-out-expo';
   const homePath = isAuthenticated ? RoutePath.DASHBOARD : RoutePath.HOME;
 
-  const navItems = isAuthenticated ? AUTH_NAV_ITEMS : GUEST_NAV_ITEMS;
-  const sidebarNavItems = isAuthenticated ? AUTH_NAV_ITEMS : GUEST_SIDEBAR_NAV_ITEMS;
+  const navItems = isAuthenticated ? AUTH_NAV_ITEMS.filter(i => !i.requireMode || i.requireMode === userMode) : GUEST_NAV_ITEMS;
+  const sidebarNavItems = isAuthenticated ? AUTH_NAV_ITEMS.filter(i => !i.requireMode || i.requireMode === userMode) : GUEST_SIDEBAR_NAV_ITEMS;
 
   return (
     <div

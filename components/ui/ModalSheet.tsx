@@ -247,7 +247,7 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
               />
 
               {(icon || title || description) && (
-                <div className="modal-sheet-header">
+                <div className={`modal-sheet-header ${!children ? 'pb-5' : ''}`.trim()}>
                   <div className="modal-sheet-heading pr-12">
                     {icon ? <span className="modal-sheet-title-icon">{icon}</span> : null}
                     <div className="modal-sheet-copy">
@@ -278,7 +278,9 @@ export const ModalSheet: React.FC<ModalSheetProps> = ({
                 </button>
               ) : null}
 
-              <div className={`modal-sheet-body ${bodyClassName}`.trim()}>{children}</div>
+              {children && (
+                <div className={`modal-sheet-body ${bodyClassName}`.trim()}>{children}</div>
+              )}
 
               {footer ? <div className="modal-sheet-footer">{footer}</div> : null}
             </div>

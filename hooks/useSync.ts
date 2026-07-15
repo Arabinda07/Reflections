@@ -4,6 +4,7 @@ import { useNetworkState } from './useNetworkState';
 import { useAuthStore } from './useAuthStore';
 import { getCurrentCryptoSession } from '../services/cryptoSessionStore';
 import { syncEngine } from '../services/syncEngine';
+import { getCurrentUserMode, isUserModeInitialized } from '../services/userModeStore';
 
 /**
  * useSync hook
@@ -25,7 +26,9 @@ export const useSync = () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
 
-    if (!getCurrentCryptoSession()) return;
+    // Mode must be resolved before syncing; otherwise getCurrentUserMode() throws.
+    if (!isUserModeInitialized()) return;
+    if (getCurrentUserMode() !== 'reflective' && !getCurrentCryptoSession()) return;
 
     isSyncing.current = true;
     try {

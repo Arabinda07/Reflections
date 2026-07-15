@@ -2,6 +2,7 @@ import { supabase } from '../src/supabaseClient';
 import type { FutureLetter, FutureLetterStatus } from '../types';
 import type { EncryptedEnvelope } from './cryptoService';
 import { decryptEnvelope, encryptedColumns, rowAad } from './encryptedPayload';
+import { getCurrentUserMode } from './userModeStore';
 
 export interface SupabaseFutureLetterRow {
   id: string;
@@ -50,16 +51,23 @@ const mapEncryptedFutureLetter = async (data: SupabaseFutureLetterRow): Promise<
 export const futureLetterRemoteStore = {
   insert: async (userId: string, title: string, content: string, openAt: string): Promise<FutureLetter> => {
     const id = crypto.randomUUID();
+    const encryptedOrPlaintext =
+      getCurrentUserMode() === 'reflective'
+        ? { title, content }
+        : {
+            title: null,
+            content: null,
+            ...(await encryptedColumns({ title, content }, futureLetterAad(userId, id))),
+          };
+
     const { data, error } = await supabase
       .from('future_letters')
       .insert({
         id,
         user_id: userId,
-        title: null,
-        content: null,
         open_at: openAt,
         status: 'scheduled',
-        ...(await encryptedColumns({ title, content }, futureLetterAad(userId, id))),
+        ...encryptedOrPlaintext,
       })
       .select()
       .single();

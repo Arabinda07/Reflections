@@ -37,7 +37,7 @@ describe('RelationshipOS routing and UI contracts', () => {
     expect(importPlanning).toContain('googleResourceName');
     expect(importPlanning).not.toContain('people:createContact');
     expect(importPlanning).not.toContain('people:updateContact');
-    expect(page).toContain('Review one by one');
+    expect(page).toContain('Bulk Import');
     expect(page).toContain('Google import');
     expect(read('services/relationshipService.ts')).not.toContain('startGoogleContactsOAuth');
   });

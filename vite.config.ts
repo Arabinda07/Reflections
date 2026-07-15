@@ -39,7 +39,7 @@ const vendorChunk = (id: string) => {
   if (id.includes('lottie-react') || id.includes('lottie-web')) return 'vendor-lottie';
   if (id.includes('motion')) return 'vendor-motion';
   if (id.includes('@phosphor-icons')) return undefined;
-  if (id.includes('@google/genai') || id.includes('@splinetool/runtime')) return 'vendor-ai';
+  if (id.includes('@google/genai')) return 'vendor-ai';
   if (id.includes('zustand')) return 'vendor-state';
 
   return 'vendor-react';

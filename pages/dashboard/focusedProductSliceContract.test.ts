@@ -124,7 +124,7 @@ describe('focused product slice source contract', () => {
 
     expect(homeAuthenticated).toContain('HOME_HERO_INTRO_DWELL_MS');
     expect(homeAuthenticated).toContain('HOME_HERO_EXIT_MS');
-    expect(homeAuthenticated).toContain('HOME_HERO_SEEN_SESSION_KEY');
+    expect(homeAuthenticated).toContain('HOME_HERO_SEEN_STORAGE_KEY');
     expect(homeAuthenticated).toContain("type HomeHeroIntroState = 'visible' | 'exiting' | 'gone';");
     expect(homeAuthenticated).toContain('heroIntroState');
     expect(homeAuthenticated).toContain('collapseHeroIntro');

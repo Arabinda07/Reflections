@@ -51,6 +51,7 @@ grant select (
   newsletter_opt_in,
   newsletter_unsubscribed_at,
   smart_mode_enabled,
+  user_mode,
   updated_at
 ) on table public.profiles to authenticated;
 
@@ -594,6 +595,7 @@ create trigger tr_enforce_note_limit
 alter table public.theme_citations enable row level security;
 
 drop policy if exists "Users can insert citations for own themes" on public.theme_citations;
+drop policy if exists "Users can insert citations for own themes and notes" on public.theme_citations;
 create policy "Users can insert citations for own themes and notes"
   on public.theme_citations
   for insert
@@ -617,6 +619,7 @@ create policy "Users can insert citations for own themes and notes"
 alter table public.wiki_absorb_log enable row level security;
 
 drop policy if exists "Users can insert their own absorb log" on public.wiki_absorb_log;
+drop policy if exists "Users can insert own absorb log for own notes" on public.wiki_absorb_log;
 create policy "Users can insert own absorb log for own notes"
   on public.wiki_absorb_log
   for insert
@@ -633,6 +636,7 @@ create policy "Users can insert own absorb log for own notes"
   );
 
 drop policy if exists "Users can update their own absorb log" on public.wiki_absorb_log;
+drop policy if exists "Users can update own absorb log for own notes" on public.wiki_absorb_log;
 create policy "Users can update own absorb log for own notes"
   on public.wiki_absorb_log
   for update
@@ -754,6 +758,9 @@ $$;
 
 revoke execute on function public.delete_user_data() from public, anon;
 grant execute on function public.delete_user_data() to authenticated;
+
+revoke execute on function public.set_user_mode(text) from public, anon;
+grant execute on function public.set_user_mode(text) to authenticated;
 
 notify pgrst, 'reload schema';
 

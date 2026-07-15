@@ -11,13 +11,12 @@ describe('CreateNote regression contract', () => {
     const trailLoadingMark = read('components/ui/TrailLoadingMark.tsx');
 
     expect(createNote).toContain("import('../../components/ui/TrailLoadingMark')");
-    expect(createNote).toContain("import('../../components/ui/CompanionObservation')");
     expect(createNote).toContain("import('../../components/ui/PaperPlaneToast')");
     expect(createNote).toContain('const CREATE_NOTE_ENTRY_ANIMATION_FALLBACK_MS = 3600;');
     expect(createNote).toContain('const [entryAnimationComplete, setEntryAnimationComplete] = useState(false);');
     expect(createNote).toContain('const showEntryExperience = loading || !entryAnimationComplete;');
     expect(createNote).toContain('window.setTimeout(() => setEntryAnimationComplete(true), CREATE_NOTE_ENTRY_ANIMATION_FALLBACK_MS);');
-    expect(createNote).toContain('<TrailLoadingMark loop={false} onComplete={() => setEntryAnimationComplete(true)} />');
+    expect(createNote).toContain('<TrailLoadingMark loop={true} />');
     expect(createNote).toContain('h-40 w-40');
     expect(trailLoadingMark).toContain("import Lottie from 'lottie-react'");
     expect(trailLoadingMark).toContain("from '@/src/lottie/trail-loading.json'");

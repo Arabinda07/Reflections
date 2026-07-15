@@ -299,6 +299,7 @@ export enum RoutePath {
   ACCOUNT = '/account',
   LOGIN = '/login',
   SIGNUP = '/signup',
+  ONBOARDING_MODE_SELECT = '/onboarding/mode-select',
   RESET_PASSWORD = '/reset-password',
   RECOVER_PRIVATE_WRITING = '/recover-private-writing',
   INSIGHTS = '/insights',

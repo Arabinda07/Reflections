@@ -4,6 +4,7 @@ const mockGetUser = vi.fn();
 const mockRpc = vi.fn();
 const mockGenerateContent = vi.fn();
 const mockGoogleGenAI = vi.fn();
+const mockMaybeSingle = vi.fn();
 
 class MockGoogleGenAI {
   readonly models = {
@@ -21,6 +22,13 @@ vi.mock('@supabase/supabase-js', () => ({
       getUser: mockGetUser,
     },
     rpc: mockRpc,
+    from: vi.fn(() => ({
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          maybeSingle: mockMaybeSingle,
+        })),
+      })),
+    })),
   })),
 }));
 
@@ -57,6 +65,17 @@ const createResponse = () => {
   return response;
 };
 
+const reflectionBody = {
+  action: 'reflection',
+  payload: {
+    note: {
+      title: 'Today',
+      content: '<p>I slowed down.</p>',
+      mood: 'calm',
+    },
+  },
+};
+
 describe('/api/ai strict private mode', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -71,6 +90,7 @@ describe('/api/ai strict private mode', () => {
       data: { user: { id: 'user-1' } },
       error: null,
     });
+    mockMaybeSingle.mockResolvedValue({ data: { user_mode: 'encrypted' }, error: null });
     mockRpc.mockResolvedValue({
       data: { allowed: true },
       error: null,
@@ -82,19 +102,7 @@ describe('/api/ai strict private mode', () => {
     const { default: handler } = await import('../../api/ai');
     const response = createResponse();
 
-    await handler(
-      createRequest({
-        action: 'reflection',
-        payload: {
-          note: {
-            title: 'Today',
-            content: '<p>I slowed down.</p>',
-            mood: 'calm',
-          },
-        },
-      }),
-      response,
-    );
+    await handler(createRequest(reflectionBody), response);
 
     expect(response.statusCode).toBe(403);
     expect(JSON.parse(response.body)).toEqual({
@@ -105,6 +113,44 @@ describe('/api/ai strict private mode', () => {
     expect(mockRpc).not.toHaveBeenCalled();
     expect(mockGenerateContent).not.toHaveBeenCalled();
     expect(mockGoogleGenAI).not.toHaveBeenCalled();
+  });
+
+  it('rejects AI when user_mode cannot be resolved (fail-closed)', async () => {
+    mockMaybeSingle.mockResolvedValue({ data: { user_mode: null }, error: null });
+    const { default: handler } = await import('../../api/ai');
+    const response = createResponse();
+
+    await handler(createRequest(reflectionBody), response);
+
+    expect(response.statusCode).toBe(403);
+    expect(JSON.parse(response.body).error).toBe('user_mode_unavailable');
+    expect(mockRpc).not.toHaveBeenCalled();
+    expect(mockGenerateContent).not.toHaveBeenCalled();
+  });
+
+  it('rejects AI when the profile fetch errors (fail-closed)', async () => {
+    mockMaybeSingle.mockResolvedValue({ data: null, error: { message: 'db down' } });
+    const { default: handler } = await import('../../api/ai');
+    const response = createResponse();
+
+    await handler(createRequest(reflectionBody), response);
+
+    expect(response.statusCode).toBe(403);
+    expect(JSON.parse(response.body).error).toBe('user_mode_unavailable');
+    expect(mockRpc).not.toHaveBeenCalled();
+    expect(mockGenerateContent).not.toHaveBeenCalled();
+  });
+
+  it('allows reflective users through the mode gate to quota checks', async () => {
+    mockMaybeSingle.mockResolvedValue({ data: { user_mode: 'reflective' }, error: null });
+    const { default: handler } = await import('../../api/ai');
+    const response = createResponse();
+
+    await handler(createRequest(reflectionBody), response);
+
+    // Reflective mode passes the privacy gate; quota/provider may still run.
+    expect(response.statusCode).not.toBe(403);
+    expect(mockRpc).toHaveBeenCalled();
   });
 
   it('keeps method and auth failures outside the private payload path', async () => {

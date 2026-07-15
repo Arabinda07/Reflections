@@ -1,6 +1,8 @@
 import React from 'react';
 
 import { PWAInstallProvider } from '../context/PWAInstallContext';
+import { UserModeProvider } from '../context/UserModeContext';
+import { UserModeBoundary } from '../components/auth/UserModeBoundary';
 import { CryptoProvider } from '../context/CryptoContext';
 import { ToastProvider } from '../components/ui/Toast';
 import { AppBootstrapper } from '../components/ui/AppBootstrapper';
@@ -21,15 +23,19 @@ export const AuthenticatedAppShell: React.FC = () => {
 
   return (
     <PWAInstallProvider>
-      <CryptoProvider>
-        <AppBootstrapper>
-          <ToastProvider>
-            <SyncBoundary>
-              <DashboardLayout />
-            </SyncBoundary>
-          </ToastProvider>
-        </AppBootstrapper>
-      </CryptoProvider>
+      <UserModeProvider>
+        <UserModeBoundary>
+          <CryptoProvider>
+            <AppBootstrapper>
+              <ToastProvider>
+                <SyncBoundary>
+                  <DashboardLayout />
+                </SyncBoundary>
+              </ToastProvider>
+            </AppBootstrapper>
+          </CryptoProvider>
+        </UserModeBoundary>
+      </UserModeProvider>
     </PWAInstallProvider>
   );
 };

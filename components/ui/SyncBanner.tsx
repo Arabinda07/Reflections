@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { CloudCheck } from '@phosphor-icons/react/CloudCheck';
 import { CloudSlash } from '@phosphor-icons/react/CloudSlash';
 import { useNetworkState } from '../../hooks/useNetworkState';
 
 export const SyncBanner: React.FC = () => {
   const isOnline = useNetworkState();
+  const prefersReducedMotion = useReducedMotion();
   const [showBanner, setShowBanner] = useState(false);
   const [bannerMode, setBannerMode] = useState<'offline' | 'recovery'>('offline');
 
@@ -37,10 +38,10 @@ export const SyncBanner: React.FC = () => {
       {showBanner && (
         <motion.div
           key="sync-banner"
-          initial={{ opacity: 0, y: -20, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -20, scale: 0.95 }}
-          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -20, scale: 0.95 }}
+          animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
+          exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -20, scale: 0.95 }}
+          transition={{ duration: prefersReducedMotion ? 0.15 : 0.4, ease: [0.16, 1, 0.3, 1] }}
           className="fixed top-[80px] left-0 right-0 z-[90] flex justify-center pointer-events-none px-4"
           role="alert"
           aria-live="assertive"
@@ -49,8 +50,8 @@ export const SyncBanner: React.FC = () => {
             className={`
               surface-inline-panel flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl backdrop-blur-2xl
               ${bannerMode === 'offline' 
-                ? 'border-amber-500/20 text-amber-700 dark:border-amber-500/30 dark:text-amber-400'
-                : 'border-green/20 text-green-700 dark:border-green/30 dark:text-green-400'
+                ? 'border-clay/25 text-clay'
+                : 'border-green/25 text-green'
               }
             `}
           >

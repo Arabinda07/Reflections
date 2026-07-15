@@ -19,6 +19,7 @@ import {
   zeroKnowledgeMigrationService,
   type MigrationProgress,
 } from '../services/zeroKnowledgeMigrationService';
+import { useUserMode } from './UserModeContext';
 
 type CryptoStatus = 'loading' | 'setupRequired' | 'locked' | 'migrating' | 'unlocked' | 'error';
 
@@ -44,6 +45,7 @@ const CryptoContext = createContext<CryptoContextValue | null>(null);
 
 export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const user = useAuthStore((state) => state.user);
+  const { userMode } = useUserMode();
   const [status, setStatus] = useState<CryptoStatus>('loading');
   const [session, setSession] = useState<CryptoSession | null>(null);
   const [migrationProgress, setMigrationProgress] = useState<MigrationProgress | null>(null);
@@ -119,6 +121,14 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         return;
       }
 
+      if (userMode == null) {
+        // User mode is still resolving. Stay in loading rather than treating the
+        // unknown mode as "not reflective" and prematurely showing setup. The
+        // effect re-runs once userMode settles (it is in the dependency array).
+        setStatus('loading');
+        return;
+      }
+
       setStatus('loading');
       const { data, error: loadError } = await supabase
         .from('user_encryption_keys')
@@ -135,7 +145,11 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
 
       if (!data) {
-        setStatus('setupRequired');
+        if (userMode === 'reflective') {
+          setStatus('unlocked');
+        } else {
+          setStatus('setupRequired');
+        }
         return;
       }
 
@@ -186,7 +200,7 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     return () => {
       isActive = false;
     };
-  }, [user?.id]);
+  }, [user?.id, userMode]);
 
   const setupEncryption = useCallback(async (passphrase: string, unlockMethod: UnlockMethod = 'private_writing_password') => {
     if (!user?.id) throw new Error('Sign in before setting up encryption.');

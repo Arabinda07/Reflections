@@ -79,7 +79,7 @@ The palette is rooted in botanical green and tinted paper neutrals. Color is inh
 - **Botanical / `sage`:** The dominant brand family. Use it for reflection, check-in, overview, home focus, and general sanctuary cards.
 - **`paper`:** The writing-safe base. Use it for note editors, forms, auth, long reading, and any surface where the user's words need to stay quiet.
 - **`sky`:** The insight and information tone. Use it for analytics, FAQ/help, weekly signal, export/help panels, and explanatory states.
-- **`honey`:** The progress and completion tone. Use it for completion cards, membership/value moments, future letters, and gentle achievement states.
+- **`honey`:** The progress and completion tone. Keep the token (defined in config/CSS), but currently unused on any active page.
 - **`clay`:** The release/destructive tone. Use it for release moments, warnings, account closure, delete flows, and emotional contrast.
 
 ### Inherited Surface Rule
