@@ -11,9 +11,11 @@ import { supabase } from '../supabaseClient';
  * letting them slip past it and be silently locked to the default `reflective`
  * mode forever.
  *
- * A false "incomplete" is self-correcting and never traps the user: `ModeSelect`
- * redirects already-onboarded users straight back to the dashboard, and the
- * `set_user_mode` RPC reports "already been set" for a duplicate choice.
+ * A false "incomplete" is self-correcting and never traps the user when
+ * `onboarding_completed_at` is readable (column is in the authenticated SELECT
+ * grant): `ModeSelect` redirects already-onboarded users to the dashboard, and
+ * the `set_user_mode` RPC path treats "already been set" as an immediate
+ * dashboard redirect after resolving `user_mode`.
  */
 export const isOnboardingIncomplete = async (userId: string): Promise<boolean> => {
   const { data, error } = await supabase
