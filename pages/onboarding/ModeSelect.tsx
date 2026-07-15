@@ -89,16 +89,29 @@ export const ModeSelect: React.FC = () => {
       navigate(RoutePath.DASHBOARD, { replace: true });
     } catch (err) {
       console.error('Failed to set mode:', err);
-      const message = err instanceof Error ? err.message : '';
+      const message =
+        err instanceof Error
+          ? err.message
+          : typeof err === 'object' && err !== null && 'message' in err
+            ? String((err as { message: unknown }).message)
+            : '';
       if (message.includes('already been set')) {
-        // Race condition: user refreshed or navigated back. The redirect in
-        // the useEffect above will catch this on re-render, but in the
-        // meantime show a clear message instead of the raw Postgres error.
-        setError('Your mode has already been chosen. Redirecting you now...');
-        setTimeout(() => navigate(RoutePath.DASHBOARD, { replace: true }), 1500);
-      } else {
-        setError('Something went wrong. Please try again.');
+        // Already onboarded (or race with a prior submit). Prefer reading the
+        // granted user_mode column so we leave with the correct store value
+        // even if onboarding_completed_at is temporarily unreadable.
+        const { data } = await supabase
+          .from('profiles')
+          .select('user_mode')
+          .eq('id', user.id)
+          .maybeSingle();
+        const resolvedMode = data?.user_mode === 'encrypted' || data?.user_mode === 'reflective'
+          ? data.user_mode
+          : mode;
+        setCurrentUserMode(resolvedMode);
+        navigate(RoutePath.DASHBOARD, { replace: true });
+        return;
       }
+      setError('Something went wrong. Please try again.');
       setIsSubmitting(false);
     }
   };

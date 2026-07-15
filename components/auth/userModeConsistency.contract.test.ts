@@ -51,10 +51,42 @@ describe('UserModeContext failure handling', () => {
 
   it('surfaces an error instead of silently assuming reflective on fetch failure', () => {
     expect(source).toContain('userModeError');
-    const errorBranch = source.slice(source.indexOf('if (error)'), source.indexOf('const mode ='));
+    const errorBranch = source.slice(source.indexOf('if (error)'), source.indexOf('if (data == null)'));
     expect(errorBranch).toContain('setUserMode(null)');
     expect(errorBranch).toContain('setUserModeError(true)');
     expect(errorBranch).not.toContain("setUserMode('reflective')");
+  });
+
+  it('fails closed when the profile row is missing', () => {
+    expect(source).toContain('if (data == null)');
+    const missingRowBranch = source.slice(
+      source.indexOf('if (data == null)'),
+      source.indexOf('A missing user_mode column value'),
+    );
+    expect(missingRowBranch).toContain('setUserMode(null)');
+    expect(missingRowBranch).toContain('setUserModeError(true)');
+    expect(missingRowBranch).not.toContain("?? 'reflective'");
+  });
+
+  it('cancels stale mode fetches with a request token instead of a by-value flag', () => {
+    expect(source).toContain('requestIdRef');
+    expect(source).toContain('requestId !== requestIdRef.current');
+    expect(source).not.toContain('loadMode(user.id, isActive)');
+  });
+});
+
+describe('ModeSelect already-set escape hatch', () => {
+  const source = read('pages/onboarding/ModeSelect.tsx');
+
+  it('treats already-set RPC errors as a redirect after reading user_mode', () => {
+    expect(source).toContain("message.includes('already been set')");
+    expect(source).toContain(".select('user_mode')");
+    expect(source).toContain('setCurrentUserMode(resolvedMode)');
+    expect(source).toContain('navigate(RoutePath.DASHBOARD, { replace: true })');
+  });
+
+  it('reads RPC error messages from plain objects as well as Error instances', () => {
+    expect(source).toContain("'message' in err");
   });
 });
 

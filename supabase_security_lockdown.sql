@@ -52,6 +52,8 @@ grant select (
   newsletter_unsubscribed_at,
   smart_mode_enabled,
   user_mode,
+  onboarding_completed_at,
+  onboarding_version_seen,
   updated_at
 ) on table public.profiles to authenticated;
 

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { supabase } from '../src/supabaseClient';
 import { useAuthStore } from '../hooks/useAuthStore';
 import type { UserMode } from '../services/privateMode';
@@ -18,23 +18,11 @@ export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [userMode, setUserMode] = useState<UserMode | null>(null);
   const [isUserModeLoading, setIsUserModeLoading] = useState(true);
   const [userModeError, setUserModeError] = useState(false);
+  // Bumped on cleanup / newer request so stale fetches cannot overwrite state.
+  const requestIdRef = useRef(0);
 
-  useEffect(() => {
-    let isActive = true;
-
-    if (!user?.id) {
-      setUserMode(null);
-      setCurrentUserMode(null);
-      setUserModeError(false);
-      setIsUserModeLoading(false);
-      return;
-    }
-
-    loadMode(user.id, isActive);
-    return () => { isActive = false; };
-  }, [user?.id]);
-
-  const loadMode = async (userId: string, isActive = true) => {
+  const loadMode = useCallback(async (userId: string) => {
+    const requestId = ++requestIdRef.current;
     setIsUserModeLoading(true);
     setUserModeError(false);
     const { data, error } = await supabase
@@ -43,7 +31,7 @@ export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       .eq('id', userId)
       .maybeSingle();
 
-    if (!isActive) return;
+    if (requestId !== requestIdRef.current) return;
 
     if (error) {
       // Do NOT silently assume 'reflective' here: an encrypted user on a bad
@@ -57,18 +45,43 @@ export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       return;
     }
 
+    // Missing profile row (signup lag / RLS hide) must fail closed — do not
+    // invent a reflective mode before the permanent choice is resolved.
+    if (data == null) {
+      console.error('[UserModeContext] Profile row missing while resolving user_mode');
+      setUserMode(null);
+      setCurrentUserMode(null);
+      setUserModeError(true);
+      setIsUserModeLoading(false);
+      return;
+    }
+
     // A missing user_mode column value (never onboarded) safely defaults to
-    // reflective; only genuine fetch failures are treated as errors above.
-    const mode = (data?.user_mode as UserMode) ?? 'reflective';
+    // reflective; only genuine fetch failures / missing rows are errors above.
+    const mode = (data.user_mode as UserMode) ?? 'reflective';
     setUserMode(mode);
     setCurrentUserMode(mode);
     setIsUserModeLoading(false);
-  };
+  }, []);
 
-  const refreshUserMode = async () => {
+  useEffect(() => {
+    if (!user?.id) {
+      requestIdRef.current += 1;
+      setUserMode(null);
+      setCurrentUserMode(null);
+      setUserModeError(false);
+      setIsUserModeLoading(false);
+      return;
+    }
+
+    void loadMode(user.id);
+    return () => { requestIdRef.current += 1; };
+  }, [user?.id, loadMode]);
+
+  const refreshUserMode = useCallback(async () => {
     if (!user?.id) return;
     await loadMode(user.id);
-  };
+  }, [user?.id, loadMode]);
 
   return (
     <UserModeContext.Provider value={{ userMode, isUserModeLoading, userModeError, refreshUserMode }}>

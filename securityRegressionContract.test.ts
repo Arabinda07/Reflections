@@ -16,9 +16,22 @@ describe('launch security regression contract', () => {
     expect(sql).toContain('claim_ai_usage');
     expect(sql).toContain('drop policy if exists "Public profiles are viewable by everyone."');
     expect(sql).toContain('revoke update on table public.profiles from authenticated');
+    expect(sql).toContain('onboarding_completed_at');
+    expect(sql).toContain('onboarding_version_seen');
     expect(sql).toContain('Users can insert citations for own themes and notes');
     expect(sql).toContain('Users can insert own absorb log for own notes');
     expect(sql).toContain('allowed_mime_types');
+  });
+
+  it('grants clients select on onboarding status columns used by ModeSelect gating', () => {
+    const lockdown = read('supabase_security_lockdown.sql');
+    const migration = read('supabase/migrations/20260715093000_grant_onboarding_status_columns.sql');
+
+    expect(lockdown).toMatch(/grant select \([\s\S]*onboarding_completed_at[\s\S]*\) on table public\.profiles to authenticated/);
+    expect(lockdown).toMatch(/grant select \([\s\S]*onboarding_version_seen[\s\S]*\) on table public\.profiles to authenticated/);
+    expect(migration).toContain('grant select (onboarding_completed_at, onboarding_version_seen)');
+    expect(migration).toContain('on table public.profiles');
+    expect(migration).toContain('to authenticated');
   });
 
   it('sets a CSP that allows required third parties without inline script execution', () => {
