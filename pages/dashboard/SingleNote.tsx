@@ -20,13 +20,14 @@ import { X } from '@phosphor-icons/react/X';
 import { Button } from '../../components/ui/Button';
 import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
 import { Input } from '../../components/ui/Input';
-import { LoadingState } from '../../components/ui/LoadingState';
 import { Alert } from '../../components/ui/Alert';
 import { MetadataPill } from '../../components/ui/MetadataPill';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { Tooltip } from '../../components/ui/Tooltip';
 import { PageContainer } from '../../components/ui/PageContainer';
+import { Skeleton } from '../../components/ui/Skeleton';
 import { StorageImage } from '../../components/ui/StorageImage';
+import { Surface } from '../../components/ui/Surface';
 import { noteService } from '../../services/noteService';
 import { storageService } from '../../services/storageService';
 import { useViewTransitionNavigation } from '../../hooks/useViewTransitionNavigation';
@@ -312,10 +313,41 @@ export const SingleNote: React.FC = () => {
 
   if (loading) {
     return (
-      <LoadingState
-        title="Opening your reflection..."
-        isVisible
-      />
+      <PageContainer className="surface-scope-paper page-wash pb-24 pt-6 md:pt-10">
+        <div className="mb-8 flex items-center justify-between gap-2">
+          <button
+            type="button"
+            onClick={() => navigate(RoutePath.NOTES)}
+            className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-green/5 hover:text-green"
+            aria-label="Go back to my reflections"
+          >
+            <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
+            <span>Back</span>
+          </button>
+        </div>
+
+        <Surface
+          variant="bezel"
+          tone="paper"
+          className="max-w-[var(--measure-wide)]"
+          innerClassName="space-y-5 p-6 sm:p-10"
+          aria-busy="true"
+          aria-label="Opening your reflection"
+        >
+          <Skeleton variant="text" className="h-5 w-40" />
+          <Skeleton variant="text" className="h-9 w-3/4 max-w-[28rem]" />
+          <div className="space-y-3 pt-4">
+            <Skeleton variant="text" className="w-full" />
+            <Skeleton variant="text" className="w-11/12" />
+            <Skeleton variant="text" className="w-full" />
+            <Skeleton variant="text" className="w-4/5" />
+            <Skeleton variant="text" className="w-full" />
+            <Skeleton variant="text" className="w-10/12" />
+            <Skeleton variant="text" className="w-3/4" />
+            <Skeleton variant="text" className="w-5/6" />
+          </div>
+        </Surface>
+      </PageContainer>
     );
   }
 
@@ -439,7 +471,7 @@ export const SingleNote: React.FC = () => {
                           type="button"
                           onClick={() => removeTag(tag)}
                           aria-label={`Remove tag ${tag}`}
-                          className="flex h-5 w-5 items-center justify-center rounded-full text-gray-nav transition-colors hover:bg-clay/10 hover:text-clay"
+                          className="flex h-11 w-11 -my-3 -mr-2 items-center justify-center rounded-full text-gray-nav transition-colors hover:text-clay focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-clay/40"
                         >
                           <X size={11} weight="bold" />
                         </button>

@@ -5,6 +5,7 @@ import type { Note, NoteAttachment, Task } from '../types';
 import { RoutePath } from '../types';
 import { noteService } from '../services/noteService';
 import { notePublishingOrchestrator } from '../services/notePublishingOrchestrator';
+import { useUserMode } from '../context/UserModeContext';
 import { profileService } from '../services/profileService';
 import { PRIVATE_WRITING_ONBOARDING_VERSION } from '../features/private-writing-onboarding/onboardingContent';
 import { recordOnboardingFunnelEvent } from '../services/onboardingFunnelService';
@@ -19,6 +20,12 @@ import {
 export interface SaveResult {
   observation: { text: string } | null;
   wasFirstPrivateReflection: boolean;
+  /**
+   * True only when the draft was fully published (note + attachments). Callers
+   * must not navigate away on `false`, or in-flight writing/attachments would be
+   * abandoned.
+   */
+  success: boolean;
 }
 
 interface NoteDraftState {
@@ -76,6 +83,13 @@ const EMPTY_DRAFT_INPUT = {
 
 const NOTE_DRAFT_READY_DELAY_MS = 450;
 
+// Upper bound on a single save. This is a stall guard for a wedged network
+// socket that never errors — NOT a "give up and leave" timer. It is generous
+// enough for large attachment uploads on slow connections, and on expiry the
+// save is reported as failed (the draft stays on screen) rather than navigating
+// away and silently dropping in-flight writing.
+const SAVE_WATCHDOG_MS = 30000;
+
 /**
  * Hook that owns the full note draft lifecycle:
  * create → edit → snapshot → save → navigate.
@@ -87,6 +101,7 @@ const NOTE_DRAFT_READY_DELAY_MS = 450;
 export const useNoteDraft = (): NoteDraftState => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const { userMode } = useUserMode();
 
   // Core state
   const [title, setTitle] = useState('');
@@ -257,31 +272,41 @@ export const useNoteDraft = (): NoteDraftState => {
   // ── Save orchestration ──
   const save = useCallback(async (): Promise<SaveResult> => {
     if (!currentSnapshot.title && !currentSnapshot.content) {
-      return { observation: null, wasFirstPrivateReflection: false };
+      return { observation: null, wasFirstPrivateReflection: false, success: false };
     }
 
     setSaving(true);
 
-    const nuclearTimer = window.setTimeout(() => {
-      if (!isUnmountedRef.current) {
-        setSaving(false);
-        navigateWithBypass(RoutePath.DASHBOARD);
-      }
-    }, 5000);
+    // Stall guard only: reject if publishing wedges, so the UI can recover.
+    // Unlike the old 5s "nuclear" timer, this never navigates away and never
+    // clears the draft — the writing stays on screen so nothing is lost and the
+    // writer can retry.
+    let watchdogTimer: number | undefined;
+    const watchdog = new Promise<never>((_, reject) => {
+      watchdogTimer = window.setTimeout(() => {
+        reject(new Error('save-watchdog-timeout'));
+      }, SAVE_WATCHDOG_MS);
+    });
 
     try {
-      const result = await notePublishingOrchestrator.publishDraft({
-        id,
-        title,
-        content,
-        mood,
-        tags,
-        tasks,
-        imagePreview,
-        existingAttachments,
-        newAttachments,
-        smartModeEnabled,
-      });
+      const result = await Promise.race([
+        notePublishingOrchestrator.publishDraft({
+          id,
+          title,
+          content,
+          mood,
+          tags,
+          tasks,
+          imagePreview,
+          existingAttachments,
+          newAttachments,
+          smartModeEnabled,
+          userMode,
+        }),
+        watchdog,
+      ]);
+
+      clearTimeout(watchdogTimer);
 
       setTasks(result.syncedTasks);
 
@@ -296,9 +321,8 @@ export const useNoteDraft = (): NoteDraftState => {
         newAttachments: [],
       });
 
-      clearTimeout(nuclearTimer);
       if (isUnmountedRef.current) {
-        return { observation: null, wasFirstPrivateReflection: false };
+        return { observation: null, wasFirstPrivateReflection: false, success: true };
       }
 
       setExistingAttachments(result.mergedAttachments);
@@ -315,13 +339,13 @@ export const useNoteDraft = (): NoteDraftState => {
         existingNoteCountRef.current = 1;
       }
 
-      return { observation: result.observation, wasFirstPrivateReflection };
+      return { observation: result.observation, wasFirstPrivateReflection, success: true };
     } catch {
-      clearTimeout(nuclearTimer);
+      clearTimeout(watchdogTimer);
       if (!isUnmountedRef.current) {
         setSaving(false);
       }
-      return { observation: null, wasFirstPrivateReflection: false };
+      return { observation: null, wasFirstPrivateReflection: false, success: false };
     }
   }, [
     currentSnapshot.title,
@@ -336,7 +360,7 @@ export const useNoteDraft = (): NoteDraftState => {
     existingAttachments,
     newAttachments,
     smartModeEnabled,
-    navigateWithBypass,
+    userMode,
   ]);
 
   // ── Release (write-and-let-go) orchestration ──

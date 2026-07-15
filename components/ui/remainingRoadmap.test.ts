@@ -50,10 +50,12 @@ describe('remaining roadmap contract', () => {
     expect(lifeWiki).toContain('SANCTUARY_LEVEL_UP_ANIMATION_SRC');
   });
 
-  it('keeps the library page on the shared loader and lazy calendar path', () => {
+  it('keeps the library page on skeleton loading and lazy calendar path', () => {
     const myNotes = read('pages/dashboard/MyNotes.tsx');
 
-    expect(myNotes).toContain('<LoadingState');
+    expect(myNotes).toContain('NotesLibrarySkeletonGrid');
+    expect(myNotes).toContain("from '../../components/ui/Skeleton'");
+    expect(myNotes).not.toContain('<LoadingState');
     expect(myNotes).not.toContain('isContentVisible');
     expect(myNotes).toContain('buildNotePreviewText');
     expect(myNotes).toContain("import('./MyNotesCalendar')");

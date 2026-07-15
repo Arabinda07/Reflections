@@ -4,6 +4,7 @@ import type { RelationshipImportInboxItem, RelationshipRecord } from '../types';
 import { cryptoService, type CryptoSession, type EncryptedEnvelope } from './cryptoService';
 import { requireCurrentCryptoSession } from './cryptoSessionStore';
 import { decryptEnvelope, encryptedColumns, rowAad } from './encryptedPayload';
+import { getCurrentUserMode } from './userModeStore';
 import {
   db,
   type LocalEncryptedRelationship,
@@ -118,12 +119,20 @@ const relationshipFromPayload = (
 
 export const mapRemoteRelationship = async (
   row: SupabaseRelationshipRow,
-  session: CryptoSession,
+  session?: CryptoSession,
 ): Promise<RelationshipRecord> => {
+  // Requires UserModeContext / setCurrentUserMode before any store call.
+  // Callers sit behind AuthenticatedAppShell → UserModeBoundary.
+  if (getCurrentUserMode() === 'reflective') {
+    const payload = row.encrypted_payload as unknown as RelationshipPayload;
+    if (!payload) throw new Error('Missing reflective relationship payload.');
+    return relationshipFromPayload(row, payload);
+  }
+
   const payload = await decryptEnvelope<RelationshipPayload>(
     row.encrypted_payload,
     relationshipAad(row.user_id, row.id),
-    session,
+    session || requireCurrentCryptoSession(),
   );
   if (!payload) {
     throw new Error('Relationship payload is not encrypted.');
@@ -133,15 +142,22 @@ export const mapRemoteRelationship = async (
 
 export const mapRemoteImportItem = async (
   row: SupabaseImportInboxRow,
-  session: CryptoSession,
+  session?: CryptoSession,
 ): Promise<RelationshipImportInboxItem> => {
-  const payload = await decryptEnvelope<ImportPayload>(
-    row.encrypted_payload,
-    importInboxAad(row.user_id, row.id),
-    session,
-  );
-  if (!payload) {
-    throw new Error('Relationship import payload is not encrypted.');
+  let payload: ImportPayload | null = null;
+  
+  if (getCurrentUserMode() === 'reflective') {
+    payload = row.encrypted_payload as unknown as ImportPayload;
+    if (!payload) throw new Error('Missing reflective import payload.');
+  } else {
+    payload = await decryptEnvelope<ImportPayload>(
+      row.encrypted_payload,
+      importInboxAad(row.user_id, row.id),
+      session || requireCurrentCryptoSession(),
+    );
+    if (!payload) {
+      throw new Error('Relationship import payload is not encrypted.');
+    }
   }
 
   return {
@@ -177,13 +193,21 @@ const encryptLocalRelationship = async (
 
 export const decryptLocalRelationship = async (
   relationship: LocalEncryptedRelationship | undefined,
-  session: CryptoSession,
+  session?: CryptoSession,
 ): Promise<LocalRelationship | undefined> => {
   if (!relationship) return undefined;
+  
+  if (getCurrentUserMode() === 'reflective') {
+    return {
+      ...(relationship as unknown as LocalRelationship),
+      syncStatus: relationship.syncStatus,
+    };
+  }
+  
   const payload = await decryptEnvelope<RelationshipPayload>(
     relationship.encryptedPayload,
     localRelationshipAad(relationship),
-    session,
+    session || requireCurrentCryptoSession(),
   );
   if (!payload) return undefined;
   return {
@@ -224,13 +248,21 @@ const encryptLocalImport = async (
 
 const decryptLocalImport = async (
   item: LocalEncryptedRelationshipImportInboxItem | undefined,
-  session: CryptoSession,
+  session?: CryptoSession,
 ): Promise<LocalRelationshipImportInboxItem | undefined> => {
   if (!item) return undefined;
+  
+  if (getCurrentUserMode() === 'reflective') {
+    return {
+      ...(item as unknown as LocalRelationshipImportInboxItem),
+      syncStatus: item.syncStatus,
+    };
+  }
+
   const payload = await decryptEnvelope<ImportPayload>(
     item.encryptedPayload,
     localImportAad(item),
-    session,
+    session || requireCurrentCryptoSession(),
   );
   if (!payload) return undefined;
   return {
@@ -253,36 +285,70 @@ const decryptLocalImport = async (
   };
 };
 
-export const toRemoteRelationshipRow = async (relationship: RelationshipRecord, userId: string) => ({
-  id: relationship.id,
-  user_id: userId,
-  created_at: relationship.createdAt,
-  updated_at: relationship.updatedAt,
-  ...(await encryptedColumns(payloadFromRelationship(relationship), relationshipAad(userId, relationship.id))),
-});
 
-export const toRemoteImportRow = async (item: RelationshipImportInboxItem, userId: string) => ({
-  id: item.id,
-  user_id: userId,
-  source: item.source,
-  status: item.status,
-  created_at: item.createdAt,
-  updated_at: item.updatedAt,
-  ...(await encryptedColumns(
-    {
-      name: item.name,
-      sourceFingerprint: item.sourceFingerprint,
-      googleResourceName: item.googleResourceName,
-      photoUrl: item.photoUrl,
-      email: item.email,
-      phone: item.phone,
-      company: item.company,
-      role: item.role,
-      suggestedMergeRelationshipId: item.suggestedMergeRelationshipId,
-    },
-    importInboxAad(userId, item.id),
-  )),
-});
+export const toRemoteRelationshipRow = async (
+  relationship: RelationshipRecord,
+  userId: string,
+): Promise<Record<string, unknown>> => {
+  // Mode must already be initialized (getCurrentUserMode throws otherwise).
+  // Do not call from boot paths that run before UserModeBoundary settles.
+  const isReflective = getCurrentUserMode() === 'reflective';
+  // Reflective users store the plaintext payload directly in encrypted_payload.
+  // This column is reused because the schema was built for encrypted-only; the
+  // CHECK constraint (via zero_knowledge_is_forced()) is disabled for reflective
+  // users, so plaintext JSON is accepted. encryption_migration_state: 'verified'
+  // is set to satisfy NOT NULL constraints, not to imply actual encryption.
+  const columns = isReflective 
+    ? { encrypted_payload: payloadFromRelationship(relationship), encrypted_payload_version: 1, encryption_migration_state: 'verified' }
+    : await encryptedColumns(
+        payloadFromRelationship(relationship),
+        relationshipAad(userId, relationship.id),
+        requireCurrentCryptoSession(),
+      );
+
+  return {
+    id: relationship.id,
+    user_id: userId,
+    ...columns,
+    created_at: relationship.createdAt,
+    updated_at: relationship.updatedAt,
+  };
+};
+
+export const toRemoteImportRow = async (
+  item: RelationshipImportInboxItem,
+  userId: string,
+): Promise<Record<string, unknown>> => {
+  const payload = {
+    name: item.name,
+    sourceFingerprint: item.sourceFingerprint,
+    googleResourceName: item.googleResourceName,
+    photoUrl: item.photoUrl,
+    email: item.email,
+    phone: item.phone,
+    company: item.company,
+    role: item.role,
+    suggestedMergeRelationshipId: item.suggestedMergeRelationshipId,
+  };
+  
+  // Mode must already be initialized — same rule as toRemoteRelationshipRow.
+  // Google import always routes through this helper (no separate mode gate).
+  const isReflective = getCurrentUserMode() === 'reflective';
+  // See comment in toRemoteRelationshipRow — same pattern for import inbox rows.
+  const columns = isReflective 
+    ? { encrypted_payload: payload, encrypted_payload_version: 1, encryption_migration_state: 'verified' }
+    : await encryptedColumns(payload, importInboxAad(userId, item.id), requireCurrentCryptoSession());
+
+  return {
+    id: item.id,
+    user_id: userId,
+    source: item.source,
+    status: item.status,
+    ...columns,
+    created_at: item.createdAt,
+    updated_at: item.updatedAt,
+  };
+};
 
 export const hasExistingImportFingerprint = (
   sourceFingerprint: string | undefined,
@@ -298,6 +364,10 @@ export const saveRelationshipLocal = async (
   relationship: RelationshipRecord,
   syncStatus: LocalSyncStatus,
 ) => {
+  if (getCurrentUserMode() === 'reflective') {
+    await db.relationships.put({ ...relationship, userId, syncStatus } as any);
+    return;
+  }
   await db.relationships.put(await encryptLocalRelationship({ ...relationship, userId, syncStatus }, requireCurrentCryptoSession()));
 };
 
@@ -306,6 +376,10 @@ export const saveImportLocal = async (
   item: RelationshipImportInboxItem,
   syncStatus: LocalSyncStatus,
 ) => {
+  if (getCurrentUserMode() === 'reflective') {
+    await db.relationshipImportInbox.put({ ...item, userId, syncStatus } as any);
+    return;
+  }
   await db.relationshipImportInbox.put(await encryptLocalImport({ ...item, userId, syncStatus }, requireCurrentCryptoSession()));
 };
 
@@ -348,8 +422,8 @@ interface EntityMirror<TRemote extends { id: string; user_id: string }, TModel e
   dexieTable: Table<MirrorRow>;
   remoteTable: string;
   orderColumn: string;
-  decryptLocal: (row: MirrorRow | undefined, session: CryptoSession) => Promise<TModel | undefined>;
-  mapRemoteRow: (row: TRemote, session: CryptoSession) => Promise<TModel>;
+  decryptLocal: (row: MirrorRow | undefined, session?: CryptoSession) => Promise<TModel | undefined>;
+  mapRemoteRow: (row: TRemote, session?: CryptoSession) => Promise<TModel>;
   toRemoteRow: (item: TModel, userId: string) => Promise<Record<string, unknown>>;
   saveLocal: (userId: string, item: TModel, syncStatus: LocalSyncStatus) => Promise<void>;
 }
@@ -359,7 +433,7 @@ const getLocalEntity = async <TRemote extends { id: string; user_id: string }, T
   userId: string,
 ): Promise<TModel[]> => {
   const cached = await mirror.dexieTable.where('userId').equals(userId).toArray();
-  const decrypted = await Promise.all(cached.map((row) => mirror.decryptLocal(row, requireCurrentCryptoSession())));
+  const decrypted = await Promise.all(cached.map((row) => mirror.decryptLocal(row)));
   return decrypted.filter((item) => Boolean(item)) as TModel[];
 };
 
@@ -373,7 +447,7 @@ const flushPendingEntity = async <TRemote extends { id: string; user_id: string 
     .toArray();
 
   for (const cached of pending) {
-    const item = await mirror.decryptLocal(cached, requireCurrentCryptoSession());
+    const item = await mirror.decryptLocal(cached);
     if (!item) continue;
 
     if (item.syncStatus === 'pending_delete') {
@@ -403,7 +477,7 @@ const loadCachedEntities = async <TRemote extends { id: string; user_id: string 
       .eq('user_id', userId)
       .order(mirror.orderColumn, { ascending: false });
     if (error) throw error;
-    const items = await Promise.all(((data || []) as TRemote[]).map((row) => mirror.mapRemoteRow(row, requireCurrentCryptoSession())));
+    const items = await Promise.all(((data || []) as TRemote[]).map((row) => mirror.mapRemoteRow(row)));
     for (const item of items) {
       const local = await mirror.dexieTable.get(item.id);
       if (!local || local.syncStatus === 'synced') {

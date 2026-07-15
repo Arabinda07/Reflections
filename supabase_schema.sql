@@ -21,6 +21,8 @@ create table if not exists profiles (
   newsletter_unsubscribed_at timestamptz,
   onboarding_completed_at timestamptz,
   onboarding_version_seen integer,
+  user_mode text not null default 'reflective'
+    check (user_mode in ('encrypted', 'reflective')),
   free_ai_reflections_used int default 0,
   free_wiki_insights_used int default 0,
   smart_mode_enabled boolean default false,

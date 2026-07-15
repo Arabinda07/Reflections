@@ -252,7 +252,7 @@ export const Insights: React.FC = () => {
 
           <div aria-live="polite" aria-busy={loading} className="w-full core-section-stack">
             {loading ? (
-            <Surface variant="flat" tone="sage" className="p-8 md:p-10">
+            <Surface variant="flat" tone="sage" className="rounded-[2rem] p-8 md:p-12">
               <WeeklyRecapLoadingSkeleton />
             </Surface>
           ) : isEmpty ? (

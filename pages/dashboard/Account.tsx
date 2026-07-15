@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
 import { Camera } from '@phosphor-icons/react/Camera';
 import { CaretDown } from '@phosphor-icons/react/CaretDown';
+import { CaretRight } from '@phosphor-icons/react/CaretRight';
 import { Check } from '@phosphor-icons/react/Check';
 import { CircleNotch } from '@phosphor-icons/react/CircleNotch';
 import { DeviceMobile } from '@phosphor-icons/react/DeviceMobile';
@@ -25,6 +26,7 @@ import { PageContainer } from '../../components/ui/PageContainer';
 import { Tooltip } from '../../components/ui/Tooltip';
 import { ReferralInvitePanel } from '../../components/ui/ReferralInvitePanel';
 import { SectionHeader } from '../../components/ui/SectionHeader';
+import { Skeleton } from '../../components/ui/Skeleton';
 import { StorageImage } from '../../components/ui/StorageImage';
 import { Surface } from '../../components/ui/Surface';
 import { supabase } from '../../src/supabaseClient';
@@ -33,6 +35,7 @@ import { noteService } from '../../services/noteService';
 import { storageService } from '../../services/storageService';
 import { offlineStorage } from '../../services/offlineStorage';
 import { useAuthStore } from '../../hooks/useAuthStore';
+import { useUserMode } from '../../context/UserModeContext';
 import { profileService } from '../../services/profileService';
 import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
 import { getPasswordResetRedirectTo } from '../../src/auth/authRedirectConfig';
@@ -85,6 +88,7 @@ type FeedbackState =
 export const Account: React.FC = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuthStore();
+  const { userMode } = useUserMode();
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [isSaved, setIsSaved] = useState(false);
@@ -160,12 +164,14 @@ export const Account: React.FC = () => {
   }, [isSaved]);
 
   const membershipCopy = useMemo(() => {
+    const encryptionPrefix = userMode === 'encrypted' ? 'Your writing is encrypted on this device. ' : '';
+    
     if (access?.planTier === 'pro') {
-      return 'Your writing is encrypted on this device. Pro gives you unlimited notes, on-demand AI reflections, and more Life Wiki refreshes.';
+      return `${encryptionPrefix}Pro gives you unlimited commonplace spaces, on-demand AI memory synthesis, and custom relationship rhythms.`;
     }
 
-    return 'Your writing is encrypted on this device. Free plan includes 30 notes each month, 1 AI reflection, and 1 Life Wiki refresh.';
-  }, [access]);
+    return `${encryptionPrefix}Free plan includes 30 entries each month, 1 AI reflection, and 1 Life Wiki refresh. If you cancel Pro, your past notes remain completely safe and readable.`;
+  }, [access, userMode]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData((previous) => ({ ...previous, [event.target.name]: event.target.value }));
@@ -319,9 +325,35 @@ export const Account: React.FC = () => {
 
   if (fetching) {
     return (
-      <div className="flex min-h-[100dvh] w-full items-center justify-center bg-body">
-        <CircleNotch size={32} className="animate-spin text-gray-nav" />
-      </div>
+      <PageContainer className="surface-scope-paper page-wash pb-24 pt-6 md:pt-10">
+        <div className="core-page-stack" aria-busy="true" aria-label="Loading account settings">
+          <Skeleton variant="text" className="h-6 w-20" />
+          <div className="space-y-2">
+            <Skeleton variant="text" className="h-8 w-64" />
+            <Skeleton variant="text" className="h-4 w-48" />
+          </div>
+          <Surface variant="bezel" innerClassName="p-6 sm:p-8">
+            <div className="flex items-center gap-4">
+              <Skeleton variant="circle" className="h-16 w-16" />
+              <div className="flex-1 space-y-2">
+                <Skeleton variant="text" className="h-5 w-40" />
+                <Skeleton variant="text" className="h-4 w-56" />
+              </div>
+            </div>
+            <div className="mt-6 space-y-4">
+              <Skeleton variant="text" className="h-12 w-full rounded-xl" />
+              <Skeleton variant="text" className="h-12 w-full rounded-xl" />
+            </div>
+          </Surface>
+          <Surface variant="bezel" innerClassName="p-6 sm:p-8">
+            <Skeleton variant="text" className="h-5 w-32" />
+            <div className="mt-4 space-y-3">
+              <Skeleton variant="text" className="h-11 w-full rounded-xl" />
+              <Skeleton variant="text" className="h-11 w-full rounded-xl" />
+            </div>
+          </Surface>
+        </div>
+      </PageContainer>
     );
   }
 
@@ -480,6 +512,19 @@ export const Account: React.FC = () => {
                     <ShieldCheck size={22} weight="duotone" className="text-green" />
                     Security
                   </h3>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <MetadataPill
+                      tone="green"
+                      icon={userMode === 'encrypted' ? <Key size={12} weight="fill" /> : <Sparkle size={12} weight="fill" />}
+                    >
+                      {userMode === 'encrypted' ? 'Encrypted Vault' : 'Reflective mode'}
+                    </MetadataPill>
+                    <span className="text-sm font-medium text-gray-nav">
+                      {userMode === 'encrypted'
+                        ? 'Only you can read your writing'
+                        : 'AI features are enabled'}
+                    </span>
+                  </div>
 
                   <div className="space-y-1">
                     <button
@@ -515,6 +560,18 @@ export const Account: React.FC = () => {
                         />
                       </div>
                     ) : null}
+
+                    <button
+                      type="button"
+                      onClick={() => navigate(RoutePath.RECOVER_PRIVATE_WRITING)}
+                      className="group flex w-full items-center justify-between px-2 py-4 text-left transition-colors hover:bg-green/5 rounded-xl"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Key size={18} weight="duotone" className="text-gray-light" />
+                        <span className="text-sm font-bold text-gray-text">Recover private writing</span>
+                      </div>
+                      <CaretRight size={18} weight="bold" className="text-gray-light transition-transform duration-300 group-hover:translate-x-1 group-hover:text-green" />
+                    </button>
 
                     <div className="flex flex-wrap items-center justify-between gap-2 px-2 py-4 opacity-60">
                       <div className="flex items-center gap-3">
@@ -634,10 +691,10 @@ export const Account: React.FC = () => {
       >
         <div className="space-y-4 text-ui-sm font-medium leading-relaxed text-gray-light">
           <p>
-            This removes your saved notes, moods, tags, tasks, and profile row from the app. It also removes stored attachments and avatar files before we close your session.
+            This permanently deletes your commonplace archive. All notes, files, relationship logs, and compiled wiki pages will be wiped forever. We cannot recover them.
           </p>
           <p>
-            If you want the sign-in account itself closed too, use the support request button here after deleting the saved writing.
+            If you want the sign-in account itself closed too, use the support request button here after deleting the saved archive.
           </p>
         </div>
       </ModalSheet>

@@ -24,9 +24,12 @@ export const rowAad = (table: string) =>
 export const decryptEnvelope = async <T>(
   envelope: EncryptedEnvelope | null | undefined,
   aad: EncryptionAad,
-  session: CryptoSession = requireCurrentCryptoSession(),
-): Promise<T | null> =>
-  isEncryptedEnvelope(envelope) ? cryptoService.decryptJson<T>(session, aad, envelope) : null;
+  session?: CryptoSession | null,
+): Promise<T | null> => {
+  if (!isEncryptedEnvelope(envelope)) return null;
+  const activeSession = session ?? requireCurrentCryptoSession();
+  return cryptoService.decryptJson<T>(activeSession, aad, envelope);
+};
 
 /** The encrypted columns every zero-knowledge Supabase row writes. */
 export const encryptedColumns = async <T>(

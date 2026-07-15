@@ -1,8 +1,10 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PublicPageIcon, type PublicPageIconName } from '../../components/ui/PublicPageIcon';
 import { PublicPageHero, PublicPageSection, PublicPageShell } from '../../components/ui/PublicPageShell';
 import { useDocumentMeta } from '../../hooks/useDocumentMeta';
 import { PUBLIC_SEO_COPY } from '../../src/config/publicSeoCopy.js';
+import { getPublicHomePath } from '../../src/utils/authHints';
 
 type PublicIconCard = {
   icon: PublicPageIconName;
@@ -69,13 +71,13 @@ const practiceItems: PublicIconCard[] = [
 // The substantive trust/billing answers, featured in a tone panel.
 const featuredDetails: PublicIconCard[] = [
   {
-    title: 'Encrypted on your device',
-    body: 'Your notes, moods, letters, attachments, Life Wiki, and relationships are encrypted on your device before they are saved. The key comes from your password, so the server stores writing it cannot read.',
+    title: 'Two privacy modes',
+    body: 'You can choose "Encrypted Vault" to encrypt your notes, moods, and relationships locally on your device, or "Reflective Sanctuary" to securely process your writing with AI on the server. The choice is yours.',
     icon: 'shield',
   },
   {
-    title: 'Your password and recovery phrase',
-    body: 'You unlock your writing once on each device. If you forget your password, the recovery phrase you saved during setup is the only other way in, so keep it somewhere safe. On a device you trust, you can choose to stay unlocked.',
+    title: 'Unlocking your writing',
+    body: 'In Encrypted Vault mode, you unlock your writing once on each device. If you forget your password, the recovery phrase is the only other way in. In Reflective Sanctuary, this step is completely bypassed.',
     icon: 'shield',
   },
   {
@@ -109,7 +111,7 @@ const detailItems: PublicIconCard[] = [
   },
   {
     title: 'Relationships, kept private',
-    body: 'The people you add and the notes around them are encrypted on your device like the rest of your writing. Nothing is shared, scored, or pushed at you — it waits until you open it.',
+    body: 'The people you add and the notes around them stay private. In Encrypted Vault mode they are encrypted on your device; in Reflective Sanctuary they are stored securely so AI can help when you ask. Either way, nothing is shared, scored, or pushed at you — it waits until you open it.',
     icon: 'heart',
   },
 ];
@@ -132,14 +134,17 @@ export const FAQ: React.FC = () => {
     description: FAQ_SEO.description,
     path: FAQ_SEO.path,
   });
+  const navigate = useNavigate();
+  const homePath = getPublicHomePath();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
   return (
-    <PublicPageShell scope="sky">
+    <PublicPageShell scope="paper">
       <PublicPageHero
+        onBack={() => navigate(homePath)}
         title={
           <>
             Untangle your <br />

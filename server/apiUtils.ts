@@ -135,3 +135,22 @@ export const getErrorStatusCode = (error: unknown) =>
 
 export const getErrorMessage = (error: unknown, fallback = 'Request failed') =>
   error instanceof Error ? error.message : fallback;
+
+/**
+ * Resolve the user's permanent privacy mode for server-side gates.
+ * Fail-closed: returns null when the profile cannot be read or user_mode is
+ * unset, so AI callers must deny rather than assume reflective.
+ */
+export const getUserMode = async (
+  userId: string,
+): Promise<'encrypted' | 'reflective' | null> => {
+  const admin = createSupabaseAdminClient();
+  const { data, error } = await admin
+    .from('profiles')
+    .select('user_mode')
+    .eq('id', userId)
+    .maybeSingle();
+  if (error || !data?.user_mode) return null;
+  if (data.user_mode !== 'encrypted' && data.user_mode !== 'reflective') return null;
+  return data.user_mode;
+};

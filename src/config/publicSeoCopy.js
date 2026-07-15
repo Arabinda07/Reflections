@@ -1,4 +1,4 @@
-export const PUBLIC_SEO_LAST_MODIFIED = '2026-06-25';
+export const PUBLIC_SEO_LAST_MODIFIED = '2026-07-06';
 
 export const PUBLIC_SEO_COPY = {
   home: {
@@ -156,23 +156,18 @@ export const PUBLIC_SEO_COPY = {
     path: '/about',
     title: 'About Reflections - A Private Journal by Arabinda',
     description:
-      'A note from Arabinda about building Reflections as a private journal where writing comes first and AI waits until invited.',
+      'Tired of keeping everything in your head? Reflections is a simple, private app to dump your thoughts, sort them out, and make them useful.',
     h1: 'About Reflections',
     intro:
-      'Reflections began as a slower place to write, notice feelings, and leave without being pushed to perform.',
+      'A simple, private app to clear your mental tabs so you can focus on what matters today.',
     sections: [
       {
-        title: 'Private writing',
-        body: 'Reflections is built around writing that stays private and ordinary.',
+        title: 'Our minds are always busy',
+        body: 'Between office work, Instagram reels, WhatsApp chats, and family, our brains never get a break. Even when we try to rest, we are still thinking about the next thing. Reflections is my small attempt to help you pause and clear that mental clutter.',
       },
       {
-        title: 'No pressure loops',
-        body: 'Write at your own pace without pressure loops, scores, or public feeds.',
-      },
-      {
-        title: 'AI should wait',
-        body:
-          'AI support appears when invited, or when Smart Mode is explicitly enabled, and should never act like it knows you better than you do.',
+        title: 'Write it down to let it go',
+        body: 'Therapy is helpful, but it is too expensive or hard to find for many of us. Reflections is not a replacement for professional therapy. It is just a simple, everyday tool. When you write a thought down, it stops spinning in your head and taking over your day.',
       },
     ],
     articleSchema: {
@@ -181,7 +176,7 @@ export const PUBLIC_SEO_COPY = {
       datePublished: '2025-01-01',
       dateModified: PUBLIC_SEO_LAST_MODIFIED,
       description:
-        'A note from Arabinda about building Reflections as a private journal where writing comes first and AI waits until invited.',
+        'Tired of keeping everything in your head? Reflections is a simple, private app to dump your thoughts, sort them out, and make them useful.',
     },
   },
   dayOne: {

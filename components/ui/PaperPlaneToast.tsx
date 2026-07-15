@@ -46,9 +46,8 @@ export const PaperPlaneToast: React.FC<PaperPlaneToastProps> = ({
           />
         </div>
 
-        <div className="flex flex-col gap-1">
-          <span className="overlay-feedback-title">Saving the swirl</span>
-          <span className="overlay-feedback-message">Putting it somewhere safe</span>
+        <div>
+          <span className="overlay-feedback-title">Saving this entry</span>
         </div>
       </motion.div>
     </OverlayFeedback>

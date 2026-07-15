@@ -6,7 +6,7 @@ const ROUTE_SURFACE_SCOPE_CLASS: Partial<Record<RoutePath, string>> = {
   [RoutePath.DASHBOARD]: 'surface-scope-sage',
   [RoutePath.NOTES]: 'surface-scope-sage',
   [RoutePath.CREATE_NOTE]: 'surface-scope-paper',
-  [RoutePath.RELEASE]: 'surface-scope-clay',
+  [RoutePath.RELEASE]: 'surface-scope-sage',
   [RoutePath.FUTURE_LETTERS]: 'surface-scope-sage',
   [RoutePath.ACCOUNT]: 'surface-scope-paper',
   [RoutePath.INSIGHTS]: 'surface-scope-sage',

@@ -62,6 +62,12 @@
   --native-top-control-offset: calc(1rem + env(safe-area-inset-top));
   --native-page-top-padding: calc(6rem + env(safe-area-inset-top));
 
+  /* Semantic stacking layers. --z-modal is the top interactive layer (modal
+     sheets, blocking overlays); --z-grain is the decorative grain, kept below
+     modals. Values preserve the previously hard-coded stacking order. */
+  --z-grain: 9999;
+  --z-modal: 999999;
+
   --dark-blue: oklch(0.25 0.05 260);
   --blue: oklch(0.54 0.16 245);
   --blue-shadow: oklch(0.40 0.16 245);
@@ -110,6 +116,9 @@
   --page-wash-clay:
     radial-gradient(circle at 14% 9%, oklch(from var(--clay) 0.955 0.024 h / 0.5), transparent 35%),
     linear-gradient(145deg, oklch(from var(--clay) 0.982 0.012 h), var(--bg-color) 48%, oklch(from var(--honey) 0.984 0.01 h / 0.42));
+  --page-wash-mixed:
+    radial-gradient(circle at 14% 9%, oklch(from var(--color-mood-mixed) 0.958 0.028 h / 0.56), transparent 36%),
+    linear-gradient(145deg, oklch(from var(--color-mood-mixed) 0.982 0.016 h), var(--bg-color) 48%, oklch(from var(--green) 0.982 0.01 h / 0.58));
   --page-wash: var(--page-wash-sage);
   --surface-paper-bg:
     linear-gradient(145deg,
@@ -160,6 +169,16 @@
   --surface-clay-bezel:
     linear-gradient(145deg,
       oklch(from var(--clay) 0.74 0.07 h / 0.28),
+      oklch(1 0 0 / 0.18));
+  --surface-mixed-bg:
+    linear-gradient(145deg,
+      oklch(from var(--color-mood-mixed) 0.96 0.026 h / 0.86),
+      oklch(from var(--panel-bg) l c h / 0.94));
+  --surface-mixed-border: oklch(from var(--color-mood-mixed) l c h / 0.24);
+  --surface-mixed-accent: var(--color-mood-mixed);
+  --surface-mixed-bezel:
+    linear-gradient(145deg,
+      oklch(from var(--color-mood-mixed) 0.78 0.08 h / 0.32),
       oklch(1 0 0 / 0.18));
   --surface-tinted-shadow:
     0 20px 44px -30px oklch(from var(--bg-color) 0.2 0.01 h / 0.2),
@@ -235,6 +254,7 @@
   --color-mood-sad: var(--blue);
   --color-mood-angry: var(--red);
   --color-mood-tired: oklch(0.60 0.05 260);
+  --color-mood-mixed: oklch(0.56 0.13 350);
 
   /* Status Tokens */
   --color-success-soft: oklch(from var(--green) 0.955 0.03 h);
@@ -1082,7 +1102,7 @@ details:focus-visible,
     .dashboard-prompt-text {
       font-size: var(--text-4xl, 2.25rem);
       line-height: 1.2;
-      letter-spacing: -0.02em;
+      letter-spacing: 0;
     }
   }
 
@@ -1195,6 +1215,10 @@ details:focus-visible,
     --page-wash: var(--page-wash-clay);
   }
 
+  .surface-scope-mixed {
+    --page-wash: var(--page-wash-mixed);
+  }
+
   .surface-scope-paper,
   .surface-scope-neutral,
   .surface-tone-paper,
@@ -1236,6 +1260,14 @@ details:focus-visible,
     --surface-current-border: var(--surface-clay-border);
     --surface-current-accent: var(--surface-clay-accent);
     --surface-current-bezel: var(--surface-clay-bezel);
+  }
+
+  .surface-scope-mixed,
+  .surface-tone-mixed {
+    --surface-current-bg: var(--surface-mixed-bg);
+    --surface-current-border: var(--surface-mixed-border);
+    --surface-current-accent: var(--surface-mixed-accent);
+    --surface-current-bezel: var(--surface-mixed-bezel);
   }
 
   .surface-tone-auto {
@@ -1360,11 +1392,22 @@ details:focus-visible,
     --surface-current-bezel: var(--surface-clay-bezel);
   }
 
+  .tone-panel-mixed,
+  .tone-icon-mixed,
+  .tone-chip-mixed,
+  .surface-panel-mixed {
+    --surface-current-bg: var(--surface-mixed-bg);
+    --surface-current-border: var(--surface-mixed-border);
+    --surface-current-accent: var(--surface-mixed-accent);
+    --surface-current-bezel: var(--surface-mixed-bezel);
+  }
+
   .surface-panel-paper,
   .surface-panel-sage,
   .surface-panel-sky,
   .surface-panel-honey,
-  .surface-panel-clay {
+  .surface-panel-clay,
+  .surface-panel-mixed {
     background: var(--surface-current-bg);
   }
 
@@ -1614,7 +1657,7 @@ details:focus-visible,
     font-style: italic;
     font-weight: 700;
     line-height: 1.1;
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
     color: var(--green);
   }
 
@@ -2608,16 +2651,16 @@ details:focus-visible,
   }
 
   .chip-filter:hover {
-    border-color: oklch(from var(--green) l c h / 0.26);
-    background: oklch(from var(--green) l c h / 0.07);
-    color: var(--green);
+    border-color: oklch(from var(--surface-current-accent) l c h / 0.26);
+    background: oklch(from var(--surface-current-accent) l c h / 0.07);
+    color: var(--surface-current-accent);
   }
 
   .chip-filter--active {
-    border-color: oklch(from var(--green) l c h / 0.28);
-    background: oklch(from var(--green) l c h / 0.1);
-    color: var(--green);
-    box-shadow: 0 10px 22px -18px rgba(22, 163, 74, 0.4);
+    border-color: oklch(from var(--surface-current-accent) l c h / 0.28);
+    background: oklch(from var(--surface-current-accent) l c h / 0.1);
+    color: var(--surface-current-accent);
+    box-shadow: 0 10px 22px -18px oklch(from var(--surface-current-accent) l c h / 0.4);
   }
 
   .chip-filter-icon {
@@ -2925,7 +2968,7 @@ details:focus-visible,
     position: fixed;
     inset: 0;
     pointer-events: none;
-    z-index: 9999;
+    z-index: var(--z-grain, 9999);
     opacity: 0.028;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }

@@ -10,6 +10,7 @@ const AuthenticatedAppShell = lazy(() => import('./layouts/AuthenticatedAppShell
 const AuthAppShell = lazy(() => import('./layouts/AuthAppShell').then((m) => ({ default: m.AuthAppShell })));
 const ProtectedRoute = lazy(() => import('./components/auth/ProtectedRoute').then((m) => ({ default: m.ProtectedRoute })));
 const PrivateDataGate = lazy(() => import('./components/auth/PrivateDataGate').then((m) => ({ default: m.PrivateDataGate })));
+const UserModeGuard = lazy(() => import('./components/auth/UserModeGuard').then((m) => ({ default: m.UserModeGuard })));
 
 const SignIn = lazy(() => import('@/pages/auth/SignIn').then((m) => ({ default: m.SignIn })));
 const SignUp = lazy(() => import('@/pages/auth/SignUp').then((m) => ({ default: m.SignUp })));
@@ -31,6 +32,7 @@ const ComparisonPage = lazy(() => import('@/pages/dashboard/ComparisonPage').the
 const AuthCallback = lazy(() => import('@/pages/auth/AuthCallback').then((m) => ({ default: m.AuthCallback })));
 const HomeAuthenticated = lazy(() => import('@/pages/dashboard/HomeAuthenticated').then((m) => ({ default: m.HomeAuthenticated })));
 const NotFound = lazy(() => import('@/pages/NotFound').then((m) => ({ default: m.NotFound })));
+const ModeSelect = lazy(() => import('@/pages/onboarding/ModeSelect').then((m) => ({ default: m.ModeSelect })));
 
 const defaultRouteFallback = <RouteLoadingFrame />;
 const authRouteFallback = (
@@ -71,6 +73,18 @@ const withAuthRouteFallback = (element: React.ReactNode) =>
 const withWritingProtectedRoute = (element: React.ReactNode) =>
   withPrivateRoute(withRouteFallback(element, writingRouteFallback), writingRouteFallback);
 
+const withModeGuard = (
+  element: React.ReactNode,
+  requireMode: 'reflective' | 'encrypted',
+  fallbackPath?: string,
+) =>
+  withRouteFallback(
+    <UserModeGuard requireMode={requireMode} fallbackPath={fallbackPath}>
+      {element}
+    </UserModeGuard>,
+    defaultRouteFallback
+  );
+
 const RootLayout = () => (
   <>
     <ScrollRestoration />
@@ -97,6 +111,9 @@ const router = createBrowserRouter(
         <Route path={RoutePath.RESET_PASSWORD} element={withAuthRouteFallback(<ResetPassword />)} />
         <Route path={RoutePath.AUTH_CALLBACK} element={withAuthRouteFallback(<AuthCallback />)} />
       </Route>
+      <Route element={withProtectedRoute(<Outlet />)} errorElement={<RouteErrorBoundary />}>
+        <Route path={RoutePath.ONBOARDING_MODE_SELECT} element={withAuthRouteFallback(<ModeSelect />)} />
+      </Route>
 
       <Route element={withRouteFallback(<AuthenticatedAppShell />)} errorElement={<RouteErrorBoundary />}>
         <Route path={RoutePath.DASHBOARD_ALIAS} element={<Navigate to={RoutePath.DASHBOARD} replace />} />
@@ -108,11 +125,11 @@ const router = createBrowserRouter(
         <Route path={RoutePath.RELEASE} element={withPrivateRoute(withRouteFallback(<ReleaseMode />))} />
         <Route path={RoutePath.FUTURE_LETTERS} element={withPrivateRoute(withRouteFallback(<FutureLetters />))} />
         <Route path={RoutePath.ACCOUNT} element={withProtectedRoute(withRouteFallback(<Account />))} />
-        <Route path={RoutePath.RECOVER_PRIVATE_WRITING} element={withProtectedRoute(withRouteFallback(<RecoverPrivateWriting />))} />
-        <Route path={RoutePath.INSIGHTS} element={withPrivateRoute(withRouteFallback(<Insights />))} />
-        <Route path={RoutePath.WIKI} element={withPrivateRoute(withRouteFallback(<LifeWiki />))} />
-        <Route path={RoutePath.SANCTUARY} element={withPrivateRoute(withRouteFallback(<LifeWiki />))} />
-        <Route path={RoutePath.SANCTUARY_ARTICLE} element={withPrivateRoute(withRouteFallback(<LifeWiki />))} />
+        <Route path={RoutePath.RECOVER_PRIVATE_WRITING} element={withProtectedRoute(withModeGuard(withRouteFallback(<RecoverPrivateWriting />), 'encrypted'))} />
+        <Route path={RoutePath.INSIGHTS} element={withPrivateRoute(withModeGuard(withRouteFallback(<Insights />), 'reflective'))} />
+        <Route path={RoutePath.WIKI} element={withPrivateRoute(withModeGuard(withRouteFallback(<LifeWiki />), 'reflective'))} />
+        <Route path={RoutePath.SANCTUARY} element={withPrivateRoute(withModeGuard(withRouteFallback(<LifeWiki />), 'reflective'))} />
+        <Route path={RoutePath.SANCTUARY_ARTICLE} element={withPrivateRoute(withModeGuard(withRouteFallback(<LifeWiki />), 'reflective'))} />
         <Route path={RoutePath.RELATIONSHIPS} element={withPrivateRoute(withRouteFallback(<Relationships />))} />
         <Route path={RoutePath.RELATIONSHIP_DETAIL} element={withPrivateRoute(withRouteFallback(<Relationships />))} />
 

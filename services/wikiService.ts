@@ -5,6 +5,7 @@ import { mapToNote, type SupabaseNoteRow } from './noteService';
 import { getAuthenticatedUserId } from './authUtils';
 import type { EncryptedEnvelope } from './cryptoService';
 import { decryptEnvelope, encryptedColumns, rowAad } from './encryptedPayload';
+import { getCurrentUserMode } from './userModeStore';
 
 const VALID_THEME_STATES = new Set<LifeTheme['state']>(['active', 'archived', 'resolved']);
 const parseThemeState = (raw: string): LifeTheme['state'] =>
@@ -134,16 +135,24 @@ export const wikiService = {
   createTheme: async (title: string, content: string): Promise<LifeTheme> => {
     const userId = await getAuthenticatedUserId();
     const id = crypto.randomUUID();
+
+    const encryptedOrPlaintext =
+      getCurrentUserMode() === 'reflective'
+        ? { title, content }
+        : {
+            title: 'Encrypted theme',
+            content: '',
+            ...(await encryptedColumns({ title, content }, wikiAad(userId, id))),
+          };
+
     const { data, error } = await supabase
       .from('life_themes')
       .insert({
         id,
         user_id: userId,
-        title: 'Encrypted theme',
-        content: '',
         state: 'active',
         page_type: 'theme',
-        ...(await encryptedColumns({ title, content }, wikiAad(userId, id))),
+        ...encryptedOrPlaintext,
       })
       .select()
       .single();
@@ -159,11 +168,22 @@ export const wikiService = {
     const userId = await getAuthenticatedUserId();
     const existingTheme = await wikiService.getThemeById(themeId);
     if (!existingTheme) throw new Error('Theme not found.');
+
+    const encryptedOrPlaintext =
+      getCurrentUserMode() === 'reflective'
+        ? { content: newContent }
+        : {
+            content: '',
+            ...(await encryptedColumns(
+              { title: existingTheme.title, content: newContent },
+              wikiAad(userId, themeId),
+            )),
+          };
+
     const { data, error } = await supabase
       .from('life_themes')
       .update({
-        content: '',
-        ...(await encryptedColumns({ title: existingTheme.title, content: newContent }, wikiAad(userId, themeId))),
+        ...encryptedOrPlaintext,
         updated_at: new Date().toISOString(),
       })
       .eq('id', themeId)
@@ -225,6 +245,16 @@ export const wikiService = {
     const userId = await getAuthenticatedUserId();
     const existing = await wikiService.getWikiPage(pageType);
     const id = existing?.id || crypto.randomUUID();
+
+    const encryptedOrPlaintext =
+      getCurrentUserMode() === 'reflective'
+        ? { title, content }
+        : {
+            title: 'Encrypted wiki page',
+            content: '',
+            ...(await encryptedColumns({ title, content }, wikiAad(userId, id))),
+          };
+
     const { data, error } = await supabase
       .from('life_themes')
       .upsert(
@@ -232,13 +262,11 @@ export const wikiService = {
           id,
           user_id: userId,
           page_type: pageType,
-          title: 'Encrypted wiki page',
-          content: '',
           state: 'active',
-          ...(await encryptedColumns({ title, content }, wikiAad(userId, id))),
+          ...encryptedOrPlaintext,
           updated_at: new Date().toISOString(),
         },
-        { onConflict: 'user_id,page_type' }
+        { onConflict: 'user_id,page_type' },
       )
       .select()
       .single();

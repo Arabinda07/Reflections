@@ -57,9 +57,9 @@ describe('mood personalization config', () => {
   });
 
   it('returns display config for broad and specific saved moods', () => {
-    expect(getMoodConfig('light')?.label).toBe('Light');
-    expect(getMoodConfig('charged')?.label).toBe('Charged');
-    expect(getMoodConfig('calm')?.label).toBe('Calm');
+    expect(getMoodConfig('light')?.label).toBe('Happy');
+    expect(getMoodConfig('charged')?.label).toBe('Stressed');
+    expect(getMoodConfig('calm')?.label).toBe('Relaxed');
     expect(getMoodConfig('unknown')).toBeUndefined();
   });
 });

@@ -1,7 +1,7 @@
 .modal-sheet-root {
     position: fixed;
     inset: 0;
-    z-index: 999999;
+    z-index: var(--z-modal, 999999);
     display: flex;
     align-items: flex-end;
     justify-content: center;

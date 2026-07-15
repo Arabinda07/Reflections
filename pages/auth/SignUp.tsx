@@ -120,7 +120,7 @@ export const SignUp: React.FC = () => {
         commitAuthSession(data.session);
         storePendingAccountPassword(password, data.session.user.id);
         await recordAcceptedReferral();
-        navigate(postLoginPath, { replace: true, state: { justLoggedIn: true } });
+        navigate(RoutePath.ONBOARDING_MODE_SELECT, { replace: true, state: { justLoggedIn: true, next: postLoginPath } });
       }
     } catch (err) {
       console.error('Signup error:', err);

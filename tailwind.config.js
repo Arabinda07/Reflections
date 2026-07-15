@@ -80,6 +80,7 @@ export default {
           sad: 'var(--color-mood-sad)',
           angry: 'var(--color-mood-angry)',
           tired: 'var(--color-mood-tired)',
+          mixed: 'var(--color-mood-mixed)',
         },
         /* Text-on-accent: tinted near-white for text on green/accent backgrounds.
            Uses --hero-ink (oklch 0.98 0.01 135) instead of pure #fff. */

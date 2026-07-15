@@ -3,6 +3,7 @@ import type { Note, NoteAttachment, Task, MoodValue } from '../types';
 import type { CryptoSession, EncryptedEnvelope } from './cryptoService';
 import { requireCurrentCryptoSession } from './cryptoSessionStore';
 import { decryptEnvelope, encryptedColumns, rowAad } from './encryptedPayload';
+import { getCurrentUserMode } from './userModeStore';
 
 export interface SupabaseNoteRow {
   id: string;
@@ -111,8 +112,12 @@ export const mapToEncryptedDbNote = async (
   updated_at: note.updatedAt,
 });
 
-const mapRemoteNote = (userId: string, data: SupabaseNoteRow) =>
-  mapEncryptedPayloadToNote(data, userId, requireCurrentCryptoSession());
+const mapRemoteNote = (userId: string, data: SupabaseNoteRow) => {
+  if (getCurrentUserMode() === 'reflective') {
+    return mapToNote(data);
+  }
+  return mapEncryptedPayloadToNote(data, userId, requireCurrentCryptoSession());
+};
 
 /**
  * Pure Supabase CRUD for notes.
@@ -144,12 +149,18 @@ export const noteRemoteStore = {
   },
 
   insert: async (userId: string, note: Note): Promise<void> => {
-    const { error } = await supabase.from('notes').insert(await mapToEncryptedDbNote(note, userId));
+    const payload = getCurrentUserMode() === 'reflective' 
+      ? mapToDbNote(note, userId) 
+      : await mapToEncryptedDbNote(note, userId);
+    const { error } = await supabase.from('notes').insert(payload);
     if (error) throw error;
   },
 
   upsert: async (userId: string, note: Note): Promise<void> => {
-    const { error } = await supabase.from('notes').upsert(await mapToEncryptedDbNote(note, userId));
+    const payload = getCurrentUserMode() === 'reflective' 
+      ? mapToDbNote(note, userId) 
+      : await mapToEncryptedDbNote(note, userId);
+    const { error } = await supabase.from('notes').upsert(payload);
     if (error) throw error;
   },
 

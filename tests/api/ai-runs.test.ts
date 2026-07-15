@@ -4,6 +4,7 @@ const mockGetUser = vi.fn();
 const mockRpc = vi.fn();
 const mockGenerateContent = vi.fn();
 const mockGoogleGenAI = vi.fn();
+const mockMaybeSingle = vi.fn();
 
 class MockGoogleGenAI {
   readonly models = { generateContent: mockGenerateContent };
@@ -17,7 +18,13 @@ vi.mock('@supabase/supabase-js', () => ({
   createClient: vi.fn(() => ({
     auth: { getUser: mockGetUser },
     rpc: mockRpc,
-    from: vi.fn(),
+    from: vi.fn(() => ({
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          maybeSingle: mockMaybeSingle,
+        })),
+      })),
+    })),
   })),
 }));
 
@@ -38,6 +45,12 @@ const createResponse = () => {
   return response;
 };
 
+const runRequest = {
+  method: 'POST',
+  headers: { authorization: 'Bearer access-token' },
+  body: { kind: 'life_wiki_refresh', trigger: 'smart_mode' },
+};
+
 describe('/api/ai-runs strict private mode', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -47,17 +60,14 @@ describe('/api/ai-runs strict private mode', () => {
     process.env.SUPABASE_SERVICE_ROLE_KEY = 'service-role-key';
     process.env.GEMINI_API_KEY = 'server-gemini-key';
     mockGetUser.mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null });
+    mockMaybeSingle.mockResolvedValue({ data: { user_mode: 'encrypted' }, error: null });
   });
 
   it('rejects new AI runs before quota, storage, or provider work', async () => {
     const { default: handler } = await import('../../api/ai-runs');
     const response = createResponse();
 
-    await handler({
-      method: 'POST',
-      headers: { authorization: 'Bearer access-token' },
-      body: { kind: 'life_wiki_refresh', trigger: 'smart_mode' },
-    }, response);
+    await handler(runRequest, response);
 
     expect(response.statusCode).toBe(403);
     expect(JSON.parse(response.body)).toEqual({
@@ -65,6 +75,32 @@ describe('/api/ai-runs strict private mode', () => {
       message: expect.stringContaining('zero-knowledge'),
     });
     expect(mockGetUser).toHaveBeenCalled();
+    expect(mockRpc).not.toHaveBeenCalled();
+    expect(mockGoogleGenAI).not.toHaveBeenCalled();
+  });
+
+  it('rejects AI runs when user_mode cannot be resolved (fail-closed)', async () => {
+    mockMaybeSingle.mockResolvedValue({ data: null, error: null });
+    const { default: handler } = await import('../../api/ai-runs');
+    const response = createResponse();
+
+    await handler(runRequest, response);
+
+    expect(response.statusCode).toBe(403);
+    expect(JSON.parse(response.body).error).toBe('user_mode_unavailable');
+    expect(mockRpc).not.toHaveBeenCalled();
+    expect(mockGoogleGenAI).not.toHaveBeenCalled();
+  });
+
+  it('rejects AI runs when the profile fetch errors (fail-closed)', async () => {
+    mockMaybeSingle.mockResolvedValue({ data: null, error: { message: 'db down' } });
+    const { default: handler } = await import('../../api/ai-runs');
+    const response = createResponse();
+
+    await handler(runRequest, response);
+
+    expect(response.statusCode).toBe(403);
+    expect(JSON.parse(response.body).error).toBe('user_mode_unavailable');
     expect(mockRpc).not.toHaveBeenCalled();
     expect(mockGoogleGenAI).not.toHaveBeenCalled();
   });

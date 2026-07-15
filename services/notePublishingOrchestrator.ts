@@ -6,7 +6,7 @@ import { observationService } from './observationService';
 import { extractTasksFromContent, mergeTasks } from '../src/utils/taskParser';
 import { supabase } from '../src/supabaseClient';
 import type { Note, NoteAttachment, Task } from '../types';
-import { isPrivateAiDisabled } from './privateMode';
+import { isPrivateAiDisabled, type UserMode } from './privateMode';
 
 export interface NotePublishInput {
   id?: string;
@@ -19,6 +19,8 @@ export interface NotePublishInput {
   existingAttachments: NoteAttachment[];
   newAttachments: File[];
   smartModeEnabled: boolean;
+  /** Null while mode is still resolving — Smart Mode must not run until known. */
+  userMode: UserMode | null;
 }
 
 export interface NotePublishResult {
@@ -82,8 +84,14 @@ export const notePublishingOrchestrator = {
       attachments: mergedAttachments,
     });
 
-    // Smart mode auto-ingest (fire-and-forget)
-    if (input.smartModeEnabled && !isPrivateAiDisabled()) {
+    // Smart mode auto-ingest (fire-and-forget). Fail-closed: unknown mode must
+    // not be treated as reflective, or encrypted users could trigger AI while
+    // UserModeContext is still loading / errored.
+    if (
+      input.smartModeEnabled &&
+      input.userMode != null &&
+      !isPrivateAiDisabled(input.userMode)
+    ) {
       aiRunClient
         .startLifeWikiRefresh({ trigger: 'smart_mode', noteId: savedNote.id })
         .catch((error) => {

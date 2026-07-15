@@ -39,4 +39,19 @@ describe('launch security regression contract', () => {
     expect(csp).not.toMatch(/https:\/\/[^/\s;]*[A-Za-z0-9-]\*[^/\s;]*/);
     expect(csp).not.toContain("script-src 'self' 'unsafe-inline'");
   });
+  it('enforces per-user encryption mode in the database', () => {
+    const sql = read('supabase/migrations/20260701100000_per_user_mode.sql');
+    
+    expect(sql).toContain('create or replace function public.zero_knowledge_is_forced()');
+    expect(sql).toContain("select user_mode = 'encrypted' from public.profiles where id = auth.uid()");
+  });
+
+  it('prevents plaintext writes via DB check constraint for encrypted users', () => {
+    const sql1 = read('supabase/migrations/20260524083000_zero_knowledge_encryption.sql');
+    const sql2 = read('supabase/migrations/20260623090000_relationship_os.sql');
+    
+    // Core payload constraints
+    expect(sql1).toContain('check (public.zero_knowledge_is_forced() = false or encrypted_payload is not null)');
+    expect(sql2).toContain('check (public.zero_knowledge_is_forced() = false or encrypted_payload is not null)');
+  });
 });

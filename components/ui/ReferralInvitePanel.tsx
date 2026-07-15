@@ -144,7 +144,7 @@ export const ReferralInvitePanel: React.FC<ReferralInvitePanelProps> = ({ compac
   }
 
   return (
-    <div className={compact ? 'space-y-4' : 'space-y-5'}>
+    <div className={`surface-inline-panel p-5 rounded-[22px] ${compact ? 'space-y-4' : 'space-y-5'}`}>
       <p className="text-xs font-bold text-gray-nav">
         {acceptedCount === 0 ? 'No one has joined yet' : `${acceptedCount} ${acceptedCount === 1 ? 'person' : 'people'} joined`}
         {invite?.lastSharedAt ? ` · Shared ${new Date(invite.lastSharedAt).toLocaleDateString()}` : ''}
@@ -156,7 +156,7 @@ export const ReferralInvitePanel: React.FC<ReferralInvitePanelProps> = ({ compac
           size="md"
           onClick={handleShare} 
           disabled={!inviteLink || justCopied} 
-          className="w-fit transition-all"
+          className="min-h-11 w-fit self-end sm:self-auto transition-all"
         >
           {justCopied ? (
             <span className="flex items-center gap-2">

@@ -6,6 +6,7 @@ import {
   getClientIp,
   getErrorMessage,
   getErrorStatusCode,
+  getUserMode,
   hashForLogs,
   parseJsonBody,
   requireUser,
@@ -401,7 +402,14 @@ export default async function handler(req: any, res: any) {
 
   try {
     const user = await requireUser(supabaseAuth, req.headers?.authorization);
-    if (isStrictPrivateModeEnabled()) {
+    const userMode = await getUserMode(user.id);
+    if (userMode == null) {
+      return sendJson(res, 403, {
+        error: 'user_mode_unavailable',
+        message: 'Your privacy mode could not be confirmed. Try again in a moment.',
+      });
+    }
+    if (isStrictPrivateModeEnabled(userMode)) {
       return sendJson(res, 403, {
         error: 'strict_private_mode_ai_disabled',
         message: STRICT_PRIVATE_MODE_DISABLED_MESSAGE,
