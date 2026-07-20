@@ -15,6 +15,11 @@ const UserModeContext = createContext<UserModeContextValue>({ userMode: null, is
 
 export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const user = useAuthStore((state) => state.user);
+  // Wait for useAuthBootstrapper to validate (or invalidate) the JWT before
+  // firing loadMode. Without this guard, a stale user.id rehydrated from
+  // IndexedDB can race the session check and trigger a profile fetch with no
+  // valid JWT — causing RLS to return data=null and trip the error boundary.
+  const isInitialCheckDone = useAuthStore((state) => state.isInitialCheckDone);
   const [userMode, setUserMode] = useState<UserMode | null>(null);
   const [isUserModeLoading, setIsUserModeLoading] = useState(true);
   const [userModeError, setUserModeError] = useState(false);
@@ -65,6 +70,13 @@ export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, []);
 
   useEffect(() => {
+    if (!isInitialCheckDone) {
+      // JWT validation is still in-flight. Stay in loading state and let the
+      // effect re-run once useAuthBootstrapper settles. This prevents a stale
+      // IndexedDB user.id from triggering a profile fetch with an expired token.
+      return;
+    }
+
     if (!user?.id) {
       requestIdRef.current += 1;
       setUserMode(null);
@@ -76,7 +88,7 @@ export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
     void loadMode(user.id);
     return () => { requestIdRef.current += 1; };
-  }, [user?.id, loadMode]);
+  }, [user?.id, loadMode, isInitialCheckDone]);
 
   const refreshUserMode = useCallback(async () => {
     if (!user?.id) return;

@@ -49,6 +49,15 @@ export const useAuthStore = create<AuthState>()(
     {
       name: 'reflections-auth-storage',
       storage: createJSONStorage(() => storage),
+      // Only persist identity state. isHydrated and isInitialCheckDone are
+      // page-load ephemeral flags: persisting them caused isInitialCheckDone
+      // to survive as `true` across page loads, which let UserModeContext fire
+      // loadMode() before useAuthBootstrapper had validated the JWT — the root
+      // cause of the "profile row missing" race on expired sessions.
+      partialize: (state) => ({
+        user: state.user,
+        isAuthenticated: state.isAuthenticated,
+      }),
       onRehydrateStorage: () => (state) => {
         state?.setHydrated(true);
       },
