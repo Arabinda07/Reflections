@@ -44,40 +44,60 @@ export const ComparisonPage: React.FC<ComparisonPageProps> = ({ seoKey }) => {
         </header>
 
         {comparison && (
-          <div className="mb-16 overflow-x-auto rounded-[1.5rem] border border-border">
-            <table className="w-full border-collapse text-left text-ui-base">
-              <caption className="sr-only">{comparison.caption}</caption>
-              <thead>
-                <tr className="border-b border-border bg-gray-text/[0.03]">
-                  {comparison.headers.map((header, index) => (
-                    <th
-                      key={index}
-                      scope="col"
-                      className="px-4 py-3 font-display text-ui-xs font-extrabold uppercase tracking-wide text-gray-text first:w-[30%]"
-                    >
-                      {header}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {comparison.rows.map((row, rowIndex) => (
-                  <tr key={rowIndex} className="border-b border-border/60 last:border-0">
-                    {row.map((cell, cellIndex) =>
-                      cellIndex === 0 ? (
-                        <th key={cellIndex} scope="row" className="px-4 py-3 font-bold text-gray-text">
-                          {cell}
-                        </th>
-                      ) : (
-                        <td key={cellIndex} className="px-4 py-3 text-gray-light">
-                          {cell}
-                        </td>
-                      ),
-                    )}
+          <div className="mb-16">
+            <div className="hidden rounded-[1.5rem] border border-border md:block">
+              <table className="w-full border-collapse text-left text-ui-base">
+                <caption className="sr-only">{comparison.caption}</caption>
+                <thead>
+                  <tr className="border-b border-border bg-gray-text/[0.03]">
+                    {comparison.headers.map((header, index) => (
+                      <th
+                        key={index}
+                        scope="col"
+                        className="px-4 py-3 font-display text-ui-xs font-extrabold uppercase tracking-wide text-gray-text first:w-[30%]"
+                      >
+                        {header}
+                      </th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {comparison.rows.map((row, rowIndex) => (
+                    <tr key={rowIndex} className="border-b border-border/60 last:border-0">
+                      {row.map((cell, cellIndex) =>
+                        cellIndex === 0 ? (
+                          <th key={cellIndex} scope="row" className="px-4 py-3 font-bold text-gray-text">
+                            {cell}
+                          </th>
+                        ) : (
+                          <td key={cellIndex} className="px-4 py-3 text-gray-light">
+                            {cell}
+                          </td>
+                        ),
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <dl className="space-y-4 md:hidden">
+              {comparison.rows.map(([criterion, reflections, dayOne]) => (
+                <div key={criterion} className="rounded-[var(--radius-panel)] border border-border p-5">
+                  <dt className="font-display text-ui-lg font-bold text-gray-text">{criterion}</dt>
+                  <dl className="mt-4 grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-1.5">
+                      <dt className="label-caps text-green">{comparison.headers[1]}</dt>
+                      <dd className="font-sans text-ui-base leading-relaxed text-gray-light">{reflections}</dd>
+                    </div>
+                    <div className="space-y-1.5">
+                      <dt className="label-caps text-gray-nav">{comparison.headers[2]}</dt>
+                      <dd className="font-sans text-ui-base leading-relaxed text-gray-light">{dayOne}</dd>
+                    </div>
+                  </dl>
+                </div>
+              ))}
+            </dl>
           </div>
         )}
 

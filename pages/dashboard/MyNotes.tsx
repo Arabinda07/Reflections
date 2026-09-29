@@ -51,10 +51,11 @@ const NotesLibrarySkeletonGrid: React.FC = () => (
     {Array.from({ length: NOTES_LIBRARY_SKELETON_COUNT }, (_, index) => (
       <Surface
         key={index}
-        variant="flat"
-        className="overflow-hidden rounded-[2.5rem] border border-border/40"
+        variant="bezel"
+        tone="sage"
+        className="overflow-hidden"
       >
-        <Skeleton variant="card" className="rounded-none" />
+        <Skeleton variant="card" />
         <div className="space-y-3 p-6">
           <Skeleton variant="text" className="w-3/4" />
           <Skeleton variant="text" className="w-full" />
@@ -255,7 +256,8 @@ export const MyNotes: React.FC = () => {
       <Surface
         key={note.id}
         variant="flat"
-        className="group relative overflow-hidden rounded-[2.5rem] border border-border/40 transition-[transform,border-color,box-shadow] duration-500 hover:-translate-y-1 hover:border-green/20 hover:shadow-xl"
+        tone="sage"
+        className="group relative overflow-hidden rounded-4xl transition-[transform,border-color,box-shadow] duration-500 hover:-translate-y-1"
       >
         <div
           data-swipe-action-rail
@@ -347,7 +349,7 @@ export const MyNotes: React.FC = () => {
               {note.tags?.length ? (
                 <div className="mb-3 flex flex-wrap gap-2">
                   {note.tags.map((tag) => (
-                    <Chip key={tag} as="span" active className="text-xs">
+                    <Chip key={tag} as="span" active>
                       #{tag}
                     </Chip>
                   ))}
@@ -393,7 +395,8 @@ export const MyNotes: React.FC = () => {
 
   return (
     <>
-      <PageContainer className="surface-scope-sage page-wash pb-14 pt-4 md:pt-8">
+      <div className="surface-scope-sage page-wash min-h-dvh">
+        <PageContainer className="pb-14 pt-4 md:pt-8">
         <div className="core-page-stack animate-fade-in-up">
           <button
             onClick={() => navigate(RoutePath.DASHBOARD)}
@@ -459,9 +462,9 @@ export const MyNotes: React.FC = () => {
                   Showing reflections tagged "{tagFilter}" · {selectedTagSummary?.count || 0}{' '}
                   {(selectedTagSummary?.count || 0) === 1 ? 'reflection' : 'reflections'}
                 </p>
-                <Button variant="ghost" size="sm" onClick={() => handleTagFilterChange(RoutePath.NOTES)} className="text-clay">
-                  <X size={12} weight="regular" className="mr-1" />
-                  Clear filter
+                <Button variant="ghost" size="sm" onClick={() => handleTagFilterChange(RoutePath.NOTES)}>
+                  <X size={12} weight="regular" className="mr-1 text-clay" />
+                  <span className="text-clay">Clear filter</span>
                 </Button>
               </div>
             ) : null}
@@ -473,7 +476,7 @@ export const MyNotes: React.FC = () => {
                   <Surface variant="bezel" innerClassName="p-6 sm:p-8">
                     <Suspense
                       fallback={
-                        <div className="min-h-[420px]" aria-busy="true" aria-label="Loading calendar">
+                        <div className="min-h-105" aria-busy="true" aria-label="Loading calendar">
                           <div className="mb-6 flex items-center justify-between">
                             <Skeleton variant="text" className="h-6 w-32" />
                             <div className="flex gap-2">
@@ -483,7 +486,7 @@ export const MyNotes: React.FC = () => {
                           </div>
                           <div className="grid grid-cols-7 gap-2">
                             {Array.from({ length: 42 }).map((_, index) => (
-                              <Skeleton key={index} variant="text" className="h-12 rounded-lg" />
+                              <Skeleton key={index} variant="text" className="h-12" />
                             ))}
                           </div>
                         </div>
@@ -509,7 +512,7 @@ export const MyNotes: React.FC = () => {
                     </MetadataPill>
                   </div>
 
-                  <div className="space-y-4 max-h-[640px] overflow-y-auto pr-1 wellness-scroll">
+                  <div className="space-y-4 max-h-160 overflow-y-auto pr-1 wellness-scroll">
                     {notesOnSelectedDate.length > 0 ? (
                       notesOnSelectedDate.map((note, index) => renderNoteCard(note, index))
                     ) : (
@@ -519,8 +522,8 @@ export const MyNotes: React.FC = () => {
                         title="No notes on this day yet."
                         description="Pick another day, or write one here."
                         action={
-                          <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.CREATE_NOTE)} className="text-green">
-                            Write a note
+                          <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.CREATE_NOTE)}>
+                            <span className="text-green">Write a note</span>
                           </Button>
                         }
                       />
@@ -560,6 +563,7 @@ export const MyNotes: React.FC = () => {
           )}
         </div>
       </PageContainer>
+    </div>
 
       <ConfirmationDialog
         isOpen={isConfirmOpen}

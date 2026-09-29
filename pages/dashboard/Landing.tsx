@@ -202,19 +202,19 @@ export const Landing: React.FC = () => {
         </div>
 
         <div className="relative z-20 flex min-h-[100dvh] flex-col px-6 pb-[calc(env(safe-area-inset-bottom)+1.75rem)] pt-[calc(env(safe-area-inset-top)+var(--header-height)+1.5rem)] sm:px-12 sm:pt-[calc(env(safe-area-inset-top)+var(--header-height)+2rem)] lg:justify-between lg:pt-[28vh] lg:pb-12 lg:px-16 xl:px-24 pointer-events-none">
-          <div className="flex flex-col gap-6 lg:w-[60%] lg:gap-8 xl:w-[55%]">
+          <div className="flex flex-col gap-6 lg:w-3/5 lg:gap-8 xl:w-7/12">
             <h1
               aria-label={HOME_SEO.heroAriaLabel}
-              className="pointer-events-auto flex max-w-[11ch] flex-col text-mk-display font-display font-extrabold tracking-normal text-gray-text leading-[1.05] sm:leading-[1.0] lg:max-w-5xl lg:leading-[0.96]"
+              className="pointer-events-auto flex max-w-xs flex-col text-mk-display font-display font-extrabold tracking-normal text-gray-text leading-none lg:max-w-5xl"
             >
               <span>{HOME_SEO.heroLines[0]}</span>
-              <span className="font-serif italic font-normal text-green leading-[1.15]">
+              <span className="font-serif italic font-normal text-green leading-tight">
                 {HOME_SEO.heroLines[1]}
               </span>
               <span>{HOME_SEO.heroLines[2]}</span>
             </h1>
 
-            <p className="pointer-events-auto max-w-[26ch] sm:max-w-[32ch] lg:max-w-[40ch] font-sans text-base font-normal leading-relaxed text-gray-text/85 sm:text-lg">
+            <p className="pointer-events-auto max-w-xs sm:max-w-sm lg:max-w-md font-sans text-base font-normal leading-relaxed text-gray-text/85 sm:text-lg">
               {HOME_SEO.heroIntro.split(/(\bFree\b)/).map((part, index) =>
                 part === 'Free' ? <em key={index} className="font-serif italic text-green">{part}</em> : part,
               )}

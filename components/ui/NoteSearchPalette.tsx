@@ -92,7 +92,6 @@ export const NoteSearchPalette: React.FC<NoteSearchPaletteProps> = ({ isOpen, on
       mobilePlacement="center"
       hideClose
     >
-      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
       <div onKeyDown={handleKeyDown}>
         <div className="relative mb-4">
           <MagnifyingGlass

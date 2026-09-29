@@ -221,19 +221,20 @@ export const Insights: React.FC = () => {
               </div>
             </div>
             <div
-              className="relative z-10 flex max-w-[42rem] flex-col items-center text-center animate-fade-in-up"
+              className="relative z-10 flex max-w-2xl flex-col items-center text-center animate-fade-in-up"
             >
               <h2 className="mt-4 text-4xl font-display font-bold leading-tight text-gray-text md:text-5xl">
                 Opening Sanctuary
               </h2>
-              <p className="mt-4 max-w-[65ch] text-base font-medium leading-relaxed text-gray-light">
+              <p className="mt-4 max-w-prose text-base font-medium leading-relaxed text-gray-light">
                 Crossing into the library without breaking the calm of the page.
               </p>
             </div>
           </div>
         ) : null}
 
-      <PageContainer className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10">
+      <div className="surface-scope-sage page-wash min-h-dvh">
+        <PageContainer className="pb-24 pt-6 md:pt-10">
         <div className="core-page-stack">
           <button
             onClick={() => navigate(RoutePath.DASHBOARD)}
@@ -277,8 +278,8 @@ export const Insights: React.FC = () => {
                     <p className="dashboard-supporting-text">
                       A quiet week — that&rsquo;s allowed. Nothing to count here; your reflections are still in My notes whenever you want them.
                     </p>
-                    <Button variant="ghost" onClick={() => navigate(RoutePath.CREATE_NOTE)} className="text-green">
-                      Write something
+                    <Button variant="ghost" onClick={() => navigate(RoutePath.CREATE_NOTE)}>
+                      <span className="text-green">Write something</span>
                     </Button>
                   </div>
                 ) : (
@@ -300,7 +301,7 @@ export const Insights: React.FC = () => {
           <Surface
             variant="flat"
             tone="sage"
-            className="group relative overflow-hidden rounded-[2rem] border border-transparent transition-[border-color] duration-500 ease-out-expo hover:border-green/20"
+            className="group relative overflow-hidden rounded-[2rem]"
           >
             <Link
               to={RoutePath.SANCTUARY}
@@ -311,7 +312,7 @@ export const Insights: React.FC = () => {
             >
               <div className="space-y-5">
                 {isWikiReadyToBuild && (
-                  <div className="h-24 w-24 overflow-hidden rounded-[2rem] bg-[oklch(from_var(--color-accent)_l_c_h_/_0.16)]">
+                  <div className="h-24 w-24 overflow-hidden rounded-[2rem] bg-accent-soft">
                     <LottieAnimation src={SANCTUARY_LEVEL_UP_ANIMATION_SRC} animationId={SANCTUARY_LEVEL_UP_ANIMATION_ID} autoplay loop />
                   </div>
                 )}
@@ -338,6 +339,7 @@ export const Insights: React.FC = () => {
           </div>
         </div>
       </PageContainer>
+    </div>
     </>
   );
 };

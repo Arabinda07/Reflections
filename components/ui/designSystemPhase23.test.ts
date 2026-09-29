@@ -126,7 +126,7 @@ describe('phase 2/3 design-system rollout', () => {
     expect(product).toContain('The journal entry is the primary object.');
     expect(product).toContain('AI is invited, not ambient.');
     expect(home).toContain('surface-scope-sage');
-    expect(insights).toContain('tone="sky"');
+    expect(insights).toContain('tone="sage"');
   });
 
   it('applies subtle pastel page washes without raw body-surface escape hatches', () => {
@@ -162,21 +162,21 @@ describe('phase 2/3 design-system rollout', () => {
     expect(dashboardLayout).toContain('const routeSurfaceScopeClass = useSurfaceScope();');
     expect(dashboardLayout).toContain('`${routeSurfaceScopeClass} page-wash');
     expect(surfaceScope).toContain("[RoutePath.FAQ]: 'surface-scope-sky'");
-    expect(surfaceScope).toContain("[RoutePath.INSIGHTS]: 'surface-scope-sky'");
+    expect(surfaceScope).toContain("[RoutePath.INSIGHTS]: 'surface-scope-sage'");
     expect(surfaceScope).toContain("[RoutePath.FUTURE_LETTERS]: 'surface-scope-sage'");
-    expect(surfaceScope).toContain("[RoutePath.RELEASE]: 'surface-scope-clay'");
+    expect(surfaceScope).toContain("[RoutePath.RELEASE]: 'surface-scope-sage'");
     expect(surfaceScope).toContain("[RoutePath.ACCOUNT]: 'surface-scope-paper'");
     expect(landing).toContain('surface-scope-sage page-wash');
     expect(homeAuthenticated).toContain('surface-scope-sage page-wash');
     expect(myNotes).toContain('surface-scope-sage page-wash');
     expect(createNote).toContain('page-wash');
     expect(singleNote).toContain('surface-scope-paper page-wash');
-    expect(releaseMode).toContain('surface-scope-clay page-wash');
+    expect(releaseMode).toContain('surface-scope-sage page-wash');
     expect(futureLetters).toContain('surface-scope-sage page-wash');
-    expect(insights).toContain('surface-scope-sky page-wash');
+    expect(insights).toContain('surface-scope-sage page-wash');
     expect(lifeWiki).toContain('surface-scope-sage page-wash');
     expect(account).toContain('surface-scope-paper page-wash');
-    expect(faq).toContain('scope="sky"');
+    expect(faq).toContain('scope="paper"');
     expect(privacyPolicy).toContain('scope="paper"');
     expect(read('components/ui/PublicPageShell.tsx')).toContain('page-wash');
     expect(signIn).toContain('surface-scope-paper page-wash');
@@ -231,8 +231,8 @@ describe('phase 2/3 design-system rollout', () => {
     expect(moodConfig).not.toContain('bg-golden/10');
     expect(moodConfig).not.toContain('text-dark-blue');
 
-    expect(insights).toContain('surface-scope-sky');
-    expect(insights).toContain('tone="sky"');
+    expect(insights).toContain('surface-scope-sage');
+    expect(insights).toContain('tone="sage"');
   });
 
   it('keeps header buttons responsive without changing the calm brand treatment', () => {

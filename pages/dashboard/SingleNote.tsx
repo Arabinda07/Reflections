@@ -313,29 +313,30 @@ export const SingleNote: React.FC = () => {
 
   if (loading) {
     return (
-      <PageContainer className="surface-scope-paper page-wash pb-24 pt-6 md:pt-10">
-        <div className="mb-8 flex items-center justify-between gap-2">
-          <button
-            type="button"
-            onClick={() => navigate(RoutePath.NOTES)}
-            className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-green/5 hover:text-green"
-            aria-label="Go back to my reflections"
-          >
-            <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
-            <span>Back</span>
-          </button>
-        </div>
+      <div className="surface-scope-paper page-wash min-h-dvh pb-24 pt-6 md:pt-10">
+        <PageContainer>
+          <div className="mb-8 flex items-center justify-between gap-2">
+            <button
+              type="button"
+              onClick={() => navigate(RoutePath.NOTES)}
+              className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-green/5 hover:text-green"
+              aria-label="Go back to my reflections"
+            >
+              <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
+              <span>Back</span>
+            </button>
+          </div>
 
-        <Surface
-          variant="bezel"
-          tone="paper"
-          className="max-w-[var(--measure-wide)]"
-          innerClassName="space-y-5 p-6 sm:p-10"
-          aria-busy="true"
-          aria-label="Opening your reflection"
-        >
-          <Skeleton variant="text" className="h-5 w-40" />
-          <Skeleton variant="text" className="h-9 w-3/4 max-w-[28rem]" />
+          <Surface
+            variant="bezel"
+            tone="paper"
+            className="max-w-[var(--measure-wide)]"
+            innerClassName="space-y-5 p-6 sm:p-10"
+            aria-busy="true"
+            aria-label="Opening your reflection"
+          >
+            <Skeleton variant="text" className="h-5 w-40" />
+            <Skeleton variant="text" className="h-9 w-3/4 max-w-md" />
           <div className="space-y-3 pt-4">
             <Skeleton variant="text" className="w-full" />
             <Skeleton variant="text" className="w-11/12" />
@@ -347,7 +348,8 @@ export const SingleNote: React.FC = () => {
             <Skeleton variant="text" className="w-5/6" />
           </div>
         </Surface>
-      </PageContainer>
+        </PageContainer>
+      </div>
     );
   }
 
@@ -366,7 +368,8 @@ export const SingleNote: React.FC = () => {
 
   return (
     <>
-      <PageContainer className="surface-scope-paper page-wash pb-24 pt-6 md:pt-10">
+      <div className="surface-scope-paper page-wash min-h-dvh">
+        <PageContainer className="pb-24 pt-6 md:pt-10">
           {/* Top row — Back (matches Insights) + prev/next only */}
           <div className="mb-8 flex items-center justify-between gap-2">
             <button
@@ -457,7 +460,7 @@ export const SingleNote: React.FC = () => {
                     </button>
                   </div>
 
-                  <h1 className="font-serif text-[2.25rem] font-semibold leading-[1.12] text-gray-text text-balance sm:text-[2.75rem]">
+                  <h1 className="font-serif text-4xl font-semibold leading-tight text-gray-text text-balance sm:text-5xl">
                     {note.title || 'Untitled reflection'}
                   </h1>
 
@@ -548,6 +551,7 @@ export const SingleNote: React.FC = () => {
                 ) : null}
           </article>
       </PageContainer>
+    </div>
 
       <ModalSheet
         isOpen={isExportSheetOpen}
@@ -685,7 +689,7 @@ export const SingleNote: React.FC = () => {
               aria-label="Add a task"
               className="sm:flex-1"
             />
-            <Button type="submit" variant="primary" className="sm:min-w-[140px]">
+            <Button type="submit" variant="primary" className="sm:min-w-35">
               <Plus size={16} weight="bold" className="mr-2" />
               Add task
             </Button>

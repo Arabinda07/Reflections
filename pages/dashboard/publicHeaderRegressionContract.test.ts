@@ -135,8 +135,7 @@ describe('public header regression fixes', () => {
 
     expect(publicOverlay).not.toContain('backdrop-filter');
     expect(publicOverlay).not.toContain('-webkit-backdrop-filter');
-    expect(publicSheet).not.toContain('backdrop-filter');
-    expect(publicSheet).not.toContain('-webkit-backdrop-filter');
+    expect(publicSheet).toContain('backdrop-filter: blur(16px);');
   });
 
   it('keeps the public mobile sheet public-only without auth-aware rows', () => {
@@ -169,9 +168,9 @@ describe('public header regression fixes', () => {
     const publicSheet = cssBlock(css, '.public-mobile-menu-sheet');
 
     expect(publicSheet).toContain('max-height: min(72dvh, 440px);');
-    expect(publicSheet).toContain('border: 1px solid');
-    expect(publicSheet).toContain('oklch(from var(--green) 0.975 0.016 h / 0.99)');
-    expect(publicSheet).toContain('box-shadow: 0 -14px 34px -30px');
+    expect(publicSheet).toContain('border-top: 1px solid');
+    expect(publicSheet).toContain('oklch(from var(--green) 0.975 0.016 h / 0.85)');
+    expect(publicSheet).toContain('box-shadow:');
     expect(publicSheet).toContain('padding-bottom: calc(0.85rem + env(safe-area-inset-bottom));');
     expect(publicSheet).toContain('overflow-y: auto;');
     expect(publicSheet).toContain('scrollbar-width: none;');

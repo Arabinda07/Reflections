@@ -139,10 +139,9 @@ describe('engagement routes source contract', () => {
 
     expect(about).toContain('A note from');
     expect(about).toContain('Arabinda');
-    expect(about).toContain('writing stay private');
-    expect(about).toContain('AI should wait');
-    expect(about).toContain('Private writing');
-    expect(about).toContain('Thank you for trusting me with a few minutes of your day.');
+    expect(about).toContain('Our minds are always busy');
+    expect(about).toContain('Write it down to let it go');
+    expect(about).toContain('Tired of keeping everything in your head?');
     expect(about).toContain('PublicPageShell');
     expect(about).toContain('onBack');
     expect(about.toLowerCase()).not.toMatch(/\b(streak|score|xp|leaderboard|diagnose|therapy replacement)\b/);

@@ -386,7 +386,7 @@ export const CreateNote: React.FC = () => {
     try {
       hasSavedBefore = localStorage.getItem('reflections-save-choice-seen') === '1';
     } catch {
-      hasSavedBefore = false;
+      // ignore storage access errors
     }
 
     if (!hasSavedBefore) {
@@ -673,7 +673,7 @@ export const CreateNote: React.FC = () => {
             placeholder={activePlaceholder || "What's on your mind?"} 
             ariaLabel="Reflection body"
             hideToolbar={isMobile}
-            className="text-[20px] md:text-[22px] font-serif leading-[1.8] text-gray-text/90" 
+            className="text-xl md:text-2xl font-serif leading-relaxed text-gray-text/90" 
           />
 
           {/* Word count Ã¢â‚¬â€ shown only after 50+ words */}
@@ -977,7 +977,7 @@ export const CreateNote: React.FC = () => {
               className={`flex w-full items-center justify-between rounded-2xl border-2 p-4 text-left text-ui-sm font-bold transition-opacity ${activeMusicTrack?.id === track.id || pendingTrackId === track.id ? 'border-green bg-green/10 text-green' : 'control-surface text-gray-text hover:border-border hover:bg-green/5'} ${pendingTrackId !== null && pendingTrackId !== track.id ? 'opacity-60' : ''}`}
             >
               <span className="flex items-center gap-3">
-                <span className="text-[18px]">{track.emoji}</span>
+                <span className="text-lg">{track.emoji}</span>
                 {track.label}
               </span>
 
@@ -1009,9 +1009,9 @@ export const CreateNote: React.FC = () => {
       >
         <div className="space-y-8">
           <div className="surface-inline-panel surface-tone-sage p-5 sm:p-6">
-            <p className="text-[20px] leading-relaxed text-gray-text font-serif italic">"{aiReflection}"</p>
+            <p className="text-xl leading-relaxed text-gray-text font-serif italic">"{aiReflection}"</p>
           </div>
-          <Button variant="primary" className="h-14 w-full rounded-2xl" onClick={() => setAiReflection(null)}>
+          <Button variant="primary" size="lg" className="w-full" onClick={() => setAiReflection(null)}>
             Back to writing
           </Button>
         </div>

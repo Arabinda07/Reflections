@@ -106,7 +106,8 @@ export const DashboardLayout: React.FC = () => {
 
   const isWritingRoute =
     location.pathname === RoutePath.CREATE_NOTE ||
-    isNoteEditRoute;
+    isNoteEditRoute ||
+    location.pathname === RoutePath.RELEASE;
 
   const isMobileNavSuppressedRoute =
     location.pathname === RoutePath.INSIGHTS ||

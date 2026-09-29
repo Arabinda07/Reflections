@@ -181,16 +181,26 @@ export const PrivacyPolicy: React.FC = () => {
 
       {/* Principles */}
       <PublicPageSection tone="sage">
-        <div className="grid gap-8 lg:grid-cols-3">
-          {principles.map((item) => (
-            <article key={item.title} className="group">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
+          <article key={principles[0].title} className="group self-center">
+            <h2 className="flex items-center gap-2.5 text-ui-lg font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">
+              <PublicPageIcon name={principles[0].icon} size={20} className="flex-none text-green" />
+              {principles[0].title}
+            </h2>
+            <p className="mt-2.5 max-w-[52ch] font-sans text-ui-base leading-relaxed text-gray-light">{principles[0].body}</p>
+          </article>
+
+          <div className="flex flex-col justify-center gap-8">
+            {principles.slice(1).map((item) => (
+              <article key={item.title} className="group">
               <h2 className="flex items-center gap-2.5 text-ui-lg font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">
                 <PublicPageIcon name={item.icon} size={20} className="flex-none text-green" />
                 {item.title}
               </h2>
               <p className="mt-2.5 font-sans text-ui-base leading-relaxed text-gray-light">{item.body}</p>
-            </article>
-          ))}
+              </article>
+            ))}
+          </div>
         </div>
       </PublicPageSection>
 

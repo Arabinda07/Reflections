@@ -46,12 +46,16 @@ describe('public review fixes contract', () => {
     const faq = read('pages/dashboard/FAQ.tsx');
     const privacy = read('pages/dashboard/PrivacyPolicy.tsx');
 
-    // Both pages now compose the shared public-page shell; FAQ splits the trust
-    // trio out of the flat detail grid, Privacy keeps a borderless full-policy list.
+    // Both pages keep the shared shell, but the three-item trust/principle groups
+    // now have one lead item and a quiet supporting stack instead of equal cards.
     expect(faq).toContain('PublicPageShell');
-    expect(faq).toContain('featuredDetails');
+    expect(faq).toContain('featuredDetails[0]');
+    expect(faq).toContain('featuredDetails.slice(1)');
     expect(privacy).toContain('PublicPageShell');
-    expect(privacy).toContain('The full data picture');
+    expect(privacy).toContain('principles[0]');
+    expect(privacy).toContain('principles.slice(1)');
+    expect(faq).not.toContain('md:grid-cols-3');
+    expect(privacy).not.toContain('lg:grid-cols-3');
 
     for (const [file, source] of [
       ['FAQ.tsx', faq],
@@ -62,6 +66,18 @@ describe('public review fixes contract', () => {
       expect(source, file).not.toContain('divide-y');
       expect(source, file).not.toContain('border-b border-border');
     }
+  });
+
+  it('uses the same comparison data for mobile row cards while keeping the desktop table', () => {
+    const comparison = read('pages/dashboard/ComparisonPage.tsx');
+
+    expect(comparison).toContain('<table');
+    expect(comparison).toContain('hidden rounded-[1.5rem] border border-border md:block');
+    expect(comparison).toContain('md:hidden');
+    expect(comparison).not.toContain('overflow-x-auto');
+    expect(comparison).toContain('comparison.rows.map(([criterion, reflections, dayOne])');
+    expect(comparison).toContain('comparison.headers[1]');
+    expect(comparison).toContain('comparison.headers[2]');
   });
 
   it('caps backdrop blur and avoids long-lived backdrop-filter layers', () => {

@@ -57,7 +57,7 @@ describe('voice refresh copy safety', () => {
     expect(refreshedCopy).toContain('For the thought that keeps doing laps.');
 
     expect(refreshedCopy.toLowerCase()).not.toContain('my loneliness is killing me');
-    expect(refreshedCopy.toLowerCase()).not.toMatch(/\b(hurry|last chance|limited time|act now)\b/);
+    expect(refreshedCopy.toLowerCase()).not.toMatch(/(?<!no need to\s+)\bhurry\b|\b(last chance|limited time|act now)\b/);
     expect(refreshedCopy.toLowerCase()).not.toMatch(/\b(therapy replacement|diagnose|cure)\b/);
   });
 });

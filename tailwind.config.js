@@ -153,7 +153,6 @@ export default {
     },
   },
   plugins: [
-    require('@tailwindcss/container-queries'),
     function ({ addUtilities, matchUtilities }) {
       addUtilities({
         '.animation-fill-mode-both': { animationFillMode: 'both' },

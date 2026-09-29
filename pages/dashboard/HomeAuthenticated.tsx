@@ -632,7 +632,7 @@ export const HomeAuthenticated: React.FC = () => {
                     {dailyPrompt}
                   </p>
                   <div className="space-y-6 lg:space-y-8 lg:mt-8">
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-8">
+                    <div className="home-primary-action-row home-primary-action-cluster flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-8">
                       <Button
                         variant="primary"
                         className="min-h-12 py-3 px-6 w-full sm:w-auto rounded-xl bg-green text-sm sm:text-base font-bold text-white shadow-none transition-colors hover:bg-green/90"
@@ -654,7 +654,7 @@ export const HomeAuthenticated: React.FC = () => {
                         activeButtonClassName="border-green/25 bg-green/20"
                       />
                     </div>
-                    <div className="flex flex-row flex-wrap items-center justify-start gap-8 pb-2">
+                    <div className="home-secondary-action-row flex flex-row flex-wrap items-center justify-start gap-8 pb-2">
                       <button
                         onClick={() => setIsCheckInOpen(true)}
                         className="group inline-flex min-h-11 items-center gap-2 py-2 text-sm font-bold text-gray-nav transition-colors hover:text-green rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/40"

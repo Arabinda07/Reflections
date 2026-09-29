@@ -162,7 +162,7 @@ describe('focused product slice source contract', () => {
     liveCopyFiles.forEach((filePath) => {
       expect(read(filePath).toLowerCase()).not.toContain('quietly');
     });
-    expect(read('pages/dashboard/FutureLetters.tsx')).toContain('Waiting to open');
+    expect(read('pages/dashboard/FutureLetters.tsx').toLowerCase()).toContain('waiting to open');
     expect(read('api/ai.ts')).toContain('calm, and reflective');
   });
 

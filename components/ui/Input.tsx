@@ -14,7 +14,7 @@ export const Input: React.FC<InputProps> = ({ label, error, icon: Icon, classNam
   return (
     <div className="w-full space-y-2">
       {label && (
-        <label htmlFor={inputId} className="ml-1 block text-ui-xs font-extrabold text-gray-nav dark:text-zinc-300">
+        <label htmlFor={inputId} className="ml-1 block text-ui-xs font-extrabold text-gray-nav dark:text-border">
           {label}
         </label>
       )}
