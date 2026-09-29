@@ -124,7 +124,24 @@ export const getClientIp = (req: any) => {
 export const hashForLogs = (value: string) =>
   crypto.createHash('sha256').update(value).digest('hex');
 
-export const timingSafeEqualHex = (left: string, right: string) => {
+// ponytail: token counts go to function logs only; persist to ai_runs if per-user cost reports are needed
+export const logAiUsage = (
+  action: string,
+  model: string,
+  usage?: { promptTokenCount?: number; candidatesTokenCount?: number; thoughtsTokenCount?: number; totalTokenCount?: number },
+) => {
+  console.info(JSON.stringify({
+    event: 'ai_usage',
+    action,
+    model,
+    promptTokens: usage?.promptTokenCount ?? null,
+    outputTokens: usage?.candidatesTokenCount ?? null,
+    thinkingTokens: usage?.thoughtsTokenCount ?? null,
+    totalTokens: usage?.totalTokenCount ?? null,
+  }));
+};
+
+export const timingSafeEqualHex =(left: string, right: string) => {
   const leftBuffer = Buffer.from(left, 'hex');
   const rightBuffer = Buffer.from(right, 'hex');
   return leftBuffer.length === rightBuffer.length && crypto.timingSafeEqual(leftBuffer, rightBuffer);

@@ -151,7 +151,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
             );
           })}
           <div
-            className="w-[1px] h-[24px] bg-border mx-2"
+            className="w-px h-6 bg-border mx-2"
             role="separator"
             aria-orientation="vertical"
           ></div>

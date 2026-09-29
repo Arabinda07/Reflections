@@ -79,7 +79,7 @@ export const LandingRoute: React.FC = () => {
   }, [isCheckingSession, location.state, navigate]);
 
   if (isCheckingSession) {
-    return <RouteLoadingFrame className="surface-scope-sage page-wash min-h-[100dvh]" />;
+    return <RouteLoadingFrame className="surface-scope-sage page-wash min-h-dvh" />;
   }
 
   return <Landing />;

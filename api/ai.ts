@@ -8,6 +8,7 @@ import {
   getErrorStatusCode,
   getUserMode,
   hashForLogs,
+  logAiUsage,
   parseJsonBody,
   requireUser,
   sendJson,
@@ -63,9 +64,6 @@ const getGemini = () => {
   return new GoogleGenAI({ apiKey });
 };
 
-const cleanJson = (text: string) =>
-  text.replace(/```json/g, '').replace(/```/g, '').trim();
-
 const stripHtml = (html: string) => html.replace(/<[^>]*>/g, '').trim();
 
 const normalizeList = (value: unknown): string[] => {
@@ -77,6 +75,7 @@ const normalizeList = (value: unknown): string[] => {
 };
 
 const generateJson = async <T>(
+  action: AiAction,
   prompt: string,
   schema: Record<string, unknown>
 ): Promise<T> => {
@@ -89,20 +88,22 @@ const generateJson = async <T>(
       responseSchema: schema as any,
     },
   });
+  logAiUsage(action, GEMINI_MODEL, response.usageMetadata);
 
   try {
-    return JSON.parse(cleanJson(response.text || '{}')) as T;
+    return JSON.parse(response.text || '{}') as T;
   } catch {
     throw new HttpError(502, 'Malformed AI JSON');
   }
 };
 
-const generateText = async (prompt: string, model = GEMINI_MODEL): Promise<string> => {
+const generateText = async (action: AiAction, prompt: string, model = GEMINI_MODEL): Promise<string> => {
   const ai = getGemini();
   const response = await ai.models.generateContent({
     model,
     contents: prompt,
   });
+  logAiUsage(action, model, response.usageMetadata);
 
   return response.text?.trim() || '';
 };
@@ -213,10 +214,10 @@ const handlePrompts = async (payload: any) => {
       ? `Here are their most recent entries for context:\n${noteContext}`
       : 'The user has no past entries yet.',
     `Current entry:\nTitle: ${note?.title || 'Untitled'}\nContent: ${stripHtml(String(note?.content || ''))}`,
-    'Instructions:\n1. Notice a recurring theme, quiet tension, or pattern from these recent entries.\n2. Generate 4 brief, personalized journaling prompts that act as practical writing starters.\n3. Avoid clinical language, poetic metaphors, or wellness slogans. Do not use phrases like "gentle nudge," "slower look," "inner world," or "journey."\n4. Be direct, human, and useful. Focus on the actual events and thoughts described.\n5. Return only a JSON array of strings.',
+    'Write 4 brief, personalized journaling prompts that work as practical writing starters, drawing on a recurring theme, quiet tension, or pattern in these entries. Write like a plain-spoken friend rather than a wellness app: name the actual events and thoughts described, and skip clinical language, metaphor, and slogans.',
   ]);
 
-  const data = await generateJson<unknown>(prompt, {
+  const data = await generateJson<unknown>('prompts', prompt, {
     type: Type.ARRAY,
     items: { type: Type.STRING },
   } as any);
@@ -228,11 +229,10 @@ const handleTags = async (payload: any) => {
   const content = stripHtml(String(payload?.content || ''));
   const prompt = buildPrompt([
     'Based on this journal entry, suggest 3 relevant tags for organization.',
-    'Return only a JSON array of strings.',
     `Entry:\n${content}`,
   ]);
 
-  const data = await generateJson<unknown>(prompt, {
+  const data = await generateJson<unknown>('tags', prompt, {
     type: Type.ARRAY,
     items: { type: Type.STRING },
   } as any);
@@ -266,15 +266,10 @@ const handleReflection = async (payload: any) => {
     wikiContext ? `PATTERNS NOTICED SO FAR\n${wikiContext}` : '',
     recentContext ? `RECENT ENTRIES\n${recentContext}` : '',
     `Now here is today's journal entry:\nTitle: ${note?.title || 'Untitled'}\nMood: ${note?.mood || 'Not noted'}\nContent:\n${stripHtml(String(note?.content || ''))}`,
-    'Instructions:',
-    '1. Write a reflection of 3 short paragraphs.',
-    '2. Use the structure: One specific observation, one possible pattern ("seems to", "might"), and one gentle question or point to return to.',
-    '3. Avoid diagnosis, clinical labels, or generic advice.',
-    '4. Stay grounded in the current note while noticing connections to the past.',
-    '5. Output plain prose only.',
+    'Write a reflection of 3 short paragraphs of plain prose: one specific observation, one possible pattern ("seems to", "might"), and one gentle question or point to return to. Stay grounded in today\'s note while noticing connections to the past, and leave out diagnosis, clinical labels, and generic advice.',
   ]);
 
-  const text = await generateText(prompt);
+  const text = await generateText('reflection', prompt);
   return text || "I wasn't able to generate a reflection right now. Please try again.";
 };
 
@@ -290,7 +285,7 @@ const handleIngestDecision = async (payload: any) => {
     'Decide whether this journal entry contains a pattern worth noticing or if it should be skipped.',
     `Current Life Themes:\n${themeIndex || '(None yet - first entry)'}`,
     `New Journal Entry:\nTitle: ${note?.title || 'Untitled'}\nDate: ${note?.createdAt ? new Date(note.createdAt).toLocaleDateString() : 'Unknown'}\nContent: ${stripHtml(String(note?.content || ''))}\nMood: ${note?.mood || 'Not set'}`,
-    'Return only valid JSON with action, themeId, newThemeTitle, and reasoning. Use grounded, non-clinical reasoning.',
+    'Set action to "append" to add the entry to an existing theme (give its themeId), "create" to start a new theme (give newThemeTitle), or "skip" if the entry carries no pattern worth noticing. Use grounded, non-clinical reasoning.',
   ]);
 
   const decision = await generateJson<{
@@ -298,10 +293,10 @@ const handleIngestDecision = async (payload: any) => {
     themeId: string | null;
     newThemeTitle: string | null;
     reasoning: string;
-  }>(prompt, {
+  }>('ingestDecision', prompt, {
     type: Type.OBJECT,
     properties: {
-      action: { type: Type.STRING },
+      action: { type: Type.STRING, enum: ['append', 'create', 'skip'] },
       themeId: { type: Type.STRING, nullable: true },
       newThemeTitle: { type: Type.STRING, nullable: true },
       reasoning: { type: Type.STRING },
@@ -331,7 +326,7 @@ const handleIngestSynthesis = async (payload: any) => {
     'Rewrite the updated Markdown for this Life Theme. Use observant, non-clinical language. Focus on what seems to be returning. Output raw markdown only.',
   ]);
 
-  return generateText(prompt, INGEST_MODEL);
+  return generateText('ingestSynthesis', prompt, INGEST_MODEL);
 };
 
 const handleWikiPage = async (payload: any) => {
@@ -347,7 +342,7 @@ const handleWikiPage = async (payload: any) => {
     retryInstruction,
   });
 
-  return generateText(prompt, INGEST_MODEL);
+  return generateText('wikiPage', prompt, INGEST_MODEL);
 };
 
 const handleIndex = async (payload: any) => {
@@ -359,7 +354,7 @@ const handleIndex = async (payload: any) => {
     })),
   );
 
-  return generateText(prompt, INGEST_MODEL);
+  return generateText('index', prompt, INGEST_MODEL);
 };
 
 const handleWritingNotes = async (payload: any) => {
@@ -367,10 +362,11 @@ const handleWritingNotes = async (payload: any) => {
   const prompt = buildPrompt([
     'You are a careful, grounded mentor for the app Reflections, focused on private writing and mental clarity.',
     indexPage?.content ? `User context (from their Life Wiki patterns):\n${indexPage.content}` : 'No user context available yet.',
-    'Instructions:\n1. Generate 3 fresh "Writing Notes" (short, punchy quotes or pieces of advice) for the user.\n2. They should be grounded and focused on the act of noticing or returning to one’s thoughts. Avoid being overly "inspiring" or using wellness slogans.\n3. If user context is provided, tailor at least one note to what seems to be recurring in their life.\n4. Each note must have an "author" (a real person like Marcus Aurelius, Carl Jung, Joan Didion, Natalie Goldberg, or "Reflections" if it is general system wisdom).\n5. Avoid clinical labels or "optimization" language. Be quiet, human, and direct.\n6. Return only a JSON array of objects with "text" and "author" fields.',
+    'Write 3 fresh "Writing Notes": short, grounded pieces of advice about noticing or returning to one’s thoughts, in a quiet, human, direct voice rather than an inspirational or self-optimization one, and without clinical labels. If user context is provided, tailor at least one note to what seems to be recurring in their life.',
+    'Set author to "Reflections" for notes you write. Attribute a note to a real person (for example Marcus Aurelius or Joan Didion) only when it is a well-known quote reproduced word for word; users read these as real quotations, so never paraphrase or invent one.',
   ]);
 
-  return generateJson<unknown>(prompt, {
+  return generateJson<unknown>('writingNotes', prompt, {
     type: Type.ARRAY,
     items: {
       type: Type.OBJECT,

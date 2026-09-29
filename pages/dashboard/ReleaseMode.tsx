@@ -43,7 +43,7 @@ export const ReleaseMode: React.FC = () => {
   };
 
   return (
-    <PageContainer className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10">
+    <PageContainer scope="sage" className="pb-24 pt-6 md:pt-10">
       <div
         className="core-page-stack transition-opacity duration-500"
         style={{
@@ -55,7 +55,7 @@ export const ReleaseMode: React.FC = () => {
           {/* contract-check: className="-ml-2 min-h-11" */}
           <button
             onClick={() => navigate(RoutePath.DASHBOARD)}
-            className="-ml-2 min-h-11 group flex w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-[var(--surface-current-soft-bg)] hover:text-[var(--surface-current-accent)]"
+            className="-ml-2 min-h-11 group flex w-fit items-center gap-2 rounded-control px-2 text-sm font-bold text-gray-nav transition-all duration-300 hover:-translate-x-1 hover:bg-accent-soft hover:text-accent"
             aria-label="Back to home"
           >
             <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
@@ -82,7 +82,7 @@ export const ReleaseMode: React.FC = () => {
             disabled={step !== 'idle'}
             autoFocus
             placeholder="Write what you are ready to put down."
-            className="input-surface w-full resize-none p-5 font-serif text-xl leading-relaxed text-gray-text placeholder:text-gray-nav/35 min-h-[34dvh] sm:min-h-[42dvh] sm:p-8 sm:text-2xl"
+            className="input-surface w-full resize-none p-5 font-serif text-xl leading-relaxed text-gray-text min-h-[34dvh] sm:min-h-[42dvh] sm:p-8 sm:text-2xl"
           />
 
           {error ? (
@@ -100,7 +100,7 @@ export const ReleaseMode: React.FC = () => {
               onClick={handleRelease}
               disabled={!canRelease}
               isLoading={step === 'releasing'}
-              className="w-full px-10 sm:w-auto"
+              className="w-full sm:w-auto"
             >
               Release
             </Button>
@@ -110,13 +110,13 @@ export const ReleaseMode: React.FC = () => {
 
       {step !== 'idle' && step !== 'releasing' && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-6 text-center backdrop-blur-xl bg-black/50 transition-all duration-[600ms] ease-out-expo"
+          className="fixed inset-0 z-50 flex items-center justify-center p-6 text-center backdrop-blur-xl bg-black/50 transition-all duration-500 ease-out-expo"
           style={{
             opacity: step === 'animating-out' ? 0 : 1,
           }}
         >
           <div
-            className="control-surface w-full max-w-md space-y-5 rounded-[28px] border border-[var(--surface-current-border)] p-8 sm:p-10 text-center shadow-2xl transition-all duration-[600ms] ease-out-expo"
+            className="control-surface w-full max-w-md space-y-5 rounded-3xl border border-border p-8 sm:p-10 text-center shadow-2xl transition-all duration-500 ease-out-expo"
             style={{
               opacity: step === 'animating-out' ? 0 : 1,
               transform: step === 'animating-out' ? 'scale(0.95)' : 'scale(1)',

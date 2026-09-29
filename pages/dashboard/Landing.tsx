@@ -153,8 +153,8 @@ export const Landing: React.FC = () => {
   };
 
   return (
-    <div role="region" aria-label="Welcome" className="surface-scope-sage page-wash relative min-h-[100dvh] overflow-x-hidden selection:bg-green/20 selection:text-green bg-body text-gray-text">
-      <div className="relative isolate min-h-[100dvh] w-full overflow-hidden bg-body">
+    <div role="region" aria-label="Welcome" className="surface-scope-sage page-wash relative min-h-dvh overflow-x-hidden selection:bg-green/20 selection:text-green bg-body text-gray-text">
+      <div className="relative isolate min-h-dvh w-full overflow-hidden bg-body">
         <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
           <div className="video-mask video-mask--mobile lg:hidden" />
           <div className="video-mask video-mask--desktop hidden lg:block" />
@@ -201,7 +201,7 @@ export const Landing: React.FC = () => {
           ) : null}
         </div>
 
-        <div className="relative z-20 flex min-h-[100dvh] flex-col px-6 pb-[calc(env(safe-area-inset-bottom)+1.75rem)] pt-[calc(env(safe-area-inset-top)+var(--header-height)+1.5rem)] sm:px-12 sm:pt-[calc(env(safe-area-inset-top)+var(--header-height)+2rem)] lg:justify-between lg:pt-[28vh] lg:pb-12 lg:px-16 xl:px-24 pointer-events-none">
+        <div className="relative z-20 flex min-h-dvh flex-col px-6 pb-[calc(env(safe-area-inset-bottom)+1.75rem)] pt-[calc(env(safe-area-inset-top)+var(--header-height)+1.5rem)] sm:px-12 sm:pt-[calc(env(safe-area-inset-top)+var(--header-height)+2rem)] lg:justify-between lg:pt-[28vh] lg:pb-12 lg:px-16 xl:px-24 pointer-events-none">
           <div className="flex flex-col gap-6 lg:w-3/5 lg:gap-8 xl:w-7/12">
             <h1
               aria-label={HOME_SEO.heroAriaLabel}
@@ -226,11 +226,11 @@ export const Landing: React.FC = () => {
               <button
                 type="button"
                 onClick={() => navigate(RoutePath.SIGNUP)}
-                className="group relative inline-flex h-14 min-w-0 items-center justify-center whitespace-nowrap rounded-[var(--radius-control)] bg-green px-8 font-sans text-ui-base font-bold text-white shadow-[0_8px_20px_-12px_var(--green-shadow)] transition-[transform,box-shadow,background-color] duration-200 ease-out-expo hover:-translate-y-px hover:bg-green-hover hover:shadow-[0_10px_24px_-12px_var(--green-shadow)] active:translate-y-0 motion-reduce:transition-none sm:h-16 sm:px-10 sm:text-btn-lg sm:shadow-[0_10px_24px_-12px_var(--green-shadow)] sm:hover:shadow-[0_12px_28px_-12px_var(--green-shadow)]"
+                className="group relative inline-flex h-14 min-w-0 items-center justify-center whitespace-nowrap rounded-control bg-green px-8 font-sans text-ui-base font-bold text-white shadow-[0_8px_20px_-12px_var(--green-shadow)] transition-[transform,box-shadow,background-color] duration-200 ease-out-expo hover:-translate-y-px hover:bg-green-hover hover:shadow-[0_10px_24px_-12px_var(--green-shadow)] active:translate-y-0 motion-reduce:transition-none sm:h-16 sm:px-10 sm:text-btn-lg sm:shadow-[0_10px_24px_-12px_var(--green-shadow)] sm:hover:shadow-[0_12px_28px_-12px_var(--green-shadow)]"
                 aria-label="Begin writing"
               >
                 {HOME_SEO.ctaLabel}
-                <ArrowRightIcon className="ml-2.5 h-[1.125rem] w-[1.125rem] text-white/80 transition-transform duration-500 ease-out-expo group-hover:translate-x-1.5 sm:ml-3 sm:h-5 sm:w-5" />
+                <ArrowRightIcon className="ml-2.5 h-4.5 w-4.5 text-white/80 transition-transform duration-500 ease-out-expo group-hover:translate-x-1.5 sm:ml-3 sm:h-5 sm:w-5" />
               </button>
             </div>
 

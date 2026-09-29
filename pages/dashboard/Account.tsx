@@ -31,7 +31,6 @@ import { StorageImage } from '../../components/ui/StorageImage';
 import { Surface } from '../../components/ui/Surface';
 import { supabase } from '../../src/supabaseClient';
 import { RoutePath, WellnessAccess } from '../../types';
-import { noteService } from '../../services/noteService';
 import { storageService } from '../../services/storageService';
 import { offlineStorage } from '../../services/offlineStorage';
 import { useAuthStore } from '../../hooks/useAuthStore';
@@ -103,7 +102,6 @@ export const Account: React.FC = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeletingData, setIsDeletingData] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
-  const timezoneDetailsRef = useRef<HTMLDetailsElement | null>(null);
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -325,7 +323,7 @@ export const Account: React.FC = () => {
 
   if (fetching) {
     return (
-      <PageContainer className="surface-scope-paper page-wash pb-24 pt-6 md:pt-10">
+      <PageContainer scope="paper" className="pb-24 pt-6 md:pt-10">
         <div className="core-page-stack" aria-busy="true" aria-label="Loading account settings">
           <Skeleton variant="text" className="h-6 w-20" />
           <div className="space-y-2">
@@ -359,12 +357,12 @@ export const Account: React.FC = () => {
 
   return (
     <>
-      <PageContainer className="surface-scope-paper page-wash pb-24 pt-6 md:pt-10">
+      <PageContainer scope="paper" className="pb-24 pt-6 md:pt-10">
         <div className="core-page-stack">
           <button
             type="button"
             onClick={() => navigate(RoutePath.DASHBOARD)}
-            className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-green/5 hover:text-green"
+            className="group flex min-h-11 w-fit items-center gap-2 rounded-control px-2 text-sm font-bold text-gray-nav transition-all duration-300 hover:-translate-x-1 hover:bg-green/5 hover:text-green"
             aria-label="Back to home"
           >
             <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
@@ -397,8 +395,8 @@ export const Account: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="space-y-5 min-w-0">
               <Surface variant="flat" tone="paper" className="p-5 sm:p-8 lg:p-10 space-y-6 sm:space-y-8 min-w-0">
-                <div className="grid gap-6 lg:gap-10 lg:grid-cols-[180px_minmax(0,1fr)] min-w-0">
-                  <div className="flex flex-col items-center gap-4">
+                <div className="flex flex-col items-center lg:flex-row lg:items-start gap-6 lg:gap-10 min-w-0">
+                  <div className="flex flex-col items-center gap-4 shrink-0">
                     <Tooltip label="Upload new profile photo">
                       <button
                         type="button"
@@ -406,7 +404,7 @@ export const Account: React.FC = () => {
                         onClick={() => avatarInputRef.current?.click()}
                         aria-label="Upload a new profile photo"
                       >
-                        <div className="surface-inline-panel h-32 w-32 overflow-hidden rounded-2xl border-4 border-surface bg-surface shadow-xl shadow-gray-text/10 transition-[border-color,box-shadow,transform] duration-500 group-hover:border-green/50 group-hover:shadow-green/10">
+                        <div className="surface-inline-panel h-32 w-32 overflow-hidden rounded-2xl border-4 border-surface bg-surface shadow-xl shadow-gray-text/10 transition-all duration-500 group-hover:border-green/50 group-hover:shadow-green/10">
                           {avatarPath ? (
                             <StorageImage path={avatarPath} alt="Profile" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
                           ) : (
@@ -415,7 +413,7 @@ export const Account: React.FC = () => {
                             </div>
                           )}
                         </div>
-                        <div className="absolute bottom-1 right-1 flex h-11 w-11 items-center justify-center rounded-xl border-4 border-surface bg-gray-text text-white shadow-xl shadow-gray-text/15 transition-[background-color,box-shadow,transform] duration-500 group-hover:bg-green group-hover:scale-110">
+                        <div className="absolute bottom-1 right-1 flex h-11 w-11 items-center justify-center rounded-xl border-4 border-surface bg-gray-text text-white shadow-xl shadow-gray-text/15 transition-all duration-500 group-hover:bg-green group-hover:scale-110">
                           <Camera size={18} weight="bold" className="transition-transform group-hover:rotate-12" />
                         </div>
                       </button>
@@ -436,7 +434,7 @@ export const Account: React.FC = () => {
                     ) : null}
                   </div>
 
-                  <div className="space-y-8 min-w-0">
+                  <div className="flex-1 space-y-8 min-w-0 w-full">
                     <div className="grid gap-6 md:grid-cols-2 min-w-0">
                       <div className="w-full max-w-md min-w-0">
                         <Input
@@ -595,7 +593,7 @@ export const Account: React.FC = () => {
                 </div>
               </Surface>
 
-              <Surface variant="flat" tone="paper" className="p-5 sm:p-8 lg:p-10 border-y sm:border border-border">
+              <Surface variant="flat" tone="paper" className="p-5 sm:p-8 lg:p-10">
                 <div className="flex flex-row items-center justify-between gap-4">
                   <div className="space-y-1 min-w-0">
                     <div className="flex items-center gap-2">
@@ -622,7 +620,7 @@ export const Account: React.FC = () => {
                     <button
                       type="button"
                       onClick={handleSignOut}
-                      className="flex h-12 items-center justify-center gap-1.5 sm:gap-2 rounded-xl border border-clay/10 bg-clay/5 px-3 sm:px-4 sm:py-2.5 text-sm sm:text-base font-bold text-clay transition-all hover:bg-clay/10 active:scale-[0.98]"
+                      className="flex h-12 items-center justify-center gap-1.5 sm:gap-2 rounded-xl border border-clay/10 bg-clay/5 px-3 sm:px-4 sm:py-2.5 text-sm sm:text-base font-bold text-clay transition-all hover:bg-clay/10 active:scale-98"
                       aria-label="Sign out of your account"
                     >
                       <SignOut size={18} weight="bold" />
@@ -635,7 +633,7 @@ export const Account: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => navigate(-1)}
-                        className="flex h-12 items-center justify-center gap-1.5 sm:gap-2 rounded-xl border border-border bg-surface px-3 sm:px-4 sm:py-2.5 text-sm sm:text-base font-bold text-gray-nav transition-all hover:bg-green/5 hover:text-green active:scale-[0.98]"
+                        className="flex h-12 items-center justify-center gap-1.5 sm:gap-2 rounded-xl border border-border bg-surface px-3 sm:px-4 sm:py-2.5 text-sm sm:text-base font-bold text-gray-nav transition-all hover:bg-green/5 hover:text-green active:scale-98"
                         aria-label="Discard account changes"
                       >
                         <X size={18} weight="bold" />
@@ -646,7 +644,7 @@ export const Account: React.FC = () => {
                       <button
                         type="submit"
                         disabled={loading || isSaved}
-                        className="flex h-12 items-center justify-center gap-1.5 sm:gap-2 rounded-xl bg-green px-4 sm:px-6 sm:py-2.5 text-sm sm:text-base font-bold text-white transition-all hover:bg-green-hover active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+                        className="flex h-12 items-center justify-center gap-1.5 sm:gap-2 rounded-xl bg-green px-4 sm:px-6 sm:py-2.5 text-sm sm:text-base font-bold text-white transition-all hover:bg-green-hover active:scale-98 disabled:opacity-50 disabled:pointer-events-none"
                         aria-label="Save account changes"
                       >
                         {loading ? (

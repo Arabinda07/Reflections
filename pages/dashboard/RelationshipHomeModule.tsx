@@ -42,7 +42,7 @@ export const RelationshipHomeModule: React.FC = () => {
   }, []);
 
   return (
-    <Surface variant="flat" tone="sage" className="rounded-[2rem] p-6 sm:p-8">
+    <Surface variant="flat" tone="sage" className="rounded-4xl p-6 sm:p-8">
       <div className="mb-6 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2 text-gray-nav">
           <UsersThree size={18} weight="duotone" className="text-green" />

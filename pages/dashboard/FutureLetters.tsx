@@ -197,7 +197,7 @@ export const FutureLetters: React.FC = () => {
           />
 
           <div className="grid gap-6 items-start lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
-            <Surface variant="flat" tone="paper" className="rounded-[2rem]">
+            <Surface variant="flat" tone="paper" className="rounded-4xl">
               <form onSubmit={handleSchedule} className="space-y-6 p-6 sm:p-8">
                 <div className="space-y-2">
                   <label htmlFor="future-letter-title" className="label-caps text-gray-nav">
@@ -221,7 +221,7 @@ export const FutureLetters: React.FC = () => {
                     value={content}
                     onChange={(event) => setContent(event.target.value)}
                     placeholder="Write about your day, a hope, or a message to yourself."
-                    className="input-surface dashboard-letter-text min-h-[320px] w-full resize-none rounded-[22px] p-5 placeholder:text-gray-nav/35"
+                    className="input-surface dashboard-letter-text min-h-[320px] w-full resize-none rounded-[22px] p-5"
                   />
                 </div>
 
@@ -283,7 +283,7 @@ export const FutureLetters: React.FC = () => {
               </form>
             </Surface>
 
-            <Surface variant="bezel" tone="sage" className="rounded-[2rem] overflow-hidden">
+            <Surface variant="bezel" tone="sage" className="rounded-4xl overflow-hidden">
               <div className="space-y-5 p-6 sm:p-8">
                 <div className="flex items-center justify-between gap-3">
                   <div>

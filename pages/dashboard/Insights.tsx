@@ -233,12 +233,11 @@ export const Insights: React.FC = () => {
           </div>
         ) : null}
 
-      <div className="surface-scope-sage page-wash min-h-dvh">
-        <PageContainer className="pb-24 pt-6 md:pt-10">
+      <PageContainer scope="sage" className="pb-24 pt-6 md:pt-10">
         <div className="core-page-stack">
           <button
             onClick={() => navigate(RoutePath.DASHBOARD)}
-            className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-green/5 hover:text-green"
+            className="group flex min-h-11 w-fit items-center gap-2 rounded-control px-2 text-sm font-bold text-gray-nav transition-colors duration-300 hover:-translate-x-1 hover:bg-green/5 hover:text-green"
             aria-label="Back to home"
           >
             <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
@@ -253,7 +252,7 @@ export const Insights: React.FC = () => {
 
           <div aria-live="polite" aria-busy={loading} className="w-full core-section-stack">
             {loading ? (
-            <Surface variant="flat" tone="sage" className="rounded-[2rem] p-8 md:p-12">
+            <Surface variant="flat" tone="sage" className="rounded-4xl p-8 md:p-12">
               <WeeklyRecapLoadingSkeleton />
             </Surface>
           ) : isEmpty ? (
@@ -269,7 +268,7 @@ export const Insights: React.FC = () => {
               }
             />
           ) : (<>
-          <Surface variant="flat" tone="sage" className="rounded-[2rem] p-8 md:p-12">
+          <Surface variant="flat" tone="sage" className="rounded-4xl p-8 md:p-12">
             <div className="space-y-10">
               <section className="space-y-5">
                 <h2 className="text-2xl font-display font-bold text-gray-text md:text-3xl">This week</h2>
@@ -278,8 +277,8 @@ export const Insights: React.FC = () => {
                     <p className="dashboard-supporting-text">
                       A quiet week — that&rsquo;s allowed. Nothing to count here; your reflections are still in My notes whenever you want them.
                     </p>
-                    <Button variant="ghost" onClick={() => navigate(RoutePath.CREATE_NOTE)}>
-                      <span className="text-green">Write something</span>
+                    <Button variant="ghost" tone="green" onClick={() => navigate(RoutePath.CREATE_NOTE)}>
+                      Write something
                     </Button>
                   </div>
                 ) : (
@@ -301,7 +300,7 @@ export const Insights: React.FC = () => {
           <Surface
             variant="flat"
             tone="sage"
-            className="group relative overflow-hidden rounded-[2rem]"
+            className="group relative overflow-hidden rounded-4xl"
           >
             <Link
               to={RoutePath.SANCTUARY}
@@ -312,7 +311,7 @@ export const Insights: React.FC = () => {
             >
               <div className="space-y-5">
                 {isWikiReadyToBuild && (
-                  <div className="h-24 w-24 overflow-hidden rounded-[2rem] bg-accent-soft">
+                  <div className="h-24 w-24 overflow-hidden rounded-4xl bg-accent-soft">
                     <LottieAnimation src={SANCTUARY_LEVEL_UP_ANIMATION_SRC} animationId={SANCTUARY_LEVEL_UP_ANIMATION_ID} autoplay loop />
                   </div>
                 )}
@@ -329,7 +328,7 @@ export const Insights: React.FC = () => {
                 </div>
               </div>
 
-              <div className="relative flex h-12 shrink-0 items-center justify-center overflow-hidden rounded-[var(--radius-control)] border border-green bg-green text-white px-6 label-caps transition-colors duration-300 group-hover:bg-green/90">
+              <div className="relative flex h-12 shrink-0 items-center justify-center overflow-hidden rounded-control border border-green bg-green text-white px-6 label-caps transition-colors duration-300 group-hover:bg-green/90">
                 Open Sanctuary
                 <CaretRight size={16} weight="regular" className="ml-2 transition-transform duration-500 ease-out-expo group-hover:translate-x-1" />
               </div>
@@ -339,7 +338,6 @@ export const Insights: React.FC = () => {
           </div>
         </div>
       </PageContainer>
-    </div>
     </>
   );
 };

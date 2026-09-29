@@ -144,7 +144,7 @@ export const mapRemoteImportItem = async (
   row: SupabaseImportInboxRow,
   session?: CryptoSession,
 ): Promise<RelationshipImportInboxItem> => {
-  let payload: ImportPayload | null = null;
+  let payload: ImportPayload;
   
   if (getCurrentUserMode() === 'reflective') {
     payload = row.encrypted_payload as unknown as ImportPayload;

@@ -145,7 +145,7 @@ export const RecoverPrivateWriting: React.FC = () => {
           />
         ) : null}
 
-        <Surface variant="flat" tone="paper" className="p-6 sm:p-8 rounded-[2rem]">
+        <Surface variant="flat" tone="paper" className="p-6 sm:p-8 rounded-4xl">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid gap-3 sm:grid-cols-2">
               <button

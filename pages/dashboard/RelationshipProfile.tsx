@@ -311,7 +311,7 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, autoOpenCat
   };
 
   return (
-    <PageContainer className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10">
+    <PageContainer scope="sage" className="pb-24 pt-6 md:pt-10">
       <button type="button" onClick={onBack} className="mb-8 flex min-h-12 w-fit items-center gap-2 rounded-xl px-3 text-sm font-bold text-gray-nav focus-visible:ring-2 focus-visible:ring-green/30 hover:bg-green/5 hover:text-green">
         <ArrowLeft size={16} weight="bold" /> Back
       </button>
@@ -352,9 +352,8 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, autoOpenCat
               variant="primary"
               size="sm"
               onClick={handleHeaderLogCatchUp}
-              className="inline-flex items-center gap-1.5"
             >
-              <ClockCounterClockwise size={14} weight="bold" />
+              <ClockCounterClockwise size={14} weight="bold" className="mr-1.5" />
               <span>Log catch-up</span>
             </Button>
             <OverflowMenu items={[

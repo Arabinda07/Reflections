@@ -119,7 +119,7 @@ export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, onSelect, 
               key={entry}
               type="button"
               onClick={() => handleMoodSelect(entry)}
-              className={`group flex min-h-[3.65rem] w-full items-center justify-between rounded-[var(--radius-control)] border p-3.5 text-left transition-[border-color,background-color,box-shadow,transform] duration-300 ease-out-expo hover:-translate-y-px ${isSelected ? moodConfig.modal : `${moodConfig.option} dark:bg-white/5`}`}
+              className={`group flex min-h-[3.65rem] w-full items-center justify-between rounded-[var(--radius-control)] border p-3.5 text-left transition-[border-color,background-color,box-shadow,transform] duration-300 ease-out-expo hover:-translate-y-px ${isSelected ? moodConfig.modal : moodConfig.option}`}
             >
               <span className="flex items-center gap-3">
                 <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${isSelected ? 'bg-white/30' : 'bg-white/40'} transition-transform duration-500 group-hover:scale-105`}>

@@ -48,7 +48,7 @@ export const AboutArabinda: React.FC = () => {
         }
         updated="July 2026"
         media={
-          <div className="aspect-[4/5] overflow-hidden rounded-[2rem] shadow-sm">
+          <div className="aspect-[4/5] overflow-hidden rounded-4xl shadow-sm">
             <img
               src="/assets/images/founder.webp"
               alt="Arabinda, creator of Reflections"
@@ -76,7 +76,7 @@ export const AboutArabinda: React.FC = () => {
         {sections.map((section) => (
           <section
             key={section.title}
-            className="group flex flex-col gap-3 rounded-[2rem] p-6 transition-colors duration-500 hover:bg-gray-text/[0.03] md:flex-row md:gap-12 md:p-10"
+            className="group flex flex-col gap-3 rounded-4xl p-6 transition-colors duration-500 hover:bg-gray-text/[0.03] md:flex-row md:gap-12 md:p-10"
           >
             <div className="shrink-0 md:w-1/3">
               <h2 className="flex items-center gap-2.5 text-ui-lg font-display font-bold leading-tight text-gray-text transition-colors duration-300 group-hover:text-green">

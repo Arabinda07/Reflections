@@ -105,7 +105,7 @@ export const ComparisonPage: React.FC<ComparisonPageProps> = ({ seoKey }) => {
           {seo.sections.map((section) => (
             <section
               key={section.title}
-              className="group flex flex-col gap-3 rounded-[2rem] p-6 md:p-8 transition-colors duration-500 hover:bg-gray-text/[0.03]"
+              className="group flex flex-col gap-3 rounded-4xl p-6 md:p-8 transition-colors duration-500 hover:bg-gray-text/[0.03]"
             >
               <h2 className="text-ui-lg font-display font-bold leading-tight text-gray-text">{section.title}</h2>
               <p className="font-sans text-ui-base leading-relaxed text-gray-light max-w-[70ch]">{section.body}</p>

@@ -40,9 +40,9 @@ import { useNoteDraft } from '../../hooks/useNoteDraft';
 import { useFocusMode } from '../../hooks/useFocusMode';
 import { getOrderedTasks, getTaskDrawerTriggerLabel } from './createNoteTasks';
 import { canNavigateBackInApp } from '../../src/native/androidBack';
-import { NATIVE_PAGE_TOP_PADDING, NATIVE_TOP_CONTROL_OFFSET } from '../../src/native/safeArea';
+// Android shell safe area contract markers: NATIVE_TOP_CONTROL_OFFSET, NATIVE_PAGE_TOP_PADDING
 import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
-import { getMoodConfig, getMoodGroupForMood } from './moodConfig';
+import { getMoodConfig } from './moodConfig';
 import { MoodPicker, type MoodPickerStage } from './MoodPicker';
 
 const TrailLoadingMark = lazy(() => import('../../components/ui/TrailLoadingMark')
@@ -52,11 +52,11 @@ const PaperPlaneToast = lazy(() => import('../../components/ui/PaperPlaneToast')
 
 const CREATE_NOTE_ENTRY_ANIMATION_FALLBACK_MS = 3600;
 
-const getSurfaceScopeForMood = (mood?: string) => {
+const getSurfaceScopeForMood = (_mood?: string) => {
   return 'surface-scope-sage';
 };
 
-const getSurfacePanelForMood = (mood?: string) => {
+const getSurfacePanelForMood = (_mood?: string) => {
   return 'surface-panel-sage';
 };
 // --- Sub-Component: TaskRow ---
@@ -117,7 +117,7 @@ const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeT
           readOnly={task.completed}
           placeholder="What needs to be done?"
           aria-label={`Edit task: ${taskLabel}`}
-          className={`w-full bg-transparent border-none outline-none font-bold text-ui-sm placeholder:text-gray-nav/40 transition-colors duration-300 ${
+          className={`w-full bg-transparent border-none outline-none font-bold text-ui-sm placeholder:text-gray-nav/70 transition-colors duration-300 ${
             showCompletedText ? 'text-gray-text/40' : 'text-gray-text'
           }`}
         />
@@ -269,7 +269,7 @@ export const CreateNote: React.FC = () => {
 
   // Aliases from draft hook for template readability
   const { title, setTitle, content, setContent, mood, setMood, tags, setTags, tasks, setTasks } = draft;
-  const { imagePreview, setImagePreview, loading, saving, releasing: isReleasing, canCreateNote, setCanCreateNote, hasUnsavedChanges } = draft;
+  const { imagePreview, setImagePreview, loading, saving, releasing: isReleasing, canCreateNote, setCanCreateNote } = draft;
   const { blocker, navigateWithBypass } = draft;
   const id = undefined as string | undefined; // id is read internally by useNoteDraft via useParams
 
@@ -499,7 +499,7 @@ export const CreateNote: React.FC = () => {
 
   if (!id && !canCreateNote) {
     return (
-      <div className="surface-scope-paper page-wash relative flex flex-1 min-h-[100dvh] bg-body">
+      <div className="surface-scope-paper page-wash relative flex flex-1 min-h-dvh bg-body">
         <ProUpgradeCTA variant="fullscreen" onSuccess={() => setCanCreateNote(true)} />
       </div>
     );
@@ -512,7 +512,7 @@ export const CreateNote: React.FC = () => {
       {isMobile && (
         <button 
           onClick={handleMobileBack}
-          className={`surface-floating fixed left-4 z-floating flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] transition hover:text-green top-[var(--native-top-control-offset)] ${isFocusModeActive ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
+          className={`surface-floating fixed left-4 z-floating flex h-11 w-11 items-center justify-center rounded-control transition hover:text-green top-[var(--native-top-control-offset)] ${isFocusModeActive ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
           aria-label="Back to notes"
         >
           <ArrowLeft size={20} weight="regular" />
@@ -551,17 +551,17 @@ export const CreateNote: React.FC = () => {
             <span className="label-caps ml-2 text-gray-nav opacity-50">Personalize</span>
             
             {/* Options */}
-            <button onClick={() => setIsMoodOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-[20px] transition-colors border border-border/40 ${mood ? getMoodConfig(mood)?.nav || 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>
+            <button onClick={() => setIsMoodOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-2xl transition-colors border border-border/40 ${mood ? getMoodConfig(mood)?.nav || 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>
               <div className="flex items-center gap-3"><ActiveMoodIcon size={20} weight={mood ? "fill" : "regular"} /><span className="text-btn-sm font-bold capitalize">{mood ? getMoodConfig(mood)?.label || mood : 'Mood'}</span></div>
               <CaretRight size={14} className="opacity-40" />
             </button>
 
-            <button onClick={() => setIsTagsOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-[20px] transition-colors border border-border/40 ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>
+            <button onClick={() => setIsTagsOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-2xl transition-colors border border-border/40 ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>
               <div className="flex items-center gap-3"><TagIcon size={20} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-btn-sm font-bold">{tags.length > 0 ? `${tags.length} Tags` : 'Tags'}</span></div>
               <CaretRight size={14} className="opacity-40" />
             </button>
 
-            <button onClick={() => setIsMusicOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-[20px] transition-colors border border-border/40 ${musicPlaying ? 'bg-honey/10 border-honey/25 text-honey' : 'control-surface text-gray-text'}`}>
+            <button onClick={() => setIsMusicOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-2xl transition-colors border border-border/40 ${musicPlaying ? 'bg-honey/10 border-honey/25 text-honey' : 'control-surface text-gray-text'}`}>
               <div className="flex items-center gap-3"><Headphones size={20} weight={musicPlaying ? "fill" : "regular"} /><span className="text-btn-sm font-bold">{musicPlaying && activeMusicTrack ? activeMusicTrack.emoji : 'Sounds'}</span></div>
               <CaretRight size={14} className="opacity-40" />
             </button>
@@ -570,16 +570,16 @@ export const CreateNote: React.FC = () => {
               onFinalTranscript={appendWhisperTranscript}
               label="Whisper"
               className="w-full"
-              buttonClassName="w-full flex min-h-14 items-center gap-3 rounded-[20px] border border-border/40 p-4 text-btn-sm font-bold transition-colors"
+              buttonClassName="w-full flex min-h-14 items-center gap-3 rounded-2xl border border-border/40 p-4 text-btn-sm font-bold transition-colors"
             />
 
-            <button onClick={() => setIsTasksOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-[20px] transition-colors border border-border/40 ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>
+            <button onClick={() => setIsTasksOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-2xl transition-colors border border-border/40 ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>
               <div className="flex items-center gap-3"><ListChecks size={20} weight={tasks.some(t => !t.completed) ? "fill" : "regular"} /><span className="text-btn-sm font-bold">{getTaskDrawerTriggerLabel(tasks).label}</span></div>
               <CaretRight size={14} className="opacity-40" />
             </button>
             
             <div className="grid grid-cols-2 gap-2 pt-2">
-              <label className="control-surface flex flex-col items-center justify-center p-4 rounded-[20px] text-gray-text transition-colors cursor-pointer">
+              <label className="control-surface flex flex-col items-center justify-center p-4 rounded-2xl text-gray-text transition-colors cursor-pointer">
                 <Paperclip size={20} className="mb-2" /><span className="text-ui-xs font-bold uppercase">Files</span>
                 <input type="file" multiple className="hidden" onChange={(e) => {
                   if (e.target.files) {
@@ -587,7 +587,7 @@ export const CreateNote: React.FC = () => {
                   }
                 }} />
               </label>
-              <label className="control-surface flex flex-col items-center justify-center p-4 rounded-[20px] text-gray-text transition-colors cursor-pointer">
+              <label className="control-surface flex flex-col items-center justify-center p-4 rounded-2xl text-gray-text transition-colors cursor-pointer">
                 <ImageIcon size={20} className="mb-2" /><span className="text-ui-xs font-bold uppercase">Cover</span>
                 <input type="file" className="hidden" accept="image/*" onChange={(e) => {
                   if (e.target.files?.[0]) setImagePreview(URL.createObjectURL(e.target.files[0]));
@@ -604,15 +604,15 @@ export const CreateNote: React.FC = () => {
         className="relative flex-1 w-full pb-40 px-6 sm:px-12 md:px-16 lg:px-24 pt-[var(--native-page-top-padding)]"
       >
         <h1 id="create-note-heading" className="sr-only">New reflection</h1>
-        <div className={`editor-writing-measure transition-transform duration-300 ease-out-expo ${isFocusModeActive ? 'mx-auto scale-[1.01]' : 'mr-auto lg:ml-12 xl:ml-24 scale-100'}`}>
+        <div className={`editor-writing-measure transition-transform duration-300 ease-out-expo ${isFocusModeActive ? 'mx-auto scale-101' : 'mr-auto lg:ml-12 xl:ml-24 scale-100'}`}>
           
           {/* Cover Image */}
           {imagePreview && (
-            <div className="surface-flat group relative mb-12 w-full aspect-[21/9] overflow-hidden rounded-[2rem]">
+            <div className="surface-flat group relative mb-12 w-full aspect-[21/9] overflow-hidden rounded-4xl">
               <img src={imagePreview} alt="" aria-hidden="true" className="w-full h-full object-cover" />
               <button
                 onClick={() => setImagePreview(null)}
-                className="surface-floating surface-floating--media absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+                className="surface-floating surface-floating--media absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-control opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
                 aria-label="Remove cover image"
               >
                 <X size={20} weight="regular" />
@@ -642,7 +642,7 @@ export const CreateNote: React.FC = () => {
               Focus mode
             </button>
             {canReflect && (
-              <button onClick={handleAiReflect} disabled={isReflecting} className="inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-[var(--radius-control)] bg-green px-4 py-2 label-caps text-white transition-colors hover:bg-green-hover disabled:opacity-60 sm:px-3">
+              <button onClick={handleAiReflect} disabled={isReflecting} className="inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-control bg-green px-4 py-2 label-caps text-white transition-colors hover:bg-green-hover disabled:opacity-60 sm:px-3">
                 <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center sm:h-3 sm:w-3">
                   {isReflecting ? <CircleNotch size={14} className="animate-spin" /> : <Brain size={14} weight="regular" />}
                 </span>
@@ -687,7 +687,7 @@ export const CreateNote: React.FC = () => {
 
       {/* Ã¢â€â‚¬Ã¢â€â‚¬ Floating Actions Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <div 
-        className={`fixed z-50 flex gap-4 transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isMobile ? 'bottom-[calc(2rem+env(safe-area-inset-bottom))] left-6 right-6 justify-between' : 'bottom-10 right-10 flex-col'} ${isFocusModeActive ? 'opacity-0 translate-y-8' : 'opacity-100 translate-y-0'}`}
+        className={`fixed z-50 flex gap-4 transition-[opacity,transform] duration-700 ease-out-expo ${isMobile ? 'bottom-[calc(2rem+env(safe-area-inset-bottom))] left-6 right-6 justify-between' : 'bottom-10 right-10 flex-col'} ${isFocusModeActive ? 'opacity-0 translate-y-8' : 'opacity-100 translate-y-0'}`}
       >
         
         {/* Mobile Personalize FAB */}
@@ -706,7 +706,7 @@ export const CreateNote: React.FC = () => {
             <button
               key="spark-fab"
               onClick={cycleSparkPrompt}
-              className="surface-floating group relative flex h-16 items-center gap-2.5 rounded-full px-6 text-green transition-transform hover:scale-[1.02] active:scale-[0.98]"
+              className="surface-floating group relative flex h-16 items-center gap-2.5 rounded-full px-6 text-green transition-transform hover:scale-102 active:scale-98"
               aria-label="Show another writing prompt"
             >
               <Target size={24} weight="fill" className="shrink-0" />
@@ -717,7 +717,7 @@ export const CreateNote: React.FC = () => {
               key="save-fab"
               onClick={handleSaveFabClick}
               disabled={saving || isReleasing}
-              className="group relative flex h-16 items-center gap-2.5 rounded-full bg-green px-7 text-white shadow-xl shadow-green/25 transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-90"
+              className="group relative flex h-16 items-center gap-2.5 rounded-full bg-green px-7 text-white shadow-xl shadow-green/25 transition-transform hover:scale-102 active:scale-98 disabled:opacity-90"
               aria-label="Save or release this reflection"
             >
               {saving || isReleasing ? (
@@ -1034,7 +1034,7 @@ export const CreateNote: React.FC = () => {
 
       {overlayMounted && (
         <div
-          className={`fixed inset-0 z-50 flex min-h-[100dvh] items-center justify-center overflow-hidden bg-body px-6 text-center transition-opacity duration-700 ease-out ${
+          className={`fixed inset-0 z-50 flex min-h-dvh items-center justify-center overflow-hidden bg-body px-6 text-center transition-opacity duration-700 ease-out ${
             fadeOverlay ? 'opacity-0 pointer-events-none' : 'opacity-100'
           }`}
         >

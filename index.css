@@ -31,7 +31,6 @@
 }
 
 @import "tailwindcss";
-@config "./tailwind.config.js";
 
 @theme {
   --font-sans: "Manrope", -apple-system, BlinkMacSystemFont, sans-serif;
@@ -72,6 +71,8 @@
 
   /* Scale Tokens */
   --scale-98: 0.98;
+  --scale-101: 1.01;
+  --scale-102: 1.02;
 
   /* Semantic Brand Tokens */
   --color-green: var(--green);
@@ -125,6 +126,106 @@
   --color-mood-angry: var(--color-mood-angry);
   --color-mood-tired: var(--color-mood-tired);
   --color-mood-mixed: var(--color-mood-mixed);
+
+  /* Transition & Easing Tokens */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Animation Tokens */
+  --animate-fade-in-up: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-fade-in: fade-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-shake-x: shake-x 0.4s ease-in-out;
+  --animate-scale-in: scale-in 0.36s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-accordion-open: accordion-open 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-accordion-close: accordion-close 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes shake-x {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  20%, 60% {
+    transform: translateX(-4px);
+  }
+  40%, 80% {
+    transform: translateX(4px);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes accordion-open {
+  from {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+  to {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+}
+
+@keyframes accordion-close {
+  from {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+  to {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+}
+
+@utility animation-fill-mode-both {
+  animation-fill-mode: both;
+}
+
+@utility z-under {
+  z-index: -1;
+}
+
+@utility z-deep {
+  z-index: -2;
+}
+
+@utility z-floating {
+  z-index: 80;
+}
+
+@utility z-sticky-nav {
+  z-index: 85;
+}
+
+@utility z-overlay {
+  z-index: 100;
 }
 
 @layer base {

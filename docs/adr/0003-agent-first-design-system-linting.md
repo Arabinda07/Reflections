@@ -34,6 +34,15 @@ We adopt [`@shadcn/lint`](https://github.com/shadcn-ui/lint) powered by **ESLint
 - **Strict (`error`)**: Component primitives (`components/ui/*`) and authenticated dashboard pages (`pages/dashboard/*`). Any primitive restyling, arbitrary values, or raw palette colors immediately halt lint and build.
 - **Transitional (`warn`)**: Legacy marketing and public landing pages while existing markup is baselined and systematically unified.
 
+### 4. Implementation & Rollout Roadmap
+
+| Phase | Focus Area | Success Metric |
+| :--- | :--- | :--- |
+| **Phase 2 (Current)** | Traps resolution & remaining dashboard screens (`Relationships`, `ReleaseMode`, `Account`) | Whitelist purged, `PageContainer` scoped, 0 CI warnings in dashboard |
+| **Phase 3** | Secondary authenticated surfaces (Auth, Onboarding, `ModalSheet`, Quill editor) | Entire authenticated app running on strict error tier |
+| **Phase 4** | Public marketing (`FAQ`, `ComparisonPage`, SEO) & Transactional Emails | Single design language across web, static prerender, and email |
+| **Phase 5** | Agent auto-fixers, git commit hooks, and automated bundle budgets | Zero-maintenance, self-correcting design system for human and AI devs |
+
 ---
 
 ## Consequences
@@ -46,4 +55,4 @@ We adopt [`@shadcn/lint`](https://github.com/shadcn-ui/lint) powered by **ESLint
 
 ### Trade-offs & Mitigations
 - **Learning Curve**: Agents and contributors must inspect `npm run lint` suggestions rather than applying ad-hoc Tailwind classes.
-- **Legacy Migration**: Pre-existing raw utility classes must be incrementally replaced with semantic tokens.
+- **Legacy Migration**: Pre-existing raw utility classes must be incrementally replaced with semantic tokens across the phases detailed above.

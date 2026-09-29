@@ -604,7 +604,7 @@ export const HomeAuthenticated: React.FC = () => {
           >
             <div className="flex flex-col gap-6">
             <div
-              className="home-primary-reflection-card group relative surface-flat overflow-hidden rounded-[2rem] p-8 sm:p-10 lg:p-12 flex flex-col transition-colors duration-300 ease-out-expo hover:border-green/20"
+              className="home-primary-reflection-card group relative surface-flat overflow-hidden rounded-4xl p-8 sm:p-10 lg:p-12 flex flex-col transition-colors duration-300 ease-out-expo hover:border-green/20"
             >
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-8">
@@ -687,7 +687,7 @@ export const HomeAuthenticated: React.FC = () => {
               <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-green/5 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
             </div>
 
-            <div className="home-intentions-card surface-flat overflow-hidden rounded-[2rem] p-8 sm:p-10 lg:p-12 text-left">
+            <div className="home-intentions-card surface-flat overflow-hidden rounded-4xl p-8 sm:p-10 lg:p-12 text-left">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-gray-nav">
                   <ListChecks size={16} weight="duotone" className="text-green" />
@@ -707,7 +707,7 @@ export const HomeAuthenticated: React.FC = () => {
                     intentionSummary.items.slice(0, 3).map((intention) => (
                       <button
                         key={intention.id}
-                        className="w-full flex items-center gap-4 p-4 rounded-2xl border border-green/15 bg-green/5 hover:border-green/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 transition-[colors,opacity,transform] text-left shadow-none group/btn active:scale-[0.98]"
+                        className="w-full flex items-center gap-4 p-4 rounded-2xl border border-green/15 bg-green/5 hover:border-green/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 transition-[colors,opacity,transform] text-left shadow-none group/btn active:scale-98"
                         onClick={() => handleToggleIntention(intention.noteId, intention.id)}
                         aria-label={`Mark "${intention.text}" from ${intention.noteTitle} as complete`}
                       >
@@ -783,7 +783,7 @@ export const HomeAuthenticated: React.FC = () => {
             <RelationshipHomeModule />
 
             <div
-              className="relative surface-flat surface-tone-sage overflow-hidden rounded-[2rem] p-6 sm:p-8 transition-colors duration-300 ease-out-expo hover:border-green/20"
+              className="relative surface-flat surface-tone-sage overflow-hidden rounded-4xl p-6 sm:p-8 transition-colors duration-300 ease-out-expo hover:border-green/20"
             >
               <div className="relative z-10">
               <div className="mb-6 flex items-center gap-2 text-gray-nav">

@@ -314,9 +314,9 @@ Reflections uses Google's Gemini API through `@google/genai`.
 
 Current prompt configuration lives in `services/aiPromptSpecs.ts`:
 
-- Default generation model: `gemini-3-flash-preview`
-- Ingest and Life Wiki refresh model: `gemini-2.5-flash`
-- Prompt version: `2026-05-19`
+- Default generation model: `gemini-3.8-flash`
+- Ingest and Life Wiki refresh model: `gemini-3.5-flash`
+- Prompt version: `2026-09-25`
 
 ### Does the browser call Gemini directly?
 

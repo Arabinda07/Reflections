@@ -6,9 +6,9 @@ export interface PromptSpec {
   model: string;
 }
 
-export const GEMINI_MODEL = 'gemini-3-flash-preview';
-export const INGEST_MODEL = 'gemini-2.5-flash';
-export const AI_PROMPT_VERSION = '2026-05-19';
+export const GEMINI_MODEL = 'gemini-3.8-flash';
+export const INGEST_MODEL = 'gemini-3.5-flash';
+export const AI_PROMPT_VERSION = '2026-09-25';
 export const LIFE_WIKI_REFRESH_PROMPT_VERSION = `life-wiki-refresh@${AI_PROMPT_VERSION}`;
 
 export const buildPrompt = (parts: string[]) => parts.filter(Boolean).join('\n\n');
@@ -45,7 +45,7 @@ Every grounded claim must carry an inline source marker in this exact format: [S
     title: 'Patterns',
     instruction: `Write a compact wiki essay about recurring emotional, practical, and attention patterns visible in the notes.
 Focus on repeated situations, rhythms, moods, triggers, and shifts over time. Avoid diagnosis or certainty.
-Use an encyclopedic third-person tone. Do not diagnose or turn patterns into certainty.
+Use an encyclopedic third-person tone.
 Every grounded claim must carry an inline source marker in this exact format: [Source: note-id]. Max 420 words.`,
   },
   {

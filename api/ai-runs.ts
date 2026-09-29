@@ -1,4 +1,4 @@
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, Type } from '@google/genai';
 import type { LifeTheme, MoodName, Note } from '../types';
 import {
   HttpError,
@@ -9,6 +9,7 @@ import {
   getErrorStatusCode,
   getUserMode,
   hashForLogs,
+  logAiUsage,
   parseJsonBody,
   requireUser,
   sendJson,
@@ -392,18 +393,32 @@ export default async function handler(req: any, res: any) {
 
     const result = await runLifeWikiRefresh({
       store: createRunStore(supabaseAdmin, user.id),
-      generateText: async (prompt, model) => {
+      generateText: async (prompt, model, action) => {
         const response = await ai.models.generateContent({
           model,
           contents: prompt,
         });
+        logAiUsage(action, model, response.usageMetadata);
         return response.text?.trim() || '';
       },
       reviewWikiPageDraft: async (input) => {
         const response = await ai.models.generateContent({
           model: INGEST_MODEL,
           contents: buildWikiReviewPrompt(input),
+          config: {
+            responseMimeType: 'application/json',
+            responseSchema: {
+              type: Type.OBJECT,
+              properties: {
+                status: { type: Type.STRING, enum: ['approve', 'revise', 'reject'] },
+                reasons: { type: Type.ARRAY, items: { type: Type.STRING } },
+                revisedContent: { type: Type.STRING, nullable: true },
+              },
+              required: ['status', 'reasons'],
+            },
+          },
         });
+        logAiUsage('wikiReview', INGEST_MODEL, response.usageMetadata);
         return parseLifeWikiReviewResult(response.text?.trim() || '');
       },
       claimFeatureUsage: (feature) => claimFeatureUsage(supabaseAdmin, user.id, feature),

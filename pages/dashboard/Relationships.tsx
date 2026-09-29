@@ -26,7 +26,7 @@ import { wikiService } from '../../services/wikiService';
 import type { RelationshipImportInboxItem, RelationshipRecord } from '../../types';
 import { RoutePath } from '../../types';
 import { RelationshipImportInbox } from './RelationshipImportInbox';
-import { RelationshipProfile, relationshipStageLabels, OverflowMenu } from './RelationshipProfile';
+import { RelationshipProfile, OverflowMenu } from './RelationshipProfile';
 
 const relationshipPath = (id: string) => RoutePath.RELATIONSHIP_DETAIL.replace(':id', encodeURIComponent(id));
 // input-surface carries the themed background/border/focus ring; bg-panel was an
@@ -156,8 +156,8 @@ export const Relationships: React.FC = () => {
   };
 
   if (id) {
-    if (isLoading) return <PageContainer className="surface-scope-sage page-wash min-h-[100dvh]"><div aria-hidden="true" /></PageContainer>;
-    if (!selectedRelationship) return <PageContainer className="surface-scope-sage page-wash pb-24 pt-10"><Surface variant="bezel" tone="sage" innerClassName="p-8 text-center"><h1 className="text-3xl font-display font-bold text-gray-text">Relationship not found.</h1></Surface></PageContainer>;
+    if (isLoading) return <PageContainer scope="sage"><div aria-hidden="true" /></PageContainer>;
+    if (!selectedRelationship) return <PageContainer scope="sage" className="pb-24 pt-10"><Surface variant="bezel" tone="sage" innerClassName="p-8 text-center"><h1 className="text-3xl font-display font-bold text-gray-text">Relationship not found.</h1></Surface></PageContainer>;
     return (
       <RelationshipProfile
         relationship={selectedRelationship}
@@ -179,11 +179,11 @@ export const Relationships: React.FC = () => {
 
   return (
     <>
-      <PageContainer className="surface-scope-sage page-wash pb-[calc(var(--mobile-bottom-nav-reserved-space)+1rem)] lg:pb-24 pt-6 md:pt-10">
+      <PageContainer scope="sage" className="pb-24 pt-6 md:pt-10">
         <div className="core-page-stack">
           <button
             onClick={() => navigate(RoutePath.DASHBOARD)}
-            className="group flex items-center gap-2 text-sm font-bold text-gray-nav hover:text-green transition-[color,transform] duration-300 w-fit hover:-translate-x-1"
+            className="group flex items-center gap-2 text-sm font-bold text-gray-nav hover:text-green transition-all duration-300 w-fit hover:-translate-x-1"
             aria-label="Back to home"
           >
             <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
@@ -205,8 +205,8 @@ export const Relationships: React.FC = () => {
           />
           {hasPendingSync && <p role="status" className="rounded-xl border border-honey/25 bg-honey/5 px-4 py-3 text-sm font-bold text-gray-nav">Saved securely on this device. Reflections will retry syncing.</p>}
 
-          <section className="grid gap-5 lg:grid-cols-[1fr_20rem]">
-            <div className="space-y-5">
+          <section className="grid gap-5 lg:grid-cols-3">
+            <div className="space-y-5 lg:col-span-2">
               {activeTab === 'weekly' && (
                 <Surface variant="bezel" tone="sage" innerClassName="p-6 md:p-8">
                     <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -214,7 +214,7 @@ export const Relationships: React.FC = () => {
                         <h2 className="text-3xl font-display font-bold text-gray-text">Who to reach out to</h2>
                         <p className="mt-2 text-sm font-medium text-gray-light">A short list for this week. No pressure to clear it.</p>
                       </div>
-                      <Button variant="ghost" size="sm" className="text-gray-nav hover:text-green" onClick={() => setIsCreateOpen(true)}>
+                      <Button variant="ghost" tone="green" size="sm" onClick={() => setIsCreateOpen(true)}>
                         Add person<Plus size={16} weight="bold" className="ml-1.5" />
                       </Button>
                     </div>
@@ -222,7 +222,7 @@ export const Relationships: React.FC = () => {
                   {suggestions.length ? (
                     <div className="grid gap-4">
                       {suggestions.map((suggestion) => (
-                        <article key={suggestion.relationship.id} className="rounded-[1.5rem] border border-green/12 bg-green/5 p-6 md:p-8 space-y-4">
+                        <article key={suggestion.relationship.id} className="rounded-3xl border border-green/12 bg-green/5 p-6 md:p-8 space-y-4">
                           <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                             <div className="min-w-0">
                               <Link to={relationshipPath(suggestion.relationship.id)} className="text-2xl font-display font-bold text-gray-text hover:text-green transition-colors">
@@ -261,8 +261,8 @@ export const Relationships: React.FC = () => {
                             </Button>
                             <Button
                               variant="ghost"
+                              tone="green"
                               size="sm"
-                              className="text-gray-nav hover:text-green"
                               onClick={async () => {
                                 try {
                                   const updated = await relationshipService.markTended(suggestion.relationship.id);
@@ -374,7 +374,7 @@ export const Relationships: React.FC = () => {
               {activeTab === 'import' && <RelationshipImportInbox relationships={relationships} pendingInbox={pendingInbox} onRefresh={load} />}
             </div>
 
-            <aside className="space-y-5">
+            <aside className="space-y-5 lg:col-span-1">
               <Surface variant="flat" tone="paper" className="p-5 sm:p-6 space-y-4">
                 <div className="flex items-center gap-2.5">
                   <span className="flex h-7 w-7 items-center justify-center rounded-full bg-green/10 text-green">

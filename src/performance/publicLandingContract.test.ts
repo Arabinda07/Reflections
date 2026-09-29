@@ -65,7 +65,7 @@ describe('public landing performance contract', () => {
     expect(landing).toContain('h-14 min-w-0 items-center');
     expect(landing).toContain('px-8 font-sans text-ui-base font-bold');
     expect(landing).toContain('sm:h-16 sm:px-10 sm:text-btn-lg');
-    expect(landing).toContain('ml-2.5 h-[1.125rem] w-[1.125rem]');
+    expect(landing).toContain('ml-2.5 h-4.5 w-4.5');
     expect(landing).toContain('flex w-full items-center justify-between gap-4 sm:w-auto');
     expect(landing).not.toContain('mt-4 flex w-full items-center justify-between gap-5');
 

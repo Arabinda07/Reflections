@@ -257,7 +257,7 @@ export const MyNotes: React.FC = () => {
         key={note.id}
         variant="flat"
         tone="sage"
-        className="group relative overflow-hidden rounded-4xl transition-[transform,border-color,box-shadow] duration-500 hover:-translate-y-1"
+        className="group relative overflow-hidden rounded-4xl transition-all duration-500 hover:-translate-y-1"
       >
         <div
           data-swipe-action-rail
@@ -314,7 +314,7 @@ export const MyNotes: React.FC = () => {
           <Link
             to={noteDetailPath}
             onClick={openNote}
-            className="flex min-h-0 flex-1 flex-col rounded-[var(--radius-control)] focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
+            className="flex min-h-0 flex-1 flex-col rounded-control focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40"
             aria-label={`Open ${note.title}`}
           >
             <div className="relative h-44 w-full overflow-hidden border-b border-border/40">
@@ -382,7 +382,7 @@ export const MyNotes: React.FC = () => {
                 event.stopPropagation();
                 setActionMenuNote(note);
               }}
-              className="control-surface inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-gray-nav transition-[transform,border-color,background-color,color] duration-500 hover:scale-110 hover:border-green/25 hover:bg-green/5 hover:text-green"
+              className="control-surface inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-gray-nav transition-all duration-500 hover:scale-110 hover:border-green/25 hover:bg-green/5 hover:text-green"
               aria-label={`More actions for ${note.title}`}
             >
               <SquaresFour size={18} weight="bold" />
@@ -395,12 +395,11 @@ export const MyNotes: React.FC = () => {
 
   return (
     <>
-      <div className="surface-scope-sage page-wash min-h-dvh">
-        <PageContainer className="pb-14 pt-4 md:pt-8">
+      <PageContainer scope="sage" className="pb-14 pt-4 md:pt-8">
         <div className="core-page-stack animate-fade-in-up">
           <button
             onClick={() => navigate(RoutePath.DASHBOARD)}
-            className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-green/5 hover:text-green"
+            className="group flex min-h-11 w-fit items-center gap-2 rounded-control px-2 text-sm font-bold text-gray-nav transition-all duration-300 hover:-translate-x-1 hover:bg-green/5 hover:text-green"
             aria-label="Back to home"
           >
             <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
@@ -462,9 +461,9 @@ export const MyNotes: React.FC = () => {
                   Showing reflections tagged "{tagFilter}" · {selectedTagSummary?.count || 0}{' '}
                   {(selectedTagSummary?.count || 0) === 1 ? 'reflection' : 'reflections'}
                 </p>
-                <Button variant="ghost" size="sm" onClick={() => handleTagFilterChange(RoutePath.NOTES)}>
-                  <X size={12} weight="regular" className="mr-1 text-clay" />
-                  <span className="text-clay">Clear filter</span>
+                <Button variant="ghost" size="sm" tone="clay" onClick={() => handleTagFilterChange(RoutePath.NOTES)}>
+                  <X size={12} weight="regular" className="mr-1" />
+                  Clear filter
                 </Button>
               </div>
             ) : null}
@@ -522,8 +521,8 @@ export const MyNotes: React.FC = () => {
                         title="No notes on this day yet."
                         description="Pick another day, or write one here."
                         action={
-                          <Button variant="ghost" size="sm" onClick={() => navigate(RoutePath.CREATE_NOTE)}>
-                            <span className="text-green">Write a note</span>
+                          <Button variant="ghost" size="sm" tone="green" onClick={() => navigate(RoutePath.CREATE_NOTE)}>
+                            Write a note
                           </Button>
                         }
                       />
@@ -563,7 +562,6 @@ export const MyNotes: React.FC = () => {
           )}
         </div>
       </PageContainer>
-    </div>
 
       <ConfirmationDialog
         isOpen={isConfirmOpen}

@@ -303,7 +303,7 @@ export const SingleNote: React.FC = () => {
           type="button"
           onClick={() => removeTask(task.id)}
           aria-label={`Remove task: ${taskLabel}`}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-control)] text-gray-nav transition-colors hover:bg-clay/5 hover:text-clay"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-control text-gray-nav transition-colors hover:bg-clay/5 hover:text-clay"
         >
           <Trash size={16} weight="bold" />
         </button>
@@ -313,30 +313,29 @@ export const SingleNote: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="surface-scope-paper page-wash min-h-dvh pb-24 pt-6 md:pt-10">
-        <PageContainer>
-          <div className="mb-8 flex items-center justify-between gap-2">
-            <button
-              type="button"
-              onClick={() => navigate(RoutePath.NOTES)}
-              className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-green/5 hover:text-green"
-              aria-label="Go back to my reflections"
-            >
-              <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
-              <span>Back</span>
-            </button>
-          </div>
-
-          <Surface
-            variant="bezel"
-            tone="paper"
-            className="max-w-[var(--measure-wide)]"
-            innerClassName="space-y-5 p-6 sm:p-10"
-            aria-busy="true"
-            aria-label="Opening your reflection"
+      <PageContainer scope="paper" className="pb-24 pt-6 md:pt-10">
+        <div className="mb-8 flex items-center justify-between gap-2">
+          <button
+            type="button"
+            onClick={() => navigate(RoutePath.NOTES)}
+            className="group flex min-h-11 w-fit items-center gap-2 rounded-control px-2 text-sm font-bold text-gray-nav transition-all duration-300 hover:-translate-x-1 hover:bg-green/5 hover:text-green"
+            aria-label="Go back to my reflections"
           >
-            <Skeleton variant="text" className="h-5 w-40" />
-            <Skeleton variant="text" className="h-9 w-3/4 max-w-md" />
+            <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
+            <span>Back</span>
+          </button>
+        </div>
+
+        <Surface
+          variant="bezel"
+          tone="paper"
+          className="max-w-[var(--measure-wide)]"
+          innerClassName="space-y-5 p-6 sm:p-10"
+          aria-busy="true"
+          aria-label="Opening your reflection"
+        >
+          <Skeleton variant="text" className="h-5 w-40" />
+          <Skeleton variant="text" className="h-9 w-3/4 max-w-md" />
           <div className="space-y-3 pt-4">
             <Skeleton variant="text" className="w-full" />
             <Skeleton variant="text" className="w-11/12" />
@@ -348,8 +347,7 @@ export const SingleNote: React.FC = () => {
             <Skeleton variant="text" className="w-5/6" />
           </div>
         </Surface>
-        </PageContainer>
-      </div>
+      </PageContainer>
     );
   }
 
@@ -364,18 +362,17 @@ export const SingleNote: React.FC = () => {
     day: 'numeric',
   });
   const navButtonClass =
-    'flex h-10 w-10 items-center justify-center rounded-[var(--radius-control)] text-gray-nav transition-colors hover:bg-green/5 hover:text-green disabled:pointer-events-none disabled:opacity-30';
+    'flex h-10 w-10 items-center justify-center rounded-control text-gray-nav transition-colors hover:bg-green/5 hover:text-green disabled:pointer-events-none disabled:opacity-30';
 
   return (
     <>
-      <div className="surface-scope-paper page-wash min-h-dvh">
-        <PageContainer className="pb-24 pt-6 md:pt-10">
+      <PageContainer scope="paper" className="pb-24 pt-6 md:pt-10">
           {/* Top row — Back (matches Insights) + prev/next only */}
           <div className="mb-8 flex items-center justify-between gap-2">
             <button
               type="button"
               onClick={() => navigate(RoutePath.NOTES)}
-              className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-green/5 hover:text-green"
+              className="group flex min-h-11 w-fit items-center gap-2 rounded-control px-2 text-sm font-bold text-gray-nav transition-all duration-300 hover:-translate-x-1 hover:bg-green/5 hover:text-green"
               aria-label="Go back to my reflections"
             >
               <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
@@ -435,7 +432,7 @@ export const SingleNote: React.FC = () => {
 
           <article className="max-w-[var(--measure-wide)] selection:bg-green/10">
                 {note.thumbnailUrl ? (
-                  <div className="mb-10 overflow-hidden rounded-[var(--radius-panel)] border border-border/40">
+                  <div className="mb-10 overflow-hidden rounded-panel border border-border/40">
                     <StorageImage path={note.thumbnailUrl} alt={note.title} className="h-64 w-full object-cover" />
                   </div>
                 ) : null}
@@ -538,7 +535,7 @@ export const SingleNote: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => downloadAttachment(attachment)}
-                            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-control)] text-gray-nav transition-colors hover:bg-green/10 hover:text-green"
+                            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-control text-gray-nav transition-colors hover:bg-green/10 hover:text-green"
                             title="Download attachment"
                             aria-label={`Download ${attachment.name}`}
                           >
@@ -551,7 +548,6 @@ export const SingleNote: React.FC = () => {
                 ) : null}
           </article>
       </PageContainer>
-    </div>
 
       <ModalSheet
         isOpen={isExportSheetOpen}

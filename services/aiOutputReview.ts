@@ -25,7 +25,7 @@ export const buildWikiReviewPrompt = (input: LifeWikiReviewInput) =>
     `Page: ${input.title} (${input.pageType})`,
     `Allowed source ids: ${input.allowedSourceIds.join(', ') || 'none'}`,
     'Reject or revise pages with missing source markers, unsupported certainty, diagnostic/clinical labels, unsafe markdown or links, motivational coaching language, or claims that go beyond the notes.',
-    'Return JSON only in this exact shape: {"status":"approve"|"revise"|"reject","reasons":["short reason"],"revisedContent":"optional safe markdown"}.',
+    'Set status to approve, revise (and put the corrected markdown in revisedContent), or reject, with short reasons.',
     `Draft markdown:\n${input.content}`,
   ]);
 
@@ -38,8 +38,7 @@ const coerceReasons = (value: unknown) => {
 };
 
 export const parseLifeWikiReviewResult = (raw: string): LifeWikiReviewResult => {
-  const trimmed = raw.trim();
-  const jsonText = trimmed.match(/\{[\s\S]*\}/)?.[0] || trimmed;
+  const jsonText = raw.trim();
 
   try {
     const parsed = JSON.parse(jsonText) as {

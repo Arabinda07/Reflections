@@ -9,6 +9,7 @@
     "postbuild": "node scripts/generate-public-seo-pages.mjs",
     "lint": "eslint . && tsc --noEmit",
     "lint:fix": "eslint . --fix",
+    "test": "vitest run",
     "seo:audit": "vitest run pages/dashboard/seoCrawlabilityContract.test.ts",
     "cap": "cap",
     "cap:sync": "cap sync",

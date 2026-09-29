@@ -168,14 +168,14 @@ describe('phase 2/3 design-system rollout', () => {
     expect(surfaceScope).toContain("[RoutePath.ACCOUNT]: 'surface-scope-paper'");
     expect(landing).toContain('surface-scope-sage page-wash');
     expect(homeAuthenticated).toContain('surface-scope-sage page-wash');
-    expect(myNotes).toContain('surface-scope-sage page-wash');
+    expect(myNotes).toContain('scope="sage"');
     expect(createNote).toContain('page-wash');
-    expect(singleNote).toContain('surface-scope-paper page-wash');
-    expect(releaseMode).toContain('surface-scope-sage page-wash');
+    expect(singleNote).toContain('scope="paper"');
+    expect(releaseMode).toContain('scope="sage"');
     expect(futureLetters).toContain('surface-scope-sage page-wash');
-    expect(insights).toContain('surface-scope-sage page-wash');
+    expect(insights).toContain('scope="sage"');
     expect(lifeWiki).toContain('surface-scope-sage page-wash');
-    expect(account).toContain('surface-scope-paper page-wash');
+    expect(account).toContain('scope="paper"');
     expect(faq).toContain('scope="paper"');
     expect(privacyPolicy).toContain('scope="paper"');
     expect(read('components/ui/PublicPageShell.tsx')).toContain('page-wash');
@@ -231,7 +231,7 @@ describe('phase 2/3 design-system rollout', () => {
     expect(moodConfig).not.toContain('bg-golden/10');
     expect(moodConfig).not.toContain('text-dark-blue');
 
-    expect(insights).toContain('surface-scope-sage');
+    expect(insights).toContain('scope="sage"');
     expect(insights).toContain('tone="sage"');
   });
 
@@ -275,7 +275,7 @@ describe('phase 2/3 design-system rollout', () => {
       expect(source, filePath).not.toContain('bg-body/');
       expect(source, filePath).not.toContain('bg-white/5');
       expect(source, filePath).not.toContain('bg-white/60');
-      expect(source, filePath).toMatch(/surface-(?:inline-panel|scope-|tone-|flat|bezel)/);
+      expect(source, filePath).toMatch(/(?:surface-(?:inline-panel|scope-|tone-|flat|bezel)|scope="(?:paper|sage|sky|honey|clay)")/);
     }
   });
 });
