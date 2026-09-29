@@ -717,7 +717,7 @@ export const CreateNote: React.FC = () => {
               key="save-fab"
               onClick={handleSaveFabClick}
               disabled={saving || isReleasing}
-              className="group relative flex h-16 items-center gap-2.5 rounded-full bg-green px-7 text-white shadow-xl shadow-green/25 transition-transform hover:scale-102 active:scale-98 disabled:opacity-90"
+              className="group relative flex h-16 items-center gap-2.5 rounded-full bg-green px-7 text-white shadow-floating transition-transform hover:scale-102 active:scale-98 disabled:opacity-90"
               aria-label="Save or release this reflection"
             >
               {saving || isReleasing ? (

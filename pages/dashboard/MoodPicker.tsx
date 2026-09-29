@@ -58,7 +58,7 @@ export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, onSelect, 
               onClick={() => handleGroupSelect(group)}
               className={`group flex min-h-[4.65rem] w-full items-center gap-3.5 rounded-[1.15rem] border p-3.5 text-left transition-[border-color,background-color,box-shadow,transform] duration-300 ease-out-expo hover:-translate-y-px sm:min-h-[5rem] sm:rounded-[1.25rem] sm:p-4 ${groupConfig?.option || 'control-surface text-gray-text'}`}
             >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/40 transition-transform duration-500 group-hover:scale-105 sm:h-11 sm:w-11">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-muted transition-transform duration-500 group-hover:scale-105 sm:h-11 sm:w-11">
                 <Icon size={22} weight="duotone" className={groupConfig?.labelClass} />
               </span>
               <span className="min-w-0">
@@ -73,7 +73,6 @@ export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, onSelect, 
   }
 
   const selectedGroupConfig = getMoodConfig(selectedGroup.id);
-  const GroupIcon = selectedGroup.icon;
 
   return (
     <div className="mood-picker-detail space-y-2">
@@ -100,7 +99,7 @@ export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, onSelect, 
       >
         <span>Keep {selectedGroup.label}</span>
         {selectedMood === selectedGroup.id ? (
-          <span className="rounded-full bg-white/70 p-1 text-green">
+          <span className="rounded-full bg-green/15 p-1 text-green">
             <Check size={12} weight="bold" />
           </span>
         ) : null}
@@ -122,13 +121,13 @@ export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, onSelect, 
               className={`group flex min-h-[3.65rem] w-full items-center justify-between rounded-[var(--radius-control)] border p-3.5 text-left transition-[border-color,background-color,box-shadow,transform] duration-300 ease-out-expo hover:-translate-y-px ${isSelected ? moodConfig.modal : moodConfig.option}`}
             >
               <span className="flex items-center gap-3">
-                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${isSelected ? 'bg-white/30' : 'bg-white/40'} transition-transform duration-500 group-hover:scale-105`}>
+                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${isSelected ? 'bg-current/15' : 'bg-surface-muted'} transition-transform duration-500 group-hover:scale-105`}>
                   <Icon size={18} weight={isSelected ? 'fill' : 'regular'} className={isSelected ? 'text-current' : moodConfig.labelClass} />
                 </span>
                 <span className="text-sm font-bold text-gray-text">{moodConfig.label}</span>
               </span>
               {isSelected ? (
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/60 text-green">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-green/15 text-green">
                   <Check size={11} weight="bold" />
                 </span>
               ) : null}

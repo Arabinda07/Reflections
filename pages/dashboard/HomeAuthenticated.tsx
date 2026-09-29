@@ -635,7 +635,8 @@ export const HomeAuthenticated: React.FC = () => {
                     <div className="home-primary-action-row home-primary-action-cluster flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-8">
                       <Button
                         variant="primary"
-                        className="min-h-12 py-3 px-6 w-full sm:w-auto rounded-xl bg-green text-sm sm:text-base font-bold text-white shadow-none transition-colors hover:bg-green/90"
+                        size="md"
+                        className="w-full sm:w-auto"
                         onPointerEnter={prefetchCreateNoteRoute}
                         onFocus={prefetchCreateNoteRoute}
                         onClick={() => handleCreateClick(dailyPrompt)}

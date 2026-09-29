@@ -2854,7 +2854,7 @@ details:focus-visible,
     border-color: oklch(from var(--surface-current-accent) l c h / 0.28);
     background: oklch(from var(--surface-current-accent) l c h / 0.1);
     color: var(--surface-current-accent);
-    box-shadow: 0 10px 22px -18px oklch(from var(--surface-current-accent) l c h / 0.4);
+    box-shadow: none;
   }
 
   .chip-filter-icon {
