@@ -126,7 +126,7 @@ const router = createBrowserRouter(
         <Route path={RoutePath.FUTURE_LETTERS} element={withPrivateRoute(withRouteFallback(<FutureLetters />))} />
         <Route path={RoutePath.ACCOUNT} element={withProtectedRoute(withRouteFallback(<Account />))} />
         <Route path={RoutePath.RECOVER_PRIVATE_WRITING} element={withProtectedRoute(withModeGuard(withRouteFallback(<RecoverPrivateWriting />), 'encrypted'))} />
-        <Route path={RoutePath.INSIGHTS} element={withPrivateRoute(withModeGuard(withRouteFallback(<Insights />), 'reflective'))} />
+        <Route path={RoutePath.INSIGHTS} element={withPrivateRoute(withRouteFallback(<Insights />))} />
         <Route path={RoutePath.WIKI} element={withPrivateRoute(withModeGuard(withRouteFallback(<LifeWiki />), 'reflective'))} />
         <Route path={RoutePath.SANCTUARY} element={withPrivateRoute(withModeGuard(withRouteFallback(<LifeWiki />), 'reflective'))} />
         <Route path={RoutePath.SANCTUARY_ARTICLE} element={withPrivateRoute(withModeGuard(withRouteFallback(<LifeWiki />), 'reflective'))} />

@@ -99,7 +99,7 @@ export const MORE_NAV_GROUPS: MoreNavGroup[] = [
   {
     label: 'Reflect',
     items: [
-      { label: 'Insights', path: RoutePath.INSIGHTS, icon: Sparkle, requireMode: 'reflective' },
+      { label: 'Insights', path: RoutePath.INSIGHTS, icon: Sparkle },
       { label: 'Relationships', path: RoutePath.RELATIONSHIPS, icon: Heart },
       { label: 'Future Letters', path: RoutePath.FUTURE_LETTERS, icon: EnvelopeSimple },
       {
@@ -131,16 +131,16 @@ const isMoreNavItemActive = (item: MoreNavItem, pathname: string) =>
   });
 
 const tabBaseClass =
-  'auth-mobile-tab relative flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-[0.875rem] px-2 py-1 text-ui-xs font-bold leading-none transition-[background-color,border-color,color,transform] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
+  'auth-mobile-tab relative flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-xl px-2 py-1 text-ui-xs font-bold leading-none transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
 
 const moreLinkClass =
-  'auth-mobile-more-link flex min-h-11 w-full items-center justify-between gap-3 rounded-[0.9rem] border border-transparent px-2.5 py-1.5 text-left text-ui-sm font-bold text-gray-text transition-colors hover:border-green/15 hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
+  'auth-mobile-more-link flex min-h-11 w-full items-center justify-between gap-3 rounded-2xl border border-transparent px-2.5 py-1.5 text-left text-ui-sm font-bold text-gray-text transition-colors hover:border-green/15 hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';
 
 const neutralIconTileClass =
-  'auth-mobile-more-icon-tile flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.8rem] bg-green/10 text-green';
+  'auth-mobile-more-icon-tile flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-green/10 text-green';
 
 const signOutIconTileClass =
-  'auth-mobile-more-icon-tile auth-mobile-more-icon-tile--danger flex h-8 w-8 shrink-0 items-center justify-center rounded-[0.8rem] bg-clay/10 text-clay';
+  'auth-mobile-more-icon-tile auth-mobile-more-icon-tile--danger flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-clay/10 text-clay';
 
 const prefetchCreateNoteRoute = () => {
   void import('@/pages/dashboard/CreateNote');
@@ -229,7 +229,7 @@ export const AuthenticatedMobileNav: React.FC<AuthenticatedMobileNavProps> = ({
     };
   }, [isMoreOpen]);
 
-  const handleInstallClick = () => triggerInstall();
+  const _handleInstallClick = () => triggerInstall();
 
   const handleInvite = () => {
     closeMore();

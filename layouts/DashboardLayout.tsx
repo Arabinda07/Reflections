@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Outlet, useLocation, useNavigate, useOutlet } from 'react-router-dom';
+import { useLocation, useNavigate, useOutlet } from 'react-router-dom';
 
 import { Link } from 'react-router-dom';
 import { House } from '@phosphor-icons/react/House';
@@ -38,7 +38,7 @@ const GUEST_NAV_ITEMS: SidebarNavItem[] = [
 const AUTH_NAV_ITEMS: SidebarNavItem[] = [
   { label: 'My notes', path: RoutePath.NOTES, icon: Notebook, description: 'Return to your saved reflections.' },
   { label: 'Create note', path: RoutePath.CREATE_NOTE, icon: PencilSimpleLine, description: 'Open a fresh writing surface.' },
-  { label: 'Insights', path: RoutePath.INSIGHTS, icon: Sparkle, description: 'See patterns drawn from your writing.', requireMode: 'reflective' },
+  { label: 'Insights', path: RoutePath.INSIGHTS, icon: Sparkle, description: 'See patterns drawn from your writing.' },
   { label: 'Relationships', path: RoutePath.RELATIONSHIPS, icon: Heart, description: 'Tend people, hooks, and weekly care.' },
   { label: 'Account', path: RoutePath.ACCOUNT, icon: UserCircle, description: 'Manage your profile and plan.' },
   { label: 'FAQ', path: RoutePath.FAQ, icon: Question, description: 'Read how Reflections works.' },
@@ -123,7 +123,7 @@ export const DashboardLayout: React.FC = () => {
 
   return (
     <div
-      className={`${routeSurfaceScopeClass} page-wash app-shell--fixed-scroll relative flex h-[100dvh] min-h-[100dvh] flex-col overflow-hidden bg-body font-sans selection:bg-green/30 selection:text-green`}
+      className={`${routeSurfaceScopeClass} page-wash app-shell--fixed-scroll relative flex h-dvh min-h-dvh flex-col overflow-hidden bg-body font-sans selection:bg-green/30 selection:text-green`}
     >
       <a href="#main-content" className="skip-link">
         Skip to content
@@ -179,7 +179,7 @@ export const DashboardLayout: React.FC = () => {
         {/* Global Footer - Positioned for full-width background with centered content */}
         {!isWritingRoute && (
           <footer className="screen-scrim screen-scrim--strong mt-auto w-full border-t border-border py-12 transition-colors duration-300">
-            <div className="max-w-[1440px] mx-auto px-6 md:px-16 flex flex-col sm:flex-row items-center justify-between gap-8">
+            <div className="max-w-360 mx-auto px-6 md:px-16 flex flex-col sm:flex-row items-center justify-between gap-8">
               <nav
                 aria-label="Footer navigation"
                 className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 sm:gap-10"

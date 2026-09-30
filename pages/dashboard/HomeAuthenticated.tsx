@@ -3,7 +3,7 @@ import { Brain } from '@phosphor-icons/react/Brain';
 import { CaretRight } from '@phosphor-icons/react/CaretRight';
 import { CheckCircle as CheckCircleIcon } from '@phosphor-icons/react/CheckCircle';
 import { EnvelopeSimple } from '@phosphor-icons/react/EnvelopeSimple';
-import { FolderOpen } from '@phosphor-icons/react/FolderOpen';
+
 import { Heart } from '@phosphor-icons/react/Heart';
 import { ListChecks } from '@phosphor-icons/react/ListChecks';
 import { Plus } from '@phosphor-icons/react/Plus';
@@ -12,7 +12,7 @@ import { Wind } from '@phosphor-icons/react/Wind';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { isSameDay } from 'date-fns';
+
 
 import { AmbientMusicButton } from '../../components/ui/AmbientMusicButton';
 import { Button } from '../../components/ui/Button';
@@ -419,7 +419,7 @@ export const HomeAuthenticated: React.FC = () => {
         setIsCheckInOpen(false);
         setTimeout(() => setCheckInFeedback(null), 300);
       }, 1500);
-    } catch (error) {
+    } catch {
       // Mood check-in could not save; feedback appears in the sheet.
       setCheckInFeedback('error');
     } finally {
@@ -440,7 +440,7 @@ export const HomeAuthenticated: React.FC = () => {
         ? taskNotes.map((item) => (item.id === noteId ? updatedNote : item))
         : [...taskNotes, updatedNote];
       updateIntentionSummary(nextNotes);
-    } catch (err) {
+    } catch {
       // Intention toggle could not save; UI remains in previous state.
     }
   };
@@ -488,7 +488,7 @@ export const HomeAuthenticated: React.FC = () => {
         setIsIntentionModalOpen(false);
         setIntentionFeedback(null);
       }, 1500);
-    } catch (err) {
+    } catch {
       // Intention creation could not save; toast tells the user.
       showToast('Could not save intention right now');
     } finally {
@@ -616,7 +616,7 @@ export const HomeAuthenticated: React.FC = () => {
                   </div>
                   <button
                     onClick={refreshPrompt}
-                    className={`flex h-11 min-w-11 items-center justify-center rounded-[var(--radius-control)] text-gray-nav transition-colors hover:text-green ${
+                    className={`flex h-11 min-w-11 items-center justify-center rounded-2xl text-gray-nav transition-colors hover:text-green ${
                       isRefreshing ? 'animate-spin' : ''
                     }`}
                     aria-label="Refresh today's reflection prompt"
@@ -627,7 +627,7 @@ export const HomeAuthenticated: React.FC = () => {
 
                 <div className="space-y-8">
                   <p
-                    className={`dashboard-prompt-text typographic-measure transition-opacity duration-[400ms] ease-out ${isRefreshing ? 'opacity-0' : 'opacity-100'}`}
+                    className={`dashboard-prompt-text typographic-measure transition-opacity duration-300 ease-out ${isRefreshing ? 'opacity-0' : 'opacity-100'}`}
                   >
                     {dailyPrompt}
                   </p>
@@ -708,7 +708,7 @@ export const HomeAuthenticated: React.FC = () => {
                     intentionSummary.items.slice(0, 3).map((intention) => (
                       <button
                         key={intention.id}
-                        className="w-full flex items-center gap-4 p-4 rounded-2xl border border-green/15 bg-green/5 hover:border-green/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 transition-[colors,opacity,transform] text-left shadow-none group/btn active:scale-98"
+                        className="w-full flex items-center gap-4 p-4 rounded-2xl border border-green/15 bg-green/5 hover:border-green/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 transition-all text-left shadow-none group/btn active:scale-98"
                         onClick={() => handleToggleIntention(intention.noteId, intention.id)}
                         aria-label={`Mark "${intention.text}" from ${intention.noteTitle} as complete`}
                       >
@@ -808,6 +808,7 @@ export const HomeAuthenticated: React.FC = () => {
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => navigate(RoutePath.INSIGHTS)}
                   className="flex w-full items-center justify-between p-4 px-2 text-left rounded-xl transition-colors hover:bg-green/5 group"
                   aria-label="View writing patterns"
@@ -886,7 +887,7 @@ export const HomeAuthenticated: React.FC = () => {
                     {getMoodConfig(checkInFeedback)?.icon && React.createElement(getMoodConfig(checkInFeedback)!.icon, { size: 32, weight: "fill" })}
                   </div>
                   <h3 className="label-caps mb-2 text-green">Recorded</h3>
-                  <p className="font-serif text-[16px] italic leading-relaxed text-gray-light">
+                  <p className="font-serif text-base italic leading-relaxed text-gray-light">
                     Logged. Tiny check-in, useful signal.
                   </p>
                 </>

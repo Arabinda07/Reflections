@@ -33,6 +33,7 @@ import {
 } from './insightsNarrative';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useViewTransitionNavigation } from '../../hooks/useViewTransitionNavigation';
+import { useUserMode } from '../../context/UserModeContext';
 
 const SANCTUARY_ENTRANCE_FALLBACK_MS = 2200;
 
@@ -45,6 +46,7 @@ const getWeekSignalSince = () => {
 
 export const Insights: React.FC = () => {
   const navigate = useViewTransitionNavigation();
+  const { userMode } = useUserMode();
 
   const [notes, setNotes] = useState<Note[]>([]);
   const [themes, setThemes] = useState<LifeTheme[]>([]);
@@ -105,13 +107,13 @@ export const Insights: React.FC = () => {
         noteMoodCounts[note.mood] = (noteMoodCounts[note.mood] || 0) + 1;
       }
 
-      const plainText = note.content.replace(/<[^>]*>/g, ' ').trim();
+      const plainText = (note.content || '').replace(/<[^>]*>/g, ' ').trim();
       wordsWritten += plainText ? plainText.split(/\s+/).filter(Boolean).length : 0;
     });
 
     moodCheckins.forEach((checkin) => {
       const date = new Date(checkin.createdAt);
-      if (date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
+      if (date.getMonth() === currentMonth && date.getFullYear() === currentYear && checkin.mood) {
         checkinMoodCounts[checkin.mood] = (checkinMoodCounts[checkin.mood] || 0) + 1;
       }
     });
@@ -136,12 +138,12 @@ export const Insights: React.FC = () => {
   }), [moodCheckins, notes, ritualEvents]);
 
   const wikiGate = useMemo(() => {
-    if (!access) return null;
+    if (!access || userMode !== 'reflective') return null;
     return getWikiInsightsGate(access, notes.length);
-  }, [access, notes.length]);
+  }, [access, notes.length, userMode]);
 
   const isWikiReadyToBuild = Boolean(
-    wikiGate?.canGenerate && notes.length >= FREE_WIKI_MINIMUM_ENTRIES && themes.length === 0,
+    userMode === 'reflective' && wikiGate?.canGenerate && notes.length >= FREE_WIKI_MINIMUM_ENTRIES && themes.length === 0,
   );
 
   // Weave the weekly/monthly signal into prose rather than a stat grid.
@@ -297,43 +299,45 @@ export const Insights: React.FC = () => {
             </div>
           </Surface>
 
-          <Surface
-            variant="flat"
-            tone="sage"
-            className="group relative overflow-hidden rounded-4xl"
-          >
-            <Link
-              to={RoutePath.SANCTUARY}
-              state={{ fromInsights: true }}
-              onClick={handleOpenSanctuary}
-              className="relative z-10 flex w-full flex-col items-center justify-between gap-8 p-8 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 md:flex-row md:p-12"
-              aria-label="Open your Life Wiki"
+          {userMode === 'reflective' && (
+            <Surface
+              variant="flat"
+              tone="sage"
+              className="group relative overflow-hidden rounded-4xl"
             >
-              <div className="space-y-5">
-                {isWikiReadyToBuild && (
-                  <div className="h-24 w-24 overflow-hidden rounded-4xl bg-accent-soft">
-                    <LottieAnimation src={SANCTUARY_LEVEL_UP_ANIMATION_SRC} animationId={SANCTUARY_LEVEL_UP_ANIMATION_ID} autoplay loop />
+              <Link
+                to={RoutePath.SANCTUARY}
+                state={{ fromInsights: true }}
+                onClick={handleOpenSanctuary}
+                className="relative z-10 flex w-full flex-col items-center justify-between gap-8 p-8 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 md:flex-row md:p-12"
+                aria-label="Open your Life Wiki"
+              >
+                <div className="space-y-5">
+                  {isWikiReadyToBuild && (
+                    <div className="h-24 w-24 overflow-hidden rounded-4xl bg-accent-soft">
+                      <LottieAnimation src={SANCTUARY_LEVEL_UP_ANIMATION_SRC} animationId={SANCTUARY_LEVEL_UP_ANIMATION_ID} autoplay loop />
+                    </div>
+                  )}
+                  <div className="space-y-3">
+                    <h2 className="flex items-center gap-2.5 text-3xl font-display font-bold text-gray-text">
+                      {!isWikiReadyToBuild && <Book size={24} weight="duotone" className="flex-none text-green" />}
+                      {isWikiReadyToBuild ? 'Your wiki is ready for insights' : 'Your Life Wiki'}
+                    </h2>
+                    <p className="text-gray-light max-w-lg text-lg leading-relaxed font-serif italic">
+                      {isWikiReadyToBuild
+                        ? 'You have enough writing to build your first Life Wiki refresh when you choose.'
+                        : 'A private reading room where AI-generated wiki pages stay grounded in your saved notes.'}
+                    </p>
                   </div>
-                )}
-                <div className="space-y-3">
-                  <h2 className="flex items-center gap-2.5 text-3xl font-display font-bold text-gray-text">
-                    {!isWikiReadyToBuild && <Book size={24} weight="duotone" className="flex-none text-green" />}
-                    {isWikiReadyToBuild ? 'Your wiki is ready for insights' : 'Your Life Wiki'}
-                  </h2>
-                  <p className="text-gray-light max-w-lg text-lg leading-relaxed font-serif italic">
-                    {isWikiReadyToBuild
-                      ? 'You have enough writing to build your first Life Wiki refresh when you choose.'
-                      : 'A private reading room where AI-generated wiki pages stay grounded in your saved notes.'}
-                  </p>
                 </div>
-              </div>
 
-              <div className="relative flex h-12 shrink-0 items-center justify-center overflow-hidden rounded-control border border-green bg-green text-white px-6 label-caps transition-colors duration-300 group-hover:bg-green/90">
-                Open Sanctuary
-                <CaretRight size={16} weight="regular" className="ml-2 transition-transform duration-500 ease-out-expo group-hover:translate-x-1" />
-              </div>
-            </Link>
-          </Surface>
+                <div className="relative flex h-12 shrink-0 items-center justify-center overflow-hidden rounded-control border border-green bg-green text-white px-6 label-caps transition-colors duration-300 group-hover:bg-green/90">
+                  Open Sanctuary
+                  <CaretRight size={16} weight="regular" className="ml-2 transition-transform duration-500 ease-out-expo group-hover:translate-x-1" />
+                </div>
+              </Link>
+            </Surface>
+          )}
           </>)}
           </div>
         </div>
