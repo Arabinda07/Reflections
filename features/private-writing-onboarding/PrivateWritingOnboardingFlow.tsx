@@ -158,7 +158,7 @@ export const PrivateWritingOnboardingFlow: React.FC<{
               size="sm"
               onClick={() => void handleSkipOnboarding('optional_guidance')}
               aria-label="Skip onboarding"
-              className="self-center px-3 text-gray-nav hover:text-green"
+              className="self-center"
             >
               Skip onboarding
             </Button>
@@ -168,7 +168,7 @@ export const PrivateWritingOnboardingFlow: React.FC<{
               variant="secondary"
               onClick={handlePreviousOnboardingStep}
               disabled={onboardingStep === 0 || shouldShowPrivateWritingSetup}
-              className="min-w-[6.75rem] flex-1 sm:flex-none"
+              className="min-w-27 flex-1 sm:flex-none"
             >
               Back
             </Button>
@@ -176,7 +176,7 @@ export const PrivateWritingOnboardingFlow: React.FC<{
               variant="primary"
               onClick={handleNextOnboardingStep}
               disabled={shouldShowPrivateWritingSetup}
-              className="min-w-[8.75rem] flex-1 sm:flex-none"
+              className="min-w-35 flex-1 sm:flex-none"
             >
               {isLastOnboardingStep ? 'Begin writing' : 'Next'}
             </Button>
@@ -196,7 +196,7 @@ export const PrivateWritingOnboardingFlow: React.FC<{
           onSetupComplete={handlePrivateWritingSetupComplete}
         />
       ) : shouldShowSetupReady ? (
-        <div className="flex min-h-[18rem] flex-col justify-between gap-6 pb-1 sm:min-h-[19rem] animate-fade-in-up">
+        <div className="flex min-h-72 flex-col justify-between gap-6 pb-1 sm:min-h-76 animate-fade-in-up">
           <div className="space-y-4">
             <p className="label-caps text-green">Private writing setup complete</p>
             <div className="rounded-sm border border-green/20 bg-green/5 p-5 sm:p-6">
@@ -211,8 +211,9 @@ export const PrivateWritingOnboardingFlow: React.FC<{
           <div className="flex flex-col gap-3">
             <Button
               variant="primary"
+              size="md"
               onClick={() => void handleWriteFirstReflection()}
-              className="min-h-12 w-full"
+              className="w-full"
             >
               Begin writing
             </Button>
@@ -221,7 +222,6 @@ export const PrivateWritingOnboardingFlow: React.FC<{
                 variant="ghost"
                 size="sm"
                 onClick={handleShowMeAround}
-                className="px-3 text-gray-nav hover:text-green"
               >
                 Show me around
               </Button>
@@ -229,7 +229,6 @@ export const PrivateWritingOnboardingFlow: React.FC<{
                 variant="ghost"
                 size="sm"
                 onClick={() => void handleSkipOnboarding('ready_screen')}
-                className="px-3 text-gray-nav hover:text-green"
               >
                 Maybe later
               </Button>
@@ -239,7 +238,7 @@ export const PrivateWritingOnboardingFlow: React.FC<{
       ) : shouldShowOptionalGuidance ? (
         <div
           key={currentOnboardingStep.title}
-          className="onboarding-step-copy flex min-h-[18rem] flex-col justify-between gap-6 pb-1 sm:min-h-[19rem] animate-fade-in-up"
+          className="onboarding-step-copy flex min-h-72 flex-col justify-between gap-6 pb-1 sm:min-h-76 animate-fade-in-up"
         >
           <div className="space-y-4">
             <p className="label-caps text-green" aria-live="polite">

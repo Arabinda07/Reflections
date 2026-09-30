@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useBlocker } from 'react-router';
-import type { Note, NoteAttachment, Task } from '../types';
+import type { NoteAttachment, Task } from '../types';
 import { RoutePath } from '../types';
 import { noteService } from '../services/noteService';
 import { notePublishingOrchestrator } from '../services/notePublishingOrchestrator';

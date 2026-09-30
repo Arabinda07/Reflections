@@ -6,7 +6,6 @@ const read = (path: string) => readFileSync(join(process.cwd(), path), 'utf8');
 
 describe('Smart Mode Sanctuary contract', () => {
   it('keeps v1 on-demand Life Wiki refresh and the Smart Mode auto-ingest plumbing', () => {
-    const createNote = read('pages/dashboard/CreateNote.tsx');
     const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
     const productContract = read('components/ui/productContractPhase1.test.ts');
 

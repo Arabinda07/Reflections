@@ -102,7 +102,6 @@ describe('engagement routes source contract', () => {
     const cardActionsPath = 'components/ui/CompletionCardActions.tsx';
     expect(existsSync(path.resolve(process.cwd(), cardActionsPath))).toBe(true);
     const actions = read(cardActionsPath);
-    const releaseMode = read('pages/dashboard/ReleaseMode.tsx');
     const letters = read('pages/dashboard/FutureLetters.tsx');
 
     expect(actions).toContain('shareCompletionCard');

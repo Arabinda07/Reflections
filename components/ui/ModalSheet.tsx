@@ -30,10 +30,10 @@ interface ModalSheetProps {
 }
 
 const sizeClasses = {
-  sm: 'sm:max-w-[360px]',
-  md: 'sm:max-w-[460px]',
-  lg: 'sm:max-w-[620px]',
-  xl: 'sm:max-w-[860px]',
+  sm: 'sm:max-w-modal-sm',
+  md: 'sm:max-w-modal-md',
+  lg: 'sm:max-w-modal-lg',
+  xl: 'sm:max-w-modal-xl',
 };
 
 /** Duration (ms) for the exit transition — must match CSS --modal-exit-duration. */

@@ -37,7 +37,7 @@ export const PaperPlaneToast: React.FC<PaperPlaneToastProps> = ({
         transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
         className="flex items-center gap-3"
       >
-        <div className="w-[80px] h-[80px] shrink-0 -my-3 -ml-2">
+        <div className="w-20 h-20 shrink-0 -my-3 -ml-2">
           <Lottie
             animationData={paperPlaneData as unknown}
             autoplay

@@ -109,7 +109,7 @@ export const NoteSearchPalette: React.FC<NoteSearchPaletteProps> = ({ isOpen, on
             role="combobox"
             aria-expanded={results.length > 0}
             aria-controls="note-search-results"
-            className="input-surface min-h-12 w-full rounded-[var(--radius-control)] pl-11 pr-4 text-ui-base font-semibold text-gray-text outline-none placeholder:text-gray-nav focus-visible:ring-2 focus-visible:ring-green"
+            className="input-surface min-h-12 w-full rounded-control pl-11 pr-4 text-ui-base font-semibold text-gray-text outline-none placeholder:text-gray-nav focus-visible:ring-2 focus-visible:ring-green"
           />
         </div>
 
@@ -141,7 +141,7 @@ export const NoteSearchPalette: React.FC<NoteSearchPaletteProps> = ({ isOpen, on
                     aria-selected={isActive}
                     onClick={() => openNote(note)}
                     onMouseMove={() => setActiveIndex(index)}
-                    className={`flex w-full flex-col gap-1 rounded-[var(--radius-control)] px-4 py-3 text-left transition-colors ${
+                    className={`flex w-full flex-col gap-1 rounded-control px-4 py-3 text-left transition-colors ${
                       isActive ? 'bg-green/5 text-green' : 'text-gray-text hover:bg-green/5'
                     }`}
                   >

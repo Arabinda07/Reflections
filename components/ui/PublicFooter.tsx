@@ -14,7 +14,7 @@ export const PublicFooter: React.FC = () => {
 
   return (
     <footer className="screen-scrim screen-scrim--strong mt-auto w-full border-t border-border py-12 transition-colors duration-300">
-      <div className="mx-auto flex w-full max-w-[1440px] flex-col items-center justify-between gap-8 px-6 sm:flex-row md:px-16">
+      <div className="mx-auto flex w-full max-w-360 flex-col items-center justify-between gap-8 px-6 sm:flex-row md:px-16">
         <nav aria-label="Public pages" className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 sm:gap-10">
           {links.map((link) => (
             <Link

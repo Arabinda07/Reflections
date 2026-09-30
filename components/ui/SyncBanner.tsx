@@ -42,7 +42,7 @@ export const SyncBanner: React.FC = () => {
           animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
           exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -20, scale: 0.95 }}
           transition={{ duration: prefersReducedMotion ? 0.15 : 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="fixed top-[80px] left-0 right-0 z-[90] flex justify-center pointer-events-none px-4"
+          className="fixed top-20 left-0 right-0 z-[90] flex justify-center pointer-events-none px-4"
           role="alert"
           aria-live="assertive"
         >

@@ -347,7 +347,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
               aria-modal="true"
               aria-labelledby={mobileMenuTitleId}
               aria-describedby={mobileMenuDescriptionId}
-              className="public-mobile-menu public-mobile-menu-sheet w-full max-w-[420px]"
+              className="public-mobile-menu public-mobile-menu-sheet w-full max-w-105"
               onKeyDown={handleMobileMenuKeyDown}
             >
               <div className="public-mobile-menu-handle" aria-hidden="true" />
@@ -446,7 +446,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({ isLandingRoute = fal
   return (
     <>
       <header className={`public-header ${isLandingRoute ? 'public-header--landing landing-nav-scrim' : 'public-header--standard'}`}>
-        <div className="mx-auto flex h-14 w-full max-w-[1440px] items-center justify-between gap-2.5 px-4 md:px-8 xl:px-10">
+        <div className="mx-auto flex h-14 w-full max-w-360 items-center justify-between gap-2.5 px-4 md:px-8 xl:px-10">
           <a
             href={homeHref}
             onClick={(event) => handleAppRouteNavigation(event, homeHref)}

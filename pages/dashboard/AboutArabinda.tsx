@@ -83,7 +83,8 @@ export const AboutArabinda: React.FC = () => {
                 <PublicPageIcon
                   name={section.icon}
                   size={20}
-                  className="flex-none text-green transition-transform duration-500 ease-out-expo group-hover:-rotate-6"
+                  tone="green"
+                  className="flex-none transition-transform duration-500 ease-out-expo group-hover:-rotate-6"
                 />
                 {section.title}
               </h2>

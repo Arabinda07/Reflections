@@ -14,11 +14,11 @@ const WaveformBars: React.FC<{ color: string }> = ({ color }) => {
   ];
 
   return (
-    <div className="flex items-center gap-[3px] h-5">
+    <div className="flex items-center gap-0.75 h-5">
       {bars.map((bar, index) => (
         <motion.div
           key={index}
-          className="h-[18px] w-[3px] origin-center rounded-full"
+          className="h-4.5 w-0.75 origin-center rounded-full"
           style={{ backgroundColor: color }}
           animate={{ scaleY: bar.h.map((value) => value / 18) }}
           transition={{
@@ -129,7 +129,7 @@ export const AmbientMusicButton: React.FC = () => {
         type="button"
         onClick={() => handleTrackClick(track)}
         className={`audio-track-row ${isActive ? 'audio-track-row--active' : ''} ${
-          compact ? '' : 'min-h-[68px]'
+          compact ? '' : 'min-h-17'
         }`}
         style={
           {
@@ -156,7 +156,7 @@ export const AmbientMusicButton: React.FC = () => {
         }
       >
         <span className="audio-track-badge" style={{ color: track.color }}>
-          <span className={compact ? 'text-[15px]' : 'text-[19px]'}>{track.emoji}</span>
+          <span className={compact ? 'text-ui-sm' : 'text-ui-lg'}>{track.emoji}</span>
         </span>
 
         <span className="audio-track-copy">
@@ -169,7 +169,7 @@ export const AmbientMusicButton: React.FC = () => {
           <WaveformBars color={track.color} />
         ) : (
           <span
-            className="h-[7px] w-[7px] rounded-full shrink-0"
+            className="h-1.75 w-1.75 rounded-full shrink-0"
             style={{ backgroundColor: `color-mix(in oklch, ${track.color} 55%, transparent)` }}
           />
         )}
@@ -188,7 +188,7 @@ export const AmbientMusicButton: React.FC = () => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
               transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-              className="audio-popup absolute bottom-[4.75rem] right-0 z-[200] min-w-[220px]"
+              className="audio-popup absolute bottom-[4.75rem] right-0 z-[200] min-w-55"
               style={
                 {
                   '--audio-picker-bg': pickerBg,
@@ -203,7 +203,7 @@ export const AmbientMusicButton: React.FC = () => {
                   <motion.div
                     animate={{ opacity: [1, 0.35, 1] }}
                     transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
-                    className="h-[7px] w-[7px] rounded-full"
+                    className="h-1.75 w-1.75 rounded-full"
                     style={{ backgroundColor: accentColor }}
                   />
                 ) : null}
@@ -236,7 +236,7 @@ export const AmbientMusicButton: React.FC = () => {
         </div>
       </ModalSheet>
 
-      <div className="relative flex flex-col items-center gap-[5px]">
+      <div className="relative flex flex-col items-center gap-1.25">
         <AnimatePresence>
           {showHint && !isPlaying && !isOpen ? (
             <motion.div
@@ -289,7 +289,7 @@ export const AmbientMusicButton: React.FC = () => {
 
           {isPlaying ? (
             <motion.span
-              className="pointer-events-none absolute inset-[-3px] rounded-full border-2"
+              className="pointer-events-none absolute -inset-0.75 rounded-full border-2"
               style={{ borderColor: accentColor }}
               animate={{ scale: [1, 1.6], opacity: [0.55, 0] }}
               transition={{ duration: 1.8, repeat: Infinity, ease: [0.16, 1, 0.3, 1] }}
@@ -305,7 +305,7 @@ export const AmbientMusicButton: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
               transition={{ duration: 0.25 }}
-              className="text-ui-xs font-bold text-white/85 whitespace-nowrap [text-shadow:0_1px_4px_rgba(0,0,0,0.5)]"
+              className="audio-playing-label text-ui-xs font-bold text-white/85 whitespace-nowrap"
             >
               {activeTrack.label}
             </motion.span>

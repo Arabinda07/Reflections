@@ -189,7 +189,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
                   key={plan.code}
                   type="button"
                   onClick={() => selectPlan(plan.code)}
-                  className={`flex min-h-[6.2rem] flex-col items-start justify-between rounded-[var(--radius-control)] border p-3 text-left transition-colors duration-300 ease-out-expo sm:min-h-28 sm:p-4 ${
+                  className={`flex min-h-25 flex-col items-start justify-between rounded-control border p-3 text-left transition-colors duration-300 ease-out-expo sm:min-h-28 sm:p-4 ${
                     selectedPlan === plan.code ? 'border-honey bg-honey/5' : 'control-surface hover:border-honey/30'
                   }`}
                 >
@@ -239,7 +239,9 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
 
             <Button
               variant="primary"
-              className="w-full h-12 text-sm rounded-[var(--radius-control)] !bg-honey !text-white border-none hover:opacity-90 whitespace-nowrap sm:h-14 sm:text-base"
+              tone="honey"
+              size="lg"
+              className="w-full"
               isLoading={isProcessing}
               onClick={handleSubscribe}
             >
@@ -248,16 +250,18 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
           </>
         ) : (
           <div className="flex flex-col items-center justify-center py-12 text-center animate-in fade-in zoom-in duration-700">
-            <div className="mb-8 flex h-20 w-20 items-center justify-center rounded-[var(--radius-panel)] bg-honey text-white">
+            <div className="mb-8 flex h-20 w-20 items-center justify-center rounded-panel bg-honey text-white">
               <CheckCircle size={40} weight="fill" />
             </div>
             <h3 className="text-3xl font-display font-extrabold text-gray-text mb-3">Your trial has started</h3>
-            <p className="text-base font-medium text-gray-light leading-relaxed max-w-[280px]">
+            <p className="text-base font-medium text-gray-light leading-relaxed max-w-70">
               Pro access activates as soon as Razorpay confirms the subscription. First charge is scheduled for {trialChargeDateLabel}.
             </p>
             <Button
               variant="primary"
-              className="mt-8 h-12 px-8 rounded-[var(--radius-control)] !bg-honey !text-white border-none hover:opacity-90"
+              tone="honey"
+              size="md"
+              className="mt-8"
               onClick={() => {
                 setIsModalOpen(false);
                 onSuccess?.();
@@ -275,7 +279,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
     return (
       <div className={`surface-scope-honey fixed inset-0 z-50 flex items-center justify-center bg-body p-6 ${className}`}>
         <div className="max-w-md w-full relative z-10 text-center space-y-8">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[var(--radius-panel)] border border-honey/15 bg-honey/5 text-honey">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-panel border border-honey/15 bg-honey/5 text-honey">
             <Crown size={40} weight="duotone" />
           </div>
           <div>
@@ -296,7 +300,9 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
 
           <Button
             variant="primary"
-            className="w-full h-14 text-base rounded-[var(--radius-control)] !bg-honey !text-white border-none hover:opacity-90 whitespace-nowrap"
+            tone="honey"
+            size="lg"
+            className="w-full"
             onClick={openPaywall}
           >
             Start my free trial
@@ -310,7 +316,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
 
   return (
     <>
-      <div className={`surface-tone-sage rounded-[var(--radius-panel)] p-5 ${className}`}>
+      <div className={`surface-tone-sage rounded-panel p-5 ${className}`}>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between items-start gap-4">
           <div className="space-y-2 max-w-lg">
             <div className="flex items-center gap-2 text-green">
@@ -324,7 +330,8 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
 
           <Button
             variant="primary"
-            className="w-fit h-12 px-6 rounded-[var(--radius-control)] whitespace-nowrap"
+            size="md"
+            className="w-fit"
             onClick={openPaywall}
           >
             Start my free trial

@@ -23,7 +23,7 @@ export const PublicPageShell: React.FC<PublicPageShellProps> = ({ scope = 'paper
     <PageContainer
       as="div"
       size="app"
-      className="flex flex-col gap-[var(--space-section)] py-16 sm:py-20 lg:py-24"
+      className="flex flex-col gap-section py-16 sm:py-20 lg:py-24"
     >
       {children}
     </PageContainer>
@@ -45,7 +45,7 @@ const BackButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
     type="button"
     onClick={onClick}
     aria-label="Back to home"
-    className="group -ml-2 mb-8 inline-flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-3 text-btn-sm font-bold text-gray-nav transition-[color,transform] duration-300 hover:-translate-x-1 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
+    className="group -ml-2 mb-8 inline-flex min-h-11 w-fit items-center gap-2 rounded-control px-3 text-btn-sm font-bold text-gray-nav transition-[color,transform] duration-300 hover:-translate-x-1 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green"
   >
     <PublicPageIcon name="arrowLeft" size={16} className="transition-transform group-hover:scale-110" />
     <span>Back</span>
@@ -121,7 +121,7 @@ export const PublicPageSection: React.FC<PublicPageSectionProps> = ({
   children,
 }) => {
   const toneClass = tone
-    ? `surface-flat surface-tone-${tone} rounded-[var(--radius-panel)] p-7 md:p-10`
+    ? `surface-flat surface-tone-${tone} rounded-panel p-7 md:p-10`
     : '';
 
   return (

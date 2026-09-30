@@ -28,7 +28,14 @@ export type PublicPageIconName =
 type PublicPageIconProps = {
   name: PublicPageIconName;
   size?: number;
+  tone?: 'default' | 'green' | 'honey';
   className?: string;
+};
+
+const toneClasses: Record<'default' | 'green' | 'honey', string> = {
+  default: '',
+  green: 'text-green',
+  honey: 'text-honey',
 };
 
 const iconPaths: Record<PublicPageIconName, React.ReactNode> = {
@@ -60,12 +67,13 @@ const iconPaths: Record<PublicPageIconName, React.ReactNode> = {
 export const PublicPageIcon: React.FC<PublicPageIconProps> = ({
   name,
   size = 24,
+  tone = 'default',
   className = '',
 }) => (
   <svg
     viewBox="0 0 24 24"
     aria-hidden="true"
-    className={className}
+    className={`${toneClasses[tone]} ${className}`.trim()}
     width={size}
     height={size}
     fill="none"

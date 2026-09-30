@@ -30,7 +30,6 @@ describe('Android shell contract', () => {
   it('routes Android back presses through the shared registry and native toast bridge', () => {
     const modalSheet = read('components/ui/ModalSheet.tsx');
     const backHook = read('src/native/useAndroidBackHandler.ts');
-    const dashboardLayout = read('layouts/DashboardLayout.tsx');
     const mainActivity = read('android/app/src/main/java/com/arabinda/reflections/MainActivity.java');
 
     const mobileSidebar = read('layouts/MobileSidebar.tsx');
@@ -52,7 +51,6 @@ describe('Android shell contract', () => {
     const authenticatedShell = read('layouts/AuthenticatedAppShell.tsx');
     const oauthHook = read('hooks/useNativeOAuthListener.ts');
     const googleOAuth = read('src/auth/googleOAuth.ts');
-    const dashboardLayout = read('layouts/DashboardLayout.tsx');
     const createNote = read('pages/dashboard/CreateNote.tsx');
     const safeArea = read('src/native/safeArea.ts');
 

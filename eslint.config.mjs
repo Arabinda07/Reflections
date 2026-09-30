@@ -34,7 +34,7 @@ const sharedContracts = [
   },
   {
     pattern: '^ModalSheet$',
-    allow: ['layout', 'spacing', 'modal-sheet.*', 'modal-sheet-panel--compact', 'modal-sheet-panel--mood-detail', 'modal-sheet-body--compact', 'modal-sheet-body--mood-detail', 'auth-mobile-more-backdrop', 'auth-mobile-more-sheet-body', 'auth-mobile-more-sheet-panel'],
+    allow: ['layout', 'spacing', 'modal-sheet.*', 'modal-sheet-panel--compact', 'modal-sheet-panel--mood-detail', 'modal-sheet-body--compact', 'modal-sheet-body--mood-detail', 'auth-mobile-more-backdrop', 'auth-mobile-more-sheet-body', 'auth-mobile-more-sheet-panel', 'onboarding-modal-panel', 'onboarding-modal-body'],
     deny: ['color'],
     message: {
       color: 'ModalSheet panel and backdrop styling must use modal-sheet.css and design tokens.',
@@ -42,11 +42,15 @@ const sharedContracts = [
   },
   {
     pattern: '^RouteLoadingFrame$',
-    allow: ['layout', 'spacing', 'color', 'surface-scope-.*', 'page-wash', 'bg-body'],
+    allow: ['layout', 'spacing', 'color', 'surface-scope-paper', 'surface-scope-sage', 'surface-scope-sky', 'surface-scope-honey', 'surface-scope-clay', 'surface-scope-neutral', 'page-wash', 'bg-body'],
   },
   {
     pattern: '^OverlayFeedback$',
-    allow: ['layout', 'spacing', 'color', 'overlay-feedback.*'],
+    allow: ['layout', 'spacing', 'color', 'overlay-feedback', 'overlay-feedback--veil', 'overlay-feedback--screen', 'overlay-feedback--soft', 'overlay-feedback-card', 'overlay-feedback-card--row'],
+  },
+  {
+    pattern: '^PublicPageIcon$',
+    allow: ['layout', 'motion', 'color', 'transition-transform', 'group-hover:scale-110', 'group-hover:-rotate-6', 'ease-out-expo', 'duration-500'],
   },
   {
     pattern: '^Alert$',
@@ -57,7 +61,7 @@ const sharedContracts = [
   },
   {
     pattern: '^PageContainer$',
-    allow: ['layout', 'spacing', 'color', 'surface-scope-.*', 'page-wash', 'bg-.*', 'relative', 'z-.*'],
+    allow: ['layout', 'spacing', 'color', 'gap-section', 'surface-scope-sage', 'surface-scope-paper', 'surface-scope-sky', 'surface-scope-honey', 'surface-scope-clay', 'surface-scope-neutral', 'page-wash', 'bg-.*', 'relative', 'z-.*'],
   },
   {
     pattern: '^SectionHeader$',
@@ -93,6 +97,7 @@ const allowedArbitraryValues = [
   'pt-[env(safe-area-inset-top)]',
   'pb-[env(safe-area-inset-bottom)]',
   'bottom-[calc(2rem+env(safe-area-inset-bottom))]',
+  'bottom-[4.75rem]',
   'top-[var(--native-top-control-offset)]',
   'pt-[var(--native-page-top-padding)]',
 
@@ -101,8 +106,15 @@ const allowedArbitraryValues = [
   'w-[min(66vmin,34rem)]',
   'min-h-[34dvh]',
   'sm:min-h-[42dvh]',
+  'min-h-[80vh]',
+  'h-[100dvh]',
+  'min-h-[100dvh]',
+  'min-h-[160px]',
+  'rounded-[1.5rem]',
   'lg:pt-[28vh]',
   'aspect-[21/9]',
+  'aspect-[4/5]',
+  'max-h-[52vh]',
   'max-h-[72vh]',
   'max-w-[var(--measure-wide)]',
   'object-[48%_center]',
@@ -114,8 +126,10 @@ const allowedArbitraryValues = [
   'transition-[color,border-color,transform]',
   'transition-[transform,box-shadow,background-color]',
   'transition-[background-color,border-color,box-shadow,color]',
+  'transition-[background-color,border-color,color,box-shadow,transform,filter]',
   'transition-[opacity,transform,border-color]',
   'transition-[opacity,transform]',
+  'transition-[color,transform,background-color]',
 
   // Dynamic OKLCH Relative Color Math & Shadows
   '[background-color:oklch(from_var(--bg-color)_l_c_h_/_0.95)]',
@@ -130,16 +144,31 @@ const allowedArbitraryValues = [
   'text-[var(--surface-current-accent)]',
   'text-[var(--surface-current-accent)]/60',
   'group-hover:bg-[var(--surface-current-accent)]',
+  'border-[var(--surface-current-accent)]',
+  'border-[var(--surface-current-accent)]/20',
+  'hover:border-[var(--surface-current-accent)]/30',
+  'bg-[var(--surface-current-soft-bg)]',
 
   // Complex Grid Layouts (page-specific responsive patterns)
+  'lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]',
+  'lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]',
   'lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]',
+  'lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]',
+  'md:grid-cols-[minmax(13rem,0.34fr)_minmax(0,1fr)]',
+
+  // Comparison & Table Column Sizing
+  'first:w-[30%]',
 
   // Navigation Chrome Z-Indices (layering system)
+  'z-[1]',
+  'z-[90]',
+  'z-[95]',
   'z-[100]',
   'z-[105]',
   'z-[110]',
+  'z-[200]',
 
-  // Brand Typography (hand-tuned sizes for logo and sidebar headings)
+  // Brand Typography & Editorial Measures
   'text-[22px]',
   'sm:text-[26px]',
   'max-w-[150px]',
@@ -149,12 +178,35 @@ const allowedArbitraryValues = [
   'rounded-[var(--radius-chip)]',
   'border-[1.5px]',
   'rounded-[20px]',
+  'leading-[0.92]',
+  'leading-[0.95]',
+  'max-w-[10ch]',
+  'max-w-[12ch]',
+  'max-w-[14ch]',
+  'max-w-[20ch]',
+  'max-w-[24ch]',
+  'max-w-[26ch]',
+  'max-w-[30ch]',
+  'max-w-[32ch]',
+  'max-w-[35ch]',
+  'max-w-[38ch]',
+  'max-w-[42ch]',
+  'max-w-[45ch]',
+  'max-w-[46ch]',
+  'max-w-[48ch]',
+  'max-w-[52ch]',
+  'max-w-[54ch]',
+  'max-w-[55ch]',
+  'max-w-[60ch]',
+  'max-w-[62ch]',
+  'max-w-[65ch]',
+  'max-w-[70ch]',
+  'max-w-[72ch]',
 
   // Native Layout Offsets (mobile sidebar safe area math)
   'mt-[calc(var(--native-top-control-offset)-var(--native-page-top-padding))]',
 
   // Authenticated Mobile Bottom Nav (floating pill bar)
-  'z-[95]',
   'pb-[calc(0.45rem+env(safe-area-inset-bottom))]',
   'min-h-[3.625rem]',
   'max-w-[23rem]',
@@ -250,6 +302,33 @@ export default tseslint.config(
       'pages/auth/SignUp.tsx',
       'pages/auth/ResetPassword.tsx',
       'pages/onboarding/ModeSelect.tsx',
+      // Phase 3D — Primitives & Overlays
+      'components/ui/Button.tsx',
+      'components/ui/ModalSheet.tsx',
+      'components/ui/ProUpgradeCTA.tsx',
+      'components/ui/AmbientMusicButton.tsx',
+      'components/ui/ConfirmationDialog.tsx',
+      'components/ui/NoteSearchPalette.tsx',
+      'components/ui/PaperPlaneToast.tsx',
+      'components/ui/PublicFooter.tsx',
+      'components/ui/PublicHeader.tsx',
+      'components/ui/PublicPageIcon.tsx',
+      'components/ui/PublicPageShell.tsx',
+      'components/ui/ReferralInvitePanel.tsx',
+      'components/ui/StartupScreen.tsx',
+      'components/ui/SyncBanner.tsx',
+      'components/ui/Tooltip.tsx',
+      // Phase 4 — Public Pages, Routes & Errors
+      'pages/dashboard/FAQ.tsx',
+      'pages/dashboard/PrivacyPolicy.tsx',
+      'pages/dashboard/AboutArabinda.tsx',
+      'pages/dashboard/ComparisonPage.tsx',
+      'pages/NotFound.tsx',
+      'pages/RouteErrorBoundary.tsx',
+      'features/private-writing-onboarding/PrivateWritingOnboardingFlow.tsx',
+      'features/private-writing-onboarding/PrivateWritingSetupStep.tsx',
+      'features/private-writing-recovery/RecoverPrivateWriting.tsx',
+      'index.tsx',
     ],
     rules: {
       'shadcn/no-arbitrary-values': [

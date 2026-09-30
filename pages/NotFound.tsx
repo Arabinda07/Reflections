@@ -17,7 +17,7 @@ export const NotFound: React.FC = () => {
       <p className="max-w-md text-gray-light font-medium mb-10">
         There are no notes written here yet. You may have followed a broken link, or this page is still finding its way.
       </p>
-      <Button variant="primary" size="lg" onClick={() => navigate(homePath)} className="rounded-2xl border-2 border-border shadow-sm px-8 font-black">
+      <Button variant="primary" size="lg" onClick={() => navigate(homePath)}>
         <ArrowLeft size={18} weight="bold" className="mr-2" />
         Return home
       </Button>

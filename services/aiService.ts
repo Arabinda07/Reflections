@@ -159,7 +159,7 @@ export const aiService = {
         await wikiService.updateThemeContent(targetThemeId, synthesis.trim());
         try {
           await wikiService.addCitation(targetThemeId, newNote.id);
-        } catch (_) {
+        } catch {
           // Duplicate citations are expected when a note is re-saved.
         }
       }

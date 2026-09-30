@@ -67,17 +67,17 @@ const renderBootstrapState = (
 ) => {
   root.render(
     <StrictMode>
-      <div className="flex min-h-[100dvh] items-center justify-center bg-body px-6 py-12 text-gray-text">
-        <div className="surface-floating surface-floating--strong w-full max-w-xl rounded-[28px] p-8 sm:p-10">
+      <div className="flex min-h-dvh items-center justify-center bg-body px-6 py-12 text-gray-text">
+        <div className="surface-floating surface-floating--strong w-full max-w-xl rounded-panel p-8 sm:p-10">
           <p className="label-caps text-gray-nav">App startup</p>
-          <h1 className="mt-4 text-[clamp(2rem,4vw,3rem)] font-black tracking-[-0.03em] text-gray-text">
+          <h1 className="mt-4 text-mk-h1 font-black tracking-tight text-gray-text">
             {title}
           </h1>
-          <p className="mt-4 font-serif text-[1rem] leading-[1.75] text-gray-light">
+          <p className="mt-4 font-serif text-base leading-relaxed text-gray-light">
             {body}
           </p>
           {detail ? (
-            <p className="mt-4 text-[0.8rem] font-semibold uppercase tracking-[0.16em] text-gray-nav/75">
+            <p className="mt-4 text-ui-xs font-semibold uppercase tracking-[0.16em] text-gray-nav/75">
               {detail}
             </p>
           ) : null}
@@ -85,7 +85,7 @@ const renderBootstrapState = (
             <button
               type="button"
               onClick={action.onClick}
-              className="mt-6 inline-flex min-h-11 items-center justify-center rounded-[var(--radius-control)] bg-green px-5 text-sm font-bold text-white transition-transform duration-200 ease-out-expo active:translate-y-px"
+              className="mt-6 inline-flex min-h-11 items-center justify-center rounded-control bg-green px-5 text-sm font-bold text-white transition-transform duration-200 ease-out-expo active:translate-y-px"
             >
               {action.label}
             </button>

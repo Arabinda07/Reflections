@@ -65,7 +65,7 @@ export const StartupScreen: React.FC<StartupScreenProps> = ({ isVisible }) => {
 
         <div className="absolute bottom-14 z-20 flex flex-col items-center gap-2">
           <span
-            className="overlay-feedback-wordmark text-white/90 [text-shadow:0_2px_8px_rgba(0,0,0,0.2)]"
+            className="overlay-feedback-wordmark overlay-feedback-wordmark--shadow text-white/90"
           >
             reflections
           </span>

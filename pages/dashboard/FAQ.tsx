@@ -153,7 +153,7 @@ export const FAQ: React.FC = () => {
         }
         updated="June 2026"
         intro={
-          <p className="max-w-[36rem] font-serif text-[18px] leading-relaxed text-gray-light">
+          <p className="max-w-xl font-serif text-lg leading-relaxed text-gray-light">
             Reflections is a calm, private writing space for the thoughts that keep doing laps. This guide explains what
             the product does, how AI waits, and what stays yours.
           </p>
@@ -162,11 +162,11 @@ export const FAQ: React.FC = () => {
 
       {/* Quick guide */}
       <section className="grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-stretch">
-        <article className="surface-flat surface-tone-sage flex flex-col justify-center rounded-[var(--radius-panel)] p-8 md:p-12">
+        <article className="surface-flat surface-tone-sage flex flex-col justify-center rounded-panel p-8 md:p-12">
           <h2 className="max-w-[12ch] text-mk-h2 font-display font-bold leading-tight text-gray-text">
             Writing stays at the center.
           </h2>
-          <p className="mt-6 max-w-[52ch] font-serif text-[20px] italic leading-relaxed text-gray-text/75">
+          <p className="mt-6 max-w-[52ch] font-serif text-xl italic leading-relaxed text-gray-text/75">
             Reflections is not a feed, a coach, or a scoreboard. It is a private place for notes, mood labels, and
             patterns you choose to inspect.
           </p>
@@ -205,7 +205,7 @@ export const FAQ: React.FC = () => {
 
       {/* The details — featured trust/billing trio + the quieter list */}
       <PublicPageSection heading="Tools built to support you without getting in the way">
-        <div className="surface-flat surface-tone-sage grid gap-8 rounded-[var(--radius-panel)] p-7 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] md:p-10">
+        <div className="surface-flat surface-tone-sage grid gap-8 rounded-panel p-7 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] md:p-10">
           <article key={featuredDetails[0].title} className="group self-center">
             <h3 className="flex items-center gap-2.5 text-ui-lg font-display font-bold text-gray-text transition-colors duration-300 group-hover:text-green">
               <PublicPageIcon name={featuredDetails[0].icon} size={20} className="flex-none text-green" />
@@ -257,7 +257,7 @@ export const FAQ: React.FC = () => {
 
       {/* Contact */}
       <section>
-        <p className="max-w-[42rem] font-sans text-ui-base leading-relaxed text-gray-light">
+        <p className="max-w-2xl font-sans text-ui-base leading-relaxed text-gray-light">
           Questions about Reflections can go to{' '}
           <a className="public-contact-link" href={`mailto:${SUPPORT_EMAIL}`}>
             {SUPPORT_EMAIL}

@@ -193,13 +193,12 @@ describe('phase 2/3 design-system rollout', () => {
     const toast = read('components/ui/Toast.tsx');
     const confirmationDialog = read('components/ui/ConfirmationDialog.tsx');
     const proUpgrade = read('components/ui/ProUpgradeCTA.tsx');
-    const dashboardLayout = read('layouts/DashboardLayout.tsx');
     const navigationBar = read('layouts/NavigationBar.tsx');
     const createNote = read('pages/dashboard/CreateNote.tsx');
     const moodConfig = read('pages/dashboard/moodConfig.ts');
     const insights = read('pages/dashboard/Insights.tsx');
 
-    expect(button).toContain('primary: "border border-transparent bg-green text-on-accent');
+    expect(button).toContain('border border-transparent bg-green text-on-accent');
     expect(button).toContain('danger: "border border-transparent bg-clay text-on-accent');
     expect(button).not.toContain('bg-red text-white');
 
@@ -212,12 +211,12 @@ describe('phase 2/3 design-system rollout', () => {
     expect(confirmationDialog).toContain("tone={variant === 'danger' ? 'clay' : 'paper'}");
 
     expect(proUpgrade).toContain('tone="honey"');
-    expect(proUpgrade).toContain('!bg-honey');
+    expect(proUpgrade).toContain('bg-honey');
     expect(proUpgrade).not.toContain("selectedPlan === 'monthly' ? 'border-green bg-green/5'");
 
     expect(navigationBar).toContain("aria-current={isActive ? 'page' : undefined}");
     expect(navigationBar).toContain('bg-green/5 text-green');
-    expect(navigationBar).toContain('text-clay hover:bg-clay/5');
+    expect(navigationBar).toContain('tone="clay"');
 
     expect(createNote).toContain('Reflect with AI');
     expect(createNote).toContain('bg-green px-4 py-2');
@@ -238,7 +237,6 @@ describe('phase 2/3 design-system rollout', () => {
   it('keeps header buttons responsive without changing the calm brand treatment', () => {
     const button = read('components/ui/Button.tsx');
     const sectionHeader = read('components/ui/SectionHeader.tsx');
-    const dashboardLayout = read('layouts/DashboardLayout.tsx');
     const navigationBar = read('layouts/NavigationBar.tsx');
     const css = read('index.css');
 

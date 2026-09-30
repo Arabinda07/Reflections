@@ -9,7 +9,7 @@ import { supabase } from '../../src/supabaseClient';
 
 const setupInputClassName =
   'input-surface w-full rounded-xl px-3 py-3 text-sm text-primary outline-none focus:border-primary';
-const setupLabelClassName = 'block text-xs font-semibold uppercase tracking-[0.08em] text-gray-nav';
+const setupLabelClassName = 'block text-xs font-semibold uppercase tracking-widest text-gray-nav';
 
 // Shared themed checkbox (mirrors the unlock modal); avoids the native dark control.
 const SquareCheckbox: React.FC<{

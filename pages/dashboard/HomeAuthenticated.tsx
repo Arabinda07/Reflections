@@ -708,7 +708,7 @@ export const HomeAuthenticated: React.FC = () => {
                     intentionSummary.items.slice(0, 3).map((intention) => (
                       <button
                         key={intention.id}
-                        className="w-full flex items-center gap-4 p-4 rounded-2xl border border-green/15 bg-green/5 hover:border-green/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 transition-all text-left shadow-none group/btn active:scale-98"
+                        className="w-full flex items-center gap-4 p-4 rounded-2xl border border-green/15 bg-green/5 hover:border-green/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 transition-colors text-left shadow-none group/btn active:scale-98"
                         onClick={() => handleToggleIntention(intention.noteId, intention.id)}
                         aria-label={`Mark "${intention.text}" from ${intention.noteTitle} as complete`}
                       >

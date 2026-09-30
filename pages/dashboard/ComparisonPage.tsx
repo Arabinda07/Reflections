@@ -83,7 +83,7 @@ export const ComparisonPage: React.FC<ComparisonPageProps> = ({ seoKey }) => {
 
             <dl className="space-y-4 md:hidden">
               {comparison.rows.map(([criterion, reflections, dayOne]) => (
-                <div key={criterion} className="rounded-[var(--radius-panel)] border border-border p-5">
+                <div key={criterion} className="rounded-panel border border-border p-5">
                   <dt className="font-display text-ui-lg font-bold text-gray-text">{criterion}</dt>
                   <dl className="mt-4 grid gap-4 sm:grid-cols-2">
                     <div className="space-y-1.5">

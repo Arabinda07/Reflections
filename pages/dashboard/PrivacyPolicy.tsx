@@ -141,7 +141,7 @@ export const PrivacyPolicy: React.FC = () => {
         title="Privacy"
         updated="June 2026"
         intro={
-          <p className="max-w-[36rem] font-serif text-[18px] leading-relaxed text-gray-light">
+          <p className="max-w-xl font-serif text-lg leading-relaxed text-gray-light">
             This page explains what Reflections stores, when AI is used, how payments work, and how you can remove your
             writing.
           </p>
@@ -150,7 +150,7 @@ export const PrivacyPolicy: React.FC = () => {
 
       {/* Short version + the three things that matter most */}
       <section className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-        <article className="surface-flat surface-tone-paper rounded-[var(--radius-panel)] p-8 md:p-12">
+        <article className="surface-flat surface-tone-paper rounded-panel p-8 md:p-12">
           <h2 className="max-w-[14ch] text-mk-h2 font-display font-bold leading-tight text-gray-text">
             Your writing is yours.
           </h2>

@@ -6,7 +6,7 @@ import { RouteLoadingFrame } from '../ui/RouteLoadingFrame';
 import { RoutePath } from '../../types';
 
 const panelClassName =
-  'surface-scope-paper page-wash flex min-h-[100dvh] items-center justify-center bg-body px-4 py-10 text-primary';
+  'surface-scope-paper page-wash flex min-h-dvh items-center justify-center bg-body px-4 py-10 text-primary';
 const cardClassName =
   'w-full max-w-lg rounded-2xl border border-border bg-surface/95 p-6 shadow-card';
 const inputClassName =
@@ -15,7 +15,7 @@ const buttonClassName =
   'inline-flex min-h-12 w-full items-center justify-center rounded-xl border border-green bg-green px-4 py-3 text-sm font-semibold text-on-accent transition hover:bg-green-hover disabled:cursor-not-allowed disabled:border-border disabled:bg-surface-muted disabled:text-gray-nav disabled:opacity-100';
 const secondaryButtonClassName =
   'inline-flex min-h-12 w-full items-center justify-center rounded-xl border border-border px-4 py-3 text-sm font-semibold text-primary transition hover:bg-surface-muted disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-gray-nav disabled:opacity-100';
-const labelClassName = 'block text-xs font-semibold uppercase tracking-[0.08em] text-gray-nav';
+const labelClassName = 'block text-xs font-semibold uppercase tracking-widest text-gray-nav';
 const errorClassName = 'text-sm text-clay';
 
 const CryptoShell: React.FC<{
@@ -193,7 +193,7 @@ export const PrivateDataGate: React.FC<{ children: React.ReactNode }> = ({ child
   const { status, error } = useCrypto();
   const location = useLocation();
 
-  if (status === 'loading') return <RouteLoadingFrame className="surface-scope-paper page-wash min-h-[100dvh] bg-body" />;
+  if (status === 'loading') return <RouteLoadingFrame className="surface-scope-paper page-wash min-h-dvh bg-body" />;
   if (status === 'migrating') return <MigrationPanel />;
   if (status === 'setupRequired') {
     if (location.pathname !== RoutePath.DASHBOARD) {

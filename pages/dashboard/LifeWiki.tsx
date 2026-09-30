@@ -587,7 +587,7 @@ export const LifeWiki: React.FC = () => {
         <div className="fixed inset-0 pointer-events-none z-deep overflow-hidden bg-body">
           <div className="sanctuary-page-fade absolute inset-0 opacity-50" />
         </div>
-        <PageContainer scope="sage" className="page-wash pb-24 pt-6 md:pt-10 relative z-10">
+        <PageContainer scope="sage" className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10 relative z-10">
           <div
             ref={lifeWikiScopeRef}
             className={`core-page-stack transition-[opacity,transform] duration-500 ease-out-expo ${isEnteringWiki ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}
@@ -803,7 +803,7 @@ export const LifeWiki: React.FC = () => {
         <div className="sanctuary-page-fade absolute inset-0 opacity-50" />
       </div>
 
-      <PageContainer scope="sage" className="page-wash pb-24 pt-6 md:pt-10 relative z-10">
+      <PageContainer scope="sage" className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10 relative z-10">
         <div
           ref={lifeWikiScopeRef}
           className={`core-page-stack transition-[opacity,transform] duration-500 ease-out-expo ${isEnteringWiki ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}

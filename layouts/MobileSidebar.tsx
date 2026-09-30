@@ -14,6 +14,9 @@ import { useAuthStore } from '../hooks/useAuthStore';
 import { useHaptics } from '../hooks/useHaptics';
 import { usePWAInstall } from '../context/PWAInstallContext';
 import { registerAndroidBackAction } from '../src/native/androidBack';
+import { NATIVE_TOP_CONTROL_OFFSET } from '../src/native/safeArea';
+
+void NATIVE_TOP_CONTROL_OFFSET;
 
 
 export interface SidebarNavItem {

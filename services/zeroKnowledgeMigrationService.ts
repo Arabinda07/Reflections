@@ -1,5 +1,5 @@
 import { supabase } from '../src/supabaseClient';
-import type { FutureLetter, LifeTheme, MoodCheckin, Note } from '../types';
+import type { FutureLetter, LifeTheme, MoodCheckin } from '../types';
 import { cryptoService, type CryptoSession, type EncryptedEnvelope, isEncryptedEnvelope } from './cryptoService';
 import { mapToNote, type SupabaseNoteRow } from './noteRemoteStore';
 import { WikiPageType } from './wikiTypes';

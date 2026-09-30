@@ -1,7 +1,6 @@
 import { noteService } from './noteService';
 import { storageService } from './storageService';
 import { aiRunClient } from './aiRunClient';
-import { ritualEventService } from './ritualService';
 import { observationService } from './observationService';
 import { extractTasksFromContent, mergeTasks } from '../src/utils/taskParser';
 import { supabase } from '../src/supabaseClient';

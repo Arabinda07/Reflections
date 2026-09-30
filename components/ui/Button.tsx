@@ -2,7 +2,7 @@ import React from 'react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'bezel';
-  tone?: 'default' | 'green' | 'clay';
+  tone?: 'default' | 'green' | 'clay' | 'honey';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
 }
@@ -23,10 +23,15 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
     default: '',
     green: 'text-green hover:text-green-hover hover:bg-green/10',
     clay: 'text-clay hover:text-clay hover:bg-clay/10',
+    honey: 'text-honey hover:text-honey hover:bg-honey/10',
   };
 
   const variants = {
-    primary: "border border-transparent bg-green text-on-accent shadow-sm hover:bg-green-hover hover:shadow-md",
+    primary: tone === 'honey'
+      ? "border border-transparent bg-honey text-white shadow-sm hover:opacity-90 hover:shadow-md"
+      : tone === 'clay'
+      ? "border border-transparent bg-clay text-on-accent shadow-sm hover:brightness-105 hover:shadow-md"
+      : "border border-transparent bg-green text-on-accent shadow-sm hover:bg-green-hover hover:shadow-md",
     secondary: "control-surface text-gray-text shadow-none hover:border-green/20 hover:bg-green/5",
     outline: "border border-border/40 bg-transparent text-gray-nav hover:border-green/20 hover:bg-green/5 hover:text-gray-text",
     ghost: tone !== 'default' ? `bg-transparent ${toneClasses[tone]}` : "bg-transparent text-gray-nav hover:bg-green/5 hover:text-green",

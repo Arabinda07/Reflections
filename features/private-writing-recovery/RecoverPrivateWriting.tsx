@@ -102,7 +102,7 @@ export const RecoverPrivateWriting: React.FC = () => {
   };
 
   if (crypto.status === 'loading' || crypto.status === 'migrating') {
-    return <RouteLoadingFrame className="surface-scope-paper page-wash min-h-[100dvh] bg-body" />;
+    return <RouteLoadingFrame className="surface-scope-paper page-wash min-h-dvh bg-body" />;
   }
 
   return (
@@ -111,7 +111,7 @@ export const RecoverPrivateWriting: React.FC = () => {
         <button
           type="button"
           onClick={() => navigate(RoutePath.ACCOUNT)}
-          className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-[var(--surface-current-soft-bg)] hover:text-[var(--surface-current-accent)]"
+          className="group flex min-h-11 w-fit items-center gap-2 rounded-control px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-[var(--surface-current-soft-bg)] hover:text-[var(--surface-current-accent)]"
           aria-label="Back to account"
         >
           <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />

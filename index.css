@@ -109,10 +109,21 @@
 
   /* Spacing Tokens */
   --spacing-section: var(--space-section, 4rem);
+  --gap-section: var(--space-section, 4rem);
   --spacing-dvh: 100dvh;
   --spacing-measure-wide: var(--measure-wide);
   --spacing-native-top-offset: var(--native-top-control-offset);
   --spacing-native-page-top: var(--native-page-top-padding);
+
+  /* Modal Max-Width Tokens */
+  --container-modal-sm: 360px;
+  --container-modal-md: 460px;
+  --container-modal-lg: 620px;
+  --container-modal-xl: 860px;
+  --width-modal-sm: 360px;
+  --width-modal-md: 460px;
+  --width-modal-lg: 620px;
+  --width-modal-xl: 860px;
 
   /* Radius Tokens */
   --radius-panel: var(--radius-panel);

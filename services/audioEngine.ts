@@ -61,7 +61,7 @@ class AudioEngine {
     let buffer: AudioBuffer;
     try {
       buffer = await this.loadBuffer(url);
-    } catch (e) {
+    } catch {
       return; // Error logged in loadBuffer
     }
 

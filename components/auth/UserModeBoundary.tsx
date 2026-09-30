@@ -3,7 +3,7 @@ import { useUserMode } from '../../context/UserModeContext';
 import { RouteLoadingFrame } from '../ui/RouteLoadingFrame';
 
 const panelClassName =
-  'surface-scope-paper page-wash flex min-h-[100dvh] items-center justify-center bg-body px-4 py-10 text-primary';
+  'surface-scope-paper page-wash flex min-h-dvh items-center justify-center bg-body px-4 py-10 text-primary';
 const cardClassName =
   'w-full max-w-lg rounded-2xl border border-border bg-surface/95 p-6 shadow-card';
 const buttonClassName =
@@ -35,7 +35,7 @@ export const UserModeBoundary: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   if (isRetrying) {
-    return <RouteLoadingFrame className="surface-scope-paper page-wash min-h-[100dvh] bg-body" />;
+    return <RouteLoadingFrame className="surface-scope-paper page-wash min-h-dvh bg-body" />;
   }
 
   return (

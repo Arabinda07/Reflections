@@ -1,6 +1,7 @@
 import React, { Suspense, lazy, useEffect } from 'react';
 import { isRouteErrorResponse, useNavigate, useRouteError } from 'react-router-dom';
 import { usePublicHomePath } from '../src/utils/authHints';
+import { Button } from '../components/ui/Button';
 
 const ROUTE_CHUNK_RECOVERY_KEY = 'route_chunk_recovered';
 
@@ -13,7 +14,7 @@ const LottieAnimation = lazy(() => import('../components/ui/LottieAnimation')
   .catch((err) => {
     console.warn('Failed to load Lottie fallback chunk', err);
     return { 
-      default: () => <div className="h-full w-full rounded-[var(--radius-panel)] bg-green/5 border border-border flex items-center justify-center" />
+      default: () => <div className="h-full w-full rounded-panel bg-green/5 border border-border flex items-center justify-center" />
     };
   })
 );
@@ -104,10 +105,10 @@ export const RouteErrorBoundary: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-[100dvh] overflow-hidden bg-body text-gray-text">
-      <div className="relative z-10 flex min-h-[100dvh] flex-col items-center justify-center px-6 py-12 text-center">
+    <div className="relative min-h-dvh overflow-hidden bg-body text-gray-text">
+      <div className="relative z-10 flex min-h-dvh flex-col items-center justify-center px-6 py-12 text-center">
         <div className="h-64 w-64 sm:h-80 sm:w-80">
-          <Suspense fallback={<div className="h-full w-full rounded-[var(--radius-panel)] bg-green/5" />}>
+          <Suspense fallback={<div className="h-full w-full rounded-panel bg-green/5" />}>
             <LottieAnimation src={error404Animation} autoplay loop />
           </Suspense>
         </div>
@@ -116,28 +117,32 @@ export const RouteErrorBoundary: React.FC = () => {
         <h1 className="mt-5 max-w-[10ch] text-mk-display leading-[0.92] tracking-normal">
           {title}
         </h1>
-        <p className="mt-4 max-w-[34rem] font-serif text-[1rem] leading-[1.72] text-gray-light sm:text-[1.125rem]">
+        <p className="mt-4 max-w-xl font-serif text-base leading-relaxed text-gray-light sm:text-lg">
           {description}
         </p>
-        <p className="mt-3 text-[0.8rem] font-semibold uppercase tracking-[0.16em] text-gray-nav/70">
+        <p className="mt-3 text-ui-xs font-semibold uppercase tracking-[0.16em] text-gray-nav/70">
           {detail}
         </p>
 
         <div className="mt-8 flex w-full max-w-md flex-col gap-3 sm:flex-row sm:justify-center">
-          <button
+          <Button
             type="button"
+            size="lg"
+            variant="primary"
             onClick={onReload}
-            className="inline-flex min-h-14 w-full items-center justify-center rounded-[var(--radius-control)] border border-transparent bg-green px-5 py-4 text-ui-base font-bold text-white shadow-sm transition-[background-color,box-shadow,transform] duration-300 ease-out-expo hover:-translate-y-0.5 hover:bg-green-hover hover:shadow-md active:translate-y-0 sm:w-auto sm:px-8"
+            className="w-full sm:w-auto"
           >
             {isChunkFailure ? 'Reload Reflections' : 'Try again'}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            size="lg"
+            variant="secondary"
             onClick={() => navigate(homePath)}
-            className="control-surface inline-flex min-h-14 w-full items-center justify-center rounded-[var(--radius-control)] px-5 py-4 text-ui-base font-bold text-gray-text transition-[background-color,border-color,color,transform] duration-300 ease-out-expo hover:-translate-y-0.5 hover:border-green/20 hover:bg-green/5 active:translate-y-0 sm:w-auto sm:px-8"
+            className="w-full sm:w-auto"
           >
             Return home
-          </button>
+          </Button>
         </div>
       </div>
     </div>

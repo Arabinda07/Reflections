@@ -45,17 +45,19 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
         <div className="flex flex-col gap-3">
           <Button
             variant={variant}
+            size="lg"
             onClick={onConfirm}
             isLoading={isConfirming}
-            className="w-full h-14 text-ui-base font-extrabold"
+            className="w-full"
           >
             {confirmLabel}
           </Button>
           <Button
             variant="secondary"
+            size="lg"
             onClick={onClose}
             disabled={isConfirming}
-            className="w-full h-14 text-ui-base font-extrabold"
+            className="w-full"
           >
             {cancelLabel}
           </Button>

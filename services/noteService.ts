@@ -1,8 +1,7 @@
 import type { Note } from '../types';
 import { offlineStorage } from './offlineStorage';
 import { getAuthenticatedUserId } from './authUtils';
-import { noteRemoteStore, mapToNote } from './noteRemoteStore';
-import type { LocalNote } from './db';
+import { noteRemoteStore } from './noteRemoteStore';
 import { syncEngine } from './syncEngine';
 
 // Re-export for callers that import mapping utilities from noteService

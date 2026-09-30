@@ -157,3 +157,7 @@ html.no-scroll .floating-audio-container {
       box-shadow 220ms ease,
       color 220ms ease;
   }
+
+  .audio-playing-label {
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  }

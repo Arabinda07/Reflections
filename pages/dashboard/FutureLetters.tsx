@@ -180,7 +180,7 @@ export const FutureLetters: React.FC = () => {
 
   return (
     <>
-      <PageContainer scope="sage" className="page-wash pb-24 pt-6 md:pt-10">
+      <PageContainer scope="sage" className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10">
         <div className="core-page-stack">
           <button
             onClick={() => navigate(RoutePath.DASHBOARD)}
@@ -346,7 +346,7 @@ export const FutureLetters: React.FC = () => {
                                 disabled={Boolean(openingLetterId)}
                                 isLoading={isOpening}
                                 onClick={() => handleOpenLetter(letter)}
-                                className="w-full sm:w-auto"
+                                className="min-h-11 w-full sm:w-auto"
                                 aria-label={
                                   isOpening
                                     ? `Opening ${letter.title}`
