@@ -199,7 +199,7 @@ describe('phase 2/3 design-system rollout', () => {
     const insights = read('pages/dashboard/Insights.tsx');
 
     expect(button).toContain('border border-transparent bg-green text-on-accent');
-    expect(button).toContain('danger: "border border-transparent bg-clay text-on-accent');
+    expect(button).toMatch(/danger:\s*"[^"]*border border-transparent bg-clay text-on-accent/);
     expect(button).not.toContain('bg-red text-white');
 
     expect(input).toContain('focus:border-green focus:ring-2 focus:ring-green/10');

@@ -35,7 +35,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
     secondary: "btn-secondary control-surface text-gray-text shadow-none hover:border-green/20 hover:bg-green/5",
     outline: "btn-outline border border-border/60 bg-transparent text-gray-nav hover:border-green/20 hover:bg-green/5 hover:text-gray-text",
     ghost: tone !== 'default' ? `btn-ghost bg-transparent ${toneClasses[tone]}` : "btn-ghost bg-transparent text-gray-nav hover:bg-green/5 hover:text-green",
-    danger: "border border-transparent bg-clay text-on-accent btn-danger shadow-none hover:brightness-105",
+    danger: "btn-danger border border-transparent bg-clay text-on-accent shadow-none hover:brightness-105",
     bezel: "surface-bezel p-0 !border-none !bg-transparent group",
   };
 
