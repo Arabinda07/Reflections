@@ -586,7 +586,7 @@
     linear-gradient(145deg,
       oklch(0.225 0.014 135 / 0.96),
       oklch(from var(--panel-bg) l c h / 0.94));
-  --surface-paper-border: oklch(0.38 0.018 135);
+  --surface-paper-border: oklch(0.28 0.018 135);
   --surface-paper-bezel:
     linear-gradient(145deg,
       oklch(from var(--green) 0.34 0.055 h / 0.18),
@@ -595,7 +595,7 @@
     linear-gradient(145deg,
       oklch(from var(--green) 0.24 0.035 h / 0.46),
       oklch(from var(--panel-bg) l c h / 0.9));
-  --surface-sage-border: oklch(from var(--green) l c h / 0.48);
+  --surface-sage-border: oklch(from var(--green) l c h / 0.28);
   --surface-sage-bezel:
     linear-gradient(145deg,
       oklch(from var(--green) 0.42 0.08 h / 0.28),
@@ -604,7 +604,7 @@
     linear-gradient(145deg,
       oklch(from var(--blue) 0.24 0.036 h / 0.42),
       oklch(from var(--panel-bg) l c h / 0.9));
-  --surface-sky-border: oklch(from var(--blue) l c h / 0.46);
+  --surface-sky-border: oklch(from var(--blue) l c h / 0.26);
   --surface-sky-bezel:
     linear-gradient(145deg,
       oklch(from var(--blue) 0.42 0.08 h / 0.25),
@@ -613,7 +613,7 @@
     linear-gradient(145deg,
       oklch(from var(--honey) 0.24 0.036 h / 0.38),
       oklch(from var(--panel-bg) l c h / 0.9));
-  --surface-honey-border: oklch(from var(--honey) l c h / 0.48);
+  --surface-honey-border: oklch(from var(--honey) l c h / 0.28);
   --surface-honey-bezel:
     linear-gradient(145deg,
       oklch(from var(--honey) 0.42 0.08 h / 0.24),
@@ -622,13 +622,11 @@
     linear-gradient(145deg,
       oklch(from var(--clay) 0.24 0.036 h / 0.38),
       oklch(from var(--panel-bg) l c h / 0.9));
-  --surface-clay-border: oklch(from var(--clay) l c h / 0.48);
+  --surface-clay-border: oklch(from var(--clay) l c h / 0.28);
   --surface-clay-bezel:
     linear-gradient(145deg,
       oklch(from var(--clay) 0.42 0.08 h / 0.24),
       oklch(1 0 0 / 0.05));
-  --surface-current-control-bg: oklch(0.24 0.014 135 / 0.95);
-  --surface-current-hover-bg: oklch(from var(--surface-current-accent) l c h / 0.16);
   --surface-tinted-shadow:
     0 24px 54px -32px oklch(from var(--bg-color) 0.2 0.01 h / 0.48),
     0 8px 20px -14px oklch(from var(--bg-color) 0.2 0.01 h / 0.3);
@@ -664,6 +662,10 @@
   /* System Hardening Tokens - Dark Mode */
   --chip-shadow: oklch(from var(--bg-color) 0.2 0.01 h / 0.3);
   --popover-bg: var(--panel-bg);
+
+  /* Control Surface & Interactive Elevation - Dark Mode */
+  --surface-current-control-bg: oklch(0.26 0.014 135 / 0.78);
+  --surface-current-hover-bg: oklch(0.30 0.016 135 / 0.88);
 
   /* ── Semantic Overrides ── */
   --color-surface-muted: oklch(0.24 0.012 135);
@@ -1642,6 +1644,97 @@ details:focus-visible,
   .surface-control:hover,
   .control-surface:hover {
     background: var(--surface-current-hover-bg);
+  }
+
+  .dark .surface-control,
+  .dark .control-surface {
+    border-color: oklch(1 0 0 / 0.15);
+    background: oklch(0.26 0.014 135 / 0.78);
+    box-shadow:
+      inset 0 1px 0 0 oklch(1 0 0 / 0.07),
+      0 2px 8px -3px oklch(0 0 0 / 0.30);
+    color: var(--gray-text);
+  }
+
+  .dark .surface-control:hover,
+  .dark .control-surface:hover {
+    border-color: oklch(from var(--green) 0.68 0.15 h / 0.40);
+    background: oklch(0.30 0.016 135 / 0.88);
+    color: var(--hero-ink);
+    box-shadow:
+      inset 0 1px 0 0 oklch(1 0 0 / 0.10),
+      0 4px 14px -3px oklch(0 0 0 / 0.40);
+  }
+
+  /* ── System-Wide Button Hierarchy & Dark Mode Elevation ── */
+  .btn-primary {
+    letter-spacing: 0.01em;
+  }
+
+  .dark .btn-primary-green {
+    background-color: oklch(0.48 0.18 138);
+    color: #ffffff;
+    border: 1.5px solid oklch(from var(--green) 0.72 0.16 h / 0.32);
+    box-shadow:
+      0 1px 2px oklch(0 0 0 / 0.28),
+      0 6px 18px -4px oklch(from var(--green) 0.48 0.18 h / 0.40);
+  }
+
+  .dark .btn-primary-green:hover {
+    background-color: oklch(0.54 0.19 138);
+    border-color: oklch(from var(--green) 0.82 0.18 h / 0.50);
+    box-shadow:
+      0 2px 6px oklch(0 0 0 / 0.35),
+      0 8px 24px -4px oklch(from var(--green) 0.54 0.19 h / 0.52);
+  }
+
+  .dark .btn-primary-clay,
+  .dark .btn-danger {
+    background-color: oklch(0.50 0.14 35);
+    color: #ffffff;
+    border: 1.5px solid oklch(from var(--clay) 0.72 0.14 h / 0.32);
+    box-shadow:
+      0 1px 2px oklch(0 0 0 / 0.28),
+      0 6px 18px -4px oklch(from var(--clay) 0.50 0.14 h / 0.40);
+  }
+
+  .dark .btn-primary-clay:hover,
+  .dark .btn-danger:hover {
+    background-color: oklch(0.55 0.15 35);
+    border-color: oklch(from var(--clay) 0.82 0.16 h / 0.50);
+    box-shadow:
+      0 2px 6px oklch(0 0 0 / 0.35),
+      0 8px 24px -4px oklch(from var(--clay) 0.55 0.15 h / 0.50);
+  }
+
+  .dark .btn-primary-honey {
+    background-color: oklch(0.52 0.13 80);
+    color: #ffffff;
+    border: 1.5px solid oklch(from var(--honey) 0.72 0.13 h / 0.32);
+    box-shadow:
+      0 1px 2px oklch(0 0 0 / 0.28),
+      0 6px 18px -4px oklch(from var(--honey) 0.52 0.13 h / 0.40);
+  }
+
+  .dark .btn-primary-honey:hover {
+    background-color: oklch(0.58 0.14 80);
+    border-color: oklch(from var(--honey) 0.82 0.15 h / 0.50);
+    box-shadow:
+      0 2px 6px oklch(0 0 0 / 0.35),
+      0 8px 24px -4px oklch(from var(--honey) 0.58 0.14 h / 0.50);
+  }
+
+  .dark .btn-outline {
+    border: 1.5px solid oklch(1 0 0 / 0.16);
+    background: oklch(1 0 0 / 0.03);
+    color: var(--gray-text);
+    box-shadow: inset 0 1px 0 0 oklch(1 0 0 / 0.05);
+  }
+
+  .dark .btn-outline:hover {
+    border-color: oklch(from var(--green) 0.68 0.15 h / 0.35);
+    background: oklch(from var(--green) 0.68 0.15 h / 0.08);
+    color: var(--hero-ink);
   }
 
   .input-surface {

@@ -28,14 +28,14 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
 
   const variants = {
     primary: tone === 'honey'
-      ? "border border-transparent bg-honey text-white shadow-sm hover:opacity-90 hover:shadow-md"
+      ? "btn-primary btn-primary-honey border border-transparent bg-honey text-white shadow-sm hover:opacity-90 hover:shadow-md"
       : tone === 'clay'
-      ? "border border-transparent bg-clay text-on-accent shadow-sm hover:brightness-105 hover:shadow-md"
-      : "border border-transparent bg-green text-on-accent shadow-sm hover:bg-green-hover hover:shadow-md",
-    secondary: "control-surface text-gray-text shadow-none hover:border-green/20 hover:bg-green/5",
-    outline: "border border-border/40 bg-transparent text-gray-nav hover:border-green/20 hover:bg-green/5 hover:text-gray-text",
-    ghost: tone !== 'default' ? `bg-transparent ${toneClasses[tone]}` : "bg-transparent text-gray-nav hover:bg-green/5 hover:text-green",
-    danger: "border border-transparent bg-clay text-on-accent shadow-none hover:brightness-105",
+      ? "btn-primary btn-primary-clay border border-transparent bg-clay text-on-accent shadow-sm hover:brightness-105 hover:shadow-md"
+      : "btn-primary btn-primary-green border border-transparent bg-green text-on-accent shadow-sm hover:bg-green-hover hover:shadow-md",
+    secondary: "btn-secondary control-surface text-gray-text shadow-none hover:border-green/20 hover:bg-green/5",
+    outline: "btn-outline border border-border/60 bg-transparent text-gray-nav hover:border-green/20 hover:bg-green/5 hover:text-gray-text",
+    ghost: tone !== 'default' ? `btn-ghost bg-transparent ${toneClasses[tone]}` : "btn-ghost bg-transparent text-gray-nav hover:bg-green/5 hover:text-green",
+    danger: "border border-transparent bg-clay text-on-accent btn-danger shadow-none hover:brightness-105",
     bezel: "surface-bezel p-0 !border-none !bg-transparent group",
   };
 
