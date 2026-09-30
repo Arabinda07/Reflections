@@ -132,7 +132,7 @@ export const BugReportFlow: React.FC<BugReportFlowProps> = ({ isOpen, onOpenChan
                 placeholder="Describe what happened..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className="input-surface w-full min-h-[160px] resize-none rounded-[20px] p-5 font-serif text-[17px] leading-relaxed placeholder:text-gray-nav/50"
+                className="input-surface w-full min-h-40 resize-none rounded-[20px] p-5 font-serif text-[17px] leading-relaxed placeholder:text-gray-nav/50"
               />
               {submitError && (
                 <p className="text-ui-xs font-bold text-clay animate-in fade-in slide-in-from-top-1">
@@ -147,7 +147,7 @@ export const BugReportFlow: React.FC<BugReportFlowProps> = ({ isOpen, onOpenChan
               size="sm"
               isLoading={isSubmitting}
               disabled={!message.trim()}
-              className="h-11 w-full rounded-xl"
+              className="w-full"
             >
               Send report
               <PaperPlaneTilt size={16} weight="regular" className="ml-2" />
@@ -159,7 +159,7 @@ export const BugReportFlow: React.FC<BugReportFlowProps> = ({ isOpen, onOpenChan
               <CheckCircle size={36} weight="fill" />
             </div>
             <h3 className="label-caps mb-2">Thank you</h3>
-            <p className="font-serif text-[16px] italic leading-relaxed text-gray-light">
+            <p className="font-serif text-base italic leading-relaxed text-gray-light">
               We've received your report. <br /> Your feedback helps a lot.
             </p>
           </div>

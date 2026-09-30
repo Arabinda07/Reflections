@@ -56,7 +56,7 @@ export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, onSelect, 
               key={group.id}
               type="button"
               onClick={() => handleGroupSelect(group)}
-              className={`group flex min-h-[4.65rem] w-full items-center gap-3.5 rounded-[1.15rem] border p-3.5 text-left transition-[border-color,background-color,box-shadow,transform] duration-300 ease-out-expo hover:-translate-y-px sm:min-h-[5rem] sm:rounded-[1.25rem] sm:p-4 ${groupConfig?.option || 'control-surface text-gray-text'}`}
+              className={`group flex min-h-18 w-full items-center gap-3.5 rounded-2xl border p-3.5 text-left transition-all duration-300 ease-out-expo hover:-translate-y-px sm:min-h-20 sm:rounded-2xl sm:p-4 ${groupConfig?.option || 'control-surface text-gray-text'}`}
             >
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-muted transition-transform duration-500 group-hover:scale-105 sm:h-11 sm:w-11">
                 <Icon size={22} weight="duotone" className={groupConfig?.labelClass} />
@@ -79,7 +79,7 @@ export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, onSelect, 
       <button
         type="button"
         onClick={() => setSelectedGroupId(null)}
-        className="inline-flex min-h-10 items-center gap-1.5 rounded-[var(--radius-control)] px-1 text-sm font-bold text-gray-nav transition-colors hover:text-green"
+        className="inline-flex min-h-10 items-center gap-1.5 rounded-2xl px-1 text-sm font-bold text-gray-nav transition-colors hover:text-green"
       >
         <CaretLeft size={16} weight="bold" />
         Back
@@ -95,7 +95,7 @@ export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, onSelect, 
       <button
         type="button"
         onClick={() => handleKeepGroup(selectedGroup)}
-        className={`flex min-h-10 w-full items-center justify-between rounded-[var(--radius-control)] border px-4 py-2 text-left text-sm font-bold transition-[border-color,background-color,color,transform] duration-300 ease-out-expo hover:-translate-y-px ${selectedGroupConfig?.selectedOption || 'border-green/30 bg-green/10 text-green'}`}
+        className={`flex min-h-10 w-full items-center justify-between rounded-2xl border px-4 py-2 text-left text-sm font-bold transition-all duration-300 ease-out-expo hover:-translate-y-px ${selectedGroupConfig?.selectedOption || 'border-green/30 bg-green/10 text-green'}`}
       >
         <span>Keep {selectedGroup.label}</span>
         {selectedMood === selectedGroup.id ? (
@@ -118,7 +118,7 @@ export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, onSelect, 
               key={entry}
               type="button"
               onClick={() => handleMoodSelect(entry)}
-              className={`group flex min-h-[3.65rem] w-full items-center justify-between rounded-[var(--radius-control)] border p-3.5 text-left transition-[border-color,background-color,box-shadow,transform] duration-300 ease-out-expo hover:-translate-y-px ${isSelected ? moodConfig.modal : moodConfig.option}`}
+              className={`group flex min-h-14 w-full items-center justify-between rounded-2xl border p-3.5 text-left transition-all duration-300 ease-out-expo hover:-translate-y-px ${isSelected ? moodConfig.modal : moodConfig.option}`}
             >
               <span className="flex items-center gap-3">
                 <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${isSelected ? 'bg-current/15' : 'bg-surface-muted'} transition-transform duration-500 group-hover:scale-105`}>

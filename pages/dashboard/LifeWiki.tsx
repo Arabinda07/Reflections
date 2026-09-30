@@ -470,7 +470,7 @@ export const LifeWiki: React.FC = () => {
       <Link
         key={meta.pageType}
         to={articlePath(meta.pageType)}
-        className="group block rounded-[var(--radius-control)] px-2 transition-colors duration-300 hover:bg-sky/[0.03] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky/40"
+        className="group block rounded-2xl px-2 transition-colors duration-300 hover:bg-sky/[0.03] focus:outline-none focus-visible:ring-2 focus-visible:ring-sky/40"
         aria-label={`Open ${meta.label} Sanctuary page`}
       >
         {innerContent}
@@ -558,7 +558,7 @@ export const LifeWiki: React.FC = () => {
             </div>
           </div>
           <div
-            className="relative z-10 flex max-w-[42rem] flex-col items-center text-center animate-fade-in-up"
+            className="relative z-10 flex max-w-2xl flex-col items-center text-center animate-fade-in-up"
           >
             {isRefreshingWiki && (
               <p className="label-caps text-sky">
@@ -568,7 +568,7 @@ export const LifeWiki: React.FC = () => {
             <h2 className="mt-4 text-4xl font-display font-bold leading-tight text-gray-text md:text-5xl">
               {isRefreshingWiki ? 'Refreshing your Life Wiki...' : 'Opening Sanctuary'}
             </h2>
-            <p className="mt-4 max-w-[65ch] text-base font-medium leading-relaxed text-gray-light">
+            <p className="mt-4 max-w-prose text-base font-medium leading-relaxed text-gray-light">
               {isRefreshingWiki
                 ? 'The library is rebuilding from the writing you saved here.'
                 : 'Crossing into the library without leaving the calm of the page.'}
@@ -587,7 +587,7 @@ export const LifeWiki: React.FC = () => {
         <div className="fixed inset-0 pointer-events-none z-deep overflow-hidden bg-body">
           <div className="sanctuary-page-fade absolute inset-0 opacity-50" />
         </div>
-        <PageContainer className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10 relative z-10">
+        <PageContainer scope="sage" className="page-wash pb-24 pt-6 md:pt-10 relative z-10">
           <div
             ref={lifeWikiScopeRef}
             className={`core-page-stack transition-[opacity,transform] duration-500 ease-out-expo ${isEnteringWiki ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}
@@ -601,7 +601,7 @@ export const LifeWiki: React.FC = () => {
               <span>Back</span>
             </button>
 
-            <div className="mx-auto max-w-[760px] w-full">
+            <div className="mx-auto max-w-3xl w-full">
               {!articlePage ? (
                 !hasLoadedLibrary ? (
                 <Surface variant="flat" tone="sky" className="p-8 md:p-10">
@@ -623,12 +623,12 @@ export const LifeWiki: React.FC = () => {
                     <h2 className="mt-3 text-4xl font-display font-bold text-gray-text">
                       Still gathering enough signal.
                     </h2>
-                    <p className="mt-4 max-w-[65ch] text-base font-medium leading-relaxed text-gray-light">
+                    <p className="mt-4 max-w-prose text-base font-medium leading-relaxed text-gray-light">
                       Write {entriesNeededForWiki} more {entriesNeededForWiki === 1 ? 'entry' : 'entries'} before this Life Wiki room opens.
                     </p>
                     <Button
                       variant="primary"
-                      className="mt-7 h-12 px-6 label-caps"
+                      size="lg"
                       onClick={() => navigate(RoutePath.CREATE_NOTE)}
                     >
                       {notes.length === 0 ? 'Begin your first entry' : 'Write another entry'}
@@ -644,7 +644,7 @@ export const LifeWiki: React.FC = () => {
                     <h1 className="max-w-3xl text-4xl font-display font-extrabold text-gray-text sm:text-5xl md:text-6xl">
                       {articleMeta?.label || 'This page'}
                     </h1>
-                    <p className="max-w-[65ch] font-serif text-xl italic leading-relaxed text-gray-text/75">
+                    <p className="max-w-prose font-serif text-xl italic leading-relaxed text-gray-text/75">
                       {articleMeta?.emptyLine || 'This room will collect the notes that belong together.'}
                     </p>
                   </header>
@@ -657,7 +657,7 @@ export const LifeWiki: React.FC = () => {
                       <h2 className="text-2xl font-display font-bold text-gray-text">
                         Awaiting your signal
                       </h2>
-                      <p className="mt-4 mb-8 max-w-[65ch] text-base font-medium leading-relaxed text-gray-light">
+                      <p className="mt-4 mb-8 max-w-prose text-base font-medium leading-relaxed text-gray-light">
                         This Life Wiki room is ready, but it has not been written yet. The AI will read through your saved reflections and organize the patterns it finds here.
                       </p>
                       {!gate?.requiresUpgrade ? (
@@ -666,13 +666,13 @@ export const LifeWiki: React.FC = () => {
                           onClick={handleRefreshWiki}
                           isLoading={isRefreshingWiki}
                           disabled={isRefreshingWiki || !gate?.canGenerate}
-                          className="px-8"
+                          size="lg"
                         >
                           <Sparkle size={16} weight="fill" className="mr-2" />
                           Draft this room
                         </Button>
                       ) : (
-                        <Button variant="primary" className="px-8" onClick={() => navigate(RoutePath.ACCOUNT)}>
+                        <Button variant="primary" onClick={() => navigate(RoutePath.ACCOUNT)}>
                           See Pro options
                         </Button>
                       )}
@@ -693,7 +693,7 @@ export const LifeWiki: React.FC = () => {
                   <h1 className="max-w-3xl text-4xl font-display font-extrabold text-gray-text sm:text-5xl md:text-6xl">
                     {articlePage.title}
                   </h1>
-                  <p className="max-w-[65ch] text-base font-medium leading-relaxed text-gray-light">
+                  <p className="max-w-prose text-base font-medium leading-relaxed text-gray-light">
                     This AI-generated wiki page is based on notes you saved here. Source badges point back to the entries that can support a claim.
                   </p>
                 </header>
@@ -799,11 +799,11 @@ export const LifeWiki: React.FC = () => {
   return (
     <>
       {renderEntrance()}
-      <div className="fixed inset-0 pointer-events-none z-[-2] overflow-hidden bg-body">
+      <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden bg-body">
         <div className="sanctuary-page-fade absolute inset-0 opacity-50" />
       </div>
 
-      <PageContainer className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10 relative z-10">
+      <PageContainer scope="sage" className="page-wash pb-24 pt-6 md:pt-10 relative z-10">
         <div
           ref={lifeWikiScopeRef}
           className={`core-page-stack transition-[opacity,transform] duration-500 ease-out-expo ${isEnteringWiki ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}
@@ -811,7 +811,7 @@ export const LifeWiki: React.FC = () => {
           <div className="flex items-center justify-between gap-4">
             <button 
               onClick={() => navigate(RoutePath.INSIGHTS)}
-              className="flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-colors hover:bg-green/5 hover:text-green"
+              className="flex min-h-11 w-fit items-center gap-2 rounded-2xl px-2 text-sm font-bold text-gray-nav transition-colors hover:bg-green/5 hover:text-green"
               aria-label="Back to Insights"
             >
               <ArrowLeft size={16} weight="bold" />
@@ -844,7 +844,7 @@ export const LifeWiki: React.FC = () => {
               title="You have used your free Life Wiki refresh."
               description="You can still read what is already here. Pro adds more refreshes for the weeks when life is a lot."
               actions={
-                <Button size="sm" variant="primary" className="font-bold" onClick={() => navigate(RoutePath.ACCOUNT)}>
+                <Button size="sm" variant="primary" onClick={() => navigate(RoutePath.ACCOUNT)}>
                   See Pro options
                 </Button>
               }
@@ -888,7 +888,7 @@ export const LifeWiki: React.FC = () => {
                 </div>
                 <Button
                   variant="primary"
-                  className="h-12 shrink-0 px-6 label-caps"
+                  size="lg"
                   onClick={() => navigate(RoutePath.CREATE_NOTE)}
                 >
                   {notes.length === 0 ? 'Begin your first entry' : 'Write another entry'}

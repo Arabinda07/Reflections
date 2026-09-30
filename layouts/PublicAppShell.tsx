@@ -11,7 +11,7 @@ export const PublicAppShell: React.FC = () => {
 
   return (
     <div
-      className={`${isLandingRoute ? 'public-shell public-shell--landing' : 'public-shell public-shell--page'} page-wash flex min-h-[100dvh] flex-col bg-body text-gray-text`}
+      className={`${isLandingRoute ? 'public-shell public-shell--landing' : 'public-shell public-shell--page'} page-wash flex min-h-dvh flex-col bg-body text-gray-text`}
     >
       <a href="#main-content" className="skip-link">
         Skip to content

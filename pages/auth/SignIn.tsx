@@ -187,12 +187,12 @@ export const SignIn: React.FC = () => {
 
   return (
     <div className="surface-scope-paper page-wash flex flex-1 items-center justify-center bg-body p-6 transition-colors duration-300">
-      <div className="w-full max-w-[460px]">
+      <div className="w-full max-w-115">
         <Surface variant="bezel">
           <div className="p-8 sm:p-10 space-y-6">
             <Link
               to={homePath}
-              className="-ml-3 inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] px-3 text-btn-sm font-bold text-gray-nav transition-colors hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
+              className="-ml-3 inline-flex min-h-11 items-center gap-2 rounded-2xl px-3 text-btn-sm font-bold text-gray-nav transition-colors hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
               aria-label="Back to home"
             >
               <ArrowLeft size={16} weight="bold" />
@@ -228,7 +228,7 @@ export const SignIn: React.FC = () => {
                   type="button"
                   onClick={handleVerifiedEmailLogin}
                   disabled={loading}
-                  className="w-full min-h-14 gap-3"
+                  className="w-full"
                 >
                   <CheckCircle size={20} weight="fill" className="text-green" />
                   <span className="font-bold text-gray-text">Continue with Verified Email</span>
@@ -240,7 +240,7 @@ export const SignIn: React.FC = () => {
                 type="button"
                 onClick={handleGoogleLogin}
                 disabled={loading}
-                className="w-full min-h-14 gap-3"
+                className="w-full"
               >
                 <GoogleLogo size={20} weight="bold" aria-hidden="true" className="text-gray-text" />
                 <span className="font-bold text-gray-text">Continue with Google</span>
@@ -248,9 +248,9 @@ export const SignIn: React.FC = () => {
             </div>
 
             <div className="my-2 flex w-full items-center gap-4">
-              <div className="h-[1px] flex-1 bg-border" />
+              <div className="h-px flex-1 bg-border" />
               <span className="text-ui-xs font-black uppercase tracking-widest text-gray-nav">Or sign in with email</span>
-              <div className="h-[1px] flex-1 bg-border" />
+              <div className="h-px flex-1 bg-border" />
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
@@ -289,13 +289,13 @@ export const SignIn: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleForgotPassword}
-                  className="inline-flex min-h-11 items-center rounded-[var(--radius-control)] px-3 text-btn-sm font-bold text-green hover:opacity-70"
+                  className="inline-flex min-h-11 items-center rounded-2xl px-3 text-btn-sm font-bold text-green hover:opacity-70"
                 >
                   Forgot password?
                 </button>
               </div>
 
-              <Button type="submit" variant="primary" className="w-full min-h-14 text-ui-base font-bold" isLoading={loading}>
+              <Button type="submit" variant="primary" size="lg" className="w-full" isLoading={loading}>
                 Sign in
               </Button>
 

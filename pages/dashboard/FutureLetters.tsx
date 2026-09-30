@@ -4,7 +4,7 @@ import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
 import { CalendarBlank } from '@phosphor-icons/react/CalendarBlank';
 import { EnvelopeOpen } from '@phosphor-icons/react/EnvelopeOpen';
 import { EnvelopeSimple } from '@phosphor-icons/react/EnvelopeSimple';
-import { LockKey } from '@phosphor-icons/react/LockKey';
+
 import { Hourglass } from '@phosphor-icons/react/Hourglass';
 import ReactCalendar from 'react-calendar';
 import './react-calendar.css';
@@ -180,11 +180,11 @@ export const FutureLetters: React.FC = () => {
 
   return (
     <>
-      <PageContainer className="surface-scope-sage page-wash pb-24 pt-6 md:pt-10">
+      <PageContainer scope="sage" className="page-wash pb-24 pt-6 md:pt-10">
         <div className="core-page-stack">
           <button
             onClick={() => navigate(RoutePath.DASHBOARD)}
-            className="group flex min-h-11 w-fit items-center gap-2 rounded-[var(--radius-control)] px-2 text-sm font-bold text-gray-nav transition-[color,transform,background-color] duration-300 hover:-translate-x-1 hover:bg-[var(--surface-current-soft-bg)] hover:text-[var(--surface-current-accent)]"
+            className="group flex min-h-11 w-fit items-center gap-2 rounded-2xl px-2 text-sm font-bold text-gray-nav transition-all duration-300 hover:-translate-x-1 hover:bg-[var(--surface-current-soft-bg)] hover:text-[var(--surface-current-accent)]"
             aria-label="Back to home"
           >
             <ArrowLeft size={16} weight="bold" className="transition-transform group-hover:scale-110" />
@@ -221,7 +221,7 @@ export const FutureLetters: React.FC = () => {
                     value={content}
                     onChange={(event) => setContent(event.target.value)}
                     placeholder="Write about your day, a hope, or a message to yourself."
-                    className="input-surface dashboard-letter-text min-h-[320px] w-full resize-none rounded-[22px] p-5"
+                    className="input-surface dashboard-letter-text min-h-80 w-full resize-none rounded-3xl p-5"
                   />
                 </div>
 
@@ -249,7 +249,7 @@ export const FutureLetters: React.FC = () => {
                           <span>{customDate ? format(new Date(`${customDate}T12:00:00`), 'MMMM do, yyyy') : 'Select custom date...'}</span>
                           <CalendarBlank size={18} weight="regular" className="text-gray-nav" />
                         </summary>
-                        <div className="absolute left-0 z-20 mt-1.5 w-full max-w-[320px] rounded-2xl border border-border bg-surface p-4 shadow-card sm:max-w-[340px]">
+                        <div className="absolute left-0 z-20 mt-1.5 w-full max-w-80 rounded-2xl border border-border bg-surface p-4 shadow-card sm:max-w-85">
                           <ReactCalendar
                             onChange={(value) => {
                               const dateVal = Array.isArray(value) ? value[0] : value;
@@ -326,7 +326,7 @@ export const FutureLetters: React.FC = () => {
                         return (
                           <div
                             key={letter.id}
-                            className={`group relative surface-inline-panel dashboard-tone-card overflow-hidden rounded-3xl p-5 transition-[border-color,box-shadow,transform] duration-300 hover:shadow-lg ${shakeLetterId === letter.id ? 'animate-shake-x' : ''}`}
+                            className={`group relative surface-inline-panel dashboard-tone-card overflow-hidden rounded-3xl p-5 transition-all duration-300 hover:shadow-lg ${shakeLetterId === letter.id ? 'animate-shake-x' : ''}`}
                           >
                             <div className="relative z-10">
                               <div className="mb-4 flex items-start justify-between gap-3">
@@ -346,7 +346,7 @@ export const FutureLetters: React.FC = () => {
                                 disabled={Boolean(openingLetterId)}
                                 isLoading={isOpening}
                                 onClick={() => handleOpenLetter(letter)}
-                                className={`min-h-11 w-full sm:w-auto px-6 font-bold transition-[background-color,border-color,color,opacity] ${isLocked ? 'opacity-60' : 'group-hover:bg-[var(--surface-current-accent)] group-hover:text-white group-hover:border-transparent'}`}
+                                className="w-full sm:w-auto"
                                 aria-label={
                                   isOpening
                                     ? `Opening ${letter.title}`
@@ -381,7 +381,7 @@ export const FutureLetters: React.FC = () => {
             <p className="dashboard-caption opacity-70">
               Opened {openedLetter.openedAt ? formatLongDateUTC(openedLetter.openedAt) : 'today'}
             </p>
-            <div className="surface-inline-panel dashboard-letter-text whitespace-pre-wrap rounded-[22px] p-5">
+            <div className="surface-inline-panel dashboard-letter-text whitespace-pre-wrap rounded-3xl p-5">
               {openedLetter.content}
             </div>
           </div>

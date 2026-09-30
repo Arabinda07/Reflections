@@ -3,7 +3,7 @@ import { BatteryEmpty } from '@phosphor-icons/react/BatteryEmpty';
 import { Bed } from '@phosphor-icons/react/Bed';
 import { Brain } from '@phosphor-icons/react/Brain';
 import { Cloud } from '@phosphor-icons/react/Cloud';
-import { CloudRain } from '@phosphor-icons/react/CloudRain';
+
 import { Drop } from '@phosphor-icons/react/Drop';
 import { EyeClosed } from '@phosphor-icons/react/EyeClosed';
 import { Flame } from '@phosphor-icons/react/Flame';
@@ -13,7 +13,7 @@ import { Heart } from '@phosphor-icons/react/Heart';
 import { Leaf } from '@phosphor-icons/react/Leaf';
 import { Lightning } from '@phosphor-icons/react/Lightning';
 import { Moon } from '@phosphor-icons/react/Moon';
-import { Question } from '@phosphor-icons/react/Question';
+
 import { Shield } from '@phosphor-icons/react/Shield';
 import { Smiley } from '@phosphor-icons/react/Smiley';
 import { SmileyBlank } from '@phosphor-icons/react/SmileyBlank';
@@ -21,7 +21,7 @@ import { SmileySad } from '@phosphor-icons/react/SmileySad';
 import { SmileyWink } from '@phosphor-icons/react/SmileyWink';
 import { Sparkle } from '@phosphor-icons/react/Sparkle';
 import { Sun } from '@phosphor-icons/react/Sun';
-import { SunHorizon } from '@phosphor-icons/react/SunHorizon';
+
 import { Tornado } from '@phosphor-icons/react/Tornado';
 import { User } from '@phosphor-icons/react/User';
 import { WarningCircle } from '@phosphor-icons/react/WarningCircle';

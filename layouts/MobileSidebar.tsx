@@ -14,7 +14,7 @@ import { useAuthStore } from '../hooks/useAuthStore';
 import { useHaptics } from '../hooks/useHaptics';
 import { usePWAInstall } from '../context/PWAInstallContext';
 import { registerAndroidBackAction } from '../src/native/androidBack';
-import { NATIVE_PAGE_TOP_PADDING, NATIVE_TOP_CONTROL_OFFSET } from '../src/native/safeArea';
+
 
 export interface SidebarNavItem {
   label: string;
@@ -176,9 +176,9 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
   if (typeof document === 'undefined' || !isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-x-0 top-0 bottom-0 z-[105] h-[100dvh] overflow-hidden lg:hidden">
+    <div className="fixed inset-x-0 top-0 bottom-0 z-[105] h-dvh overflow-hidden lg:hidden">
       <motion.div
-        className="mobile-sidebar-scrim fixed inset-x-0 top-0 bottom-0 h-[100dvh]"
+        className="mobile-sidebar-scrim fixed inset-x-0 top-0 bottom-0 h-dvh"
         onClick={onClose}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

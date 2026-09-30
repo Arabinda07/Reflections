@@ -34,7 +34,7 @@ const sharedContracts = [
   },
   {
     pattern: '^ModalSheet$',
-    allow: ['layout', 'spacing', 'modal-sheet.*'],
+    allow: ['layout', 'spacing', 'modal-sheet.*', 'modal-sheet-panel--compact', 'modal-sheet-panel--mood-detail', 'modal-sheet-body--compact', 'modal-sheet-body--mood-detail', 'auth-mobile-more-backdrop', 'auth-mobile-more-sheet-body', 'auth-mobile-more-sheet-panel'],
     deny: ['color'],
     message: {
       color: 'ModalSheet panel and backdrop styling must use modal-sheet.css and design tokens.',
@@ -73,7 +73,7 @@ const sharedContracts = [
   },
   {
     pattern: '^WhisperComposerControl$',
-    allow: ['layout', 'spacing', 'shape', 'typography', 'color', 'motion'],
+    allow: ['layout', 'spacing', 'shape', 'typography', 'color', 'motion', 'control-surface'],
   },
   {
     pattern: '^StorageImage$',
@@ -123,6 +123,43 @@ const allowedArbitraryValues = [
   'hover:shadow-[0_10px_24px_-12px_var(--green-shadow)]',
   'sm:shadow-[0_10px_24px_-12px_var(--green-shadow)]',
   'sm:hover:shadow-[0_12px_28px_-12px_var(--green-shadow)]',
+
+  // Scoped Surface Tokens (dynamic CSS custom props set by surface scope classes)
+  'hover:bg-[var(--surface-current-soft-bg)]',
+  'hover:text-[var(--surface-current-accent)]',
+  'text-[var(--surface-current-accent)]',
+  'text-[var(--surface-current-accent)]/60',
+  'group-hover:bg-[var(--surface-current-accent)]',
+
+  // Complex Grid Layouts (page-specific responsive patterns)
+  'lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]',
+
+  // Navigation Chrome Z-Indices (layering system)
+  'z-[100]',
+  'z-[105]',
+  'z-[110]',
+
+  // Brand Typography (hand-tuned sizes for logo and sidebar headings)
+  'text-[22px]',
+  'sm:text-[26px]',
+  'max-w-[150px]',
+  'text-[17px]',
+  'tracking-[0.16em]',
+  'tracking-[0.22em]',
+  'rounded-[var(--radius-chip)]',
+  'border-[1.5px]',
+  'rounded-[20px]',
+
+  // Native Layout Offsets (mobile sidebar safe area math)
+  'mt-[calc(var(--native-top-control-offset)-var(--native-page-top-padding))]',
+
+  // Authenticated Mobile Bottom Nav (floating pill bar)
+  'z-[95]',
+  'pb-[calc(0.45rem+env(safe-area-inset-bottom))]',
+  'min-h-[3.625rem]',
+  'max-w-[23rem]',
+  'rounded-[1.45rem]',
+  'shadow-[0_-10px_28px_-24px_oklch(from_var(--green-shadow)_l_c_h_/_0.28)]',
 ];
 
 export default tseslint.config(
@@ -184,6 +221,7 @@ export default tseslint.config(
   {
     // Strict error enforcement for the refactored core surfaces
     files: [
+      // Phase 2 — Core dashboard surfaces
       'components/ui/Input.tsx',
       'pages/dashboard/Landing.tsx',
       'pages/dashboard/SingleNote.tsx',
@@ -194,6 +232,24 @@ export default tseslint.config(
       'pages/dashboard/RelationshipProfile.tsx',
       'pages/dashboard/ReleaseMode.tsx',
       'pages/dashboard/Account.tsx',
+      // Phase 3 — Authenticated views
+      'pages/dashboard/HomeAuthenticated.tsx',
+      'pages/dashboard/FutureLetters.tsx',
+      'pages/dashboard/LifeWiki.tsx',
+      'pages/dashboard/MoodPicker.tsx',
+      'pages/dashboard/moodConfig.ts',
+      // Phase 3 — Layouts & Navigation
+      'layouts/DashboardLayout.tsx',
+      'layouts/NavigationBar.tsx',
+      'layouts/MobileSidebar.tsx',
+      'layouts/AuthenticatedMobileNav.tsx',
+      'layouts/BugReportFlow.tsx',
+      'layouts/PublicAppShell.tsx',
+      // Phase 3 — Auth & Onboarding
+      'pages/auth/SignIn.tsx',
+      'pages/auth/SignUp.tsx',
+      'pages/auth/ResetPassword.tsx',
+      'pages/onboarding/ModeSelect.tsx',
     ],
     rules: {
       'shadcn/no-arbitrary-values': [

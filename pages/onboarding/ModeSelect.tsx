@@ -118,7 +118,7 @@ export const ModeSelect: React.FC = () => {
 
   return (
     <div className="surface-scope-paper page-wash flex flex-1 items-center justify-center bg-body p-6 transition-colors duration-300 min-h-screen">
-      <div className="w-full max-w-[600px]">
+      <div className="w-full max-w-150">
         <Surface variant="bezel">
           <div className="p-8 sm:p-10 space-y-6">
             <div className="space-y-3">

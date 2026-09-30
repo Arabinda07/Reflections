@@ -177,12 +177,12 @@ export const SignUp: React.FC = () => {
 
   return (
     <div className="surface-scope-paper page-wash flex flex-1 items-center justify-center bg-body p-6 transition-colors duration-300">
-      <div className="w-full max-w-[460px]">
+      <div className="w-full max-w-115">
         <Surface variant="bezel">
           <div className="p-8 sm:p-10 space-y-6">
             <Link
               to={homePath}
-              className="-ml-3 inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-control)] px-3 text-btn-sm font-bold text-gray-nav transition-colors hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
+              className="-ml-3 inline-flex min-h-11 items-center gap-2 rounded-2xl px-3 text-btn-sm font-bold text-gray-nav transition-colors hover:bg-green/5 hover:text-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2"
               aria-label="Back to home"
             >
               <ArrowLeft size={16} weight="bold" />
@@ -201,7 +201,7 @@ export const SignUp: React.FC = () => {
                   type="button"
                   onClick={handleVerifiedEmailLogin}
                   disabled={loading}
-                  className="w-full h-[52px] gap-3"
+                  className="w-full"
                 >
                   <CheckCircle size={20} weight="fill" className="text-green" />
                   <span className="font-bold text-gray-text">Continue with Verified Email</span>
@@ -213,7 +213,7 @@ export const SignUp: React.FC = () => {
                 type="button"
                 onClick={handleGoogleLogin}
                 disabled={loading}
-                className="w-full h-[52px] gap-3"
+                className="w-full"
               >
                 <GoogleLogo size={20} weight="bold" aria-hidden="true" className="text-gray-text" />
                 <span className="font-bold text-gray-text">Continue with Google</span>
@@ -221,9 +221,9 @@ export const SignUp: React.FC = () => {
             </div>
 
             <div className="my-2 flex w-full items-center gap-4">
-              <div className="h-[1px] flex-1 bg-border" />
+              <div className="h-px flex-1 bg-border" />
               <span className="text-ui-xs font-black uppercase tracking-widest text-gray-nav">Or sign up with email</span>
-              <div className="h-[1px] flex-1 bg-border" />
+              <div className="h-px flex-1 bg-border" />
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
@@ -275,7 +275,7 @@ export const SignUp: React.FC = () => {
                 </div>
               </motion.div>
 
-              <label htmlFor="newsletter" className="mt-4 flex min-h-11 cursor-pointer select-none items-center gap-3 rounded-[var(--radius-control)] pr-2 text-ui-sm font-medium text-gray-text">
+              <label htmlFor="newsletter" className="mt-4 flex min-h-11 cursor-pointer select-none items-center gap-3 rounded-2xl pr-2 text-ui-sm font-medium text-gray-text">
                 <span className="relative flex h-11 w-11 shrink-0 items-center justify-center">
                   <input
                     type="checkbox"
@@ -298,11 +298,11 @@ export const SignUp: React.FC = () => {
                 </span>
               </label>
 
-              <Button type="submit" variant="primary" className="w-full h-[52px] text-ui-base font-bold mt-6" isLoading={loading}>
+              <Button type="submit" variant="primary" size="lg" className="w-full mt-6" isLoading={loading}>
                 Create account
               </Button>
 
-              <div className="min-h-[24px] mt-2 flex items-center justify-center" role="alert" aria-live="assertive">
+              <div className="min-h-6 mt-2 flex items-center justify-center" role="alert" aria-live="assertive">
                 <AnimatePresence>
                   {error ? (
                     <motion.p

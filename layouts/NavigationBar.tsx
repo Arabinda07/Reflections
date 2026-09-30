@@ -110,7 +110,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
           : '[background-color:oklch(from_var(--bg-color)_l_c_h_/_0.95)] pt-[env(safe-area-inset-top)]'
       }`}
     >
-      <div className="flex h-14 w-full max-w-[1440px] min-w-0 items-center justify-between gap-3 px-4 md:px-8 xl:px-10">
+      <div className="flex h-14 w-full max-w-360 min-w-0 items-center justify-between gap-3 px-4 md:px-8 xl:px-10">
         {/* Left Side */}
         <div className="flex items-center gap-4">
           <Link
@@ -140,7 +140,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
                 key={item.label}
                 to={item.path}
                 aria-current={isActive ? 'page' : undefined}
-                className={`inline-flex min-h-11 items-center rounded-xl px-3 py-2 text-ui-xs font-extrabold transition-[background-color,color] duration-200 hover:bg-green/5 hover:text-green xl:px-4 xl:text-btn-sm ${
+                className={`inline-flex min-h-11 items-center rounded-xl px-3 py-2 text-ui-xs font-extrabold transition-colors duration-200 hover:bg-green/5 hover:text-green xl:px-4 xl:text-btn-sm ${
                   isActive
                     ? 'bg-green/5 text-green'
                     : 'text-gray-nav'
@@ -161,7 +161,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={onInvite}
-                className="gap-2 px-3 hover:bg-green/5 text-green xl:px-4"
+
               >
                 <span>Invite</span>
                 <UserPlus size={16} weight="regular" />
@@ -170,7 +170,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={() => logout()}
-                className="px-3 text-gray-light hover:text-clay hover:bg-clay/5 xl:px-4"
+                tone="clay"
               >
                 Logout
               </Button>
@@ -181,7 +181,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate(RoutePath.LOGIN)}
-                className="px-3 xl:px-4"
+
               >
                 Sign in
               </Button>
@@ -189,7 +189,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
                 variant="primary"
                 size="sm"
                 onClick={() => navigate(RoutePath.SIGNUP)}
-                className="px-3 xl:px-4"
+
               >
                 Sign up
               </Button>
