@@ -4,6 +4,17 @@ vi.mock('./userModeStore', () => ({
   getCurrentUserMode: vi.fn(),
 }));
 
+vi.mock('../src/supabaseClient', () => ({
+  supabase: {
+    auth: {
+      getUser: vi.fn(),
+      getSession: vi.fn(),
+      signInWithOAuth: vi.fn(),
+    },
+    from: vi.fn(),
+  },
+}));
+
 vi.mock('./cryptoSessionStore', () => ({
   requireCurrentCryptoSession: vi.fn(() => ({ userId: 'u-1', keyId: 'k-1' })),
 }));

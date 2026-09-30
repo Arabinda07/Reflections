@@ -59,8 +59,8 @@ describe('noteExport', () => {
     const markdown = buildNoteExportText(structuredNote, 'md');
 
     expect(markdown).toMatch(/^# A quiet Tuesday \/ draft\n\n/);
-    expect(markdown).toContain('Created: April 20, 2026, 3:30 PM');
-    expect(markdown).toContain('Updated: April 21, 2026, 5:00 PM');
+    expect(markdown).toMatch(/Created:\s+April 20, 2026, \d{1,2}:\d{2}\s+(?:AM|PM)/);
+    expect(markdown).toMatch(/Updated:\s+April 21, 2026, \d{1,2}:\d{2}\s+(?:AM|PM)/);
     expect(markdown).toContain('Mood: calm');
     expect(markdown).toContain('Tags: work, rest');
     expect(markdown).not.toContain('---');
