@@ -819,7 +819,9 @@ details:focus-visible,
 }
 
 .editor-title-input:focus-visible,
-.note-editor [contenteditable]:focus-visible {
+.note-editor [contenteditable]:focus-visible,
+.intention-entry-input:focus-visible,
+.intention-entry-input:focus {
   outline: none;
   box-shadow: none;
   border-radius: 0;
@@ -1672,20 +1674,20 @@ details:focus-visible,
   }
 
   .dark .btn-primary-green {
-    background-color: oklch(0.48 0.18 138);
+    background-color: oklch(0.56 0.18 138);
     color: #ffffff;
-    border: 1.5px solid oklch(from var(--green) 0.72 0.16 h / 0.32);
+    border: 1.5px solid oklch(from var(--green) 0.76 0.16 h / 0.40);
     box-shadow:
       0 1px 2px oklch(0 0 0 / 0.28),
-      0 6px 18px -4px oklch(from var(--green) 0.48 0.18 h / 0.40);
+      0 8px 24px -4px oklch(from var(--green) 0.52 0.18 h / 0.48);
   }
 
   .dark .btn-primary-green:hover {
-    background-color: oklch(0.54 0.19 138);
-    border-color: oklch(from var(--green) 0.82 0.18 h / 0.50);
+    background-color: oklch(0.62 0.19 138);
+    border-color: oklch(from var(--green) 0.84 0.18 h / 0.55);
     box-shadow:
       0 2px 6px oklch(0 0 0 / 0.35),
-      0 8px 24px -4px oklch(from var(--green) 0.54 0.19 h / 0.52);
+      0 10px 28px -4px oklch(from var(--green) 0.58 0.19 h / 0.56);
   }
 
   .dark .btn-primary-clay,
@@ -1782,10 +1784,10 @@ details:focus-visible,
   }
 
   .intention-entry-control:focus-within {
-    border-color: oklch(from var(--surface-current-accent) l c h / 0.24);
+    border-color: oklch(from var(--green) l c h / 0.40);
     background: oklch(from var(--panel-bg) l c h / 0.74);
     box-shadow:
-      0 0 0 3px oklch(from var(--surface-current-accent) l c h / 0.08),
+      0 0 0 3px oklch(from var(--green) l c h / 0.12),
       0 14px 26px -24px oklch(from var(--bg-color) 0.2 0.01 h / 0.18);
   }
 

@@ -650,9 +650,9 @@ export const HomeAuthenticated: React.FC = () => {
                         label="Speak a note"
                         stopOnFinalTranscript
                         className="w-full sm:w-auto"
-                        buttonClassName="relative inline-flex min-h-12 py-3 px-6 w-full sm:w-auto items-center justify-center gap-1.5 rounded-xl text-sm sm:text-base font-bold transition-colors text-green"
+                        buttonClassName="relative inline-flex min-h-12 py-3 px-6 w-full sm:w-auto items-center justify-center gap-1.5 rounded-xl text-sm sm:text-base font-bold transition-colors text-gray-nav hover:text-green"
                         idleButtonClassName="control-surface"
-                        activeButtonClassName="border-green/25 bg-green/20"
+                        activeButtonClassName="border-green/25 bg-green/20 text-green"
                       />
                     </div>
                     <div className="home-secondary-action-row flex flex-row flex-wrap items-center justify-start gap-8 pb-2">
