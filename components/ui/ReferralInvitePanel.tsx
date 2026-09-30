@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Check } from '@phosphor-icons/react/Check';
-
+import { CopySimple } from '@phosphor-icons/react/CopySimple';
 import { WarningCircle } from '@phosphor-icons/react/WarningCircle';
 import { Button } from './Button';
 import { buildReferralLink, referralService } from '../../services/referralService';
@@ -21,6 +21,7 @@ export const ReferralInvitePanel: React.FC<ReferralInvitePanelProps> = ({ compac
   const [status, setStatus] = useState<string | null>(null);
   const [justCopied, setJustCopied] = useState(false);
   const isErrorStatus = status ? status.startsWith('I could not') || status.startsWith('Copy did not') : false;
+  const canShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 
   useEffect(() => {
     let isMounted = true;
@@ -108,6 +109,12 @@ export const ReferralInvitePanel: React.FC<ReferralInvitePanelProps> = ({ compac
     if (!inviteLink) return;
 
     try {
+      await copyInviteLink(false);
+    } catch {
+      // Clipboard fallback may be blocked by browser permissions; continue to native share
+    }
+
+    try {
       if (navigator.share) {
         await navigator.share({
           title: 'Reflections',
@@ -129,13 +136,7 @@ export const ReferralInvitePanel: React.FC<ReferralInvitePanelProps> = ({ compac
       }
 
       console.error('Could not share invite:', error);
-      try {
-        await copyInviteLink(false);
-        setStatus('I could not share the invite, so I copied the link instead.');
-      } catch (copyError) {
-        console.error('Could not copy invite link after share failed:', copyError);
-        setStatus('I could not share or copy the invite just now.');
-      }
+      setStatus('Invite link copied to clipboard.');
     }
   };
 
@@ -150,23 +151,52 @@ export const ReferralInvitePanel: React.FC<ReferralInvitePanelProps> = ({ compac
         {invite?.lastSharedAt ? ` · Shared ${new Date(invite.lastSharedAt).toLocaleDateString()}` : ''}
       </p>
 
-      <div className="pt-1">
-        <Button 
-          type="button" 
-          size="sm"
-          onClick={handleShare} 
-          disabled={!inviteLink || justCopied} 
-          className="min-h-11 w-fit self-end sm:self-auto"
-        >
-          {justCopied ? (
-            <span className="flex items-center gap-2">
-              <Check size={18} weight="bold" />
-              Link Copied!
-            </span>
-          ) : (
-            'Invite a Friend'
-          )}
-        </Button>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="surface-inline-panel flex min-w-0 flex-1 items-center gap-2 rounded-control border border-border px-3.5 py-2">
+          <span
+            tabIndex={0}
+            className="min-w-0 flex-1 select-all truncate font-mono text-ui-xs text-gray-text"
+            title={inviteLink}
+          >
+            {inviteLink || 'Preparing invite link...'}
+          </span>
+        </div>
+
+        <div className="flex shrink-0 items-center gap-2">
+          <Button 
+            type="button" 
+            size="sm"
+            onClick={handleCopy} 
+            disabled={!inviteLink} 
+            className="min-h-11 w-fit self-end sm:self-auto"
+          >
+            {justCopied ? (
+              <span className="flex items-center gap-1.5">
+                <Check size={16} weight="bold" />
+                Link Copied!
+              </span>
+            ) : (
+              <span className="flex items-center gap-1.5">
+                <CopySimple size={16} weight="bold" />
+                Copy Link
+              </span>
+            )}
+          </Button>
+
+          {canShare ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleShare}
+              disabled={!inviteLink}
+              className="min-h-11 w-fit"
+              aria-label="Share invite via device options"
+            >
+              Share
+            </Button>
+          ) : null}
+        </div>
       </div>
 
       {status ? (
