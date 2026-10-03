@@ -22,8 +22,14 @@ import {
 } from '../server/lifeWikiRuns.js';
 import type { AiAction } from '../services/aiContracts';
 import { getNoteContentHash } from '../services/aiContext.js';
-import { buildWikiReviewPrompt, parseLifeWikiReviewResult } from '../services/aiOutputReview.js';
+import {
+  buildJevWikiReviewRequest,
+  buildWikiReviewPrompt,
+  evaluateJevWikiReview,
+  parseLifeWikiReviewResult,
+} from '../services/aiOutputReview.js';
 import { INGEST_MODEL } from '../services/aiPromptSpecs.js';
+import { typesafeClient } from '../server/typesafeClient.js';
 import {
   STRICT_PRIVATE_MODE_DISABLED_MESSAGE,
   isStrictPrivateModeEnabled,
@@ -402,6 +408,21 @@ export default async function handler(req: any, res: any) {
         return response.text?.trim() || '';
       },
       reviewWikiPageDraft: async (input) => {
+        if (typesafeClient.isConfigured()) {
+          const jevRequest = buildJevWikiReviewRequest(input);
+          const jevResponse = await typesafeClient.evaluate(jevRequest);
+          const jevDecision = evaluateJevWikiReview(jevResponse);
+          if (jevDecision !== null) {
+            logAiUsage('wikiReview', 'jev-latest', {
+              promptTokenCount: jevResponse?.usage?.input_tokens ?? 0,
+              candidatesTokenCount: jevResponse?.usage?.output_tokens ?? 0,
+              totalTokenCount:
+                (jevResponse?.usage?.input_tokens ?? 0) + (jevResponse?.usage?.output_tokens ?? 0),
+            } as any);
+            return jevDecision;
+          }
+        }
+
         const response = await ai.models.generateContent({
           model: INGEST_MODEL,
           contents: buildWikiReviewPrompt(input),

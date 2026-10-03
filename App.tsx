@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from 'react';
 import { Navigate, Route, RouterProvider, createBrowserRouter, createRoutesFromElements, ScrollRestoration, Outlet } from 'react-router-dom';
 import { RouteLoadingFrame } from './components/ui/RouteLoadingFrame';
+import { usePageTracking } from './hooks/usePageTracking';
 import { PublicAppShell } from './layouts/PublicAppShell';
 import { RouteErrorBoundary } from './pages/RouteErrorBoundary';
 import { LandingRoute } from './pages/dashboard/LandingRoute';
@@ -85,12 +86,15 @@ const withModeGuard = (
     defaultRouteFallback
   );
 
-const RootLayout = () => (
-  <>
-    <ScrollRestoration />
-    <Outlet />
-  </>
-);
+const RootLayout = () => {
+  usePageTracking();
+  return (
+    <>
+      <ScrollRestoration />
+      <Outlet />
+    </>
+  );
+};
 
 const router = createBrowserRouter(
   createRoutesFromElements(

@@ -30,6 +30,11 @@ import {
   STRICT_PRIVATE_MODE_DISABLED_MESSAGE,
   isStrictPrivateModeEnabled,
 } from '../services/privateMode.js';
+import { typesafeClient } from '../server/typesafeClient.js';
+import {
+  buildJevIngestDecisionRequest,
+  evaluateJevIngestDecision,
+} from '../services/typesafeRouting.js';
 
 const MAX_BODY_BYTES = 250_000;
 const NOTE_OWNERSHIP_ACTIONS = new Set<AiAction>([
@@ -276,6 +281,26 @@ const handleReflection = async (payload: any) => {
 const handleIngestDecision = async (payload: any) => {
   const themes = Array.isArray(payload?.themes) ? payload.themes : [];
   const note = payload?.note || {};
+  const validThemeIds = themes.map((theme: any) => String(theme.id));
+
+  // 1. Fast-path routing via TypeSafe Jev System One model
+  if (typesafeClient.isConfigured()) {
+    const jevRequest = buildJevIngestDecisionRequest(note, themes);
+    const jevResponse = await typesafeClient.evaluate(jevRequest);
+    const jevDecision = evaluateJevIngestDecision(jevResponse, validThemeIds);
+
+    if (jevDecision !== null) {
+      logAiUsage('ingestDecision', 'jev-latest', {
+        promptTokenCount: jevResponse?.usage?.input_tokens ?? 0,
+        candidatesTokenCount: jevResponse?.usage?.output_tokens ?? 0,
+        totalTokenCount:
+          (jevResponse?.usage?.input_tokens ?? 0) + (jevResponse?.usage?.output_tokens ?? 0),
+      } as any);
+      return jevDecision;
+    }
+  }
+
+  // 2. Escalation / fallback to Gemini for new theme creation or uncertain cases
   const themeIndex = themes
     .map((theme: any) => `- ID: ${theme.id} | Title: ${theme.title}`)
     .join('\n');
@@ -304,10 +329,7 @@ const handleIngestDecision = async (payload: any) => {
     required: ['action', 'themeId', 'newThemeTitle', 'reasoning'],
   } as any);
 
-  const validation = validateIngestDecision(
-    decision,
-    themes.map((theme: any) => String(theme.id)),
-  );
+  const validation = validateIngestDecision(decision, validThemeIds);
   if (validation.ok === false) {
     throw new HttpError(502, validation.error);
   }
