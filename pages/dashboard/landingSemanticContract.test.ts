@@ -20,4 +20,16 @@ describe('landing semantic contract', () => {
     expect(publicSeoCopy).toContain('beautifully');
     expect(publicSeoCopy).toContain('organized');
   });
+
+  it('ensures static SEO generator does not introduce a duplicate h1 on the home page', () => {
+    const generator = read('scripts/generate-public-seo-pages.mjs');
+    expect(generator).toContain("const headingTag = page.path === '/' ? 'h2' : 'h1';");
+  });
+
+  it('ensures landing hero image provides descriptive alt text for search engine crawlers', () => {
+    const landing = read('pages/dashboard/Landing.tsx');
+    const generator = read('scripts/generate-public-seo-pages.mjs');
+    expect(landing).toContain('alt="Reflections private journal calm writing atmosphere"');
+    expect(generator).toContain('alt="Reflections private journal calm writing atmosphere"');
+  });
 });

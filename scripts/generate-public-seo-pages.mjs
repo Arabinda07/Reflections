@@ -154,10 +154,12 @@ const renderSeoContent = (page) => {
     )
     .join('');
 
+  const headingTag = page.path === '/' ? 'h2' : 'h1';
+
   return `
     <main id="public-seo-content" data-seo-snapshot="true" class="sr-only">
       <nav aria-label="Public pages">${navLinks}</nav>
-      <h1>${escapeHtml(page.h1)}</h1>
+      <${headingTag}>${escapeHtml(page.h1)}</${headingTag}>
       <p>${escapeHtml(page.intro)}</p>
       ${sections}
       ${renderComparisonTable(page.comparison)}
@@ -313,7 +315,7 @@ const renderStaticLandingShell = (page) => `
             <picture>
               <source srcset="/assets/videos/landing_video.webp" type="image/webp" media="(min-width: 1024px)" />
               <source srcset="/assets/videos/landing_video_mobile.webp" type="image/webp" media="(max-width: 1023px)" />
-              <img src="/assets/videos/landing_video_mobile.webp" alt="" aria-hidden="true" fetchpriority="high" loading="eager" decoding="async" />
+              <img src="/assets/videos/landing_video_mobile.webp" alt="Reflections private journal calm writing atmosphere" fetchpriority="high" loading="eager" decoding="async" />
             </picture>
           </div>
           <div>

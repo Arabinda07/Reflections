@@ -164,8 +164,7 @@ export const Landing: React.FC = () => {
             <source srcSet="/assets/videos/landing_video_mobile.webp" type="image/webp" media="(max-width: 1023px)" />
             <img
               src="/assets/videos/landing_video_mobile.webp"
-              alt=""
-              aria-hidden="true"
+              alt="Reflections private journal calm writing atmosphere"
               fetchPriority="high"
               loading="eager"
               decoding="async"
