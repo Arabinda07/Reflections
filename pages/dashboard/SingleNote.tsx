@@ -553,6 +553,7 @@ export const SingleNote: React.FC = () => {
                   currentNoteId={note.id}
                   currentNoteTitle={note.title}
                   currentNoteContent={note.content}
+                  currentNoteUpdatedAt={note.updatedAt}
                   currentMood={note.mood}
                 />
           </article>

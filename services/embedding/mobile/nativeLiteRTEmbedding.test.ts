@@ -21,10 +21,11 @@ describe('nativeLiteRTEmbedding', () => {
     expect(vector).toBeNull();
   });
 
-  it('detects supported state on native Android', () => {
+  it('stays unsupported on native Android until the plugin runs a real model', () => {
     vi.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(true);
     vi.spyOn(mobileRuntime, 'isAndroid').mockReturnValue(true);
 
-    expect(nativeLiteRTEmbedding.isSupported()).toBe(true);
+    // LiteRTEmbeddingPlugin.java currently hashes text instead of embedding it.
+    expect(nativeLiteRTEmbedding.isSupported()).toBe(false);
   });
 });

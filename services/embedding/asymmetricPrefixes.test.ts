@@ -2,40 +2,34 @@ import { describe, it, expect } from 'vitest';
 import { formatDocumentText, formatQueryText } from './asymmetricPrefixes';
 
 describe('formatDocumentText', () => {
-  it('prefixes with title and separator when title is present', () => {
-    expect(formatDocumentText('My Day', 'Felt great today'))
-      .toBe('Document: My Day | Felt great today');
+  it('bge: joins title and content without a prefix', () => {
+    expect(formatDocumentText('My Day', 'Felt great today')).toBe('My Day\nFelt great today');
   });
 
-  it('prefixes without separator when title is empty', () => {
-    expect(formatDocumentText('', 'Felt great today'))
-      .toBe('Document: Felt great today');
+  it('bge: content only when title is blank', () => {
+    expect(formatDocumentText('   ', 'Content here')).toBe('Content here');
   });
 
-  it('handles whitespace-only title as empty', () => {
-    expect(formatDocumentText('   ', 'Content here'))
-      .toBe('Document: Content here');
+  it('gemma: uses title/text format with "none" for a missing title', () => {
+    expect(formatDocumentText('My Day', 'Felt great', 'tier2-gemma')).toBe('title: My Day | text: Felt great');
+    expect(formatDocumentText('', 'Felt great', 'tier2-gemma')).toBe('title: none | text: Felt great');
   });
 
   it('returns empty string when both title and content are empty', () => {
     expect(formatDocumentText('', '')).toBe('');
-  });
-
-  it('handles title-only with empty content', () => {
-    expect(formatDocumentText('Title Only', ''))
-      .toBe('Document: Title Only | ');
+    expect(formatDocumentText('', '', 'tier2-gemma')).toBe('');
   });
 });
 
 describe('formatQueryText', () => {
-  it('prefixes with SearchQuery:', () => {
-    expect(formatQueryText('burnout at work'))
-      .toBe('SearchQuery: burnout at work');
+  it('bge: prepends the retrieval instruction', () => {
+    expect(formatQueryText('  burnout at work ')).toBe(
+      'Represent this sentence for searching relevant passages: burnout at work',
+    );
   });
 
-  it('trims whitespace', () => {
-    expect(formatQueryText('  tired  '))
-      .toBe('SearchQuery: tired');
+  it('gemma: uses the search-result task prompt', () => {
+    expect(formatQueryText('tired', 'tier2-gemma')).toBe('task: search result | query: tired');
   });
 
   it('returns empty string for empty query', () => {

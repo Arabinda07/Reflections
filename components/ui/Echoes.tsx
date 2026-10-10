@@ -16,6 +16,8 @@ export interface EchoesProps {
   currentNoteId: string;
   currentNoteTitle?: string;
   currentNoteContent?: string;
+  /** Needed so an on-the-fly embedding is stored with the note's real hash. */
+  currentNoteUpdatedAt?: string;
   currentMood?: string;
   minScore?: number; // default 0.40
 }
@@ -36,6 +38,7 @@ export const Echoes: React.FC<EchoesProps> = ({
   currentNoteId,
   currentNoteTitle = '',
   currentNoteContent = '',
+  currentNoteUpdatedAt,
   currentMood,
   minScore = 0.4,
 }) => {
@@ -59,8 +62,8 @@ export const Echoes: React.FC<EchoesProps> = ({
             id: currentNoteId,
             title: currentNoteTitle,
             content: currentNoteContent,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+            createdAt: currentNoteUpdatedAt ?? new Date().toISOString(),
+            updatedAt: currentNoteUpdatedAt ?? new Date().toISOString(),
           });
         }
 
@@ -131,7 +134,7 @@ export const Echoes: React.FC<EchoesProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [currentNoteId, currentNoteTitle, currentNoteContent, currentMood, minScore]);
+  }, [currentNoteId, currentNoteTitle, currentNoteContent, currentNoteUpdatedAt, currentMood, minScore]);
 
   // If loading or no echoes cross the threshold, quietly render nothing
   // to keep the journal reading experience serene and distraction-free.

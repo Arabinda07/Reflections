@@ -19,12 +19,17 @@ import { tierManager } from './tierManager';
 import { nativeLiteRTEmbedding } from './mobile/nativeLiteRTEmbedding';
 import { multimodalEmbedder } from './multimodal/multimodalEmbedder';
 
+// Bump whenever the text fed to the model changes (prefixes, blending) so every
+// stored vector is treated as stale and re-embedded.
+const EMBED_FORMAT_VERSION = 2;
+
 type PendingRequest = {
   resolve: (value: unknown) => void;
   reject: (reason: unknown) => void;
 };
 
 let worker: Worker | null = null;
+let initPromise: Promise<void> | null = null;
 let status: EmbeddingStatus = { state: 'idle' };
 const pending = new Map<string, PendingRequest>();
 
@@ -74,7 +79,7 @@ const handleWorkerMessage = (event: MessageEvent<EmbeddingWorkerResponse>) => {
  * Uses a fast string hash — cryptographic strength isn't needed here.
  */
 const contentHash = (note: Note): string => {
-  const input = `${note.updatedAt}|${note.title}|${note.content}`;
+  const input = `v${EMBED_FORMAT_VERSION}|${note.updatedAt}|${note.title}|${note.content}`;
   let hash = 0;
   for (let i = 0; i < input.length; i++) {
     hash = ((hash << 5) - hash + input.charCodeAt(i)) | 0;
@@ -91,13 +96,15 @@ export const embeddingService = {
    */
   async initialize(targetTier?: EmbeddingModelTier): Promise<void> {
     const tierToLoad = targetTier || activeTier;
-    if (worker && activeTier === tierToLoad && (status.state === 'ready' || status.state === 'loading')) {
-      return;
+    // Concurrent callers share one load; the worker rejects embeds until INIT finishes.
+    if (worker && initPromise && activeTier === tierToLoad) {
+      return initPromise;
     }
 
     if (worker) {
       worker.terminate();
       worker = null;
+      for (const req of pending.values()) req.reject(new Error('Embedding worker restarted'));
       pending.clear();
     }
 
@@ -118,11 +125,24 @@ export const embeddingService = {
 
     worker.onmessage = handleWorkerMessage;
     worker.onerror = (err) => {
-      status = { state: 'error', message: err.message || 'Worker crashed' };
+      const message = err.message || 'Worker crashed';
+      status = { state: 'error', message };
+      // Fail in-flight requests instead of leaving them hanging forever.
+      for (const req of pending.values()) req.reject(new Error(message));
+      pending.clear();
+      worker?.terminate();
+      worker = null;
+      initPromise = null;
     };
 
     status = { state: 'loading', progress: 0, file: '' };
-    await sendRequest<{ type: 'INIT_DONE'; ready: boolean }>({ type: 'INIT' });
+    const current = sendRequest<{ type: 'INIT_DONE'; ready: boolean }>({ type: 'INIT' }).then(() => undefined);
+    initPromise = current;
+    current.catch(() => {
+      // Let the next call retry from scratch.
+      if (initPromise === current) initPromise = null;
+    });
+    return current;
   },
 
   /** Get the current embedding engine status. */
@@ -173,13 +193,14 @@ export const embeddingService = {
       return existing.vector;
     }
 
-    const text = formatDocumentText(note.title, note.content);
+    const text = formatDocumentText(note.title, note.content, activeTier);
     if (!text) {
       // Empty note — remove any stale vector
       await vectorStore.delete(note.id);
       return new Float32Array(activeDim);
     }
 
+    await embeddingService.initialize();
     let vector: Float32Array;
 
     // On native mobile with Tier 2, attempt native LiteRT execution first to prevent WebView RAM spikes
@@ -204,11 +225,9 @@ export const embeddingService = {
       vector = new Float32Array(response.vector);
     }
 
-    // Blend multimodal features if note has photos or voice recordings
-    const mediaVector = multimodalEmbedder.embedMedia(note, activeDim);
-    if (mediaVector) {
-      vector = multimodalEmbedder.blendTextAndMedia(vector, mediaVector);
-    }
+    // ponytail: media blending disabled — imageEmbedder/audioEmbedder receive no
+    // pixel/PCM data yet, so they emit near-constant vectors that pull every media
+    // note together. Re-enable once real features are extracted.
 
     const modality = multimodalEmbedder.detectModality(note);
 
@@ -231,8 +250,9 @@ export const embeddingService = {
    */
   async embedQuery(query: string): Promise<Float32Array> {
     const activeDim = tierManager.getTierDimension(activeTier);
-    const text = formatQueryText(query);
+    const text = formatQueryText(query, activeTier);
     if (!text) return new Float32Array(activeDim);
+    await embeddingService.initialize();
 
     if (nativeLiteRTEmbedding.isSupported() && activeTier === 'tier2-gemma') {
       const nativeVec = await nativeLiteRTEmbedding.embedText(text, activeDim);
@@ -324,7 +344,25 @@ export const embeddingService = {
   destroy(): void {
     worker?.terminate();
     worker = null;
+    initPromise = null;
     status = { state: 'idle' };
+    for (const req of pending.values()) req.reject(new Error('Embedding worker destroyed'));
     pending.clear();
+  },
+
+  /**
+   * Lock/logout: drop the model from memory and wipe stored vectors.
+   * Vectors are derived from decrypted text, so they must not outlive the
+   * unlocked session.
+   * ponytail: wipe-on-lock means a full re-embed after unlock; encrypting
+   * vectors with the session data key is the upgrade if that gets slow.
+   */
+  async reset(): Promise<void> {
+    embeddingService.destroy();
+    try {
+      await vectorStore.clear();
+    } catch {
+      // IndexedDB unavailable (private mode / tests) — nothing persisted to wipe.
+    }
   },
 };

@@ -20,7 +20,7 @@ Reflections initially struggled with the classic trade-off in digital journaling
    Rather than matching exact strings (which fails when searching for "burnout" in a note about "being drained by endless meetings"), an on-device embedding model reads decrypted text in device RAM and assigns it mathematical coordinates on an invisible semantic map.
 3. **Two-Tier Engine**:
    * **Tier 1 (`bge-small` ~33 MB)**: Instant semantic search, tag recommendations, and offline theme classification in <100ms at ₹0 server cost.
-   * **Tier 2 (`Embedding Gemma 2` 270M)**: Deep memory model running via WebGPU on desktop and Google LiteRT on Android mobile. Captures up to 8,000 words without chunking and compresses memory by 66% using Matryoshka Representation Learning (MRL).
+   * **Tier 2 (`EmbeddingGemma` 270M)**: Deep memory model via WebGPU (fp16) or WASM (q4) in a worker, MRL-truncated 768→256d. **Status (Oct 10 2026):** worker path implemented but not exposed in UI; the Android LiteRT plugin is still a hash stub and is hard-disabled (`NATIVE_LITERT_READY = false`) until a real `.tflite` model runs natively.
 4. **Echoes & Antidote Memories**:
    Quietly surfaces forgotten reflections that share the same feeling or topic, or surfaces past resilience entries when the user logs a heavy mood.
 
@@ -84,3 +84,17 @@ During our design review evaluating ideas from the wellness space (*Insight Time
 * [x] In `Insights.tsx`, remove the separate `<MindsetDriftCard>` section.
 * [x] Weave emotional tone into "This week" and embed the mindset family balance bar + relational energy orbit directly inside "This month".
 * [x] Run automated tests (`npx vitest run`: 158/158 files passed) and type check/linter (`npm run lint`: 0 errors, 0 warnings).
+
+### Phase 4: Make the Private-Memory Promise True (Oct 10 2026 audit)
+An audit found the embedding pipeline was never initialized in production (only tests called `initialize()`), so Echoes, antidote memories and semantic search silently returned nothing.
+* [x] Lazy, shared-promise worker init inside `embeddingService` — every caller now works without wiring.
+* [x] Reject in-flight requests on worker crash/restart (no hanging promises).
+* [x] Wipe vectors + terminate worker on lock and logout (`embeddingService.reset()`); vectors are derived from plaintext and must not outlive the unlocked session.
+* [x] Hard-disable the Android LiteRT stub (SHA-256 vectors).
+* [x] Disable image/audio blending (no pixel/PCM input yet → constant vectors).
+* [x] Model-native prefixes (BGE query instruction; Gemma `title: | text:` / `task: search result | query:`), with `EMBED_FORMAT_VERSION` forcing a re-embed of old vectors.
+* [x] Echoes stores on-the-fly vectors with the note's real `updatedAt` (no re-embed churn).
+* [ ] Encrypt vectors at rest with the session data key (removes the full re-embed after each unlock).
+* [ ] Remove dead Gemini code (`api/ai.ts`, `api/ai-runs.ts`, `@google/genai`, unused `aiService` functions); replace `suggestTags` with local nearest-tag lookup.
+* [ ] Quiet Paper UI pass: filled primary buttons on auth/unlock, hide nav behind the unlock veil, Home "Desk", blank-page-first editor, Insights a11y.
+* [ ] Real on-device EmbeddingGemma on Android (only if Tier 1 proves insufficient).

@@ -1,35 +1,39 @@
 /**
  * Asymmetric prefix formatting for embedding model input.
  *
- * BGE models require task-specific prefixes to distinguish between document
- * indexing and search queries. Without these, retrieval quality degrades
- * because the model conflates the two intents.
+ * Each model was trained with its own prompt format; using the wrong one
+ * quietly degrades retrieval quality.
+ * - bge-small-en-v1.5: documents raw, queries get the BGE retrieval instruction.
+ * - EmbeddingGemma: `title: … | text: …` for documents, `task: search result | query: …` for queries.
  *
  * Reference: ADR 0004 §2.4 — Asymmetric Search Prefixes
  */
+import type { EmbeddingModelTier } from './embeddingTypes';
 
-/**
- * Formats a note for document embedding.
- * Prefixes with "Document: " and optionally includes the title.
- */
-export const formatDocumentText = (title: string, content: string): string => {
+const BGE_QUERY_INSTRUCTION = 'Represent this sentence for searching relevant passages: ';
+
+/** Formats a note for document embedding in the given tier's native format. */
+export const formatDocumentText = (
+  title: string,
+  content: string,
+  tier: EmbeddingModelTier = 'tier1-bge',
+): string => {
   const trimmedTitle = title.trim();
   const trimmedContent = content.trim();
 
   if (!trimmedTitle && !trimmedContent) return '';
 
-  if (trimmedTitle) {
-    return `Document: ${trimmedTitle} | ${trimmedContent}`;
+  if (tier === 'tier2-gemma') {
+    return `title: ${trimmedTitle || 'none'} | text: ${trimmedContent}`;
   }
-  return `Document: ${trimmedContent}`;
+  return trimmedTitle ? `${trimmedTitle}\n${trimmedContent}` : trimmedContent;
 };
 
-/**
- * Formats a search query for query embedding.
- * Prefixes with "SearchQuery: " to activate the model's retrieval mode.
- */
-export const formatQueryText = (query: string): string => {
+/** Formats a search query for query embedding in the given tier's native format. */
+export const formatQueryText = (query: string, tier: EmbeddingModelTier = 'tier1-bge'): string => {
   const trimmed = query.trim();
   if (!trimmed) return '';
-  return `SearchQuery: ${trimmed}`;
+  return tier === 'tier2-gemma'
+    ? `task: search result | query: ${trimmed}`
+    : `${BGE_QUERY_INSTRUCTION}${trimmed}`;
 };

@@ -31,6 +31,8 @@ export interface LiteRTEmbeddingPlugin {
   unload(): Promise<{ unloaded: boolean }>;
 }
 
+const NATIVE_LITERT_READY = false;
+
 const LiteRTEmbedding = registerPlugin<LiteRTEmbeddingPlugin>('LiteRTEmbedding');
 
 export const nativeLiteRTEmbedding = {
@@ -38,7 +40,10 @@ export const nativeLiteRTEmbedding = {
    * Check if the current runtime environment is native Android with LiteRT capability.
    */
   isSupported(): boolean {
-    return Capacitor.isNativePlatform() && mobileRuntime.isAndroid();
+    // ponytail: hard-off — LiteRTEmbeddingPlugin.java still returns SHA-256 hash
+    // vectors, not model output. Restore the platform check once a real
+    // EmbeddingGemma .tflite runs natively.
+    return NATIVE_LITERT_READY && Capacitor.isNativePlatform() && mobileRuntime.isAndroid();
   },
 
   /**

@@ -10,6 +10,7 @@ import {
 } from '../services/keyWrapperPolicy';
 import { setCurrentCryptoSession } from '../services/cryptoSessionStore';
 import { cryptoKeyCache } from '../services/cryptoKeyCache';
+import { embeddingService } from '../services/embedding/embeddingService';
 import {
   consumePendingAccountPassword,
   hasPendingAccountPassword,
@@ -95,6 +96,7 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const lock = useCallback(() => {
     void cryptoKeyCache.clear();
+    void embeddingService.reset();
     setCurrentCryptoSession(null);
     setSession(null);
     setMigrationProgress(null);
@@ -116,6 +118,7 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         // No signed-in user (initial load or just-logged-out): drop any cached
         // "keep me unlocked" key so it never outlives the session.
         await cryptoKeyCache.clear();
+        await embeddingService.reset();
         if (!isActive) return;
         setStatus('loading');
         return;

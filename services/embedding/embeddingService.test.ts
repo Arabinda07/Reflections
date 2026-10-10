@@ -132,3 +132,32 @@ describe('embeddingService progressive tier switching', () => {
   });
 });
 
+
+describe('embeddingService lazy initialization (regression: no prod caller ever initialized)', () => {
+  it('embedQuery works without an explicit initialize()', async () => {
+    const vector = await embeddingService.embedQuery('drained by endless meetings');
+    expect(vector.length).toBe(384);
+    expect(embeddingService.getStatus().state).toBe('ready');
+  });
+
+  it('concurrent callers share a single model load', async () => {
+    const spy = vi.spyOn(MockWorker.prototype, 'postMessage');
+    await Promise.all([
+      embeddingService.embedQuery('one'),
+      embeddingService.embedQuery('two'),
+    ]);
+    const inits = spy.mock.calls.filter(([msg]) => msg.type === 'INIT');
+    expect(inits).toHaveLength(1);
+    spy.mockRestore();
+  });
+});
+
+describe('embeddingService.reset', () => {
+  it('terminates the worker and wipes stored vectors', async () => {
+    const { vectorStore } = await import('./vectorStore');
+    await embeddingService.initialize();
+    await embeddingService.reset();
+    expect(embeddingService.getStatus().state).toBe('idle');
+    expect(vectorStore.clear).toHaveBeenCalled();
+  });
+});
