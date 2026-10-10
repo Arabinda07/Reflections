@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Sparkle } from '@phosphor-icons/react/Sparkle';
+import { Microphone } from '@phosphor-icons/react/Microphone';
+import { Image } from '@phosphor-icons/react/Image';
 import { vectorStore } from '../../services/embedding/vectorStore';
 import { embeddingService } from '../../services/embedding/embeddingService';
 import { noteService } from '../../services/noteService';
@@ -165,10 +167,22 @@ export const Echoes: React.FC<EchoesProps> = ({
             >
               <div>
                 <div className="mb-2 flex items-center justify-between gap-2">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-green/10 px-2 py-0.5 text-ui-xs font-bold text-green">
-                    <Sparkle size={11} weight="fill" />
-                    {resonancePercent}% resonance
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-green/10 px-2 py-0.5 text-ui-xs font-bold text-green">
+                      <Sparkle size={11} weight="fill" />
+                      {resonancePercent}% resonance
+                    </span>
+                    {note.attachments?.some((a) => a.type?.startsWith('audio/')) && (
+                      <span className="inline-flex items-center text-gray-nav" title="Voice reflection">
+                        <Microphone size={12} weight="fill" />
+                      </span>
+                    )}
+                    {(note.thumbnailUrl || note.attachments?.some((a) => a.type?.startsWith('image/'))) && (
+                      <span className="inline-flex items-center text-gray-nav" title="Photo memory">
+                        <Image size={12} weight="fill" />
+                      </span>
+                    )}
+                  </div>
                   <span className="text-ui-xs font-bold text-gray-nav">
                     {formatEchoDate(note.createdAt)}
                   </span>

@@ -8,6 +8,7 @@ export interface ScoredNoteSearchResult {
   score: number;
   matchType: 'exact' | 'keyword' | 'semantic' | 'hybrid';
   similarity?: number;
+  modality?: 'text' | 'image' | 'audio' | 'unified';
 }
 
 export interface HybridSearchOptions {
@@ -102,7 +103,8 @@ const blendScores = (
   notes: Note[],
   keywordScores: Map<string, KeywordMatch>,
   semanticScores: Map<string, number>,
-  options?: HybridSearchOptions
+  options?: HybridSearchOptions,
+  modalityScores?: Map<string, 'text' | 'image' | 'audio' | 'unified'>,
 ): ScoredNoteSearchResult[] => {
   const kwWeight = options?.keywordWeight ?? 0.45;
   const semWeight = options?.semanticWeight ?? 0.55;
@@ -135,11 +137,20 @@ const blendScores = (
       combinedScore = semScore * semWeight;
     }
 
+    const noteModality =
+      modalityScores?.get(note.id) ??
+      (note.thumbnailUrl || note.attachments?.some((a) => a.type?.startsWith('image/'))
+        ? 'image'
+        : note.attachments?.some((a) => a.type?.startsWith('audio/'))
+          ? 'audio'
+          : 'text');
+
     results.push({
       note,
       score: combinedScore,
       matchType,
       similarity: semScore > 0 ? semScore : undefined,
+      modality: noteModality,
     });
   }
 
@@ -174,6 +185,11 @@ export const searchNotesHybrid = async (
       note,
       score: 1.0,
       matchType: 'exact' as const,
+      modality: (note.thumbnailUrl || note.attachments?.some((a) => a.type?.startsWith('image/'))
+        ? 'image'
+        : note.attachments?.some((a) => a.type?.startsWith('audio/'))
+          ? 'audio'
+          : 'text') as 'text' | 'image' | 'audio' | 'unified',
     }));
     return options?.topK && options.topK > 0 ? all.slice(0, options.topK) : all;
   }
@@ -182,6 +198,7 @@ export const searchNotesHybrid = async (
   const minSemanticScore = options?.minSemanticScore ?? 0.28;
 
   const semanticScores = new Map<string, number>();
+  const modalityScores = new Map<string, 'text' | 'image' | 'audio' | 'unified'>();
   try {
     const queryVector = await embeddingService.embedQuery(trimmed);
     if (queryVector && queryVector.length > 0 && queryVector.some((v) => v !== 0)) {
@@ -191,6 +208,9 @@ export const searchNotesHybrid = async (
         const sim = vectorStore.cosineSimilarity(queryVector, record.vector);
         if (sim >= minSemanticScore) {
           semanticScores.set(record.noteId, sim);
+          if (record.modality) {
+            modalityScores.set(record.noteId, record.modality);
+          }
         }
       }
     }
@@ -198,5 +218,5 @@ export const searchNotesHybrid = async (
     // Graceful fallback to pure keyword scoring
   }
 
-  return blendScores(notes, keywordScores, semanticScores, options);
+  return blendScores(notes, keywordScores, semanticScores, options, modalityScores);
 };

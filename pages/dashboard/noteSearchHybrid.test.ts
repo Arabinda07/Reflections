@@ -10,7 +10,7 @@ const note = (over: Partial<Note>): Note => ({
   content: over.content || '',
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
-  tags: over.tags,
+  ...over,
 });
 
 const notes: Note[] = [
@@ -137,6 +137,28 @@ describe('searchNotesHybrid', () => {
     const note1 = results.find((r) => r.note.id === '1');
     expect(note1).toBeDefined();
     expect(note1?.similarity).toBeCloseTo(0.95);
+  });
+
+  it('correctly attributes modality in hybrid search results', async () => {
+    const audioNote = note({
+      id: 'audio-note',
+      title: 'Voice reflection',
+      content: 'Thinking out loud',
+      attachments: [{ id: 'att-1', name: 'memo.webm', path: 'notes/memo.webm', size: 1000, type: 'audio/webm' }],
+    });
+    const photoNote = note({
+      id: 'photo-note',
+      title: 'Photo memory',
+      content: 'Snapshot of sunset',
+      thumbnailUrl: 'https://example.com/sunset.jpg',
+    });
+
+    const results = await searchNotesHybrid([audioNote, photoNote], '');
+    const audioRes = results.find((r) => r.note.id === 'audio-note');
+    const photoRes = results.find((r) => r.note.id === 'photo-note');
+
+    expect(audioRes?.modality).toBe('audio');
+    expect(photoRes?.modality).toBe('image');
   });
 });
 

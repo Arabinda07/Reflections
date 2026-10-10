@@ -42,6 +42,8 @@ export interface StoredNoteVector {
   dimension: number;
   updatedAtHash: string;
   createdAt: string;
+  modality?: 'text' | 'image' | 'audio' | 'unified';
+  attachmentId?: string;
 }
 
 // --- Service Status ---

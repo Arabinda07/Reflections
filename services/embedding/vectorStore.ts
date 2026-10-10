@@ -55,6 +55,8 @@ const deserializeVector = (raw: Record<string, unknown>): StoredNoteVector => {
     dimension: (raw.dimension as number) || vector.length,
     updatedAtHash: raw.updatedAtHash as string,
     createdAt: raw.createdAt as string,
+    modality: raw.modality as StoredNoteVector['modality'],
+    attachmentId: raw.attachmentId as string | undefined,
   };
 };
 
@@ -156,8 +158,8 @@ export const vectorStore = {
     queryVector: Float32Array,
     topK: number = 10,
     minScore: number = 0.3,
-    options?: { model?: SupportedEmbeddingModel; dimension?: number },
-  ): Promise<Array<{ noteId: string; score: number }>> {
+    options?: { model?: SupportedEmbeddingModel; dimension?: number; modality?: StoredNoteVector['modality'] },
+  ): Promise<Array<{ noteId: string; score: number; modality?: StoredNoteVector['modality'] }>> {
     const all = await vectorStore.getAll();
     const targetDim = options?.dimension ?? queryVector.length;
 
@@ -165,11 +167,13 @@ export const vectorStore = {
       .filter((record) => {
         if (record.dimension !== targetDim) return false;
         if (options?.model && record.model !== options.model) return false;
+        if (options?.modality && record.modality !== options.modality) return false;
         return true;
       })
       .map((record) => ({
         noteId: record.noteId,
         score: vectorStore.cosineSimilarity(queryVector, record.vector),
+        modality: record.modality,
       }))
       .filter((r) => r.score >= minScore && !Number.isNaN(r.score));
 

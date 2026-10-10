@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { CircleNotch } from '@phosphor-icons/react/CircleNotch';
 import { MagnifyingGlass } from '@phosphor-icons/react/MagnifyingGlass';
 import { Sparkle } from '@phosphor-icons/react/Sparkle';
+import { Microphone } from '@phosphor-icons/react/Microphone';
+import { Image } from '@phosphor-icons/react/Image';
 import { ModalSheet } from './ModalSheet';
 import { EmptyState } from './EmptyState';
 import { noteService } from '../../services/noteService';
@@ -205,6 +207,18 @@ export const NoteSearchPalette: React.FC<NoteSearchPaletteProps> = ({ isOpen, on
                           <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-green/10 px-2 py-0.5 text-ui-xs font-bold text-green">
                             <Sparkle size={12} weight="fill" />
                             Resonance
+                          </span>
+                        )}
+                        {item.modality === 'audio' && (
+                          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-gray-nav/10 px-2 py-0.5 text-ui-xs font-bold text-gray-text">
+                            <Microphone size={12} weight="fill" />
+                            Voice
+                          </span>
+                        )}
+                        {item.modality === 'image' && (
+                          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-gray-nav/10 px-2 py-0.5 text-ui-xs font-bold text-gray-text">
+                            <Image size={12} weight="fill" />
+                            Photo
                           </span>
                         )}
                       </span>

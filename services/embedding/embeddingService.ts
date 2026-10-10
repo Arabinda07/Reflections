@@ -16,6 +16,8 @@ import type {
 import { formatDocumentText, formatQueryText } from './asymmetricPrefixes';
 import { vectorStore } from './vectorStore';
 import { tierManager } from './tierManager';
+import { nativeLiteRTEmbedding } from './mobile/nativeLiteRTEmbedding';
+import { multimodalEmbedder } from './multimodal/multimodalEmbedder';
 
 type PendingRequest = {
   resolve: (value: unknown) => void;
@@ -178,13 +180,37 @@ export const embeddingService = {
       return new Float32Array(activeDim);
     }
 
-    const response = await sendRequest<{
-      type: 'EMBED_DOCUMENT_DONE';
-      noteId: string;
-      vector: number[];
-    }>({ type: 'EMBED_DOCUMENT', text, noteId: note.id });
+    let vector: Float32Array;
 
-    const vector = new Float32Array(response.vector);
+    // On native mobile with Tier 2, attempt native LiteRT execution first to prevent WebView RAM spikes
+    if (nativeLiteRTEmbedding.isSupported() && activeTier === 'tier2-gemma') {
+      const nativeVec = await nativeLiteRTEmbedding.embedText(text, activeDim);
+      if (nativeVec) {
+        vector = nativeVec;
+      } else {
+        const response = await sendRequest<{
+          type: 'EMBED_DOCUMENT_DONE';
+          noteId: string;
+          vector: number[];
+        }>({ type: 'EMBED_DOCUMENT', text, noteId: note.id });
+        vector = new Float32Array(response.vector);
+      }
+    } else {
+      const response = await sendRequest<{
+        type: 'EMBED_DOCUMENT_DONE';
+        noteId: string;
+        vector: number[];
+      }>({ type: 'EMBED_DOCUMENT', text, noteId: note.id });
+      vector = new Float32Array(response.vector);
+    }
+
+    // Blend multimodal features if note has photos or voice recordings
+    const mediaVector = multimodalEmbedder.embedMedia(note, activeDim);
+    if (mediaVector) {
+      vector = multimodalEmbedder.blendTextAndMedia(vector, mediaVector);
+    }
+
+    const modality = multimodalEmbedder.detectModality(note);
 
     const record: StoredNoteVector = {
       noteId: note.id,
@@ -193,6 +219,7 @@ export const embeddingService = {
       dimension: activeDim,
       updatedAtHash: hash,
       createdAt: new Date().toISOString(),
+      modality,
     };
     await vectorStore.put(record);
 
@@ -206,6 +233,13 @@ export const embeddingService = {
     const activeDim = tierManager.getTierDimension(activeTier);
     const text = formatQueryText(query);
     if (!text) return new Float32Array(activeDim);
+
+    if (nativeLiteRTEmbedding.isSupported() && activeTier === 'tier2-gemma') {
+      const nativeVec = await nativeLiteRTEmbedding.embedText(text, activeDim);
+      if (nativeVec) {
+        return nativeVec;
+      }
+    }
 
     const response = await sendRequest<{
       type: 'EMBED_QUERY_DONE';
