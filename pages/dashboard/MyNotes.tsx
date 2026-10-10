@@ -335,7 +335,9 @@ export const MyNotes: React.FC = () => {
 
               <div className="pointer-events-none absolute right-4 top-4 z-20 flex flex-wrap justify-end gap-2">
                 <MetadataPill icon={<CalendarIcon size={12} weight="regular" />}>
-                  {new Date(note.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                  <span className="tabular-nums">
+                    {new Date(note.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                  </span>
                 </MetadataPill>
                 {note.mood ? (
                   <MetadataPill icon={getMoodIcon(note.mood)} className={moodConfig?.nav || ''}>

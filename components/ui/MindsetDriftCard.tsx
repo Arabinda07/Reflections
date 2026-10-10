@@ -38,7 +38,7 @@ export const MindsetDriftCard: React.FC<MindsetDriftCardProps> = ({ report }) =>
       {hasSufficientData ? (
         <div className="space-y-3 pt-2">
           {/* Proportional Family Balance Bar */}
-          <div className="h-2.5 w-full overflow-hidden rounded-full bg-surface-muted flex">
+          <div className="h-2.5 w-full overflow-clip rounded-full bg-surface-muted flex">
             {currentFamilyProportions.light > 0 ? (
               <div
                 style={{ width: `${currentFamilyProportions.light}%` }}

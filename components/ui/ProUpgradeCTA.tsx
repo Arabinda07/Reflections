@@ -183,7 +183,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
               </p>
             </div>
             
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3 grid-subgrid-parent-3">
               {PRO_PRICING_PLAN_LIST.map((plan) => (
                 <button
                   key={plan.code}
@@ -194,7 +194,7 @@ export const ProUpgradeCTA: React.FC<ProUpgradeCTAProps> = ({ onSuccess, classNa
                   }`}
                 >
                   <span className={`label-caps ${selectedPlan === plan.code ? 'text-honey' : 'text-gray-nav'}`}>{plan.shortName}</span>
-                  <span className="mt-2 text-xl font-serif italic text-gray-text sm:text-2xl">
+                  <span className="mt-2 text-xl font-serif italic text-gray-text sm:text-2xl tabular-nums">
                     {plan.displayPrice}
                     <span className="text-sm not-italic text-gray-light">/{plan.intervalLabel}</span>
                   </span>

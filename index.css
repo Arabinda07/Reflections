@@ -128,6 +128,8 @@
   /* Radius Tokens */
   --radius-panel: var(--radius-panel);
   --radius-control: var(--radius-control);
+  --radius-concentric-panel: var(--radius-concentric-panel);
+  --radius-concentric-control: var(--radius-concentric-control);
 
   /* Mood Tokens */
   --color-mood-happy: var(--color-mood-happy);
@@ -250,6 +252,8 @@
 }
 
 :root {
+  interpolate-size: allow-keywords;
+
   /* App Shell – single source of truth for header height */
   --header-height: 3.5rem;
   /* 56px – comfortable mobile app-bar */
@@ -523,6 +527,8 @@
   --radius-control: 1rem;
   --radius-panel: 1.5rem;
   --radius-shell: 2rem;
+  --radius-concentric-panel: max(0px, calc(var(--radius-panel) - var(--space-4)));
+  --radius-concentric-control: max(0px, calc(var(--radius-control) - var(--space-2)));
 
   /* Natural Physics: Out-Quart (Exponential) Easing */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -677,6 +683,14 @@
 
 html {
   scrollbar-gutter: stable;
+  scroll-padding-block-start: calc(var(--header-height) + 1.25rem);
+  overscroll-behavior-y: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 .custom-scrollbar {
@@ -869,6 +883,37 @@ details:focus-visible,
   }
 }
 
+:where(input, select, textarea):user-invalid {
+  border-color: var(--clay);
+}
+
+:where(input, select, textarea):user-invalid:focus-visible {
+  outline-color: var(--clay);
+  box-shadow: 0 0 0 4px oklch(from var(--clay) l c h / 0.12);
+}
+
+.textarea-auto-grow {
+  field-sizing: content;
+  min-block-size: 5rem;
+  resize: vertical;
+}
+
+.hit-target-expanded {
+  position: relative;
+}
+
+.hit-target-expanded::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
 @supports (color: contrast-color(white)) {
   .tag-filter-count {
     --auto-contrast-ink: contrast-color(var(--surface-current-soft-bg));
@@ -880,6 +925,116 @@ details:focus-visible,
   .surface-bezel-inner.modal-sheet-panel,
   .control-surface {
     corner-shape: squircle;
+  }
+}
+
+.radius-concentric {
+  border-radius: var(--radius-concentric-panel);
+}
+
+.radius-concentric-control {
+  border-radius: var(--radius-concentric-control);
+}
+
+.surface-lift-fade {
+  position: relative;
+}
+
+.surface-lift-fade::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: var(--shadow-floating);
+  opacity: 0;
+  transition: opacity 280ms var(--ease-out-expo);
+  pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .surface-lift-fade:hover::after {
+    opacity: 1;
+  }
+}
+
+@supports (text-box: trim-both cap alphabetic) {
+  .btn-primary,
+  .btn-secondary,
+  .btn-outline,
+  .btn-ghost,
+  .metadata-pill,
+  .chip {
+    text-box: trim-both cap alphabetic;
+  }
+}
+
+.grid-subgrid-3 {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+@supports (grid-template-rows: subgrid) {
+  .grid-subgrid-parent-3 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: auto auto auto;
+  }
+
+  .grid-subgrid-parent-3 > * {
+    grid-row: span 3;
+    display: grid;
+    grid-template-rows: subgrid;
+  }
+}
+
+details::details-content {
+  height: 0;
+  overflow: clip;
+}
+
+details[open]::details-content {
+  height: auto;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  details::details-content {
+    transition:
+      height 300ms var(--ease-out-expo),
+      content-visibility 300ms allow-discrete;
+  }
+}
+
+.safe-center {
+  display: flex;
+  justify-content: safe center;
+  align-items: safe center;
+}
+
+.scroll-contained {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+dialog,
+[popover] {
+  opacity: 0;
+  transition:
+    opacity 240ms var(--ease-out-expo),
+    transform 240ms var(--ease-out-expo),
+    display 240ms allow-discrete,
+    overlay 240ms allow-discrete;
+}
+
+dialog[open],
+[popover]:popover-open {
+  opacity: 1;
+}
+
+@starting-style {
+  dialog[open],
+  [popover]:popover-open {
+    opacity: 0;
   }
 }
 
@@ -2625,9 +2780,11 @@ details:focus-visible,
       transform 220ms ease;
   }
 
-  .surface-floating:hover {
-    background: var(--surface-current-bg);
-    border-color: oklch(from var(--surface-current-accent) l c h / 0.24);
+  @media (hover: hover) and (pointer: fine) {
+    .surface-floating:hover {
+      background: var(--surface-current-bg);
+      border-color: oklch(from var(--surface-current-accent) l c h / 0.24);
+    }
   }
 
   .surface-floating--strong {
@@ -2641,10 +2798,23 @@ details:focus-visible,
     color: var(--floating-panel-media-text);
   }
 
-  .surface-floating--media:hover {
-    background: var(--floating-panel-media-bg-hover);
-    border-color: var(--floating-panel-media-border);
-    color: var(--floating-panel-media-text);
+  @media (hover: hover) and (pointer: fine) {
+    .surface-floating--media:hover {
+      background: var(--floating-panel-media-bg-hover);
+      border-color: var(--floating-panel-media-border);
+      color: var(--floating-panel-media-text);
+    }
+  }
+
+  @media (hover: none), (pointer: coarse) {
+    button:hover,
+    a:hover,
+    .btn-primary:hover,
+    .btn-secondary:hover,
+    .btn-outline:hover,
+    .btn-ghost:hover {
+      transform: none;
+    }
   }
 
   .public-contact-link {
@@ -3029,6 +3199,7 @@ details:focus-visible,
     font-size: 0.72rem;
     font-weight: 800;
     line-height: 1;
+    font-variant-numeric: tabular-nums;
     box-shadow: 0 10px 24px -22px oklch(from var(--bg-color) 0.2 0.01 h / 0.22);
   }
 

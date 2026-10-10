@@ -397,13 +397,13 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, autoOpenCat
                 <input name="name" value={context.name} required autoComplete="name" onChange={(event) => setContext((current) => ({ ...current, name: event.target.value }))} className={fieldClass} />
               </label>
               <label className="block text-sm font-bold text-gray-nav">How you know them
-                <textarea name="howWeMet" value={context.howWeMet} onChange={(event) => setContext((current) => ({ ...current, howWeMet: event.target.value }))} placeholder="Add a note about how you know them." className={`${fieldClass} min-h-20 font-medium`} />
+                <textarea name="howWeMet" value={context.howWeMet} onChange={(event) => setContext((current) => ({ ...current, howWeMet: event.target.value }))} placeholder="Add a note about how you know them." className={`${fieldClass} min-h-20 font-medium textarea-auto-grow`} />
               </label>
               <label className="block text-sm font-bold text-gray-nav">What they care about
-                <textarea name="caresAbout" value={context.caresAbout} onChange={(event) => setContext((current) => ({ ...current, caresAbout: event.target.value }))} placeholder="Add what matters to them." className={`${fieldClass} min-h-20 font-medium`} />
+                <textarea name="caresAbout" value={context.caresAbout} onChange={(event) => setContext((current) => ({ ...current, caresAbout: event.target.value }))} placeholder="Add what matters to them." className={`${fieldClass} min-h-20 font-medium textarea-auto-grow`} />
               </label>
               <label className="block text-sm font-bold text-gray-nav">Healthy boundaries
-                <textarea name="boundaries" value={context.boundaries} onChange={(event) => setContext((current) => ({ ...current, boundaries: event.target.value }))} placeholder="What boundary keeps this relationship healthy or protects your peace?" className={`${fieldClass} min-h-20 font-medium`} />
+                <textarea name="boundaries" value={context.boundaries} onChange={(event) => setContext((current) => ({ ...current, boundaries: event.target.value }))} placeholder="What boundary keeps this relationship healthy or protects your peace?" className={`${fieldClass} min-h-20 font-medium textarea-auto-grow`} />
               </label>
               <div className="flex gap-2">
                 <Button type="submit" variant="secondary" isLoading={isSavingFacts}>Save</Button>
@@ -484,7 +484,7 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, autoOpenCat
                       value={catchUpNote}
                       onChange={(event) => setCatchUpNote(event.target.value)}
                       placeholder="Coffee, a call, a quick message…"
-                      className={`${fieldClass} min-h-20 font-medium`}
+                      className={`${fieldClass} min-h-20 font-medium textarea-auto-grow`}
                     />
                   </label>
                   <div className="flex gap-2">

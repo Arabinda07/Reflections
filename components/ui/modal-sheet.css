@@ -189,6 +189,8 @@
 
   .modal-sheet-body {
     overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
     padding: 1.25rem;
   }
 

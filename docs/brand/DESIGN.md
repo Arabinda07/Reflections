@@ -117,11 +117,21 @@ Depth is achieved through **Tonal Layering** and **Glassmorphism** rather than t
 - **Floating Panels**: Utilize a combination of background blur (14px - 20px), subtle borders, and semi-transparent surface colors.
 - **Scrims**: Cinematic video backgrounds are softened with subtle gradients (scrims) to ensure text remains the primary focus.
 
+## Viewport & Scroll Ergonomics
+
+Reflections treats the viewport as a calm, stable canvas:
+
+- **Scroll Containment**: Modal bodies and floating drawers enforce `overscroll-behavior: contain` and `scrollbar-gutter: stable`. Scrolling through long reflections or filters never chains into background page scrolling, and content does not shift when scrollbars appear.
+- **Sticky Header Clearance**: Anchor targets and in-page hash links land with mathematical breathing room below the sticky app bar using `scroll-padding-block-start: calc(var(--header-height) + 1.25rem)`.
+- **Native Disclosure Animations**: Disclosures (`<details>`) animate height smoothly between `0` and `auto` via `interpolate-size: allow-keywords` and `details::details-content` without JavaScript layout measurement.
+- **Desktop Bounce Elimination**: `overscroll-behavior-y: none` on `html` prevents macOS trackpads from dragging fixed navigation off-screen.
+
 ## Shapes
 
 The shape language is defined by **Bespoke Craftsmanship**.
 
 - **Radii**: We avoid generic small corners. Large, structured radii (`24px` to `32px`) are used for main containers and shells to evoke the feeling of a physical object or high-end device.
+- **Concentric Nested Radii Formula**: Nested child elements (controls, images, badges, inner surfaces) must calculate their radius relative to the enclosing parent: `inner-radius = max(0px, outer-radius - padding)` (or `border-radius: max(0px, calc(var(--radius-outer) - var(--padding)))`). This eliminates jarring curvature mismatches where nested elements feel either too sharp or excessively rounded against the parent card curve.
 - **Interactive Elements**: Buttons and controls use a refined `16px` radius.
 
 ## Components

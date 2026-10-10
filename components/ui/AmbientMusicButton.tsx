@@ -260,7 +260,7 @@ export const AmbientMusicButton: React.FC = () => {
           onClick={handleButtonClick}
           whileTap={{ scale: 0.86 }}
           aria-label={isPlaying ? `Stop ${activeTrack?.label}` : 'Ambient sounds'}
-          className="audio-floating-button"
+          className="audio-floating-button hit-target-expanded"
           style={
             {
               '--audio-button-bg': isPlaying

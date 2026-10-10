@@ -15,7 +15,7 @@ export const InlineLoadingBadge: React.FC<InlineLoadingBadgeProps> = ({
     <span
       className={`metadata-pill metadata-pill--sage ${className}`.trim()}
     >
-      <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center overflow-hidden rounded-full bg-green/8">
+      <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center overflow-clip rounded-full bg-green/8">
         <Lottie animationData={loadingAnimation as unknown} autoplay loop />
       </span>
       <span className="leading-none">{label}</span>

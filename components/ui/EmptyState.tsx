@@ -54,7 +54,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   }
 
   return (
-    <Surface variant={surface} tone={tone} className="overflow-hidden">
+    <Surface variant={surface} tone={tone} className="overflow-clip">
       <EmptyStateBody {...props} />
     </Surface>
   );

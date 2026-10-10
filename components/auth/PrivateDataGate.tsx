@@ -162,7 +162,7 @@ const MigrationPanel: React.FC = () => {
     >
       <div className="space-y-4">
         <div
-          className="h-2 w-full overflow-hidden rounded-full bg-surface-muted"
+          className="h-2 w-full overflow-clip rounded-full bg-surface-muted"
           role="progressbar"
           aria-valuemin={0}
           aria-valuemax={hasKnownTotal ? total : undefined}

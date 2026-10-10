@@ -82,7 +82,7 @@ export const ReleaseMode: React.FC = () => {
             disabled={step !== 'idle'}
             autoFocus
             placeholder="Write what you are ready to put down."
-            className="input-surface w-full resize-none p-5 font-serif text-xl leading-relaxed text-gray-text min-h-[34dvh] sm:min-h-[42dvh] sm:p-8 sm:text-2xl"
+            className="input-surface w-full resize-none p-5 font-serif text-xl leading-relaxed text-gray-text min-h-[34dvh] sm:min-h-[42dvh] sm:p-8 sm:text-2xl textarea-auto-grow"
           />
 
           {error ? (
