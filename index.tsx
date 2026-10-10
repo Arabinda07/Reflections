@@ -29,7 +29,8 @@ const reloadWithCacheBust = () => {
   window.location.replace(currentUrl.toString());
 };
 
-window.addEventListener('vite:preloadError', () => {
+window.addEventListener('vite:preloadError', (event) => {
+  event.preventDefault();
   console.warn("Vite preload error detected. Attempting to recover from stale app shell...");
   void recoverFromStaleAppShell("vite:preloadError");
 });

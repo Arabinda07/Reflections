@@ -87,6 +87,9 @@ const withModeGuard = (
 
 const RootLayout = () => {
   usePageTracking();
+  React.useEffect(() => {
+    sessionStorage.removeItem('route_chunk_recovered');
+  }, []);
   return (
     <>
       <ScrollRestoration />

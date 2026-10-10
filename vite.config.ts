@@ -125,7 +125,7 @@ export default defineConfig({
             runtimeCaching: [
               {
                 urlPattern: /\/assets\/.*\.(js|css)$/i,
-                handler: 'CacheFirst',
+                handler: 'StaleWhileRevalidate',
                 options: {
                   cacheName: 'app-route-chunks',
                   expiration: {

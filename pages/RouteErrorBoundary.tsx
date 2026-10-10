@@ -101,7 +101,12 @@ export const RouteErrorBoundary: React.FC = () => {
   // Recovery failed a second time — let the user manually reload.
   const onReload = () => {
     sessionStorage.removeItem(ROUTE_CHUNK_RECOVERY_KEY);
-    reloadWithCacheBust();
+    void clearBrowserManagedAppCaches().finally(() => reloadWithCacheBust());
+  };
+
+  const onReturnHome = () => {
+    sessionStorage.removeItem(ROUTE_CHUNK_RECOVERY_KEY);
+    navigate(homePath);
   };
 
   return (
@@ -138,7 +143,7 @@ export const RouteErrorBoundary: React.FC = () => {
             type="button"
             size="lg"
             variant="secondary"
-            onClick={() => navigate(homePath)}
+            onClick={onReturnHome}
             className="w-full sm:w-auto"
           >
             Return home
