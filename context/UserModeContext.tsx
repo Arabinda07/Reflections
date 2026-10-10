@@ -62,8 +62,8 @@ export const UserModeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
 
     // A missing user_mode column value (never onboarded) safely defaults to
-    // reflective; only genuine fetch failures / missing rows are errors above.
-    const mode = (data.user_mode as UserMode) ?? 'reflective';
+    // encrypted under ADR 0004; only genuine fetch failures / missing rows are errors above.
+    const mode = (data.user_mode as UserMode) ?? 'encrypted';
     setUserMode(mode);
     setCurrentUserMode(mode);
     setIsUserModeLoading(false);

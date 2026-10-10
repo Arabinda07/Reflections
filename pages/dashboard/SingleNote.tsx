@@ -21,6 +21,7 @@ import { Button } from '../../components/ui/Button';
 import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
 import { Input } from '../../components/ui/Input';
 import { Alert } from '../../components/ui/Alert';
+import { Echoes } from '../../components/ui/Echoes';
 import { MetadataPill } from '../../components/ui/MetadataPill';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { Tooltip } from '../../components/ui/Tooltip';
@@ -546,6 +547,14 @@ export const SingleNote: React.FC = () => {
                     </ul>
                   </section>
                 ) : null}
+
+                {/* Memory Echoes */}
+                <Echoes
+                  currentNoteId={note.id}
+                  currentNoteTitle={note.title}
+                  currentNoteContent={note.content}
+                  currentMood={note.mood}
+                />
           </article>
       </PageContainer>
 
@@ -714,6 +723,7 @@ export const SingleNote: React.FC = () => {
       >
         <MoodPicker
           selectedMood={note.mood}
+          draftText={note.content}
           onStageChange={setMoodPickerStage}
           onSelect={async (nextMood) => {
             await persistNote({ mood: nextMood });

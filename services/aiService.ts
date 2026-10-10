@@ -8,6 +8,8 @@ import { WIKI_PAGE_CONFIGS } from './aiPromptSpecs';
 import { buildWikiRetryInstruction, validateWikiPageOutput } from './aiOutputValidation';
 import { getStrictPrivateModeDisabledMessage, isPrivateAiDisabled } from './privateMode';
 import { getCurrentUserMode } from './userModeStore';
+import { triageNoteTheme } from './themeTriage';
+import { wikiRagService } from './wikiRagService';
 
 export type WikiRefreshSource = 'themes' | 'notes' | 'none';
 
@@ -80,12 +82,22 @@ const generateValidatedWikiPage = async (
   throw new Error(retryValidation.reason);
 };
 
-const refreshStructuredWikiPages = async (corpus: NotesCorpus): Promise<number> => {
+const refreshStructuredWikiPages = async (
+  corpus: NotesCorpus,
+  sourceNotes?: Note[],
+): Promise<number> => {
   let pageCount = 0;
 
   for (const config of WIKI_PAGE_CONFIGS) {
     try {
-      const content = await generateValidatedWikiPage(config, corpus);
+      let pageCorpus = corpus;
+      if (sourceNotes && sourceNotes.length > 0) {
+        const ragResult = await wikiRagService.buildChapterRagCorpus(config.pageType, sourceNotes, 10);
+        if (ragResult.corpus.text.trim()) {
+          pageCorpus = ragResult.corpus;
+        }
+      }
+      const content = await generateValidatedWikiPage(config, pageCorpus);
       await wikiService.upsertWikiPage(config.pageType, config.title, content);
       pageCount += 1;
     } catch (error) {
@@ -116,18 +128,7 @@ export const aiService = {
     const userThemes = await wikiService.getUserThemes();
 
     try {
-      const decision = await aiClient.requestJson<{
-        action: 'append' | 'create' | 'skip';
-        themeId: string | null;
-        newThemeTitle: string | null;
-        reasoning: string;
-      }>('ingestDecision', {
-        note: newNote,
-        themes: userThemes.map((theme) => ({
-          id: theme.id,
-          title: theme.title,
-        })),
-      });
+      const decision = await triageNoteTheme(newNote, userThemes);
 
       if (decision.action === 'skip') return;
 
@@ -216,7 +217,7 @@ export const aiService = {
       };
     }
 
-    const pageCount = await refreshStructuredWikiPages(notesCorpus);
+    const pageCount = await refreshStructuredWikiPages(notesCorpus, notes);
     return {
       pageCount,
       source: pageCount > 0 ? 'notes' : 'none',
@@ -266,7 +267,9 @@ export const aiService = {
       processedNotes = [...processedNotes, ...batch];
 
       const notesCorpus = buildNotesCorpus(processedNotes);
-      pageCount = notesCorpus.text.trim() ? await refreshStructuredWikiPages(notesCorpus) : 0;
+      pageCount = notesCorpus.text.trim()
+        ? await refreshStructuredWikiPages(notesCorpus, processedNotes)
+        : 0;
 
       if (pageCount > 0) {
         await absorbLogService.logAbsorptions(batch);

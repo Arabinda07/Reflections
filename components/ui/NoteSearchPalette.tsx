@@ -1,13 +1,18 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { CircleNotch } from '@phosphor-icons/react/CircleNotch';
 import { MagnifyingGlass } from '@phosphor-icons/react/MagnifyingGlass';
+import { Sparkle } from '@phosphor-icons/react/Sparkle';
 import { ModalSheet } from './ModalSheet';
 import { EmptyState } from './EmptyState';
 import { noteService } from '../../services/noteService';
 import { useViewTransitionNavigation } from '../../hooks/useViewTransitionNavigation';
 import { type Note, RoutePath } from '../../types';
 import { buildNotePreviewText } from '../../pages/dashboard/noteContent';
-import { searchNotes } from '../../pages/dashboard/noteSearch';
+import {
+  searchNotes,
+  searchNotesHybrid,
+  type ScoredNoteSearchResult,
+} from '../../pages/dashboard/noteSearch';
 
 interface NoteSearchPaletteProps {
   isOpen: boolean;
@@ -23,6 +28,7 @@ export const NoteSearchPalette: React.FC<NoteSearchPaletteProps> = ({ isOpen, on
   const navigate = useViewTransitionNavigation();
   const [notes, setNotes] = useState<Note[] | null>(null);
   const [query, setQuery] = useState('');
+  const [results, setResults] = useState<ScoredNoteSearchResult[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const listRef = useRef<HTMLUListElement>(null);
 
@@ -33,6 +39,7 @@ export const NoteSearchPalette: React.FC<NoteSearchPaletteProps> = ({ isOpen, on
     let cancelled = false;
     setNotes(null);
     setQuery('');
+    setResults([]);
     setActiveIndex(0);
 
     noteService
@@ -49,10 +56,55 @@ export const NoteSearchPalette: React.FC<NoteSearchPaletteProps> = ({ isOpen, on
     };
   }, [isOpen]);
 
-  const results = useMemo(
-    () => (notes ? searchNotes(notes, query).slice(0, MAX_RESULTS) : []),
-    [notes, query],
-  );
+  // Two-phase progressive search UX:
+  // Phase 1: Instant synchronous keyword match on keystroke (0ms)
+  // Phase 2: Debounced asynchronous hybrid search enriching with semantic scoring
+  useEffect(() => {
+    if (!notes) {
+      setResults([]);
+      return;
+    }
+
+    const trimmed = query.trim();
+    if (!trimmed) {
+      setResults(
+        notes.slice(0, MAX_RESULTS).map((note) => ({
+          note,
+          score: 1.0,
+          matchType: 'exact' as const,
+        })),
+      );
+      return;
+    }
+
+    // Phase 1: Instant synchronous keyword match (0ms)
+    const initialKeywordMatches = searchNotes(notes, trimmed).slice(0, MAX_RESULTS);
+    setResults(
+      initialKeywordMatches.map((note) => ({
+        note,
+        score: 1.0,
+        matchType: 'keyword' as const,
+      })),
+    );
+
+    // Phase 2: Debounced asynchronous hybrid re-ranking
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      try {
+        const hybridResults = await searchNotesHybrid(notes, trimmed, { topK: MAX_RESULTS });
+        if (!cancelled) {
+          setResults(hybridResults);
+        }
+      } catch {
+        // Retain Phase 1 keyword matches on fallback
+      }
+    }, 150);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [notes, query]);
 
   useEffect(() => {
     setActiveIndex(0);
@@ -78,8 +130,8 @@ export const NoteSearchPalette: React.FC<NoteSearchPaletteProps> = ({ isOpen, on
       setActiveIndex((index) => Math.max(index - 1, 0));
     } else if (event.key === 'Enter') {
       event.preventDefault();
-      const note = results[activeIndex];
-      if (note) openNote(note);
+      const item = results[activeIndex];
+      if (item) openNote(item.note);
     }
   };
 
@@ -131,7 +183,8 @@ export const NoteSearchPalette: React.FC<NoteSearchPaletteProps> = ({ isOpen, on
           />
         ) : (
           <ul ref={listRef} id="note-search-results" role="listbox" className="max-h-[52vh] space-y-1 overflow-y-auto">
-            {results.map((note, index) => {
+            {results.map((item, index) => {
+              const { note, matchType } = item;
               const isActive = index === activeIndex;
               return (
                 <li key={note.id} data-index={index}>
@@ -146,7 +199,15 @@ export const NoteSearchPalette: React.FC<NoteSearchPaletteProps> = ({ isOpen, on
                     }`}
                   >
                     <span className="flex items-baseline justify-between gap-3">
-                      <span className="truncate text-ui-base font-extrabold">{note.title || 'Untitled reflection'}</span>
+                      <span className="flex min-w-0 items-center gap-2">
+                        <span className="truncate text-ui-base font-extrabold">{note.title || 'Untitled reflection'}</span>
+                        {matchType === 'semantic' && (
+                          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-green/10 px-2 py-0.5 text-ui-xs font-bold text-green">
+                            <Sparkle size={12} weight="fill" />
+                            Resonance
+                          </span>
+                        )}
+                      </span>
                       <span className="shrink-0 text-ui-xs font-black uppercase tracking-widest text-gray-nav">
                         {formatNoteDate(note.createdAt)}
                       </span>

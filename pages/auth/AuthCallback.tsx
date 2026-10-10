@@ -9,7 +9,6 @@ import {
 } from '../../src/auth/googleOAuth';
 import { resolveSafeCallbackNextPath } from '../../src/auth/authRedirectConfig';
 import { commitAuthSession } from '../../src/auth/sessionUser';
-import { isOnboardingIncomplete } from '../../src/auth/onboardingStatus';
 
 type AuthCallbackFeedback = {
   successMessage?: string;
@@ -27,25 +26,7 @@ const navigateWithFeedback = (
   navigate(path, { replace: true, state: feedback });
 };
 
-/**
- * Check if a user has completed onboarding; if not, redirect to mode-select.
- * Returns true if a redirect was triggered (caller should stop further navigation).
- *
- * Uses the shared fail-safe check: a missing profile row (replication lag right
- * after signup) or a transient read error is treated as "onboarding incomplete"
- * so the permanent mode choice is never skipped. The previous `.single()` here
- * errored on a missing row and let users fall through to the dashboard.
- */
-const redirectIfOnboardingIncomplete = async (
-  userId: string,
-  navigate: ReturnType<typeof useNavigate>,
-): Promise<boolean> => {
-  if (await isOnboardingIncomplete(userId)) {
-    navigate(RoutePath.ONBOARDING_MODE_SELECT, { replace: true });
-    return true;
-  }
-  return false;
-};
+// Under ADR 0004, mode-select onboarding is retired; all users navigate directly to their destination.
 
 /**
  * Handles the Supabase OAuth PKCE callback for web.
@@ -86,8 +67,6 @@ export const AuthCallback: React.FC = () => {
         if (session) {
           commitAuthSession(session);
 
-          if (await redirectIfOnboardingIncomplete(session.user.id, navigate)) return;
-
           const redirectPath = safeNextPath || consumePendingGoogleAuthRedirectPath(sourcePath) || RoutePath.DASHBOARD;
           navigate(redirectPath, { replace: true });
         } else {
@@ -107,8 +86,6 @@ export const AuthCallback: React.FC = () => {
 
         if (session) {
           commitAuthSession(session);
-
-          if (await redirectIfOnboardingIncomplete(session.user.id, navigate)) return;
         }
 
         if (safeNextPath) {

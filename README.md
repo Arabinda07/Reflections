@@ -282,19 +282,15 @@ A manual refresh builds a notes corpus, asks Gemini to produce the structured wi
 
 The refresh result reports page count and source. If there's no usable note corpus, the result is `source: 'none'`.
 
-### Why use a compiled wiki instead of vector search?
+### How does on-device vector search interact with the compiled Life Wiki?
 
-The wiki approach keeps the user's history small and readable. Rather than storing embeddings for every note chunk and retrieving raw fragments on every request, Reflections compiles writing into a few text pages.
+Reflections pairs on-device local vector embeddings with a compiled Life Wiki:
 
-That means:
-
-- Lower storage pressure
-- Less repeated AI work
-- User-visible summaries
-- Easier citation and validation
-- A calmer mental model for the product
-
-Vector search may become useful later, but the current product bet is that compiled context is enough for the core experience.
+1. **On-Device Vector Store (`IndexedDB`)**: Notes are vectorized locally in a background Web Worker using `bge-small-en-v1.5` (quantized ONNX, ~33 MB). Vectors are stored client-side in an isolated IndexedDB (`reflections_ai_vectors`).
+2. **Hybrid Search**: The search palette renders instant keyword results on keystroke (0ms) and smoothly re-ranks with conceptual discovery from vector cosine similarity.
+3. **Echoes**: The note view displays past reflections resonating with the current note using cosine similarity.
+4. **Zero-Cloud Theme Triage**: Local distance calculations against theme centroids classify notes in <100ms at ₹0 compute cost without sending text over the network.
+5. **Compiled Life Wiki**: Synthesized multi-chapter essays remain compact, grounded, and human-readable, now powered by local-first retrieval.
 
 ### How are Life Wiki claims grounded?
 
@@ -333,7 +329,7 @@ The AI API validates a fixed set of actions:
 - `prompts`
 - `reflection`
 - `tags`
-- `ingestDecision`
+- `ingestDecision` (legacy fallback; now triaged locally offline via `services/themeTriage.ts`)
 - `ingestSynthesis`
 - `wikiPage`
 - `index`

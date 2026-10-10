@@ -32,7 +32,6 @@ import {
 import { commitAuthSession } from '@/src/auth/sessionUser';
 import { storePendingAccountPassword } from '@/src/auth/accountPasswordHandoff';
 import { getPasswordResetRedirectTo } from '@/src/auth/authRedirectConfig';
-import { isOnboardingIncomplete } from '@/src/auth/onboardingStatus';
 
 export const SignIn: React.FC = () => {
   useDocumentMeta({
@@ -53,16 +52,10 @@ export const SignIn: React.FC = () => {
   const postLoginPath = resolvePostAuthRedirectPath(location.state?.from);
   const homePath = getPublicHomePath();
 
-  // Route through the permanent-mode onboarding gate on every successful auth.
-  // A user who abandoned onboarding (closed the tab on ModeSelect) must not be
-  // able to sign in straight to the dashboard and be silently locked to the
-  // default reflective mode — send them back to ModeSelect first.
+  // Under ADR 0004, all users transition directly to their destination
+  // with unified encryption, bypassing the retired ModeSelect screen.
   const navigatePostAuth = useCallback(
-    async (userId: string, fallbackPath: string, fallbackState?: Record<string, unknown>) => {
-      if (await isOnboardingIncomplete(userId)) {
-        navigate(RoutePath.ONBOARDING_MODE_SELECT, { replace: true });
-        return;
-      }
+    async (_userId: string, fallbackPath: string, fallbackState?: Record<string, unknown>) => {
       navigate(fallbackPath, { replace: true, state: fallbackState });
     },
     [navigate],

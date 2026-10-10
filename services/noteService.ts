@@ -3,6 +3,8 @@ import { offlineStorage } from './offlineStorage';
 import { getAuthenticatedUserId } from './authUtils';
 import { noteRemoteStore } from './noteRemoteStore';
 import { syncEngine } from './syncEngine';
+import { embeddingService } from './embedding/embeddingService';
+import { vectorStore } from './embedding/vectorStore';
 
 // Re-export for callers that import mapping utilities from noteService
 export { mapToNote, type SupabaseNoteRow } from './noteRemoteStore';
@@ -32,11 +34,14 @@ export const noteService = {
         }
       }
 
+      void embeddingService.syncNotesVectors(notes).catch(() => {});
       return notes;
     } catch (err) {
       console.warn('Supabase fetch failed, falling back to local Dexie:', err);
       // 3. Fallback to local storage if offline
-      return offlineStorage.getAllNotes(userId);
+      const offlineNotes = await offlineStorage.getAllNotes(userId);
+      void embeddingService.syncNotesVectors(offlineNotes).catch(() => {});
+      return offlineNotes;
     }
   },
 
@@ -75,19 +80,25 @@ export const noteService = {
     };
 
     await syncEngine.enqueueInsert(userId, newNote);
+    void embeddingService.embedNote(newNote).catch(() => {});
     return newNote;
   },
 
   // Update an existing note
   update: async (id: string, updates: Partial<Note>): Promise<Note> => {
     const userId = await getAuthenticatedUserId();
-    return await syncEngine.enqueueUpdate(userId, id, updates);
+    const updated = await syncEngine.enqueueUpdate(userId, id, updates);
+    if (updated?.id) {
+      void embeddingService.embedNote(updated).catch(() => {});
+    }
+    return updated;
   },
 
   // Delete a note
   delete: async (id: string): Promise<void> => {
     const userId = await getAuthenticatedUserId();
     await syncEngine.enqueueDelete(userId, id);
+    void vectorStore.delete(id).catch(() => {});
   },
 
   getCount: async (): Promise<number> => {

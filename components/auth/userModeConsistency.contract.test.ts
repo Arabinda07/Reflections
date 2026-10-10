@@ -18,19 +18,15 @@ describe('UserModeGuard route protection', () => {
   });
 });
 
-describe('ModeSelect onboarding destination', () => {
+describe('ModeSelect retirement destination (ADR 0004)', () => {
   const source = read('pages/onboarding/ModeSelect.tsx');
 
-  it('navigates to the authenticated dashboard after setting the mode', () => {
-    expect(source).toContain('set_user_mode');
+  it('immediately redirects to the authenticated dashboard', () => {
     expect(source).toContain('navigate(RoutePath.DASHBOARD, { replace: true })');
   });
 
-  it('does not send successfully onboarded users to the public landing page', () => {
-    // A single RoutePath.HOME navigation is acceptable only for the
-    // "already onboarded" redirect guard, never as the success destination.
-    const successBlock = source.slice(source.indexOf('set_user_mode'));
-    expect(successBlock).not.toContain('navigate(RoutePath.HOME');
+  it('renders a route loading frame while redirecting', () => {
+    expect(source).toContain('<RouteLoadingFrame />');
   });
 });
 
@@ -75,33 +71,33 @@ describe('UserModeContext failure handling', () => {
   });
 });
 
-describe('ModeSelect already-set escape hatch', () => {
-  const source = read('pages/onboarding/ModeSelect.tsx');
+describe('Life Wiki route unification (ADR 0004)', () => {
+  const source = read('App.tsx');
 
-  it('treats already-set RPC errors as a redirect after reading user_mode', () => {
-    expect(source).toContain("message.includes('already been set')");
-    expect(source).toContain(".select('user_mode')");
-    expect(source).toContain('setCurrentUserMode(resolvedMode)');
-    expect(source).toContain('navigate(RoutePath.DASHBOARD, { replace: true })');
-  });
-
-  it('reads RPC error messages from plain objects as well as Error instances', () => {
-    expect(source).toContain("'message' in err");
+  it('does not restrict Life Wiki or Sanctuary routes to reflective mode', () => {
+    const lines = source.split('\n');
+    const wikiLine = lines.find((line) => line.includes('RoutePath.WIKI'));
+    const sanctuaryLine = lines.find((line) => line.includes('RoutePath.SANCTUARY}'));
+    expect(wikiLine).toBeDefined();
+    expect(wikiLine).not.toContain("'reflective'");
+    expect(sanctuaryLine).toBeDefined();
+    expect(sanctuaryLine).not.toContain("'reflective'");
   });
 });
 
-describe('CreateNote gates AI features by mode', () => {
+describe('CreateNote gates AI features with Pro teaser (ADR 0004)', () => {
   const source = read('pages/dashboard/CreateNote.tsx');
 
   it('derives an aiEnabled flag from the resolved user mode', () => {
     expect(source).toContain('useUserMode');
-    expect(source).toContain('isPrivateAiDisabled');
     expect(source).toContain('const aiEnabled =');
   });
 
-  it('gates tag suggestions and the Reflect with AI button on aiEnabled', () => {
+  it('gates tag suggestions on aiEnabled and provides Pro teaser for reflection', () => {
     expect(source).toContain('if (!aiEnabled) return;');
-    expect(source).toContain('const canReflect = aiEnabled &&');
+    expect(source).toContain('const canReflect =');
+    expect(source).toContain('isReflectProOpen');
+    expect(source).toContain('ProUpgradeCTA');
   });
 });
 

@@ -10,6 +10,8 @@ import { Sparkle } from '@phosphor-icons/react/Sparkle';
 import { Warning } from '@phosphor-icons/react/Warning';
 import { LottieAnimation } from '../../components/ui/LottieAnimation';
 import { Button } from '../../components/ui/Button';
+import { ModalSheet } from '../../components/ui/ModalSheet';
+import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
 import { Alert } from '../../components/ui/Alert';
 import { MetadataPill } from '../../components/ui/MetadataPill';
 import { PageContainer } from '../../components/ui/PageContainer';
@@ -261,6 +263,7 @@ export const LifeWiki: React.FC = () => {
   const [refreshFeedback, setRefreshFeedback] = useState<RefreshFeedback | null>(null);
   const [recentRuns, setRecentRuns] = useState<LifeWikiRunRecord[]>([]);
   const [runDetail, setRunDetail] = useState<LifeWikiRunDetail | null>(null);
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
 
   const loadRunActivity = async (preferredRunId?: string) => {
     try {
@@ -926,9 +929,10 @@ export const LifeWiki: React.FC = () => {
                 ) : (
                   <Button
                     variant="primary"
-                    onClick={() => navigate(RoutePath.ACCOUNT)}
+                    onClick={() => setIsUpgradeModalOpen(true)}
                   >
-                    See Pro options
+                    <Sparkle size={16} weight="fill" className="mr-2" />
+                    Unlock with Pro
                   </Button>
                 )}
               </div>
@@ -979,6 +983,28 @@ export const LifeWiki: React.FC = () => {
           {renderRunActivity()}
         </div>
       </PageContainer>
+
+      <ModalSheet
+        isOpen={isUpgradeModalOpen}
+        onClose={() => setIsUpgradeModalOpen(false)}
+        title="Upgrade to Pro for Life Wiki"
+        icon={<Sparkle size={22} weight="duotone" />}
+        size="md"
+        bodyClassName="pt-2"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-gray-text leading-relaxed">
+            Generate and refresh complete structured Life Wiki chapters (People, Patterns, Philosophies, Eras) synthesized from your private reflections.
+          </p>
+          <ProUpgradeCTA
+            variant="card"
+            onSuccess={() => {
+              setIsUpgradeModalOpen(false);
+              void loadData();
+            }}
+          />
+        </div>
+      </ModalSheet>
     </>
   );
 };

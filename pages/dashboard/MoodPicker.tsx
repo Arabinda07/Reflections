@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { CaretLeft } from '@phosphor-icons/react/CaretLeft';
 import { Check } from '@phosphor-icons/react/Check';
+import { Sparkle } from '@phosphor-icons/react/Sparkle';
 import {
   MOOD_PICKER_GROUPS,
   getMoodConfig,
@@ -10,6 +11,7 @@ import {
   type MoodName,
   type MoodValue,
 } from './moodConfig';
+import { predictMoodFromText, type MoodPredictionResult } from '../../services/moodIntelligence';
 
 export type MoodPickerStage = 'group' | 'detail';
 
@@ -17,13 +19,30 @@ interface MoodPickerProps {
   selectedMood?: string;
   onSelect: (mood: MoodValue | undefined) => void | Promise<void>;
   onStageChange?: (stage: MoodPickerStage) => void;
+  draftText?: string;
 }
 
 const getInitialGroupId = (mood?: string) => getMoodGroupForMood(mood)?.id || null;
 
-export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, onSelect, onStageChange }) => {
+export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, onSelect, onStageChange, draftText }) => {
   const [selectedGroupId, setSelectedGroupId] = useState<MoodGroupId | null>(() => getInitialGroupId(selectedMood));
+  const [suggestion, setSuggestion] = useState<MoodPredictionResult | null>(null);
   const selectedGroup = MOOD_PICKER_GROUPS.find((group) => group.id === selectedGroupId) || null;
+
+  useEffect(() => {
+    if (!draftText || draftText.trim().length < 40) return;
+    let cancelled = false;
+
+    void predictMoodFromText(draftText).then((res) => {
+      if (!cancelled && res) {
+        setSuggestion(res);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [draftText]);
 
   useEffect(() => {
     if (!onStageChange) return;
@@ -47,6 +66,21 @@ export const MoodPicker: React.FC<MoodPickerProps> = ({ selectedMood, onSelect, 
   if (!selectedGroup) {
     return (
       <div className="space-y-2.5">
+        {suggestion ? (
+          <div className="flex items-center justify-between rounded-2xl border border-green/20 bg-green/5 p-3 text-xs">
+            <span className="flex items-center gap-2 font-medium text-gray-text">
+              <Sparkle size={16} className="text-green shrink-0" weight="duotone" />
+              <span>Suggested tone: <strong className="capitalize">{suggestion.label}</strong></span>
+            </span>
+            <button
+              type="button"
+              onClick={() => void onSelect(suggestion.mood)}
+              className="font-bold text-green hover:underline cursor-pointer"
+            >
+              Use suggestion
+            </button>
+          </div>
+        ) : null}
         {MOOD_PICKER_GROUPS.map((group) => {
           const Icon = group.icon;
           const groupConfig = getMoodConfig(group.id);

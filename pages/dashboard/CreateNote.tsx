@@ -34,7 +34,6 @@ import { InlineLoadingBadge } from '../../components/ui/InlineLoadingBadge';
 import { DEFAULT_WELLNESS_PROMPTS, getCurrentWellnessPrompt, getNextWellnessPromptState } from '../../services/wellnessPrompts';
 import { aiService } from '../../services/aiService';
 import { useUserMode } from '../../context/UserModeContext';
-import { isPrivateAiDisabled } from '../../services/privateMode';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useNoteDraft } from '../../hooks/useNoteDraft';
 import { useFocusMode } from '../../hooks/useFocusMode';
@@ -42,8 +41,11 @@ import { getOrderedTasks, getTaskDrawerTriggerLabel } from './createNoteTasks';
 import { canNavigateBackInApp } from '../../src/native/androidBack';
 // Android shell safe area contract markers: NATIVE_TOP_CONTROL_OFFSET, NATIVE_PAGE_TOP_PADDING
 import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
+import { profileService } from '../../services/profileService';
+import type { WellnessAccess } from '../../types';
 import { getMoodConfig } from './moodConfig';
 import { MoodPicker, type MoodPickerStage } from './MoodPicker';
+import { detectEmotionalDissonance } from '../../services/moodIntelligence';
 
 const TrailLoadingMark = lazy(() => import('../../components/ui/TrailLoadingMark')
   .then((module) => ({ default: module.TrailLoadingMark })));
@@ -273,11 +275,40 @@ export const CreateNote: React.FC = () => {
   const { blocker, navigateWithBypass } = draft;
   const id = undefined as string | undefined; // id is read internally by useNoteDraft via useParams
 
+  const [dissonancePrompt, setDissonancePrompt] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!mood || !content) {
+      setDissonancePrompt(null);
+      return;
+    }
+    let cancelled = false;
+    void detectEmotionalDissonance(content, mood).then((res) => {
+      if (!cancelled) {
+        setDissonancePrompt(res.hasDissonance ? res.prompt : null);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [mood, content]);
+
   const { userMode } = useUserMode();
-  // AI features are unavailable to encrypted users (no plaintext to send) and
-  // while the mode is still resolving. Gate the UI so encrypted users never see
-  // AI CTAs that would only return a "disabled" message.
-  const aiEnabled = userMode != null && !isPrivateAiDisabled(userMode);
+  const [access, setAccess] = useState<WellnessAccess | null>(null);
+  const [isReflectProOpen, setIsReflectProOpen] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    profileService.getWellnessAccess().then((data) => {
+      if (active) setAccess(data);
+    }).catch(() => {});
+    return () => { active = false; };
+  }, []);
+
+  const isPro = access?.planTier === 'pro';
+  // Under ADR 0004, all users operate under unified client-side encryption.
+  // Local intelligence is open to all, while generative cloud reflection is Pro-gated.
+  const aiEnabled = userMode != null;
 
   const handleMobileBack = useCallback(() => {
     stopMusic();
@@ -642,14 +673,52 @@ export const CreateNote: React.FC = () => {
               Focus mode
             </button>
             {canReflect && (
-              <button onClick={handleAiReflect} disabled={isReflecting} className="inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-control bg-green px-4 py-2 label-caps text-white transition-colors hover:bg-green-hover disabled:opacity-60 sm:px-3">
+              <button
+                type="button"
+                onClick={isPro ? handleAiReflect : () => setIsReflectProOpen(true)}
+                disabled={isReflecting}
+                className={`inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-control label-caps transition-colors disabled:opacity-60 sm:px-3 ${
+                  isPro
+                    ? 'bg-green px-4 py-2 text-white hover:bg-green-hover'
+                    : 'border border-golden/30 bg-golden/10 px-4 py-2 text-golden hover:bg-golden/20'
+                }`}
+                aria-label={isPro ? 'Reflect with AI' : 'Reflect with AI (Pro feature)'}
+              >
                 <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center sm:h-3 sm:w-3">
-                  {isReflecting ? <CircleNotch size={14} className="animate-spin" /> : <Brain size={14} weight="regular" />}
+                  {isReflecting ? (
+                    <CircleNotch size={14} className="animate-spin" />
+                  ) : isPro ? (
+                    <Brain size={14} weight="regular" />
+                  ) : (
+                    <Sparkle size={14} weight="fill" className="text-golden" />
+                  )}
                 </span>
                 <span className="leading-none">Reflect with AI</span>
+                {!isPro && (
+                  <span className="rounded-full bg-golden/20 px-1.5 py-0.5 text-ui-xs font-black uppercase tracking-wider text-golden">
+                    Pro
+                  </span>
+                )}
               </button>
             )}
           </div>
+
+          {dissonancePrompt ? (
+            <div className="mb-4 flex items-start justify-between gap-3 rounded-2xl border border-border/60 bg-surface-muted/60 p-4 text-xs text-gray-text animate-fade-in">
+              <div className="space-y-1">
+                <p className="font-bold text-gray-nav">Gentle reflection</p>
+                <p className="leading-relaxed text-gray-text/90 font-serif italic text-sm">{dissonancePrompt}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDissonancePrompt(null)}
+                className="text-xs font-bold text-gray-nav hover:text-gray-text shrink-0 cursor-pointer"
+                aria-label="Dismiss gentle reflection"
+              >
+                Dismiss
+              </button>
+            </div>
+          ) : null}
 
           {/* Reflection title field */}
           <input
@@ -949,6 +1018,7 @@ export const CreateNote: React.FC = () => {
       >
         <MoodPicker
           selectedMood={mood}
+          draftText={content}
           onStageChange={setMoodPickerStage}
           onSelect={(nextMood) => {
             setMood(nextMood);
@@ -1014,6 +1084,28 @@ export const CreateNote: React.FC = () => {
           <Button variant="primary" size="lg" className="w-full" onClick={() => setAiReflection(null)}>
             Back to writing
           </Button>
+        </div>
+      </ModalSheet>
+
+      <ModalSheet
+        isOpen={isReflectProOpen}
+        onClose={() => setIsReflectProOpen(false)}
+        title="Reflect with AI is a Pro feature"
+        icon={<Sparkle size={22} weight="duotone" />}
+        size="md"
+        bodyClassName="pt-2"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-gray-text leading-relaxed">
+            Get 3-paragraph conversational mirrors of your writing grounded in your thoughts, with zero data training.
+          </p>
+          <ProUpgradeCTA
+            variant="card"
+            onSuccess={() => {
+              setIsReflectProOpen(false);
+              profileService.getWellnessAccess().then(setAccess).catch(() => {});
+            }}
+          />
         </div>
       </ModalSheet>
 

@@ -6,6 +6,7 @@ import { extractTasksFromContent, mergeTasks } from '../src/utils/taskParser';
 import { supabase } from '../src/supabaseClient';
 import type { Note, NoteAttachment, Task } from '../types';
 import { isPrivateAiDisabled, type UserMode } from './privateMode';
+import { embeddingService } from './embedding/embeddingService';
 
 export interface NotePublishInput {
   id?: string;
@@ -82,6 +83,8 @@ export const notePublishingOrchestrator = {
       thumbnailUrl: finalThumbnailUrl || undefined,
       attachments: mergedAttachments,
     });
+
+    void embeddingService.embedNote(savedNote).catch(() => {});
 
     // Smart mode auto-ingest (fire-and-forget). Fail-closed: unknown mode must
     // not be treated as reflective, or encrypted users could trigger AI while

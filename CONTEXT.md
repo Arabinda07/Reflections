@@ -48,13 +48,25 @@ AI that acts when the user explicitly asks or enables a clearly bounded mode.
 
 Invited AI is different from ambient AI. It should not feel like a watcher, background analyst, diagnosis engine, or constant coach. In Reflections, Invited AI supports reflection, Life Wiki refreshes, and pattern recognition without replacing writing as the center of the product.
 
-## Encrypted Vault Mode
+## Unified Zero-Knowledge Encryption
 
-A user-configured mode that enforces full end-to-end device-level encryption for all journals, moods, and relationships. It disables all server-side and client-side AI analysis features (such as reflections, Life Wiki compilation, and relationship link cards) to guarantee total zero-knowledge privacy.
+The standardized security architecture (ADR 0004). All users enjoy client-side WebCrypto AES-GCM 256-bit encryption for all notes, moods, relationships, and future letters. Notes are decrypted strictly in local device memory, where on-device embedding models operate privately. This eliminates the legacy forced trade-off between privacy and intelligence.
 
-## Reflective Sanctuary Mode
+## On-Device Vector Store
 
-A user-configured mode that stores notes in plaintext in the database (or server-side decrypted) to fully enable invited AI reflections, index summaries, and Life Wiki insights. This mode bypasses local key setups, passwords, and recovery phrase mechanisms for a simplified, AI-guided writing experience.
+An isolated client-side IndexedDB vector database (`reflections_ai_vectors`) running alongside the Web Worker embedding engine. It stores mathematical coordinate vectors (384d $L_2$-normalized) of decrypted notes locally on the user's device, enabling instant semantic retrieval without transmitting note text or search queries over the network.
+
+## Hybrid Search
+
+A dual-phase note discovery pipeline combining exact token/title matching with cosine vector similarity. Instant synchronous keyword matches render on frame zero (0ms), while debounced query embeddings smoothly re-rank results and surface conceptual matches with semantic resonance badges.
+
+## Echoes (Resonant Memories)
+
+A calm memory web mounted beneath reflections in `SingleNote.tsx`. It calculates cosine proximity against past entries to surface quiet thematic connections across time, showing resonance percentages without unsolicited intrusive interruptions.
+
+## Zero-Cloud Theme Triage
+
+On-device cosine distance calculations against Life Theme centroids that automatically classify or create themes in <100ms at ₹0 compute cost, completely replacing cloud LLM calls for `ingestDecision`.
 
 ## Encrypted Personal Data Loop
 

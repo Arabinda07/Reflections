@@ -107,7 +107,6 @@ export const MORE_NAV_GROUPS: MoreNavGroup[] = [
         path: RoutePath.SANCTUARY,
         icon: Book,
         aliases: [RoutePath.WIKI, RoutePath.SANCTUARY_ARTICLE],
-        requireMode: 'reflective',
       },
     ],
   },

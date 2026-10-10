@@ -1,7 +1,7 @@
 # ADR 0001: Per-User Encryption vs. AI Insights Choice
 
-**Status:** Accepted  
-**Date:** 2026-07-01
+**Status:** Superseded by [ADR 0004: Local Embeddings & Unified Encryption Architecture](file:///e:/Reflections/docs/adr/0004-local-embeddings-and-unified-encryption-architecture.md)  
+**Date:** 2026-07-01 (Superseded: October 2026)
 
 ---
 

@@ -42,6 +42,7 @@ const vendorChunk = (id: string) => {
   if (id.includes('@phosphor-icons')) return undefined;
   if (id.includes('@google/genai')) return 'vendor-ai';
   if (id.includes('zustand')) return 'vendor-state';
+  if (id.includes('@huggingface/transformers') || id.includes('onnxruntime-web')) return 'vendor-embedding';
 
   return 'vendor-react';
 };
@@ -111,6 +112,7 @@ export default defineConfig({
             ],
             globIgnores: [
               '**/vendor-lottie-*.js',
+              '**/vendor-embedding-*.js',
               '**/*.mp4',
               '**/*.webm',
             ],
@@ -211,7 +213,8 @@ export default defineConfig({
             return deps.filter(dep => 
               !dep.includes('vendor-supabase') &&
               !dep.includes('vendor-calendar') &&
-              !dep.includes('vendor-editor')
+              !dep.includes('vendor-editor') &&
+              !dep.includes('vendor-embedding')
             );
           }
         },

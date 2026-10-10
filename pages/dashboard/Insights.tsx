@@ -34,6 +34,8 @@ import {
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useViewTransitionNavigation } from '../../hooks/useViewTransitionNavigation';
 import { useUserMode } from '../../context/UserModeContext';
+import { MindsetDriftCard } from '../../components/ui/MindsetDriftCard';
+import { computeMindsetDrift, type MindsetDriftReport } from '../../services/mindsetDrift';
 
 const SANCTUARY_ENTRANCE_FALLBACK_MS = 2200;
 
@@ -84,6 +86,23 @@ export const Insights: React.FC = () => {
 
     fetchData();
   }, []);
+
+  const [driftReport, setDriftReport] = useState<MindsetDriftReport | null>(null);
+
+  useEffect(() => {
+    if (notes.length === 0) return;
+    let cancelled = false;
+
+    void computeMindsetDrift(notes).then((report) => {
+      if (!cancelled) {
+        setDriftReport(report);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [notes]);
 
   const stats = useMemo(() => {
     const now = new Date();
@@ -296,48 +315,50 @@ export const Insights: React.FC = () => {
                 <h2 className="text-2xl font-display font-bold text-gray-text md:text-3xl">This month</h2>
                 <p className="dashboard-supporting-text text-pretty">{monthSummary}</p>
               </section>
+
+              {driftReport ? (
+                <MindsetDriftCard report={driftReport} />
+              ) : null}
             </div>
           </Surface>
 
-          {userMode === 'reflective' && (
-            <Surface
-              variant="flat"
-              tone="sage"
-              className="group relative overflow-hidden rounded-4xl"
+          <Surface
+            variant="flat"
+            tone="sage"
+            className="group relative overflow-hidden rounded-4xl"
+          >
+            <Link
+              to={RoutePath.SANCTUARY}
+              state={{ fromInsights: true }}
+              onClick={handleOpenSanctuary}
+              className="relative z-10 flex w-full flex-col items-center justify-between gap-8 p-8 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 md:flex-row md:p-12"
+              aria-label="Open your Life Wiki"
             >
-              <Link
-                to={RoutePath.SANCTUARY}
-                state={{ fromInsights: true }}
-                onClick={handleOpenSanctuary}
-                className="relative z-10 flex w-full flex-col items-center justify-between gap-8 p-8 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 md:flex-row md:p-12"
-                aria-label="Open your Life Wiki"
-              >
-                <div className="space-y-5">
-                  {isWikiReadyToBuild && (
-                    <div className="h-24 w-24 overflow-hidden rounded-4xl bg-accent-soft">
-                      <LottieAnimation src={SANCTUARY_LEVEL_UP_ANIMATION_SRC} animationId={SANCTUARY_LEVEL_UP_ANIMATION_ID} autoplay loop />
-                    </div>
-                  )}
-                  <div className="space-y-3">
-                    <h2 className="flex items-center gap-2.5 text-3xl font-display font-bold text-gray-text">
-                      {!isWikiReadyToBuild && <Book size={24} weight="duotone" className="flex-none text-green" />}
-                      {isWikiReadyToBuild ? 'Your wiki is ready for insights' : 'Your Life Wiki'}
-                    </h2>
-                    <p className="text-gray-light max-w-lg text-lg leading-relaxed font-serif italic">
-                      {isWikiReadyToBuild
-                        ? 'You have enough writing to build your first Life Wiki refresh when you choose.'
-                        : 'A private reading room where AI-generated wiki pages stay grounded in your saved notes.'}
-                    </p>
+              <div className="space-y-5">
+                {isWikiReadyToBuild && (
+                  <div className="h-24 w-24 overflow-hidden rounded-4xl bg-accent-soft">
+                    <LottieAnimation src={SANCTUARY_LEVEL_UP_ANIMATION_SRC} animationId={SANCTUARY_LEVEL_UP_ANIMATION_ID} autoplay loop />
                   </div>
+                )}
+                <div className="space-y-3">
+                  <h2 className="flex items-center gap-2.5 text-3xl font-display font-bold text-gray-text">
+                    {!isWikiReadyToBuild && <Book size={24} weight="duotone" className="flex-none text-green" />}
+                    {isWikiReadyToBuild ? 'Your wiki is ready for insights' : 'Your Life Wiki'}
+                  </h2>
+                  <p className="text-gray-light max-w-lg text-lg leading-relaxed font-serif italic">
+                    {isWikiReadyToBuild
+                      ? 'You have enough writing to build your first Life Wiki refresh when you choose.'
+                      : 'A private reading room where AI-generated wiki pages stay grounded in your saved notes.'}
+                  </p>
                 </div>
+              </div>
 
-                <div className="relative flex h-12 shrink-0 items-center justify-center overflow-hidden rounded-control border border-green bg-green text-white px-6 label-caps transition-colors duration-300 group-hover:bg-green/90">
-                  Open Sanctuary
-                  <CaretRight size={16} weight="regular" className="ml-2 transition-transform duration-500 ease-out-expo group-hover:translate-x-1" />
-                </div>
-              </Link>
-            </Surface>
-          )}
+              <div className="relative flex h-12 shrink-0 items-center justify-center overflow-hidden rounded-control border border-green bg-green text-white px-6 label-caps transition-colors duration-300 group-hover:bg-green/90">
+                Open Sanctuary
+                <CaretRight size={16} weight="regular" className="ml-2 transition-transform duration-500 ease-out-expo group-hover:translate-x-1" />
+              </div>
+            </Link>
+          </Surface>
           </>)}
           </div>
         </div>
