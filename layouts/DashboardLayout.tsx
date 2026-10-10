@@ -9,11 +9,11 @@ import { Question } from '@phosphor-icons/react/Question';
 import { Sparkle } from '@phosphor-icons/react/Sparkle';
 import { Heart } from '@phosphor-icons/react/Heart';
 import { SignIn } from '@phosphor-icons/react/SignIn';
-import { UserCircle } from '@phosphor-icons/react/UserCircle';
 import { UserPlus } from '@phosphor-icons/react/UserPlus';
 import { RoutePath } from '../types';
 import { useAuthStore } from '../hooks/useAuthStore';
 import { useUserMode } from '../context/UserModeContext';
+import { useCrypto } from '../context/CryptoContext';
 import { useKeyboardShortcut } from '../src/hooks/useKeyboardShortcut';
 import { referralService } from '../services/referralService';
 import { useAndroidBackHandler } from '../src/native/useAndroidBackHandler';
@@ -35,13 +35,14 @@ const GUEST_NAV_ITEMS: SidebarNavItem[] = [
   { label: 'FAQ', path: RoutePath.FAQ, icon: Question, description: 'Answers about privacy, writing, and care.' },
 ];
 
+// Five places, one row. Account, FAQ, letters, release, invite and logout
+// live in the NavigationBar "More" menu.
 const AUTH_NAV_ITEMS: SidebarNavItem[] = [
-  { label: 'My notes', path: RoutePath.NOTES, icon: Notebook, description: 'Return to your saved reflections.' },
-  { label: 'Create note', path: RoutePath.CREATE_NOTE, icon: PencilSimpleLine, description: 'Open a fresh writing surface.' },
+  { label: 'Home', path: RoutePath.DASHBOARD, icon: House, description: "Today's prompt and your desk." },
+  { label: 'Write', path: RoutePath.CREATE_NOTE, icon: PencilSimpleLine, description: 'Open a fresh writing surface.' },
+  { label: 'Notes', path: RoutePath.NOTES, icon: Notebook, description: 'Return to your saved reflections.' },
+  { label: 'People', path: RoutePath.RELATIONSHIPS, icon: Heart, description: 'Tend people, hooks, and weekly care.' },
   { label: 'Insights', path: RoutePath.INSIGHTS, icon: Sparkle, description: 'See patterns drawn from your writing.' },
-  { label: 'Relationships', path: RoutePath.RELATIONSHIPS, icon: Heart, description: 'Tend people, hooks, and weekly care.' },
-  { label: 'Account', path: RoutePath.ACCOUNT, icon: UserCircle, description: 'Manage your profile and plan.' },
-  { label: 'FAQ', path: RoutePath.FAQ, icon: Question, description: 'Read how Reflections works.' },
 ];
 
 const GUEST_SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
@@ -109,16 +110,21 @@ export const DashboardLayout: React.FC = () => {
     isNoteEditRoute ||
     location.pathname === RoutePath.RELEASE;
 
-  const isMobileNavSuppressedRoute =
-    location.pathname === RoutePath.INSIGHTS ||
-    location.pathname.startsWith(RoutePath.SANCTUARY);
+  const isMobileNavSuppressedRoute = location.pathname === RoutePath.INSIGHTS;
 
-  const shouldShowAuthenticatedMobileNav = isAuthenticated && !isWritingRoute;
+  // While the vault is locked every private route shows the unlock panel, so
+  // nav links would only lead back to it.
+  const { status: cryptoStatus } = useCrypto();
+  const isVaultGated = isAuthenticated && cryptoStatus !== 'unlocked';
+
+  const shouldShowAuthenticatedMobileNav = isAuthenticated && !isWritingRoute && !isVaultGated;
   const isLandingRoute = location.pathname === RoutePath.HOME && !isAuthenticated;
   const routeTransitionClass = isWritingRoute ? '' : 'animate-in fade-in duration-300 ease-out-expo';
   const homePath = isAuthenticated ? RoutePath.DASHBOARD : RoutePath.HOME;
 
-  const navItems = isAuthenticated ? AUTH_NAV_ITEMS.filter(i => !i.requireMode || i.requireMode === userMode) : GUEST_NAV_ITEMS;
+  const navItems = isVaultGated
+    ? []
+    : isAuthenticated ? AUTH_NAV_ITEMS.filter(i => !i.requireMode || i.requireMode === userMode) : GUEST_NAV_ITEMS;
   const sidebarNavItems = isAuthenticated ? AUTH_NAV_ITEMS.filter(i => !i.requireMode || i.requireMode === userMode) : GUEST_SIDEBAR_NAV_ITEMS;
 
   return (
@@ -138,7 +144,8 @@ export const DashboardLayout: React.FC = () => {
           isMobileMenuOpen={isMobileMenuOpen}
           onMobileMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           onInvite={() => setIsInviteModalOpen(true)}
-          onSearch={isAuthenticated ? () => setIsSearchOpen(true) : undefined}
+          onSearch={isAuthenticated && !isVaultGated ? () => setIsSearchOpen(true) : undefined}
+          isVaultGated={isVaultGated}
         />
       )}
 
@@ -179,7 +186,7 @@ export const DashboardLayout: React.FC = () => {
         {/* Global Footer - Positioned for full-width background with centered content */}
         {!isWritingRoute && (
           <footer className="screen-scrim screen-scrim--strong mt-auto w-full border-t border-border py-12 transition-colors duration-300">
-            <div className="max-w-360 mx-auto px-6 md:px-16 flex flex-col sm:flex-row items-center justify-between gap-8">
+            <div className="max-w-360 mx-auto px-6 md:px-24 flex flex-col sm:flex-row items-center justify-between gap-8">
               <nav
                 aria-label="Footer navigation"
                 className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 sm:gap-10"

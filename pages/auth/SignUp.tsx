@@ -189,10 +189,7 @@ export const SignUp: React.FC = () => {
               Back
             </Link>
 
-            <SectionHeader
-              eyebrow="Join Reflections"
-              title="Create account"
-            />
+            <SectionHeader title="Create your account" />
 
             <div className="space-y-3">
               {isVerifiedEmailAvailable() && (

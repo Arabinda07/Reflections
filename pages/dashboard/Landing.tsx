@@ -238,14 +238,14 @@ export const Landing: React.FC = () => {
                 <a
                   href={RoutePath.LOGIN}
                   onClick={(event) => handleAppRouteNavigation(event, RoutePath.LOGIN)}
-                  className="inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap px-1 text-btn-sm font-bold text-gray-nav transition-[color,transform] duration-200 ease-out-expo hover:-translate-y-px hover:text-green active:translate-y-px"
+                  className="surface-floating surface-floating--media inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap rounded-full px-4 text-btn-sm font-bold !text-gray-text transition-[color,transform] duration-200 ease-out-expo hover:-translate-y-px hover:border-green/30 active:translate-y-px"
                 >
                   Sign in
                 </a>
 
                 <a
                   href={RoutePath.FAQ}
-                  className="inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap px-1 text-btn-sm font-bold text-gray-nav transition-[color,transform] duration-200 ease-out-expo hover:-translate-y-px hover:text-green active:translate-y-px"
+                  className="surface-floating surface-floating--media inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap rounded-full px-4 text-btn-sm font-bold !text-gray-text transition-[color,transform] duration-200 ease-out-expo hover:-translate-y-px hover:border-green/30 active:translate-y-px"
                 >
                   How it works
                 </a>

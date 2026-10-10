@@ -5,6 +5,7 @@ import { MagnifyingGlass } from '@phosphor-icons/react/MagnifyingGlass';
 import { Moon } from '@phosphor-icons/react/Moon';
 import { UserPlus } from '@phosphor-icons/react/UserPlus';
 import { Sun } from '@phosphor-icons/react/Sun';
+import { DotsThreeCircle } from '@phosphor-icons/react/DotsThreeCircle';
 import { Button } from '../components/ui/Button';
 import { useAuthStore } from '../hooks/useAuthStore';
 import { RoutePath } from '../types';
@@ -22,7 +23,22 @@ interface NavigationBarProps {
   onMobileMenuToggle: () => void;
   onInvite: () => void;
   onSearch?: () => void;
+  /** Vault locked: hide everything except Logout so the user isn't sent into dead ends. */
+  isVaultGated?: boolean;
 }
+
+const MORE_MENU_ID = 'nav-more-menu';
+
+const MORE_LINKS = [
+  { label: 'Future letters', path: RoutePath.FUTURE_LETTERS },
+  { label: 'Release a thought', path: RoutePath.RELEASE },
+  { label: 'Account', path: RoutePath.ACCOUNT },
+  { label: 'FAQ', path: RoutePath.FAQ },
+];
+
+const menuItemBase =
+  'flex min-h-11 w-full items-center gap-2 rounded-lg px-3 text-left text-ui-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green';
+const menuItemClass = `${menuItemBase} text-gray-text hover:bg-green/5 hover:text-green`;
 
 /**
  * Top navigation bar.
@@ -36,6 +52,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
   onMobileMenuToggle,
   onInvite,
   onSearch,
+  isVaultGated = false,
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -71,6 +88,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
     ? 'hero-ink hover:text-green hover:bg-white/10'
     : 'text-gray-nav hover:text-green hover:bg-green/5';
   const homePath = isAuthenticated ? RoutePath.DASHBOARD : RoutePath.HOME;
+  const closeMoreMenu = () => document.getElementById(MORE_MENU_ID)?.hidePopover();
 
   const DarkModeToggle = (
     <button
@@ -150,30 +168,54 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
               </Link>
             );
           })}
-          <div
-            className="w-px h-6 bg-border mx-2"
-            role="separator"
-            aria-orientation="vertical"
-          ></div>
-          {isAuthenticated ? (
+          {navItems.length > 0 && (
+            <div
+              className="w-px h-6 bg-border mx-2"
+              role="separator"
+              aria-orientation="vertical"
+            ></div>
+          )}
+          {isAuthenticated && isVaultGated ? (
+            <Button variant="ghost" size="sm" tone="clay" onClick={() => logout()}>
+              Logout
+            </Button>
+          ) : isAuthenticated ? (
             <>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onInvite}
-
+              {/* Native popover: light-dismiss, Esc and focus return come free. */}
+              <button
+                type="button"
+                popoverTarget={MORE_MENU_ID}
+                className={`relative flex h-11 w-11 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green ${landingControlClass}`}
+                aria-label="More"
+                title="More"
               >
-                <span>Invite</span>
-                <UserPlus size={16} weight="regular" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => logout()}
-                tone="clay"
+                <DotsThreeCircle size={24} />
+              </button>
+              <div
+                id={MORE_MENU_ID}
+                popover="auto"
+                className="fixed inset-auto right-6 top-16 m-0 w-60 rounded-2xl border border-border bg-surface p-2 shadow-lg"
               >
-                Logout
-              </Button>
+                <nav aria-label="More">
+                  {MORE_LINKS.map((item) => (
+                    <Link key={item.path} to={item.path} className={menuItemClass} onClick={closeMoreMenu}>
+                      {item.label}
+                    </Link>
+                  ))}
+                  <div className="my-1 h-px bg-border" role="separator" />
+                  <button type="button" className={menuItemClass} onClick={() => { closeMoreMenu(); onInvite(); }}>
+                    <span>Invite</span>
+                    <UserPlus size={16} weight="regular" />
+                  </button>
+                  <button
+                    type="button"
+                    className={`${menuItemBase} text-clay hover:bg-clay/10`}
+                    onClick={() => { closeMoreMenu(); logout(); }}
+                  >
+                    Logout
+                  </button>
+                </nav>
+              </div>
             </>
           ) : (
             <div className="flex gap-2">

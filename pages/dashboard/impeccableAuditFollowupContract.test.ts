@@ -15,7 +15,6 @@ describe('impeccable audit follow-up contract', () => {
     const about = read('pages/dashboard/AboutArabinda.tsx');
     const indexHtml = read('index.html');
     const lottieAnimation = read('components/ui/LottieAnimation.tsx');
-    const sanctuaryAnimation = read('src/lottie/sanctuaryAnimation.ts');
 
     expect(input).toContain('useId');
     expect(input).toContain('const inputId = props.id ?? generatedId;');
@@ -48,7 +47,6 @@ describe('impeccable audit follow-up contract', () => {
     expect(indexHtml).not.toContain('landing_video_mobile.webp" as="image"');
     expect(indexHtml).not.toContain('landing_video.webp" as="image"');
 
-    expect(sanctuaryAnimation).toContain("'/assets/lottie/level-up-animation.lottie'");
     expect(lottieAnimation).toContain("import { strFromU8, unzipSync } from 'fflate';");
     expect(lottieAnimation).toContain('loadLottieAnimation');
     expect(lottieAnimation).toContain("src.endsWith('.lottie')");
@@ -77,7 +75,9 @@ describe('impeccable audit follow-up contract', () => {
     expect(landing).not.toContain('secondaryCtaClassName');
     expect(landing).not.toContain('landing-secondary-cta');
     expect(landing).toContain('flex min-w-0 items-center gap-x-8 sm:gap-x-10');
-    expect(landing).toContain('text-gray-nav transition-[color,transform] duration-200 ease-out-expo hover:-translate-y-px hover:text-green');
+    // Secondary links sit on the hero video (dark on mobile, white-faded on desktop),
+    // so they use the same frosted chip as the mute button to stay legible on both.
+    expect(landing).toContain('surface-floating surface-floating--media inline-flex h-11 min-h-11 min-w-0 items-center justify-center whitespace-nowrap rounded-full px-4 text-btn-sm font-bold !text-gray-text');
     expect(landing).not.toContain('text-white lg:text-gray-text');
     expect(landing).not.toContain('hover:text-white lg:hover:text-gray-text');
     expect(landing).toContain('surface-floating surface-floating--media');

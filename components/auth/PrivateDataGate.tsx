@@ -15,7 +15,7 @@ const buttonClassName =
   'inline-flex min-h-12 w-full items-center justify-center rounded-xl border border-green bg-green px-4 py-3 text-sm font-semibold text-on-accent transition hover:bg-green-hover disabled:cursor-not-allowed disabled:border-border disabled:bg-surface-muted disabled:text-gray-nav disabled:opacity-100';
 const secondaryButtonClassName =
   'inline-flex min-h-12 w-full items-center justify-center rounded-xl border border-border px-4 py-3 text-sm font-semibold text-primary transition hover:bg-surface-muted disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-gray-nav disabled:opacity-100';
-const labelClassName = 'block text-xs font-semibold uppercase tracking-widest text-gray-nav';
+const labelClassName = 'block text-sm font-semibold text-gray-text';
 const errorClassName = 'text-sm text-clay';
 
 const CryptoShell: React.FC<{

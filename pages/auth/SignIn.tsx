@@ -192,10 +192,7 @@ export const SignIn: React.FC = () => {
               Back
             </Link>
 
-            <SectionHeader
-              eyebrow="Welcome back"
-              title="Sign in"
-            />
+            <SectionHeader title="Welcome back" />
             {successMessage ? (
               <Alert
                 variant="success"

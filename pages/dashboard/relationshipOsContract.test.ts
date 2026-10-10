@@ -16,7 +16,7 @@ describe('RelationshipOS routing and UI contracts', () => {
     expect(types).toContain("RELATIONSHIP_DETAIL = '/relationships/:id'");
     expect(app).toContain('RoutePath.RELATIONSHIPS');
     expect(app).toContain('RoutePath.RELATIONSHIP_DETAIL');
-    expect(desktopNav).toContain("label: 'Relationships'");
+    expect(desktopNav).toContain("label: 'People', path: RoutePath.RELATIONSHIPS");
     expect(mobileNav).toContain("label: 'Relationships'");
   });
 
