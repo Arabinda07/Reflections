@@ -12,8 +12,9 @@ import { PageContainer } from '../../components/ui/PageContainer';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { Surface } from '../../components/ui/Surface';
 import { WeeklyRecapLoadingSkeleton } from '../../components/ui/skeletons/WeeklyRecapLoadingSkeleton';
-import { LifeTheme, MoodCheckin, Note, RitualEvent, RoutePath, WellnessAccess } from '../../types';
+import { LifeTheme, MoodCheckin, Note, RelationshipRecord, RitualEvent, RoutePath, WellnessAccess } from '../../types';
 import { noteService } from '../../services/noteService';
+import { relationshipService } from '../../services/relationshipService';
 import { wikiService } from '../../services/wikiService';
 import { profileService } from '../../services/profileService';
 import { FREE_WIKI_MINIMUM_ENTRIES, getWikiInsightsGate } from '../../services/wellnessPolicy';
@@ -24,7 +25,7 @@ import {
   SANCTUARY_LEVEL_UP_ANIMATION_ID,
   SANCTUARY_LEVEL_UP_ANIMATION_SRC,
 } from '../../src/lottie/sanctuaryAnimation';
-import { getMoodConfig, getMoodGroupConfig } from './moodConfig';
+import { getMoodConfig, getMoodFamilyForMood, getMoodGroupConfig } from './moodConfig';
 import {
   buildMonthSummary,
   buildMoodSentence,
@@ -34,7 +35,6 @@ import {
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useViewTransitionNavigation } from '../../hooks/useViewTransitionNavigation';
 import { useUserMode } from '../../context/UserModeContext';
-import { MindsetDriftCard } from '../../components/ui/MindsetDriftCard';
 import { computeMindsetDrift, type MindsetDriftReport } from '../../services/mindsetDrift';
 
 const SANCTUARY_ENTRANCE_FALLBACK_MS = 2200;
@@ -54,6 +54,7 @@ export const Insights: React.FC = () => {
   const [themes, setThemes] = useState<LifeTheme[]>([]);
   const [moodCheckins, setMoodCheckins] = useState<MoodCheckin[]>([]);
   const [ritualEvents, setRitualEvents] = useState<RitualEvent[]>([]);
+  const [relationships, setRelationships] = useState<RelationshipRecord[]>([]);
   const [access, setAccess] = useState<WellnessAccess | null>(null);
   const [isOpeningSanctuary, setIsOpeningSanctuary] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -64,12 +65,13 @@ export const Insights: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [allNotes, allThemes, accessData, checkins, events] = await Promise.all([
+        const [allNotes, allThemes, accessData, checkins, events, allRelationships] = await Promise.all([
           noteService.getAll(),
           wikiService.getAllThemes(),
           profileService.getWellnessAccess(),
           moodCheckinService.list(),
           ritualEventService.listSince(getWeekSignalSince()),
+          relationshipService.getAll(),
         ]);
 
         setNotes(allNotes);
@@ -77,6 +79,7 @@ export const Insights: React.FC = () => {
         setAccess(accessData);
         setMoodCheckins(checkins);
         setRitualEvents(events);
+        setRelationships(allRelationships);
       } catch (error) {
         console.error('[Insights] Failed to load data:', error);
       } finally {
@@ -179,6 +182,51 @@ export const Insights: React.FC = () => {
     wordsWritten: stats.wordsWritten,
     tone: monthTone,
   });
+
+  const relationalOrbit = useMemo(() => {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    const monthNotesWithPeople = notes.filter((note) => {
+      const d = new Date(note.createdAt);
+      return (
+        d.getMonth() === currentMonth &&
+        d.getFullYear() === currentYear &&
+        note.relationshipIds &&
+        note.relationshipIds.length > 0
+      );
+    });
+
+    if (monthNotesWithPeople.length === 0 || relationships.length === 0) return [];
+
+    const relMap = new Map(relationships.map((r) => [r.id, r]));
+    const personStats = new Map<string, { person: RelationshipRecord; count: number; familyCounts: Record<string, number> }>();
+
+    for (const note of monthNotesWithPeople) {
+      for (const relId of note.relationshipIds || []) {
+        const person = relMap.get(relId);
+        if (!person) continue;
+
+        if (!personStats.has(relId)) {
+          personStats.set(relId, { person, count: 0, familyCounts: {} });
+        }
+        const currentStats = personStats.get(relId)!;
+        currentStats.count += 1;
+        if (note.mood) {
+          const family = getMoodFamilyForMood(note.mood)?.id || 'steady';
+          currentStats.familyCounts[family] = (currentStats.familyCounts[family] || 0) + 1;
+        }
+      }
+    }
+
+    return Array.from(personStats.values())
+      .map(({ person, count, familyCounts }) => {
+        const dominantFamily = Object.entries(familyCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'steady';
+        return { person, count, dominantFamily };
+      })
+      .sort((a, b) => b.count - a.count);
+  }, [notes, relationships]);
 
   const completeOpenSanctuary = useCallback(() => {
     if (!isOpeningSanctuaryRef.current) return;
@@ -311,14 +359,123 @@ export const Insights: React.FC = () => {
                 )}
               </section>
 
-              <section className="space-y-5">
-                <h2 className="text-2xl font-display font-bold text-gray-text md:text-3xl">This month</h2>
-                <p className="dashboard-supporting-text text-pretty">{monthSummary}</p>
-              </section>
+              <section className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-display font-bold text-gray-text md:text-3xl">This month</h2>
+                  {driftReport?.hasSufficientData && driftReport.previousFamilyProportions ? (
+                    <span className="text-ui-xs font-bold text-gray-nav">
+                      {driftReport.driftAngleDegrees}° movement
+                    </span>
+                  ) : null}
+                </div>
 
-              {driftReport ? (
-                <MindsetDriftCard report={driftReport} />
-              ) : null}
+                <div className="dashboard-supporting-text space-y-3 text-pretty">
+                  <p>{monthSummary}</p>
+                  {driftReport?.trajectorySummary ? (
+                    <p>{driftReport.trajectorySummary}</p>
+                  ) : null}
+                </div>
+
+                {driftReport?.hasSufficientData ? (
+                  <div className="space-y-3 pt-1">
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-surface-muted flex">
+                      {driftReport.currentFamilyProportions.light > 0 ? (
+                        <div
+                          style={{ width: `${driftReport.currentFamilyProportions.light}%` }}
+                          className="bg-mood-happy"
+                          title={`Light / Uplifting: ${driftReport.currentFamilyProportions.light}%`}
+                        />
+                      ) : null}
+                      {driftReport.currentFamilyProportions.steady > 0 ? (
+                        <div
+                          style={{ width: `${driftReport.currentFamilyProportions.steady}%` }}
+                          className="bg-mood-calm"
+                          title={`Steady / Calm: ${driftReport.currentFamilyProportions.steady}%`}
+                        />
+                      ) : null}
+                      {driftReport.currentFamilyProportions.charged > 0 ? (
+                        <div
+                          style={{ width: `${driftReport.currentFamilyProportions.charged}%` }}
+                          className="bg-mood-anxious"
+                          title={`Charged / Active: ${driftReport.currentFamilyProportions.charged}%`}
+                        />
+                      ) : null}
+                      {driftReport.currentFamilyProportions.heavy > 0 ? (
+                        <div
+                          style={{ width: `${driftReport.currentFamilyProportions.heavy}%` }}
+                          className="bg-mood-sad"
+                          title={`Heavy / Tender: ${driftReport.currentFamilyProportions.heavy}%`}
+                        />
+                      ) : null}
+                      {driftReport.currentFamilyProportions.mixed > 0 ? (
+                        <div
+                          style={{ width: `${driftReport.currentFamilyProportions.mixed}%` }}
+                          className="bg-mood-mixed"
+                          title={`Mixed / Complex: ${driftReport.currentFamilyProportions.mixed}%`}
+                        />
+                      ) : null}
+                    </div>
+
+                    <div className="flex flex-wrap items-center justify-between gap-y-2 text-ui-xs font-semibold text-gray-nav">
+                      <span className="flex items-center gap-1.5">
+                        <span className="h-2 w-2 rounded-full bg-mood-happy inline-block" />
+                        Light {driftReport.currentFamilyProportions.light}%
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <span className="h-2 w-2 rounded-full bg-mood-calm inline-block" />
+                        Steady {driftReport.currentFamilyProportions.steady}%
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <span className="h-2 w-2 rounded-full bg-mood-anxious inline-block" />
+                        Charged {driftReport.currentFamilyProportions.charged}%
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <span className="h-2 w-2 rounded-full bg-mood-sad inline-block" />
+                        Heavy {driftReport.currentFamilyProportions.heavy}%
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <span className="h-2 w-2 rounded-full bg-mood-mixed inline-block" />
+                        Mixed {driftReport.currentFamilyProportions.mixed}%
+                      </span>
+                    </div>
+                  </div>
+                ) : null}
+
+                {relationalOrbit.length > 0 ? (
+                  <div className="space-y-3 pt-2">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-gray-nav">
+                      People in your reflections this month
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {relationalOrbit.map(({ person, count, dominantFamily }) => (
+                        <Link
+                          key={person.id}
+                          to={RoutePath.RELATIONSHIP_DETAIL.replace(':id', encodeURIComponent(person.id))}
+                          className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-bold text-gray-text hover:border-green/30 hover:text-green transition-colors"
+                        >
+                          <span
+                            className={`h-2 w-2 rounded-full ${
+                              dominantFamily === 'light'
+                                ? 'bg-mood-happy'
+                                : dominantFamily === 'steady'
+                                ? 'bg-mood-calm'
+                                : dominantFamily === 'charged'
+                                ? 'bg-mood-anxious'
+                                : dominantFamily === 'heavy'
+                                ? 'bg-mood-sad'
+                                : 'bg-mood-mixed'
+                            }`}
+                          />
+                          <span>{person.name}</span>
+                          <span className="text-gray-nav font-medium">
+                            ({count} {count === 1 ? 'reflection' : 'reflections'})
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+              </section>
             </div>
           </Surface>
 

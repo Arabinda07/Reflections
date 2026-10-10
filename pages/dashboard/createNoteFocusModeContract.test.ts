@@ -38,17 +38,17 @@ describe('CreateNote focus mode contract', () => {
     expect(focusModeButtonBlock).not.toContain('sm:py-1');
   });
 
-  it('keeps the reflect with AI action at the shared touch target size on desktop', () => {
+  it('keeps the with-person action at the shared touch target size on desktop', () => {
     const createNote = read('pages/dashboard/CreateNote.tsx');
-    const reflectActionLabel = 'Reflect with AI';
-    const reflectActionIndex = createNote.indexOf(reflectActionLabel);
+    const personActionLabel = 'aria-label="Add or view people in this reflection"';
+    const personActionIndex = createNote.indexOf(personActionLabel);
 
-    expect(reflectActionIndex).toBeGreaterThan(-1);
+    expect(personActionIndex).toBeGreaterThan(-1);
 
-    const reflectActionButtonBlock = createNote.slice(reflectActionIndex - 520, reflectActionIndex + 120);
+    const personActionButtonBlock = createNote.slice(personActionIndex - 400, personActionIndex + 100);
 
-    expect(reflectActionButtonBlock).toContain('min-h-11');
-    expect(reflectActionButtonBlock).not.toContain('sm:min-h-0');
-    expect(reflectActionButtonBlock).not.toContain('sm:py-1');
+    expect(personActionButtonBlock).toContain('min-h-11');
+    expect(personActionButtonBlock).not.toContain('sm:min-h-0');
+    expect(personActionButtonBlock).not.toContain('sm:py-1');
   });
 });

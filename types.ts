@@ -28,6 +28,7 @@ export interface Note {
   attachments?: NoteAttachment[];
   mood?: string;
   tasks?: Task[];
+  relationshipIds?: string[];
 }
 
 export interface LifeTheme {
@@ -244,6 +245,7 @@ export interface RelationshipRecord {
   location?: string;
   howWeMet?: string;
   caresAbout?: string;
+  boundaries?: string;
   notes?: string;
   tier: RelationshipTier;
   stage: RelationshipStage;

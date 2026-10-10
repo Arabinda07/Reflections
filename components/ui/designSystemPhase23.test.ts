@@ -218,11 +218,8 @@ describe('phase 2/3 design-system rollout', () => {
     expect(navigationBar).toContain('bg-green/5 text-green');
     expect(navigationBar).toContain('tone="clay"');
 
-    expect(createNote).toContain('Reflect with AI');
-    expect(createNote).toContain('bg-green px-4 py-2');
-    expect(createNote).toContain('text-white');
+    expect(createNote).not.toContain('Reflect with AI');
     expect(createNote).toContain('title="A reflection, not a verdict"');
-    expect(createNote).toContain('tone="sage"');
 
     expect(moodConfig).toContain('bg-mood-calm/10 border-mood-calm/20 text-mood-calm');
     expect(moodConfig).not.toContain('bg-blue/10');

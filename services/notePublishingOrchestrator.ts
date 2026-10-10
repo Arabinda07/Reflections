@@ -7,6 +7,7 @@ import { supabase } from '../src/supabaseClient';
 import type { Note, NoteAttachment, Task } from '../types';
 import { isPrivateAiDisabled, type UserMode } from './privateMode';
 import { embeddingService } from './embedding/embeddingService';
+import { relationshipService } from './relationshipService';
 
 export interface NotePublishInput {
   id?: string;
@@ -15,6 +16,7 @@ export interface NotePublishInput {
   mood?: string;
   tags: string[];
   tasks: Task[];
+  relationshipIds?: string[];
   imagePreview: string | null;
   existingAttachments: NoteAttachment[];
   newAttachments: File[];
@@ -51,6 +53,7 @@ export const notePublishingOrchestrator = {
         tags: input.tags,
         mood: input.mood,
         tasks: syncedTasks,
+        relationshipIds: input.relationshipIds,
       });
       noteId = newNote.id;
     }
@@ -80,9 +83,16 @@ export const notePublishingOrchestrator = {
       mood: input.mood,
       tags: input.tags,
       tasks: syncedTasks,
+      relationshipIds: input.relationshipIds,
       thumbnailUrl: finalThumbnailUrl || undefined,
       attachments: mergedAttachments,
     });
+
+    if (input.relationshipIds?.length) {
+      input.relationshipIds.forEach((relId) => {
+        void relationshipService.markTended(relId).catch(() => {});
+      });
+    }
 
     void embeddingService.embedNote(savedNote).catch(() => {});
 

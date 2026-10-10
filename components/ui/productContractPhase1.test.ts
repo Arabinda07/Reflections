@@ -13,7 +13,7 @@ describe('phase 1 product contract and clarity', () => {
 
     expect(createNote).not.toContain('processNoteIntoWiki');
     expect(createNote).not.toContain("requestJson<string[]>('prompts'");
-    expect(createNote).toContain('Reflect with AI');
+    expect(createNote).not.toContain('Reflect with AI');
 
     expect(insights).toContain('<Link');
     expect(insights).toContain('to={RoutePath.SANCTUARY}');

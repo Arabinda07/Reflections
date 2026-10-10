@@ -8,6 +8,7 @@ import { ArrowUpRight } from '@phosphor-icons/react/ArrowUpRight';
 import { Plus } from '@phosphor-icons/react/Plus';
 import { Tray } from '@phosphor-icons/react/Tray';
 import { User } from '@phosphor-icons/react/User';
+import { BookOpen } from '@phosphor-icons/react/BookOpen';
 
 import { Button } from '../../components/ui/Button';
 import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
@@ -18,12 +19,13 @@ import { PageContainer } from '../../components/ui/PageContainer';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { Surface } from '../../components/ui/Surface';
 import { useToast } from '../../components/ui/Toast';
+import { noteService } from '../../services/noteService';
 import { relationshipService } from '../../services/relationshipService';
 import { relationshipImportService } from '../../services/relationshipImportService';
 import { countMentionedNames } from '../../services/relationshipWikiLink';
 import { useUserMode } from '../../context/UserModeContext';
 import { wikiService } from '../../services/wikiService';
-import type { RelationshipImportInboxItem, RelationshipRecord } from '../../types';
+import type { Note, RelationshipImportInboxItem, RelationshipRecord } from '../../types';
 import { RoutePath } from '../../types';
 import { RelationshipImportInbox } from './RelationshipImportInbox';
 import { RelationshipProfile, OverflowMenu } from './RelationshipProfile';
@@ -44,6 +46,7 @@ export const Relationships: React.FC = () => {
   const { userMode } = useUserMode();
   const [relationships, setRelationships] = useState<RelationshipRecord[]>([]);
   const [inbox, setInbox] = useState<RelationshipImportInboxItem[]>([]);
+  const [notes, setNotes] = useState<Note[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [draft, setDraft] = useState<Draft>(emptyDraft);
@@ -65,15 +68,43 @@ export const Relationships: React.FC = () => {
     [peopleWiki, relationships],
   );
 
+  const latestNoteByPersonId = useMemo(() => {
+    const map = new Map<string, Note>();
+    if (notes.length === 0 || relationships.length === 0) return map;
+
+    const sortedNotes = [...notes].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+
+    for (const rel of relationships) {
+      const relName = rel.name.trim().toLowerCase();
+      const match = sortedNotes.find((n) => {
+        if (n.relationshipIds?.includes(rel.id)) return true;
+        if (relName.length >= 2) {
+          const titleMatch = n.title?.toLowerCase().includes(relName);
+          const contentMatch = n.content?.toLowerCase().includes(relName);
+          if (titleMatch || contentMatch) return true;
+        }
+        return false;
+      });
+      if (match) {
+        map.set(rel.id, match);
+      }
+    }
+    return map;
+  }, [notes, relationships]);
+
   const load = useCallback(async () => {
     setIsLoading(true);
     try {
-      const [nextRelationships, nextInbox] = await Promise.all([
+      const [nextRelationships, nextInbox, nextNotes] = await Promise.all([
         relationshipService.getAll(),
         relationshipImportService.getImportInbox(),
+        noteService.getAll(),
       ]);
       setRelationships(nextRelationships);
       setInbox(nextInbox);
+      setNotes(nextNotes);
       setHasPendingSync(await relationshipService.hasPendingSync());
     } catch {
       showToast("I couldn't load your people right now. Try again in a moment.");
@@ -248,6 +279,18 @@ export const Relationships: React.FC = () => {
                             <p className="text-xs text-gray-nav/80">
                               Last contact: {suggestion.lastInteraction ? new Date(suggestion.lastInteraction.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'No contact yet'}
                             </p>
+                            {(() => {
+                              const noteMention = latestNoteByPersonId.get(suggestion.relationship.id);
+                              if (!noteMention) return null;
+                              return (
+                                <p className="flex items-center gap-1.5 text-xs font-semibold text-green">
+                                  <BookOpen size={14} weight="bold" />
+                                  <span>
+                                    Mentioned in your journal on {new Date(noteMention.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                  </span>
+                                </p>
+                              );
+                            })()}
                           </div>
 
                           <div className="pt-2 flex flex-wrap items-center gap-3">

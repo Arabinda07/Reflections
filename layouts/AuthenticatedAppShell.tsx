@@ -9,12 +9,28 @@ import { AppBootstrapper } from '../components/ui/AppBootstrapper';
 import { useNativeOAuthListener } from '../hooks/useNativeOAuthListener';
 import { useNativeStatusBar } from '../hooks/useNativeStatusBar';
 import { useSync } from '../hooks/useSync';
+import { useBackgroundPrivacyVeil } from '../hooks/useBackgroundPrivacyVeil';
+import { PrivacyVeil } from '../components/ui/PrivacyVeil';
 import { DashboardLayout } from './DashboardLayout';
 
 const SyncBoundary: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   useSync();
 
   return <>{children}</>;
+};
+
+const PrivacyVeilContainer: React.FC = () => {
+  const veil = useBackgroundPrivacyVeil();
+
+  return (
+    <PrivacyVeil
+      isOpen={veil.isVeiled}
+      requiresBiometric={veil.requiresBiometric}
+      isAuthenticating={veil.isAuthenticating}
+      errorMessage={veil.errorMessage}
+      onUnlock={veil.unlock}
+    />
+  );
 };
 
 export const AuthenticatedAppShell: React.FC = () => {
@@ -29,6 +45,7 @@ export const AuthenticatedAppShell: React.FC = () => {
             <AppBootstrapper>
               <ToastProvider>
                 <SyncBoundary>
+                  <PrivacyVeilContainer />
                   <DashboardLayout />
                 </SyncBoundary>
               </ToastProvider>

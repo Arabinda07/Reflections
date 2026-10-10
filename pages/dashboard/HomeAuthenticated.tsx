@@ -28,7 +28,7 @@ import { useAuthStore } from '../../hooks/useAuthStore';
 import { useHaptics } from '../../hooks/useHaptics';
 import { moodCheckinService } from '../../services/moodService';
 import { noteService } from '../../services/noteService';
-import { DEFAULT_WELLNESS_PROMPTS } from '../../services/wellnessPrompts';
+import { DEFAULT_WELLNESS_PROMPTS, getTimeAwareWellnessPrompts } from '../../services/wellnessPrompts';
 import { hasPendingAccountPassword } from '../../src/auth/accountPasswordHandoff';
 import { supabase } from '../../src/supabaseClient';
 import { Note, RoutePath } from '../../types';
@@ -225,8 +225,9 @@ export const HomeAuthenticated: React.FC = () => {
   );
 
   useEffect(() => {
+    const timePrompts = getTimeAwareWellnessPrompts();
     setDailyPrompt(
-      DEFAULT_WELLNESS_PROMPTS[Math.floor(Math.random() * DEFAULT_WELLNESS_PROMPTS.length)],
+      timePrompts[Math.floor(Math.random() * timePrompts.length)],
     );
   }, []);
 
@@ -236,12 +237,15 @@ export const HomeAuthenticated: React.FC = () => {
       if (isRefreshing) return;
       setIsRefreshing(true);
 
+      const timePrompts = getTimeAwareWellnessPrompts();
       let nextPrompt = dailyPrompt;
-      while (nextPrompt === dailyPrompt) {
+      let attempts = 0;
+      while (nextPrompt === dailyPrompt && attempts < 10) {
         nextPrompt =
-          DEFAULT_WELLNESS_PROMPTS[
-            Math.floor(Math.random() * DEFAULT_WELLNESS_PROMPTS.length)
+          timePrompts[
+            Math.floor(Math.random() * timePrompts.length)
           ];
+        attempts++;
       }
 
       setDailyPrompt(nextPrompt);

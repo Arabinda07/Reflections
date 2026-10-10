@@ -27,6 +27,7 @@ const encryptLocalNote = async (note: LocalNote, session: CryptoSession): Promis
     attachments: note.attachments || [],
     mood: note.mood,
     tasks: note.tasks || [],
+    relationshipIds: note.relationshipIds || [],
   }),
 });
 
@@ -52,6 +53,7 @@ const normalizeLegacyLocalNote = (note: LegacyLocalNote): LocalNote => ({
   attachments: note.attachments || [],
   mood: note.mood,
   tasks: note.tasks || [],
+  relationshipIds: note.relationshipIds || [],
 });
 
 const decryptLocalNote = async (note: LocalEncryptedNote | LegacyLocalNote, session: CryptoSession): Promise<LocalNote | undefined> => {

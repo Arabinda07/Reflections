@@ -3,6 +3,8 @@ import {
   DEFAULT_WELLNESS_PROMPTS,
   getCurrentWellnessPrompt,
   getNextWellnessPromptState,
+  getTimeAwareWellnessPrompts,
+  getTimeOfDay,
 } from './wellnessPrompts';
 
 describe('wellnessPrompts', () => {
@@ -86,5 +88,34 @@ describe('wellnessPrompts', () => {
       nextIndex: 0,
       prompt: DEFAULT_WELLNESS_PROMPTS[0],
     });
+  });
+
+  it('determines the correct time of day based on the hour', () => {
+    const morningDate = new Date('2026-10-10T08:00:00');
+    const afternoonDate = new Date('2026-10-10T14:00:00');
+    const eveningDate = new Date('2026-10-10T20:00:00');
+
+    expect(getTimeOfDay(morningDate)).toBe('morning');
+    expect(getTimeOfDay(afternoonDate)).toBe('afternoon');
+    expect(getTimeOfDay(eveningDate)).toBe('evening');
+  });
+
+  it('returns grounded time-aware prompt pools', () => {
+    const morningDate = new Date('2026-10-10T08:00:00');
+    const afternoonDate = new Date('2026-10-10T14:00:00');
+    const eveningDate = new Date('2026-10-10T20:00:00');
+
+    const morningPrompts = getTimeAwareWellnessPrompts(morningDate);
+    const afternoonPrompts = getTimeAwareWellnessPrompts(afternoonDate);
+    const eveningPrompts = getTimeAwareWellnessPrompts(eveningDate);
+
+    expect(morningPrompts.length).toBeGreaterThan(0);
+    expect(afternoonPrompts.length).toBeGreaterThan(0);
+    expect(eveningPrompts.length).toBeGreaterThan(0);
+
+    // Verify all time-aware prompts belong to DEFAULT_WELLNESS_PROMPTS
+    morningPrompts.forEach((prompt) => expect(DEFAULT_WELLNESS_PROMPTS).toContain(prompt));
+    afternoonPrompts.forEach((prompt) => expect(DEFAULT_WELLNESS_PROMPTS).toContain(prompt));
+    eveningPrompts.forEach((prompt) => expect(DEFAULT_WELLNESS_PROMPTS).toContain(prompt));
   });
 });

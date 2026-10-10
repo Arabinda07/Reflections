@@ -10,18 +10,19 @@ import { ClockCounterClockwise } from '@phosphor-icons/react/ClockCounterClockwi
 import { PencilSimple } from '@phosphor-icons/react/PencilSimple';
 import { SquaresFour } from '@phosphor-icons/react/SquaresFour';
 import { Plus } from '@phosphor-icons/react/Plus';
-import { ArrowUpRight } from '@phosphor-icons/react/ArrowUpRight';
-import { Sparkle } from '@phosphor-icons/react/Sparkle';
+import { BookBookmark } from '@phosphor-icons/react/BookBookmark';
 
 import { Button } from '../../components/ui/Button';
 import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { Surface } from '../../components/ui/Surface';
 import { useToast } from '../../components/ui/Toast';
+import { noteService } from '../../services/noteService';
 import { relationshipService } from '../../services/relationshipService';
 import { findWikiMentions } from '../../services/relationshipWikiLink';
 import { wikiService } from '../../services/wikiService';
 import type {
+  Note,
   RelationshipHook,
   RelationshipInteraction,
   RelationshipNextCare,
@@ -130,6 +131,7 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, autoOpenCat
     name: relationship.name,
     howWeMet: relationship.howWeMet || '',
     caresAbout: relationship.caresAbout || '',
+    boundaries: relationship.boundaries || '',
     email: relationship.email || '',
     phone: relationship.phone || '',
     role: relationship.role || '',
@@ -146,6 +148,22 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, autoOpenCat
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [wikiMentions, setWikiMentions] = useState<string[]>([]);
+  const [relatedNotes, setRelatedNotes] = useState<Note[]>([]);
+
+  useEffect(() => {
+    let active = true;
+    void noteService.getAll().then((notes) => {
+      if (!active) return;
+      const escape = (val: string) => val.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const pattern = new RegExp(`(?<![\\p{L}\\p{N}])${escape(relationship.name.trim())}(?![\\p{L}\\p{N}])`, 'iu');
+      const matched = notes.filter((note) => {
+        if (note.relationshipIds?.includes(relationship.id)) return true;
+        return pattern.test(note.title || '') || pattern.test(note.content || '');
+      });
+      setRelatedNotes(matched);
+    }).catch(() => {});
+    return () => { active = false; };
+  }, [relationship.id, relationship.name]);
 
   const handleHeaderLogCatchUp = () => {
     setCatchUpOpen(true);
@@ -171,7 +189,7 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, autoOpenCat
     return new Date(Math.max(...dates.map((value) => Date.parse(value))));
   }, [relationship.lastTendedAt, relationship.interactions]);
   const openHooks = relationship.hooks.filter((item) => !item.used);
-  const isNewProfile = !relationship.howWeMet && !relationship.caresAbout
+  const isNewProfile = !relationship.howWeMet && !relationship.caresAbout && !relationship.boundaries
     && !relationship.hooks.length && !relationship.interactions.length && !relationship.nextCare.length;
 
   useEffect(() => {
@@ -187,6 +205,7 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, autoOpenCat
       name: relationship.name,
       howWeMet: relationship.howWeMet || '',
       caresAbout: relationship.caresAbout || '',
+      boundaries: relationship.boundaries || '',
       email: relationship.email || '',
       phone: relationship.phone || '',
       role: relationship.role || '',
@@ -215,6 +234,7 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, autoOpenCat
       name: context.name.trim(),
       howWeMet: context.howWeMet.trim() || undefined,
       caresAbout: context.caresAbout.trim() || undefined,
+      boundaries: context.boundaries.trim() || undefined,
     }, 'Saved.');
     setIsSavingFacts(false);
     if (saved) setEditingFacts(false);
@@ -342,6 +362,11 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, autoOpenCat
                 <span className="font-bold text-gray-nav">Cares about</span> {relationship.caresAbout}
               </p>
             )}
+            {!editingFacts && relationship.boundaries && (
+              <p className="text-ui-base leading-relaxed text-gray-light">
+                <span className="font-bold text-gray-nav">Healthy boundaries</span> {relationship.boundaries}
+              </p>
+            )}
             {isNewProfile && !editingFacts && (
               <p className="text-sm font-medium text-gray-light">Add a note, a reason to reconnect, or log a catch-up to get started.</p>
             )}
@@ -377,10 +402,13 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, autoOpenCat
               <label className="block text-sm font-bold text-gray-nav">What they care about
                 <textarea name="caresAbout" value={context.caresAbout} onChange={(event) => setContext((current) => ({ ...current, caresAbout: event.target.value }))} placeholder="Add what matters to them." className={`${fieldClass} min-h-20 font-medium`} />
               </label>
+              <label className="block text-sm font-bold text-gray-nav">Healthy boundaries
+                <textarea name="boundaries" value={context.boundaries} onChange={(event) => setContext((current) => ({ ...current, boundaries: event.target.value }))} placeholder="What boundary keeps this relationship healthy or protects your peace?" className={`${fieldClass} min-h-20 font-medium`} />
+              </label>
               <div className="flex gap-2">
                 <Button type="submit" variant="secondary" isLoading={isSavingFacts}>Save</Button>
                 {!isNewProfile && (
-                  <Button type="button" variant="ghost" onClick={() => { setContext((current) => ({ ...current, name: relationship.name, howWeMet: relationship.howWeMet || '', caresAbout: relationship.caresAbout || '' })); setEditingFacts(false); }}>Cancel</Button>
+                  <Button type="button" variant="ghost" onClick={() => { setContext((current) => ({ ...current, name: relationship.name, howWeMet: relationship.howWeMet || '', caresAbout: relationship.caresAbout || '', boundaries: relationship.boundaries || '' })); setEditingFacts(false); }}>Cancel</Button>
                 )}
               </div>
             </form>
@@ -479,53 +507,61 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, autoOpenCat
           </div>
         </Surface>
 
-        {/* From your Life Wiki — surfaced in the default view when there's something to show */}
-        {wikiMentions.length > 0 && (
-          <Surface variant="flat" tone="paper" className="p-5 md:p-6">
-            <CardHeader
-              icon={Sparkle}
-              title="From your People room"
-              subtitle="Pulled from what you've written about them in Notes."
-              action={
+        {/* Shared Memories & Notes */}
+        <Surface variant="flat" tone="paper" className="p-5 md:p-6 space-y-6">
+          <CardHeader
+            icon={BookBookmark}
+            title="Shared Memories & Notes"
+            subtitle="Journal reflections and memories connected to this relationship."
+          />
+
+          {relatedNotes.length > 0 ? (
+            <div className="space-y-3">
+              {relatedNotes.map((note) => (
                 <Link
-                  to={RoutePath.SANCTUARY_ARTICLE.replace(':pageType', 'people')}
-                  className="shrink-0 text-sm font-bold text-green hover:text-green-hover transition-colors inline-flex items-center gap-1"
+                  key={note.id}
+                  to={RoutePath.NOTE_DETAIL.replace(':id', note.id)}
+                  className="block rounded-2xl bg-surface p-4 transition-colors hover:bg-green/5 border border-border/40 group"
                 >
-                  <span>Open People room</span>
-                  <ArrowUpRight size={14} weight="bold" />
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-base font-bold text-gray-text group-hover:text-green transition-colors">
+                      {note.title || 'Untitled reflection'}
+                    </span>
+                    <span className="text-xs font-semibold text-gray-nav">
+                      {formatDate(note.createdAt)}
+                    </span>
+                  </div>
+                  {note.mood && (
+                    <span className="mt-1.5 inline-block text-ui-xs font-bold uppercase tracking-wider text-green">
+                      Mood: {note.mood}
+                    </span>
+                  )}
+                  <p className="mt-1 line-clamp-2 text-sm font-medium text-gray-light leading-relaxed">
+                    {note.content.replace(/<[^>]*>/g, '').trim()}
+                  </p>
                 </Link>
-              }
-            />
-            <div className="mt-4 space-y-3">
+              ))}
+            </div>
+          ) : null}
+
+          {wikiMentions.length > 0 ? (
+            <div className="space-y-3 pt-2 border-t border-border/40">
+              <p className="text-xs font-bold uppercase tracking-wider text-gray-nav">From your People room</p>
               {wikiMentions.map((snippet, index) => (
-                <div key={index} className="rounded-2xl bg-green/5 p-5 space-y-3">
+                <div key={index} className="rounded-2xl bg-green/5 p-4 space-y-3">
                   <p className="text-sm font-medium leading-relaxed text-gray-text">{snippet}</p>
-                  <Button type="button" size="sm" variant="secondary" className="mt-1" onClick={() => void saveSnippetAsHook(snippet)}>Save as a reason to reconnect</Button>
+                  <Button type="button" size="sm" variant="secondary" onClick={() => void saveSnippetAsHook(snippet)}>Save as a reason to reconnect</Button>
                 </div>
               ))}
             </div>
-          </Surface>
-        )}
+          ) : null}
 
-        {/* From your Life Wiki — empty hint keeps the People room link reachable */}
-        {!wikiMentions.length && (
-          <Surface variant="flat" tone="paper" className="p-5 md:p-6">
-            <CardHeader
-              icon={Sparkle}
-              title="From your People room"
-              action={
-                <Link
-                  to={RoutePath.SANCTUARY_ARTICLE.replace(':pageType', 'people')}
-                  className="shrink-0 text-sm font-bold text-green hover:text-green-hover transition-colors inline-flex items-center gap-1"
-                >
-                  <span>Open People room</span>
-                  <ArrowUpRight size={14} weight="bold" />
-                </Link>
-              }
-            />
-            <p className="mt-4 text-sm font-medium leading-relaxed text-gray-nav">Nothing about {relationship.name} in your People room yet. As you write about them in Notes, mentions will gather here.</p>
-          </Surface>
-        )}
+          {relatedNotes.length === 0 && wikiMentions.length === 0 ? (
+            <p className="text-sm font-medium leading-relaxed text-gray-nav">
+              No journal reflections connected to {relationship.name} yet. When you tag them or write about them in your journal, memories will gather here.
+            </p>
+          ) : null}
+        </Surface>
 
         {/* Contact details — a quiet, optional toggle; clearly secondary to the identity facts above */}
         <details className="group pt-2">

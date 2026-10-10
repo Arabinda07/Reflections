@@ -68,4 +68,25 @@ describe('Android shell contract', () => {
     expect(createNote).toContain('NATIVE_PAGE_TOP_PADDING');
     expect(safeArea).toContain('env(safe-area-inset-top)');
   });
+
+  it('hardens Android runtime with FLAG_SECURE, hardware Keystore, and biometric privacy veil (ADR 0002)', () => {
+    const mainActivity = read('android/app/src/main/java/com/arabinda/reflections/MainActivity.java');
+    const manifest = read('android/app/src/main/AndroidManifest.xml');
+    const buildGradle = read('android/app/build.gradle');
+    const authenticatedShell = read('layouts/AuthenticatedAppShell.tsx');
+    const cryptoKeyCacheSource = read('services/cryptoKeyCache.ts');
+    const accountPage = read('pages/dashboard/Account.tsx');
+
+    expect(mainActivity).toContain('FLAG_SECURE');
+    expect(mainActivity).toContain('registerPlugin(NativeSecureStoragePlugin.class);');
+    expect(mainActivity).toContain('registerPlugin(NativeBiometricPlugin.class);');
+    expect(manifest).toContain('android.permission.USE_BIOMETRIC');
+    expect(buildGradle).toContain('androidx.biometric:biometric');
+    expect(buildGradle).toContain('androidx.security:security-crypto');
+    expect(authenticatedShell).toContain('PrivacyVeil');
+    expect(cryptoKeyCacheSource).toContain('nativeSecureStorage');
+    expect(cryptoKeyCacheSource).toContain('exportRawDataKey');
+    expect(accountPage).toContain('Require biometrics to unlock');
+    expect(accountPage).toContain('Data Ownership & Backups');
+  });
 });

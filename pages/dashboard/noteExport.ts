@@ -1,5 +1,7 @@
 import type { Note } from '../../types';
 import { extractNotePlainText } from './noteContent';
+import { mobileRuntime } from '../../src/native/mobileRuntime';
+import { nativeShareExport } from '../../src/native/nativeShareExport';
 
 export type NoteExportFormat = 'txt' | 'md';
 
@@ -370,16 +372,31 @@ export const buildNoteExportText = (note: Note, format: NoteExportFormat) => {
 };
 
 export const downloadNoteExport = (note: Note, format: NoteExportFormat) => {
+  const filename = getNoteExportFilename(note, format);
+  const textContent = buildNoteExportText(note, format);
+  const mimeType = format === 'md' ? 'text/markdown;charset=utf-8' : 'text/plain;charset=utf-8';
+
+  if (mobileRuntime.isNativePlatform()) {
+    void nativeShareExport.exportFile({
+      filename,
+      data: textContent,
+      mimeType,
+      title: note.title.trim() || 'Reflection',
+      dialogTitle: 'Share or save reflection',
+    });
+    return;
+  }
+
   if (typeof document === 'undefined') return;
 
-  const blob = new Blob([buildNoteExportText(note, format)], {
-    type: format === 'md' ? 'text/markdown;charset=utf-8' : 'text/plain;charset=utf-8',
+  const blob = new Blob([textContent], {
+    type: mimeType,
   });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
 
   link.href = url;
-  link.download = getNoteExportFilename(note, format);
+  link.download = filename;
   link.rel = 'noopener';
   document.body.appendChild(link);
   link.click();

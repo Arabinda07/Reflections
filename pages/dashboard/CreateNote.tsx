@@ -1,7 +1,6 @@
 import React, { Suspense, lazy, useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
-import { Brain } from '@phosphor-icons/react/Brain';
 import { CalendarBlank } from '@phosphor-icons/react/CalendarBlank';
 import { CaretRight } from '@phosphor-icons/react/CaretRight';
 import { Check } from '@phosphor-icons/react/Check';
@@ -19,6 +18,7 @@ import { Smiley } from '@phosphor-icons/react/Smiley';
 import { Tag as TagIcon } from '@phosphor-icons/react/Tag';
 import { Target } from '@phosphor-icons/react/Target';
 import { Trash } from '@phosphor-icons/react/Trash';
+import { UsersThree } from '@phosphor-icons/react/UsersThree';
 import { Wind } from '@phosphor-icons/react/Wind';
 import { X } from '@phosphor-icons/react/X';
 import { useAmbientAudio, AMBIENT_TRACKS } from '../../hooks/useAmbientAudio';
@@ -32,8 +32,6 @@ import { ModalSheet } from '../../components/ui/ModalSheet';
 import { WhisperComposerControl, appendTranscriptToHtml } from '../../components/ui/WhisperComposerControl';
 import { InlineLoadingBadge } from '../../components/ui/InlineLoadingBadge';
 import { DEFAULT_WELLNESS_PROMPTS, getCurrentWellnessPrompt, getNextWellnessPromptState } from '../../services/wellnessPrompts';
-import { aiService } from '../../services/aiService';
-import { useUserMode } from '../../context/UserModeContext';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useNoteDraft } from '../../hooks/useNoteDraft';
 import { useFocusMode } from '../../hooks/useFocusMode';
@@ -41,8 +39,10 @@ import { getOrderedTasks, getTaskDrawerTriggerLabel } from './createNoteTasks';
 import { canNavigateBackInApp } from '../../src/native/androidBack';
 // Android shell safe area contract markers: NATIVE_TOP_CONTROL_OFFSET, NATIVE_PAGE_TOP_PADDING
 import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
-import { profileService } from '../../services/profileService';
-import type { WellnessAccess } from '../../types';
+import { useUserMode } from '../../context/UserModeContext';
+import { aiService } from '../../services/aiService';
+import { relationshipService } from '../../services/relationshipService';
+import type { RelationshipRecord } from '../../types';
 import { getMoodConfig } from './moodConfig';
 import { MoodPicker, type MoodPickerStage } from './MoodPicker';
 import { detectEmotionalDissonance } from '../../services/moodIntelligence';
@@ -199,12 +199,19 @@ export const CreateNote: React.FC = () => {
   const isMobile = useMediaQuery('(max-width: 1023px)');
   const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const [tagInput, setTagInput] = useState('');
+  const { userMode } = useUserMode();
+  const aiEnabled = userMode === 'reflective';
+  const canReflect = false;
+  const [isReflectProOpen, setIsReflectProOpen] = useState(false);
+  if (canReflect && isReflectProOpen) {
+    setIsReflectProOpen(false);
+  }
   const [activePlaceholder, setActivePlaceholder] = useState<string | null>(
     initialPrompt || getCurrentWellnessPrompt(0, DEFAULT_WELLNESS_PROMPTS),
   );
   const [promptIndex, setPromptIndex] = useState(0);
-  const [isReflecting, setIsReflecting] = useState(false);
-  const [aiReflection, setAiReflection] = useState<string | null>(null);
+  const [relationships, setRelationships] = useState<RelationshipRecord[]>([]);
+  const [isPeoplePickerOpen, setIsPeoplePickerOpen] = useState(false);
   const [isMobileOptionsOpen, setIsMobileOptionsOpen] = useState(false);
   const [entryAnimationComplete, setEntryAnimationComplete] = useState(false);
   const [fadeOverlay, setFadeOverlay] = useState(false);
@@ -227,14 +234,21 @@ export const CreateNote: React.FC = () => {
 
   const { isPlaying: musicPlaying, activeTrack: activeMusicTrack, playTrack: playMusicTrack, stopAll: stopMusic } = useAmbientAudio();
   const haptics = useHaptics();
-  const { playSaveChime } = useSound();
+  const { playSaveChime, playPageTurn } = useSound();
   const ActiveMoodIcon = getMoodConfig(draft.mood)?.icon || Smiley;
   const editorInstanceRef = useRef<EditorRef>(null);
   const isUnmounted = useRef(false);
 
   useEffect(() => {
     isUnmounted.current = false;
-    return () => { isUnmounted.current = true; };
+    let active = true;
+    void relationshipService.getAll().then((list) => {
+      if (active) setRelationships(list.filter((r) => r.stage !== 'archived'));
+    }).catch(() => {});
+    return () => {
+      isUnmounted.current = true;
+      active = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -244,16 +258,25 @@ export const CreateNote: React.FC = () => {
       setEntryAnimationComplete(true);
       return;
     }
-    // Clear the overlay the moment the draft is ready instead of holding for a
-    // fixed duration; the fade-out below smooths the hand-off to the editor.
+    // Hold for an intentional 1s dwell time so the writer can center themselves before the notebook opens.
     if (!draft.loading) {
-      setEntryAnimationComplete(true);
-      return;
+      const timer = window.setTimeout(() => {
+        setEntryAnimationComplete(true);
+      }, 1000);
+      return () => window.clearTimeout(timer);
     }
     // Safety net only: if the draft never resolves, never trap the writer.
     const timer = window.setTimeout(() => setEntryAnimationComplete(true), CREATE_NOTE_ENTRY_ANIMATION_FALLBACK_MS);
     return () => window.clearTimeout(timer);
   }, [entryAnimationComplete, prefersReducedMotion, draft.loading]);
+
+  const hasPlayedTurnRef = useRef(false);
+  useEffect(() => {
+    if (entryAnimationComplete && !hasPlayedTurnRef.current) {
+      hasPlayedTurnRef.current = true;
+      playPageTurn();
+    }
+  }, [entryAnimationComplete, playPageTurn]);
 
 
 
@@ -270,7 +293,7 @@ export const CreateNote: React.FC = () => {
   }, [draft.setContent, initialContent]);
 
   // Aliases from draft hook for template readability
-  const { title, setTitle, content, setContent, mood, setMood, tags, setTags, tasks, setTasks } = draft;
+  const { title, setTitle, content, setContent, mood, setMood, tags, setTags, tasks, setTasks, relationshipIds, setRelationshipIds } = draft;
   const { imagePreview, setImagePreview, loading, saving, releasing: isReleasing, canCreateNote, setCanCreateNote } = draft;
   const { blocker, navigateWithBypass } = draft;
   const id = undefined as string | undefined; // id is read internally by useNoteDraft via useParams
@@ -293,22 +316,6 @@ export const CreateNote: React.FC = () => {
     };
   }, [mood, content]);
 
-  const { userMode } = useUserMode();
-  const [access, setAccess] = useState<WellnessAccess | null>(null);
-  const [isReflectProOpen, setIsReflectProOpen] = useState(false);
-
-  useEffect(() => {
-    let active = true;
-    profileService.getWellnessAccess().then((data) => {
-      if (active) setAccess(data);
-    }).catch(() => {});
-    return () => { active = false; };
-  }, []);
-
-  const isPro = access?.planTier === 'pro';
-  // Under ADR 0004, all users operate under unified client-side encryption.
-  // Local intelligence is open to all, while generative cloud reflection is Pro-gated.
-  const aiEnabled = userMode != null;
 
   const handleMobileBack = useCallback(() => {
     stopMusic();
@@ -463,37 +470,11 @@ export const CreateNote: React.FC = () => {
     [activeMusicTrack?.id, handleStopMusic, pendingTrackId, playMusicTrack],
   );
 
-  const handleAiReflect = async () => {
-    if (!content || content === '<p><br></p>') return;
-    setIsReflecting(true);
-    setAiReflection(null);
-    try {
-      const now = new Date().toISOString();
-      const reflection = await aiService.generateReflection({
-        id: 'draft-reflection-preview',
-        title,
-        content,
-        mood,
-        createdAt: now,
-        updatedAt: now,
-        tags,
-        tasks,
-        attachments: [],
-      });
-      if (!isUnmounted.current) setAiReflection(reflection || "I'm here with you.");
-    } catch {
-      setAiReflection("I couldn't reflect on that right now. Try again in a moment.");
-    } finally {
-      if (!isUnmounted.current) setIsReflecting(false);
-    }
-  };
-
-  // â”€â”€ Derived values â”€â”€
+  // Derived values
   const hasContent = Boolean(draft.currentSnapshot.content);
   const wordCount = React.useMemo(() => {
     return draft.currentSnapshot.content.replace(/<[^>]*>/g, '').trim().split(/\s+/).filter(Boolean).length;
   }, [draft.currentSnapshot.content]);
-  const canReflect = aiEnabled && wordCount >= 100;
   const isFocusModeActive = focusMode.isActive;
   const isFocusModeEnabled = focusMode.isEnabled;
   const showEntryExperience = loading || !entryAnimationComplete;
@@ -592,6 +573,11 @@ export const CreateNote: React.FC = () => {
               <CaretRight size={14} className="opacity-40" />
             </button>
 
+            <button onClick={() => setIsPeoplePickerOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-2xl transition-colors border border-border/40 ${relationshipIds.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>
+              <div className="flex items-center gap-3"><UsersThree size={20} weight={relationshipIds.length > 0 ? "fill" : "regular"} /><span className="text-btn-sm font-bold">{relationshipIds.length > 0 ? `${relationshipIds.length} People` : 'People'}</span></div>
+              <CaretRight size={14} className="opacity-40" />
+            </button>
+
             <button onClick={() => setIsMusicOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-2xl transition-colors border border-border/40 ${musicPlaying ? 'bg-honey/10 border-honey/25 text-honey' : 'control-surface text-gray-text'}`}>
               <div className="flex items-center gap-3"><Headphones size={20} weight={musicPlaying ? "fill" : "regular"} /><span className="text-btn-sm font-bold">{musicPlaying && activeMusicTrack ? activeMusicTrack.emoji : 'Sounds'}</span></div>
               <CaretRight size={14} className="opacity-40" />
@@ -672,41 +658,31 @@ export const CreateNote: React.FC = () => {
               <Target size={12} weight={isFocusModeEnabled ? 'fill' : 'bold'} />
               Focus mode
             </button>
-            {canReflect && (
-              <button
-                type="button"
-                onClick={isPro ? handleAiReflect : () => setIsReflectProOpen(true)}
-                disabled={isReflecting}
-                className={`inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-control label-caps transition-colors disabled:opacity-60 sm:px-3 ${
-                  isPro
-                    ? 'bg-green px-4 py-2 text-white hover:bg-green-hover'
-                    : 'border border-golden/30 bg-golden/10 px-4 py-2 text-golden hover:bg-golden/20'
-                }`}
-                aria-label={isPro ? 'Reflect with AI' : 'Reflect with AI (Pro feature)'}
-              >
-                <span className="inline-flex h-4 w-4 shrink-0 items-center justify-center sm:h-3 sm:w-3">
-                  {isReflecting ? (
-                    <CircleNotch size={14} className="animate-spin" />
-                  ) : isPro ? (
-                    <Brain size={14} weight="regular" />
-                  ) : (
-                    <Sparkle size={14} weight="fill" className="text-golden" />
-                  )}
-                </span>
-                <span className="leading-none">Reflect with AI</span>
-                {!isPro && (
-                  <span className="rounded-full bg-golden/20 px-1.5 py-0.5 text-ui-xs font-black uppercase tracking-wider text-golden">
-                    Pro
-                  </span>
-                )}
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => setIsPeoplePickerOpen(true)}
+              className={`inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 label-caps transition-colors sm:px-3 ${
+                relationshipIds.length > 0
+                  ? 'bg-green/10 text-green border border-green/20'
+                  : 'control-surface text-gray-text hover:bg-green/10 hover:text-green'
+              }`}
+              aria-label="Add or view people in this reflection"
+            >
+              <UsersThree size={14} weight={relationshipIds.length > 0 ? 'fill' : 'bold'} />
+              <span>
+                {relationshipIds.length === 0
+                  ? 'With...'
+                  : relationshipIds.length === 1
+                  ? `With ${relationships.find((r) => r.id === relationshipIds[0])?.name || 'Someone'}`
+                  : `With ${relationshipIds.length} people`}
+              </span>
+            </button>
           </div>
 
           {dissonancePrompt ? (
             <div className="mb-4 flex items-start justify-between gap-3 rounded-2xl border border-border/60 bg-surface-muted/60 p-4 text-xs text-gray-text animate-fade-in">
               <div className="space-y-1">
-                <p className="font-bold text-gray-nav">Gentle reflection</p>
+                <p className="font-bold text-gray-nav" title="A reflection, not a verdict">Gentle reflection</p>
                 <p className="leading-relaxed text-gray-text/90 font-serif italic text-sm">{dissonancePrompt}</p>
               </div>
               <button
@@ -813,6 +789,7 @@ export const CreateNote: React.FC = () => {
         <div className="grid grid-cols-2 gap-3">
           <button onClick={() => { setIsMobileOptionsOpen(false); setIsMoodOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${mood ? getMoodConfig(mood)?.nav || 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><ActiveMoodIcon size={24} weight={mood ? "fill" : "regular"} /><span className="text-ui-sm font-bold capitalize">{mood ? getMoodConfig(mood)?.label || mood : 'Mood'}</span></button>
           <button onClick={() => { setIsMobileOptionsOpen(false); setIsTagsOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><TagIcon size={24} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-ui-sm font-bold">Tags</span></button>
+          <button onClick={() => { setIsMobileOptionsOpen(false); setIsPeoplePickerOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${relationshipIds.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><UsersThree size={24} weight={relationshipIds.length > 0 ? "fill" : "regular"} /><span className="text-ui-sm font-bold">{relationshipIds.length > 0 ? `${relationshipIds.length} People` : 'People'}</span></button>
           <button onClick={() => { setIsMobileOptionsOpen(false); setIsMusicOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${musicPlaying ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><Headphones size={24} weight={musicPlaying ? "fill" : "regular"} /><span className="text-ui-sm font-bold">Sounds</span></button>
           <button onClick={() => { setIsMobileOptionsOpen(false); setIsTasksOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><ListChecks size={24} weight={tasks.some(t => !t.completed) ? "fill" : "regular"} /><span className="text-ui-sm font-bold">Tasks</span></button>
           <WhisperComposerControl
@@ -1069,43 +1046,48 @@ export const CreateNote: React.FC = () => {
       </ModalSheet>
 
       <ModalSheet
-        isOpen={Boolean(aiReflection)}
-        onClose={() => setAiReflection(null)}
-        title="A reflection, not a verdict"
-        icon={<Sparkle size={22} weight="duotone" />}
-        size="lg"
-        tone="sage"
-        bodyClassName="pt-4"
-      >
-        <div className="space-y-8">
-          <div className="surface-inline-panel surface-tone-sage p-5 sm:p-6">
-            <p className="text-xl leading-relaxed text-gray-text font-serif italic">"{aiReflection}"</p>
-          </div>
-          <Button variant="primary" size="lg" className="w-full" onClick={() => setAiReflection(null)}>
-            Back to writing
-          </Button>
-        </div>
-      </ModalSheet>
-
-      <ModalSheet
-        isOpen={isReflectProOpen}
-        onClose={() => setIsReflectProOpen(false)}
-        title="Reflect with AI is a Pro feature"
-        icon={<Sparkle size={22} weight="duotone" />}
+        isOpen={isPeoplePickerOpen}
+        onClose={() => setIsPeoplePickerOpen(false)}
+        title="People in this reflection"
+        icon={<UsersThree size={22} weight="duotone" className="text-green" />}
         size="md"
-        bodyClassName="pt-2"
+        tone="sage"
       >
         <div className="space-y-4">
-          <p className="text-sm text-gray-text leading-relaxed">
-            Get 3-paragraph conversational mirrors of your writing grounded in your thoughts, with zero data training.
+          <p className="text-sm font-medium text-gray-light leading-relaxed">
+            Connect who was present or on your mind. This reflection will be saved in their memories timeline.
           </p>
-          <ProUpgradeCTA
-            variant="card"
-            onSuccess={() => {
-              setIsReflectProOpen(false);
-              profileService.getWellnessAccess().then(setAccess).catch(() => {});
-            }}
-          />
+          {relationships.length === 0 ? (
+            <p className="py-6 text-center text-sm font-medium text-gray-nav">
+              No people added yet in Relationships.
+            </p>
+          ) : (
+            <div className="max-h-60 overflow-y-auto space-y-2 py-2">
+              {relationships.map((person) => {
+                const isSelected = relationshipIds.includes(person.id);
+                return (
+                  <button
+                    key={person.id}
+                    type="button"
+                    onClick={() => {
+                      setRelationshipIds((current) =>
+                        isSelected ? current.filter((id) => id !== person.id) : [...current, person.id]
+                      );
+                    }}
+                    className={`w-full flex items-center justify-between p-3 rounded-2xl transition-colors border ${
+                      isSelected ? 'bg-green/10 border-green/25 text-green' : 'border-border/40 hover:bg-surface-muted text-gray-text'
+                    }`}
+                  >
+                    <span className="text-sm font-bold">{person.name}</span>
+                    {isSelected && <Check size={16} weight="bold" className="text-green" />}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          <Button variant="primary" size="md" className="w-full" onClick={() => setIsPeoplePickerOpen(false)}>
+            Done
+          </Button>
         </div>
       </ModalSheet>
 

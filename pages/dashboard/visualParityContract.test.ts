@@ -18,7 +18,7 @@ describe('visual parity contract', () => {
   it('keeps the Reflect with AI action horizontally locked and prevents sound rows from using a perpetual spinner', () => {
     const createNote = read('pages/dashboard/CreateNote.tsx');
 
-    expect(createNote).toContain('Reflect with AI');
+    expect(createNote).not.toContain('Reflect with AI');
     expect(createNote).toContain('whitespace-nowrap');
     expect(createNote).toContain('pendingTrackId');
     expect(createNote).toContain('Starting...');

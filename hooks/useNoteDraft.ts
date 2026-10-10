@@ -40,6 +40,8 @@ interface NoteDraftState {
   setTags: React.Dispatch<React.SetStateAction<string[]>>;
   tasks: Task[];
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+  relationshipIds: string[];
+  setRelationshipIds: React.Dispatch<React.SetStateAction<string[]>>;
   imagePreview: string | null;
   setImagePreview: React.Dispatch<React.SetStateAction<string | null>>;
 
@@ -109,6 +111,7 @@ export const useNoteDraft = (): NoteDraftState => {
   const [mood, setMood] = useState<string | undefined>(undefined);
   const [tags, setTags] = useState<string[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [relationshipIds, setRelationshipIds] = useState<string[]>([]);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [existingAttachments, setExistingAttachments] = useState<NoteAttachment[]>([]);
   const [newAttachments, setNewAttachments] = useState<File[]>([]);
@@ -243,6 +246,7 @@ export const useNoteDraft = (): NoteDraftState => {
           setMood(note.mood);
           setTags(note.tags || []);
           setTasks(note.tasks || []);
+          setRelationshipIds(note.relationshipIds || []);
           setImagePreview(note.thumbnailUrl || null);
           setExistingAttachments(note.attachments || []);
           setBaselineSnapshot(initialSnapshot);
@@ -297,6 +301,7 @@ export const useNoteDraft = (): NoteDraftState => {
           mood,
           tags,
           tasks,
+          relationshipIds,
           imagePreview,
           existingAttachments,
           newAttachments,
@@ -404,6 +409,8 @@ export const useNoteDraft = (): NoteDraftState => {
     setTags,
     tasks,
     setTasks,
+    relationshipIds,
+    setRelationshipIds,
     imagePreview,
     setImagePreview,
     existingAttachments,

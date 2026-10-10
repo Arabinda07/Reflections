@@ -17,6 +17,9 @@ import { Trash } from '@phosphor-icons/react/Trash';
 import { User } from '@phosphor-icons/react/User';
 import { Warning } from '@phosphor-icons/react/Warning';
 import { X } from '@phosphor-icons/react/X';
+import { Fingerprint } from '@phosphor-icons/react/Fingerprint';
+import { DownloadSimple } from '@phosphor-icons/react/DownloadSimple';
+import { FileText } from '@phosphor-icons/react/FileText';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Alert } from '../../components/ui/Alert';
@@ -38,6 +41,10 @@ import { useUserMode } from '../../context/UserModeContext';
 import { profileService } from '../../services/profileService';
 import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
 import { getPasswordResetRedirectTo } from '../../src/auth/authRedirectConfig';
+import { nativeBiometric, type BiometricAvailability } from '../../src/native/nativeBiometric';
+import { appSecuritySettings } from '../../src/native/appSecuritySettings';
+import { journalBackupService } from '../../services/journalBackupService';
+import { mobileRuntime } from '../../src/native/mobileRuntime';
 
 const SUPPORT_EMAIL = 'robinsaha434@gmail.com';
 
@@ -101,6 +108,13 @@ export const Account: React.FC = () => {
   const [isPasswordResetting, setIsPasswordResetting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeletingData, setIsDeletingData] = useState(false);
+  const [isBiometricEnabled, setIsBiometricEnabled] = useState(false);
+  const [biometricAvailability, setBiometricAvailability] = useState<BiometricAvailability | null>(null);
+  const [isTogglingBiometric, setIsTogglingBiometric] = useState(false);
+  const [biometricFeedback, setBiometricFeedback] = useState<FeedbackState>(null);
+  const [isExportingJson, setIsExportingJson] = useState(false);
+  const [isExportingZip, setIsExportingZip] = useState(false);
+  const [backupFeedback, setBackupFeedback] = useState<FeedbackState>(null);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
 
   const [formData, setFormData] = useState({
@@ -153,6 +167,15 @@ export const Account: React.FC = () => {
 
     fetchUser();
   }, [isAuthenticated, navigate, user]);
+
+  useEffect(() => {
+    setIsBiometricEnabled(appSecuritySettings.isBiometricLockEnabled());
+    const checkBio = async () => {
+      const avail = await nativeBiometric.isAvailable();
+      setBiometricAvailability(avail);
+    };
+    void checkBio();
+  }, []);
 
   useEffect(() => {
     if (!isSaved) return;
@@ -270,6 +293,86 @@ export const Account: React.FC = () => {
       });
     } finally {
       setIsPasswordResetting(false);
+    }
+  };
+
+  const handleToggleBiometric = async () => {
+    if (isTogglingBiometric) return;
+    setIsTogglingBiometric(true);
+    setBiometricFeedback(null);
+
+    const nextState = !isBiometricEnabled;
+    if (nextState && mobileRuntime.isNativePlatform()) {
+      const auth = await nativeBiometric.authenticate({
+        title: 'Enable Biometric Lock',
+        subtitle: 'Confirm your fingerprint or face scan to require it on app resume',
+      });
+      if (!auth.success) {
+        setBiometricFeedback({
+          variant: 'error',
+          title: 'Could not enable biometric lock.',
+          description: auth.error || 'Biometric authentication was cancelled or not recognized.',
+        });
+        setIsTogglingBiometric(false);
+        return;
+      }
+    }
+
+    await appSecuritySettings.setBiometricLockEnabled(nextState);
+    setIsBiometricEnabled(nextState);
+    setBiometricFeedback({
+      variant: 'success',
+      title: nextState ? 'Biometric app lock active.' : 'Biometric app lock turned off.',
+      description: nextState
+        ? 'Reflections will require biometric authentication whenever you resume the app from the background.'
+        : 'The sanctuary privacy veil will unmask immediately upon reopening.',
+    });
+    setIsTogglingBiometric(false);
+  };
+
+  const handleExportJson = async () => {
+    setIsExportingJson(true);
+    setBackupFeedback(null);
+    try {
+      const result = await journalBackupService.exportEncryptedJsonBackup();
+      if (result.success) {
+        setBackupFeedback({
+          variant: 'success',
+          title: 'Encrypted backup exported.',
+          description: `Successfully exported ${result.notesCount} reflections.`,
+        });
+      }
+    } catch (err) {
+      setBackupFeedback({
+        variant: 'error',
+        title: 'Export could not be completed.',
+        description: err instanceof Error ? err.message : 'Please try again in a moment.',
+      });
+    } finally {
+      setIsExportingJson(false);
+    }
+  };
+
+  const handleExportZip = async () => {
+    setIsExportingZip(true);
+    setBackupFeedback(null);
+    try {
+      const result = await journalBackupService.exportZipArchive();
+      if (result.success) {
+        setBackupFeedback({
+          variant: 'success',
+          title: 'Journal archive (.zip) exported.',
+          description: `Packaged ${result.notesCount} reflections with Markdown files and manifest.`,
+        });
+      }
+    } catch (err) {
+      setBackupFeedback({
+        variant: 'error',
+        title: 'Archive generation failed.',
+        description: err instanceof Error ? err.message : 'Please try again in a moment.',
+      });
+    } finally {
+      setIsExportingZip(false);
     }
   };
 
@@ -578,7 +681,121 @@ export const Account: React.FC = () => {
                       </div>
                       <MetadataPill>Coming soon</MetadataPill>
                     </div>
+
+                    {/* Biometric App Lock Toggle */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-3 py-4 rounded-xl border border-border/60 bg-surface/40">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-3">
+                          <Fingerprint size={20} weight="duotone" className="text-green shrink-0" />
+                          <span className="text-sm font-bold text-gray-text">Require biometrics to unlock</span>
+                        </div>
+                        <p className="text-xs font-medium text-gray-nav pl-8">
+                          {mobileRuntime.isNativePlatform()
+                            ? biometricAvailability?.isAvailable
+                              ? 'Trigger native Android fingerprint or face scan when resuming the app.'
+                              : 'Biometric hardware is not configured on this device.'
+                            : 'Active on native mobile apps. Visual privacy veil protects your writing across all devices.'}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 pl-8 sm:pl-0">
+                        {isBiometricEnabled && (
+                          <MetadataPill tone="green">Locked on resume</MetadataPill>
+                        )}
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={isBiometricEnabled}
+                          aria-label="Require biometrics to unlock"
+                          onClick={handleToggleBiometric}
+                          disabled={isTogglingBiometric || (mobileRuntime.isNativePlatform() && !biometricAvailability?.isAvailable)}
+                          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-green focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${
+                            isBiometricEnabled ? 'bg-green' : 'bg-gray-nav/20'
+                          }`}
+                        >
+                          <span
+                            aria-hidden="true"
+                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                              isBiometricEnabled ? 'translate-x-5' : 'translate-x-0'
+                            }`}
+                          />
+                        </button>
+                      </div>
+                    </div>
+
+                    {biometricFeedback && (
+                      <div className="py-2">
+                        <Alert
+                          variant={biometricFeedback.variant}
+                          title={biometricFeedback.title}
+                          description={biometricFeedback.description}
+                          icon={
+                            biometricFeedback.variant === 'error' ? (
+                              <Warning size={20} weight="fill" />
+                            ) : (
+                              <Check size={20} weight="bold" />
+                            )
+                          }
+                        />
+                      </div>
+                    )}
                   </div>
+                </div>
+
+                <div className="pt-6 sm:pt-8 border-t border-border space-y-4">
+                  <h3 className="flex items-center gap-2 text-xl font-display font-bold text-gray-text">
+                    <DownloadSimple size={22} weight="duotone" className="text-green" />
+                    Data Ownership & Backups
+                  </h3>
+                  <p className="dashboard-supporting-text">
+                    Export your complete journal sanctuary to an encrypted backup or standard Markdown archive. On Android, this opens the native OS Share Sheet directly to save to Google Drive or local storage.
+                  </p>
+
+                  <div className="flex flex-col sm:flex-row gap-3 pt-1">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="md"
+                      onClick={handleExportJson}
+                      disabled={isExportingJson || isExportingZip}
+                      isLoading={isExportingJson}
+                    >
+                      <span className="flex items-center gap-2">
+                        <FileText size={18} weight="duotone" className="text-green" />
+                        <span>Export Encrypted Backup (.json)</span>
+                      </span>
+                    </Button>
+
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="md"
+                      onClick={handleExportZip}
+                      disabled={isExportingJson || isExportingZip}
+                      isLoading={isExportingZip}
+                    >
+                      <span className="flex items-center gap-2">
+                        <DownloadSimple size={18} weight="duotone" className="text-green" />
+                        <span>Export Journal Archive (.zip)</span>
+                      </span>
+                    </Button>
+                  </div>
+
+                  {backupFeedback && (
+                    <div className="py-2">
+                      <Alert
+                        variant={backupFeedback.variant}
+                        title={backupFeedback.title}
+                        description={backupFeedback.description}
+                        icon={
+                          backupFeedback.variant === 'error' ? (
+                            <Warning size={20} weight="fill" />
+                          ) : (
+                            <Check size={20} weight="bold" />
+                          )
+                        }
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <div className="pt-6 sm:pt-8 border-t border-border space-y-4">
