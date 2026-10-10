@@ -2,7 +2,6 @@ import { supabase } from '../src/supabaseClient';
 import type { FutureLetter, LifeTheme, MoodCheckin } from '../types';
 import { cryptoService, type CryptoSession, type EncryptedEnvelope, isEncryptedEnvelope } from './cryptoService';
 import { mapToNote, type SupabaseNoteRow } from './noteRemoteStore';
-import { WikiPageType } from './wikiTypes';
 
 type MigrationTable = 'notes' | 'mood_checkins' | 'future_letters' | 'life_themes';
 
@@ -253,7 +252,7 @@ const migrateFutureLetters = async (session: CryptoSession, onProgress?: Migrati
 const migrateLifeThemes = async (session: CryptoSession, onProgress?: MigrationProgressCallback) => {
   await migrateRowsInBatches<LifeTheme & {
     user_id: string;
-    page_type: WikiPageType;
+    page_type: string;
     title: string;
     content: string | null;
     encryption_migration_state?: string;

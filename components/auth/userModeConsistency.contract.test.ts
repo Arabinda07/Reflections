@@ -71,30 +71,28 @@ describe('UserModeContext failure handling', () => {
   });
 });
 
-describe('Life Wiki route unification (ADR 0004)', () => {
+describe('Retired Life Wiki routes', () => {
   const source = read('App.tsx');
 
-  it('does not restrict Life Wiki or Sanctuary routes to reflective mode', () => {
+  it('redirects legacy Life Wiki and Sanctuary routes to Insights', () => {
     const lines = source.split('\n');
-    const wikiLine = lines.find((line) => line.includes('RoutePath.WIKI'));
-    const sanctuaryLine = lines.find((line) => line.includes('RoutePath.SANCTUARY}'));
-    expect(wikiLine).toBeDefined();
-    expect(wikiLine).not.toContain("'reflective'");
-    expect(sanctuaryLine).toBeDefined();
-    expect(sanctuaryLine).not.toContain("'reflective'");
+    for (const route of ['RoutePath.WIKI}', 'RoutePath.SANCTUARY}', 'RoutePath.SANCTUARY_ARTICLE}']) {
+      const line = lines.find((candidate) => candidate.includes(route));
+      expect(line).toContain('<Navigate to={RoutePath.INSIGHTS} replace />');
+    }
   });
 });
 
-describe('CreateNote gates AI features with Pro teaser (ADR 0004)', () => {
+describe('CreateNote keeps intelligence on-device (ADR 0004)', () => {
   const source = read('pages/dashboard/CreateNote.tsx');
 
-  it('derives an aiEnabled flag from the resolved user mode', () => {
-    expect(source).toContain('useUserMode');
-    expect(source).toContain('const aiEnabled =');
+  it('suggests tags from local embeddings instead of a server AI call', () => {
+    expect(source).toContain('suggestTagsFromSimilarNotes');
+    expect(source).toContain('vectorStore.findSimilar');
+    expect(source).not.toContain('aiService');
   });
 
-  it('gates tag suggestions on aiEnabled and provides Pro teaser for reflection', () => {
-    expect(source).toContain('if (!aiEnabled) return;');
+  it('keeps the Pro teaser for reflection', () => {
     expect(source).toContain('const canReflect =');
     expect(source).toContain('isReflectProOpen');
     expect(source).toContain('ProUpgradeCTA');

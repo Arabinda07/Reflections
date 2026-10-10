@@ -95,6 +95,6 @@ An audit found the embedding pipeline was never initialized in production (only 
 * [x] Model-native prefixes (BGE query instruction; Gemma `title: | text:` / `task: search result | query:`), with `EMBED_FORMAT_VERSION` forcing a re-embed of old vectors.
 * [x] Echoes stores on-the-fly vectors with the note's real `updatedAt` (no re-embed churn).
 * [ ] Encrypt vectors at rest with the session data key (removes the full re-embed after each unlock).
-* [ ] Remove dead Gemini code (`api/ai.ts`, `api/ai-runs.ts`, `@google/genai`, unused `aiService` functions); replace `suggestTags` with local nearest-tag lookup.
+* [x] Remove dead Gemini code (`api/ai.ts`, `api/ai-runs.ts`, `@google/genai`, unused `aiService` functions); replace `suggestTags` with local nearest-tag lookup.
 * [ ] Quiet Paper UI pass: filled primary buttons on auth/unlock, hide nav behind the unlock veil, Home "Desk", blank-page-first editor, Insights a11y.
 * [ ] Real on-device EmbeddingGemma on Android (only if Tier 1 proves insufficient).

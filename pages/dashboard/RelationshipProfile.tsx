@@ -19,8 +19,6 @@ import { Surface } from '../../components/ui/Surface';
 import { useToast } from '../../components/ui/Toast';
 import { noteService } from '../../services/noteService';
 import { relationshipService } from '../../services/relationshipService';
-import { findWikiMentions } from '../../services/relationshipWikiLink';
-import { wikiService } from '../../services/wikiService';
 import type {
   Note,
   RelationshipHook,
@@ -147,7 +145,6 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, autoOpenCat
   const [isLoggingCatchUp, setIsLoggingCatchUp] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [wikiMentions, setWikiMentions] = useState<string[]>([]);
   const [relatedNotes, setRelatedNotes] = useState<Note[]>([]);
 
   useEffect(() => {
@@ -191,14 +188,6 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, autoOpenCat
   const openHooks = relationship.hooks.filter((item) => !item.used);
   const isNewProfile = !relationship.howWeMet && !relationship.caresAbout && !relationship.boundaries
     && !relationship.hooks.length && !relationship.interactions.length && !relationship.nextCare.length;
-
-  useEffect(() => {
-    let active = true;
-    void wikiService.getWikiPage('people')
-      .then((page) => { if (active) setWikiMentions(findWikiMentions(page?.content || '', relationship.name)); })
-      .catch(() => { if (active) setWikiMentions([]); });
-    return () => { active = false; };
-  }, [relationship.id, relationship.name]);
 
   useEffect(() => {
     setContext({
@@ -281,17 +270,6 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, autoOpenCat
       used: false,
     }];
     if (await update({ hooks })) setHook('');
-  };
-
-  const saveSnippetAsHook = async (snippet: string) => {
-    const hooks: RelationshipHook[] = [...relationship.hooks, {
-      id: crypto.randomUUID(),
-      description: snippet,
-      source: 'life wiki',
-      createdAt: new Date().toISOString(),
-      used: false,
-    }];
-    await update({ hooks }, 'Saved as a reason to reconnect.');
   };
 
   const addNextCare = async (event: React.FormEvent) => {
@@ -544,19 +522,7 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, autoOpenCat
             </div>
           ) : null}
 
-          {wikiMentions.length > 0 ? (
-            <div className="space-y-3 pt-2 border-t border-border/40">
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-nav">From your People room</p>
-              {wikiMentions.map((snippet, index) => (
-                <div key={index} className="rounded-2xl bg-green/5 p-4 space-y-3">
-                  <p className="text-sm font-medium leading-relaxed text-gray-text">{snippet}</p>
-                  <Button type="button" size="sm" variant="secondary" onClick={() => void saveSnippetAsHook(snippet)}>Save as a reason to reconnect</Button>
-                </div>
-              ))}
-            </div>
-          ) : null}
-
-          {relatedNotes.length === 0 && wikiMentions.length === 0 ? (
+          {relatedNotes.length === 0 ? (
             <p className="text-sm font-medium leading-relaxed text-gray-nav">
               No journal reflections connected to {relationship.name} yet. When you tag them or write about them in your journal, memories will gather here.
             </p>

@@ -14,8 +14,9 @@ describe('strict private mode', () => {
     expect(isPrivateAiDisabled('reflective')).toBe(false);
   });
 
-  it('prevents a stale Smart Mode preference from starting an AI run after save', () => {
+  it('never starts a server-side AI run after save', () => {
     const publisher = readFileSync(path.resolve(process.cwd(), 'services/notePublishingOrchestrator.ts'), 'utf8');
-    expect(publisher).toContain('!isPrivateAiDisabled(input.userMode)');
+    expect(publisher).not.toContain('aiRunClient');
+    expect(publisher).not.toContain('startLifeWikiRefresh');
   });
 });

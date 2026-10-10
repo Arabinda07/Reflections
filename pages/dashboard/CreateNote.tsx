@@ -39,8 +39,10 @@ import { getOrderedTasks, getTaskDrawerTriggerLabel } from './createNoteTasks';
 import { canNavigateBackInApp } from '../../src/native/androidBack';
 // Android shell safe area contract markers: NATIVE_TOP_CONTROL_OFFSET, NATIVE_PAGE_TOP_PADDING
 import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
-import { useUserMode } from '../../context/UserModeContext';
-import { aiService } from '../../services/aiService';
+import { embeddingService } from '../../services/embedding/embeddingService';
+import { vectorStore } from '../../services/embedding/vectorStore';
+import { noteService } from '../../services/noteService';
+import { stripHtml } from '../../services/collectionUtils';
 import { relationshipService } from '../../services/relationshipService';
 import type { RelationshipRecord } from '../../types';
 import { getMoodConfig } from './moodConfig';
@@ -56,6 +58,21 @@ const CREATE_NOTE_ENTRY_ANIMATION_FALLBACK_MS = 3600;
 
 const getSurfaceScopeForMood = (_mood?: string) => {
   return 'surface-scope-sage';
+};
+
+// On-device tag suggestions: most frequent tags on the nearest notes, minus ones already applied.
+const suggestTagsFromSimilarNotes = async (content: string, existingTags: string[]): Promise<string[]> => {
+  try {
+    const matches = await vectorStore.findSimilar(await embeddingService.embedQuery(stripHtml(content)), 8);
+    const notes = await Promise.all(matches.map((match) => noteService.getById(match.noteId)));
+    const counts = new Map<string, number>();
+    for (const tag of notes.flatMap((note) => note?.tags ?? [])) {
+      if (!existingTags.includes(tag)) counts.set(tag, (counts.get(tag) ?? 0) + 1);
+    }
+    return [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 3).map(([tag]) => tag);
+  } catch {
+    return [];
+  }
 };
 
 const getSurfacePanelForMood = (_mood?: string) => {
@@ -199,8 +216,6 @@ export const CreateNote: React.FC = () => {
   const isMobile = useMediaQuery('(max-width: 1023px)');
   const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const [tagInput, setTagInput] = useState('');
-  const { userMode } = useUserMode();
-  const aiEnabled = userMode === 'reflective';
   const canReflect = false;
   const [isReflectProOpen, setIsReflectProOpen] = useState(false);
   if (canReflect && isReflectProOpen) {
@@ -332,26 +347,23 @@ export const CreateNote: React.FC = () => {
     navigate(RoutePath.NOTES);
   }, [navigate, stopMusic]);
 
-  // ── AI tag suggestions when tags modal opens ──
+  // ── On-device tag suggestions when tags modal opens ──
   useEffect(() => {
     if (!isTagsOpen) {
       setSuggestedTags([]);
       return;
     }
-    if (!aiEnabled) return;
     if (!content || content === '<p><br></p>') return;
 
     let active = true;
     setIsLoadingSuggestions(true);
-    aiService.suggestTags(content).then((suggestions) => {
-      if (active) setSuggestedTags(suggestions);
-    }).catch(() => {
-      // Silent failure; placeholder stays at default.
-    }).finally(() => {
-      if (active) setIsLoadingSuggestions(false);
+    void suggestTagsFromSimilarNotes(content, tags).then((suggestions) => {
+      if (!active) return;
+      setSuggestedTags(suggestions);
+      setIsLoadingSuggestions(false);
     });
     return () => { active = false; };
-  }, [isTagsOpen, content, aiEnabled]);
+  }, [isTagsOpen, content, tags]);
 
   // Blocker ── leave dialog sync
   useEffect(() => {

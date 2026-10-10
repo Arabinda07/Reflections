@@ -55,7 +55,6 @@ describe('phase 2/3 design-system rollout', () => {
     const myNotes = read('pages/dashboard/MyNotes.tsx');
     const singleNote = read('pages/dashboard/SingleNote.tsx');
     const insights = read('pages/dashboard/Insights.tsx');
-    const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
     const account = read('pages/dashboard/Account.tsx');
     const signIn = read('pages/auth/SignIn.tsx');
     const signUp = read('pages/auth/SignUp.tsx');
@@ -70,8 +69,6 @@ describe('phase 2/3 design-system rollout', () => {
     expect(singleNote).toContain('<ModalSheet');
 
     expect(insights).toContain('<SectionHeader');
-    expect(lifeWiki).toContain('<PageContainer');
-    expect(lifeWiki).toContain('<ReactMarkdown');
 
     expect(account).toContain('<Alert');
     expect(account).not.toContain('alert(');
@@ -80,7 +77,7 @@ describe('phase 2/3 design-system rollout', () => {
     expect(signUp).toContain('<SectionHeader');
     expect(privacyPolicy).toContain('PublicPageShell');
     expect(privacyPolicy).toContain('What Reflections keeps');
-    expect(privacyPolicy).toContain('AI and Smart Mode');
+    expect(privacyPolicy).toContain('On-device intelligence');
     expect(privacyPolicy).not.toContain('Privacy and terms');
   });
 
@@ -141,7 +138,6 @@ describe('phase 2/3 design-system rollout', () => {
     const releaseMode = read('pages/dashboard/ReleaseMode.tsx');
     const futureLetters = read('pages/dashboard/FutureLetters.tsx');
     const insights = read('pages/dashboard/Insights.tsx');
-    const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
     const account = read('pages/dashboard/Account.tsx');
     const faq = read('pages/dashboard/FAQ.tsx');
     const privacyPolicy = read('pages/dashboard/PrivacyPolicy.tsx');
@@ -174,7 +170,6 @@ describe('phase 2/3 design-system rollout', () => {
     expect(releaseMode).toContain('scope="sage"');
     expect(futureLetters).toContain('surface-scope-sage page-wash');
     expect(insights).toContain('scope="sage"');
-    expect(lifeWiki).toContain('surface-scope-sage page-wash');
     expect(account).toContain('scope="paper"');
     expect(faq).toContain('scope="paper"');
     expect(privacyPolicy).toContain('scope="paper"');
@@ -260,7 +255,6 @@ describe('phase 2/3 design-system rollout', () => {
       'components/ui/ReferralInvitePanel.tsx',
       'pages/dashboard/ReleaseMode.tsx',
       'pages/dashboard/FutureLetters.tsx',
-      'pages/dashboard/LifeWiki.tsx',
       'pages/dashboard/Account.tsx',
     ];
 

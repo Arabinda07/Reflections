@@ -33,7 +33,6 @@ describe('remaining roadmap contract', () => {
     const companionObservation = read('components/ui/CompanionObservation.tsx');
     const notFound = read('pages/NotFound.tsx');
     const myNotes = read('pages/dashboard/MyNotes.tsx');
-    const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
 
     expect(createNote).toContain("import('../../components/ui/TrailLoadingMark')");
     expect(createNote).not.toContain("import Lottie from 'lottie-react'");
@@ -47,7 +46,6 @@ describe('remaining roadmap contract', () => {
     expect(notFound).toContain('<Lottie');
     expect(notFound).toContain('/assets/lottie/error-404.json');
     expect(myNotes).toContain('/assets/lottie/empty-notes.json');
-    expect(lifeWiki).toContain('SANCTUARY_LEVEL_UP_ANIMATION_SRC');
   });
 
   it('keeps the library page on skeleton loading and lazy calendar path', () => {

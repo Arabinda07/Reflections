@@ -92,7 +92,6 @@ describe('public review fixes contract', () => {
 
   it('keeps heavyweight public media out of the default shipped asset budget', () => {
     const landing = read('pages/dashboard/Landing.tsx');
-    const sanctuaryAnimation = read('src/lottie/sanctuaryAnimation.ts');
     const packagedAnimationPath = path.resolve(
       process.cwd(),
       'public/assets/lottie/level-up-animation.lottie',
@@ -100,8 +99,6 @@ describe('public review fixes contract', () => {
 
     expect(landing).not.toContain('landing_video.mp4');
     expect(existsSync(path.resolve(process.cwd(), 'public/assets/videos/landing_video.mp4'))).toBe(false);
-    expect(sanctuaryAnimation).toContain('/assets/lottie/level-up-animation.lottie');
-    expect(sanctuaryAnimation).not.toContain('level-up-animation.json');
     expect(existsSync(packagedAnimationPath)).toBe(true);
     expect(statSync(packagedAnimationPath).size).toBeLessThan(360 * 1024);
   });

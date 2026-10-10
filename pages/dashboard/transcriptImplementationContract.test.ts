@@ -66,7 +66,6 @@ describe('transcript-inspired implementation contracts', () => {
   it('uses scoped transitions for quiet in-page state changes and keeps gestures tactile', () => {
     const myNotes = read('pages/dashboard/MyNotes.tsx');
     const insights = read('pages/dashboard/Insights.tsx');
-    const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
     const modalSheet = read('components/ui/ModalSheet.tsx');
     const mobileSidebar = read('layouts/MobileSidebar.tsx');
 
@@ -80,8 +79,6 @@ describe('transcript-inspired implementation contracts', () => {
     expect(modalSheet).toContain('dragOffsetYRef');
     // Insights is a single prose scroll now — no in-page toggles to scope.
     expect(insights).toContain('useViewTransitionNavigation');
-    expect(lifeWiki).toContain('runScopedTransition');
-    expect(lifeWiki).toContain('lifeWikiScopeRef');
     expect(modalSheet).toContain('SHEET_DRAG_CLOSE_THRESHOLD');
     expect(modalSheet).toContain('SHEET_DRAG_MINIMUM_MOVEMENT');
     expect(modalSheet).toContain('useHaptics');

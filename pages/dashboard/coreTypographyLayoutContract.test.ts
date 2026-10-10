@@ -27,7 +27,6 @@ describe('core app typography and layout contract', () => {
       createNote: read('pages/dashboard/CreateNote.tsx'),
       singleNote: read('pages/dashboard/SingleNote.tsx'),
       insights: read('pages/dashboard/Insights.tsx'),
-      lifeWiki: read('pages/dashboard/LifeWiki.tsx'),
       futureLetters: read('pages/dashboard/FutureLetters.tsx'),
       account: read('pages/dashboard/Account.tsx'),
       release: read('pages/dashboard/ReleaseMode.tsx'),
@@ -41,8 +40,6 @@ describe('core app typography and layout contract', () => {
     expect(pages.singleNote).toContain('dashboard-prose');
     expect(pages.insights).toContain('core-page-stack');
     expect(pages.insights).toContain('dashboard-supporting-text');
-    expect(pages.lifeWiki).toContain('core-page-stack');
-    expect(pages.lifeWiki).toContain('dashboard-prose');
     expect(pages.futureLetters).toContain('core-page-stack');
     expect(pages.account).toContain('core-page-stack');
     expect(pages.release).toContain('release-writing-measure');

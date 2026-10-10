@@ -48,11 +48,12 @@ describe('signed-in mobile navigation contract', () => {
 
     expect(mobileNav).toContain('MORE_NAV_GROUPS');
     expect(mobileNav).toMatch(
-      /label: 'Insights'[\s\S]*label: 'Future Letters'[\s\S]*label: 'Life Wiki'/,
+      /label: 'Insights'[\s\S]*label: 'Future Letters'/,
     );
     expect(mobileNav).toContain('RoutePath.INSIGHTS');
-    expect(mobileNav).toContain('RoutePath.SANCTUARY');
-    expect(mobileNav).toContain('RoutePath.WIKI');
+    expect(mobileNav).not.toContain("label: 'Life Wiki'");
+    expect(mobileNav).not.toContain('RoutePath.SANCTUARY');
+    expect(mobileNav).not.toContain('RoutePath.WIKI');
     expect(mobileNav).toContain('RoutePath.FUTURE_LETTERS');
     expect(mobileNav).not.toContain("label: 'Release Mode'");
     expect(mobileNav).not.toContain('path: RoutePath.RELEASE');
@@ -139,26 +140,17 @@ describe('signed-in mobile navigation contract', () => {
 
   it('uses page-owned back buttons for the intended mobile route flow', () => {
     const insights = read('pages/dashboard/Insights.tsx');
-    const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
 
     expect(insights).toContain('onClick={() => navigate(RoutePath.DASHBOARD)}');
-    expect(lifeWiki).toContain('onClick={() => navigate(RoutePath.INSIGHTS)}');
-    expect(lifeWiki).toContain('onClick={() => navigate(RoutePath.SANCTUARY)}');
   });
 
   it('keeps audited mobile refresh actions labelled and 44px touch-safe', () => {
     const home = read('pages/dashboard/HomeAuthenticated.tsx');
-    const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
     const homeRefreshButton = home.slice(
       home.indexOf('aria-label="Refresh today\'s reflection prompt"') - 260,
       home.indexOf('aria-label="Refresh today\'s reflection prompt"') + 80,
     );
-    const lifeWikiRefreshButton = lifeWiki.slice(
-      lifeWiki.indexOf('aria-label="Refresh Life Wiki with AI"') - 260,
-      lifeWiki.indexOf('aria-label="Refresh Life Wiki with AI"') + 80,
-    );
 
     expect(homeRefreshButton).toContain('h-11 min-w-11');
-    expect(lifeWikiRefreshButton).toContain('min-h-11 min-w-11');
   });
 });

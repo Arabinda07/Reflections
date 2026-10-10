@@ -1,11 +1,10 @@
 import { noteService } from './noteService';
 import { storageService } from './storageService';
-import { aiRunClient } from './aiRunClient';
 import { observationService } from './observationService';
 import { extractTasksFromContent, mergeTasks } from '../src/utils/taskParser';
 import { supabase } from '../src/supabaseClient';
 import type { Note, NoteAttachment, Task } from '../types';
-import { isPrivateAiDisabled, type UserMode } from './privateMode';
+import type { UserMode } from './privateMode';
 import { embeddingService } from './embedding/embeddingService';
 import { relationshipService } from './relationshipService';
 
@@ -21,7 +20,7 @@ export interface NotePublishInput {
   existingAttachments: NoteAttachment[];
   newAttachments: File[];
   smartModeEnabled: boolean;
-  /** Null while mode is still resolving — Smart Mode must not run until known. */
+  /** Null while mode is still resolving. */
   userMode: UserMode | null;
 }
 
@@ -95,21 +94,6 @@ export const notePublishingOrchestrator = {
     }
 
     void embeddingService.embedNote(savedNote).catch(() => {});
-
-    // Smart mode auto-ingest (fire-and-forget). Fail-closed: unknown mode must
-    // not be treated as reflective, or encrypted users could trigger AI while
-    // UserModeContext is still loading / errored.
-    if (
-      input.smartModeEnabled &&
-      input.userMode != null &&
-      !isPrivateAiDisabled(input.userMode)
-    ) {
-      aiRunClient
-        .startLifeWikiRefresh({ trigger: 'smart_mode', noteId: savedNote.id })
-        .catch((error) => {
-          console.error('[NotePublishingOrchestrator] Smart Mode auto-ingest failed:', error);
-        });
-    }
 
     // Observation check
     const [totalCount, recentNotes] = await Promise.all([

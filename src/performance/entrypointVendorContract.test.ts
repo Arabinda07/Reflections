@@ -50,7 +50,6 @@ describe('entrypoint vendor loading contract', () => {
     const signIn = read('pages/auth/SignIn.tsx');
     const signUp = read('pages/auth/SignUp.tsx');
     const notePublisher = read('services/notePublishingOrchestrator.ts');
-    const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
     const moodPicker = read('pages/dashboard/MoodPicker.tsx');
     const proUpgrade = read('components/ui/ProUpgradeCTA.tsx');
 
@@ -63,7 +62,6 @@ describe('entrypoint vendor loading contract', () => {
       signIn,
       signUp,
       notePublisher,
-      lifeWiki,
       moodPicker,
       proUpgrade,
     ]) {

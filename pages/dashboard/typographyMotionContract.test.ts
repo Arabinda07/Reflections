@@ -104,7 +104,6 @@ describe('Typography and motion contract', () => {
     const auditedMotionFiles = [
       'pages/dashboard/HomeAuthenticated.tsx',
       'pages/dashboard/Insights.tsx',
-      'pages/dashboard/LifeWiki.tsx',
       'components/ui/AmbientMusicButton.tsx',
     ];
 
@@ -122,13 +121,5 @@ describe('Typography and motion contract', () => {
     // Insights is prose-led now: no broad or layout-property animations.
     expect(insights).not.toContain('transition-all');
     expect(ambientButton).toContain('scaleY: bar.h.map');
-  });
-
-  it('keeps the Sanctuary entry animation unframed and full-screen', () => {
-    const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
-
-    expect(lifeWiki).toContain('pointer-events-none absolute inset-0 z-0 flex items-center justify-center');
-    expect(lifeWiki).toContain('SANCTUARY_LEVEL_UP_ANIMATION_SRC');
-    expect(lifeWiki).not.toContain('h-32 w-32 overflow-hidden rounded-[var(--radius-panel)] bg-green/5');
   });
 });

@@ -1,10 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { AddressBook } from '@phosphor-icons/react/AddressBook';
 import { CirclesThreePlus } from '@phosphor-icons/react/CirclesThreePlus';
 import { ClockCounterClockwise } from '@phosphor-icons/react/ClockCounterClockwise';
 import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
-import { ArrowUpRight } from '@phosphor-icons/react/ArrowUpRight';
 import { Plus } from '@phosphor-icons/react/Plus';
 import { Tray } from '@phosphor-icons/react/Tray';
 import { User } from '@phosphor-icons/react/User';
@@ -22,9 +20,6 @@ import { useToast } from '../../components/ui/Toast';
 import { noteService } from '../../services/noteService';
 import { relationshipService } from '../../services/relationshipService';
 import { relationshipImportService } from '../../services/relationshipImportService';
-import { countMentionedNames } from '../../services/relationshipWikiLink';
-import { useUserMode } from '../../context/UserModeContext';
-import { wikiService } from '../../services/wikiService';
 import type { Note, RelationshipImportInboxItem, RelationshipRecord } from '../../types';
 import { RoutePath } from '../../types';
 import { RelationshipImportInbox } from './RelationshipImportInbox';
@@ -43,7 +38,6 @@ export const Relationships: React.FC = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const { showToast } = useToast();
-  const { userMode } = useUserMode();
   const [relationships, setRelationships] = useState<RelationshipRecord[]>([]);
   const [inbox, setInbox] = useState<RelationshipImportInboxItem[]>([]);
   const [notes, setNotes] = useState<Note[]>([]);
@@ -51,7 +45,6 @@ export const Relationships: React.FC = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [hasPendingSync, setHasPendingSync] = useState(false);
-  const [peopleWiki, setPeopleWiki] = useState('');
   const [showArchived, setShowArchived] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<RelationshipRecord | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -63,10 +56,6 @@ export const Relationships: React.FC = () => {
   const activePeople = useMemo(() => relationships.filter((item) => item.stage !== 'archived'), [relationships]);
   const archivedPeople = useMemo(() => relationships.filter((item) => item.stage === 'archived'), [relationships]);
   const suggestions = useMemo(() => relationshipService.buildWeeklySuggestions(relationships), [relationships]);
-  const wikiMentionCount = useMemo(
-    () => countMentionedNames(peopleWiki, relationships.map((relationship) => relationship.name)),
-    [peopleWiki, relationships],
-  );
 
   const latestNoteByPersonId = useMemo(() => {
     const map = new Map<string, Note>();
@@ -114,14 +103,6 @@ export const Relationships: React.FC = () => {
   }, [showToast]);
 
   useEffect(() => { void load(); }, [load]);
-
-  useEffect(() => {
-    let active = true;
-    void wikiService.getWikiPage('people')
-      .then((page) => { if (active) setPeopleWiki(page?.content || ''); })
-      .catch(() => {});
-    return () => { active = false; };
-  }, []);
 
   useEffect(() => {
     if (searchParams.get('add') === '1' || searchParams.get('add') === 'true') {
@@ -450,9 +431,6 @@ export const Relationships: React.FC = () => {
                   </div>
                 </div>
               </Surface>
-              {userMode !== 'encrypted' && (
-                <Surface variant="flat" tone="paper" className="p-6"><div className="flex items-center gap-2"><AddressBook size={18} weight="duotone" className="text-green" /><p className="label-caps text-gray-nav">Life Wiki</p></div><p className="mt-4 text-sm font-medium leading-relaxed text-gray-light">{wikiMentionCount > 0 ? `${wikiMentionCount} of your people ${wikiMentionCount === 1 ? 'appears' : 'appear'} in your People room. Open a profile to see what you've written and turn it into a reason to reach out.` : "Your People room holds what you've written about people. Names that match your relationships show up on their profiles."}</p><Link to={RoutePath.SANCTUARY_ARTICLE.replace(':pageType', 'people')} className="mt-5 inline-flex items-center gap-1 text-sm font-bold text-green hover:text-green-hover transition-colors"><span>Open People room</span><ArrowUpRight size={14} weight="bold" /></Link></Surface>
-              )}
             </aside>
           </section>
         </div>

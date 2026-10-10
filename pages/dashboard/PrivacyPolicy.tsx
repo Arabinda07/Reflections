@@ -22,16 +22,15 @@ const policySections: PolicySection[] = [
     icon: 'database',
     body: [
       'Reflections stores the account information needed to sign you in, including your email address and profile details you choose to save, such as your name, display name, timezone, and avatar.',
-      'The app stores the writing you create here: notes, moods, tags, tasks, attachments, note covers, future letters, mood check-ins, Life Wiki pages, relationships, referral invite status, and the small usage counters needed for Free and Pro access. For users in Encrypted Vault mode, private writing is encrypted on your device before it reaches the server.',
+      'The app stores the writing you create here: notes, moods, tags, tasks, attachments, note covers, future letters, mood check-ins, relationships, referral invite status, and the small usage counters needed for Free and Pro access. Private writing is encrypted on your device before it reaches the server.',
     ],
   },
   {
-    title: 'Privacy Modes: Encrypted Vault vs Reflective Sanctuary',
+    title: 'Encrypted Vault',
     icon: 'shield',
     body: [
-      'Reflections offers two privacy modes. In Encrypted Vault, your private writing — notes, moods, tags, tasks, attachments, future letters, Life Wiki pages, and relationships — is encrypted on your device before it is saved. The key is derived from your password and never sent to the server, so what Reflections stores is data it cannot read.',
-      'Because the key stays on your device in Encrypted Vault mode, you unlock your writing once on each device you use. If you forget your password, the recovery phrase is the only other way to unlock your writing. AI features that need the server to read your writing stay off while this protection is on.',
-      'In Reflective Sanctuary mode, device-side encryption is bypassed so that the Gemini API can process your notes server-side for AI reflections. Your data is still secured with Supabase account security, private storage, and Row Level Security.',
+      'Your private writing — notes, moods, tags, tasks, attachments, future letters, and relationships — is encrypted on your device before it is saved. The key is derived from your password and never sent to the server, so what Reflections stores is data it cannot read.',
+      'Because the key stays on your device, you unlock your writing once on each device you use. If you forget your password, the recovery phrase is the only other way to unlock your writing.',
     ],
   },
   {
@@ -51,13 +50,11 @@ const policySections: PolicySection[] = [
     ],
   },
   {
-    title: 'AI and Smart Mode',
-    icon: 'robot',
+    title: 'On-device intelligence',
+    icon: 'device',
     body: [
-      'Most AI work runs when you choose an AI action, or when you explicitly turn on Smart Mode. If you use Reflect with AI, Refresh with AI, or Smart Mode, the relevant writing is sent to the AI service so it can return that result.',
-      'The Home dashboard may also refresh short note suggestions. If your Life Wiki has an index page, that index may be sent as context for those suggestions.',
-      'We do not use your personal notes to train AI models. AI reflections and Life Wiki updates are saved only to your account. They are for personal reflection, not medical advice.',
-      'Smart Mode can be turned off in Account. Turning it off stops future automatic Life Wiki refreshes. It does not delete Life Wiki pages that already exist.',
+      'Reflections has no server-side AI. Related notes, tag suggestions, and search run on your device with a small embedding model, so your writing is never sent to an AI service.',
+      'Those embeddings stay in local storage on your device and are cleared when your vault locks. We do not use your notes to train AI models.',
     ],
   },
   {
@@ -65,7 +62,7 @@ const policySections: PolicySection[] = [
     icon: 'chart',
     body: [
       'Reflections does not send product analytics, route tracking, session replay, or error-monitoring events to PostHog, Sentry, Vercel Analytics, or Vercel Speed Insights.',
-      'The services that run chosen features can still process the data needed for those features, such as Supabase sign-in and storage, AI requests, payments, email delivery, and ordinary hosting logs.',
+      'The services that run chosen features can still process the data needed for those features, such as Supabase sign-in and storage, payments, email delivery, and ordinary hosting logs.',
     ],
   },
   {
@@ -97,8 +94,8 @@ const policySections: PolicySection[] = [
     title: 'Security and service limits',
     icon: 'shield',
     body: [
-      'For users in Encrypted Vault mode, private writing is encrypted on your device before it is saved. For all users, Reflections uses Supabase account security, private storage, Row Level Security, and encrypted connections. No online service can promise perfect security.',
-      'Some features require an internet connection. AI features, sync, payments, and exports can fail if a provider is unavailable. Features and Free or Pro limits may change as the product changes, but the app should explain limits plainly where they matter.',
+      'Private writing is encrypted on your device before it is saved. Reflections also uses Supabase account security, private storage, Row Level Security, and encrypted connections. No online service can promise perfect security.',
+      'Some features require an internet connection. Sync, payments, and exports can fail if a provider is unavailable. Features and Free or Pro limits may change as the product changes, but the app should explain limits plainly where they matter.',
     ],
   },
 ];
@@ -106,13 +103,13 @@ const policySections: PolicySection[] = [
 const principles = [
   {
     title: 'Stays private',
-    body: 'Notes, moods, tags, tasks, letters, and Life Wiki pages are scoped to your account.',
+    body: 'Notes, moods, tags, tasks, letters, and relationships are scoped to your account.',
     icon: 'shield' as const,
   },
   {
-    title: 'Leaves only by action',
-    body: 'AI receives relevant writing only when you choose an AI action, or when Smart Mode is enabled.',
-    icon: 'robot' as const,
+    title: 'Read only by you',
+    body: 'There is no server-side AI. Suggestions and search run on your device.',
+    icon: 'device' as const,
   },
   {
     title: 'Can be removed',
@@ -142,7 +139,7 @@ export const PrivacyPolicy: React.FC = () => {
         updated="June 2026"
         intro={
           <p className="max-w-xl font-serif text-lg leading-relaxed text-gray-light">
-            This page explains what Reflections stores, when AI is used, how payments work, and how you can remove your
+            This page explains what Reflections stores, how your writing is encrypted, how payments work, and how you can remove your
             writing.
           </p>
         }
@@ -156,8 +153,8 @@ export const PrivacyPolicy: React.FC = () => {
           </h2>
           <div className="mt-7 max-w-[62ch] space-y-4 font-sans text-ui-base leading-relaxed text-gray-light">
             <p>
-              Reflections stores the account and writing data needed to make the journal work. AI runs only for the
-              actions you choose, or for Smart Mode if you turn it on.
+              Reflections stores the account and writing data needed to make the journal work. Private writing is
+              encrypted on your device, and suggestions run on your device too.
             </p>
             <p>
               You can export notes, delete individual notes, and request account closure when you want the sign-in

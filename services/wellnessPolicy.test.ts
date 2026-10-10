@@ -1,12 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import {
-  FREE_AI_REFLECTION_SAMPLES,
-  FREE_MONTHLY_NOTE_LIMIT,
-  getAiReflectionGate,
-  getMonthlyNoteUsage,
-  getWikiInsightsGate,
-} from './wellnessPolicy';
-import type { Note, WellnessAccess, WikiInsightsGate } from '../types';
+import { FREE_MONTHLY_NOTE_LIMIT, getMonthlyNoteUsage } from './wellnessPolicy';
+import type { Note, WellnessAccess } from '../types';
 
 const note = (id: string, createdAt: string): Note => ({
   id,
@@ -17,9 +11,8 @@ const note = (id: string, createdAt: string): Note => ({
 });
 
 describe('wellnessPolicy', () => {
-  it('uses a 30 note monthly free limit and one free AI sample', () => {
+  it('uses a 30 note monthly free limit', () => {
     expect(FREE_MONTHLY_NOTE_LIMIT).toBe(30);
-    expect(FREE_AI_REFLECTION_SAMPLES).toBe(1);
   });
 
   it('counts only notes from the current month', () => {
@@ -36,113 +29,6 @@ describe('wellnessPolicy', () => {
       monthlyLimit: 30,
       remainingThisMonth: 28,
       canCreateNote: true,
-    });
-  });
-
-  it('gates AI reflection for free users before enough notes and after the sample is used', () => {
-    const access: WellnessAccess = {
-      userId: 'user-1',
-      planTier: 'free',
-      freeAiReflectionsUsed: 1,
-      freeWikiInsightsUsed: 0,
-      smartModeEnabled: false,
-    };
-
-    expect(getAiReflectionGate(access, 2, true)).toEqual({
-      canReflect: false,
-      reason: 'needs_more_notes',
-      remainingFreeSamples: 0,
-      requiresUpgrade: false,
-    });
-
-    expect(getAiReflectionGate(access, 3, true)).toEqual({
-      canReflect: false,
-      reason: 'sample_used',
-      remainingFreeSamples: 0,
-      requiresUpgrade: true,
-    });
-  });
-
-  it('lets free users use one sample after a few notes', () => {
-    const access: WellnessAccess = {
-      userId: 'user-1',
-      planTier: 'free',
-      freeAiReflectionsUsed: 0,
-      freeWikiInsightsUsed: 0,
-      smartModeEnabled: false,
-    };
-
-    expect(getAiReflectionGate(access, 3, true)).toEqual({
-      canReflect: true,
-      remainingFreeSamples: 1,
-      requiresUpgrade: false,
-    });
-  });
-
-  it('gates wiki generation below the minimum entry count', () => {
-    const access: WellnessAccess = {
-      userId: 'user-1',
-      planTier: 'free',
-      freeAiReflectionsUsed: 0,
-      freeWikiInsightsUsed: 0,
-      smartModeEnabled: false,
-    };
-
-    expect(getWikiInsightsGate(access, 2)).toEqual<WikiInsightsGate>({
-      canGenerate: false,
-      reason: 'needs_more_entries',
-      remainingFreeGenerations: 1,
-      requiresUpgrade: false,
-    });
-  });
-
-  it('allows one free wiki generation after enough entries', () => {
-    const access: WellnessAccess = {
-      userId: 'user-1',
-      planTier: 'free',
-      freeAiReflectionsUsed: 1,
-      freeWikiInsightsUsed: 0,
-      smartModeEnabled: false,
-    };
-
-    expect(getWikiInsightsGate(access, 3)).toEqual<WikiInsightsGate>({
-      canGenerate: true,
-      remainingFreeGenerations: 1,
-      requiresUpgrade: false,
-    });
-  });
-
-  it('gates wiki generation after the free generation is exhausted', () => {
-    const access: WellnessAccess = {
-      userId: 'user-1',
-      planTier: 'free',
-      freeAiReflectionsUsed: 0,
-      freeWikiInsightsUsed: 1,
-      smartModeEnabled: false,
-    };
-
-    expect(getWikiInsightsGate(access, 3)).toEqual<WikiInsightsGate>({
-      canGenerate: false,
-      reason: 'free_limit_reached',
-      remainingFreeGenerations: 0,
-      requiresUpgrade: true,
-    });
-  });
-
-  it('gates pro users below the minimum entry count', () => {
-    const access: WellnessAccess = {
-      userId: 'user-1',
-      planTier: 'pro',
-      freeAiReflectionsUsed: 1,
-      freeWikiInsightsUsed: 1,
-      smartModeEnabled: false,
-    };
-
-    expect(getWikiInsightsGate(access, 0)).toEqual<WikiInsightsGate>({
-      canGenerate: false,
-      reason: 'needs_more_entries',
-      remainingFreeGenerations: 0,
-      requiresUpgrade: false,
     });
   });
 });

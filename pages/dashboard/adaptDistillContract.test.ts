@@ -12,7 +12,6 @@ describe('adapt and distill source contract', () => {
     const home = read('pages/dashboard/HomeAuthenticated.tsx');
     const createNote = read('pages/dashboard/CreateNote.tsx');
     const myNotes = read('pages/dashboard/MyNotes.tsx');
-    const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
     const button = read('components/ui/Button.tsx');
 
     expect(landing).toContain('min-h-11');
@@ -22,8 +21,6 @@ describe('adapt and distill source contract', () => {
     expect(myNotes).toContain('control-surface inline-flex h-11 w-11');
     expect(myNotes).toContain('flex min-h-11 w-full items-center');
     expect(createNote).toContain('inline-flex min-h-11 items-center gap-2 whitespace-nowrap');
-    expect(lifeWiki).toContain('flex min-h-11 w-fit items-center');
-    expect(lifeWiki).toContain('flex min-h-11 min-w-11 items-center justify-center gap-2');
   });
 
   it('removes repeated grain overlays and flattens the FAQ guide', () => {
@@ -48,13 +45,9 @@ describe('adapt and distill source contract', () => {
     expect(faq).not.toContain('Plain answers');
   });
 
-  it('keeps the Life Wiki and Pro upgrade surfaces quiet after distill', () => {
-    const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
+  it('keeps the Pro upgrade surface quiet after distill', () => {
     const proUpgrade = read('components/ui/ProUpgradeCTA.tsx');
 
-    expect(lifeWiki).not.toContain('tone.wash');
-    expect(lifeWiki).not.toContain('Hash');
-    expect(lifeWiki).toContain('SANCTUARY_LEVEL_UP_ANIMATION_SRC');
     expect(proUpgrade).not.toContain('cycling.mp4');
     expect(proUpgrade).toContain('More room when life gets loud');
     expect(proUpgrade).toContain('No surprise charges. No guilt trip. Cancel anytime.');

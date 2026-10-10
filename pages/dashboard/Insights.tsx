@@ -1,9 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
-import { Book } from '@phosphor-icons/react/Book';
-import { CaretRight } from '@phosphor-icons/react/CaretRight';
 
 import { LottieAnimation } from '../../components/ui/LottieAnimation';
 import { Button } from '../../components/ui/Button';
@@ -12,19 +10,12 @@ import { PageContainer } from '../../components/ui/PageContainer';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { Surface } from '../../components/ui/Surface';
 import { WeeklyRecapLoadingSkeleton } from '../../components/ui/skeletons/WeeklyRecapLoadingSkeleton';
-import { LifeTheme, MoodCheckin, Note, RelationshipRecord, RitualEvent, RoutePath, WellnessAccess } from '../../types';
+import { MoodCheckin, Note, RelationshipRecord, RitualEvent, RoutePath } from '../../types';
 import { noteService } from '../../services/noteService';
 import { relationshipService } from '../../services/relationshipService';
-import { wikiService } from '../../services/wikiService';
-import { profileService } from '../../services/profileService';
-import { FREE_WIKI_MINIMUM_ENTRIES, getWikiInsightsGate } from '../../services/wellnessPolicy';
 import { buildWeeklyRecap } from '../../services/weeklyRecapService';
 import { moodCheckinService } from '../../services/moodService';
 import { ritualEventService } from '../../services/ritualService';
-import {
-  SANCTUARY_LEVEL_UP_ANIMATION_ID,
-  SANCTUARY_LEVEL_UP_ANIMATION_SRC,
-} from '../../src/lottie/sanctuaryAnimation';
 import { getMoodConfig, getMoodFamilyForMood, getMoodGroupConfig } from './moodConfig';
 import {
   buildMonthSummary,
@@ -32,12 +23,8 @@ import {
   buildTagsSentence,
   buildWeekSummary,
 } from './insightsNarrative';
-import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useViewTransitionNavigation } from '../../hooks/useViewTransitionNavigation';
-import { useUserMode } from '../../context/UserModeContext';
 import { computeMindsetDrift, type MindsetDriftReport } from '../../services/mindsetDrift';
-
-const SANCTUARY_ENTRANCE_FALLBACK_MS = 2200;
 
 const getWeekSignalSince = () => {
   const start = new Date();
@@ -48,35 +35,24 @@ const getWeekSignalSince = () => {
 
 export const Insights: React.FC = () => {
   const navigate = useViewTransitionNavigation();
-  const { userMode } = useUserMode();
 
   const [notes, setNotes] = useState<Note[]>([]);
-  const [themes, setThemes] = useState<LifeTheme[]>([]);
   const [moodCheckins, setMoodCheckins] = useState<MoodCheckin[]>([]);
   const [ritualEvents, setRitualEvents] = useState<RitualEvent[]>([]);
   const [relationships, setRelationships] = useState<RelationshipRecord[]>([]);
-  const [access, setAccess] = useState<WellnessAccess | null>(null);
-  const [isOpeningSanctuary, setIsOpeningSanctuary] = useState(false);
   const [loading, setLoading] = useState(true);
-  const isOpeningSanctuaryRef = useRef(false);
-  const openingTimerRef = useRef<number | null>(null);
-  const shouldReduceMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [allNotes, allThemes, accessData, checkins, events, allRelationships] = await Promise.all([
+        const [allNotes, checkins, events, allRelationships] = await Promise.all([
           noteService.getAll(),
-          wikiService.getAllThemes(),
-          profileService.getWellnessAccess(),
           moodCheckinService.list(),
           ritualEventService.listSince(getWeekSignalSince()),
           relationshipService.getAll(),
         ]);
 
         setNotes(allNotes);
-        setThemes(allThemes);
-        setAccess(accessData);
         setMoodCheckins(checkins);
         setRitualEvents(events);
         setRelationships(allRelationships);
@@ -159,15 +135,6 @@ export const Insights: React.FC = () => {
     ritualEvents,
   }), [moodCheckins, notes, ritualEvents]);
 
-  const wikiGate = useMemo(() => {
-    if (!access || userMode !== 'reflective') return null;
-    return getWikiInsightsGate(access, notes.length);
-  }, [access, notes.length, userMode]);
-
-  const isWikiReadyToBuild = Boolean(
-    userMode === 'reflective' && wikiGate?.canGenerate && notes.length >= FREE_WIKI_MINIMUM_ENTRIES && themes.length === 0,
-  );
-
   // Weave the weekly/monthly signal into prose rather than a stat grid.
   const moodLabels = weeklyRecap.moodFamilyData
     .slice(0, 2)
@@ -228,80 +195,10 @@ export const Insights: React.FC = () => {
       .sort((a, b) => b.count - a.count);
   }, [notes, relationships]);
 
-  const completeOpenSanctuary = useCallback(() => {
-    if (!isOpeningSanctuaryRef.current) return;
-
-    isOpeningSanctuaryRef.current = false;
-    if (openingTimerRef.current !== null) {
-      window.clearTimeout(openingTimerRef.current);
-      openingTimerRef.current = null;
-    }
-
-    navigate(RoutePath.SANCTUARY, { state: { fromInsights: true } });
-  }, [navigate]);
-
-  const handleOpenSanctuary = useCallback((event: React.MouseEvent<HTMLAnchorElement>) => {
-    event.preventDefault();
-    if (isOpeningSanctuaryRef.current) return;
-
-    if (shouldReduceMotion) {
-      navigate(RoutePath.SANCTUARY, { state: { fromInsights: true } });
-      return;
-    }
-
-    isOpeningSanctuaryRef.current = true;
-    setIsOpeningSanctuary(true);
-    openingTimerRef.current = window.setTimeout(completeOpenSanctuary, SANCTUARY_ENTRANCE_FALLBACK_MS);
-  }, [completeOpenSanctuary, navigate, shouldReduceMotion]);
-
-  useEffect(() => {
-    return () => {
-      if (openingTimerRef.current !== null) {
-        window.clearTimeout(openingTimerRef.current);
-      }
-    };
-  }, []);
-
   const isEmpty = notes.length === 0 && weeklyRecap.writingDays === 0;
   const isQuietWeek = weeklyRecap.writingDays === 0;
 
   return (
-    <>
-      {isOpeningSanctuary ? (
-          <div
-            className="fixed inset-0 z-overlay flex items-center justify-center overflow-hidden bg-body px-6 animate-fade-in"
-            aria-live="polite"
-            aria-label="Opening Sanctuary"
-          >
-            <div className="sanctuary-entrance-glow absolute inset-0" />
-            <div className="sanctuary-entrance-scrim absolute inset-0" />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center animate-scale-in"
-            >
-              <div className="h-[min(66vmin,34rem)] w-[min(66vmin,34rem)]">
-                <LottieAnimation
-                  src={SANCTUARY_LEVEL_UP_ANIMATION_SRC}
-                  animationId={SANCTUARY_LEVEL_UP_ANIMATION_ID}
-                  autoplay
-                  loop={false}
-                  onComplete={completeOpenSanctuary}
-                />
-              </div>
-            </div>
-            <div
-              className="relative z-10 flex max-w-2xl flex-col items-center text-center animate-fade-in-up"
-            >
-              <h2 className="mt-4 text-4xl font-display font-bold leading-tight text-gray-text md:text-5xl">
-                Opening Sanctuary
-              </h2>
-              <p className="mt-4 max-w-prose text-base font-medium leading-relaxed text-gray-light">
-                Crossing into the library without breaking the calm of the page.
-              </p>
-            </div>
-          </div>
-        ) : null}
-
       <PageContainer scope="sage" className="pb-24 pt-6 md:pt-10">
         <div className="core-page-stack">
           <button
@@ -478,48 +375,9 @@ export const Insights: React.FC = () => {
               </section>
             </div>
           </Surface>
-
-          <Surface
-            variant="flat"
-            tone="sage"
-            className="group relative overflow-hidden rounded-4xl"
-          >
-            <Link
-              to={RoutePath.SANCTUARY}
-              state={{ fromInsights: true }}
-              onClick={handleOpenSanctuary}
-              className="relative z-10 flex w-full flex-col items-center justify-between gap-8 p-8 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-green/40 md:flex-row md:p-12"
-              aria-label="Open your Life Wiki"
-            >
-              <div className="space-y-5">
-                {isWikiReadyToBuild && (
-                  <div className="h-24 w-24 overflow-hidden rounded-4xl bg-accent-soft">
-                    <LottieAnimation src={SANCTUARY_LEVEL_UP_ANIMATION_SRC} animationId={SANCTUARY_LEVEL_UP_ANIMATION_ID} autoplay loop />
-                  </div>
-                )}
-                <div className="space-y-3">
-                  <h2 className="flex items-center gap-2.5 text-3xl font-display font-bold text-gray-text">
-                    {!isWikiReadyToBuild && <Book size={24} weight="duotone" className="flex-none text-green" />}
-                    {isWikiReadyToBuild ? 'Your wiki is ready for insights' : 'Your Life Wiki'}
-                  </h2>
-                  <p className="text-gray-light max-w-lg text-lg leading-relaxed font-serif italic">
-                    {isWikiReadyToBuild
-                      ? 'You have enough writing to build your first Life Wiki refresh when you choose.'
-                      : 'A private reading room where AI-generated wiki pages stay grounded in your saved notes.'}
-                  </p>
-                </div>
-              </div>
-
-              <div className="relative flex h-12 shrink-0 items-center justify-center overflow-hidden rounded-control border border-green bg-green text-white px-6 label-caps transition-colors duration-300 group-hover:bg-green/90">
-                Open Sanctuary
-                <CaretRight size={16} weight="regular" className="ml-2 transition-transform duration-500 ease-out-expo group-hover:translate-x-1" />
-              </div>
-            </Link>
-          </Surface>
           </>)}
           </div>
         </div>
       </PageContainer>
-    </>
   );
 };

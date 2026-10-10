@@ -15,7 +15,6 @@ describe('lottie surface mapping contract', () => {
     const lottieAnimation = read('components/ui/LottieAnimation.tsx');
     const notFound = read('pages/NotFound.tsx');
     const myNotes = read('pages/dashboard/MyNotes.tsx');
-    const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
 
     expect(createNote).toContain("import('../../components/ui/TrailLoadingMark')");
     expect(trailLoadingMark).toContain("from '@/src/lottie/trail-loading.json'");
@@ -28,9 +27,5 @@ describe('lottie surface mapping contract', () => {
     expect(lottieAnimation).toContain("from 'lottie-react'");
     expect(notFound).toContain('/assets/lottie/error-404.json');
     expect(myNotes).toContain('/assets/lottie/empty-notes.json');
-    expect(lifeWiki).toContain('SANCTUARY_LEVEL_UP_ANIMATION_SRC');
-    expect(lifeWiki).toContain('const [isEnteringWiki, setIsEnteringWiki]');
-    expect(lifeWiki).toContain('location.pathname === RoutePath.WIKI');
-    expect(lifeWiki).toContain('isRefreshingWiki || isEnteringWiki');
   });
 });

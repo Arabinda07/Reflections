@@ -19,7 +19,8 @@ describe('voice refresh copy safety', () => {
       "An encrypted journal for writing what's on your mind and noticing patterns. Free to start.",
     );
     expect(privacy).toContain('What Reflections keeps');
-    expect(privacy).toContain('AI and Smart Mode');
+    expect(privacy).toContain('On-device intelligence');
+    expect(privacy).not.toContain('Gemini');
   });
 
   it('keeps public copy away from overclaiming AI, therapy, or pressure language', () => {

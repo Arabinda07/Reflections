@@ -6,20 +6,17 @@ const read = (filePath: string) =>
   readFileSync(path.resolve(process.cwd(), filePath), 'utf8');
 
 describe('phase 1 product contract and clarity', () => {
-  it('keeps AI explicit and on demand instead of running in the background', () => {
+  it('keeps server-side AI out of the app entirely', () => {
     const createNote = read('pages/dashboard/CreateNote.tsx');
     const insights = read('pages/dashboard/Insights.tsx');
-    const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
 
     expect(createNote).not.toContain('processNoteIntoWiki');
     expect(createNote).not.toContain("requestJson<string[]>('prompts'");
     expect(createNote).not.toContain('Reflect with AI');
 
-    expect(insights).toContain('<Link');
-    expect(insights).toContain('to={RoutePath.SANCTUARY}');
-    expect(insights).not.toContain('onClick={() => navigate(RoutePath.SANCTUARY)}');
-    expect(lifeWiki).toContain('getWikiInsightsGate');
-    expect(lifeWiki).toContain("aiRunClient.startLifeWikiRefresh({ trigger: 'manual' })");
+    expect(createNote).not.toContain('aiService');
+    expect(insights).not.toContain('RoutePath.SANCTUARY');
+    expect(insights).not.toContain('wikiService');
     expect(insights).not.toContain('getAiReflectionGate');
     expect(insights).not.toContain('incrementFreeAiReflections');
   });

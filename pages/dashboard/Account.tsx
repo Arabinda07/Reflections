@@ -188,10 +188,10 @@ export const Account: React.FC = () => {
     const encryptionPrefix = userMode === 'encrypted' ? 'Your writing is encrypted on this device. ' : '';
     
     if (access?.planTier === 'pro') {
-      return `${encryptionPrefix}Pro gives you unlimited commonplace spaces, on-demand AI memory synthesis, and custom relationship rhythms.`;
+      return `${encryptionPrefix}Pro gives you unlimited commonplace spaces and custom relationship rhythms.`;
     }
 
-    return `${encryptionPrefix}Free plan includes 30 entries each month, 1 AI reflection, and 1 Life Wiki refresh. If you cancel Pro, your past notes remain completely safe and readable.`;
+    return `${encryptionPrefix}Free plan includes 30 entries each month. If you cancel Pro, your past notes remain completely safe and readable.`;
   }, [access, userMode]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -623,7 +623,7 @@ export const Account: React.FC = () => {
                     <span className="text-sm font-medium text-gray-nav">
                       {userMode === 'encrypted'
                         ? 'Only you can read your writing'
-                        : 'AI features are enabled'}
+                        : 'Protected by account security'}
                     </span>
                   </div>
 
@@ -906,7 +906,7 @@ export const Account: React.FC = () => {
       >
         <div className="space-y-4 text-ui-sm font-medium leading-relaxed text-gray-light">
           <p>
-            This permanently deletes your commonplace archive. All notes, files, relationship logs, and compiled wiki pages will be wiped forever. We cannot recover them.
+            This permanently deletes your commonplace archive. All notes, files, and relationship logs will be wiped forever. We cannot recover them.
           </p>
           <p>
             If you want the sign-in account itself closed too, use the support request button here after deleting the saved archive.

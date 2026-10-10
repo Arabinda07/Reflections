@@ -156,14 +156,12 @@ describe('focused product slice source contract', () => {
       'pages/dashboard/AboutArabinda.tsx',
       'pages/dashboard/FutureLetters.tsx',
       'pages/dashboard/Account.tsx',
-      'api/ai.ts',
     ];
 
     liveCopyFiles.forEach((filePath) => {
       expect(read(filePath).toLowerCase()).not.toContain('quietly');
     });
     expect(read('pages/dashboard/FutureLetters.tsx').toLowerCase()).toContain('waiting to open');
-    expect(read('api/ai.ts')).toContain('calm, and reflective');
   });
 
   it('adds standalone mood check-ins without turning moods into scores', () => {
