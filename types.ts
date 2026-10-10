@@ -1,3 +1,4 @@
+import type { WikiPageType } from './services/wikiTypes';
 export type { MoodName, MoodValue } from './pages/dashboard/moodConfig';
 
 export interface NoteAttachment {
@@ -36,8 +37,9 @@ export interface LifeTheme {
   title: string;
   content: string;
   state: 'active' | 'archived' | 'resolved';
-  // Legacy column from the removed Life Wiki; kept so existing rows can still be migrated.
-  pageType: string;
+  // Distinguishes freeform user themes from LLM-maintained wiki pages.
+  // 'theme' = user-created (default, backward compatible)
+  pageType: WikiPageType;
   createdAt: string;
   updatedAt: string;
 }
@@ -72,6 +74,20 @@ export interface NoteUsage {
   monthlyLimit: number;
   remainingThisMonth: number;
   canCreateNote: boolean;
+}
+
+export interface AiReflectionGate {
+  canReflect: boolean;
+  reason?: 'needs_more_notes' | 'sample_used' | 'missing_content';
+  remainingFreeSamples: number;
+  requiresUpgrade: boolean;
+}
+
+export interface WikiInsightsGate {
+  canGenerate: boolean;
+  reason?: 'needs_more_entries' | 'free_limit_reached';
+  remainingFreeGenerations: number;
+  requiresUpgrade: boolean;
 }
 
 export interface MonthlyWellnessSummary {

@@ -110,7 +110,9 @@ export const DashboardLayout: React.FC = () => {
     isNoteEditRoute ||
     location.pathname === RoutePath.RELEASE;
 
-  const isMobileNavSuppressedRoute = location.pathname === RoutePath.INSIGHTS;
+  const isMobileNavSuppressedRoute =
+    location.pathname === RoutePath.INSIGHTS ||
+    location.pathname.startsWith(RoutePath.SANCTUARY);
 
   // While the vault is locked every private route shows the unlock panel, so
   // nav links would only lead back to it.

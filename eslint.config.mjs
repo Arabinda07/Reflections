@@ -287,6 +287,7 @@ export default tseslint.config(
       // Phase 3 — Authenticated views
       'pages/dashboard/HomeAuthenticated.tsx',
       'pages/dashboard/FutureLetters.tsx',
+      'pages/dashboard/LifeWiki.tsx',
       'pages/dashboard/MoodPicker.tsx',
       'pages/dashboard/moodConfig.ts',
       // Phase 3 — Layouts & Navigation

@@ -96,5 +96,7 @@ An audit found the embedding pipeline was never initialized in production (only 
 * [x] Echoes stores on-the-fly vectors with the note's real `updatedAt` (no re-embed churn).
 * [ ] Encrypt vectors at rest with the session data key (removes the full re-embed after each unlock).
 * [x] Remove dead Gemini code (`api/ai.ts`, `api/ai-runs.ts`, `@google/genai`, unused `aiService` functions); replace `suggestTags` with local nearest-tag lookup.
+* [x] Keep the Life Wiki page and stored pages with refreshes unplugged (`aiRunClient` stub).
+* [ ] Build Life Wiki pages on-device (extractive: cluster notes by embedding, quote the user's own sentences with note links).
 * [ ] Quiet Paper UI pass: filled primary buttons on auth/unlock, hide nav behind the unlock veil, Home "Desk", blank-page-first editor, Insights a11y.
 * [ ] Real on-device EmbeddingGemma on Android (only if Tier 1 proves insufficient).

@@ -71,15 +71,17 @@ describe('UserModeContext failure handling', () => {
   });
 });
 
-describe('Retired Life Wiki routes', () => {
+describe('Life Wiki route unification (ADR 0004)', () => {
   const source = read('App.tsx');
 
-  it('redirects legacy Life Wiki and Sanctuary routes to Insights', () => {
+  it('does not restrict Life Wiki or Sanctuary routes to reflective mode', () => {
     const lines = source.split('\n');
-    for (const route of ['RoutePath.WIKI}', 'RoutePath.SANCTUARY}', 'RoutePath.SANCTUARY_ARTICLE}']) {
-      const line = lines.find((candidate) => candidate.includes(route));
-      expect(line).toContain('<Navigate to={RoutePath.INSIGHTS} replace />');
-    }
+    const wikiLine = lines.find((line) => line.includes('RoutePath.WIKI'));
+    const sanctuaryLine = lines.find((line) => line.includes('RoutePath.SANCTUARY}'));
+    expect(wikiLine).toBeDefined();
+    expect(wikiLine).not.toContain("'reflective'");
+    expect(sanctuaryLine).toBeDefined();
+    expect(sanctuaryLine).not.toContain("'reflective'");
   });
 });
 

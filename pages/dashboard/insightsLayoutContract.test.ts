@@ -46,9 +46,9 @@ describe('Insights layout contract', () => {
     expect(app).toContain('path={RoutePath.INSIGHTS}');
     expect(app).not.toMatch(/path=\{RoutePath\.INSIGHTS\}\s+element=\{[^}]*withModeGuard[^}]*'reflective'/);
 
-    // Insights has no mode-gated Sanctuary CTA now that the Life Wiki is retired
-    expect(insights).not.toContain('useUserMode');
-    expect(insights).not.toContain('RoutePath.SANCTUARY');
+    // Insights uses userMode to conditionally gate the Sanctuary CTA
+    expect(insights).toContain('const { userMode } = useUserMode();');
+    expect(insights).toContain("userMode === 'reflective' &&");
   });
 });
 

@@ -4,7 +4,7 @@ A private, writing-first journaling app: React + Vite frontend, Vercel functions
 
 ## Gotchas
 
-- There is no server-side AI (Gemini, `api/ai*.ts`, and the Life Wiki were removed). All users are in `encrypted` mode (`services/privateMode.ts`), so the server can never read notes; all intelligence (related notes, tag suggestions, search) runs on-device via embeddings in `services/embedding/`. Don't add features that send note content to a server.
+- There is no server-side AI (Gemini and `api/ai*.ts` were removed). The Life Wiki page and stored pages remain, but refreshes are unplugged: `services/aiRunClient.ts` is a no-network stub until an on-device builder replaces it. All users are in `encrypted` mode (`services/privateMode.ts`), so the server can never read notes; all intelligence (related notes, tag suggestions, search) runs on-device via embeddings in `services/embedding/`. Don't add features that send note content to a server.
 - Product copy stays non-clinical: no diagnoses, labels, or wellness slogans. The product does not claim to be therapy.
 - The ~76 contract tests (`*.contract.test.ts`, `*Contract.test.ts`) read source files as text and assert on strings in them. Renaming a component, changing UI copy, or moving a call can fail them without any change in behavior. Run `npm test` after such edits.
 - `npm run lint` runs ESLint with zero warnings allowed, plus `tsc --noEmit`.
