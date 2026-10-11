@@ -297,6 +297,16 @@ describe('googleOAuth', () => {
     expect(mockSetSession).not.toHaveBeenCalled();
   });
 
+  it('refuses raw access/refresh tokens on the native callback (PKCE code only)', async () => {
+    const result = await consumeNativeGoogleOAuthCallback(
+      'com.arabinda.reflections://auth/callback#access_token=a&refresh_token=b',
+    );
+
+    expect(mockSetSession).not.toHaveBeenCalled();
+    expect(mockExchangeCodeForSession).not.toHaveBeenCalled();
+    expect(result).toEqual({ handled: false });
+  });
+
   it('accepts the app callback scheme when exchanging the native Google session', async () => {
     const result = await consumeNativeGoogleOAuthCallback(
       'com.arabinda.reflections://auth/callback?code=oauth-code',

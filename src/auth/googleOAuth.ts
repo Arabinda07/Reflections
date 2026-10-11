@@ -35,13 +35,10 @@ const parseAuthParams = (urlString: string) => {
       url.searchParams.get('error') ||
       hashParams.get('error_description') ||
       hashParams.get('error'),
-    accessToken: hashParams.get('access_token'),
-    refreshToken: hashParams.get('refresh_token'),
     hasAuthParams:
       Boolean(url.searchParams.get('code')) ||
       Boolean(url.searchParams.get('error')) ||
       Boolean(url.searchParams.get('error_description')) ||
-      Boolean(hashParams.get('access_token')) ||
       Boolean(hashParams.get('error')) ||
       Boolean(hashParams.get('error_description')),
     };
@@ -247,7 +244,7 @@ export const consumeNativeGoogleOAuthCallback = async (
   urlString: string,
 ): Promise<NativeGoogleOAuthResult> => {
   try {
-    const { code, error, accessToken, refreshToken, hasAuthParams } = parseAuthParams(urlString);
+    const { code, error, hasAuthParams } = parseAuthParams(urlString);
 
     if (!hasAuthParams) {
       return { handled: false };
@@ -262,19 +259,6 @@ export const consumeNativeGoogleOAuthCallback = async (
 
       if (exchangeError) {
         return { handled: true, success: false, error: exchangeError.message };
-      }
-
-      return { handled: true, success: true };
-    }
-
-    if (accessToken && refreshToken) {
-      const { error: sessionError } = await supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken,
-      });
-
-      if (sessionError) {
-        return { handled: true, success: false, error: sessionError.message };
       }
 
       return { handled: true, success: true };
