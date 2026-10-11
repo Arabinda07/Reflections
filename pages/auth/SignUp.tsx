@@ -124,7 +124,7 @@ export const SignUp: React.FC = () => {
       }
     } catch (err) {
       console.error('Signup error:', err);
-      setError('An unexpected error occurred. Please try again.');
+      setError('I couldn’t create your account just now. Try again in a moment.');
     } finally {
       setLoading(false);
     }
@@ -159,7 +159,7 @@ export const SignUp: React.FC = () => {
       const { success, error: authError } = authResult;
 
       if (!success) {
-        setError(authError || 'Failed to sign up with verified email.');
+        setError(authError || 'I couldn’t sign you up with verified email just now. Try again in a moment.');
         setLoading(false);
       } else {
         if (authResult.data?.session) {
@@ -170,7 +170,7 @@ export const SignUp: React.FC = () => {
       }
     } catch (err) {
       console.error('Verified Email error:', err);
-      setError('An unexpected error occurred. Please try again.');
+      setError('I couldn’t sign you up with verified email just now. Try again in a moment.');
       setLoading(false);
     }
   };

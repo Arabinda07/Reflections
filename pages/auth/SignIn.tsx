@@ -90,7 +90,14 @@ export const SignIn: React.FC = () => {
       });
 
       if (signInError) {
-        setError(signInError.message);
+        // ponytail: map the two common cases, hide raw backend text; extend if more come up
+        setError(
+          /invalid login credentials/i.test(signInError.message)
+            ? 'That email and password don’t match. Try again.'
+            : /email not confirmed/i.test(signInError.message)
+              ? 'Confirm your email first. The link is in your inbox.'
+              : 'I couldn’t sign you in just now. Try again in a moment.',
+        );
       } else if (data.session) {
         commitAuthSession(data.session);
         storePendingAccountPassword(password, data.session.user.id);
@@ -100,7 +107,7 @@ export const SignIn: React.FC = () => {
       }
     } catch (err) {
       console.error('Login error:', err);
-      setError('An unexpected error occurred. Please try again.');
+      setError('I couldn’t sign you in just now. Try again in a moment.');
     } finally {
       setLoading(false);
     }
@@ -136,7 +143,7 @@ export const SignIn: React.FC = () => {
       const { success, error: authError } = authResult;
 
       if (!success) {
-        setError(authError || 'Failed to sign in with verified email.');
+        setError(authError || 'I couldn’t sign you in with verified email just now. Try again in a moment.');
         setLoading(false);
       } else if (authResult.data?.session) {
         commitAuthSession(authResult.data.session);
@@ -146,7 +153,7 @@ export const SignIn: React.FC = () => {
       }
     } catch (err) {
       console.error('Verified Email error:', err);
-      setError('An unexpected error occurred. Please try again.');
+      setError('I couldn’t sign you in with verified email just now. Try again in a moment.');
       setLoading(false);
     }
   };
@@ -172,7 +179,7 @@ export const SignIn: React.FC = () => {
       setResetMessage('Password reset email sent. Check your inbox for the secure recovery link.');
     } catch (err) {
       console.error('Password reset error:', err);
-      setError('We could not send the reset email. Please try again.');
+      setError('I couldn’t send the reset email just now. Try again in a moment.');
     } finally {
       setLoading(false);
     }

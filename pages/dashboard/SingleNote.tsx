@@ -123,7 +123,7 @@ export const SingleNote: React.FC = () => {
     } catch (err) {
       console.error('Failed to update note:', err);
       setNote(previous);
-      setError('We could not save that change. Please try again.');
+      setError('I couldn’t save that change. Your note is unchanged. Try again.');
     }
   };
 
@@ -260,7 +260,7 @@ export const SingleNote: React.FC = () => {
       if (url.startsWith('blob:')) window.setTimeout(() => URL.revokeObjectURL(url), 0);
     } catch (err) {
       console.error('Failed to open attachment', err);
-      setError('This attachment could not be opened right now. Please try again.');
+      setError('I couldn’t open this attachment just now. It’s still saved. Try again.');
     }
   };
 

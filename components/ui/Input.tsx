@@ -10,6 +10,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 export const Input: React.FC<InputProps> = ({ label, error, icon: Icon, className = '', ...props }) => {
   const generatedId = useId();
   const inputId = props.id ?? generatedId;
+  const errorId = `${inputId}-error`;
 
   return (
     <div className="w-full space-y-2">
@@ -29,10 +30,16 @@ export const Input: React.FC<InputProps> = ({ label, error, icon: Icon, classNam
             Icon ? 'pl-12' : ''
           } ${error ? 'border-clay' : ''} ${className}`}
           {...props}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? [props['aria-describedby'], errorId].filter(Boolean).join(' ') : props['aria-describedby']}
           id={inputId}
         />
       </div>
-      {error && <p className="mt-1.5 text-xs font-bold text-clay ml-1">{error}</p>}
+      {error && (
+        <p id={errorId} role="alert" className="mt-1.5 text-ui-xs font-bold text-clay ml-1">
+          {error}
+        </p>
+      )}
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useId, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-type ToastVariant = 'success' | 'info' | 'warning';
+type ToastVariant = 'success' | 'info' | 'warning' | 'error';
 
 interface ToastData {
   id: string;
@@ -21,11 +21,13 @@ const ToastContext = React.createContext<ToastContextValue>({
 export const useToast = () => React.useContext(ToastContext);
 
 const AUTO_DISMISS_MS = 3200;
+const ERROR_DISMISS_MS = 7000; // errors need time to read and act on
 
 const variantStyles: Record<ToastVariant, string> = {
   success: 'border-green/20 bg-green/5 text-green',
   info: 'border-sky/20 bg-sky/5 text-sky',
   warning: 'border-honey/20 bg-honey/5 text-honey',
+  error: 'border-clay/20 bg-clay/5 text-clay',
 };
 
 const ToastItem: React.FC<{ toast: ToastData; onDismiss: (id: string) => void }> = ({
@@ -40,19 +42,26 @@ const ToastItem: React.FC<{ toast: ToastData; onDismiss: (id: string) => void }>
     return () => cancelAnimationFrame(raf);
   }, []);
 
+  const [isPaused, setIsPaused] = useState(false);
+  const isError = toast.variant === 'error';
+
   useEffect(() => {
-    if (toast.isExiting) return;
-    const timer = window.setTimeout(() => onDismiss(toast.id), AUTO_DISMISS_MS);
+    if (toast.isExiting || isPaused) return;
+    const timer = window.setTimeout(() => onDismiss(toast.id), isError ? ERROR_DISMISS_MS : AUTO_DISMISS_MS);
     return () => window.clearTimeout(timer);
-  }, [toast.id, onDismiss, toast.isExiting]);
+  }, [toast.id, onDismiss, toast.isExiting, isPaused, isError]);
 
   return (
     <div
       className={`pointer-events-auto flex items-center gap-3 rounded-2xl border px-5 py-3.5 shadow-lg shadow-black/5 backdrop-blur-xl text-btn-sm font-bold ${variantStyles[toast.variant]} transition-[opacity,transform] duration-300 ease-out-expo transform-gpu ${
         isMounted && !toast.isExiting ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-2 scale-95'
       }`}
-      role="status"
-      aria-live="polite"
+      role={isError ? 'alert' : 'status'}
+      aria-live={isError ? 'assertive' : 'polite'}
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      onFocus={() => setIsPaused(true)}
+      onBlur={() => setIsPaused(false)}
     >
       {toast.message}
     </div>

@@ -298,7 +298,7 @@
   --red: oklch(0.55 0.18 20);
   --red-shadow: oklch(0.45 0.18 20);
   --orange: oklch(0.57 0.16 50);
-  --golden: oklch(0.59 0.13 80);
+  --golden: oklch(0.52 0.12 80); /* darkened for AA with white text (was 0.59) */
   --sky: var(--blue);
   --honey: var(--golden);
   --clay: oklch(0.53 0.13 35);

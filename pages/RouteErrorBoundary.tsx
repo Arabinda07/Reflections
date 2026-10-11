@@ -24,7 +24,7 @@ const getRouteErrorCopy = (error: unknown) => {
     if (error.status === 404) {
       return {
         title: "This path doesn't exist yet.",
-        description: "The page you were trying to open drifted out of reach. Let's guide you back to a calmer place.",
+        description: "I couldn’t find that page. Head back home and pick up where you left off.",
         detail: `${error.status} ${error.statusText}`,
       };
     }

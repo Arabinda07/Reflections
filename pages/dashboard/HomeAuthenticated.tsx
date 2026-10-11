@@ -494,7 +494,7 @@ export const HomeAuthenticated: React.FC = () => {
       }, 1500);
     } catch {
       // Intention creation could not save; toast tells the user.
-      showToast('Could not save intention right now');
+      showToast('I couldn’t save that intention just now. Try again.', 'error');
     } finally {
       setIsCreatingTask(false);
     }
@@ -882,7 +882,7 @@ export const HomeAuthenticated: React.FC = () => {
               className="flex flex-col items-center justify-center py-10 text-center animate-scale-in"
             >
               {checkInFeedback === 'error' ? (
-                <p className="text-sm font-bold text-clay">Could not save that just now.</p>
+                <p className="text-sm font-bold text-clay">I couldn’t save that just now. Try again.</p>
               ) : (
                 <>
                   <div 
