@@ -18,10 +18,18 @@ export function useNativeStatusBar() {
       }
 
       const { StatusBar, Style } = await import('@capacitor/status-bar');
+      const { SystemBars, SystemBarsStyle } = await import('@capacitor/core');
 
       const updateStatusBar = async () => {
         if (!isActive) return;
         const isDark = document.documentElement.classList.contains('dark');
+        try {
+          // Android 15+ is edge-to-edge: StatusBar color/overlay calls are ignored there, but
+          // SystemBars still sets icon contrast for both the status and navigation bars.
+          await SystemBars.setStyle({ style: isDark ? SystemBarsStyle.Dark : SystemBarsStyle.Light });
+        } catch (error) {
+          console.warn('[native] Failed to set system bar icon style.', error);
+        }
         try {
           await StatusBar.setOverlaysWebView({ overlay: false });
           await StatusBar.setStyle({ style: isDark ? Style.Dark : Style.Light });

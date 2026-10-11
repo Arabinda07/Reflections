@@ -19,3 +19,14 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# --- Reflections release rules (minifyEnabled true) ---
+# Capacitor discovers plugins and @PluginMethod handlers by reflection.
+-keep class com.arabinda.reflections.** { *; }
+-keepattributes *Annotation*, InnerClasses, Signature, RuntimeVisibleAnnotations
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
+# TensorFlow Lite uses JNI and reflection.
+-keep class org.tensorflow.lite.** { *; }
+-dontwarn org.tensorflow.lite.**

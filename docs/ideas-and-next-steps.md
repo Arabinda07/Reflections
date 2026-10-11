@@ -100,3 +100,19 @@ An audit found the embedding pipeline was never initialized in production (only 
 * [ ] Build Life Wiki pages on-device (extractive: cluster notes by embedding, quote the user's own sentences with note links).
 * [ ] Quiet Paper UI pass: filled primary buttons on auth/unlock, hide nav behind the unlock veil, Home "Desk", blank-page-first editor, Insights a11y.
 * [ ] Real on-device EmbeddingGemma on Android (only if Tier 1 proves insufficient).
+
+### Phase 5: Design & Android Hardening (Oct 11 2026 audit)
+Audit of UI and Capacitor readiness; full findings in `~/.claude/plans/` and tracked in `TASKS.md`.
+* [x] Contrast: darkened `--golden` for AA with white label text.
+* [x] `Input` a11y: `aria-invalid`, `aria-describedby`, `role="alert"` on errors.
+* [x] Error copy pass (auth, SingleNote, Home, not-found) in one first-person voice; raw backend text no longer shown on sign-in. `Toast` gained an `error` variant (alert role, 7s dismiss, pause on hover).
+* [x] Android 15+ bar icon contrast via `SystemBars.setStyle` (StatusBar colour calls are ignored under edge-to-edge).
+* [x] Keyboard: no JS listeners needed; Capacitor 8 `SystemBars` pads for the IME natively (ADR 0002 updated).
+* [x] Plan 005: native OAuth deep link accepts only a PKCE `code`; raw-token `setSession` branch removed (test written first, confirmed failing).
+* [x] Plan 006: Capacitor 8.5.3, axios 1.20, dompurify 3.4.16, fflate 0.4.9. `cap sync` also wired the missing `capacitor-filesystem` and `capacitor-share` Android modules that the native export code already used.
+* [x] Release build: `minifyEnabled`/`shrinkResources` on with keep rules for custom plugins and TFLite; `versionCode` 2. Debug and release APKs both build.
+* [x] CI: `npm audit --audit-level=critical` and an Android `assembleDebug` job.
+* [ ] On-device smoke test of the minified release build (sign-in deep link, unlock + biometrics, note with attachment, export share sheet, embeddings).
+* [ ] Monochrome themed-icon layer (needs a single-colour glyph).
+* [ ] Shared-component cleanup (`PrivateDataGate`, Account one-offs), sub-44px touch targets, `Account.tsx` error voice.
+* [ ] Embedding model download gate (size/Wi-Fi prompt); local notifications for Future Letters.
