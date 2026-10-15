@@ -3,7 +3,7 @@ import { cryptoService } from './cryptoService';
 import { mobileRuntime } from '../src/native/mobileRuntime';
 import { nativeSecureStorage } from '../src/native/nativeSecureStorage';
 
-// Opt-in "keep me unlocked on this device" cache.
+// "Keep me unlocked on this device" cache, on by default after any unlock.
 // On native mobile (ADR 0002): WebCrypto CryptoKey is exported to raw Base64 and stored
 // directly in Android Keystore / EncryptedSharedPreferences to resist extraction.
 // On web: idb-keyval persists via structured clone.

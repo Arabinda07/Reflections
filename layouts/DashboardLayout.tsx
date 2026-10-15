@@ -56,7 +56,7 @@ export const DashboardLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const outlet = useOutlet();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, isInitialCheckDone } = useAuthStore();
   const { userMode } = useUserMode();
   const routeSurfaceScopeClass = useSurfaceScope();
 
@@ -183,8 +183,8 @@ export const DashboardLayout: React.FC = () => {
           </div>
         </div>
 
-        {/* Global Footer - Positioned for full-width background with centered content */}
-        {!isWritingRoute && (
+        {/* Guest footer only: inside the app, FAQ, Privacy and Account live in More. */}
+        {!isWritingRoute && isInitialCheckDone && !isAuthenticated && (
           <footer className="screen-scrim screen-scrim--strong mt-auto w-full border-t border-border py-12 transition-colors duration-300">
             <div className="max-w-360 mx-auto px-6 md:px-24 flex flex-col sm:flex-row items-center justify-between gap-8">
               <nav

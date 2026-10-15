@@ -238,6 +238,7 @@ export const Relationships: React.FC = () => {
             <div className="space-y-5 lg:col-span-2">
               {activeTab === 'weekly' && (
                 <Surface variant="bezel" tone="sage" innerClassName="p-6 md:p-8">
+                    {activePeople.length > 0 && (
                     <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                       <div>
                         <h2 className="text-3xl font-display font-bold text-gray-text">Who to reach out to</h2>
@@ -247,6 +248,7 @@ export const Relationships: React.FC = () => {
                         Add person<Plus size={16} weight="bold" className="ml-1.5" />
                       </Button>
                     </div>
+                    )}
 
                   {suggestions.length ? (
                     <div className="grid gap-4">
@@ -333,10 +335,10 @@ export const Relationships: React.FC = () => {
                         <CirclesThreePlus size={24} weight="duotone" />
                       </div>
                       <div className="space-y-2">
-                        <h3 className="text-xl font-display font-bold text-gray-text">No people yet</h3>
-                        <p className="text-sm font-medium text-gray-light leading-relaxed">Add the people who matter over in the People tab, and your weekly list will show up here.</p>
+                        <h3 className="text-xl font-display font-bold text-gray-text">Who's on your mind?</h3>
+                        <p className="text-sm font-medium text-gray-light leading-relaxed">Add the people you write about. Reflections notices when they come up and brings them back gently.</p>
                       </div>
-                      <Button variant="primary" className="mt-2" onClick={() => navigate(`${RoutePath.RELATIONSHIPS}?tab=people`)}>Go to People</Button>
+                      <Button variant="primary" className="mt-2" onClick={() => setIsCreateOpen(true)}>Add someone</Button>
                     </div>
                   )}
                 </Surface>

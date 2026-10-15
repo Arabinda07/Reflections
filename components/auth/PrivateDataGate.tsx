@@ -43,7 +43,7 @@ const UnlockPanel: React.FC = () => {
   const [recoveryKey, setRecoveryKey] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [remember, setRemember] = useState(false);
+  const [remember, setRemember] = useState(true);
   const [showRecovery, setShowRecovery] = useState(false);
   const canUnlockWithPassphrase = passphrase.trim().length > 0;
   const canUnlockWithRecoveryKey = recoveryKey.trim().length > 0;

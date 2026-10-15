@@ -30,7 +30,7 @@ export const useToast = () => React.useContext(ToastContext);
 
 const AUTO_DISMISS_MS = 3200;
 const ERROR_DISMISS_MS = 7000; // errors need time to read and act on
-export const ACTION_DISMISS_MS = 6000; // time to reach an Undo
+export const ACTION_DISMISS_MS = 10000; // time to reach an Undo
 
 const variantStyles: Record<ToastVariant, string> = {
   success: 'border-green/20 bg-green/5 text-green',
@@ -86,7 +86,7 @@ const ToastItem: React.FC<{ toast: ToastData; onDismiss: (id: string) => void }>
             toast.action?.onClick();
             onDismiss(toast.id);
           }}
-          className="-my-1.5 -mr-2 min-h-11 rounded-xl px-3 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current"
+          className="-my-1.5 -mr-2 min-h-11 min-w-16 rounded-xl border border-current/30 px-4 transition-colors hover:bg-current/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current"
         >
           {toast.action.label}
         </button>
@@ -130,7 +130,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       {children}
       {typeof document !== 'undefined' &&
         createPortal(
-          <div className="pointer-events-none fixed bottom-6 right-6 z-[200] flex flex-col items-end gap-2">
+          <div className="pointer-events-none fixed inset-x-4 bottom-24 z-[200] flex flex-col items-center gap-2 lg:inset-x-auto lg:bottom-6 lg:right-6 lg:items-end">
             {toasts.map((toast) => (
               <ToastItem key={toast.id} toast={toast} onDismiss={dismissToast} />
             ))}

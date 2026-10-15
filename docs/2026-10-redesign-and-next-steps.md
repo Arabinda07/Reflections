@@ -37,6 +37,12 @@ Thesis: writing and people are one loop. You write, the app notices who you wrot
 - **`.claude/settings.json`.** It has allow and deny rules, plus a Stop hook that runs lint and tests.
 - **`/verify`.** This command runs the full gate and writes a report.
 
+### After live QA
+- **Unlock once per device.** Every successful unlock now remembers the data key on this device (Android Keystore on native, this browser's IndexedDB on web). This covers login auto-unlock, the unlock form and first-time setup. The "Keep me unlocked" box starts checked. Sign-out clears the key. Reloads no longer ask for the password.
+- **Undo toast.** The window is now 10s, the Undo button is larger, and on mobile the toast is centred above the tab bar.
+- **No signed-in footer.** The marketing footer shows to guests only, and only after the auth check finishes, so it no longer flashes on load.
+- **Empty People page.** With no people, it shows a "Who's on your mind?" prompt that opens the add dialog directly.
+
 ## Next steps: Insights (`pages/dashboard/Insights.tsx`, 525 lines)
 1. **Lead with one quiet card.** Show "This week" by default (notes written, people who came up, one recurring theme). Put "This month" and the drift report behind "See more". Insights should support writing, not compete with it.
 2. **Remove percentages from the mood-family bars.** The `title` values at `Insights.tsx:384-414` are `light: 32%` and so on. Use words instead ("mostly steady, some heavy days"). PRODUCT.md forbids score-like interpretation.

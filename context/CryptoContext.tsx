@@ -187,6 +187,8 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               setCurrentCryptoSession(nextSession);
               setSession(nextSession);
               setStatus('unlocked');
+              // Remember on this device so a reload never asks again.
+              void cryptoKeyCache.persist(nextSession).catch(() => {});
               return;
             } catch {
               // Stale stash (e.g. account password changed after setup) — fall
@@ -240,9 +242,11 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setRecoveryKey(null);
     setJustCompletedSetup(true);
     await setUnlockedSession(nextSession, pendingBundle.migrationState);
+    await cryptoKeyCache.persist(nextSession).catch(() => {});
   }, [pendingBundle, setUnlockedSession]);
 
-  const unlockWithPassphrase = useCallback(async (passphrase: string, remember = false) => {
+  // Unlocking remembers this device by default; sign-out clears it.
+  const unlockWithPassphrase = useCallback(async (passphrase: string, remember = true) => {
     if (!user?.id || !bundle) throw new Error('Encryption is not set up for this account.');
     const nextSession = await keyWrapperPolicy.unlockWithPrimarySecret({
       userId: user.id,
@@ -253,7 +257,7 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (remember) await cryptoKeyCache.persist(nextSession);
   }, [bundle, setUnlockedSession, user?.id]);
 
-  const unlockWithRecoveryKey = useCallback(async (typedRecoveryKey: string, remember = false) => {
+  const unlockWithRecoveryKey = useCallback(async (typedRecoveryKey: string, remember = true) => {
     if (!user?.id || !bundle) throw new Error('Encryption is not set up for this account.');
     const nextSession = await keyWrapperPolicy.unlockWithRecoveryPhrase({
       userId: user.id,
