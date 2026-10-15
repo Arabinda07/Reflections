@@ -101,7 +101,10 @@ export default defineConfig({
             ]
           },
           workbox: {
-            navigateFallback: '/index.html',
+            // Vercel cleanUrls answers /index.html with a 308 to /. A service worker
+            // may not answer a navigation with a redirected response (Chrome shows
+            // ERR_FAILED), so the shell is precached and served as / directly.
+            navigateFallback: '/',
             navigateFallbackAllowlist: [/^(?!\/__).*$/],
             cleanupOutdatedCaches: true,
             maximumFileSizeToCacheInBytes: 2 * 1024 * 1024,
@@ -117,7 +120,9 @@ export default defineConfig({
             ],
             manifestTransforms: [
               async (entries) => ({
-                manifest: entries.filter((entry) => keepLeanPrecacheEntry(entry.url)),
+                manifest: entries
+                  .filter((entry) => keepLeanPrecacheEntry(entry.url))
+                  .map((entry) => (entry.url === 'index.html' ? { ...entry, url: '/' } : entry)),
                 warnings: [],
               }),
             ],

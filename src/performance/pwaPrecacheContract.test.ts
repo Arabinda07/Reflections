@@ -12,7 +12,9 @@ describe('lean PWA precache contract', () => {
     expect(viteConfig).toContain('const leanPrecacheAllowlist = [');
     expect(viteConfig).toContain('keepLeanPrecacheEntry');
     expect(viteConfig).toContain('manifestTransforms');
-    expect(viteConfig).toContain('entries.filter((entry) => keepLeanPrecacheEntry(entry.url))');
+    expect(viteConfig).toContain('.filter((entry) => keepLeanPrecacheEntry(entry.url))');
+    // The shell is precached as "/" because Vercel 308-redirects /index.html.
+    expect(viteConfig).toContain("navigateFallback: '/'");
     expect(viteConfig).toContain('maximumFileSizeToCacheInBytes: 2 * 1024 * 1024');
     expect(viteConfig).toContain('app-route-chunks');
 
