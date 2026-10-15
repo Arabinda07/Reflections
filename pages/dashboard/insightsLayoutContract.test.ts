@@ -33,14 +33,9 @@ describe('Insights layout contract', () => {
     expect(insights).not.toMatch(/>\s*Failed/i);
   });
 
-  it('keeps writing patterns accessible from homepage across user modes without a restrictive mode guard', () => {
-    const home = read('pages/dashboard/HomeAuthenticated.tsx');
+  it('keeps writing patterns accessible across user modes without a restrictive mode guard', () => {
     const app = read('App.tsx');
     const insights = read('pages/dashboard/Insights.tsx');
-
-    // Homepage button triggers navigation to insights
-    expect(home).toContain('onClick={() => navigate(RoutePath.INSIGHTS)}');
-    expect(home).toContain('Writing patterns');
 
     // App route is not blocked by withModeGuard('reflective')
     expect(app).toContain('path={RoutePath.INSIGHTS}');

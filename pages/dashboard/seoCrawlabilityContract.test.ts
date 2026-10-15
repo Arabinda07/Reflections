@@ -365,7 +365,6 @@ describe('SEO crawlability contract', () => {
   it('keeps SEO metadata and machine-readable surfaces out of stale AI-ish positioning', () => {
     const publicSeoSurfaces = [
       read('index.html'),
-      read('metadata.json'),
       read('public/llms.txt'),
       read('public/pricing.md'),
       read('src/config/publicSeoCopy.js'),

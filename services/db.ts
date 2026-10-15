@@ -46,8 +46,16 @@ export interface LocalEncryptedRelationshipImportInboxItem {
   encryptedPayload: EncryptedEnvelope;
 }
 
+export interface LocalEncryptedDraft {
+  id: string; // `${userId}:${noteId | 'new'}`
+  userId: string;
+  updatedAt: string;
+  encryptedPayload: EncryptedEnvelope;
+}
+
 export class AppDatabase extends Dexie {
   notes!: Table<LocalEncryptedNote>;
+  drafts!: Table<LocalEncryptedDraft>;
   relationships!: Table<LocalEncryptedRelationship>;
   relationshipImportInbox!: Table<LocalEncryptedRelationshipImportInboxItem>;
 
@@ -63,6 +71,9 @@ export class AppDatabase extends Dexie {
       notes: 'id, userId, syncStatus, [userId+syncStatus], updatedAt',
       relationships: 'id, userId, syncStatus, [userId+syncStatus], updatedAt',
       relationshipImportInbox: 'id, userId, source, status, syncStatus, [userId+syncStatus], updatedAt',
+    });
+    this.version(5).stores({
+      drafts: 'id, userId',
     });
   }
 }

@@ -2,7 +2,7 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
-    exclude: ['**/node_modules/**', '**/dist/**', '**/.worktrees/**', 'scratch/mobile-browser-audit.spec.js'],
+    exclude: ['**/node_modules/**', '**/dist/**', '**/.worktrees/**'],
     env: {
       TZ: 'UTC',
       VITE_SUPABASE_URL: process.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co',

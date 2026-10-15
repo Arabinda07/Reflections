@@ -28,3 +28,42 @@ export const countMentionedNames = (content: string, names: string[]): number =>
     return trimmed && mentionRegExp(trimmed).test(content);
   }).length;
 };
+
+const plainText = (html: string) =>
+  html.replace(/<\/(p|div|li|h[1-6])>|<br\s*\/?>/gi, '\n').replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ');
+
+const personNames = (person: { name: string; aliases?: string[] }) =>
+  [person.name, ...(person.aliases || [])].map((name) => name.trim()).filter(Boolean);
+
+/**
+ * The one way the app decides a note is "about" a person: an explicit tag, or
+ * their name/alias appearing in the title or body. On-device, no AI.
+ */
+export const noteMentionsPerson = (
+  note: { title?: string; content?: string; relationshipIds?: string[] },
+  person: { id: string; name: string; aliases?: string[] },
+): boolean => {
+  if (note.relationshipIds?.includes(person.id)) return true;
+  const text = `${note.title || ''}\n${plainText(note.content || '')}`;
+  return personNames(person).some((name) => mentionRegExp(name).test(text));
+};
+
+/** The sentence in a note that names the person, trimmed for a quiet quote. */
+export const mentionedLine = (
+  note: { content?: string },
+  person: { name: string; aliases?: string[] },
+  maxLength = 120,
+): string | undefined => {
+  const sentences = plainText(note.content || '').split(/(?<=[.!?])\s+|\n+/).map((s) => s.trim()).filter(Boolean);
+  const names = personNames(person);
+  const hit = sentences.find((sentence) => names.some((name) => mentionRegExp(name).test(sentence)));
+  if (!hit) return undefined;
+  return hit.length > maxLength ? `${hit.slice(0, maxLength - 1).trimEnd()}…` : hit;
+};
+
+/** Known people named in a draft who aren't tagged yet. */
+export const untaggedMentions = <P extends { id: string; name: string; aliases?: string[] }>(
+  draft: { title?: string; content?: string },
+  people: P[],
+  taggedIds: string[],
+): P[] => people.filter((person) => !taggedIds.includes(person.id) && noteMentionsPerson(draft, person));

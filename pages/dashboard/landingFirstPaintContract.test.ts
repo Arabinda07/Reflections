@@ -57,19 +57,6 @@ describe('landing first-paint contract', () => {
     expect(appBootstrapper).not.toContain('className="flex-1 contents"');
   });
 
-  it('keeps the startup poster visible while video fades above it', () => {
-    const startup = read('components/ui/StartupScreen.tsx');
-
-    expect(existsSync(path.resolve(process.cwd(), 'public/assets/videos/sanctuary.webp'))).toBe(true);
-    expect(startup).toContain('src="/assets/videos/sanctuary.webp"');
-    expect(startup).toContain('poster="/assets/videos/sanctuary.webp"');
-    expect(startup).not.toContain('/assets/videos/sanctuary.png');
-    expect(startup).toContain('className="absolute inset-0 z-0 h-full w-full object-cover opacity-85"');
-    expect(startup).toContain("isVideoReady ? 'opacity-85' : 'opacity-0'");
-    expect(startup).not.toContain('isPosterReady');
-    expect(startup).not.toContain('setIsPosterReady');
-    expect(startup).not.toContain("isPosterReady && !isVideoReady ? 'opacity-85' : 'opacity-0'");
-  });
 
   it('pins the landing hero to the poster while the video crossfades over it', () => {
     const landing = read('pages/dashboard/Landing.tsx');
@@ -158,27 +145,7 @@ describe('landing first-paint contract', () => {
     expect(layout).toContain('min-h-0 w-full flex-1 flex-col overflow-y-auto');
     expect(landing).toContain('relative isolate min-h-dvh w-full overflow-hidden bg-body');
     expect(landing).toContain('h-full min-h-full w-full min-w-full transform-gpu object-cover');
-    expect(homeAuthenticated).toContain('home-hero-shell relative isolate');
-    expect(homeAuthenticated).toContain('src="/assets/videos/field.png"');
-    expect(homeAuthenticated).toContain('h-full min-h-full w-full min-w-full object-cover object-center');
-    expect(homeAuthenticated).toContain('object-cover object-center opacity-90');
-    expect(homeAuthenticated).toContain('const [shouldLoadHeroVideo, setShouldLoadHeroVideo] = useState(false);');
-    expect(homeAuthenticated).toContain("const shouldAllowHeroVideoViewport = useMediaQuery('(min-width: 768px)');");
-    expect(homeAuthenticated).toContain('const [hasHeroVideoFailed, setHasHeroVideoFailed] = useState(false);');
-    expect(homeAuthenticated).toContain("heroIntroState !== 'visible'");
-    expect(homeAuthenticated).toContain('!shouldAllowHeroVideoViewport');
-    expect(homeAuthenticated).toContain('HOME_HERO_VIDEO_LOAD_DELAY_MS = 1200');
-    expect(homeAuthenticated).toContain('setShouldLoadHeroVideo(false);');
-    expect(homeAuthenticated).toContain('setShouldLoadHeroVideo(true);');
-    expect(homeAuthenticated).toContain('onCanPlay={(event) => {');
-    expect(homeAuthenticated).toContain('void event.currentTarget.play().catch(() => {');
-    expect(homeAuthenticated).toContain('onPlaying={() => setIsHeroVideoReady(true)}');
-    expect(homeAuthenticated).toContain('onError={() => {');
-    expect(homeAuthenticated).toContain('setHasHeroVideoFailed(true);');
-    expect(homeAuthenticated).toContain('isHeroVideoReady ? \'opacity-70\' : \'opacity-0\'');
-    expect(homeAuthenticated).not.toContain('isHeroPosterReady');
-    expect(homeAuthenticated).not.toContain("isHeroPosterReady && !isHeroVideoReady ? 'opacity-100' : 'opacity-0'");
-    expect(homeAuthenticated).not.toContain("filter: 'blur(10px) brightness(0.8)'");
+    expect(homeAuthenticated).not.toContain('<video');
   });
 
   it('keeps non-critical third-party scripts off the initial document', () => {

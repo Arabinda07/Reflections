@@ -28,7 +28,9 @@ graphify-out/
 
 # Local agent tooling / session artifacts — never commit
 .playwright-mcp/
-.claude/
+.claude/*
+!.claude/settings.json
+!.claude/commands/
 .agents/
 .specify/
 .mcp.json

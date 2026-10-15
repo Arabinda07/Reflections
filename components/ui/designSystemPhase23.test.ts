@@ -30,7 +30,6 @@ describe('phase 2/3 design-system rollout', () => {
     const paperPlaneToast = read('components/ui/PaperPlaneToast.tsx');
     const companionObservation = read('components/ui/CompanionObservation.tsx');
     const ambientMusicButton = read('components/ui/AmbientMusicButton.tsx');
-    const homeAuthenticated = read('pages/dashboard/HomeAuthenticated.tsx');
     const indexCss = read('index.css');
     const modalCss = read('components/ui/modal-sheet.css');
 
@@ -39,7 +38,6 @@ describe('phase 2/3 design-system rollout', () => {
     expect(paperPlaneToast).toContain("from './OverlayFeedback'");
     expect(companionObservation).toContain("from './OverlayFeedback'");
     expect(ambientMusicButton).toContain("from './ModalSheet'");
-    expect(homeAuthenticated).toContain('tone="sage"');
     expect(indexCss).toContain('--modal-sheet-backdrop-bg: oklch(from var(--panel-bg) l c h / 0.88);');
     expect(indexCss).toContain('--modal-sheet-opaque-bg');
     expect(modalCss).toMatch(/\.modal-sheet-backdrop\s*{[^}]*background: var\(--modal-sheet-backdrop-bg\);/s);

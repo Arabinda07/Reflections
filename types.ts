@@ -211,21 +211,6 @@ export interface RelationshipNextCare {
   createdAt: string;
 }
 
-export interface RelationshipConnection {
-  id: string;
-  relatedRelationshipId: string;
-  label: string;
-  notes?: string;
-}
-
-export interface RelationshipValueEntry {
-  id: string;
-  direction: 'given' | 'received';
-  category: 'introduction' | 'opportunity' | 'advice' | 'knowledge' | 'support' | 'other';
-  description: string;
-  createdAt: string;
-}
-
 export interface RelationshipTag {
   id: string;
   category: 'domain' | 'role' | 'context' | 'project';
@@ -247,17 +232,18 @@ export interface RelationshipRecord {
   caresAbout?: string;
   boundaries?: string;
   notes?: string;
+  /** Other names the writer uses for this person ("Mom", "Sammy"). */
+  aliases?: string[];
+  /** "MM-DD" or "YYYY-MM-DD". */
+  birthday?: string;
+  /** Gentle rhythm: surface them when it's been about this many weeks. */
+  cadenceWeeks?: number;
   tier: RelationshipTier;
   stage: RelationshipStage;
-  closeness: number;
-  energy: number;
-  opportunity: number;
   tags: RelationshipTag[];
   interactions: RelationshipInteraction[];
   hooks: RelationshipHook[];
   nextCare: RelationshipNextCare[];
-  connections: RelationshipConnection[];
-  valueLedger: RelationshipValueEntry[];
   lastTendedAt?: string;
   createdAt: string;
   updatedAt: string;
@@ -287,6 +273,8 @@ export interface WeeklyRelationshipSuggestion {
   suggestedHook?: RelationshipHook;
   lastInteraction?: RelationshipInteraction;
   suggestedCare: string;
+  /** When the writer last mentioned this person in a note. */
+  lastWrittenAt?: string;
 }
 
 export enum RoutePath {

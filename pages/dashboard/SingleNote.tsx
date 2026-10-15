@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
 import { Calendar } from '@phosphor-icons/react/Calendar';
@@ -18,7 +18,6 @@ import { Trash } from '@phosphor-icons/react/Trash';
 import { WarningCircle } from '@phosphor-icons/react/WarningCircle';
 import { X } from '@phosphor-icons/react/X';
 import { Button } from '../../components/ui/Button';
-import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
 import { Input } from '../../components/ui/Input';
 import { Alert } from '../../components/ui/Alert';
 import { Echoes } from '../../components/ui/Echoes';
@@ -44,8 +43,6 @@ export const SingleNote: React.FC = () => {
   const navigate = useViewTransitionNavigation();
   const [note, setNote] = useState<Note | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isMoodOpen, setIsMoodOpen] = useState(false);
   const [moodPickerStage, setMoodPickerStage] = useState<MoodPickerStage>('group');
@@ -99,9 +96,27 @@ export const SingleNote: React.FC = () => {
   }, []);
 
   const { prevId, nextId } = getAdjacent(orderedIds, id ?? '');
-  const goToNote = (targetId: string | null) => {
+  const goToNote = useCallback((targetId: string | null) => {
     if (targetId) navigate(RoutePath.NOTE_DETAIL.replace(':id', targetId));
-  };
+  }, [navigate]);
+
+  // Reading shortcuts: E to edit, ← / → (or J / K) to move between entries.
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey || event.defaultPrevented) return;
+      const target = event.target as HTMLElement | null;
+      if (target?.closest('input, textarea, select, [contenteditable="true"], [role="dialog"]')) return;
+      if (document.querySelector('[role="dialog"]')) return;
+      const key = event.key.toLowerCase();
+      if (key === 'e' && id) navigate(RoutePath.EDIT_NOTE.replace(':id', id));
+      else if (key === 'arrowleft' || key === 'j') goToNote(prevId);
+      else if (key === 'arrowright' || key === 'k') goToNote(nextId);
+      else return;
+      event.preventDefault();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [goToNote, id, navigate, nextId, prevId]);
 
   const pendingTaskCount = useMemo(
     () => note?.tasks?.filter((task) => !task.completed).length ?? 0,
@@ -127,21 +142,9 @@ export const SingleNote: React.FC = () => {
     }
   };
 
-  const performDelete = async () => {
-    if (!id) return;
-
-    setIsDeleting(true);
-    setError(null);
-
-    try {
-      await noteService.delete(id);
-      navigate(RoutePath.NOTES);
-    } catch (err) {
-      console.error('Failed to delete note:', err);
-      setError("That delete didn't go through. Your note is safe — try again.");
-      setIsDeleting(false);
-      setIsConfirmOpen(false);
-    }
+  // Delete hands off to the notes list, which removes it with an Undo.
+  const handleDelete = () => {
+    if (id) navigate(RoutePath.NOTES, { state: { deleteNoteId: id } });
   };
 
   const handleEdit = () => {
@@ -381,6 +384,15 @@ export const SingleNote: React.FC = () => {
             </button>
 
             <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={handleEdit}
+                className="mr-1 inline-flex min-h-11 items-center gap-1.5 rounded-full px-4 text-sm font-bold text-green transition-colors hover:bg-green/10"
+                aria-keyshortcuts="E"
+              >
+                <PencilSimpleLine size={16} weight="bold" />
+                Edit
+              </button>
               <Tooltip label="Older entry" placement="bottom">
                 <button
                   type="button"
@@ -662,7 +674,7 @@ export const SingleNote: React.FC = () => {
             type="button"
             onClick={() => {
               setIsActionsOpen(false);
-              setIsConfirmOpen(true);
+              handleDelete();
             }}
             className="surface-inline-panel flex min-h-11 w-full items-center gap-3 px-4 py-4 text-left transition-colors hover:border-clay/30 hover:bg-clay/5"
           >
@@ -734,15 +746,6 @@ export const SingleNote: React.FC = () => {
         />
       </ModalSheet>
 
-      <ConfirmationDialog
-        isOpen={isConfirmOpen}
-        onClose={() => setIsConfirmOpen(false)}
-        onConfirm={performDelete}
-        title="Delete this note?"
-        confirmLabel={isDeleting ? 'Deleting...' : 'Delete note'}
-        isConfirming={isDeleting}
-        variant="danger"
-      />
     </>
   );
 };

@@ -6,15 +6,6 @@ const read = (filePath: string) =>
   readFileSync(path.resolve(process.cwd(), filePath), 'utf8');
 
 describe('visual parity contract', () => {
-  it('keeps the welcome banner name legible against media-heavy backgrounds', () => {
-    const home = read('pages/dashboard/HomeAuthenticated.tsx');
-    const css = read('index.css');
-
-    expect(css).toContain('.hero-ink-accent');
-    expect(home).toContain('hero-ink-accent');
-    expect(home).not.toContain('text-green drop-shadow-none');
-  });
-
   it('keeps the Reflect with AI action horizontally locked and prevents sound rows from using a perpetual spinner', () => {
     const createNote = read('pages/dashboard/CreateNote.tsx');
 

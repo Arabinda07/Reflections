@@ -19,7 +19,8 @@ import { Surface } from '../../components/ui/Surface';
 import { useToast } from '../../components/ui/Toast';
 import { noteService } from '../../services/noteService';
 import { relationshipService } from '../../services/relationshipService';
-import { findWikiMentions } from '../../services/relationshipWikiLink';
+import { findWikiMentions, noteMentionsPerson } from '../../services/relationshipWikiLink';
+import { daysUntilBirthday, writeAboutState } from '../../services/relationshipSuggestions';
 import { wikiService } from '../../services/wikiService';
 import type {
   Note,
@@ -132,6 +133,9 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, autoOpenCat
     howWeMet: relationship.howWeMet || '',
     caresAbout: relationship.caresAbout || '',
     boundaries: relationship.boundaries || '',
+    aliases: (relationship.aliases || []).join(', '),
+    birthday: relationship.birthday || '',
+    cadenceWeeks: relationship.cadenceWeeks ? String(relationship.cadenceWeeks) : '',
     email: relationship.email || '',
     phone: relationship.phone || '',
     role: relationship.role || '',
@@ -154,16 +158,14 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, autoOpenCat
     let active = true;
     void noteService.getAll().then((notes) => {
       if (!active) return;
-      const escape = (val: string) => val.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const pattern = new RegExp(`(?<![\\p{L}\\p{N}])${escape(relationship.name.trim())}(?![\\p{L}\\p{N}])`, 'iu');
-      const matched = notes.filter((note) => {
-        if (note.relationshipIds?.includes(relationship.id)) return true;
-        return pattern.test(note.title || '') || pattern.test(note.content || '');
-      });
-      setRelatedNotes(matched);
+      setRelatedNotes(
+        notes
+          .filter((note) => noteMentionsPerson(note, relationship))
+          .sort((left, right) => Date.parse(right.createdAt) - Date.parse(left.createdAt)),
+      );
     }).catch(() => {});
     return () => { active = false; };
-  }, [relationship.id, relationship.name]);
+  }, [relationship]);
 
   const handleHeaderLogCatchUp = () => {
     setCatchUpOpen(true);
@@ -206,6 +208,9 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, autoOpenCat
       howWeMet: relationship.howWeMet || '',
       caresAbout: relationship.caresAbout || '',
       boundaries: relationship.boundaries || '',
+      aliases: (relationship.aliases || []).join(', '),
+      birthday: relationship.birthday || '',
+      cadenceWeeks: relationship.cadenceWeeks ? String(relationship.cadenceWeeks) : '',
       email: relationship.email || '',
       phone: relationship.phone || '',
       role: relationship.role || '',
@@ -235,6 +240,9 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, autoOpenCat
       howWeMet: context.howWeMet.trim() || undefined,
       caresAbout: context.caresAbout.trim() || undefined,
       boundaries: context.boundaries.trim() || undefined,
+      aliases: context.aliases.split(',').map((alias) => alias.trim()).filter(Boolean),
+      birthday: context.birthday || undefined,
+      cadenceWeeks: Number(context.cadenceWeeks) || undefined,
     }, 'Saved.');
     setIsSavingFacts(false);
     if (saved) setEditingFacts(false);
@@ -343,6 +351,20 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, autoOpenCat
             {subtitle && <p className="text-lg leading-relaxed text-gray-light">{subtitle}</p>}
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-bold text-gray-nav">
               <span>{lastCaughtUp ? `Last caught up ${formatDate(lastCaughtUp.toISOString())}` : 'No catch-ups yet'}</span>
+              {relatedNotes[0] && (
+                <>
+                  <span className="text-gray-nav/40" aria-hidden="true">•</span>
+                  <span>Last wrote about {formatDate(relatedNotes[0].createdAt)}</span>
+                </>
+              )}
+              {relationship.birthday && Number.isFinite(daysUntilBirthday(relationship.birthday)) && (
+                <>
+                  <span className="text-gray-nav/40" aria-hidden="true">•</span>
+                  <span>
+                    Birthday {new Date(`2000-${relationship.birthday.slice(-5)}T12:00:00`).toLocaleDateString(undefined, { month: 'long', day: 'numeric' })}
+                  </span>
+                </>
+              )}
               {!editingFacts && (
                 <>
                   <span className="text-gray-nav/40" aria-hidden="true">•</span>
@@ -372,6 +394,14 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, autoOpenCat
             )}
           </div>
           <div className="flex shrink-0 items-center gap-2">
+            <Link
+              to={RoutePath.CREATE_NOTE}
+              state={writeAboutState(relationship)}
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-xl px-3 text-sm font-bold text-green hover:bg-green/10"
+            >
+              <PencilSimple size={14} weight="bold" />
+              Write
+            </Link>
             <Button
               type="button"
               variant="primary"
@@ -405,6 +435,25 @@ export const RelationshipProfile: React.FC<Props> = ({ relationship, autoOpenCat
               <label className="block text-sm font-bold text-gray-nav">Healthy boundaries
                 <textarea name="boundaries" value={context.boundaries} onChange={(event) => setContext((current) => ({ ...current, boundaries: event.target.value }))} placeholder="What boundary keeps this relationship healthy or protects your peace?" className={`${fieldClass} min-h-20 font-medium textarea-auto-grow`} />
               </label>
+              <label className="block text-sm font-bold text-gray-nav">Other names you use
+                <input name="aliases" value={context.aliases} onChange={(event) => setContext((current) => ({ ...current, aliases: event.target.value }))} placeholder="Mom, Sammy" className={fieldClass} />
+                <span className="mt-1 block text-xs font-medium text-gray-light">Separate with commas. Used to notice them in your writing, on this device only.</span>
+              </label>
+              <div className="grid gap-5 sm:grid-cols-2">
+                <label className="block text-sm font-bold text-gray-nav">Birthday
+                  <input name="birthday" type="date" value={context.birthday} onChange={(event) => setContext((current) => ({ ...current, birthday: event.target.value }))} className={fieldClass} />
+                </label>
+                <label className="block text-sm font-bold text-gray-nav">Bring them back about
+                  <select name="cadenceWeeks" value={context.cadenceWeeks} onChange={(event) => setContext((current) => ({ ...current, cadenceWeeks: event.target.value }))} className={fieldClass}>
+                    <option value="">When it feels right</option>
+                    <option value="1">Every week</option>
+                    <option value="2">Every couple of weeks</option>
+                    <option value="4">Every month</option>
+                    <option value="13">Every few months</option>
+                    <option value="26">Twice a year</option>
+                  </select>
+                </label>
+              </div>
               <div className="flex gap-2">
                 <Button type="submit" variant="secondary" isLoading={isSavingFacts}>Save</Button>
                 {!isNewProfile && (

@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { relationshipService } from './relationshipService';
+import { daysUntilBirthday } from './relationshipSuggestions';
 import { buildNonDestructiveMerge, deriveRelationshipImportFingerprint, fetchAllGoogleConnections, findRelationshipMergeSuggestion } from './relationshipImportPlanning';
 import { mergeRemoteWithPending } from './relationshipStore';
 import type { RelationshipRecord } from '../types';
@@ -22,18 +23,24 @@ const baseRelationship = (overrides: Partial<RelationshipRecord>): RelationshipR
   name: overrides.name || 'Ada',
   tier: 'none',
   stage: 'active',
-  closeness: 3,
-  energy: 3,
-  opportunity: 3,
   tags: [],
   interactions: [],
   hooks: [],
   nextCare: [],
-  connections: [],
-  valueLedger: [],
   createdAt: '2026-01-01T00:00:00.000Z',
   updatedAt: '2026-01-01T00:00:00.000Z',
   ...overrides,
+});
+
+describe('daysUntilBirthday', () => {
+  it('counts days to the next birthday and ignores invalid dates', () => {
+    const now = new Date(2026, 9, 15);
+    expect(daysUntilBirthday('10-15', now)).toBe(0);
+    expect(daysUntilBirthday('1990-10-18', now)).toBe(3);
+    expect(daysUntilBirthday('10-14', now)).toBe(364);
+    expect(daysUntilBirthday('13-45', now)).toBe(Number.POSITIVE_INFINITY);
+    expect(daysUntilBirthday(undefined, now)).toBe(Number.POSITIVE_INFINITY);
+  });
 });
 
 describe('relationshipService.buildWeeklySuggestions', () => {
@@ -82,21 +89,42 @@ describe('relationshipService.buildWeeklySuggestions', () => {
     expect(suggestions[1].suggestedHook?.description).toContain('Started a new role');
   });
 
-  it('ranks on behavior only — closeness/energy/opportunity do not change order', () => {
-    const recent = () => [{
-      id: 'touch',
-      date: new Date().toISOString(),
-      channel: 'email' as const,
-      notes: 'Recent',
-      direction: 'mutual' as const,
-    }];
+  it('surfaces an upcoming birthday first and says so plainly', () => {
+    const soon = new Date(Date.now() + 3 * 86_400_000);
+    const mmdd = `${String(soon.getMonth() + 1).padStart(2, '0')}-${String(soon.getDate()).padStart(2, '0')}`;
     const suggestions = relationshipService.buildWeeklySuggestions([
-      baseRelationship({ id: 'low', closeness: 1, energy: 1, opportunity: 1, interactions: recent() }),
-      baseRelationship({ id: 'high', closeness: 5, energy: 5, opportunity: 5, interactions: recent() }),
+      baseRelationship({ id: 'hooked', hooks: [{ id: 'h', description: 'New job', source: 'manual', createdAt: '2026-01-01', used: false }] }),
+      baseRelationship({ id: 'bday', birthday: mmdd }),
     ]);
 
-    // Equal behavior → stable input order. Old slider weights would have floated 'high' to the top.
-    expect(suggestions.map((suggestion) => suggestion.relationship.id)).toEqual(['low', 'high']);
+    expect(suggestions[0].relationship.id).toBe('bday');
+    expect(suggestions[0].reason).toBe('Birthday in 3 days.');
+  });
+
+  it('quotes what the writer last wrote about the person, matched by alias', () => {
+    const suggestions = relationshipService.buildWeeklySuggestions(
+      [baseRelationship({ id: 'mom', name: 'Priya', aliases: ['Mom'] })],
+      [
+        { title: '', content: '<p>Long day. Mom called about the garden.</p>', createdAt: '2026-03-01T00:00:00.000Z' },
+        { title: '', content: '<p>Nothing about anyone.</p>', createdAt: '2026-04-01T00:00:00.000Z' },
+      ],
+    );
+
+    expect(suggestions[0].reason).toBe('You wrote: “Mom called about the garden.”');
+    expect(suggestions[0].lastWrittenAt).toBe('2026-03-01T00:00:00.000Z');
+  });
+
+  it('respects a person\'s rhythm: early contacts rank below due ones', () => {
+    const daysAgo = (days: number) => [{
+      id: 't', date: new Date(Date.now() - days * 86_400_000).toISOString(), channel: 'phone' as const, notes: '', direction: 'mutual' as const,
+    }];
+    const suggestions = relationshipService.buildWeeklySuggestions([
+      baseRelationship({ id: 'early', cadenceWeeks: 8, interactions: daysAgo(14) }),
+      baseRelationship({ id: 'due', cadenceWeeks: 2, interactions: daysAgo(20) }),
+    ]);
+
+    expect(suggestions.map((suggestion) => suggestion.relationship.id)).toEqual(['due', 'early']);
+    expect(suggestions[0].reason).toBe('It’s been about 3 weeks.');
   });
 
   it('does not suggest archived relationships', () => {
@@ -158,7 +186,6 @@ describe('relationship import planning', () => {
       name: 'Ada Lovelace',
       email: 'personal@example.com',
       company: 'Existing company',
-      closeness: 5,
     });
     const item = {
       id: 'import-1', userId: 'user-1', source: 'google_contacts' as const, status: 'pending' as const,

@@ -22,7 +22,8 @@ import { useToast } from '../../components/ui/Toast';
 import { noteService } from '../../services/noteService';
 import { relationshipService } from '../../services/relationshipService';
 import { relationshipImportService } from '../../services/relationshipImportService';
-import { countMentionedNames } from '../../services/relationshipWikiLink';
+import { countMentionedNames, noteMentionsPerson } from '../../services/relationshipWikiLink';
+import { writeAboutState } from '../../services/relationshipSuggestions';
 import { useUserMode } from '../../context/UserModeContext';
 import { wikiService } from '../../services/wikiService';
 import type { Note, RelationshipImportInboxItem, RelationshipRecord } from '../../types';
@@ -62,7 +63,7 @@ export const Relationships: React.FC = () => {
   const pendingInbox = useMemo(() => inbox.filter((item) => item.status === 'pending'), [inbox]);
   const activePeople = useMemo(() => relationships.filter((item) => item.stage !== 'archived'), [relationships]);
   const archivedPeople = useMemo(() => relationships.filter((item) => item.stage === 'archived'), [relationships]);
-  const suggestions = useMemo(() => relationshipService.buildWeeklySuggestions(relationships), [relationships]);
+  const suggestions = useMemo(() => relationshipService.buildWeeklySuggestions(relationships, notes), [relationships, notes]);
   const wikiMentionCount = useMemo(
     () => countMentionedNames(peopleWiki, relationships.map((relationship) => relationship.name)),
     [peopleWiki, relationships],
@@ -77,16 +78,7 @@ export const Relationships: React.FC = () => {
     );
 
     for (const rel of relationships) {
-      const relName = rel.name.trim().toLowerCase();
-      const match = sortedNotes.find((n) => {
-        if (n.relationshipIds?.includes(rel.id)) return true;
-        if (relName.length >= 2) {
-          const titleMatch = n.title?.toLowerCase().includes(relName);
-          const contentMatch = n.content?.toLowerCase().includes(relName);
-          if (titleMatch || contentMatch) return true;
-        }
-        return false;
-      });
+      const match = sortedNotes.find((n) => noteMentionsPerson(n, rel));
       if (match) {
         map.set(rel.id, match);
       }
@@ -132,17 +124,23 @@ export const Relationships: React.FC = () => {
 
   const createRelationship = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!draft.name.trim()) return;
+    // "Sam, Priya, Mom" adds three people at once; a single name opens their profile.
+    const names = Array.from(new Set(draft.name.split(',').map((name) => name.trim()).filter(Boolean)));
+    if (!names.length) return;
     try {
-      const relationship = await relationshipService.create({
-        name: draft.name.trim(),
-        howWeMet: draft.howWeMet.trim() || undefined,
-      });
-      setRelationships((current) => [relationship, ...current]);
+      const created: RelationshipRecord[] = [];
+      for (const name of names) {
+        created.push(await relationshipService.create({
+          name,
+          howWeMet: names.length === 1 ? draft.howWeMet.trim() || undefined : undefined,
+        }));
+      }
+      setRelationships((current) => [...created, ...current]);
       setHasPendingSync(await relationshipService.hasPendingSync());
       setDraft(emptyDraft);
       setIsCreateOpen(false);
-      navigate(relationshipPath(relationship.id));
+      if (created.length === 1) navigate(relationshipPath(created[0].id));
+      else showToast(`Added ${created.length} people.`);
     } catch {
       showToast("I couldn't add them. Nothing was lost — try again.");
     }
@@ -266,12 +264,6 @@ export const Relationships: React.FC = () => {
                           </div>
 
                           <div className="text-sm space-y-2 text-gray-light border-l border-green/20 pl-4 py-1">
-                            {suggestion.suggestedHook?.description && (
-                              <p>
-                                <span className="font-semibold text-gray-text">Why: </span>
-                                {suggestion.suggestedHook.description}
-                              </p>
-                            )}
                             <p>
                               <span className="font-semibold text-gray-text">Suggested step: </span>
                               {suggestion.suggestedCare}
@@ -301,6 +293,13 @@ export const Relationships: React.FC = () => {
                             >
                               <Check size={16} weight="bold" className="mr-2" />
                               Log a catch-up
+                            </Button>
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => navigate(RoutePath.CREATE_NOTE, { state: writeAboutState(suggestion.relationship) })}
+                            >
+                              Write about {suggestion.relationship.name.trim().split(/\s+/)[0]}
                             </Button>
                             <Button
                               variant="ghost"
@@ -458,9 +457,9 @@ export const Relationships: React.FC = () => {
         </div>
       </PageContainer>
 
-      <ModalSheet isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title="Add someone" description="Just a name to start. You can add more on their profile." tone="sage" size="md">
+      <ModalSheet isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title="Who's on your mind?" description="One name, or a few separated by commas. You can add more on their profile later." tone="sage" size="md">
         <form onSubmit={createRelationship} className="space-y-4">
-          <Input name="name" label="Name" value={draft.name} onChange={(event) => setDraft((current) => ({ ...current, name: event.target.value }))} autoComplete="name" required autoFocus />
+          <Input name="name" label="Name or names" placeholder="Sam, Priya, Mom" value={draft.name} onChange={(event) => setDraft((current) => ({ ...current, name: event.target.value }))} autoComplete="name" required autoFocus />
           <label className="block text-sm font-bold text-gray-nav">How you know them (optional)<textarea name="howWeMet" value={draft.howWeMet} onChange={(event) => setDraft((current) => ({ ...current, howWeMet: event.target.value }))} className={`${fieldClass} min-h-24`} /></label>
           <Button type="submit" variant="primary" className="w-full">Add</Button>
         </form>

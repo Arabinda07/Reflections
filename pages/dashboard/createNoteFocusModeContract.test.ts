@@ -6,13 +6,13 @@ const read = (filePath: string) =>
   readFileSync(path.resolve(process.cwd(), filePath), 'utf8');
 
 describe('CreateNote focus mode contract', () => {
-  it('keeps focus mode opt-in and does not auto-focus the editor after the entry experience', () => {
+  it('keeps focus mode opt-in and puts the cursor in the editor on open', () => {
     const createNote = read('pages/dashboard/CreateNote.tsx');
     const focusModeHook = read('hooks/useFocusMode.ts');
 
     expect(focusModeHook).toContain('const [isEnabled, setIsEnabled] = useState(false);');
     expect(createNote).toContain('useFocusMode');
-    expect(createNote).not.toContain('editorInstanceRef.current?.focus();');
+    expect(createNote).toContain('editorInstanceRef.current?.focus();');
   });
 
   it('quiets surrounding chrome without dimming the editor canvas itself', () => {

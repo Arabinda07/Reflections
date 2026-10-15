@@ -6,18 +6,13 @@ const read = (filePath: string) =>
   readFileSync(path.resolve(process.cwd(), filePath), 'utf8');
 
 describe('CreateNote regression contract', () => {
-  it('keeps the entry experience on a lottie-based loading state', () => {
+  it('opens straight onto the page with no entrance overlay', () => {
     const createNote = read('pages/dashboard/CreateNote.tsx');
     const trailLoadingMark = read('components/ui/TrailLoadingMark.tsx');
 
-    expect(createNote).toContain("import('../../components/ui/TrailLoadingMark')");
     expect(createNote).toContain("import('../../components/ui/PaperPlaneToast')");
-    expect(createNote).toContain('const CREATE_NOTE_ENTRY_ANIMATION_FALLBACK_MS = 3600;');
-    expect(createNote).toContain('const [entryAnimationComplete, setEntryAnimationComplete] = useState(false);');
-    expect(createNote).toContain('const showEntryExperience = loading || !entryAnimationComplete;');
-    expect(createNote).toContain('window.setTimeout(() => setEntryAnimationComplete(true), CREATE_NOTE_ENTRY_ANIMATION_FALLBACK_MS);');
-    expect(createNote).toContain('<TrailLoadingMark loop={true} />');
-    expect(createNote).toContain('h-40 w-40');
+    expect(createNote).not.toContain('entryAnimationComplete');
+    expect(createNote).not.toContain('LOADING_QUOTES');
     expect(trailLoadingMark).toContain("import Lottie from 'lottie-react'");
     expect(trailLoadingMark).toContain("from '@/src/lottie/trail-loading.json'");
     expect(trailLoadingMark).toContain('loop?: boolean;');
@@ -45,10 +40,10 @@ describe('CreateNote regression contract', () => {
       noteDraft.indexOf('const access = await profileService.getWellnessAccess();', noteDraft.indexOf('if (!id) {')),
     );
 
-    expect(noteDraft).toContain('openBlankDraftAfterMinimumDelay');
+    expect(noteDraft).not.toContain('NOTE_DRAFT_READY_DELAY_MS');
     expect(noteDraft).toContain("console.warn('[useNoteDraft] Could not verify note limits for new draft:'");
     expect(newDraftBlock).toContain('setBaselineSnapshot(buildCreateNoteDraftSnapshot(EMPTY_DRAFT_INPUT));');
-    expect(newDraftBlock).toContain('openBlankDraftAfterMinimumDelay();');
+    expect(newDraftBlock).toContain('setLoading(false);');
     expect(newDraftBlock).toContain('await loadNewDraftAccess();');
   });
 });

@@ -37,17 +37,11 @@ describe('optimize audit contract', () => {
     expect(vite).not.toContain('sentrySourcemap');
   });
 
-  it('removes perception-slow waits from the authenticated home prompt refresh', () => {
+  it('refreshes the Today prompt instantly', () => {
     const homeAuthenticated = read('pages/dashboard/HomeAuthenticated.tsx');
-    const refreshPromptBlock = homeAuthenticated.slice(
-      homeAuthenticated.indexOf('const refreshPrompt = useCallback'),
-      homeAuthenticated.indexOf('useEffect(() => {', homeAuthenticated.indexOf('const refreshPrompt = useCallback')),
-    );
 
-    expect(refreshPromptBlock).toContain('window.requestAnimationFrame(() => {');
-    expect(refreshPromptBlock).toContain('setIsRefreshing(false);');
-    expect(refreshPromptBlock).not.toContain('window.setTimeout');
-    expect(refreshPromptBlock).not.toContain('}, 600);');
+    expect(homeAuthenticated).toContain('setDailyPrompt((current) => pickPrompt(current))');
+    expect(homeAuthenticated).not.toContain('window.setTimeout');
   });
 
   it('keeps note routes free of artificial page and save delays', () => {
@@ -57,7 +51,7 @@ describe('optimize audit contract', () => {
 
     expect(createNote).not.toContain('const [isBreathing');
     expect(createNote).not.toContain('setIsBreathing');
-    expect(createNote).toContain('const showEntryExperience = loading || !entryAnimationComplete;');
+    expect(createNote).not.toContain('entryAnimationComplete');
     expect(createNoteDraftState).toContain('CREATE_NOTE_SAVE_VISUAL_FLOOR_MS = 0');
     expect(myNotes).not.toContain('isContentVisible');
   });

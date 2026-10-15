@@ -3,15 +3,23 @@ import { createPortal } from 'react-dom';
 
 type ToastVariant = 'success' | 'info' | 'warning' | 'error';
 
+export interface ToastAction {
+  label: string;
+  onClick: () => void;
+  /** Runs when the toast times out without the action being taken (e.g. commit a delete). */
+  onExpire?: () => void;
+}
+
 interface ToastData {
   id: string;
   message: string;
   variant: ToastVariant;
+  action?: ToastAction;
   isExiting?: boolean;
 }
 
 interface ToastContextValue {
-  showToast: (message: string, variant?: ToastVariant) => void;
+  showToast: (message: string, variant?: ToastVariant, action?: ToastAction) => void;
 }
 
 const ToastContext = React.createContext<ToastContextValue>({
@@ -22,6 +30,7 @@ export const useToast = () => React.useContext(ToastContext);
 
 const AUTO_DISMISS_MS = 3200;
 const ERROR_DISMISS_MS = 7000; // errors need time to read and act on
+export const ACTION_DISMISS_MS = 6000; // time to reach an Undo
 
 const variantStyles: Record<ToastVariant, string> = {
   success: 'border-green/20 bg-green/5 text-green',
@@ -47,9 +56,15 @@ const ToastItem: React.FC<{ toast: ToastData; onDismiss: (id: string) => void }>
 
   useEffect(() => {
     if (toast.isExiting || isPaused) return;
-    const timer = window.setTimeout(() => onDismiss(toast.id), isError ? ERROR_DISMISS_MS : AUTO_DISMISS_MS);
+    const timer = window.setTimeout(
+      () => {
+        toast.action?.onExpire?.();
+        onDismiss(toast.id);
+      },
+      isError ? ERROR_DISMISS_MS : toast.action ? ACTION_DISMISS_MS : AUTO_DISMISS_MS,
+    );
     return () => window.clearTimeout(timer);
-  }, [toast.id, onDismiss, toast.isExiting, isPaused, isError]);
+  }, [toast.id, onDismiss, toast.isExiting, isPaused, isError, toast.action]);
 
   return (
     <div
@@ -63,7 +78,19 @@ const ToastItem: React.FC<{ toast: ToastData; onDismiss: (id: string) => void }>
       onFocus={() => setIsPaused(true)}
       onBlur={() => setIsPaused(false)}
     >
-      {toast.message}
+      <span>{toast.message}</span>
+      {toast.action ? (
+        <button
+          type="button"
+          onClick={() => {
+            toast.action?.onClick();
+            onDismiss(toast.id);
+          }}
+          className="-my-1.5 -mr-2 min-h-11 rounded-xl px-3 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current"
+        >
+          {toast.action.label}
+        </button>
+      ) : null}
     </div>
   );
 };
@@ -74,9 +101,15 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const counterRef = React.useRef(0);
 
   const showToast = useCallback(
-    (message: string, variant: ToastVariant = 'success') => {
+    (message: string, variant: ToastVariant = 'success', action?: ToastAction) => {
       const id = `${idPrefix}-${++counterRef.current}`;
-      setToasts((prev) => [...prev.filter(t => !t.isExiting).slice(-2), { id, message, variant }]);
+      setToasts((prev) => {
+        // Keep at most 3 plain toasts; never evict one with an action (its
+        // onExpire may commit something, like a pending delete).
+        const live = prev.filter((t) => !t.isExiting);
+        const keptPlain = live.filter((t) => !t.action).slice(-2);
+        return [...live.filter((t) => t.action || keptPlain.includes(t)), { id, message, variant, action }];
+      });
     },
     [idPrefix],
   );

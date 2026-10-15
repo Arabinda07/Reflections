@@ -22,13 +22,12 @@ describe('mood modal stage contract', () => {
   it('lets mood modals hide their broad-stage header while preserving accessible dialog names', () => {
     const modalSheet = read('components/ui/ModalSheet.tsx');
     const createNote = read('pages/dashboard/CreateNote.tsx');
-    const homeAuthenticated = read('pages/dashboard/HomeAuthenticated.tsx');
     const singleNote = read('pages/dashboard/SingleNote.tsx');
 
     expect(modalSheet).toContain('ariaLabel?: string;');
     expect(modalSheet).toContain('aria-label={!title && ariaLabel ? ariaLabel : undefined}');
 
-    [createNote, homeAuthenticated, singleNote].forEach((source) => {
+    [createNote, singleNote].forEach((source) => {
       expect(source).toContain("useState<MoodPickerStage>('group')");
       expect(source).toContain("title={moodPickerStage === 'group' ? 'How does it feel right now?' : undefined}");
       expect(source).toContain("description={moodPickerStage === 'group' ? 'Pick a broad mood. Details are optional.' : undefined}");

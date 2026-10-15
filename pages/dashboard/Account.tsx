@@ -27,7 +27,6 @@ import { MetadataPill } from '../../components/ui/MetadataPill';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { PageContainer } from '../../components/ui/PageContainer';
 import { Tooltip } from '../../components/ui/Tooltip';
-import { ReferralInvitePanel } from '../../components/ui/ReferralInvitePanel';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { StorageImage } from '../../components/ui/StorageImage';
@@ -798,16 +797,6 @@ export const Account: React.FC = () => {
                   )}
                 </div>
 
-                <div className="pt-6 sm:pt-8 border-t border-border space-y-4">
-                  <h3 className="flex items-center gap-2 text-xl font-display font-bold text-gray-text">
-                    <EnvelopeSimple size={22} weight="duotone" className="text-green" />
-                    Share Reflections
-                  </h3>
-                  <p className="dashboard-supporting-text">
-                    Account tracks how many people joined from your invite. There is no prize or public list.
-                  </p>
-                  <ReferralInvitePanel />
-                </div>
               </Surface>
 
               <Surface variant="flat" tone="paper" className="p-5 sm:p-8 lg:p-10">

@@ -1,2 +1,2 @@
-export const NATIVE_STARTUP_MIN_MS = 650;
-export const NATIVE_STARTUP_FADE_MS = 260;
+export const NATIVE_STARTUP_MIN_MS = 0;
+export const NATIVE_STARTUP_FADE_MS = 0;

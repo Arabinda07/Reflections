@@ -17,7 +17,7 @@ describe('RelationshipOS routing and UI contracts', () => {
     expect(app).toContain('RoutePath.RELATIONSHIPS');
     expect(app).toContain('RoutePath.RELATIONSHIP_DETAIL');
     expect(desktopNav).toContain("label: 'People', path: RoutePath.RELATIONSHIPS");
-    expect(mobileNav).toContain("label: 'Relationships'");
+    expect(mobileNav).toContain("label: 'People',\n    path: RoutePath.RELATIONSHIPS");
   });
 
   it('keeps Google Contacts import one-time, read-only, and inbox-gated', () => {

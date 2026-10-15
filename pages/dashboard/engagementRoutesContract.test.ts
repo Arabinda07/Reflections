@@ -29,12 +29,11 @@ describe('engagement routes source contract', () => {
     expect(guestNavItems).not.toContain('About');
   });
 
-  it('keeps future letters on Home and moves Release into the note save choice', () => {
+  it('keeps future letters and Release reachable from Today, with Release into the note save choice', () => {
     const homeAuthenticated = read('pages/dashboard/HomeAuthenticated.tsx');
     const createNote = read('pages/dashboard/CreateNote.tsx');
 
     expect(homeAuthenticated).toContain('RoutePath.FUTURE_LETTERS');
-    expect(homeAuthenticated).toContain('Future letter');
     expect(homeAuthenticated).toContain('RoutePath.RELEASE');
     const noteDraft = read('hooks/useNoteDraft.ts');
     expect(noteDraft).toContain('recordReleaseCompleted');
@@ -123,8 +122,7 @@ describe('engagement routes source contract', () => {
     expect(layout).toContain('Invite');
     expect(layout).toContain('<ReferralInvitePanel');
     expect(layout).toContain('flex flex-wrap items-center justify-center gap-x-6 gap-y-4 sm:gap-10');
-    expect(account).toContain('<ReferralInvitePanel');
-    expect(account).toContain('people joined from your invite');
+    expect(account).not.toContain('<ReferralInvitePanel');
     expect(signUp).toContain('referralService.recordAcceptedReferral');
     const referralPanel = read('components/ui/ReferralInvitePanel.tsx');
     expect(referralPanel).toContain('WarningCircle');

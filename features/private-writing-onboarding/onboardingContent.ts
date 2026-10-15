@@ -1,5 +1,5 @@
 import { Archive } from '@phosphor-icons/react/Archive';
-import { Feather } from '@phosphor-icons/react/Feather';
+import { UsersThree } from '@phosphor-icons/react/UsersThree';
 import { LockKey } from '@phosphor-icons/react/LockKey';
 import { NotePencil } from '@phosphor-icons/react/NotePencil';
 
@@ -14,31 +14,31 @@ export const PRIVATE_WRITING_ONBOARDING_STEPS = [
     note: 'One honest line is already enough to begin.',
   },
   {
-    label: 'Focus',
-    title: 'Focus on the writing',
+    label: 'People',
+    title: 'The people you write about',
     body:
-      'Start with one sentence. Write what you need to say and let the page hold the rest.',
-    note: 'The page can hold the unfinished part too.',
+      'Add the people who matter. When they come up in your writing, Reflections notices and brings them back gently, with your own words.',
+    note: 'No streaks, no scores. Just a reminder of who is on your mind.',
   },
   {
     label: 'Privacy',
-    title: 'Private and secure',
+    title: 'Private by design',
     body:
-      'Your notes stay with you. AI only runs if you specifically ask it to help you find a pattern.',
-    note: 'Support appears only when you invite it in.',
+      'Notes and people are encrypted on this device before they sync. Search, related notes and name matching run here too, so your writing never has to leave.',
+    note: 'Only you hold the key. Keep your recovery key somewhere safe.',
   },
   {
     label: 'Ready',
     title: 'Ready to start',
     body:
-      'Start with a blank note or use a daily focus prompt. Your archived reflections are always available.',
+      'The app opens on a blank page. Today, your notes and your people are one tap away.',
     note: 'When you are ready, begin with the smallest true thing.',
   },
 ];
 
 export const privateWritingOnboardingStepIcons = [
   NotePencil,
-  Feather,
+  UsersThree,
   LockKey,
   Archive,
 ] as const;

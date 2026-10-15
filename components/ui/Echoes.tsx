@@ -159,8 +159,7 @@ export const Echoes: React.FC<EchoesProps> = ({
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        {echoes.map(({ note, similarity }) => {
-          const resonancePercent = Math.round(similarity * 100);
+        {echoes.map(({ note }) => {
           return (
             <button
               key={note.id}
@@ -173,7 +172,7 @@ export const Echoes: React.FC<EchoesProps> = ({
                   <div className="flex items-center gap-1.5">
                     <span className="inline-flex items-center gap-1 rounded-full bg-green/10 px-2 py-0.5 text-ui-xs font-bold text-green">
                       <Sparkle size={11} weight="fill" />
-                      {resonancePercent}% resonance
+                      {new Date(note.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                     </span>
                     {note.attachments?.some((a) => a.type?.startsWith('audio/')) && (
                       <span className="inline-flex items-center text-gray-nav" title="Voice reflection">

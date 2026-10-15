@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import React, { Suspense, lazy, useState, useEffect, useCallback, useRef, useDeferredValue, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
 import { CalendarBlank } from '@phosphor-icons/react/CalendarBlank';
@@ -11,23 +11,21 @@ import { Headphones } from '@phosphor-icons/react/Headphones';
 import { Sparkle } from '@phosphor-icons/react/Sparkle';
 import { Tag } from '@phosphor-icons/react/Tag';
 import { Image as ImageIcon } from '@phosphor-icons/react/Image';
-import { ListChecks } from '@phosphor-icons/react/ListChecks';
 import { Paperclip } from '@phosphor-icons/react/Paperclip';
-import { Plus } from '@phosphor-icons/react/Plus';
 import { Smiley } from '@phosphor-icons/react/Smiley';
 import { Tag as TagIcon } from '@phosphor-icons/react/Tag';
 import { Target } from '@phosphor-icons/react/Target';
-import { Trash } from '@phosphor-icons/react/Trash';
 import { UsersThree } from '@phosphor-icons/react/UsersThree';
 import { Wind } from '@phosphor-icons/react/Wind';
 import { X } from '@phosphor-icons/react/X';
+import { Plus } from '@phosphor-icons/react/Plus';
 import { useAmbientAudio, AMBIENT_TRACKS } from '../../hooks/useAmbientAudio';
 import { useHaptics } from '../../hooks/useHaptics';
 import { useSound } from '../../hooks/useSound';
 import { Button } from '../../components/ui/Button';
 import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
 import { Editor, EditorRef } from '../../components/ui/Editor';
-import { RoutePath, Task } from '../../types';
+import { RoutePath } from '../../types';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { WhisperComposerControl, appendTranscriptToHtml } from '../../components/ui/WhisperComposerControl';
 import { InlineLoadingBadge } from '../../components/ui/InlineLoadingBadge';
@@ -35,7 +33,6 @@ import { DEFAULT_WELLNESS_PROMPTS, getCurrentWellnessPrompt, getNextWellnessProm
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useNoteDraft } from '../../hooks/useNoteDraft';
 import { useFocusMode } from '../../hooks/useFocusMode';
-import { getOrderedTasks, getTaskDrawerTriggerLabel } from './createNoteTasks';
 import { canNavigateBackInApp } from '../../src/native/androidBack';
 // Android shell safe area contract markers: NATIVE_TOP_CONTROL_OFFSET, NATIVE_PAGE_TOP_PADDING
 import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
@@ -43,18 +40,16 @@ import { embeddingService } from '../../services/embedding/embeddingService';
 import { vectorStore } from '../../services/embedding/vectorStore';
 import { noteService } from '../../services/noteService';
 import { stripHtml } from '../../services/collectionUtils';
+import { untaggedMentions } from '../../services/relationshipWikiLink';
 import { relationshipService } from '../../services/relationshipService';
 import type { RelationshipRecord } from '../../types';
 import { getMoodConfig } from './moodConfig';
 import { MoodPicker, type MoodPickerStage } from './MoodPicker';
 import { detectEmotionalDissonance } from '../../services/moodIntelligence';
 
-const TrailLoadingMark = lazy(() => import('../../components/ui/TrailLoadingMark')
-  .then((module) => ({ default: module.TrailLoadingMark })));
 const PaperPlaneToast = lazy(() => import('../../components/ui/PaperPlaneToast')
   .then((module) => ({ default: module.PaperPlaneToast })));
 
-const CREATE_NOTE_ENTRY_ANIMATION_FALLBACK_MS = 3600;
 
 const getSurfaceScopeForMood = (_mood?: string) => {
   return 'surface-scope-sage';
@@ -78,130 +73,21 @@ const suggestTagsFromSimilarNotes = async (content: string, existingTags: string
 const getSurfacePanelForMood = (_mood?: string) => {
   return 'surface-panel-sage';
 };
-// --- Sub-Component: TaskRow ---
-interface TaskRowProps {
-  task: Task;
-  updateTask: (taskId: string, updates: Partial<Task>) => void;
-  toggleTask: (taskId: string) => void;
-  removeTask: (taskId: string) => void;
-}
 
-const TaskRow: React.FC<TaskRowProps> = ({ task, updateTask, toggleTask, removeTask }) => {
-  const [showCompletedText, setShowCompletedText] = useState(task.completed);
-  const wasCompleted = useRef(task.completed);
-  const taskLabel = task.text.trim() || 'untitled task';
-
-  useEffect(() => {
-    if (task.completed) {
-      if (!wasCompleted.current) {
-        if (window.navigator && window.navigator.vibrate) {
-            window.navigator.vibrate(10);
-        }
-      }
-      const timer = window.setTimeout(() => setShowCompletedText(true), 180);
-      wasCompleted.current = true;
-      return () => window.clearTimeout(timer);
-    }
-    setShowCompletedText(false);
-    wasCompleted.current = false;
-  }, [task.completed]);
-
-  return (
-    <div className="relative mb-1 rounded-2xl">
-      <div
-        className={`group relative z-10 flex items-center gap-3 rounded-2xl bg-surface p-3 transition-colors duration-200 hover:bg-green/5 dark:hover:bg-white/5 ${task.completed ? 'opacity-60' : ''}`}
-      >
-
-
-      <button
-        type="button"
-        onClick={() => toggleTask(task.id)}
-        aria-label={task.completed ? `Mark "${taskLabel}" as open` : `Mark "${taskLabel}" as complete`}
-        className="relative z-10 flex size-11 shrink-0 items-center justify-center group/checkbox"
-      >
-        <div className={`flex h-6 w-6 items-center justify-center rounded-lg border-2 transition-colors duration-300 ${
-          task.completed ? 'border-green bg-green text-white' : 'border-border text-transparent group-hover/checkbox:border-green/50'
-        }`}>
-          <span className={`transition-transform duration-300 ${task.completed ? 'scale-100' : 'scale-0'}`}>
-            <Check size={14} weight="bold" />
-          </span>
-        </div>
-      </button>
-
-      <div className="relative flex-1 z-10 flex items-center">
-        <input
-          type="text"
-          value={task.text}
-          onChange={(e) => updateTask(task.id, { text: e.target.value })}
-          readOnly={task.completed}
-          placeholder="What needs to be done?"
-          aria-label={`Edit task: ${taskLabel}`}
-          className={`w-full bg-transparent border-none outline-none font-bold text-ui-sm placeholder:text-gray-nav/70 transition-colors duration-300 ${
-            showCompletedText ? 'text-gray-text/40' : 'text-gray-text'
-          }`}
-        />
-        {/* Animated Strikethrough */}
-        <div
-          className={`pointer-events-none absolute left-0 right-0 top-1/2 h-0.5 -translate-y-1/2 origin-left bg-green transition-transform duration-300 ease-out ${showCompletedText ? 'scale-x-100 opacity-100' : 'scale-x-0 opacity-0'}`}
-        />
-      </div>
-
-      <button
-        type="button"
-        onClick={() => removeTask(task.id)}
-        aria-label={`Remove task: ${taskLabel}`}
-        className="opacity-0 lg:group-hover:opacity-100 flex size-11 items-center justify-center text-gray-nav hover:text-clay transition-opacity"
-      >
-        <Trash size={16} />
-      </button>
-      </div>
-    </div>
-  );
-};
-
-const LOADING_QUOTES = [
-  { text: "I write entirely to find out what I'm thinking.", author: "Joan Didion" },
-  { text: "Fill your paper with the breathings of your heart.", author: "William Wordsworth" },
-  { text: "The unexamined life is not worth living.", author: "Socrates" },
-  { text: "Look within. Within is the fountain of good.", author: "Marcus Aurelius" },
-  { text: "We suffer more often in imagination than in reality.", author: "Seneca" },
-  { text: "Faith is the bird that feels the light.", author: "Rabindranath Tagore" },
-  { text: "No need to hurry. No need to sparkle.", author: "Virginia Woolf" },
-  { text: "Live the questions now.", author: "Rainer Maria Rilke" },
-  { text: "It's not what you look at that matters, it's what you see.", author: "Henry David Thoreau" },
-  { text: "Nothing can bring you peace but yourself.", author: "Ralph Waldo Emerson" },
-  { text: "Attention is the rarest and purest form of generosity.", author: "Simone Weil" },
-  { text: "The beginning is always today.", author: "Mary Shelley" },
-  { text: "There is no greater agony than bearing an untold story inside you.", author: "Maya Angelou" },
-  { text: "The only journey is the journey within.", author: "Rainer Maria Rilke" },
-  { text: "Observe, and do not judge.", author: "Jiddu Krishnamurti" },
-  { text: "To know yourself is the beginning of wisdom.", author: "Aristotle" },
-  { text: "Not all those who wander are lost.", author: "J. R. R. Tolkien" },
-  { text: "The quieter you become, the more you are able to hear.", author: "Rumi" },
-  { text: "The child is father of the man.", author: "William Wordsworth" },
-  { text: "What we think, we become.", author: "Buddha" },
-  { text: "Knowing yourself is the beginning of all wisdom.", author: "Aristotle" },
-  { text: "The soul becomes dyed with the color of its thoughts.", author: "Marcus Aurelius" },
-  { text: "Life changes fast. Life changes in the instant.", author: "Joan Didion" },
-  { text: "I am rooted, but I flow.", author: "Virginia Woolf" },
-  { text: "The privilege of a lifetime is to become who you truly are.", author: "Carl Jung" }
-];
 
 export const CreateNote: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const initialPrompt = location.state?.initialPrompt;
 
-  const entryQuote = useMemo(() => {
-    const randomIndex = Math.floor(Math.random() * LOADING_QUOTES.length);
-    return LOADING_QUOTES[randomIndex];
-  }, []);
   const initialContent =
     typeof location.state?.initialContent === 'string' ? location.state.initialContent : '';
 
   // â”€â”€ Core draft lifecycle (state, save, release, navigation blocking) â”€â”€
   const draft = useNoteDraft();
   const hasAppliedInitialContentRef = useRef(false);
+  const initialRelationshipIds: string[] = Array.isArray(location.state?.relationshipIds) ? location.state.relationshipIds : [];
+  const hasAppliedInitialPeopleRef = useRef(false);
 
   // â”€â”€ Focus/flow mode â”€â”€
   const [isFocused, setIsFocused] = useState(false);
@@ -214,7 +100,6 @@ export const CreateNote: React.FC = () => {
 
   // â”€â”€ UI-local state (modals, editor chrome) â”€â”€
   const isMobile = useMediaQuery('(max-width: 1023px)');
-  const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const [tagInput, setTagInput] = useState('');
   const canReflect = false;
   const [isReflectProOpen, setIsReflectProOpen] = useState(false);
@@ -228,21 +113,16 @@ export const CreateNote: React.FC = () => {
   const [relationships, setRelationships] = useState<RelationshipRecord[]>([]);
   const [isPeoplePickerOpen, setIsPeoplePickerOpen] = useState(false);
   const [isMobileOptionsOpen, setIsMobileOptionsOpen] = useState(false);
-  const [entryAnimationComplete, setEntryAnimationComplete] = useState(false);
-  const [fadeOverlay, setFadeOverlay] = useState(false);
-  const [overlayMounted, setOverlayMounted] = useState(true);
   const [isMoodOpen, setIsMoodOpen] = useState(false);
   const [moodPickerStage, setMoodPickerStage] = useState<MoodPickerStage>('group');
   const [isTagsOpen, setIsTagsOpen] = useState(false);
   const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [isMusicOpen, setIsMusicOpen] = useState(false);
-  const [isTasksOpen, setIsTasksOpen] = useState(false);
   const [isSaveChoiceOpen, setIsSaveChoiceOpen] = useState(false);
   const [releaseError, setReleaseError] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [releaseSuccess, setReleaseSuccess] = useState<string | null>(null);
-  const [newTaskText, setNewTaskText] = useState('');
   const [pendingTrackId, setPendingTrackId] = useState<string | null>(null);
   const [showPlane, setShowPlane] = useState(false);
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
@@ -266,32 +146,14 @@ export const CreateNote: React.FC = () => {
     };
   }, []);
 
+  // Open straight onto the page: no entrance, cursor ready for a new entry.
+  const hasOpenedRef = useRef(false);
   useEffect(() => {
-    if (entryAnimationComplete) return;
-    // Reduced-motion users skip the cinematic entrance entirely.
-    if (prefersReducedMotion) {
-      setEntryAnimationComplete(true);
-      return;
-    }
-    // Hold for an intentional 1s dwell time so the writer can center themselves before the notebook opens.
-    if (!draft.loading) {
-      const timer = window.setTimeout(() => {
-        setEntryAnimationComplete(true);
-      }, 1000);
-      return () => window.clearTimeout(timer);
-    }
-    // Safety net only: if the draft never resolves, never trap the writer.
-    const timer = window.setTimeout(() => setEntryAnimationComplete(true), CREATE_NOTE_ENTRY_ANIMATION_FALLBACK_MS);
-    return () => window.clearTimeout(timer);
-  }, [entryAnimationComplete, prefersReducedMotion, draft.loading]);
-
-  const hasPlayedTurnRef = useRef(false);
-  useEffect(() => {
-    if (entryAnimationComplete && !hasPlayedTurnRef.current) {
-      hasPlayedTurnRef.current = true;
-      playPageTurn();
-    }
-  }, [entryAnimationComplete, playPageTurn]);
+    if (draft.loading || hasOpenedRef.current) return;
+    hasOpenedRef.current = true;
+    playPageTurn();
+    if (!draft.restoredDraft || !draft.title) editorInstanceRef.current?.focus();
+  }, [draft.loading, draft.restoredDraft, draft.title, playPageTurn]);
 
 
 
@@ -307,9 +169,23 @@ export const CreateNote: React.FC = () => {
     draft.setContent((previous: string) => appendTranscriptToHtml(previous, initialContent));
   }, [draft.setContent, initialContent]);
 
+  // Arriving from "Write about Sam" starts the page already about Sam.
+  useEffect(() => {
+    if (draft.loading || hasAppliedInitialPeopleRef.current || initialRelationshipIds.length === 0) return;
+    hasAppliedInitialPeopleRef.current = true;
+    draft.setRelationshipIds((previous) => Array.from(new Set([...previous, ...initialRelationshipIds])));
+  }, [draft.loading, draft.setRelationshipIds, initialRelationshipIds]);
+
   // Aliases from draft hook for template readability
-  const { title, setTitle, content, setContent, mood, setMood, tags, setTags, tasks, setTasks, relationshipIds, setRelationshipIds } = draft;
-  const { imagePreview, setImagePreview, loading, saving, releasing: isReleasing, canCreateNote, setCanCreateNote } = draft;
+  const { title, setTitle, content, setContent, mood, setMood, tags, setTags, relationshipIds, setRelationshipIds } = draft;
+  const { imagePreview, setImagePreview, saving, releasing: isReleasing, canCreateNote, setCanCreateNote } = draft;
+
+  // Quietly notice known people named in the draft; one tap links them.
+  const deferredDraftText = useDeferredValue(`${title}\n${content}`);
+  const mentionedPeople = useMemo(
+    () => untaggedMentions({ content: deferredDraftText }, relationships, relationshipIds).slice(0, 3),
+    [deferredDraftText, relationships, relationshipIds],
+  );
   const { blocker, navigateWithBypass } = draft;
   const id = undefined as string | undefined; // id is read internally by useNoteDraft via useParams
 
@@ -366,15 +242,27 @@ export const CreateNote: React.FC = () => {
   }, [isTagsOpen, content, tags]);
 
   // Blocker ── leave dialog sync
+  // Leaving saves, like a notebook closing. Only a failed save asks anything;
+  // the writing is already kept (encrypted) on this device either way.
+  const saveRef = useRef(draft.save);
+  saveRef.current = draft.save;
+  const blockerRef = useRef(blocker);
+  blockerRef.current = blocker;
   useEffect(() => {
-    if (blocker.state === 'blocked') {
-      setShowLeaveDialog(true);
+    if (blocker.state !== 'blocked') {
+      if (blocker.state === 'unblocked') setShowLeaveDialog(false);
       return;
     }
-    if (blocker.state === 'unblocked') {
-      setShowLeaveDialog(false);
-    }
-  }, [blocker.state]);
+    void saveRef.current().then((result) => {
+      if (isUnmounted.current || blockerRef.current.state !== 'blocked') return;
+      if (result.success) {
+        stopMusic();
+        blockerRef.current.proceed?.();
+      } else {
+        setShowLeaveDialog(true);
+      }
+    });
+  }, [blocker.state, stopMusic]);
 
   // â”€â”€ Save handler (delegates to draft.save, adds UI feedback) â”€â”€
   const handleSave = async () => {
@@ -489,17 +377,10 @@ export const CreateNote: React.FC = () => {
   }, [draft.currentSnapshot.content]);
   const isFocusModeActive = focusMode.isActive;
   const isFocusModeEnabled = focusMode.isEnabled;
-  const showEntryExperience = loading || !entryAnimationComplete;
+  // While words are flowing, the chrome steps back (opacity only, no layout
+  // shift). It returns the moment the writer pauses and taps away.
+  const isWritingQuiet = isFocused && !isTitleFocused && wordCount > 0 && !isFocusModeActive;
 
-  useEffect(() => {
-    if (!showEntryExperience) {
-      setFadeOverlay(true);
-      const timer = window.setTimeout(() => {
-        setOverlayMounted(false);
-      }, 700);
-      return () => window.clearTimeout(timer);
-    }
-  }, [showEntryExperience]);
 
   const handleStayOnDraft = () => {
     setShowLeaveDialog(false);
@@ -511,6 +392,7 @@ export const CreateNote: React.FC = () => {
     setShowLeaveDialog(false);
     if (blocker.state === 'blocked') {
       stopMusic();
+      draft.discardDraft();
       blocker.proceed();
     }
   };
@@ -536,14 +418,14 @@ export const CreateNote: React.FC = () => {
       {isMobile && (
         <button 
           onClick={handleMobileBack}
-          className={`surface-floating fixed left-4 z-floating flex h-11 w-11 items-center justify-center rounded-control transition hover:text-green top-[var(--native-top-control-offset)] ${isFocusModeActive ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
+          className={`surface-floating fixed left-4 z-floating flex h-11 w-11 items-center justify-center rounded-control transition hover:text-green top-[var(--native-top-control-offset)] ${isFocusModeActive || isWritingQuiet ? 'pointer-events-none opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
           aria-label="Back to notes"
         >
           <ArrowLeft size={20} weight="regular" />
         </button>
       )}
 
-      {isFocusModeActive ? (
+      {isFocusModeActive && isFocusModeEnabled ? (
         <button
           type="button"
           onClick={() => {
@@ -558,7 +440,7 @@ export const CreateNote: React.FC = () => {
 
       {/* â”€â”€ Desktop Sidebar â”€â”€ */}
       {!isMobile && (
-        <aside className={`${getSurfacePanelForMood(mood)} flex flex-col min-h-0 z-40 transition-[opacity,transform,border-color] duration-300 ease-out-expo border-r border-green/15 ${isFocusModeActive ? 'w-0 pointer-events-none opacity-0 -translate-x-4 overflow-hidden border-r-0' : 'w-60 shrink-0 opacity-100 translate-x-0'}`}>
+        <aside className={`${getSurfacePanelForMood(mood)} flex flex-col min-h-0 z-40 transition-[opacity,transform,border-color] duration-300 ease-out-expo border-r border-green/15 ${isFocusModeActive ? 'w-0 pointer-events-none opacity-0 -translate-x-4 overflow-hidden border-r-0' : `w-60 shrink-0 translate-x-0 ${isWritingQuiet ? 'opacity-30 hover:opacity-100' : 'opacity-100'}`}`}>
           <div className="pt-8 px-6 pb-6 flex-1 overflow-y-auto custom-scrollbar space-y-4">
             
             {/* Desktop Back Button */}
@@ -602,10 +484,6 @@ export const CreateNote: React.FC = () => {
               buttonClassName="w-full flex min-h-14 items-center gap-3 rounded-2xl border border-border/40 p-4 text-btn-sm font-bold transition-colors"
             />
 
-            <button onClick={() => setIsTasksOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-2xl transition-colors border border-border/40 ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>
-              <div className="flex items-center gap-3"><ListChecks size={20} weight={tasks.some(t => !t.completed) ? "fill" : "regular"} /><span className="text-btn-sm font-bold">{getTaskDrawerTriggerLabel(tasks).label}</span></div>
-              <CaretRight size={14} className="opacity-40" />
-            </button>
             
             <div className="grid grid-cols-2 gap-2 pt-2">
               <label className="control-surface flex flex-col items-center justify-center p-4 rounded-2xl text-gray-text transition-colors cursor-pointer">
@@ -650,7 +528,7 @@ export const CreateNote: React.FC = () => {
           )}
 
           {/* Eyebrow Date */}
-          <div className="mb-6 flex flex-wrap items-center gap-2">
+          <div className={`mb-6 flex flex-wrap items-center gap-2 transition-opacity duration-500 ${isWritingQuiet ? 'opacity-30 focus-within:opacity-100 hover:opacity-100' : 'opacity-100'}`}>
             <span className="label-caps flex items-center gap-2 rounded-full bg-green/10 px-3 py-1 text-green">
               <CalendarBlank size={12} weight="regular" />
               {new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'long', day: 'numeric' })}
@@ -689,6 +567,18 @@ export const CreateNote: React.FC = () => {
                   : `With ${relationshipIds.length} people`}
               </span>
             </button>
+            {mentionedPeople.map((person) => (
+              <button
+                key={person.id}
+                type="button"
+                onClick={() => setRelationshipIds((previous) => [...previous, person.id])}
+                className="inline-flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-full border border-dashed border-green/30 px-3 py-2 text-ui-xs font-bold text-green transition-colors hover:bg-green/10 animate-fade-in"
+                aria-label={`Add ${person.name} to this reflection`}
+              >
+                <Plus size={12} weight="bold" />
+                {person.name}
+              </button>
+            ))}
           </div>
 
           {dissonancePrompt ? (
@@ -733,7 +623,13 @@ export const CreateNote: React.FC = () => {
             className="text-xl md:text-2xl font-serif leading-relaxed text-gray-text/90" 
           />
 
-          {/* Word count Ã¢â‚¬â€ shown only after 50+ words */}
+          {draft.restoredDraft && (
+            <p className="mt-2 text-ui-xs font-medium text-gray-nav/60 select-none" role="status">
+              Picked up where you left off.
+            </p>
+          )}
+
+          {/* Word count, shown only after 50+ words */}
           {wordCount >= 50 && (
             <p className="mt-2 text-right text-ui-xs font-medium text-gray-nav/40 select-none" aria-label={`${wordCount} words`}>
               {wordCount} words
@@ -744,7 +640,7 @@ export const CreateNote: React.FC = () => {
 
       {/* Ã¢â€â‚¬Ã¢â€â‚¬ Floating Actions Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <div 
-        className={`fixed z-50 flex gap-4 transition-[opacity,transform] duration-700 ease-out-expo ${isMobile ? 'bottom-[calc(2rem+env(safe-area-inset-bottom))] left-6 right-6 justify-between' : 'bottom-10 right-10 flex-col'} ${isFocusModeActive ? 'opacity-0 translate-y-8' : 'opacity-100 translate-y-0'}`}
+        className={`fixed z-50 flex gap-4 transition-[opacity,transform] duration-700 ease-out-expo ${isMobile ? 'bottom-[calc(2rem+env(safe-area-inset-bottom))] left-6 right-6 justify-between' : 'bottom-10 right-10 flex-col'} ${isFocusModeActive ? 'opacity-0 translate-y-8' : isWritingQuiet ? (isMobile ? 'pointer-events-none opacity-0 translate-y-8' : 'opacity-30 hover:opacity-100') : 'opacity-100 translate-y-0'}`}
       >
         
         {/* Mobile Personalize FAB */}
@@ -803,7 +699,6 @@ export const CreateNote: React.FC = () => {
           <button onClick={() => { setIsMobileOptionsOpen(false); setIsTagsOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><TagIcon size={24} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-ui-sm font-bold">Tags</span></button>
           <button onClick={() => { setIsMobileOptionsOpen(false); setIsPeoplePickerOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${relationshipIds.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><UsersThree size={24} weight={relationshipIds.length > 0 ? "fill" : "regular"} /><span className="text-ui-sm font-bold">{relationshipIds.length > 0 ? `${relationshipIds.length} People` : 'People'}</span></button>
           <button onClick={() => { setIsMobileOptionsOpen(false); setIsMusicOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${musicPlaying ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><Headphones size={24} weight={musicPlaying ? "fill" : "regular"} /><span className="text-ui-sm font-bold">Sounds</span></button>
-          <button onClick={() => { setIsMobileOptionsOpen(false); setIsTasksOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${tasks.some(t => !t.completed) ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><ListChecks size={24} weight={tasks.some(t => !t.completed) ? "fill" : "regular"} /><span className="text-ui-sm font-bold">Tasks</span></button>
           <WhisperComposerControl
             onFinalTranscript={appendWhisperTranscript}
             label="Whisper"
@@ -885,67 +780,6 @@ export const CreateNote: React.FC = () => {
               {releaseSuccess}
             </p>
           ) : null}
-        </div>
-      </ModalSheet>
-
-      <ModalSheet
-        isOpen={isTasksOpen}
-        onClose={() => setIsTasksOpen(false)}
-        title="Tasks"
-        icon={<ListChecks size={22} weight="duotone" />}
-        size="md"
-        bodyClassName="max-h-[72vh] pt-2"
-      >
-        <div className="flex flex-col gap-6">
-          <div className="space-y-2 overflow-y-auto">
-            {getOrderedTasks(tasks).map((task) => (
-              <TaskRow
-                key={task.id}
-                task={task}
-                updateTask={(taskId, updates) => setTasks(tasks.map((item) => item.id === taskId ? { ...item, ...updates } : item))}
-                toggleTask={(taskId) => setTasks(tasks.map((item) => {
-                  if (item.id !== taskId) return item;
-                  const completed = !item.completed;
-                  return {
-                    ...item,
-                    completed,
-                    completedAt: completed ? new Date().toISOString() : undefined,
-                  };
-                }))}
-                removeTask={(taskId) => setTasks(tasks.filter((item) => item.id !== taskId))}
-              />
-            ))}
-          </div>
-
-          <form 
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (newTaskText.trim()) {
-                setTasks([...tasks, { id: Math.random().toString(36).substr(2, 9), text: newTaskText.trim(), completed: false }]);
-                setNewTaskText('');
-              }
-            }} 
-            className="flex items-center gap-3 mt-4"
-          >
-            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border-2 border-dashed border-border">
-              <Plus size={12} weight="bold" className="text-gray-nav/40" />
-            </div>
-            <div className="intention-entry-control flex-1">
-              <input
-                type="text"
-                value={newTaskText}
-                onChange={(e) => setNewTaskText(e.target.value)}
-                placeholder="What needs to be done?"
-                aria-label="Add task"
-                className="intention-entry-input"
-              />
-            </div>
-            {newTaskText.trim() && (
-              <Button type="submit" variant="primary" size="sm" className="shrink-0">
-                Add
-              </Button>
-            )}
-          </form>
         </div>
       </ModalSheet>
 
@@ -1107,9 +941,10 @@ export const CreateNote: React.FC = () => {
         isOpen={showLeaveDialog}
         onClose={handleStayOnDraft}
         onConfirm={handleLeaveDraft}
-        title="Leave this draft?"
-        confirmLabel="Leave without saving"
-        cancelLabel="Keep writing"
+        title="This didn’t save yet"
+        description="Your writing is kept on this device. Stay and try again, or leave and discard it."
+        confirmLabel="Discard and leave"
+        cancelLabel="Stay"
       />
       {showPlane ? (
         <Suspense fallback={null}>
@@ -1118,26 +953,6 @@ export const CreateNote: React.FC = () => {
       ) : null}
       </div>
 
-      {overlayMounted && (
-        <div
-          className={`fixed inset-0 z-50 flex min-h-dvh items-center justify-center overflow-hidden bg-body px-6 text-center transition-opacity duration-700 ease-out ${
-            fadeOverlay ? 'opacity-0 pointer-events-none' : 'opacity-100'
-          }`}
-        >
-          <div className="relative z-10 flex w-full max-w-md md:max-w-xl lg:max-w-2xl flex-col items-center">
-            <div className="mb-6 h-40 w-40 max-w-full opacity-80 sm:h-44 sm:w-44" aria-hidden="true">
-              <Suspense fallback={<div className="h-full w-full rounded-full bg-green/5" />}>
-                <TrailLoadingMark loop={true} />
-              </Suspense>
-            </div>
-
-            <h2 className="h2-section mb-4 font-serif italic font-normal text-gray-text">
-              "{entryQuote.text}"
-            </h2>
-            <p className="body-editorial max-w-sm">— {entryQuote.author}</p>
-          </div>
-        </div>
-      )}
     </>
   );
 };

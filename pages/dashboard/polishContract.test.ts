@@ -30,8 +30,6 @@ describe('polish surface contract', () => {
 
     expect(home).not.toContain('text-[rgb(255,255,255)]');
     expect(home).not.toContain('bg-[linear-gradient(180deg,rgba(14,28,18,0.18),rgba(14,28,18,0.3))]');
-    expect(home).toContain('hero-ink');
-    expect(home).toContain('screen-scrim');
 
     expect(landing).not.toContain('bg-[rgba(var(--panel-bg-rgb),0.62)]');
     expect(landing).not.toContain('hover:bg-[rgba(var(--panel-bg-rgb),0.76)]');

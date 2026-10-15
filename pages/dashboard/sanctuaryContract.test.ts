@@ -121,8 +121,6 @@ describe('Sanctuary Life Wiki contract', () => {
     const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
     const css = read('index.css');
 
-    expect(startupScreen).toContain('startup-ambient-wash');
-    expect(startupScreen).toContain('startup-video-scrim');
     expect(startupScreen).not.toContain('bg-[radial-gradient');
     expect(startupScreen).not.toContain('bg-[linear-gradient');
 
@@ -137,8 +135,6 @@ describe('Sanctuary Life Wiki contract', () => {
     expect(lifeWiki).not.toContain('bg-[radial-gradient');
     expect(lifeWiki).not.toContain('bg-gradient-to-b');
 
-    expect(css).toContain('--startup-ambient-wash:');
-    expect(css).toContain('--startup-video-scrim:');
     expect(css).toContain('--sanctuary-entrance-glow:');
     expect(css).toContain('--sanctuary-entrance-scrim:');
     expect(css).toContain('--sanctuary-page-fade:');

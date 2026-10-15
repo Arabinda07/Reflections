@@ -24,21 +24,16 @@ describe('surgical route and landing contract', () => {
     }
   });
 
-  it('keeps CreateNote entry feedback tied to loading and the one-shot entry animation', () => {
+  it('keeps CreateNote free of an entrance overlay', () => {
     const createNote = read('pages/dashboard/CreateNote.tsx');
     const trailLoadingMark = read('components/ui/TrailLoadingMark.tsx');
 
-    expect(createNote).toContain('const showEntryExperience = loading || !entryAnimationComplete;');
-    expect(createNote).toContain('CREATE_NOTE_ENTRY_ANIMATION_FALLBACK_MS = 3600');
-    expect(createNote).toContain('<TrailLoadingMark loop={true} />');
-    expect(createNote).toContain('overlayMounted');
+    expect(createNote).not.toContain('overlayMounted');
     expect(createNote).not.toContain('const [isBreathing');
     expect(createNote).not.toContain('setIsBreathing');
     expect(createNote).not.toContain('<OverlayFeedback isVisible={loading || isBreathing}');
-    expect(createNote).toContain("import('../../components/ui/TrailLoadingMark')");
     expect(createNote).not.toContain("import Lottie from 'lottie-react'");
     expect(trailLoadingMark).toContain("from '@/src/lottie/trail-loading.json'");
-    expect(createNote).toContain('h-40 w-40');
     expect(createNote).toContain('value={content}');
   });
 

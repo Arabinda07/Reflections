@@ -25,8 +25,7 @@ describe('Echoes component contract', () => {
     expect(echoesCode).toContain('return null;');
 
     // Resonance percentage display
-    expect(echoesCode).toContain('Math.round(similarity * 100)');
-    expect(echoesCode).toContain('% resonance');
+    expect(echoesCode).not.toContain('% resonance');
   });
 
   it('is correctly integrated inside SingleNote.tsx article', () => {

@@ -12,6 +12,13 @@ import { useSync } from '../hooks/useSync';
 import { useBackgroundPrivacyVeil } from '../hooks/useBackgroundPrivacyVeil';
 import { PrivacyVeil } from '../components/ui/PrivacyVeil';
 import { DashboardLayout } from './DashboardLayout';
+import { RoutePath } from '../types';
+import { markLaunchRouted } from '../src/utils/launchRouting';
+
+// A session that starts anywhere but Today has already chosen where to be.
+if (typeof window !== 'undefined' && window.location.pathname !== RoutePath.DASHBOARD && window.location.pathname !== RoutePath.HOME) {
+  markLaunchRouted();
+}
 
 const SyncBoundary: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   useSync();

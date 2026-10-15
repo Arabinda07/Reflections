@@ -18,18 +18,6 @@ describe('UserModeGuard route protection', () => {
   });
 });
 
-describe('ModeSelect retirement destination (ADR 0004)', () => {
-  const source = read('pages/onboarding/ModeSelect.tsx');
-
-  it('immediately redirects to the authenticated dashboard', () => {
-    expect(source).toContain('navigate(RoutePath.DASHBOARD, { replace: true })');
-  });
-
-  it('renders a route loading frame while redirecting', () => {
-    expect(source).toContain('<RouteLoadingFrame />');
-  });
-});
-
 describe('CryptoContext boot ordering', () => {
   const source = read('context/CryptoContext.tsx');
 

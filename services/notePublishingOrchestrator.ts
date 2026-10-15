@@ -6,7 +6,6 @@ import { supabase } from '../src/supabaseClient';
 import type { Note, NoteAttachment, Task } from '../types';
 import type { UserMode } from './privateMode';
 import { embeddingService } from './embedding/embeddingService';
-import { relationshipService } from './relationshipService';
 
 export interface NotePublishInput {
   id?: string;
@@ -87,12 +86,8 @@ export const notePublishingOrchestrator = {
       attachments: mergedAttachments,
     });
 
-    if (input.relationshipIds?.length) {
-      input.relationshipIds.forEach((relId) => {
-        void relationshipService.markTended(relId).catch(() => {});
-      });
-    }
-
+    // Writing about someone is not the same as being in touch with them, so it
+    // never marks a person as tended. The note itself carries the link.
     void embeddingService.embedNote(savedNote).catch(() => {});
 
     // Observation check

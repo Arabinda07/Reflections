@@ -16,7 +16,7 @@ describe('lottie surface mapping contract', () => {
     const notFound = read('pages/NotFound.tsx');
     const myNotes = read('pages/dashboard/MyNotes.tsx');
 
-    expect(createNote).toContain("import('../../components/ui/TrailLoadingMark')");
+    expect(createNote).not.toContain('TrailLoadingMark');
     expect(trailLoadingMark).toContain("from '@/src/lottie/trail-loading.json'");
     expect(createNote).not.toContain("from '@/src/lottie/loading.json'");
 

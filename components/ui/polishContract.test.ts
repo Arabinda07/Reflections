@@ -19,23 +19,13 @@ describe('polish contract', () => {
     expect(createNote).toContain('aria-label={`Remove ${tag} tag`}');
   });
 
-  it('keeps startup from showing a black empty media frame before video is ready', () => {
+  it('keeps startup quiet: no media and no minimum display time', () => {
     const startupScreen = read('components/ui/StartupScreen.tsx');
     const appLaunch = read('src/native/appLaunch.ts');
 
-    expect(startupScreen).toContain('src="/assets/videos/sanctuary.webp"');
-    expect(startupScreen).toContain('poster="/assets/videos/sanctuary.webp"');
-    expect(startupScreen).toContain('className="absolute inset-0 z-0 h-full w-full object-cover opacity-85"');
-    expect(startupScreen).toContain('isVideoReady');
-    expect(startupScreen).toContain('onLoadedData={() => setIsVideoReady(true)}');
-    expect(startupScreen).toContain("isVideoReady ? 'opacity-85' : 'opacity-0'");
-    expect(startupScreen).not.toContain('isPosterReady');
-    expect(startupScreen).not.toContain('setIsPosterReady');
-    expect(startupScreen).not.toContain("isPosterReady && !isVideoReady ? 'opacity-85' : 'opacity-0'");
-    expect(startupScreen).toContain('opacity-0');
-    expect(startupScreen).toContain('startup-ambient-wash');
-    expect(startupScreen).not.toContain('animate-pulse');
-    expect(appLaunch).toContain('NATIVE_STARTUP_MIN_MS = 650');
+    expect(startupScreen).not.toContain('<video');
+    expect(startupScreen).not.toContain('<img');
+    expect(appLaunch).toContain('NATIVE_STARTUP_MIN_MS = 0');
   });
 
   it('uses the destination writing surface while Create Note auth and route chunks load', () => {

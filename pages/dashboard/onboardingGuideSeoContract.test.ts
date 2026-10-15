@@ -48,8 +48,9 @@ describe('onboarding, guide, install, feedback, and SEO contract', () => {
     expect(flow).toContain('PrivateWritingSetupStep');
     expect(setupStep).toContain('Use my account password');
     expect(setupStep).toContain('Use a separate password');
-    expect(content).toContain('Private and secure');
-    expect(content).toContain('AI only runs if you specifically ask');
+    expect(content).toContain('Private by design');
+    expect(content).toContain('encrypted on this device before they sync');
+    expect(content).not.toContain('AI only runs');
     expect(hook).toContain('profileService.getOnboardingState');
     expect(hook).toContain('profileService.completeOnboarding');
     expect(home).not.toContain('hasSeenOnboarding');

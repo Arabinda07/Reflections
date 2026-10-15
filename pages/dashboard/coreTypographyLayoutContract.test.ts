@@ -32,7 +32,6 @@ describe('core app typography and layout contract', () => {
       release: read('pages/dashboard/ReleaseMode.tsx'),
     };
 
-    expect(pages.home).toContain('core-bento-grid');
     expect(pages.home).toContain('dashboard-prompt-text typographic-measure');
     expect(pages.notes).toContain('core-page-stack');
     expect(pages.createNote).toContain('editor-writing-measure');
@@ -57,63 +56,16 @@ describe('core app typography and layout contract', () => {
     expect(audioCss).toContain('.floating-audio-container .audio-hint');
     expect(audioCss).toContain('display: none;');
     expect(css).toContain('--mobile-bottom-nav-reserved-space');
-    expect(css).toContain('.home-authenticated-mobile-safe .core-bento-grid');
-    expect(css).toContain('padding-bottom: calc(var(--mobile-bottom-nav-reserved-space) + env(safe-area-inset-bottom) + 1rem);');
     expect(home).toContain('home-authenticated-mobile-safe');
-    expect(home).toContain('home-primary-reflection-card');
-    expect(home).toContain('home-primary-action-cluster');
-    const audioPosition = home.indexOf('<div className="floating-audio-container">');
-    const cardsPosition = home.indexOf('className="core-bento-grid"');
-
-    expect(audioPosition).toBeGreaterThan(-1);
-    expect(cardsPosition).toBeGreaterThan(-1);
-    expect(audioPosition).toBeGreaterThan(cardsPosition);
+    expect(home).not.toContain('AmbientMusicButton');
   });
 
-  it('makes the authenticated home greeting auto-dismiss into the dashboard', () => {
-    const css = read('index.css');
+  it('opens a session on a blank page and keeps Today free of a hero intro', () => {
     const home = read('pages/dashboard/HomeAuthenticated.tsx');
 
-    expect(home).toContain('home-hero-shell');
-    expect(home).toContain("data-intro-state={heroIntroState}");
-    expect(home).toContain("const HOME_HERO_INTRO_DWELL_MS = 3000;");
-    expect(home).toContain("const HOME_HERO_EXIT_MS = 650;");
-    expect(home).toContain('const HOME_HERO_DRAG_DISMISS_THRESHOLD = 48;');
-    expect(home).toContain('const HOME_HERO_SCROLL_DISMISS_THRESHOLD = 32;');
-    expect(home).toContain("const HOME_HERO_SEEN_STORAGE_KEY = 'home_hero_intro_seen';");
-    expect(home).toContain("type HomeHeroIntroState = 'visible' | 'exiting' | 'gone';");
-    expect(home).toContain('collapseHeroIntro');
-    expect(home).toContain('Show dashboard');
-    expect(home).toContain('aria-controls="home-dashboard-grid"');
-    expect(home).toContain("disabled={heroIntroState !== 'visible'}");
-    expect(home).toContain("tabIndex={heroIntroState === 'visible' ? 0 : -1}");
-    expect(home).toContain('dashboardGridRef.current?.focus({ preventScroll: true });');
-    expect(home).toContain('id="home-dashboard-grid"');
-    expect(home).toContain('tabIndex={-1}');
-    expect(home).toContain('localStorage');
-    expect(home).not.toContain('Show greeting');
-    expect(home).not.toContain('expandHero');
-    expect(home).not.toContain('HomeHeroCollapseReason');
-    expect(home).not.toContain('lastHeroCollapseReasonRef');
-    expect(home).not.toContain('home-hero-handle');
-    expect(home).not.toContain('aria-expanded={!isHeroCollapsed}');
-    expect(home).not.toContain('handleHeroHandleClick');
-    expect(home).not.toContain('HOME_HERO_COLLAPSED_SESSION_KEY');
-    expect(home).not.toContain("localStorage.getItem('home_hero_collapsed')");
-    expect(home).not.toContain('HOME_HERO_SEEN_SESSION_KEY');
-    expect(home).not.toContain('generateWritingNotes');
-    expect(home).not.toContain('dynamic_writing_notes');
-
-    expect(css).toContain('.home-dashboard-intro-frame[data-intro-state="visible"]');
-    expect(css).toContain('.home-dashboard-intro-frame[data-intro-state="exiting"]');
-    expect(css).toContain('.home-dashboard-intro-frame[data-intro-state="gone"]');
-    expect(css).toContain('.home-dashboard-intro-frame[data-intro-state="gone"] #home-dashboard-grid');
-    expect(css).toContain('will-change: auto;');
-    expect(css).not.toContain('.home-hero-shell[data-collapsed="false"]');
-    expect(css).not.toContain('.home-hero-shell[data-collapsed="true"]');
-    expect(css).not.toContain('.home-hero-handle');
-    expect(css).toContain('.home-hero-dismiss-control');
-    expect(css).toContain('@media (prefers-reduced-motion: reduce)');
-    expect(css).toContain('.home-hero-shell');
+    expect(home).toContain('navigate(RoutePath.CREATE_NOTE, { replace: true });');
+    expect(home).toContain('isSessionLaunch()');
+    expect(home).not.toContain('<video');
+    expect(home).not.toContain('heroIntroState');
   });
 });

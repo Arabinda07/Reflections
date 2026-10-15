@@ -16,6 +16,7 @@ import { Question } from '@phosphor-icons/react/Question';
 import { SignOut } from '@phosphor-icons/react/SignOut';
 import { Sparkle } from '@phosphor-icons/react/Sparkle';
 import { UserCircle } from '@phosphor-icons/react/UserCircle';
+import { Wind } from '@phosphor-icons/react/Wind';
 
 import { ModalSheet } from '../components/ui/ModalSheet';
 import { usePWAInstall } from '../context/PWAInstallContext';
@@ -24,7 +25,7 @@ import { useUserMode } from '../context/UserModeContext';
 import { RoutePath } from '../types';
 
 interface MobileTabItem {
-  label: 'Home' | 'Write' | 'Notes' | 'More';
+  label: 'Today' | 'Notes' | 'Write' | 'People' | 'More';
   path?: RoutePath;
   icon: React.ElementType;
   matches: (pathname: string) => boolean;
@@ -60,8 +61,7 @@ const isNoteRoute = (pathname: string) =>
 const isMoreRoute = (pathname: string) =>
   pathname === RoutePath.INSIGHTS ||
   pathname === RoutePath.FUTURE_LETTERS ||
-  pathname === RoutePath.RELATIONSHIPS ||
-  pathname.startsWith(`${RoutePath.RELATIONSHIPS}/`) ||
+  pathname === RoutePath.RELEASE ||
   pathname === RoutePath.ACCOUNT ||
   pathname === RoutePath.FAQ ||
   pathname === RoutePath.WIKI ||
@@ -70,11 +70,17 @@ const isMoreRoute = (pathname: string) =>
 
 export const AUTHENTICATED_MOBILE_TABS: MobileTabItem[] = [
   {
-    label: 'Home',
+    label: 'Today',
     path: RoutePath.DASHBOARD,
     icon: House,
     matches: (pathname) =>
       pathname === RoutePath.DASHBOARD || pathname === RoutePath.DASHBOARD_ALIAS,
+  },
+  {
+    label: 'Notes',
+    path: RoutePath.NOTES,
+    icon: Notebook,
+    matches: isNoteRoute,
   },
   {
     label: 'Write',
@@ -83,10 +89,11 @@ export const AUTHENTICATED_MOBILE_TABS: MobileTabItem[] = [
     matches: (pathname) => pathname === RoutePath.CREATE_NOTE || isNoteEditRoute(pathname),
   },
   {
-    label: 'Notes',
-    path: RoutePath.NOTES,
-    icon: Notebook,
-    matches: isNoteRoute,
+    label: 'People',
+    path: RoutePath.RELATIONSHIPS,
+    icon: Heart,
+    matches: (pathname) =>
+      pathname === RoutePath.RELATIONSHIPS || pathname.startsWith(`${RoutePath.RELATIONSHIPS}/`),
   },
   {
     label: 'More',
@@ -100,8 +107,8 @@ export const MORE_NAV_GROUPS: MoreNavGroup[] = [
     label: 'Reflect',
     items: [
       { label: 'Insights', path: RoutePath.INSIGHTS, icon: Sparkle },
-      { label: 'Relationships', path: RoutePath.RELATIONSHIPS, icon: Heart },
       { label: 'Future Letters', path: RoutePath.FUTURE_LETTERS, icon: EnvelopeSimple },
+      { label: 'Release a thought', path: RoutePath.RELEASE, icon: Wind },
       {
         label: 'Life Wiki',
         path: RoutePath.SANCTUARY,

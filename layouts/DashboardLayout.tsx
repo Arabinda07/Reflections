@@ -6,7 +6,6 @@ import { House } from '@phosphor-icons/react/House';
 import { Notebook } from '@phosphor-icons/react/Notebook';
 import { PencilSimpleLine } from '@phosphor-icons/react/PencilSimpleLine';
 import { Question } from '@phosphor-icons/react/Question';
-import { Sparkle } from '@phosphor-icons/react/Sparkle';
 import { Heart } from '@phosphor-icons/react/Heart';
 import { SignIn } from '@phosphor-icons/react/SignIn';
 import { UserPlus } from '@phosphor-icons/react/UserPlus';
@@ -35,14 +34,13 @@ const GUEST_NAV_ITEMS: SidebarNavItem[] = [
   { label: 'FAQ', path: RoutePath.FAQ, icon: Question, description: 'Answers about privacy, writing, and care.' },
 ];
 
-// Five places, one row. Account, FAQ, letters, release, invite and logout
-// live in the NavigationBar "More" menu.
+// The writing-and-people loop, one row. Insights, Life Wiki, letters, release,
+// account, invite and logout live in the NavigationBar "More" menu.
 const AUTH_NAV_ITEMS: SidebarNavItem[] = [
-  { label: 'Home', path: RoutePath.DASHBOARD, icon: House, description: "Today's prompt and your desk." },
+  { label: 'Today', path: RoutePath.DASHBOARD, icon: House, description: "Today's prompt and the people on your mind." },
   { label: 'Write', path: RoutePath.CREATE_NOTE, icon: PencilSimpleLine, description: 'Open a fresh writing surface.' },
   { label: 'Notes', path: RoutePath.NOTES, icon: Notebook, description: 'Return to your saved reflections.' },
-  { label: 'People', path: RoutePath.RELATIONSHIPS, icon: Heart, description: 'Tend people, hooks, and weekly care.' },
-  { label: 'Insights', path: RoutePath.INSIGHTS, icon: Sparkle, description: 'See patterns drawn from your writing.' },
+  { label: 'People', path: RoutePath.RELATIONSHIPS, icon: Heart, description: 'The people you write about and want to keep close.' },
 ];
 
 const GUEST_SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [

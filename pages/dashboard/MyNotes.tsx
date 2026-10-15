@@ -11,11 +11,13 @@ import { Trash } from '@phosphor-icons/react/Trash';
 import { X } from '@phosphor-icons/react/X';
 import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
 import { format, isSameDay } from 'date-fns';
+import { MagnifyingGlass } from '@phosphor-icons/react/MagnifyingGlass';
 import { Button } from '../../components/ui/Button';
 import { Chip } from '../../components/ui/Chip';
 import { LottieAnimation } from '../../components/ui/LottieAnimation';
 import { EmptyState } from '../../components/ui/EmptyState';
-import { ConfirmationDialog } from '../../components/ui/ConfirmationDialog';
+import { useToast } from '../../components/ui/Toast';
+import { stripHtml } from '../../services/collectionUtils';
 import { MetadataPill } from '../../components/ui/MetadataPill';
 import { ModalSheet } from '../../components/ui/ModalSheet';
 import { PageContainer } from '../../components/ui/PageContainer';
@@ -74,9 +76,8 @@ export const MyNotes: React.FC = () => {
   const { user } = useAuthStore();
   const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [noteIdToDelete, setNoteIdToDelete] = useState<string | null>(null);
+  const { showToast } = useToast();
+  const [query, setQuery] = useState('');
   const [actionMenuNote, setActionMenuNote] = useState<Note | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'calendar'>('grid');
@@ -116,7 +117,18 @@ export const MyNotes: React.FC = () => {
     fetchNotes();
   }, []);
 
-  const filteredNotes = tagFilter ? notes.filter((note) => note.tags?.includes(tagFilter)) : notes;
+  const normalizedQuery = query.trim().toLowerCase();
+  const filteredNotes = notes
+    .filter((note) => !tagFilter || note.tags?.includes(tagFilter))
+    .filter((note) => !normalizedQuery || `${note.title}\n${stripHtml(note.content)}`.toLowerCase().includes(normalizedQuery))
+    .sort((left, right) => Date.parse(right.createdAt) - Date.parse(left.createdAt));
+  const notesByMonth = filteredNotes.reduce<{ label: string; notes: Note[] }[]>((groups, note) => {
+    const label = format(new Date(note.createdAt), 'MMMM yyyy');
+    const last = groups[groups.length - 1];
+    if (last?.label === label) last.notes.push(note);
+    else groups.push({ label, notes: [note] });
+    return groups;
+  }, []);
   const tagSummaries = Array.from(
     notes.reduce((tagCounts, note) => {
       for (const tag of note.tags || []) {
@@ -136,14 +148,39 @@ export const MyNotes: React.FC = () => {
     taggedReflectionCount === 1 ? 'reflection' : 'reflections'
   }`;
   const notesOnSelectedDate = filteredNotes.filter((note) =>
-    isSameDay(new Date(note.updatedAt), selectedDate),
+    isSameDay(new Date(note.createdAt), selectedDate),
   );
+
+  // Delete is instant and undoable; the real delete commits when the toast expires.
+  const deleteWithUndo = (id: string) => {
+    const removed = notes.find((note) => note.id === id);
+    if (!removed) return;
+    setNotes((previous) => previous.filter((note) => note.id !== id));
+    showToast('Note deleted.', 'info', {
+      label: 'Undo',
+      onClick: () => setNotes((previous) => [...previous, removed]),
+      onExpire: () => {
+        void noteService.delete(id).catch(() => {
+          setNotes((previous) => [...previous, removed]);
+          showToast('That note could not be deleted. It is still here.', 'error');
+        });
+      },
+    });
+  };
 
   const initiateDelete = (event: React.MouseEvent, id: string) => {
     event.stopPropagation();
-    setNoteIdToDelete(id);
-    setIsConfirmOpen(true);
+    deleteWithUndo(id);
   };
+
+  // Arriving from a note page's Delete: offer the same undo here.
+  useEffect(() => {
+    const pendingId = (location.state as { deleteNoteId?: string } | null)?.deleteNoteId;
+    if (!pendingId || loading) return;
+    rawNavigate(`${location.pathname}${location.search}`, { replace: true, state: null });
+    deleteWithUndo(pendingId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, location.state]);
 
   const handleViewModeChange = (nextViewMode: 'grid' | 'calendar') => {
     runScopedTransition(notesViewScopeRef.current, () => {
@@ -187,21 +224,6 @@ export const MyNotes: React.FC = () => {
     swipeNoteIdRef.current = null;
   };
 
-  const performDelete = async () => {
-    if (!noteIdToDelete) return;
-
-    setIsDeleting(true);
-    try {
-      await noteService.delete(noteIdToDelete);
-      setNotes((previous) => previous.filter((note) => note.id !== noteIdToDelete));
-      setIsConfirmOpen(false);
-    } catch (error) {
-      console.error('Failed to delete note:', error);
-    } finally {
-      setIsDeleting(false);
-      setNoteIdToDelete(null);
-    }
-  };
 
   const getPreviewText = (html: string) => {
     return buildNotePreviewText(html);
@@ -218,7 +240,7 @@ export const MyNotes: React.FC = () => {
   const tileContent = ({ date, view }: { date: Date; view: string }) => {
     if (view !== 'month') return null;
 
-    const dayNotes = filteredNotes.filter((note) => isSameDay(new Date(note.updatedAt), date));
+    const dayNotes = filteredNotes.filter((note) => isSameDay(new Date(note.createdAt), date));
     if (dayNotes.length === 0) return null;
 
     return (
@@ -336,7 +358,7 @@ export const MyNotes: React.FC = () => {
               <div className="pointer-events-none absolute right-4 top-4 z-20 flex flex-wrap justify-end gap-2">
                 <MetadataPill icon={<CalendarIcon size={12} weight="regular" />}>
                   <span className="tabular-nums">
-                    {new Date(note.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                    {new Date(note.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                   </span>
                 </MetadataPill>
                 {note.mood ? (
@@ -450,6 +472,20 @@ export const MyNotes: React.FC = () => {
             }
           />
 
+          {!loading && notes.length > 0 ? (
+            <label className="relative block">
+              <span className="sr-only">Search your notes</span>
+              <MagnifyingGlass size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-nav" aria-hidden="true" />
+              <input
+                type="search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search your notes"
+                className="input-surface min-h-12 w-full rounded-2xl pl-11 pr-4 text-base"
+              />
+            </label>
+          ) : null}
+
           {loading ? (
             <NotesLibrarySkeletonGrid />
           ) : (
@@ -533,14 +569,23 @@ export const MyNotes: React.FC = () => {
                 </div>
               </div>
             ) : filteredNotes.length > 0 ? (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-8" aria-live="polite">
-                {filteredNotes.map((note, index) => renderNoteCard(note, index))}
+              <div className="space-y-10" aria-live="polite">
+                {notesByMonth.map((group) => (
+                  <section key={group.label} aria-label={group.label}>
+                    <h2 className="label-caps sticky top-0 z-10 -mx-2 mb-4 bg-body/90 px-2 py-2 text-gray-nav backdrop-blur-sm">
+                      {group.label}
+                    </h2>
+                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-8">
+                      {group.notes.map((note) => renderNoteCard(note, filteredNotes.indexOf(note)))}
+                    </div>
+                  </section>
+                ))}
               </div>
             ) : (
               <EmptyState
                 surface="bezel"
                 illustration={<LottieAnimation src="/assets/lottie/empty-notes.json" className="h-full w-full" autoplay loop />}
-                title={tagFilter ? `No notes tagged “${tagFilter}” yet.` : 'No notes yet.'}
+                title={normalizedQuery ? `Nothing matches “${query.trim()}”.` : tagFilter ? `No notes tagged “${tagFilter}” yet.` : 'No notes yet.'}
                 description={
                   tagFilter
                     ? 'Clear the filter to see all your notes.'
@@ -564,16 +609,6 @@ export const MyNotes: React.FC = () => {
           )}
         </div>
       </PageContainer>
-
-      <ConfirmationDialog
-        isOpen={isConfirmOpen}
-        onClose={() => setIsConfirmOpen(false)}
-        onConfirm={performDelete}
-        title="Delete this note?"
-        confirmLabel={isDeleting ? 'Deleting...' : 'Delete note'}
-        isConfirming={isDeleting}
-        variant="danger"
-      />
 
       <ModalSheet
         isOpen={!!actionMenuNote}
@@ -614,9 +649,8 @@ export const MyNotes: React.FC = () => {
             type="button"
             onClick={() => {
               if (!actionMenuNote) return;
-              setNoteIdToDelete(actionMenuNote.id);
+              deleteWithUndo(actionMenuNote.id);
               setActionMenuNote(null);
-              setIsConfirmOpen(true);
             }}
             className="surface-inline-panel flex min-h-11 w-full items-center gap-3 px-4 py-4 text-left transition-colors hover:border-clay/30 hover:bg-clay/5"
           >

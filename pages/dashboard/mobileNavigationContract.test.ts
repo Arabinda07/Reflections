@@ -16,7 +16,9 @@ describe('signed-in mobile navigation contract', () => {
 
     expect(mobileNav).toContain('aria-label="Signed-in mobile navigation"');
     expect(mobileNav).toContain('AUTHENTICATED_MOBILE_TABS');
-    expect(mobileNav).toContain("label: 'Home'");
+    expect(mobileNav).toContain("label: 'Today'");
+    expect(mobileNav).toContain("label: 'People'");
+    expect(mobileNav).toContain('RoutePath.RELATIONSHIPS');
     expect(mobileNav).toContain("label: 'Write'");
     expect(mobileNav).toContain("label: 'Notes'");
     expect(mobileNav).toContain("label: 'More'");
@@ -55,7 +57,7 @@ describe('signed-in mobile navigation contract', () => {
     expect(mobileNav).toContain('RoutePath.WIKI');
     expect(mobileNav).toContain('RoutePath.FUTURE_LETTERS');
     expect(mobileNav).not.toContain("label: 'Release Mode'");
-    expect(mobileNav).not.toContain('path: RoutePath.RELEASE');
+    expect(mobileNav).toContain("label: 'Release a thought', path: RoutePath.RELEASE");
     expect(layout).toContain('location.pathname === RoutePath.RELEASE');
     expect(mobileNav).toContain("label: 'Account'");
     expect(mobileNav).not.toContain('Account / Settings');
@@ -150,8 +152,8 @@ describe('signed-in mobile navigation contract', () => {
     const home = read('pages/dashboard/HomeAuthenticated.tsx');
     const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
     const homeRefreshButton = home.slice(
-      home.indexOf('aria-label="Refresh today\'s reflection prompt"') - 260,
-      home.indexOf('aria-label="Refresh today\'s reflection prompt"') + 80,
+      home.indexOf('aria-label="Show a different prompt"') - 260,
+      home.indexOf('aria-label="Show a different prompt"') + 80,
     );
     const lifeWikiRefreshButton = lifeWiki.slice(
       lifeWiki.indexOf('aria-label="Refresh Life Wiki with AI"') - 260,

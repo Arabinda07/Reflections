@@ -70,7 +70,7 @@ export const NoteSearchPalette: React.FC<NoteSearchPaletteProps> = ({ isOpen, on
     const trimmed = query.trim();
     if (!trimmed) {
       setResults(
-        notes.slice(0, MAX_RESULTS).map((note) => ({
+        [...notes].sort((left, right) => Date.parse(right.createdAt) - Date.parse(left.createdAt)).slice(0, MAX_RESULTS).map((note) => ({
           note,
           score: 1.0,
           matchType: 'exact' as const,
@@ -206,7 +206,7 @@ export const NoteSearchPalette: React.FC<NoteSearchPaletteProps> = ({ isOpen, on
                         {matchType === 'semantic' && (
                           <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-green/10 px-2 py-0.5 text-ui-xs font-bold text-green">
                             <Sparkle size={12} weight="fill" />
-                            Resonance
+                            Related
                           </span>
                         )}
                         {item.modality === 'audio' && (

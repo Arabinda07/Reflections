@@ -17,9 +17,6 @@ import { relationshipStageLabels } from './RelationshipProfile';
 
 type TriageDraft = {
   stage: RelationshipStage;
-  closeness: number;
-  energy: number;
-  opportunity: number;
   domain: string;
   roleTag: string;
   context: string;
@@ -28,9 +25,6 @@ type TriageDraft = {
 
 const defaultDraft = (): TriageDraft => ({
   stage: 'discover',
-  closeness: 3,
-  energy: 3,
-  opportunity: 3,
   domain: '',
   roleTag: '',
   context: '',
@@ -138,9 +132,6 @@ export const RelationshipImportInbox: React.FC<Props> = ({ relationships, pendin
               void run(() => relationshipImportService.acceptImportItem(item.id, {
                 name: item.name,
                 stage: draft.stage,
-                closeness: draft.closeness,
-                energy: draft.energy,
-                opportunity: draft.opportunity,
                 ...additions,
               }), `Added ${item.name}.`);
             }} className="rounded-2xl border border-green/20 bg-green/5 p-4">
@@ -150,16 +141,11 @@ export const RelationshipImportInbox: React.FC<Props> = ({ relationships, pendin
                 {mergeTarget && <p className="text-sm font-bold text-honey">Possible match: {mergeTarget.name}. You choose whether to combine them.</p>}
 
                 <div className="grid gap-3 md:grid-cols-4">
-                  <label className="text-sm font-bold text-gray-nav">Stage
+                  <label className="text-sm font-bold text-gray-nav md:col-span-2">Stage
                     <select name="stage" value={draft.stage} onChange={(event) => updateDraft(item.id, { stage: event.target.value as RelationshipStage })} className={`mt-2 ${fieldClass}`}>
                       {stages.map((stage) => <option key={stage} value={stage}>{relationshipStageLabels[stage]}</option>)}
                     </select>
                   </label>
-                  {(['closeness', 'energy', 'opportunity'] as const).map((field) => (
-                    <label key={field} className="text-sm font-bold capitalize text-gray-nav">{field} {draft[field]}/5
-                      <input name={field} type="range" min={1} max={5} value={draft[field]} onChange={(event) => updateDraft(item.id, { [field]: Number(event.target.value) })} className="mt-4 w-full accent-green" />
-                    </label>
-                  ))}
                 </div>
                 <div className="grid gap-3 md:grid-cols-4">
                   {([

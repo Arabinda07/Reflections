@@ -15,17 +15,6 @@ describe('focused product slice source contract', () => {
     expect(home).not.toContain('<HomeFallback />');
   });
 
-  it('makes the home intentions panel visible without reverting to old task-summary copy', () => {
-    const homeAuthenticated = read('pages/dashboard/HomeAuthenticated.tsx');
-
-    expect(homeAuthenticated).toContain('Your Intentions');
-    expect(homeAuthenticated).toContain('Set your first intention');
-    expect(homeAuthenticated).not.toContain('Task summary');
-    expect(homeAuthenticated).not.toContain('All settled');
-    expect(homeAuthenticated).toContain('{intentionSummary.openCount}');
-    expect(homeAuthenticated).toContain('{intentionSummary.openCount} open');
-    expect(homeAuthenticated).toContain('intentionSummary.items.slice(0, 3).map');
-  });
 
   it('keeps the landing media control touch-safe on mobile', () => {
     const landing = read('pages/dashboard/Landing.tsx');
@@ -96,60 +85,18 @@ describe('focused product slice source contract', () => {
     expect(singleNote).not.toContain('downloadAllAttachments');
   });
 
-  it('keeps the home dashboard organized around the primary writing action', () => {
+  it('keeps Today organized around the primary writing action', () => {
     const homeAuthenticated = read('pages/dashboard/HomeAuthenticated.tsx');
 
-    expect(homeAuthenticated).toContain("Today's Reflection");
-    expect(homeAuthenticated).toContain('Begin Writing');
+    expect(homeAuthenticated).toContain('Begin writing');
     expect(homeAuthenticated).toContain('Speak a note');
-    expect(homeAuthenticated).toContain('Quick check-in');
-    expect(homeAuthenticated).toContain('Future letter');
-    expect(homeAuthenticated).toContain('Your Rhythm');
-    expect(homeAuthenticated).toContain('core-bento-grid');
-    expect(homeAuthenticated).toContain('home-primary-action-row');
-    expect(homeAuthenticated).toContain('home-secondary-action-row');
     expect(homeAuthenticated).toContain('stopOnFinalTranscript');
-    expect(homeAuthenticated).not.toContain('Daily Focus');
-    expect(homeAuthenticated).not.toContain('Start Reflection');
-    expect(homeAuthenticated).not.toContain('Reflections Overview');
-    expect(homeAuthenticated).not.toContain('Writing note');
-    expect(homeAuthenticated).not.toContain('lg:grid-cols-3');
-    
-    // Check for the specific combination of classes that was removed from the prompt
+    expect(homeAuthenticated).toContain('<RelationshipHomeModule />');
     expect(homeAuthenticated).toContain('dashboard-prompt-text typographic-measure');
+    expect(homeAuthenticated).not.toContain('Your Intentions');
+    expect(homeAuthenticated).not.toContain('Quick check-in');
   });
 
-  it('lets the authenticated greeting auto-dismiss into the dashboard', () => {
-    const homeAuthenticated = read('pages/dashboard/HomeAuthenticated.tsx');
-
-    expect(homeAuthenticated).toContain('HOME_HERO_INTRO_DWELL_MS');
-    expect(homeAuthenticated).toContain('HOME_HERO_EXIT_MS');
-    expect(homeAuthenticated).toContain('HOME_HERO_SEEN_STORAGE_KEY');
-    expect(homeAuthenticated).toContain("type HomeHeroIntroState = 'visible' | 'exiting' | 'gone';");
-    expect(homeAuthenticated).toContain('heroIntroState');
-    expect(homeAuthenticated).toContain('collapseHeroIntro');
-    expect(homeAuthenticated).toContain("return shouldReduceMotion ? 'gone' : 'exiting';");
-    expect(homeAuthenticated).toContain('setHeroIntroState(\'gone\')');
-    expect(homeAuthenticated).toContain('rememberHomeHeroIntroSeen');
-    expect(homeAuthenticated).toContain('shouldRenderHeroIntro');
-    expect(homeAuthenticated).toContain('shouldReduceMotion');
-    expect(homeAuthenticated).toContain('HOME_HERO_DRAG_DISMISS_THRESHOLD = 48');
-    expect(homeAuthenticated).toContain('HOME_HERO_SCROLL_DISMISS_THRESHOLD = 32');
-    expect(homeAuthenticated).toContain('Show dashboard');
-    expect(homeAuthenticated).toContain('aria-controls="home-dashboard-grid"');
-    expect(homeAuthenticated).toContain("disabled={heroIntroState !== 'visible'}");
-    expect(homeAuthenticated).toContain("tabIndex={heroIntroState === 'visible' ? 0 : -1}");
-    expect(homeAuthenticated).toContain('dashboardGridRef.current?.focus({ preventScroll: true });');
-    expect(homeAuthenticated).toContain('collapseHeroIntro();');
-    expect(homeAuthenticated).toContain('setPointerCapture');
-    expect(homeAuthenticated).not.toContain('HOME_HERO_COLLAPSED_SESSION_KEY');
-    expect(homeAuthenticated).not.toContain('expandHero');
-    expect(homeAuthenticated).not.toContain('Show greeting');
-    expect(homeAuthenticated).not.toContain('HomeHeroCollapseReason');
-    expect(homeAuthenticated).not.toContain('lastHeroCollapseReasonRef');
-    expect(homeAuthenticated).not.toContain('generateWritingNotes');
-    expect(homeAuthenticated).not.toContain('dynamic_writing_notes');
-  });
 
   it('removes quietly from live app and AI copy', () => {
     const liveCopyFiles = [
@@ -164,13 +111,10 @@ describe('focused product slice source contract', () => {
     expect(read('pages/dashboard/FutureLetters.tsx').toLowerCase()).toContain('waiting to open');
   });
 
-  it('adds standalone mood check-ins without turning moods into scores', () => {
+  it('keeps moods descriptive, never scores', () => {
     const homeAuthenticated = read('pages/dashboard/HomeAuthenticated.tsx');
     const createNote = read('pages/dashboard/CreateNote.tsx');
 
-    expect(homeAuthenticated).toContain('moodCheckinService.create');
-    expect(homeAuthenticated).toContain('Quick check-in');
-    expect(homeAuthenticated).toContain('<MoodPicker');
     expect(read('pages/dashboard/moodConfig.ts')).toContain("'overthinking'");
     expect(read('pages/dashboard/moodConfig.ts')).toContain("'charged'");
     expect(homeAuthenticated.toLowerCase()).not.toContain('score');

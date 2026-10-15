@@ -11,6 +11,7 @@ import { PRIVATE_WRITING_ONBOARDING_VERSION } from '../features/private-writing-
 import { recordOnboardingFunnelEvent } from '../services/onboardingFunnelService';
 import { ritualEventService } from '../services/ritualService';
 import { getMonthlyNoteUsage } from '../services/wellnessPolicy';
+import { draftStore } from '../services/draftStore';
 import {
   buildCreateNoteDraftSnapshot,
   hasUnsavedCreateNoteChanges,
@@ -55,6 +56,8 @@ interface NoteDraftState {
   saving: boolean;
   releasing: boolean;
   hasUnsavedChanges: boolean;
+  /** True when unsaved writing from an earlier visit was restored on open. */
+  restoredDraft: boolean;
   canCreateNote: boolean;
   setCanCreateNote: React.Dispatch<React.SetStateAction<boolean>>;
   smartModeEnabled: boolean;
@@ -65,6 +68,8 @@ interface NoteDraftState {
   // Actions
   save: () => Promise<SaveResult>;
   release: () => Promise<string | null>;
+  /** Drop the locally kept draft (the writer chose to leave without saving). */
+  discardDraft: () => void;
 
   // Navigation blocker
   blocker: ReturnType<typeof useBlocker>;
@@ -83,7 +88,7 @@ const EMPTY_DRAFT_INPUT = {
   newAttachments: [] as File[],
 };
 
-const NOTE_DRAFT_READY_DELAY_MS = 450;
+const DRAFT_AUTOSAVE_DELAY_MS = 800;
 
 // Upper bound on a single save. This is a stall guard for a wedged network
 // socket that never errors — NOT a "give up and leave" timer. It is generous
@@ -122,12 +127,14 @@ export const useNoteDraft = (): NoteDraftState => {
   const [releasing, setReleasing] = useState(false);
   const [canCreateNote, setCanCreateNote] = useState(true);
   const [smartModeEnabled, setSmartModeEnabled] = useState(false);
+  const [restoredDraft, setRestoredDraft] = useState(false);
 
   const [baselineSnapshot, setBaselineSnapshot] = useState(() =>
     buildCreateNoteDraftSnapshot(EMPTY_DRAFT_INPUT),
   );
 
   const isUnmountedRef = useRef(false);
+  const isSavingRef = useRef(false);
   const allowNavigationRef = useRef(false);
   const existingNoteCountRef = useRef<number | null>(null);
 
@@ -169,28 +176,55 @@ export const useNoteDraft = (): NoteDraftState => {
     [navigate],
   );
 
-  // beforeunload guard
+  // Autosave: keep unsaved writing on this device (encrypted) so a crash,
+  // reload or OS kill never loses a word. Cleared on save, release or discard.
+  const baseUpdatedAtRef = useRef<string | undefined>(undefined);
+  const draftPayloadRef = useRef({ title, content, mood, tags, relationshipIds, baseUpdatedAt: baseUpdatedAtRef.current });
+  draftPayloadRef.current = { title, content, mood, tags, relationshipIds, baseUpdatedAt: baseUpdatedAtRef.current };
+
+  useEffect(() => {
+    if (loading || saving || releasing) return;
+    if (!hasUnsavedChanges) {
+      void draftStore.clear(id).catch(() => {});
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      void draftStore.save(id, draftPayloadRef.current).catch(() => {});
+    }, DRAFT_AUTOSAVE_DELAY_MS);
+    return () => window.clearTimeout(timer);
+  }, [loading, saving, releasing, hasUnsavedChanges, id, title, content, mood, tags, relationshipIds]);
+
   useEffect(() => {
     if (!hasUnsavedChanges || saving || releasing) return;
-
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (allowNavigationRef.current) return;
-      event.preventDefault();
-      event.returnValue = '';
+    const flush = () => {
+      if (document.visibilityState === 'hidden') {
+        void draftStore.save(id, draftPayloadRef.current).catch(() => {});
+      }
     };
+    document.addEventListener('visibilitychange', flush);
+    return () => document.removeEventListener('visibilitychange', flush);
+  }, [hasUnsavedChanges, saving, releasing, id]);
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [hasUnsavedChanges, releasing, saving]);
+  const discardDraft = useCallback(() => {
+    void draftStore.clear(id).catch(() => {});
+  }, [id]);
 
   // Load existing note or check creation limits
   useEffect(() => {
-    let blankDraftReadyTimer: number | undefined;
-
-    const openBlankDraftAfterMinimumDelay = () => {
-      blankDraftReadyTimer = window.setTimeout(() => {
-        if (!isUnmountedRef.current) setLoading(false);
-      }, NOTE_DRAFT_READY_DELAY_MS);
+    const restoreLocalDraft = async (noteUpdatedAt?: string) => {
+      const saved = await draftStore.load(id).catch(() => null);
+      if (!saved || isUnmountedRef.current) return;
+      // The note was saved elsewhere after this draft began: the saved note wins.
+      if (noteUpdatedAt && saved.baseUpdatedAt && Date.parse(noteUpdatedAt) > Date.parse(saved.baseUpdatedAt)) {
+        void draftStore.clear(id).catch(() => {});
+        return;
+      }
+      setTitle(saved.title);
+      setContent(saved.content);
+      setMood(saved.mood);
+      setTags(saved.tags);
+      setRelationshipIds(saved.relationshipIds);
+      setRestoredDraft(true);
     };
 
     const loadNewDraftAccess = async () => {
@@ -219,7 +253,8 @@ export const useNoteDraft = (): NoteDraftState => {
       try {
         if (!id) {
           setBaselineSnapshot(buildCreateNoteDraftSnapshot(EMPTY_DRAFT_INPUT));
-          openBlankDraftAfterMinimumDelay();
+          await restoreLocalDraft();
+          if (!isUnmountedRef.current) setLoading(false);
           await loadNewDraftAccess();
           return;
         }
@@ -250,9 +285,9 @@ export const useNoteDraft = (): NoteDraftState => {
           setImagePreview(note.thumbnailUrl || null);
           setExistingAttachments(note.attachments || []);
           setBaselineSnapshot(initialSnapshot);
-          window.setTimeout(() => {
-            if (!isUnmountedRef.current) setLoading(false);
-          }, NOTE_DRAFT_READY_DELAY_MS);
+          baseUpdatedAtRef.current = note.updatedAt;
+          await restoreLocalDraft(note.updatedAt);
+          if (!isUnmountedRef.current) setLoading(false);
         } else {
           navigate(RoutePath.DASHBOARD);
         }
@@ -261,12 +296,6 @@ export const useNoteDraft = (): NoteDraftState => {
       }
     };
     fetchNote();
-
-    return () => {
-      if (blankDraftReadyTimer) {
-        window.clearTimeout(blankDraftReadyTimer);
-      }
-    };
   }, [id, navigate]);
 
   const addFiles = useCallback((files: File[]) => {
@@ -278,7 +307,11 @@ export const useNoteDraft = (): NoteDraftState => {
     if (!currentSnapshot.title && !currentSnapshot.content) {
       return { observation: null, wasFirstPrivateReflection: false, success: false };
     }
+    if (isSavingRef.current) {
+      return { observation: null, wasFirstPrivateReflection: false, success: false };
+    }
 
+    isSavingRef.current = true;
     setSaving(true);
 
     // Stall guard only: reject if publishing wedges, so the UI can recover.
@@ -312,6 +345,8 @@ export const useNoteDraft = (): NoteDraftState => {
       ]);
 
       clearTimeout(watchdogTimer);
+      isSavingRef.current = false;
+      void draftStore.clear(id).catch(() => {});
 
       setTasks(result.syncedTasks);
 
@@ -347,6 +382,7 @@ export const useNoteDraft = (): NoteDraftState => {
       return { observation: result.observation, wasFirstPrivateReflection, success: true };
     } catch {
       clearTimeout(watchdogTimer);
+      isSavingRef.current = false;
       if (!isUnmountedRef.current) {
         setSaving(false);
       }
@@ -376,6 +412,7 @@ export const useNoteDraft = (): NoteDraftState => {
 
     try {
       await ritualEventService.recordReleaseCompleted();
+      void draftStore.clear(id).catch(() => {});
 
       setTitle('');
       setContent('');
@@ -396,7 +433,7 @@ export const useNoteDraft = (): NoteDraftState => {
         setReleasing(false);
       }
     }
-  }, [currentSnapshot.title, currentSnapshot.content]);
+  }, [currentSnapshot.title, currentSnapshot.content, id]);
 
   return {
     title,
@@ -420,12 +457,14 @@ export const useNoteDraft = (): NoteDraftState => {
     saving,
     releasing,
     hasUnsavedChanges,
+    restoredDraft,
     canCreateNote,
     setCanCreateNote,
     smartModeEnabled,
     currentSnapshot,
     save,
     release,
+    discardDraft,
     blocker,
     allowNavigationRef,
     navigateWithBypass,

@@ -35,8 +35,7 @@ describe('adapt and distill source contract', () => {
     expect(layout).not.toContain('grain-overlay');
     expect(createNote).not.toContain('grain-overlay');
     expect(createNote).toContain('editor-title-input');
-    expect(home).toContain('home-hero-shell relative isolate');
-    expect(css).toContain('--home-hero-intro-height: max(300px, 44dvh);');
+    expect(home).not.toContain('grain-overlay');
     expect(faq).toContain('PublicPageSection');
     expect(css).toContain('@media (max-width: 768px)');
     expect(css).toContain('background-attachment: scroll');

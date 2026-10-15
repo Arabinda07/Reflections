@@ -30,6 +30,8 @@ interface NavigationBarProps {
 const MORE_MENU_ID = 'nav-more-menu';
 
 const MORE_LINKS = [
+  { label: 'Insights', path: RoutePath.INSIGHTS },
+  { label: 'Life Wiki', path: RoutePath.SANCTUARY },
   { label: 'Future letters', path: RoutePath.FUTURE_LETTERS },
   { label: 'Release a thought', path: RoutePath.RELEASE },
   { label: 'Account', path: RoutePath.ACCOUNT },
