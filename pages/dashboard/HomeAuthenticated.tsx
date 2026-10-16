@@ -1,5 +1,7 @@
 import { ArrowsClockwise } from '@phosphor-icons/react/ArrowsClockwise';
+import { ArrowRight } from '@phosphor-icons/react/ArrowRight';
 import { CaretRight } from '@phosphor-icons/react/CaretRight';
+import { ClockCounterClockwise } from '@phosphor-icons/react/ClockCounterClockwise';
 import { EnvelopeSimple } from '@phosphor-icons/react/EnvelopeSimple';
 import { PencilSimple } from '@phosphor-icons/react/PencilSimple';
 import { Wind } from '@phosphor-icons/react/Wind';
@@ -22,6 +24,7 @@ import { DEFAULT_WELLNESS_PROMPTS, getTimeAwareWellnessPrompts } from '../../ser
 import { hasPendingAccountPassword } from '../../src/auth/accountPasswordHandoff';
 import { Note, RoutePath } from '../../types';
 import { RelationshipHomeModule } from './RelationshipHomeModule';
+import { findResurfacedNote, type ResurfacedNote } from './homeResurface';
 import { isSessionLaunch, markLaunchRouted } from '../../src/utils/launchRouting';
 
 const prefetchCreateNoteRoute = () => {
@@ -42,7 +45,13 @@ const greetingFor = (date: Date) => {
   return 'Good evening';
 };
 
+const MOD_KEY = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.userAgent) ? '⌘' : 'Ctrl';
+
 const notePath = (id: string) => RoutePath.NOTE_DETAIL.replace(':id', encodeURIComponent(id));
+
+const isTypingTarget = (target: EventTarget | null) =>
+  target instanceof HTMLElement &&
+  (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName));
 
 export const HomeAuthenticated: React.FC = () => {
   const navigate = useNavigate();
@@ -51,8 +60,11 @@ export const HomeAuthenticated: React.FC = () => {
   const { user } = useAuthStore();
   const cryptoContext = useCrypto();
   const [dailyPrompt, setDailyPrompt] = useState(DEFAULT_WELLNESS_PROMPTS[0]);
+  const [firstLines, setFirstLines] = useState('');
   const [recentNotes, setRecentNotes] = useState<Note[] | null>(null);
+  const [resurfaced, setResurfaced] = useState<ResurfacedNote | null>(null);
   const isLaunchRef = useRef(isSessionLaunch());
+  const composerRef = useRef<HTMLTextAreaElement>(null);
 
   const isPrivateWritingReady = cryptoContext.status === 'unlocked';
   const onboarding = usePrivateWritingOnboarding({
@@ -96,7 +108,9 @@ export const HomeAuthenticated: React.FC = () => {
     noteService
       .getAll()
       .then((notes) => {
-        if (active) setRecentNotes(notes.slice(0, 3));
+        if (!active) return;
+        setRecentNotes(notes.slice(0, 3));
+        setResurfaced(findResurfacedNote(notes, new Date()));
       })
       .catch(() => {
         if (active) setRecentNotes([]);
@@ -105,6 +119,25 @@ export const HomeAuthenticated: React.FC = () => {
       active = false;
     };
   }, [isPrivateWritingReady, user]);
+
+  // "/" jumps to the page from anywhere on Today, like search in a good desktop app.
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== '/' || event.metaKey || event.ctrlKey || isTypingTarget(event.target)) return;
+      event.preventDefault();
+      composerRef.current?.focus();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
+
+  const beginWriting = useCallback(() => {
+    prefetchCreateNoteRoute();
+    const initialContent = firstLines.trim();
+    navigate(RoutePath.CREATE_NOTE, {
+      state: initialContent ? { initialPrompt: dailyPrompt, initialContent } : { initialPrompt: dailyPrompt },
+    });
+  }, [dailyPrompt, firstLines, navigate]);
 
   const handleBeginWritingFromOnboarding = useCallback(() => {
     prefetchCreateNoteRoute();
@@ -126,17 +159,17 @@ export const HomeAuthenticated: React.FC = () => {
         className="home-authenticated-mobile-safe surface-scope-sage page-wash relative min-h-full flex flex-col flex-1 bg-body selection:bg-green/10"
         aria-hidden={showOnboarding ? 'true' : undefined}
       >
-        <section aria-label="Today" className="mx-auto w-full max-w-3xl px-5 pb-28 pt-native-top-offset sm:px-8 lg:pt-16">
-          <header className="mb-10 mt-6">
+        <section aria-label="Today" className="page-container home-grid pb-28 pt-native-top-offset lg:pt-14">
+          <header className="home-grid-head mt-6 lg:mt-0">
             <p className="label-caps text-gray-nav">
               {now.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
             </p>
-            <h1 className="h2-section mt-2 font-serif font-normal text-gray-text">
+            <h1 className="home-greeting mt-3">
               {greetingFor(now)}{firstName ? `, ${firstName}` : ''}.
             </h1>
           </header>
 
-          <div className="surface-flat rounded-4xl p-7 sm:p-10">
+          <div className="home-grid-compose surface-flat home-composer rounded-4xl p-6 sm:p-10">
             <div className="flex items-start justify-between gap-4">
               <p className="dashboard-prompt-text typographic-measure">{dailyPrompt}</p>
               <button
@@ -148,18 +181,37 @@ export const HomeAuthenticated: React.FC = () => {
                 <ArrowsClockwise size={20} weight="regular" />
               </button>
             </div>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
+
+            <label htmlFor="home-first-lines" className="sr-only">Start writing here</label>
+            <textarea
+              id="home-first-lines"
+              ref={composerRef}
+              value={firstLines}
+              onChange={(event) => setFirstLines(event.target.value)}
+              onFocus={prefetchCreateNoteRoute}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
+                  event.preventDefault();
+                  beginWriting();
+                }
+              }}
+              rows={2}
+              placeholder="Start with one true sentence."
+              className="home-composer-input mt-6"
+            />
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
               <Button
                 variant="primary"
                 size="md"
                 className="w-full sm:w-auto"
                 onPointerEnter={prefetchCreateNoteRoute}
                 onFocus={prefetchCreateNoteRoute}
-                onClick={() => navigate(RoutePath.CREATE_NOTE, { state: { initialPrompt: dailyPrompt } })}
-                aria-label="Begin writing with this prompt"
+                onClick={beginWriting}
+                aria-label={firstLines.trim() ? 'Continue on the page' : 'Begin writing with this prompt'}
               >
                 <PencilSimple size={16} weight="regular" className="mr-1.5 shrink-0" />
-                <span>Begin writing</span>
+                <span>{firstLines.trim() ? 'Continue on the page' : 'Begin writing'}</span>
               </Button>
               <WhisperComposerControl
                 onFinalTranscript={handleVoiceDraft}
@@ -170,35 +222,69 @@ export const HomeAuthenticated: React.FC = () => {
                 idleButtonClassName="control-surface"
                 activeButtonClassName="border-green/25 bg-green/20 text-green"
               />
+              <p className="hidden text-ui-xs font-medium text-gray-nav lg:ml-auto lg:block" aria-hidden="true">
+                {firstLines.trim() ? <><kbd className="home-kbd">{MOD_KEY}</kbd> <kbd className="home-kbd">Enter</kbd> to continue</> : <><kbd className="home-kbd">/</kbd> to start typing</>}
+              </p>
             </div>
           </div>
 
-          <div className="mt-6">
+          <aside aria-label="People and memories" className="home-grid-rail flex flex-col gap-6">
             <RelationshipHomeModule />
-          </div>
+
+            {resurfaced ? (
+              <Link
+                to={notePath(resurfaced.note.id)}
+                className="surface-flat home-card group block rounded-4xl p-6 sm:p-7"
+              >
+                <span className="flex items-center gap-2 label-caps text-gray-nav">
+                  <ClockCounterClockwise size={14} weight="bold" className="text-green" />
+                  {resurfaced.label}
+                </span>
+                <span className="mt-4 block font-serif text-lg italic leading-relaxed text-gray-text line-clamp-4">
+                  {stripHtml(resurfaced.note.content).slice(0, 240) || resurfaced.note.title || 'Untitled reflection'}
+                </span>
+                <span className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-green">
+                  Read it again
+                  <ArrowRight size={14} weight="bold" className="transition-transform group-hover:translate-x-0.5" />
+                </span>
+              </Link>
+            ) : null}
+
+            <nav aria-label="Other ways to write" className="grid gap-1">
+              <Link to={RoutePath.FUTURE_LETTERS} className="group flex min-h-11 items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold text-gray-nav hover:bg-green/5 hover:text-green">
+                <EnvelopeSimple size={18} weight="duotone" className="text-green/80" />
+                <span className="flex-1">Write to your future self</span>
+                <CaretRight size={14} className="text-gray-nav/40" />
+              </Link>
+              <Link to={RoutePath.RELEASE} className="group flex min-h-11 items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold text-gray-nav hover:bg-green/5 hover:text-green">
+                <Wind size={18} weight="duotone" className="text-green/80" />
+                <span className="flex-1">Release a thought</span>
+                <CaretRight size={14} className="text-gray-nav/40" />
+              </Link>
+            </nav>
+          </aside>
 
           {recentNotes && recentNotes.length > 0 ? (
-            <section aria-labelledby="today-recent" className="mt-10">
-              <div className="mb-3 flex items-center justify-between">
+            <section aria-labelledby="today-recent" className="home-grid-recent">
+              <div className="mb-4 flex items-baseline justify-between">
                 <h2 id="today-recent" className="label-caps text-gray-nav">Recently written</h2>
-                <Link to={RoutePath.NOTES} className="text-xs font-bold uppercase tracking-wider text-green hover:text-green-hover">
+                <Link to={RoutePath.NOTES} className="inline-flex min-h-11 items-center gap-1 text-xs font-bold uppercase tracking-wider text-green hover:text-green-hover">
                   All notes
+                  <ArrowRight size={12} weight="bold" />
                 </Link>
               </div>
-              <ul className="divide-y divide-border/60">
+              <ul className="grid gap-4 md:grid-cols-3">
                 {recentNotes.map((note) => (
-                  <li key={note.id}>
-                    <Link to={notePath(note.id)} className="group flex items-center gap-4 py-4">
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate text-base font-bold text-gray-text group-hover:text-green">
-                          {note.title || 'Untitled reflection'}
-                        </span>
-                        <span className="mt-1 block truncate text-sm text-gray-light">
-                          {stripHtml(note.content).slice(0, 140)}
-                        </span>
+                  <li key={note.id} className="min-w-0">
+                    <Link to={notePath(note.id)} className="surface-flat home-card group flex h-full flex-col rounded-3xl p-5">
+                      <span className="label-caps text-gray-nav">
+                        {new Date(note.createdAt).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
                       </span>
-                      <span className="shrink-0 text-xs font-medium text-gray-nav">
-                        {new Date(note.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                      <span className="mt-3 block truncate text-base font-bold text-gray-text group-hover:text-green">
+                        {note.title || 'Untitled reflection'}
+                      </span>
+                      <span className="mt-2 block font-serif text-sm leading-relaxed text-gray-light line-clamp-3">
+                        {stripHtml(note.content).slice(0, 180)}
                       </span>
                     </Link>
                   </li>
@@ -206,19 +292,6 @@ export const HomeAuthenticated: React.FC = () => {
               </ul>
             </section>
           ) : null}
-
-          <nav aria-label="Other ways to write" className="mt-10 grid gap-1 sm:grid-cols-2">
-            <Link to={RoutePath.FUTURE_LETTERS} className="group flex min-h-11 items-center gap-3 rounded-xl px-2 py-3 text-sm font-bold text-gray-nav hover:bg-green/5 hover:text-green">
-              <EnvelopeSimple size={18} weight="duotone" className="text-green/80" />
-              <span className="flex-1">Write to your future self</span>
-              <CaretRight size={14} className="text-gray-nav/40" />
-            </Link>
-            <Link to={RoutePath.RELEASE} className="group flex min-h-11 items-center gap-3 rounded-xl px-2 py-3 text-sm font-bold text-gray-nav hover:bg-green/5 hover:text-green">
-              <Wind size={18} weight="duotone" className="text-green/80" />
-              <span className="flex-1">Release a thought</span>
-              <CaretRight size={14} className="text-gray-nav/40" />
-            </Link>
-          </nav>
         </section>
       </div>
 

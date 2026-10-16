@@ -1217,6 +1217,106 @@ dialog[open],
     }
   }
 
+  /* Today: one stack on phones; on desktop an editorial two-column page
+     with the people rail beside the writing, not a lone centred column. */
+  .home-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "head" "compose" "rail" "recent";
+    gap: var(--space-6) var(--space-16, 4rem);
+    align-items: start;
+  }
+
+  .home-grid-head { grid-area: head; }
+  .home-grid-compose { grid-area: compose; }
+  .home-grid-rail { grid-area: rail; }
+  .home-grid-recent { grid-area: recent; margin-top: var(--space-4); }
+
+  @media (min-width: 1024px) {
+    .home-grid {
+      grid-template-columns: minmax(0, 1fr) clamp(18rem, 26vw, 22rem);
+      grid-template-areas: "head head" "compose rail" "recent rail";
+      row-gap: var(--space-8);
+    }
+
+    .home-grid-head { padding-block-end: var(--space-4); }
+
+    .home-grid-rail {
+      position: sticky;
+      top: var(--space-8);
+    }
+  }
+
+  .home-greeting {
+    font-family: var(--font-serif);
+    font-size: clamp(2.25rem, 1.4rem + 3.2vw, 4.25rem);
+    font-weight: 400;
+    line-height: 1.04;
+    letter-spacing: 0;
+    color: var(--gray-text);
+    text-wrap: balance;
+  }
+
+  .home-composer {
+    transition: box-shadow 200ms var(--ease-out-expo, ease-out);
+  }
+
+  .home-composer:focus-within {
+    box-shadow: 0 0 0 1px oklch(from var(--green) l c h / 0.35), var(--floating-panel-shadow);
+  }
+
+  .home-composer-input {
+    display: block;
+    inline-size: 100%;
+    field-sizing: content;
+    min-block-size: 3.5rem;
+    max-block-size: 40vh;
+    resize: none;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    font-family: var(--font-editor);
+    font-size: 1.1875rem;
+    line-height: 1.7;
+    color: var(--gray-text);
+    caret-color: var(--green);
+  }
+
+  .home-composer-input::placeholder {
+    color: var(--gray-light);
+    opacity: 0.8;
+  }
+
+  .home-composer-input:focus,
+  .home-composer-input:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+
+  .home-card {
+    transition: transform 200ms var(--ease-out-expo, ease-out), box-shadow 200ms var(--ease-out-expo, ease-out);
+  }
+
+  @media (hover: hover) {
+    .home-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--floating-panel-shadow);
+    }
+  }
+
+  .home-kbd {
+    display: inline-flex;
+    min-inline-size: 1.5rem;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    padding: 0.0625rem 0.375rem;
+    font-family: var(--font-sans, inherit);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    color: var(--nav-text);
+  }
+
   .dashboard-stat-value {
     font-family: var(--font-display);
     font-size: var(--text-xl);
