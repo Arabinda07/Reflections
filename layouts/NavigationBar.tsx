@@ -22,6 +22,7 @@ interface NavigationBarProps {
   isMobileMenuOpen: boolean;
   onMobileMenuToggle: () => void;
   onInvite: () => void;
+  onBugReport: () => void;
   onSearch?: () => void;
   /** Vault locked: hide everything except Logout so the user isn't sent into dead ends. */
   isVaultGated?: boolean;
@@ -52,6 +53,7 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
   isMobileMenuOpen,
   onMobileMenuToggle,
   onInvite,
+  onBugReport,
   onSearch,
   isVaultGated = false,
 }) => {
@@ -207,6 +209,9 @@ export const NavigationBar: React.FC<NavigationBarProps> = ({
                   <button type="button" className={menuItemClass} onClick={() => { closeMoreMenu(); onInvite(); }}>
                     <span>Invite</span>
                     <UserPlus size={16} weight="regular" />
+                  </button>
+                  <button type="button" className={menuItemClass} onClick={() => { closeMoreMenu(); onBugReport(); }}>
+                    Report a bug
                   </button>
                   <button
                     type="button"

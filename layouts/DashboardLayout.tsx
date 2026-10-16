@@ -142,6 +142,7 @@ export const DashboardLayout: React.FC = () => {
           isMobileMenuOpen={isMobileMenuOpen}
           onMobileMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           onInvite={() => setIsInviteModalOpen(true)}
+          onBugReport={() => setIsBugReportOpen(true)}
           onSearch={isAuthenticated && !isVaultGated ? () => setIsSearchOpen(true) : undefined}
           isVaultGated={isVaultGated}
         />
@@ -232,7 +233,7 @@ export const DashboardLayout: React.FC = () => {
       {/* Bug Report Flow — self-contained with floating trigger + modal */}
       {!isWritingRoute && (
         <React.Suspense fallback={null}>
-          <BugReportFlow isOpen={isBugReportOpen} onOpenChange={setIsBugReportOpen} />
+          <BugReportFlow isOpen={isBugReportOpen} onOpenChange={setIsBugReportOpen} showTrigger={!isAuthenticated} />
         </React.Suspense>
       )}
 

@@ -18,6 +18,8 @@ const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 interface BugReportFlowProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Signed-in desktop opens this from the More menu, so the floating button would only cover content. */
+  showTrigger?: boolean;
 }
 
 /**
@@ -25,7 +27,7 @@ interface BugReportFlowProps {
  * Owns its form state, EmailJS submission, and success feedback.
  * Its open/close state is controlled by its parent to allow triggers from multiple places.
  */
-export const BugReportFlow: React.FC<BugReportFlowProps> = ({ isOpen, onOpenChange }) => {
+export const BugReportFlow: React.FC<BugReportFlowProps> = ({ isOpen, onOpenChange, showTrigger = true }) => {
   const { user } = useAuthStore();
   const haptics = useHaptics();
   const { playSaveChime } = useSound();
@@ -90,6 +92,7 @@ export const BugReportFlow: React.FC<BugReportFlowProps> = ({ isOpen, onOpenChan
   return (
     <>
       {/* Floating Bug Report Button — desktop only */}
+      {showTrigger ? (
       <button
         onClick={() => onOpenChange(!isOpen)}
         className={`fixed bottom-4 left-6 z-[110] hidden h-11 w-11 items-center justify-center rounded-2xl transition duration-300 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green/20 group shadow-sm md:flex ${
@@ -109,6 +112,7 @@ export const BugReportFlow: React.FC<BugReportFlowProps> = ({ isOpen, onOpenChan
           />
         )}
       </button>
+      ) : null}
 
       <ModalSheet
         isOpen={isOpen}
