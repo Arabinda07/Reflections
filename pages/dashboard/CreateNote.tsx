@@ -2,7 +2,6 @@ import React, { Suspense, lazy, useState, useEffect, useCallback, useRef, useDef
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
 import { CalendarBlank } from '@phosphor-icons/react/CalendarBlank';
-import { CaretRight } from '@phosphor-icons/react/CaretRight';
 import { Check } from '@phosphor-icons/react/Check';
 import { CircleNotch } from '@phosphor-icons/react/CircleNotch';
 import { SquaresFour } from '@phosphor-icons/react/SquaresFour';
@@ -32,7 +31,6 @@ import { InlineLoadingBadge } from '../../components/ui/InlineLoadingBadge';
 import { DEFAULT_WELLNESS_PROMPTS, getCurrentWellnessPrompt, getNextWellnessPromptState } from '../../services/wellnessPrompts';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useNoteDraft } from '../../hooks/useNoteDraft';
-import { useFocusMode } from '../../hooks/useFocusMode';
 import { canNavigateBackInApp } from '../../src/native/androidBack';
 // Android shell safe area contract markers: NATIVE_TOP_CONTROL_OFFSET, NATIVE_PAGE_TOP_PADDING
 import { ProUpgradeCTA } from '../../components/ui/ProUpgradeCTA';
@@ -70,10 +68,6 @@ const suggestTagsFromSimilarNotes = async (content: string, existingTags: string
   }
 };
 
-const getSurfacePanelForMood = (_mood?: string) => {
-  return 'surface-panel-sage';
-};
-
 
 export const CreateNote: React.FC = () => {
   const navigate = useNavigate();
@@ -92,7 +86,6 @@ export const CreateNote: React.FC = () => {
   // â”€â”€ Focus/flow mode â”€â”€
   const [isFocused, setIsFocused] = useState(false);
   const [isTitleFocused, setIsTitleFocused] = useState(false);
-  const focusMode = useFocusMode({ isEditorFocused: isFocused, isTitleFocused });
 
   const appendWhisperTranscript = useCallback((text: string) => {
     draft.setContent((prev: string) => appendTranscriptToHtml(prev, text));
@@ -112,7 +105,7 @@ export const CreateNote: React.FC = () => {
   const [promptIndex, setPromptIndex] = useState(0);
   const [relationships, setRelationships] = useState<RelationshipRecord[]>([]);
   const [isPeoplePickerOpen, setIsPeoplePickerOpen] = useState(false);
-  const [isMobileOptionsOpen, setIsMobileOptionsOpen] = useState(false);
+  const [isOptionsOpen, setIsOptionsOpen] = useState(false);
   const [isMoodOpen, setIsMoodOpen] = useState(false);
   const [moodPickerStage, setMoodPickerStage] = useState<MoodPickerStage>('group');
   const [isTagsOpen, setIsTagsOpen] = useState(false);
@@ -375,11 +368,9 @@ export const CreateNote: React.FC = () => {
   const wordCount = React.useMemo(() => {
     return draft.currentSnapshot.content.replace(/<[^>]*>/g, '').trim().split(/\s+/).filter(Boolean).length;
   }, [draft.currentSnapshot.content]);
-  const isFocusModeActive = focusMode.isActive;
-  const isFocusModeEnabled = focusMode.isEnabled;
   // While words are flowing, the chrome steps back (opacity only, no layout
   // shift). It returns the moment the writer pauses and taps away.
-  const isWritingQuiet = isFocused && !isTitleFocused && wordCount > 0 && !isFocusModeActive;
+  const isWritingQuiet = isFocused && !isTitleFocused && wordCount > 0;
 
 
   const handleStayOnDraft = () => {
@@ -415,95 +406,13 @@ export const CreateNote: React.FC = () => {
     <>
       <div className={`${getSurfaceScopeForMood(mood)} page-wash relative flex-1 flex min-h-0 bg-body overflow-hidden`}>
       {/* Ã¢â€â‚¬Ã¢â€â‚¬ Mobile Back Button Ã¢â€â‚¬Ã¢â€â‚¬ */}
-      {isMobile && (
-        <button 
-          onClick={handleMobileBack}
-          className={`surface-floating fixed left-4 z-floating flex h-11 w-11 items-center justify-center rounded-control transition hover:text-green top-[var(--native-top-control-offset)] ${isFocusModeActive || isWritingQuiet ? 'pointer-events-none opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
-          aria-label="Back to notes"
-        >
-          <ArrowLeft size={20} weight="regular" />
-        </button>
-      )}
-
-      {isFocusModeActive && isFocusModeEnabled ? (
-        <button
-          type="button"
-          onClick={() => {
-            focusMode.disable();
-          }}
-          className="surface-floating fixed right-4 z-sticky-nav inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 label-caps text-green hover:text-green top-[var(--native-top-control-offset)]"
-        >
-          <X size={12} weight="regular" />
-          Exit focus
-        </button>
-      ) : null}
-
-      {/* â”€â”€ Desktop Sidebar â”€â”€ */}
-      {!isMobile && (
-        <aside className={`${getSurfacePanelForMood(mood)} flex flex-col min-h-0 z-40 transition-[opacity,transform,border-color] duration-300 ease-out-expo border-r border-green/15 ${isFocusModeActive ? 'w-0 pointer-events-none opacity-0 -translate-x-4 overflow-hidden border-r-0' : `w-60 shrink-0 translate-x-0 ${isWritingQuiet ? 'opacity-30 hover:opacity-100' : 'opacity-100'}`}`}>
-          <div className="pt-8 px-6 pb-6 flex-1 overflow-y-auto custom-scrollbar space-y-4">
-            
-            {/* Desktop Back Button */}
-            <button 
-              onClick={() => navigate(RoutePath.NOTES)}
-              className="flex min-h-11 items-center gap-2 text-gray-nav hover:text-gray-text text-btn-sm font-bold mb-8 group transition-colors"
-            >
-              <div className="control-surface flex h-8 w-8 items-center justify-center transition-colors group-hover:border-green/20 group-hover:bg-green/5">
-                <ArrowLeft size={14} weight="regular" />
-              </div>
-              Back to Notes
-            </button>
-
-            <span className="label-caps ml-2 text-gray-nav opacity-50">Personalize</span>
-            
-            {/* Options */}
-            <button onClick={() => setIsMoodOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-2xl transition-colors border border-border/40 ${mood ? getMoodConfig(mood)?.nav || 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>
-              <div className="flex items-center gap-3"><ActiveMoodIcon size={20} weight={mood ? "fill" : "regular"} /><span className="text-btn-sm font-bold capitalize">{mood ? getMoodConfig(mood)?.label || mood : 'Mood'}</span></div>
-              <CaretRight size={14} className="opacity-40" />
-            </button>
-
-            <button onClick={() => setIsTagsOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-2xl transition-colors border border-border/40 ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>
-              <div className="flex items-center gap-3"><TagIcon size={20} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-btn-sm font-bold">{tags.length > 0 ? `${tags.length} Tags` : 'Tags'}</span></div>
-              <CaretRight size={14} className="opacity-40" />
-            </button>
-
-            <button onClick={() => setIsPeoplePickerOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-2xl transition-colors border border-border/40 ${relationshipIds.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}>
-              <div className="flex items-center gap-3"><UsersThree size={20} weight={relationshipIds.length > 0 ? "fill" : "regular"} /><span className="text-btn-sm font-bold">{relationshipIds.length > 0 ? `${relationshipIds.length} People` : 'People'}</span></div>
-              <CaretRight size={14} className="opacity-40" />
-            </button>
-
-            <button onClick={() => setIsMusicOpen(true)} className={`w-full flex items-center justify-between p-4 min-h-14 rounded-2xl transition-colors border border-border/40 ${musicPlaying ? 'bg-honey/10 border-honey/25 text-honey' : 'control-surface text-gray-text'}`}>
-              <div className="flex items-center gap-3"><Headphones size={20} weight={musicPlaying ? "fill" : "regular"} /><span className="text-btn-sm font-bold">{musicPlaying && activeMusicTrack ? activeMusicTrack.emoji : 'Sounds'}</span></div>
-              <CaretRight size={14} className="opacity-40" />
-            </button>
-
-            <WhisperComposerControl
-              onFinalTranscript={appendWhisperTranscript}
-              label="Whisper"
-              className="w-full"
-              buttonClassName="w-full flex min-h-14 items-center gap-3 rounded-2xl border border-border/40 p-4 text-btn-sm font-bold transition-colors"
-            />
-
-            
-            <div className="grid grid-cols-2 gap-2 pt-2">
-              <label className="control-surface flex flex-col items-center justify-center p-4 rounded-2xl text-gray-text transition-colors cursor-pointer">
-                <Paperclip size={20} className="mb-2" /><span className="text-ui-xs font-bold uppercase">Files</span>
-                <input type="file" multiple className="hidden" onChange={(e) => {
-                  if (e.target.files) {
-                draft.addFiles(Array.from(e.target.files || []));
-                  }
-                }} />
-              </label>
-              <label className="control-surface flex flex-col items-center justify-center p-4 rounded-2xl text-gray-text transition-colors cursor-pointer">
-                <ImageIcon size={20} className="mb-2" /><span className="text-ui-xs font-bold uppercase">Cover</span>
-                <input type="file" className="hidden" accept="image/*" onChange={(e) => {
-                  if (e.target.files?.[0]) setImagePreview(URL.createObjectURL(e.target.files[0]));
-                }} />
-              </label>
-            </div>
-          </div>
-        </aside>
-      )}
+      <button
+        onClick={handleMobileBack}
+        className={`surface-floating fixed left-4 z-floating flex h-11 w-11 items-center justify-center rounded-control transition hover:text-green top-[var(--native-top-control-offset)] lg:left-8 ${isWritingQuiet ? 'pointer-events-none opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}
+        aria-label="Back to notes"
+      >
+        <ArrowLeft size={20} weight="regular" />
+      </button>
 
       {/* Main Canvas */}
       <section
@@ -511,7 +420,7 @@ export const CreateNote: React.FC = () => {
         className="relative flex-1 w-full pb-40 px-6 sm:px-12 md:px-16 lg:px-24 pt-[var(--native-page-top-padding)]"
       >
         <h1 id="create-note-heading" className="sr-only">New reflection</h1>
-        <div className={`editor-writing-measure transition-transform duration-300 ease-out-expo ${isFocusModeActive ? 'mx-auto scale-101' : 'mr-auto lg:ml-12 xl:ml-24 scale-100'}`}>
+        <div className="editor-writing-measure mx-auto">
           
           {/* Cover Image */}
           {imagePreview && (
@@ -533,21 +442,6 @@ export const CreateNote: React.FC = () => {
               <CalendarBlank size={12} weight="regular" />
               {new Date().toLocaleDateString(undefined, { weekday: 'short', month: 'long', day: 'numeric' })}
             </span>
-            <button
-              type="button"
-              aria-pressed={isFocusModeEnabled}
-              onClick={() => {
-                focusMode.toggle();
-              }}
-              className={`inline-flex min-h-11 items-center gap-2 rounded-full px-4 py-2 label-caps transition-colors sm:px-3 ${
-                isFocusModeEnabled
-                  ? 'bg-green text-white'
-                  : 'control-surface text-gray-text hover:bg-green/10 hover:text-green'
-              }`}
-            >
-              <Target size={12} weight={isFocusModeEnabled ? 'fill' : 'bold'} />
-              Focus mode
-            </button>
             <button
               type="button"
               onClick={() => setIsPeoplePickerOpen(true)}
@@ -619,7 +513,6 @@ export const CreateNote: React.FC = () => {
             }}
             placeholder={activePlaceholder || "What's on your mind?"} 
             ariaLabel="Reflection body"
-            hideToolbar={isMobile}
             className="text-xl md:text-2xl font-serif leading-relaxed text-gray-text/90" 
           />
 
@@ -640,19 +533,16 @@ export const CreateNote: React.FC = () => {
 
       {/* Ã¢â€â‚¬Ã¢â€â‚¬ Floating Actions Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <div 
-        className={`fixed z-50 flex gap-4 transition-[opacity,transform] duration-700 ease-out-expo ${isMobile ? 'bottom-[calc(2rem+env(safe-area-inset-bottom))] left-6 right-6 justify-between' : 'bottom-10 right-10 flex-col'} ${isFocusModeActive ? 'opacity-0 translate-y-8' : isWritingQuiet ? (isMobile ? 'pointer-events-none opacity-0 translate-y-8' : 'opacity-30 hover:opacity-100') : 'opacity-100 translate-y-0'}`}
+        className={`fixed z-50 flex gap-4 transition-[opacity,transform] duration-700 ease-out-expo ${isMobile ? 'bottom-[calc(2rem+env(safe-area-inset-bottom))] left-6 right-6 justify-between' : 'bottom-10 right-10 flex-col'} ${isWritingQuiet ? (isMobile ? 'pointer-events-none opacity-0 translate-y-8' : 'opacity-30 hover:opacity-100') : 'opacity-100 translate-y-0'}`}
       >
         
-        {/* Mobile Personalize FAB */}
-        {isMobile && (
-          <button 
-            onClick={() => setIsMobileOptionsOpen(true)}
-            className="surface-floating group relative flex h-16 w-16 items-center justify-center rounded-full hover:text-green"
-            aria-label="Open reflection options"
-          >
-            <SquaresFour size={24} weight="fill" className="opacity-80" />
-          </button>
-        )}
+        <button
+          onClick={() => setIsOptionsOpen(true)}
+          className="surface-floating group relative flex h-16 w-16 items-center justify-center rounded-full hover:text-green"
+          aria-label="Open reflection options"
+        >
+          <SquaresFour size={24} weight="fill" className="opacity-80" />
+        </button>
 
         {/* Interchangeable Action FAB: cycles prompts while empty, becomes Save once you write */}
           {!hasContent ? (
@@ -687,18 +577,18 @@ export const CreateNote: React.FC = () => {
 
       {/* Ã¢â€â‚¬Ã¢â€â‚¬ Shared Sheets Ã¢â€â‚¬Ã¢â€â‚¬ */}
       <ModalSheet
-        isOpen={isMobile && isMobileOptionsOpen}
-        onClose={() => setIsMobileOptionsOpen(false)}
+        isOpen={isOptionsOpen}
+        onClose={() => setIsOptionsOpen(false)}
         title="Personalize"
         icon={<Sparkle size={22} weight="duotone" />}
         size="sm"
         bodyClassName="pt-2"
       >
         <div className="grid grid-cols-2 gap-3">
-          <button onClick={() => { setIsMobileOptionsOpen(false); setIsMoodOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${mood ? getMoodConfig(mood)?.nav || 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><ActiveMoodIcon size={24} weight={mood ? "fill" : "regular"} /><span className="text-ui-sm font-bold capitalize">{mood ? getMoodConfig(mood)?.label || mood : 'Mood'}</span></button>
-          <button onClick={() => { setIsMobileOptionsOpen(false); setIsTagsOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><TagIcon size={24} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-ui-sm font-bold">Tags</span></button>
-          <button onClick={() => { setIsMobileOptionsOpen(false); setIsPeoplePickerOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${relationshipIds.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><UsersThree size={24} weight={relationshipIds.length > 0 ? "fill" : "regular"} /><span className="text-ui-sm font-bold">{relationshipIds.length > 0 ? `${relationshipIds.length} People` : 'People'}</span></button>
-          <button onClick={() => { setIsMobileOptionsOpen(false); setIsMusicOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${musicPlaying ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><Headphones size={24} weight={musicPlaying ? "fill" : "regular"} /><span className="text-ui-sm font-bold">Sounds</span></button>
+          <button onClick={() => { setIsOptionsOpen(false); setIsMoodOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${mood ? getMoodConfig(mood)?.nav || 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><ActiveMoodIcon size={24} weight={mood ? "fill" : "regular"} /><span className="text-ui-sm font-bold capitalize">{mood ? getMoodConfig(mood)?.label || mood : 'Mood'}</span></button>
+          <button onClick={() => { setIsOptionsOpen(false); setIsTagsOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${tags.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><TagIcon size={24} weight={tags.length > 0 ? "fill" : "regular"} /><span className="text-ui-sm font-bold">Tags</span></button>
+          <button onClick={() => { setIsOptionsOpen(false); setIsPeoplePickerOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${relationshipIds.length > 0 ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><UsersThree size={24} weight={relationshipIds.length > 0 ? "fill" : "regular"} /><span className="text-ui-sm font-bold">{relationshipIds.length > 0 ? `${relationshipIds.length} People` : 'People'}</span></button>
+          <button onClick={() => { setIsOptionsOpen(false); setIsMusicOpen(true); }} className={`flex items-center gap-3 rounded-2xl border p-4 ${musicPlaying ? 'bg-green/10 border-green/20 text-green' : 'control-surface text-gray-text'}`}><Headphones size={24} weight={musicPlaying ? "fill" : "regular"} /><span className="text-ui-sm font-bold">Sounds</span></button>
           <WhisperComposerControl
             onFinalTranscript={appendWhisperTranscript}
             label="Whisper"
@@ -711,14 +601,14 @@ export const CreateNote: React.FC = () => {
               if (e.target.files) {
                 draft.addFiles(Array.from(e.target.files || []));
               }
-              setIsMobileOptionsOpen(false);
+              setIsOptionsOpen(false);
             }} />
           </label>
           <label className="control-surface flex cursor-pointer items-center gap-3 rounded-2xl p-4 text-gray-text transition-colors hover:border-green/20 hover:bg-green/5">
             <ImageIcon size={24} weight="regular" /><span className="text-ui-sm font-bold">Cover</span>
             <input type="file" className="hidden" accept="image/*" onChange={(e) => {
               if (e.target.files?.[0]) setImagePreview(URL.createObjectURL(e.target.files[0]));
-              setIsMobileOptionsOpen(false);
+              setIsOptionsOpen(false);
             }} />
           </label>
         </div>

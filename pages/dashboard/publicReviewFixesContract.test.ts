@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -99,7 +99,6 @@ describe('public review fixes contract', () => {
 
     expect(landing).not.toContain('landing_video.mp4');
     expect(existsSync(path.resolve(process.cwd(), 'public/assets/videos/landing_video.mp4'))).toBe(false);
-    expect(existsSync(packagedAnimationPath)).toBe(true);
-    expect(statSync(packagedAnimationPath).size).toBeLessThan(360 * 1024);
+    expect(existsSync(packagedAnimationPath)).toBe(false);
   });
 });

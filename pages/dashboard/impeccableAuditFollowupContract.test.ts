@@ -11,7 +11,7 @@ describe('impeccable audit follow-up contract', () => {
     const account = read('pages/dashboard/Account.tsx');
     const createNote = read('pages/dashboard/CreateNote.tsx');
     const editor = read('components/ui/Editor.tsx');
-    const quillCss = read('components/ui/quill-snow.css');
+    const quillCss = read('components/ui/quill-bubble.css');
     const about = read('pages/dashboard/AboutArabinda.tsx');
     const indexHtml = read('index.html');
     const lottieAnimation = read('components/ui/LottieAnimation.tsx');
@@ -38,8 +38,8 @@ describe('impeccable audit follow-up contract', () => {
     expect(editor).toContain('applyToolbarAccessibility');
     expect(editor).toContain("setAttribute('aria-label'");
     expect(editor).toContain("setAttribute('type', 'button')");
-    expect(quillCss).toContain('min-height: 44px;');
-    expect(quillCss).toContain('min-width: 44px;');
+    expect(quillCss).toContain('min-height: 2.75rem;');
+    expect(quillCss).toContain('min-width: 2.75rem;');
 
     expect(about).not.toContain('lg:gap-24');
     expect(about).toContain('PublicPageHero');

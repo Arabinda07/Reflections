@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -9,19 +9,13 @@ describe('phase 1 product contract and clarity', () => {
   it('keeps server-side AI out of the app entirely', () => {
     const createNote = read('pages/dashboard/CreateNote.tsx');
     const insights = read('pages/dashboard/Insights.tsx');
-    const lifeWiki = read('pages/dashboard/LifeWiki.tsx');
 
     expect(createNote).not.toContain('processNoteIntoWiki');
     expect(createNote).not.toContain("requestJson<string[]>('prompts'");
     expect(createNote).not.toContain('Reflect with AI');
 
     expect(createNote).not.toContain('aiService');
-    // Life Wiki stays reachable but its refresh is unplugged (no server AI).
-    expect(insights).toContain('to={RoutePath.SANCTUARY}');
-    expect(insights).not.toContain('onClick={() => navigate(RoutePath.SANCTUARY)}');
-    expect(lifeWiki).toContain('getWikiInsightsGate');
-    expect(lifeWiki).toContain('canGenerate: false, requiresUpgrade: false');
-    expect(read('services/aiRunClient.ts')).not.toContain('fetch(');
+    expect(existsSync(path.resolve(process.cwd(), 'services/aiRunClient.ts'))).toBe(false);
     expect(insights).not.toContain('getAiReflectionGate');
     expect(insights).not.toContain('incrementFreeAiReflections');
   });

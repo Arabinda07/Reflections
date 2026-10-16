@@ -158,7 +158,7 @@ describe('public landing performance contract', () => {
       'components/ui/modal-sheet.css',
       'components/ui/overlay-feedback.css',
       'components/ui/ambient-music.css',
-      'components/ui/quill-snow.css',
+      'components/ui/quill-bubble.css',
     ];
 
     for (const filePath of scopedCssFiles) {
@@ -169,7 +169,7 @@ describe('public landing performance contract', () => {
     const modalCss = read('components/ui/modal-sheet.css');
     const overlayCss = read('components/ui/overlay-feedback.css');
     const audioCss = read('components/ui/ambient-music.css');
-    const quillCss = read('components/ui/quill-snow.css');
+    const quillCss = read('components/ui/quill-bubble.css');
     const modalSheet = read('components/ui/ModalSheet.tsx');
     const overlayFeedback = read('components/ui/OverlayFeedback.tsx');
     const ambientMusicButton = read('components/ui/AmbientMusicButton.tsx');
@@ -190,12 +190,12 @@ describe('public landing performance contract', () => {
     expect(modalCss).toContain('.modal-sheet-root');
     expect(overlayCss).toContain('.overlay-feedback');
     expect(audioCss).toContain('.audio-popup');
-    expect(quillCss).toContain('.ql-toolbar.ql-snow');
+    expect(quillCss).toContain('.ql-bubble .ql-tooltip');
 
     expect(modalSheet).toContain("import './modal-sheet.css';");
     expect(overlayFeedback).toContain("import './overlay-feedback.css';");
     expect(ambientMusicButton).toContain("import './ambient-music.css';");
-    expect(editor).toContain("import './quill-snow.css';");
+    expect(editor).toContain("import './quill-bubble.css';");
   });
 
   it('keeps editor-only critical styles out of the public document head', () => {
@@ -204,7 +204,7 @@ describe('public landing performance contract', () => {
 
     expect(indexHtml).not.toContain('.ql-container.ql-snow');
     expect(indexHtml).not.toContain('.ql-editor {');
-    expect(editor).toContain("import './quill-snow.css';");
+    expect(editor).toContain("import './quill-bubble.css';");
   });
 
   it('keeps generated mobile video assets inside the mobile payload budget', () => {

@@ -35,15 +35,10 @@ describe('Insights layout contract', () => {
 
   it('keeps writing patterns accessible across user modes without a restrictive mode guard', () => {
     const app = read('App.tsx');
-    const insights = read('pages/dashboard/Insights.tsx');
 
     // App route is not blocked by withModeGuard('reflective')
     expect(app).toContain('path={RoutePath.INSIGHTS}');
     expect(app).not.toMatch(/path=\{RoutePath\.INSIGHTS\}\s+element=\{[^}]*withModeGuard[^}]*'reflective'/);
-
-    // Insights uses userMode to conditionally gate the Sanctuary CTA
-    expect(insights).toContain('const { userMode } = useUserMode();');
-    expect(insights).toContain("userMode === 'reflective' &&");
   });
 });
 

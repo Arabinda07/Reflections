@@ -407,12 +407,6 @@
   --hero-scrim: linear-gradient(180deg,
       oklch(0.28 0.02 135 / 0.12),
       oklch(0.24 0.02 135 / 0.28));
-  --sanctuary-entrance-glow:
-    radial-gradient(circle at center, oklch(from var(--color-accent) l c h / 0.17), transparent 54%);
-  --sanctuary-entrance-scrim:
-    linear-gradient(to bottom, oklch(from var(--green) l c h / 0.1), oklch(from var(--bg-color) l c h / 0.95), var(--bg-color));
-  --sanctuary-page-fade:
-    linear-gradient(to bottom, oklch(from var(--green) l c h / 0.05), var(--bg-color), var(--bg-color));
   --screen-scrim-soft: oklch(from var(--panel-bg) l c h / 0.85);
   --screen-scrim-strong: oklch(from var(--panel-bg) l c h / 0.95);
   --floating-panel-bg: oklch(from var(--panel-bg) l c h / 0.82);
@@ -639,12 +633,6 @@
   --hero-scrim: linear-gradient(180deg,
       oklch(0.13 0.02 135 / 0.22),
       oklch(0.1 0.02 135 / 0.48));
-  --sanctuary-entrance-glow:
-    radial-gradient(circle at center, oklch(from var(--color-accent) l c h / 0.2), transparent 54%);
-  --sanctuary-entrance-scrim:
-    linear-gradient(to bottom, oklch(from var(--green) l c h / 0.14), oklch(from var(--bg-color) l c h / 0.95), var(--bg-color));
-  --sanctuary-page-fade:
-    linear-gradient(to bottom, oklch(from var(--green) l c h / 0.08), var(--bg-color), var(--bg-color));
   --screen-scrim-soft: oklch(from var(--panel-bg) l c h / 0.85);
   --screen-scrim-strong: oklch(from var(--panel-bg) l c h / 0.95);
   --floating-panel-media-border: oklch(1 0 0 / 0.12);
@@ -727,18 +715,6 @@ body {
   background: var(--page-wash);
   background-attachment: fixed;
   background-size: cover;
-}
-
-.sanctuary-entrance-glow {
-  background: var(--sanctuary-entrance-glow);
-}
-
-.sanctuary-entrance-scrim {
-  background: var(--sanctuary-entrance-scrim);
-}
-
-.sanctuary-page-fade {
-  background: var(--sanctuary-page-fade);
 }
 
 @media (max-width: 768px) {

@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '../src/supabaseClient';
 import { type CryptoSession } from '../services/cryptoService';
 import {
@@ -9,7 +9,7 @@ import {
   type UserEncryptionKeyBundle,
 } from '../services/keyWrapperPolicy';
 import { setCurrentCryptoSession } from '../services/cryptoSessionStore';
-import { cryptoKeyCache } from '../services/cryptoKeyCache';
+import { cryptoKeyCache, shouldClearKeyCache } from '../services/cryptoKeyCache';
 import { embeddingService } from '../services/embedding/embeddingService';
 import {
   consumePendingAccountPassword,
@@ -58,6 +58,7 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   // transition triggers, so onboarding can show the "ready" screen once.
   const [justCompletedSetup, setJustCompletedSetup] = useState(false);
   const clearJustCompletedSetup = useCallback(() => setJustCompletedSetup(false), []);
+  const previousUserIdRef = useRef<string | null>(null);
   const setUnlockedSession = useCallback(async (
     nextSession: CryptoSession,
     migrationState: EncryptionMigrationState,
@@ -114,12 +115,17 @@ export const CryptoProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setRecoveryKey(null);
       setMigrationProgress(null);
 
-      if (!user?.id) {
-        // No signed-in user (initial load or just-logged-out): drop any cached
-        // "keep me unlocked" key so it never outlives the session.
+      const previousUserId = previousUserIdRef.current;
+      const nextUserId = user?.id ?? null;
+      previousUserIdRef.current = nextUserId;
+      if (shouldClearKeyCache(previousUserId, nextUserId)) {
+        // Signed out or switched account: the cached key must not outlive it.
         await cryptoKeyCache.clear();
         await embeddingService.reset();
         if (!isActive) return;
+      }
+
+      if (!user?.id) {
         setStatus('loading');
         return;
       }

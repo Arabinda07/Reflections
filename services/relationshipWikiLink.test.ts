@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { countMentionedNames, findWikiMentions } from './relationshipWikiLink';
+import { findWikiMentions } from './relationshipWikiLink';
 
 const content = [
   'Maya keeps showing up when I write about work. She pushed me to ship.',
@@ -19,12 +19,5 @@ describe('findWikiMentions', () => {
     expect(findWikiMentions(content, 'May')).toHaveLength(0);
     expect(findWikiMentions(content, '')).toHaveLength(0);
     expect(findWikiMentions('', 'Maya')).toHaveLength(0);
-  });
-});
-
-describe('countMentionedNames', () => {
-  it('counts only names present in the content', () => {
-    expect(countMentionedNames(content, ['Maya', 'Sam', 'Priya'])).toBe(2);
-    expect(countMentionedNames('', ['Maya'])).toBe(0);
   });
 });

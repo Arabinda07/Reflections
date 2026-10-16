@@ -18,8 +18,6 @@ const ROUTE_SURFACE_SCOPE_CLASS: Partial<Record<RoutePath, string>> = {
   [RoutePath.RESET_PASSWORD]: 'surface-scope-paper',
   [RoutePath.RECOVER_PRIVATE_WRITING]: 'surface-scope-paper',
   [RoutePath.AUTH_CALLBACK]: 'surface-scope-paper',
-  [RoutePath.WIKI]: 'surface-scope-sage',
-  [RoutePath.SANCTUARY]: 'surface-scope-sage',
 };
 
 /**
@@ -29,10 +27,6 @@ const ROUTE_SURFACE_SCOPE_CLASS: Partial<Record<RoutePath, string>> = {
 export const getRouteSurfaceScopeClass = (pathname: string) => {
   if (pathname.startsWith('/notes/') && pathname !== RoutePath.CREATE_NOTE) {
     return 'surface-scope-paper';
-  }
-
-  if (pathname.startsWith(RoutePath.SANCTUARY)) {
-    return 'surface-scope-sage';
   }
 
   return ROUTE_SURFACE_SCOPE_CLASS[pathname as RoutePath] ?? 'surface-scope-sage';

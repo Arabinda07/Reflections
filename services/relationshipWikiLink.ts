@@ -20,15 +20,6 @@ export const findWikiMentions = (content: string, name: string): string[] => {
     .filter((paragraph) => paragraph && pattern.test(paragraph));
 };
 
-/** How many of `names` appear at least once in `content`. */
-export const countMentionedNames = (content: string, names: string[]): number => {
-  if (!content) return 0;
-  return names.filter((name) => {
-    const trimmed = name.trim();
-    return trimmed && mentionRegExp(trimmed).test(content);
-  }).length;
-};
-
 const plainText = (html: string) =>
   html.replace(/<\/(p|div|li|h[1-6])>|<br\s*\/?>/gi, '\n').replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ');
 

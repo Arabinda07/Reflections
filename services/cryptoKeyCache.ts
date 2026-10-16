@@ -108,3 +108,9 @@ export const cryptoKeyCache = {
     await del(CACHE_KEY);
   },
 };
+
+// The auth store hydrates asynchronously, so a cold start always begins with no
+// user. Only a real sign-out or account switch (a known user going away) may
+// wipe the cached key; an initial empty user must not.
+export const shouldClearKeyCache = (previousUserId: string | null, nextUserId: string | null): boolean =>
+  previousUserId !== null && previousUserId !== nextUserId;

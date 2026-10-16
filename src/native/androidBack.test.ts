@@ -69,7 +69,7 @@ describe('resolveAndroidBackOutcome', () => {
         now: 1000,
         lastExitPromptAt: null,
       }),
-    ).toEqual({ type: 'navigate-to-fallback', path: '/sanctuary' });
+    ).toEqual({ type: 'navigate-to-fallback', path: '/home' });
   });
 
   it('prompts before exit, then exits on a second press inside the confirmation window', () => {
@@ -125,8 +125,6 @@ describe('isTopLevelAndroidRoute', () => {
     expect(isTopLevelAndroidRoute('/faq')).toBe(true);
     expect(isTopLevelAndroidRoute('/about')).toBe(true);
     expect(isTopLevelAndroidRoute('/privacy')).toBe(true);
-    expect(isTopLevelAndroidRoute('/wiki')).toBe(true);
-    expect(isTopLevelAndroidRoute('/sanctuary')).toBe(true);
     expect(isTopLevelAndroidRoute('/notes/new')).toBe(false);
     expect(isTopLevelAndroidRoute('/notes/123')).toBe(false);
   });
@@ -137,7 +135,6 @@ describe('getAndroidBackFallbackPath', () => {
     expect(getAndroidBackFallbackPath('/notes/new')).toBe('/notes');
     expect(getAndroidBackFallbackPath('/notes/123')).toBe('/notes');
     expect(getAndroidBackFallbackPath('/notes/123/edit')).toBe('/notes');
-    expect(getAndroidBackFallbackPath('/sanctuary/grief')).toBe('/sanctuary');
     expect(getAndroidBackFallbackPath('/release')).toBe('/home');
     expect(getAndroidBackFallbackPath('/unknown')).toBe('/home');
   });

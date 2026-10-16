@@ -1,6 +1,5 @@
 import React, { useEffect, useId, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Book } from '@phosphor-icons/react/Book';
 import { Bug } from '@phosphor-icons/react/Bug';
 import { CaretRight } from '@phosphor-icons/react/CaretRight';
 import { SquaresFour } from '@phosphor-icons/react/SquaresFour';
@@ -35,7 +34,6 @@ interface MoreNavItem {
   label: string;
   path: RoutePath;
   icon: React.ElementType;
-  aliases?: RoutePath[];
   requireMode?: 'reflective' | 'encrypted';
 }
 
@@ -63,10 +61,7 @@ const isMoreRoute = (pathname: string) =>
   pathname === RoutePath.FUTURE_LETTERS ||
   pathname === RoutePath.RELEASE ||
   pathname === RoutePath.ACCOUNT ||
-  pathname === RoutePath.FAQ ||
-  pathname === RoutePath.WIKI ||
-  pathname === RoutePath.SANCTUARY ||
-  pathname.startsWith(`${RoutePath.SANCTUARY}/`);
+  pathname === RoutePath.FAQ;
 
 export const AUTHENTICATED_MOBILE_TABS: MobileTabItem[] = [
   {
@@ -109,12 +104,6 @@ export const MORE_NAV_GROUPS: MoreNavGroup[] = [
       { label: 'Insights', path: RoutePath.INSIGHTS, icon: Sparkle },
       { label: 'Future Letters', path: RoutePath.FUTURE_LETTERS, icon: EnvelopeSimple },
       { label: 'Release a thought', path: RoutePath.RELEASE, icon: Wind },
-      {
-        label: 'Life Wiki',
-        path: RoutePath.SANCTUARY,
-        icon: Book,
-        aliases: [RoutePath.WIKI, RoutePath.SANCTUARY_ARTICLE],
-      },
     ],
   },
   {
@@ -126,15 +115,7 @@ export const MORE_NAV_GROUPS: MoreNavGroup[] = [
   },
 ];
 
-const isMoreNavItemActive = (item: MoreNavItem, pathname: string) =>
-  pathname === item.path ||
-  item.aliases?.some((alias) => {
-    if (alias === RoutePath.SANCTUARY_ARTICLE) {
-      return pathname.startsWith(`${RoutePath.SANCTUARY}/`);
-    }
-
-    return pathname === alias;
-  });
+const isMoreNavItemActive = (item: MoreNavItem, pathname: string) => pathname === item.path;
 
 const tabBaseClass =
   'auth-mobile-tab relative flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-xl px-2 py-1 text-ui-xs font-bold leading-none transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2';

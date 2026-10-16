@@ -30,15 +30,15 @@ describe('WhisperComposerControl contract', () => {
     expect(home).toContain('stopOnFinalTranscript');
   });
 
-  it('keeps Create Note whisper as a sidebar action instead of a duplicate editor mode', () => {
+  it('keeps Create Note whisper as an options sheet action instead of a duplicate editor mode', () => {
     const createNote = read('pages/dashboard/CreateNote.tsx');
     const whisperIndex = createNote.indexOf('label="Whisper"');
-    const sidebarWhisper = createNote.slice(whisperIndex, createNote.indexOf('/>', whisperIndex));
+    const sheetWhisper = createNote.slice(whisperIndex, createNote.indexOf('/>', whisperIndex));
 
     expect(createNote).not.toContain('label="Voice capture"');
-    expect(sidebarWhisper).toContain('gap-3');
-    expect(sidebarWhisper).toContain('text-btn-sm font-bold');
-    expect(sidebarWhisper).not.toContain('justify-between');
-    expect(sidebarWhisper).not.toContain('CaretRight');
+    expect(sheetWhisper).toContain('gap-3');
+    expect(sheetWhisper).toContain('text-ui-sm font-bold');
+    expect(sheetWhisper).not.toContain('justify-between');
+    expect(sheetWhisper).not.toContain('CaretRight');
   });
 });

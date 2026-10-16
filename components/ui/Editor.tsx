@@ -1,23 +1,15 @@
 import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import Quill from 'quill';
-import './quill-snow.css';
+import 'quill/dist/quill.bubble.css';
+import './quill-bubble.css';
 
 const QUILL_TOOL_LABELS: Record<string, string> = {
-  align: 'Text alignment',
-  background: 'Highlight color',
   blockquote: 'Block quote',
   bold: 'Bold',
-  clean: 'Clear formatting',
-  code: 'Code',
-  'code-block': 'Code block',
-  color: 'Text color',
-  header: 'Text style',
+  'header:2': 'Heading',
   italic: 'Italic',
   link: 'Insert link',
   'list:bullet': 'Bulleted list',
-  'list:ordered': 'Numbered list',
-  strike: 'Strikethrough',
-  underline: 'Underline',
 };
 
 const getToolbarControlLabel = (control: Element) => {
@@ -46,15 +38,6 @@ const applyToolbarAccessibility = (toolbar: HTMLElement | null) => {
     }
     button.setAttribute('type', 'button');
   });
-
-  toolbar.querySelectorAll<HTMLElement>('.ql-picker-label').forEach((pickerLabel) => {
-    const label = getToolbarControlLabel(pickerLabel.parentElement ?? pickerLabel);
-    if (label) {
-      pickerLabel.setAttribute('aria-label', label);
-      pickerLabel.setAttribute('title', label);
-    }
-    pickerLabel.setAttribute('role', 'button');
-  });
 };
 
 interface EditorProps {
@@ -64,14 +47,13 @@ interface EditorProps {
   placeholder?: string;
   ariaLabel?: string;
   className?: string;
-  hideToolbar?: boolean;
 }
 
 export interface EditorRef {
   focus: () => void;
 }
 
-export const Editor = forwardRef<EditorRef, EditorProps>(({ value, onChange, onFocusChange, placeholder, ariaLabel = 'Reflection body', className = '', hideToolbar = false }, ref) => {
+export const Editor = forwardRef<EditorRef, EditorProps>(({ value, onChange, onFocusChange, placeholder, ariaLabel = 'Reflection body', className = '' }, ref) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const quillInstance = useRef<InstanceType<typeof Quill> | null>(null);
 
@@ -104,18 +86,14 @@ export const Editor = forwardRef<EditorRef, EditorProps>(({ value, onChange, onF
     wrapper.appendChild(editorEl);
 
     const quill = new Quill(editorEl, {
-      theme: 'snow',
+      // Bubble: the toolbar appears only over a text selection, so the page stays blank.
+      theme: 'bubble',
       placeholder: placeholder || 'Start typing...',
       modules: {
-        toolbar: hideToolbar ? false : [
-          [{ 'header': [1, 2, 3, false] }],
-          ['bold', 'italic', 'underline', 'strike'],
-          [{ 'color': [] }, { 'background': [] }],
-          [{ 'align': [] }],
-          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-          ['link', 'blockquote', 'code-block'],
-          ['clean']
-        ]
+        toolbar: [
+          [{ header: 2 }, 'bold', 'italic', 'link'],
+          ['blockquote', { list: 'bullet' }],
+        ],
       }
     });
     quillInstance.current = quill;

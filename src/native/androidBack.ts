@@ -32,8 +32,6 @@ const ANDROID_TOP_LEVEL_ROUTES = new Set<string>([
   RoutePath.FAQ,
   RoutePath.ABOUT,
   RoutePath.PRIVACY,
-  RoutePath.WIKI,
-  RoutePath.SANCTUARY,
 ]);
 
 const DEFAULT_EXIT_PROMPT_WINDOW_MS = 2000;
@@ -95,10 +93,6 @@ export const getAndroidBackFallbackPath = (pathname: string) => {
 
   if (normalizedPathname.startsWith(`${RoutePath.NOTES}/`)) {
     return RoutePath.NOTES;
-  }
-
-  if (normalizedPathname.startsWith(`${RoutePath.SANCTUARY}/`)) {
-    return RoutePath.SANCTUARY;
   }
 
   return RoutePath.DASHBOARD;
