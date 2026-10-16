@@ -105,6 +105,10 @@ export default defineConfig({
             // may not answer a navigation with a redirected response (Chrome shows
             // ERR_FAILED), so the shell is precached and served as / directly.
             navigateFallback: '/',
+            // The deferred register script never posts SKIP_WAITING, so without
+            // these a new build waits until every tab and the installed app close.
+            skipWaiting: true,
+            clientsClaim: true,
             navigateFallbackAllowlist: [/^(?!\/__).*$/],
             cleanupOutdatedCaches: true,
             maximumFileSizeToCacheInBytes: 2 * 1024 * 1024,
