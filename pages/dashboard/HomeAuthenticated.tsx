@@ -159,7 +159,7 @@ export const HomeAuthenticated: React.FC = () => {
         className="home-authenticated-mobile-safe surface-scope-sage page-wash relative min-h-full flex flex-col flex-1 bg-body selection:bg-green/10"
         aria-hidden={showOnboarding ? 'true' : undefined}
       >
-        <section aria-label="Today" className="page-container home-grid pb-28 pt-native-top-offset lg:pt-14">
+        <section aria-label="Today" className="home-grid mx-auto w-full max-w-360 px-5 pb-28 pt-native-top-offset md:px-8 lg:pt-14 xl:px-10">
           <header className="home-grid-head mt-6 lg:mt-0">
             <p className="label-caps text-gray-nav">
               {now.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
@@ -218,7 +218,7 @@ export const HomeAuthenticated: React.FC = () => {
                 label="Speak a note"
                 stopOnFinalTranscript
                 className="w-full sm:w-auto"
-                buttonClassName="relative inline-flex min-h-12 py-3 px-6 w-full sm:w-auto items-center justify-center gap-1.5 rounded-xl text-sm sm:text-base font-bold transition-colors text-gray-nav hover:text-green"
+                buttonClassName="relative inline-flex min-h-12 py-3 px-6 w-full sm:w-auto items-center justify-center gap-1.5 rounded-[var(--radius-control)] text-ui-base font-bold transition-colors text-gray-nav hover:text-green"
                 idleButtonClassName="control-surface"
                 activeButtonClassName="border-green/25 bg-green/20 text-green"
               />

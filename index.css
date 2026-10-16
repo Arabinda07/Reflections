@@ -1308,7 +1308,8 @@ dialog[open],
     display: inline-flex;
     min-inline-size: 1.5rem;
     justify-content: center;
-    border: 1px solid var(--border-color);
+    border: 1px solid oklch(from var(--nav-text) l c h / 0.45);
+    border-block-end-width: 2px;
     border-radius: 0.375rem;
     padding: 0.0625rem 0.375rem;
     font-family: var(--font-sans, inherit);
